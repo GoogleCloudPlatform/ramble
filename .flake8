@@ -1,0 +1,60 @@
+# -*- conf -*-
+# flake8 settings for Ramble core files.
+#
+# These exceptions are for Ramble core files. We're slightly more lenient
+# with applications.  See .flake8_applications for that.
+#
+# E1: Indentation
+# - E129: visually indented line with same indent as next logical line
+#
+# E2: Whitespace
+# - E221: multiple spaces before operator
+# - E241: multiple spaces after ','
+# - E272: multiple spaces before keyword
+#
+# E7: Statement
+# - E731: do not assign a lambda expression, use a def
+#
+# W5: Line break warning
+# - W503: line break before binary operator
+# - W504: line break after binary operator
+#
+# These are required to get the package.py files to test clean:
+# - F999: syntax error in doctest
+#
+# N8: PEP8-naming
+# - N801: class names should use CapWords convention
+# - N813: camelcase imported as lowercase
+# - N814: camelcase imported as constant
+#
+[flake8]
+ignore = E129,E221,E241,E272,E731,W503,W504,F999,N801,N813,N814,F403,F405
+max-line-length = 99
+
+per-file-ignores =
+  var/ramble/repos/*/application.py:F405,F821
+
+# exclude things we usually do not want linting for.
+# These still get linted when passed explicitly, as when spack flake8 passes
+# them on the command line.
+exclude =
+  .git
+  etc/
+  opt/
+  share/
+  lib/ramble/external
+  lib/ramble/spack
+  lib/ramble/llnl
+  __pycache__
+  var
+  docs/tutorial/examples
+
+format = ramble
+
+[flake8:local-plugins]
+report =
+# TODO :I'm guessing we'd rather this is renamed to Ramble?
+# .. It's tempting to keep it as Spack unless it diverges
+  ramble = flake8_formatter:SpackFormatter
+paths =
+  ./share/ramble/qa/

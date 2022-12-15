@@ -1,0 +1,75 @@
+ramble:
+  mpi:
+    command: mpirun
+    args:
+      - -n
+      - '{n_ranks}'
+      - -ppn
+      - '{processes_per_node}'
+      - -hostfile
+      - hostfile
+  batch:
+    submit: '{execute_experiment}'
+  variables:
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    openfoam:
+      workloads:
+        motorbike:
+          experiments:
+            test_{partition}_{processes_per_node}_{n_nodes}:
+              variables:
+                partition: ['part1', 'part2']
+                processes_per_node: ['16', '32']
+                #^-- (partition, processes_per_node) -> (part1, 16), (part2, 32)
+                n_nodes: ['2', '4']
+              matrices:
+                - - n_nodes
+                #^-- (partiton, processes_per_node, n_nodes) ->
+                                #(part1, 16, 2), (part1, 16, 4)
+                                #(part2, 32, 2), (part2, 32, 4)
+    wrfv4:
+      workloads:
+        CONUS_2p5km:
+          experiments:
+            new_test:
+              variables:
+                n_ranks: '1'
+                n_nodes: '1'
+spack:
+  concretized: true
+  compilers:
+    gcc9:
+      base: gcc
+      version: 9.3.0
+      target: x86_64
+  mpi_libraries:
+    ompi412:
+      base: openmpi
+      version: 4.1.2
+      variants: +legacylaunchers +pmi +thread_multiple +cxx
+      target: x86_64
+    impi2018:
+      base: intel-mpi
+      version: 2018.4.274
+  applications:
+    openfoam:
+      flex:
+        base: flex
+        version: 2.6.4
+        compiler: gcc9
+      openfoam:
+        base: openfoam-org
+        version: '7'
+        compiler: gcc9
+        mpi: ompi412
+        dependencies:
+        - flex
+    wrfv4:
+      wrf:
+        base: wrf
+        version: '4.2'
+        variants: build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        compiler: gcc9
+        mpi: impi2018
+        required: true

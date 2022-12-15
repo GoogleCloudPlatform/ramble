@@ -1,0 +1,82 @@
+ramble:
+  mpi:
+    command: mpirun
+    args:
+      - -n
+      - '{n_ranks}'
+      - -ppn
+      - '{processes_per_node}'
+      - -hostfile
+      - hostfile
+  batch:
+    submit: '{execute_experiment}'
+  env-vars:
+    set:
+      I_MPI_DEBUG: '5'
+  variables:
+    processes_per_node: '16'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    openfoam:
+      workloads:
+        motorbike:
+          experiments:
+            test_{partition}_{processes_per_node}_{n_nodes}_{spec_name}:
+              env-vars:
+                set:
+                  OMP_NUM_THREADS: '{n_threads}'
+              variables:
+                partition: ['part1', 'part2']
+                processes_per_node: ['16', '32']
+                spec_name: ['openfoam-skx', 'openfoam-zen2']
+                #^-- (partition, processes_per_node) -> (part1, 16, openfoam-skx), (part2, 32, openfoam-zen2)
+                n_nodes: ['2', '4']
+              matrices:
+                - matrix_a:
+                  - n_nodes
+                #^-- (partiton, processes_per_node, n_nodes) ->
+                                #(part1, 16, openfoam-skx, 2), (part1, 16, openfoam-skx, 4)
+                                #(part2, 32, openfoam-zen2, 2), (part2, 32, openfoam-zen2, 4)
+spack:
+  concretized: true
+  compilers:
+    gcc9:
+      base: gcc
+      version: 9.3.0
+      target: x86_64
+  mpi_libraries:
+    ompi412:
+      base: openmpi
+      version: 4.1.2
+      variants: +legacylaunchers +pmi +thread_multiple +cxx
+      target: x86_64
+    impi2018:
+      base: intel-mpi
+      version: 2018.4.274
+  applications:
+    openfoam-skx:
+      flex:
+        base: flex
+        version: 2.6.4
+        compiler: gcc9
+      openfoam:
+        base: openfoam-org
+        version: '7'
+        compiler: gcc9
+        mpi: ompi412
+        target: cascadelake
+        dependencies:
+        - flex
+    openfoam-zen2:
+      flex:
+        base: flex
+        version: 2.6.4
+        compiler: gcc9
+      openfoam:
+        base: openfoam-org
+        version: '7'
+        compiler: gcc9
+        mpi: ompi412
+        target: zen2
+        dependencies:
+        - flex

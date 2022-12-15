@@ -1,0 +1,5 @@
+[run]
+omit =
+  lib/ramble/spack/*
+  lib/ramble/external/*
+  lib/ramble/llnl/*
