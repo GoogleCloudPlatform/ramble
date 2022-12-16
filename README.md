@@ -1,13 +1,20 @@
-Ramble is a multi-platform experimentation framework that is capable of driving
-software installation, acquire input files, configure experiments, and extract
-results. It works on Linux, macOS, and many supercomputers.
+Ramble is a multi-platform experimentation framework to increase exploration
+productivity and improve reproducibility. Ramble is capable of driving software
+installation, acquire input files, configure experiments, and extract results.
+It works on Linux, macOS, and many supercomputers.
+
+Ramble can be used to configure a variety of experiments for applications.
+These can include anything from:
+ - Scientific parameter sweeps
+ - Performance focused scalaing studies
+ - Compiler flag sweeps
 
 To install ramble and configure your experiment workspace, make sure you have Python.
 Then:
 
     $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
     $ cd ramble/bin
-    $ ./ramble workspace create -d test_workspace -c ../examples/basic_workspace.yaml
+    $ ./ramble workspace create -d test_workspace -c ../examples/basic_hostname_config.yaml
 
 Dependencies
 ------------
@@ -26,6 +33,12 @@ Documentation
 ----------------
 
 For help with Ramble’s commands, run `ramble help` or `ramble help --all`.
+
+For more information on concepts in Ramble, see Ramble’s
+[Getting Started](./docs/Getting_Started.md) guide.
+
+Example configuration files are also contained in the
+[examples](./examples) directory.
 
 Community
 ------------------------
@@ -52,7 +65,7 @@ please use the test runners:
  - share/ramble/qa/run-unit-tests
  - share/ramble/qa/run-flake8-tests
 
- For additional requirements about contributing, see our
+ For additional requirements about contributing, including Google’s CLA, see our
  [Contribution Guide](.github/CONTRIBUTING.md).
 
 
