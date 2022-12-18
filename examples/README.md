@@ -47,7 +47,7 @@ math expressions using variable definitions.
 
 A description of the configuration files available is below:
 
-### [basic_hostname_config.yaml]
+### [Basic Hostname Config](./basic_hostname_config.yaml)
 The basic hostname config is the simplest of the configuration files. This file
 uses a pre-existing binary (hostname) to generate experiments.
 
@@ -64,14 +64,14 @@ And for information on what workloads are available within an application, one c
 ramble info <app_name>
 ```
 
-### [basic_gromacs_config.yaml]
+### [Basic Gromacs Config](basic_gromacs_config.yaml)
 The basic gromacs configuration file is a good next step in get started using
 ramble. It is overly verbose, but this is to show how configurable experiments
 can be.
 
 This configuration changes from a pre-existing binary to using spack to build gromacs.
 
-### [basic_expansion_config.yaml]
+### [Basic Expansion Config](basic_expansion_config.yaml)
 The basic expansion configuration file shows some examples of the experiment generation syntax.
 
 It changes from using groamcs to using OpenFoam and WRF.
@@ -79,7 +79,7 @@ It changes from using groamcs to using OpenFoam and WRF.
 Additionally, it shows how a configuration file can contain experiments for
 multiple applications and / or workloads at the same time.
 
-### [full_expansion_config.yaml]
+### [Full Config](full_expansion_config.yaml)
 
 The full expansion configuration file shows a more complete example of
 experiment generation. It extends the basic expansion config file by showing two main aspects:
