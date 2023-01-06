@@ -1,0 +1,50 @@
+# Copyright 2022-2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+
+steps:
+  - name: gcr.io/cloud-builders/git
+    args:
+      - fetch
+      - '--unshallow'
+    id: ramble-clone
+  - name: spack/centos7
+    args:
+      - '-c'
+      - |
+        . /opt/spack/share/spack/setup-env.sh
+        spack config add "config:install_tree:root:/workspace/spack_install"
+        spack install miniconda3
+    id: spack-install-conda
+    entrypoint: /bin/bash
+  - name: spack/centos7
+    args:
+      - '-c'
+      - >
+        export PATH="$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}"
+
+        conda install --file /workspace/requirements.txt &> /dev/null
+
+        yum install -y -q which mercurial
+
+        cd /workspace
+        git branch develop origin/develop
+
+        . /opt/spack/share/spack/setup-env.sh
+
+        . /workspace/share/ramble/setup-env.sh
+
+        /workspace/share/ramble/qa/run-unit-tests
+
+        /workspace/share/ramble/qa/run-flake8-tests
+    id: ramble-tests
+    entrypoint: sh
+timeout: 600s
+options:
+  machineType: N1_HIGHCPU_8
+
