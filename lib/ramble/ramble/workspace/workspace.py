@@ -28,6 +28,7 @@ import ramble.spack_runner
 import ramble.expander
 import ramble.util.web
 import ramble.fetch_strategy
+import ramble.cache
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
@@ -426,6 +427,8 @@ class Workspace(object):
         self.specs = []
 
         self.config_sections = {}
+
+        self.install_cache = ramble.cache.SetCache()
 
         self.results = None
 
@@ -1497,6 +1500,12 @@ class Workspace(object):
         deactivate()
         if self._previous_active:
             activate(self._previous_active)
+
+    def check_cache(self, tupl):
+        return self.install_cache.contains(tupl)
+
+    def add_to_cache(self, tupl):
+        self.install_cache.add(tupl)
 
 
 def read(name):
