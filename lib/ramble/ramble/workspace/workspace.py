@@ -28,7 +28,7 @@ import ramble.spack_runner
 import ramble.expander
 import ramble.util.web
 import ramble.fetch_strategy
-import ramble.cache
+import ramble.util.install_cache
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
@@ -428,7 +428,7 @@ class Workspace(object):
 
         self.config_sections = {}
 
-        self.install_cache = ramble.cache.SetCache()
+        self.install_cache = ramble.util.install_cache.SetCache()
 
         self.results = None
 
