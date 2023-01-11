@@ -88,25 +88,25 @@ class Gromacs(SpackApplication):
                       workload='benchpep')
 
     figure_of_merit('Core Time', log_file='{experiment_run_dir}/md.log',
-                    fom_regex='\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*',
                     group_name='core_time', units='s')
 
     figure_of_merit('Wall Time', log_file='{experiment_run_dir}/md.log',
-                    fom_regex='\s+Time:\s+[0-9]+\.[0-9]+\s+' +
-                              '(?P<wall_time>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s+Time:\s+[0-9]+\.[0-9]+\s+' +
+                              r'(?P<wall_time>[0-9]+\.[0-9]+).*',
                     group_name='wall_time', units='s')
 
     figure_of_merit('Percent Core Time', log_file='{experiment_run_dir}/md.log',
-                    fom_regex='\s+Time:\s+[0-9]+\.[0-9]+\s+[0-9]+\.[0-9]+\s+' +
-                              '(?P<perc_core_time>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s+Time:\s+[0-9]+\.[0-9]+\s+[0-9]+\.[0-9]+\s+' +
+                              r'(?P<perc_core_time>[0-9]+\.[0-9]+).*',
                     group_name='perc_core_time', units='%')
 
     figure_of_merit('Nanosecs per day', log_file='{experiment_run_dir}/md.log',
-                    fom_regex='Performance:\s+' +
-                              '(?P<ns_per_day>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'Performance:\s+' +
+                              r'(?P<ns_per_day>[0-9]+\.[0-9]+).*',
                     group_name='ns_per_day', units='ns/day')
 
     figure_of_merit('Hours per nanosec', log_file='{experiment_run_dir}/md.log',
-                    fom_regex='Performance:\s+[0-9]+\.[0-9]+\s+' +
-                              '(?P<hours_per_ns>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'Performance:\s+[0-9]+\.[0-9]+\s+' +
+                              r'(?P<hours_per_ns>[0-9]+\.[0-9]+).*',
                     group_name='hours_per_ns', units='hours/ns')

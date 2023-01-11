@@ -128,15 +128,15 @@ class Hpl(SpackApplication):
                       workloads=['calculator'])
 
     figure_of_merit('Time', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n',
+                    fom_regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n',
                     group_name='time', units='s', contexts=['problem-name'])
 
     figure_of_merit('GFlops', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n',
+                    fom_regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n',
                     group_name='gflops', units='GFLOP/s',
                     contexts=['problem-name'])
 
-    figure_of_merit_context('problem-name', regex='.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n', output_format='{N}-{NB}-{P}-{Q}')
+    figure_of_merit_context('problem-name', regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n', output_format='{N}-{NB}-{P}-{Q}')
 
     def _calculate_values(self, workspace, expander):
         if expander.workload_name == 'calculator':

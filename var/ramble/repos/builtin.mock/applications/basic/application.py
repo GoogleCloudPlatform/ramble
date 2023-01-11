@@ -28,5 +28,5 @@ class Basic(ExecutableApplication):
     archive_pattern('{experiment_run_dir}/archive_test.*')
 
     figure_of_merit('test_fom', 'log_file',
-                    '(?P<test>[0-9]+\.[0-9]+).*seconds.*',
+                    r'(?P<test>[0-9]+\.[0-9]+).*seconds.*',
                     'test', 's')
