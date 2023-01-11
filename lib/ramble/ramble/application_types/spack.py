@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -87,9 +87,9 @@ class SpackApplication(ApplicationBase):
     def _install_software(self, workspace, expander):
 
         # See if we cached this already, and if so return
-        cache_tupl = ( 'spack', expander.workload_namespace)
+        cache_tupl = ('spack', expander.workload_namespace)
         if workspace.check_cache(cache_tupl):
-            tty.debug('{} already in cache.'.format(cache_tupl) )
+            tty.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
