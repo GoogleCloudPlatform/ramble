@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -41,27 +41,27 @@ class Lulesh(SpackApplication):
                       workloads=['standard'])
 
     figure_of_merit('Time', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+).*',
                     group_name='time', units='s')
 
     figure_of_merit('FOM', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+).*',
                     group_name='fom', units='z/s')
 
     figure_of_merit('Size', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s*Problem size\s+=\s+(?P<size>[0-9]+)',
+                    fom_regex=r'\s*Problem size\s+=\s+(?P<size>[0-9]+)',
                     group_name='size', units='')
 
     figure_of_merit('Grind Time', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+).*',
                     group_name='grind', units='s/element')
 
     figure_of_merit('NumTasks', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s*MPI tasks\s+=\s+(?P<tasks>[0-9]+)',
+                    fom_regex=r'\s*MPI tasks\s+=\s+(?P<tasks>[0-9]+)',
                     group_name='tasks', units='')
 
     figure_of_merit('Iterations', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
+                    fom_regex=r'\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
                     group_name='iterations', units='')
 
     def _make_experiments(self, workspace, expander):

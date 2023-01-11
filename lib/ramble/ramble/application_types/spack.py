@@ -85,6 +85,15 @@ class SpackApplication(ApplicationBase):
             tty.die(e)
 
     def _install_software(self, workspace, expander):
+
+        # See if we cached this already, and if so return
+        cache_tupl = ('spack', expander.workload_namespace)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already in cache.'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
         def extract_specs(workspace, expander, spec_name, app_name):
             """Build a list of all specs the named spec requires
 

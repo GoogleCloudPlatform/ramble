@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -38,20 +38,20 @@ class IntelMpiBenchmarks(SpackApplication):
                       workloads=['MPI1'])
 
     figure_of_merit('Latency-0-Byte', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s+0\s+[0-9]+\s+(?P<latency>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s+0\s+[0-9]+\s+(?P<latency>[0-9]+\.[0-9]+).*',
                     group_name='latency', units='usec')
 
     figure_of_merit('Bandwidth-0-Byte', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='\s+0\s+[0-9]+\s+[0-9]+\.[0-9]+\s+(?P<bandwidth>[0-9]+\.[0-9]+).*',
+                    fom_regex=r'\s+0\s+[0-9]+\s+[0-9]+\.[0-9]+\s+(?P<bandwidth>[0-9]+\.[0-9]+).*',
                     group_name='bandwidth', units='Mbytes/sec')
 
     max_exponent = 25
     for exp in range(0, max_exponent):
         size = 2**exp
         figure_of_merit('Latency-%s-Byte' % size, log_file='{experiment_run_dir}/{experiment_name}.out',
-                        fom_regex='\s+%s\s+[0-9]+\s+(?P<latency>[0-9]+\.[0-9]+).*' % size,
+                        fom_regex=r'\s+%s\s+[0-9]+\s+(?P<latency>[0-9]+\.[0-9]+).*' % size,
                         group_name='latency', units='usec')
 
         figure_of_merit('Bandwidth-%s-Byte' % size, log_file='{experiment_run_dir}/{experiment_name}.out',
-                        fom_regex='\s+%s\s+[0-9]+\s+[0-9]+\.[0-9]+\s+(?P<bandwidth>[0-9]+\.[0-9]+).*' % size,
+                        fom_regex=r'\s+%s\s+[0-9]+\s+[0-9]+\.[0-9]+\s+(?P<bandwidth>[0-9]+\.[0-9]+).*' % size,
                         group_name='bandwidth', units='Mbytes/sec')

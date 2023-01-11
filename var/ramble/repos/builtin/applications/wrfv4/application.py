@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -55,27 +55,27 @@ class Wrfv4(SpackApplication):
                       workloads=['CONUS_2p5km'])
 
     figure_of_merit('Average Timestep Time', log_file='{experiment_run_dir}/stats.out',
-                    fom_regex='Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*).*',
+                    fom_regex=r'Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*).*',
                     group_name='avg_time', units='s')
 
     figure_of_merit('Cumulative Timestep Time', log_file='{experiment_run_dir}/stats.out',
-                    fom_regex='Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*).*',
+                    fom_regex=r'Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*).*',
                     group_name='total_time', units='s')
 
     figure_of_merit('Minimum Timestep Time', log_file='{experiment_run_dir}/stats.out',
-                    fom_regex='Min time:\s+(?P<min_time>[0-9]+\.[0-9]*).*',
+                    fom_regex=r'Min time:\s+(?P<min_time>[0-9]+\.[0-9]*).*',
                     group_name='min_time', units='s')
 
     figure_of_merit('Maximum Timestep Time', log_file='{experiment_run_dir}/stats.out',
-                    fom_regex='Max time:\s+(?P<max_time>[0-9]+\.[0-9]*).*',
+                    fom_regex=r'Max time:\s+(?P<max_time>[0-9]+\.[0-9]*).*',
                     group_name='max_time', units='s')
 
     figure_of_merit('Number of timesteps', log_file='{experiment_run_dir}/stats.out',
-                    fom_regex='Number of times:\s+(?P<count>[0-9]+)',
+                    fom_regex=r'Number of times:\s+(?P<count>[0-9]+)',
                     group_name='count', units='')
 
     figure_of_merit('Avg. Max Ratio Time', log_file='{experiment_run_dir}/stats.out',
-                    fom_regex='Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*',
+                    fom_regex=r'Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*',
                     group_name='avg_max_ratio', units='')
 
     archive_pattern('{experiment_run_dir}/rsl.out.*')

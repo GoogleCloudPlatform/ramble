@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -137,20 +137,20 @@ class Openfoam(SpackApplication):
     executable('reconstructPar', 'reconstructPar -latestTime', use_mpi=False,
                redirect='{experiment_run_dir}/log.reconstructPar')
 
-    executable('allRun', template=['sed "s/writephi/writePhi/g" -i Allrun',
-                                   'sed "s/rm.*log\./#/g" -i Allclean',
-                                   'chmod a+x Allrun',
+    executable('allRun', template=[r'sed "s/writephi/writePhi/g" -i Allrun',
+                                   r'sed "s/rm.*log\./#/g" -i Allclean',
+                                   r'chmod a+x Allrun',
                                    './Allrun'],
                use_mpi=False)
 
     figure_of_merit('snappyHexMesh Time', log_file='{experiment_run_dir}/log.snappyHexMesh',
-                    fom_regex='Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*',
+                    fom_regex=r'Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*',
                     group_name='mesh_time', units='s')
 
     figure_of_merit('simpleFoam Time', log_file='{experiment_run_dir}/log.simpleFoam',
-                    fom_regex='\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
+                    fom_regex=r'\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
                     group_name='foam_time', units='s')
 
     figure_of_merit('potentialFoam Time', log_file='{experiment_run_dir}/log.potentialFoam',
-                    fom_regex='\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
+                    fom_regex=r'\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
                     group_name='foam_time', units='s')

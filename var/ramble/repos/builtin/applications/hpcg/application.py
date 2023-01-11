@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -43,35 +43,35 @@ class Hpcg(SpackApplication):
                       workloads=['standard'])
 
     figure_of_merit('Status', log_file='{out_file}',
-                    fom_regex='Final Summary::HPCG result is (?P<status>[a-zA-Z]+) with a GFLOP/s rating of=(?P<gflops>[0-9]+\.[0-9]+)',
+                    fom_regex=r'Final Summary::HPCG result is (?P<status>[a-zA-Z]+) with a GFLOP/s rating of=(?P<gflops>[0-9]+\.[0-9]+)',
                     group_name='status', units='')
 
     figure_of_merit('Gflops', log_file='{out_file}',
-                    fom_regex='Final Summary::HPCG result is (?P<status>[a-zA-Z]+) with a GFLOP/s rating of=(?P<gflops>[0-9]+\.[0-9]+)',
+                    fom_regex=r'Final Summary::HPCG result is (?P<status>[a-zA-Z]+) with a GFLOP/s rating of=(?P<gflops>[0-9]+\.[0-9]+)',
                     group_name='gflops', units='GFLOP/s')
 
     figure_of_merit('Time', log_file='{out_file}',
-                    fom_regex='Final Summary::Results are.* execution time.*is=(?P<exec_time>[0-9]+\.[0-9]*)',
+                    fom_regex=r'Final Summary::Results are.* execution time.*is=(?P<exec_time>[0-9]+\.[0-9]*)',
                     group_name='exec_time', units='s')
 
     figure_of_merit('ComputeDotProductMsg', log_file='{out_file}',
-                    fom_regex='Final Summary::Reference version of ComputeDotProduct used.*=(?P<msg>.*)',
+                    fom_regex=r'Final Summary::Reference version of ComputeDotProduct used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
     figure_of_merit('ComputeSPMVMsg', log_file='{out_file}',
-                    fom_regex='Final Summary::Reference version of ComputeSPMV used.*=(?P<msg>.*)',
+                    fom_regex=r'Final Summary::Reference version of ComputeSPMV used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
     figure_of_merit('ComputeMGMsg', log_file='{out_file}',
-                    fom_regex='Final Summary::Reference version of ComputeMG used.*=(?P<msg>.*)',
+                    fom_regex=r'Final Summary::Reference version of ComputeMG used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
     figure_of_merit('ComputeWAXPBYMsg', log_file='{out_file}',
-                    fom_regex='Final Summary::Reference version of ComputeWAXPBY used.*=(?P<msg>.*)',
+                    fom_regex=r'Final Summary::Reference version of ComputeWAXPBY used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
     figure_of_merit('HPCG 2.4 Rating', log_file='{out_file}',
-                    fom_regex='Final Summary::HPCG 2\.4 rating.*=(?P<rating>[0-9]+\.*[0-9]*)',
+                    fom_regex=r'Final Summary::HPCG 2\.4 rating.*=(?P<rating>[0-9]+\.*[0-9]*)',
                     group_name='rating', units='')
 
     def _make_experiments(self, workspace, expander):

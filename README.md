@@ -23,7 +23,7 @@ Ramble’s python dependencies can be installed using the included requirements.
 
 e.g.
 
-    $ pip -r requirements.txt
+    $ pip install -r requirements.txt
 
 Outside of these requirements, ramble requires an existing installation of
 spack for some application definition. See

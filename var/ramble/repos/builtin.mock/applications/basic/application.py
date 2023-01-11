@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -28,5 +28,5 @@ class Basic(ExecutableApplication):
     archive_pattern('{experiment_run_dir}/archive_test.*')
 
     figure_of_merit('test_fom', 'log_file',
-                    '(?P<test>[0-9]+\.[0-9]+).*seconds.*',
+                    r'(?P<test>[0-9]+\.[0-9]+).*seconds.*',
                     'test', 's')

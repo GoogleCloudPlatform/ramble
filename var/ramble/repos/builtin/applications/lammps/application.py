@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -76,11 +76,11 @@ class Lammps(SpackApplication):
                       workloads=['lj', 'eam', 'chain', 'chute', 'rhodo'])
 
     figure_of_merit('Nanoseconds per day', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='Performance: (?P<nspd>[0-9]+\.[0-9]*) tau/day, (?P<tsps>[0-9]+\.[0-9]*) timesteps/s',
+                    fom_regex=r'Performance: (?P<nspd>[0-9]+\.[0-9]*) tau/day, (?P<tsps>[0-9]+\.[0-9]*) timesteps/s',
                     group_name='nspd', units='ns/day')
     figure_of_merit('Timesteps per second', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='Performance: (?P<nspd>[0-9]+\.[0-9]*) tau/day, (?P<tsps>[0-9]+\.[0-9]*) timesteps/s',
+                    fom_regex=r'Performance: (?P<nspd>[0-9]+\.[0-9]*) tau/day, (?P<tsps>[0-9]+\.[0-9]*) timesteps/s',
                     group_name='tsps', units='timesteps/s')
     figure_of_merit('Wallclock time', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex='Total wall time: (?P<walltime>[0-9]+:[0-9]+:[0-9]+)',
+                    fom_regex=r'Total wall time: (?P<walltime>[0-9]+:[0-9]+:[0-9]+)',
                     group_name='walltime', units='')
