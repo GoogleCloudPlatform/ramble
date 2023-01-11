@@ -20,3 +20,6 @@ config:
     connect_timeout: 10
     checksum: true
     shell: 'sh'
+    spack_flags:
+      install: '--reuse'
+      concretize: '--reuse'

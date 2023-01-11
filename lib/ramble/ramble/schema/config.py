@@ -26,6 +26,25 @@ properties['config']['shell'] = {
     'enum': ['sh', 'bash', 'csh', 'tcsh', 'fish']
 }
 
+properties['config']['spack_flags'] = {
+    'type': 'object',
+    'default': {
+        'install': '--reuse',
+        'concretize': '--reuse'
+    },
+    'properties': {
+        'install': {
+            'type': 'string',
+            'default': '--reuse'
+        },
+        'concretize': {
+            'type': 'string',
+            'default': '--reuse'
+        }
+    },
+    'additionalProperties': False,
+}
+
 #: Full schema with metadata
 schema = {
     '$schema': 'http://json-schema.org/schema#',
