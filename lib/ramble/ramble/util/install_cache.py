@@ -8,6 +8,7 @@
 
 """Provide data structures to assist with cacheing operations"""
 
+
 class SetCache:
     def __init__(self):
         self.store = set()

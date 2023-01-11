@@ -87,9 +87,9 @@ class SpackApplication(ApplicationBase):
     def _install_software(self, workspace, expander):
 
         # See if we cached this already, and if so return
-        cache_tupl = ( 'spack', expander.workload_namespace)
+        cache_tupl = ('spack', expander.workload_namespace)
         if workspace.check_cache(cache_tupl):
-            tty.debug('{} already in cache.'.format(cache_tupl) )
+            tty.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
