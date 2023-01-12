@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -97,7 +97,7 @@ class IntelMpiBenchmarks(SpackApplication):
 
     # Matches tables like:
           #bytes #repetitions  t_min[usec]  t_max[usec]  t_avg[usec]
-    latency_regex = '^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<t_max>\d+\.\d+)$'
+    latency_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<t_max>\d+\.\d+)$'
 
     figure_of_merit('Latency min', log_file='{experiment_run_dir}/{experiment_name}.out',
             fom_regex=latency_regex,
@@ -113,7 +113,7 @@ class IntelMpiBenchmarks(SpackApplication):
 
     # Matches tables like:
        #bytes #repetitions      t[usec]   Mbytes/sec
-    bw_regex = '^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
+    bw_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
     figure_of_merit('Bandwidth', log_file='{experiment_run_dir}/{experiment_name}.out',
             fom_regex=bw_regex,
             group_name='bw', units='Mbytes/sec', contexts=['bw-bytes'])
@@ -121,7 +121,7 @@ class IntelMpiBenchmarks(SpackApplication):
     # Combiend tables like:
        #bytes #repetitions  t_min[usec]  t_max[usec]  t_avg[usec]   Mbytes/sec
        # (happens in sendrecv and exchange)
-    combined_regex = '^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<t_max>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
+    combined_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<t_max>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
     figure_of_merit('Combo', log_file='{experiment_run_dir}/{experiment_name}.out',
             fom_regex=combined_regex,
             group_name='bw', units='Mbytes/sec', contexts=['combo-bytes'])
