@@ -106,9 +106,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         var_str = '\t\tDescription: ' + \
                             workload_vars[var]['description'] + '\n'
                         out_str.append(var_str)
+
                         var_str = '\t\tDefault: ' + \
                             workload_vars[var]['default'] + '\n'
                         out_str.append(var_str)
+
+                        if 'values' in workload_vars[var].keys():
+                            var_str = '\t\tSuggested Values: ' + \
+                                str(workload_vars[var]['values']) + '\n'
+                            out_str.append(var_str)
+
                     out_str.append('\n')
 
         return out_str
