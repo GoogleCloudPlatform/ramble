@@ -20,6 +20,7 @@ import llnl.util.filesystem as fs
 from spack.util.executable import which, CommandNotFoundError, ProcessError
 import spack.util.spack_yaml as syaml
 
+import ramble.config
 import ramble.error
 
 spack_namespace = 'spack'
@@ -281,10 +282,12 @@ class SpackRunner(object):
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
             syaml.dump_config(env_file, f, default_flow_style=False)
 
+        concretize_flags = ramble.config.get('config:spack_flags:concretize')
+
         args = [
-            'concretize',
-            '--reuse'
+            'concretize'
         ]
+        args.extend(concretize_flags.split())
         if not self.dry_run:
             self.exe(*args)
         else:
@@ -298,10 +301,12 @@ class SpackRunner(object):
         """
         self._check_active()
 
+        install_flags = ramble.config.get('config:spack_flags:install')
+
         args = [
-            'install',
-            '--reuse'
+            'install'
         ]
+        args.extend(install_flags.split())
         if not self.dry_run:
             self.exe(*args)
         else:

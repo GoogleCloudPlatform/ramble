@@ -112,6 +112,10 @@ config_defaults = {
         'concretizer': 'clingo',
         'license_dir': spack.paths.default_license_dir,
         'shell': 'sh',
+        'spack_flags': {
+            'install': '--reuse',
+            'concretize': '--reuse'
+        }
     }
 }
 
