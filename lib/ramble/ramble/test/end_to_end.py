@@ -48,6 +48,11 @@ ramble:
         CONUS_12km:
           experiments:
             scaling_{n_nodes}_{partition}_{spec_name}:
+              success_criteria:
+              - name: 'timing'
+                mode: 'string'
+                match: '.*Timing for main.*'
+                file: '{experiment_run_dir}/rsl.out.0000'
               env-vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'

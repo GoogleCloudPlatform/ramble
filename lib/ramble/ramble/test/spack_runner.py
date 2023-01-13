@@ -121,7 +121,6 @@ def test_config_concretize_flags(tmpdir, capsys, mutable_config):
 
 
 def test_default_install_flags(tmpdir, capsys):
-    import sys
     try:
         env_path = tmpdir.join('spack-env')
         sr = ramble.spack_runner.SpackRunner(dry_run=True)
