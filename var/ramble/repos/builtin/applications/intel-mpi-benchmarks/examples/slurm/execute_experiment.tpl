@@ -19,7 +19,6 @@ cd "{experiment_run_dir}"
 
 {spack_setup}
 
-#scontrol show hostnames ${SLURM_JOB_NODELIST} > hostfile
-echo 'localhost' > hostfile
+scontrol show hostnames ${SLURM_JOB_NODELIST} > hostfile
 
 {command}

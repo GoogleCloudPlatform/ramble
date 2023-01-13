@@ -9,8 +9,7 @@ ramble:
     - -hostfile
     - hostfile
   batch:
-    #submit: sbatch '{execute_experiment}'
-    submit: '{execute_experiment}'
+    submit: sbatch '{execute_experiment}'
   variables:
     processes_per_node: 56
   applications:
@@ -44,6 +43,6 @@ spack:
   applications:
     intel-mpi-benchmarks:
       intel-mpi-benchmarks:
-        base: intel-mpi
-        version: 2018.4.274
+        base: intel-mpi-benchmarks
+        version: 2019.6
         required: true
