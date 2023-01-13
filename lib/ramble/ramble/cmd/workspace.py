@@ -455,15 +455,13 @@ def workspace_info(args):
         color.cprint(nested_1('  Compilers:'))
         for name, info in spack_dict[comp_str].items():
             spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec,
-                                      long=True).replace('@', '@@')
+            spec_str = ws.spec_string(spec).replace('@', '@@')
             color.cprint('    %s = %s' % (name, spec_str))
     if mpi_str in spack_dict:
         color.cprint(nested_1('  MPI Libraries:'))
         for name, info in spack_dict[mpi_str].items():
             spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec,
-                                      long=True).replace('@', '@@')
+            spec_str = ws.spec_string(spec).replace('@', '@@')
             color.cprint('    %s = %s' % (name, spec_str))
     if app_str in spack_dict:
         color.cprint(nested_1('  Application Specs:'))
@@ -472,8 +470,7 @@ def workspace_info(args):
             for name, info in specs.items():
                 spec = ws._build_spec_dict(info, app)
                 spec['application_name'] = app
-                spec_str = ws.spec_string(spec,
-                                          long=True).replace('@', '@@')
+                spec_str = ws.spec_string(spec).replace('@', '@@')
                 color.cprint('      %s = %s' % (name, spec_str))
                 ws_name = ' ' * (len(name) + 2)
                 if 'compiler' in info:
