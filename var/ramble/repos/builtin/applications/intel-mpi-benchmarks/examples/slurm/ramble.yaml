@@ -1,0 +1,48 @@
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - -n
+    - '{n_ranks}'
+    - -ppn
+    - '{processes_per_node}'
+    - -hostfile
+    - hostfile
+  batch:
+    submit: sbatch '{execute_experiment}'
+  variables:
+    processes_per_node: 56
+  applications:
+    intel-mpi-benchmarks:
+      workloads:
+        pingpong:
+          experiments:
+            full_node_{pingpong_type}:
+              variables:
+                pingpong_type: ['Pingpong', 'Unirandom', 'Multi-Pingpong', 'Birandom', 'Corandom']
+                n_ranks: '56'
+        multi-pingpong:
+          experiments:
+            full_node:
+              variables:
+                n_ranks: '128'
+        collective:
+          experiments:
+            full_node_{collective_type}:
+              variables:
+                collective_type: ['Bcast', 'Allgather', 'Allgatherv', 'Alltoall', 'Alltoallv', 'Scatter', 'Scatterv', 'Gather', 'Gatherv', 'Reduce', 'Reduce_scatter', 'Allreduce', 'Barrier']
+                n_ranks: '128'
+spack:
+  concretized: true
+  compilers: {}
+  mpi_libraries:
+    impi2018:
+      base: intel-mpi
+      version: 2018.4.274
+      target: x86_64
+  applications:
+    intel-mpi-benchmarks:
+      intel-mpi-benchmarks:
+        base: intel-mpi-benchmarks
+        version: 2019.6
+        required: true

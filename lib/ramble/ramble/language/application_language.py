@@ -197,7 +197,7 @@ def input_file(name, url, description, target_dir='{workload_name}', **kwargs):
 
 
 @application_directive('workload_variables')
-def workload_variable(name, default, description, workload=None,
+def workload_variable(name, default, description, values=None, workload=None,
                       workloads=None, **kwargs):
     """Define a new variable to be used in experiments
 
@@ -230,6 +230,9 @@ def workload_variable(name, default, description, workload=None,
                 'default': default,
                 'description': description
             }
+            if values:
+                app.workload_variables[wl_name][name]['values'] = values
+
 
     return _execute_workload_variable
 
