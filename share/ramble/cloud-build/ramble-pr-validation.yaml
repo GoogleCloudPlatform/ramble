@@ -39,9 +39,12 @@ steps:
 
         . /workspace/share/ramble/setup-env.sh
 
-        /workspace/share/ramble/qa/run-unit-tests
-
         /workspace/share/ramble/qa/run-flake8-tests
+
+        COVERAGE=true /workspace/share/ramble/qa/run-unit-tests
+
+        coverage report -m
+
     id: ramble-tests
     entrypoint: sh
 timeout: 600s
