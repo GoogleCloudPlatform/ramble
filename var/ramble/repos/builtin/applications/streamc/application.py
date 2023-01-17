@@ -30,6 +30,10 @@ class Streamc(SpackApplication):
 
     log_file = '{experiment_run_dir}/{experiment_name}.out'
 
+    success_criteria('valid', mode='string',
+                     match=r'Solution Validates: avg error less than 1.000000e-13 on all three arrays',
+                     file=log_file)
+
     figure_of_merit("Array size",
                     log_file=log_file,
                     fom_regex=r'Array size\s+\=\s+(?P<array_size>[0-9]+)',

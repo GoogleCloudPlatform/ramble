@@ -25,3 +25,5 @@ class Hostname(ExecutableApplication):
     figure_of_merit('user time', log_file='{experiment_run_dir}/{experiment_name}.out',
                     fom_regex=r'(?P<user_time>[0-9]+\.[0-9]+)user.*',
                     group_name='user_time', units='s')
+
+    success_criteria('has_user_time', mode='string', match=r'[0-9]+\.[0-9]+user.*', file='{experiment_run_dir}/{experiment_name}.out')

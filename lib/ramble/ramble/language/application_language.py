@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import llnl.util.tty as tty
+
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
 
@@ -328,3 +330,33 @@ def software_spec(name, base, version=None, variants=None,
             }
 
     return _execute_software_spec
+
+
+@application_directive('success_criteria')
+def success_criteria(name, mode, match, file):
+    """Defines a success criteria used by experiments of this application
+
+    Adds a new success criteria to this application definition.
+
+    These will be checked during the analyze step to see if a job exited properly.
+
+    Arguments:
+      - name: The name of this success criteria
+      - mode: The type of success criteria that will be validated
+              Valid values are: 'string'
+      - match: The value to check indicate success (if found, it would mark success)
+      - file: Which file the success criteria should be located in
+    """
+
+    def _execute_success_criteria(app):
+        valid_modes = ['string']
+        if mode not in valid_modes:
+            tty.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
+
+        app.success_criteria[name] = {
+            'mode': mode,
+            'match': match,
+            'file': file
+        }
+
+    return _execute_success_criteria

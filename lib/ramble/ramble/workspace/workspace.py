@@ -29,6 +29,7 @@ import ramble.expander
 import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
+import ramble.success_criteria
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
@@ -47,6 +48,7 @@ application_namespace = 'applications'
 workload_namespace = 'workloads'
 experiment_namespace = 'experiments'
 variables_namespace = 'variables'
+success_namespace = 'success_criteria'
 env_var_namespace = 'env-vars'
 mpi_namespace = 'mpi'
 batch_namespace = 'batch'
@@ -432,6 +434,8 @@ class Workspace(object):
 
         self.results = None
 
+        self.success_list = ramble.success_criteria.ScopedCriteriaList()
+
         # Key for each application config should be it's filepath
         # Format for an application config should be:
         #  {
@@ -696,6 +700,23 @@ class Workspace(object):
         self._previous_active = None      # previously active environment
         self.specs = []
 
+    def extract_success_criteria(self, scope, contents):
+        """Extract success citeria, and inject it into the scoped list
+
+        Extract success criteria from a contents dictionary, and inject it into
+        the scoped success list within the right scope.
+        """
+        self.success_list.flush_scope(scope)
+
+        if success_namespace in contents:
+            tty.debug(' ---- Found success in %s' % scope)
+            for conf in contents[success_namespace]:
+                tty.debug(' ---- Adding criteria %s' % conf['name'])
+                self.success_list.add_criteria(scope, conf['name'],
+                                               conf['mode'],
+                                               conf['match'],
+                                               conf['file'])
+
     def all_applications(self):
         """Iterator over applications
 
@@ -717,6 +738,7 @@ class Workspace(object):
                     application_vars = contents[variables_namespace]
                 if env_var_namespace in contents:
                     application_env_vars = contents[env_var_namespace]
+                self.extract_success_criteria('application', contents)
 
                 yield application, contents, application_vars, \
                     application_env_vars
@@ -738,6 +760,7 @@ class Workspace(object):
                         contents[variables_namespace]
                 if env_var_namespace in contents:
                     application_env_vars = contents[env_var_namespace]
+                self.extract_success_criteria('application', contents)
                 yield application, contents, application_vars, application_env_vars
 
     def all_workloads(self, application):
@@ -761,6 +784,7 @@ class Workspace(object):
                 workload_variables = contents[variables_namespace]
             if env_var_namespace in contents:
                 workload_env_vars = contents[env_var_namespace]
+            self.extract_success_criteria('workload', contents)
 
             yield workload, contents, workload_variables, workload_env_vars
 
@@ -784,6 +808,7 @@ class Workspace(object):
                 experiment_vars = contents[variables_namespace]
             if env_var_namespace in contents:
                 experiment_env_vars = contents[env_var_namespace]
+            self.extract_success_criteria('experiment', contents)
 
             matrices = []
             if 'matrix' in contents:
@@ -1091,6 +1116,8 @@ class Workspace(object):
                             'Then ensure its software_stack.yaml file is ' + \
                             'properly configured.'
             tty.die(error_message)
+
+        self.extract_success_criteria('workspace', self._get_workspace_dict()[ramble_namespace])
 
         if pipeline == 'setup':
             all_experiments_path = os.path.join(self.root,
