@@ -25,26 +25,50 @@ steps:
   - name: spack/centos7
     args:
       - '-c'
-      - >
+      - |
         export PATH="$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}"
-
         conda install --file /workspace/requirements.txt &> /dev/null
-
         yum install -y -q which mercurial
 
         cd /workspace
+
         git branch develop origin/develop
 
         . /opt/spack/share/spack/setup-env.sh
-
         . /workspace/share/ramble/setup-env.sh
 
         /workspace/share/ramble/qa/run-flake8-tests
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        flake_err=$$?
 
         COVERAGE=true /workspace/share/ramble/qa/run-unit-tests
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        unit_err=$$?
 
         coverage report -m
 
+        error=0
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$flake_err -gt 0 ]; then
+          echo "Flake error = $$flake_err"
+          echo " ***** Flake8 tests failed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$unit_err -gt 0 ]; then
+          echo "Unit error = $$unit_err"
+          echo " ***** Unit tests failed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        exit $$error
     id: ramble-tests
     entrypoint: sh
 timeout: 600s
