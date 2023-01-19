@@ -239,6 +239,14 @@ class Expander(object):
             return '%s.%s' % (app_name, wl_name)
         return None
 
+    @property
+    def spec_namespace(self):
+        app_name = self.expand_var('{spec_name}')
+        wl_name = self.workload_name
+        if app_name and wl_name:
+            return '%s.%s' % (app_name, wl_name)
+        return None
+
     def set_experiment(self, exp_name):
         tty.debug('Expander: Setting exp name %s' % exp_name)
         if not self.workload_name:

@@ -8,7 +8,7 @@
 
 import llnl.util.tty as tty
 
-from ramble.application import ApplicationBase
+from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
 
 header_color = '@*b'
@@ -87,7 +87,11 @@ class SpackApplication(ApplicationBase):
     def _install_software(self, workspace, expander):
 
         # See if we cached this already, and if so return
-        cache_tupl = ('spack', expander.workload_namespace)
+        namespace = expander.spec_namespace
+        if not namespace:
+            raise ApplicationError('Ramble spec_namespace is set to None.')
+
+        cache_tupl = ('spack', namespace)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
