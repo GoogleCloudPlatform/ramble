@@ -115,11 +115,20 @@ licenses:
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
         license_path = os.path.join(ws1.config_dir, 'licenses.yaml')
 
+        aux_software_path = os.path.join(ws1.config_dir,
+                                         ramble.workspace.auxiliary_software_dir_name)
+        aux_software_files = ['packages.yaml', 'my_test.sh']
+
         with open(config_path, 'w+') as f:
             f.write(test_config)
 
         with open(license_path, 'w+') as f:
             f.write(test_licenses)
+
+        for file in aux_software_files:
+            file_path = os.path.join(aux_software_path, file)
+            with open(file_path, 'w+') as f:
+                f.write('')
 
         # Write a command template
         with open(os.path.join(ws1.config_dir, 'full_command.tpl'), 'w+') as f:
@@ -129,6 +138,20 @@ licenses:
 
         output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
         assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus12km.tar.gz" in output
+
+        # Test software directories
+        software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
+        software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
+        assert os.path.exists(software_base_dir)
+        for software_dir in software_dirs:
+            software_path = os.path.join(software_base_dir, software_dir)
+            assert os.path.exists(software_path)
+
+            spack_file = os.path.join(software_path, 'spack.yaml')
+            assert os.path.exists(spack_file)
+            for file in aux_software_files:
+                file_path = os.path.join(software_path, file)
+                assert os.path.exists(file_path)
 
         expected_experiments = [
             'scaling_1_part1_wrfv4',

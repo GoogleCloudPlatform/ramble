@@ -85,6 +85,7 @@ class SpackApplication(ApplicationBase):
             tty.die(e)
 
     def _install_software(self, workspace, expander):
+        import os
 
         # See if we cached this already, and if so return
         namespace = expander.spec_namespace
@@ -120,6 +121,13 @@ class SpackApplication(ApplicationBase):
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
 
             runner.create_env(expander.expand_var('{spack_env}'))
+
+            # Write auxiliary software files into created spack env.
+            for name, contents in workspace.all_auxiliary_software_files():
+                aux_file_path = expander.expand_var(os.path.join('{spack_env}', f'{name}'))
+                with open(aux_file_path, 'w+') as f:
+                    f.write(contents)
+
             runner.activate()
 
             added_specs = {}

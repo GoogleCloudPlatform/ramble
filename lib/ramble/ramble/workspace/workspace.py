@@ -92,6 +92,9 @@ applications_schema = ramble.schema.applications.schema
 #: Extension for template files
 workspace_template_extension = '.tpl'
 
+#: Directory name for auxiliary software files
+auxiliary_software_dir_name = 'auxiliary_software_files'
+
 #: Config file information for workspaces.
 #: Keys are filenames, values are dictionaries describing the config files.
 config_schema = ramble.schema.workspace.schema
@@ -425,6 +428,7 @@ class Workspace(object):
 
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
         self._templates = {}
+        self._auxiliary_software_files = {}
 
         self.specs = []
 
@@ -488,6 +492,12 @@ class Workspace(object):
                     with open(template_path, 'r') as f:
                         self._read_template(template_name, f.read())
 
+            if os.path.exists(self.auxiliary_software_dir):
+                for filename in os.listdir(self.auxiliary_software_dir):
+                    aux_file_path = os.path.join(self.auxiliary_software_dir, filename)
+                    with open(aux_file_path, 'r') as f:
+                        self._read_auxiliary_software_file(filename, f.read())
+
         if read_default_script:
             template_name = workspace_execution_template[0:-ext_len]
             self._read_template(template_name, template_execute_script)
@@ -548,6 +558,10 @@ class Workspace(object):
     def _read_template(self, name, f):
         """Read a tempalte file"""
         self._templates[name] = f
+
+    def _read_auxiliary_software_file(self, name, f):
+        """Read an auxiliary software file for generated software directories"""
+        self._auxiliary_software_files[name] = f
 
     def add(self, user_spec):
         """Add a single workload spec to the workspace
@@ -665,6 +679,7 @@ class Workspace(object):
         # Ensure required directory structure exists
         fs.mkdirp(self.path)
         fs.mkdirp(self.config_dir)
+        fs.mkdirp(self.auxiliary_software_dir)
         fs.mkdirp(self.log_dir)
         fs.mkdirp(self.experiment_dir)
         fs.mkdirp(self.input_dir)
@@ -1235,10 +1250,12 @@ class Workspace(object):
         # Copy current configs
         archive_configs = os.path.join(self.latest_archive_path, workspace_config_path)
         fs.mkdirp(archive_configs)
-        for file in os.listdir(self.config_dir):
-            src = os.path.join(self.config_dir, file)
-            dest = src.replace(self.config_dir, archive_configs)
-            shutil.copyfile(src, dest)
+        for root, dirs, files in os.walk(self.config_dir):
+            for name in files:
+                src = os.path.join(self.config_dir, root, name)
+                dest = src.replace(self.config_dir, archive_configs)
+                fs.mkdirp(os.path.dirname(dest))
+                shutil.copyfile(src, dest)
 
         # Copy current software spack.yamls
         archive_software = os.path.join(self.latest_archive_path, workspace_software_path)
@@ -1372,6 +1389,11 @@ class Workspace(object):
         return os.path.join(self.root, workspace_config_path)
 
     @property
+    def auxiliary_software_dir(self):
+        """Path to the auxiliary software files directory"""
+        return os.path.join(self.config_dir, auxiliary_software_dir_name)
+
+    @property
     def config_file_path(self):
         """Path to the configuration file directory"""
         return os.path.join(self.config_dir, config_file_name)
@@ -1390,6 +1412,11 @@ class Workspace(object):
     def all_templates(self):
         """Iterator over each template in the workspace"""
         for name, value in self._templates.items():
+            yield name, value
+
+    def all_auxiliary_software_files(self):
+        """Iterator over each file in $workspace/configs/auxiliary_software_files"""
+        for name, value in self._auxiliary_software_files.items():
             yield name, value
 
     def included_config_scopes(self):
