@@ -1,3 +1,9 @@
+#!/bin/bash
+#SBATCH --nodes={n_nodes}
+#SBATCH --ntasks-per-node={processes_per_node}
+#SBATCH --job-name=IMB_{n_nodes}
+#SBATCH --mail-type=ALL
+
 # This is a template execution script for
 # running the execute pipeline.
 #
