@@ -63,65 +63,39 @@ class DirectiveMeta(type):
         # commands:
         # 1. in the order they were defined
         # 2. following the MRO
-
-        attr_dict['_directives_to_be_executed'] = []
-
-        meta_stack = []
-        meta_stack.extend(cls.__bases__)
-        meta_list = []
-        while meta_stack:
-            cur_meta = meta_stack.pop(0)
-
-            meta_stack.extend(cur_meta.__bases__)
-
-            if hasattr(cur_meta, '_directives_to_be_executed'):
-                meta_list.append(cur_meta)
-
-        for meta in meta_list:
-            try:
-                directives = meta._directives_to_be_executed
-                attr_dict['_directives_to_be_executed'].extend(directives)
-                meta._directives_to_be_executed = []
-            except AttributeError:
-                pass
-
-            for directive in meta._directive_names:
-                if directive not in cls._directive_names:
-                    cls._directive_names |= set((directive,))
-
+        attr_dict["_directives_to_be_executed"] = []
         for base in reversed(bases):
             try:
                 directive_from_base = base._directives_to_be_executed
-                attr_dict['_directives_to_be_executed'].extend(
-                    directive_from_base)
+                attr_dict["_directives_to_be_executed"].extend(directive_from_base)
             except AttributeError:
                 # The base class didn't have the required attribute.
                 # Continue searching
                 pass
 
         # De-duplicates directives from base classes
-        attr_dict['_directives_to_be_executed'] = [
-            x for x in llnl.util.lang.dedupe(
-                attr_dict['_directives_to_be_executed'])]
+        attr_dict["_directives_to_be_executed"] = [
+            x for x in llnl.util.lang.dedupe(attr_dict["_directives_to_be_executed"])
+        ]
 
         # Move things to be executed from module scope (where they
         # are collected first) to class scope
-        if cls._directives_to_be_executed:
-            attr_dict['_directives_to_be_executed'].extend(
-                cls._directives_to_be_executed)
-            cls._directives_to_be_executed = []
+        if DirectiveMeta._directives_to_be_executed:
+            attr_dict["_directives_to_be_executed"].extend(
+                DirectiveMeta._directives_to_be_executed
+            )
+            DirectiveMeta._directives_to_be_executed = []
 
-        return super(DirectiveMeta, cls).__new__(
-            cls, name, bases, attr_dict)
+        return super(DirectiveMeta, cls).__new__(cls, name, bases, attr_dict)
 
     def __init__(cls, name, bases, attr_dict):
         # The instance is being initialized: if it is a package we must ensure
         # that the directives are called to set it up.
 
-        if 'ramble.app' in cls.__module__:
+        if "ramble.app" in cls.__module__:
             # Ensure the presence of the dictionaries associated
             # with the directives
-            for d in cls._directive_names:
+            for d in DirectiveMeta._directive_names:
                 setattr(cls, d, {})
 
             # Lazily execute directives
@@ -130,9 +104,10 @@ class DirectiveMeta(type):
 
             # Ignore any directives executed *within* top-level
             # directives by clearing out the queue they're appended to
-            cls._directives_to_be_executed = []
+            DirectiveMeta._directives_to_be_executed = []
 
-        super().__init__(name, bases, attr_dict)
+        super(DirectiveMeta, cls).__init__(name, bases, attr_dict)
+
 
     @classmethod
     def directive(cls, dicts=None):
@@ -176,22 +151,16 @@ class DirectiveMeta(type):
         """
         if isinstance(dicts, string_types):
             dicts = (dicts, )
+
         if not isinstance(dicts, Sequence):
             message = "dicts arg must be list, tuple, or string. Found {0}"
             raise TypeError(message.format(type(dicts)))
+
         # Add the dictionary names if not already there
-        cls._directive_names |= set(dicts)
+        DirectiveMeta._directive_names |= set(dicts)
 
         # This decorator just returns the directive functions
         def _decorator(decorated_function):
-            mod = sys.modules[decorated_function.__module__]
-
-            if hasattr(mod, '__all__'):
-                mod.__all__.append(decorated_function.__name__)
-            else:
-                mod.__all__ = [decorated_function.__name__]
-            # __all__.append(decorated_function.__name__)
-
             @functools.wraps(decorated_function)
             def _wrapper(*args, **kwargs):
                 # If any of the arguments are executors returned by a
@@ -200,7 +169,7 @@ class DirectiveMeta(type):
                 # This allows nested directive calls in applications.  The
                 # caller can return the directive if it should be queued.
                 def remove_directives(arg):
-                    directives = cls._directives_to_be_executed
+                    directives = DirectiveMeta._directives_to_be_executed
                     if isinstance(arg, (list, tuple)):
                         # Descend into args that are lists or tuples
                         for a in arg:
@@ -226,14 +195,16 @@ class DirectiveMeta(type):
                 if not isinstance(values, Sequence):
                     values = (values, )
 
-                cls._directives_to_be_executed.extend(values)
+                DirectiveMeta._directives_to_be_executed.extend(values)
 
                 # wrapped function returns same result as original so
                 # that we can nest directives
                 return result
+
             return _wrapper
 
         return _decorator
+
 
 
 class DirectiveError(ramble.error.RambleError):
