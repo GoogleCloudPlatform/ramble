@@ -11,7 +11,7 @@ import pytest
 
 
 @pytest.mark.parametrize('app', [
-    'basic'
+    'basic', 'basic-inherited'
 ])
 def test_app_features(mutable_mock_repo, app):
     app_inst = mutable_mock_repo.get(app)
