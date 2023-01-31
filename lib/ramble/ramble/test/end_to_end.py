@@ -240,8 +240,10 @@ licenses:
         output = workspace('analyze', '-f', 'text',
                            'json', 'yaml', global_args=['-w', workspace_name])
         text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
+        text_simlink_results_files = glob.glob(os.path.join(ws1.root, 'results.latest.txt'))
         json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
         yaml_results_files = glob.glob(os.path.join(ws1.root, 'results*.yaml'))
+        assert len(text_simlink_results_files) == 1
         assert len(text_results_files) == 1
         assert len(json_results_files) == 1
         assert len(yaml_results_files) == 1
