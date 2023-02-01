@@ -115,7 +115,8 @@ config_defaults = {
         'spack_flags': {
             'install': '--reuse',
             'concretize': '--reuse'
-        }
+        },
+        'input_cache': '$ramble/var/ramble/cache'
     }
 }
 

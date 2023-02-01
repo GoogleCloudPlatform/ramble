@@ -26,7 +26,6 @@ from llnl.util.filesystem import mkdirp, can_access, install, install_tree
 from llnl.util.filesystem import partition_path, remove_linked_tree
 
 import spack.paths
-import spack.caches
 import spack.config
 import spack.mirror
 import spack.util.pattern as pattern
@@ -35,6 +34,7 @@ import spack.util.url as url_util
 
 from spack.util.crypto import prefix_bits, bit_length
 
+import ramble.caches
 import ramble.fetch_strategy as fs
 import ramble.util.lock
 import ramble.error
@@ -434,7 +434,7 @@ class InputStage(object):
 
             if self.default_fetcher.cachable:
                 for rel_path in reversed(list(self.mirror_paths)):
-                    cache_fetcher = spack.caches.fetch_cache.fetcher(
+                    cache_fetcher = ramble.caches.fetch_cache.fetcher(
                         rel_path, digest, expand=expand,
                         extension=extension)
                     fetchers.insert(0, cache_fetcher)
@@ -525,7 +525,7 @@ class InputStage(object):
             self.fetcher.check()
 
     def cache_local(self):
-        spack.caches.fetch_cache.store(
+        ramble.caches.fetch_cache.store(
             self.fetcher, self.mirror_paths.storage_path)
 
     def cache_mirror(self, mirror, stats):

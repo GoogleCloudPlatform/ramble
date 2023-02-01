@@ -359,6 +359,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 stage.set_subdir(expander.expand_var(input_conf['target_dir']))
                 if not workspace.dry_run:
                     stage.fetch()
+                    stage.cache_local()
                     try:
                         stage.expand_archive()
                     except spack.util.executable.ProcessError:
