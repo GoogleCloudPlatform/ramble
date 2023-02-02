@@ -732,6 +732,18 @@ class Workspace(object):
                                                conf['match'],
                                                conf['file'])
 
+    def all_specs(self):
+        import ramble.spec
+
+        specs = []
+        for app, workloads, _, _ in self.all_applications():
+            for workload, _, _, _ in self.all_workloads(workloads):
+                app_spec = ramble.spec.Spec(app)
+                app_spec.workloads[workload] = True
+                specs.append(app_spec)
+
+        return specs
+
     def all_applications(self):
         """Iterator over applications
 

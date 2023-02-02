@@ -15,6 +15,6 @@ class BasicInherited(BaseBasic):
     name = "Basic Inheritance Test Application"
 
     input_file('inherited_input', url='file:///tmp/inherited_file.log',
-               description='Again, not a file')
+               description='Again, not a file', extension='.log')
 
     workload('test_wl3', executable='foo', input='inherited_input')
