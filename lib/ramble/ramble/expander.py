@@ -452,6 +452,7 @@ class Expander(object):
             if final_exp_name in rendered_experiments:
                 tty.die('Experiment %s is not unique.' % final_exp_name)
             rendered_experiments.add(final_exp_name)
+
             yield
 
     def set_application_env_vars(self, application_env_vars):
@@ -516,6 +517,13 @@ class Expander(object):
             self.experiment_matrices = experiment_matrices.copy()
         else:
             self.experiment_matrices = None
+
+    def unset_mpi_vars(self):
+        self.remove_var(self.nodes_key, level='experiment')
+        self.remove_var(self.threads_key, level='experiment')
+        self.remove_var(self.ranks_key, level='experiment')
+        self.remove_var(self.ppn_key, level='experiment')
+        self.remove_var(self.nodes_key, level='experiment')
 
     def _compute_mpi_vars(self):
         n_ranks = self._find_key(self.ranks_key)
