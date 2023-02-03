@@ -746,11 +746,14 @@ class Workspace(object):
         # Iterate over applications in ramble.yaml first
         if application_namespace in ws_dict[ramble_namespace]:
             app_dict = ws_dict[ramble_namespace][application_namespace]
+
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
+
                 if variables_namespace in contents:
                     application_vars = contents[variables_namespace]
+
                 if env_var_namespace in contents:
                     application_env_vars = contents[env_var_namespace]
                 self.extract_success_criteria('application', contents)
@@ -817,12 +820,18 @@ class Workspace(object):
 
         experiments = workload[experiment_namespace]
         for experiment, contents in experiments.items():
-            experiment_vars = None
+
+            # FIXME: what is the cleanest way to do this?
+            import ruamel
+            experiment_vars = ruamel.yaml.comments.CommentedMap()
             experiment_env_vars = None
+
             if variables_namespace in contents:
                 experiment_vars = contents[variables_namespace]
+
             if env_var_namespace in contents:
                 experiment_env_vars = contents[env_var_namespace]
+
             self.extract_success_criteria('experiment', contents)
 
             matrices = []
