@@ -504,7 +504,7 @@ class Expander(object):
 
     def set_experiment_vars(self, experiment_vars):
         self._expansion_dict = None
-        if experiment_vars:
+        if experiment_vars is not None:
             self.experiment_vars = experiment_vars.copy()
         else:
             self.experiment_vars = None
