@@ -1059,7 +1059,7 @@ class Workspace(object):
 
         self.results.update(result)
 
-    def simlink_result(self, filename_base, latest_base, file_extension, overwrite=True):
+    def simlink_result(self, filename_base, latest_base, file_extension):
         """
         Create simlink of result file so that results.latest.txt always points
         to the most recent analysis. This clobbers the existing link
@@ -1067,9 +1067,7 @@ class Workspace(object):
         out_file = os.path.join(self.root, filename_base + file_extension)
         latest_file = os.path.join(self.root, latest_base + file_extension)
 
-        if overwrite and os.path.exists(latest_file):
-            # this is actually an alias remove, so will delete it regardless of
-            # if it's a simlink or file
+        if os.path.islink(latest_file):
             os.unlink(latest_file)
 
         os.symlink(out_file, latest_file)
