@@ -63,6 +63,53 @@ def test_mirror_nonexisting(tmp_scope):
                'not-a-mirror', 'http://ramble.io')
 
 
+def test_mirror_add(tmp_scope):
+    mirror('add', '--scope', tmp_scope, 'first', 'my.url.com')
+
+    output = mirror('list')
+    assert 'my.url.com' in output
+    assert 'first' in output
+
+
+def test_mirror_remove(tmp_scope):
+    mirror('add', '--scope', tmp_scope, 'first', 'my.url.com')
+    mirror('add', '--scope', tmp_scope, 'second', 'another.url.com')
+
+    output = mirror('list')
+    assert 'my.url.com' in output
+    assert 'first' in output
+    assert 'another.url.com' in output
+    assert 'second' in output
+
+    output = mirror('remove', '--scope', tmp_scope, 'second')
+    assert "Removed mirror second" in output
+
+    output = mirror('list')
+    assert 'second' not in output
+    assert 'first' in output
+
+
+def test_mirror_set_url(tmp_scope):
+    mirror('add', '--scope', tmp_scope, 'first', 'my.url.com')
+    output = mirror('list')
+    assert 'my.url.com' in output
+    assert 'url' in output
+    mirror('set-url', '--scope', tmp_scope, 'first', 'changed.url.com')
+    output = mirror('list')
+    assert 'changed.url.com' in output
+
+
+def test_mirror_set_push_url(tmp_scope):
+    mirror('add', '--scope', tmp_scope, 'first', 'my.url.com')
+    output = mirror('list')
+    assert 'my.url.com' in output
+    assert 'url' in output
+    mirror('set-url', '--scope', tmp_scope, 'first', 'changed.url.com', '--push')
+    output = mirror('list')
+    assert 'my.url.com (fetch)' in output
+    assert 'changed.url.com (push)' in output
+
+
 def test_mirror_name_collision(tmp_scope):
     mirror('add', '--scope', tmp_scope, 'first', '1')
 
@@ -83,13 +130,13 @@ def test_mirror_destroy(install_mockery_mutable_config,
     # Destroy mirror by name
     mirror('destroy', '-m', 'atest')
 
-    assert(not os.path.exists(mirror_dir.strpath))
+    assert not os.path.exists(mirror_dir.strpath)
 
     # Destroy mirror by url
     fs.mkdirp(mirror_dir.strpath)
     assert os.path.exists(mirror_dir.strpath)
     mirror('destroy', '--mirror-url', mirror_url)
 
-    assert(not os.path.exists(mirror_dir.strpath))
+    assert not os.path.exists(mirror_dir.strpath)
 
     mirror('remove', 'atest')

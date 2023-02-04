@@ -22,6 +22,7 @@ from llnl.util.tty.colify import colified
 import spack.util.executable
 import spack.util.spack_json
 import spack.util.environment
+import spack.util.compression
 
 import ramble.config
 import ramble.stage
@@ -349,17 +350,21 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for workload_name, workload in self.workloads.items():
             for input_file in workload['inputs']:
                 input_conf = self.inputs[input_file]
-                input_url = input_conf['url']
 
-                file_name = '.'.join(os.path.basename(input_url).split('.')[0:-1])
+                fetcher = ramble.fetch_strategy.URLFetchStrategy(**input_conf)
 
-                fetcher = ramble.fetch_strategy.URLFetchStrategy(url=input_url,
-                                                                 sha256=input_conf['sha256'])
+                file_name = os.path.basename(input_conf['url'])
+                if not fetcher.extension:
+                    fetcher.extension = spack.util.compression.extension(file_name)
+
+                file_name = file_name.replace(f'.{fetcher.extension}', '')
 
                 namespace = f'{self.name}.{workload_name}'
 
                 expected_files[file_name] = {'fetcher': fetcher,
-                                             'namespace': namespace}
+                                             'namespace': namespace,
+                                             'extension': fetcher.extension,
+                                             'input_name': input_file}
 
         return expected_files
 

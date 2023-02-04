@@ -100,14 +100,9 @@ class Mirror(object):
             )
 
     def to_dict(self):
-        if self._push_url is None:
-            return syaml_dict([
-                ('fetch', self._fetch_url),
-                ('push', self._fetch_url)])
-        else:
-            return syaml_dict([
-                ('fetch', self._fetch_url),
-                ('push', self._push_url)])
+        return syaml_dict([
+            ('fetch', self._fetch_url),
+            ('push', self._push_url or self._fetch_url)])
 
     @staticmethod
     def from_dict(d, name=None):
@@ -257,31 +252,6 @@ class MirrorCollection(Mapping):
 
     def to_yaml(self, stream=None):
         return spack.util.spack_yaml.dump(self.to_dict(True), stream)
-
-    # TODO: this isn't called anywhere
-    @staticmethod
-    def from_yaml(stream, name=None):
-        try:
-            data = spack.util.spack_yaml.load(stream)
-            return MirrorCollection(data)
-        except yaml_error.MarkedYAMLError as e:
-            raise six.raise_from(
-                spack.util.spack_yaml.SpackYAMLError("error parsing YAML mirror collection:",
-                                                     str(e)),
-                e,
-            )
-
-    @staticmethod
-    def from_json(stream, name=None):
-        try:
-            d = spack.util.spack_json.load(stream)
-            return MirrorCollection(d)
-        except Exception as e:
-            raise six.raise_from(
-                spack.util.spack_json.SpackJSONError("error parsing JSON mirror collection:",
-                                                     str(e)),
-                e,
-            )
 
     def to_dict(self, recursive=False):
         return syaml_dict(sorted(

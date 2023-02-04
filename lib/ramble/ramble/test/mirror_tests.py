@@ -9,6 +9,7 @@
 
 import os
 import sys
+import hashlib
 
 import pytest
 
@@ -18,106 +19,11 @@ import ramble.mirror
 import ramble.repository
 import ramble.workspace
 
-import spack.util.spack_json as sjson
-from spack.util.spack_yaml import SpackYAMLError
+import spack.util.executable
 
 pytestmark = [pytest.mark.skipif(sys.platform == "win32",
                                  reason="does not run on windows"),
               pytest.mark.usefixtures('mutable_config', 'mutable_mock_repo')]
-
-
-@pytest.mark.parametrize(
-    "mirror",
-    [
-        ramble.mirror.Mirror(
-            'https://example.com/fetch',
-            'https://example.com/push',
-        ),
-    ],
-)
-def test_roundtrip_mirror(mirror):
-    mirror_yaml = mirror.to_yaml()
-    assert ramble.mirror.Mirror.from_yaml(mirror_yaml) == mirror
-    mirror_json = mirror.to_json()
-    assert ramble.mirror.Mirror.from_json(mirror_json) == mirror
-
-
-@pytest.mark.parametrize(
-    "invalid_yaml",
-    [
-        "playing_playlist: {{ action }} playlist {{ playlist_name }}"
-    ]
-)
-def test_invalid_yaml_mirror(invalid_yaml):
-    with pytest.raises(SpackYAMLError) as e:
-        ramble.mirror.Mirror.from_yaml(invalid_yaml)
-    exc_msg = str(e.value)
-    assert exc_msg.startswith("error parsing YAML mirror:")
-    assert invalid_yaml in exc_msg
-
-
-@pytest.mark.parametrize(
-    "invalid_json, error_message",
-    [
-        ("{13:", "Expecting property name")
-    ]
-)
-def test_invalid_json_mirror(invalid_json, error_message):
-    with pytest.raises(sjson.SpackJSONError) as e:
-        ramble.mirror.Mirror.from_json(invalid_json)
-    exc_msg = str(e.value)
-    assert exc_msg.startswith("error parsing JSON mirror:")
-    assert error_message in exc_msg
-
-
-@pytest.mark.parametrize(
-    "mirror_collection",
-    [
-        ramble.mirror.MirrorCollection(
-            mirrors={
-                'example-mirror': ramble.mirror.Mirror(
-                    'https://example.com/fetch',
-                    'https://example.com/push',
-                ).to_dict(),
-            },
-        ),
-    ],
-)
-def test_roundtrip_mirror_collection(mirror_collection):
-    mirror_collection_yaml = mirror_collection.to_yaml()
-    assert (ramble.mirror.MirrorCollection.from_yaml(mirror_collection_yaml) ==
-            mirror_collection)
-    mirror_collection_json = mirror_collection.to_json()
-    assert (ramble.mirror.MirrorCollection.from_json(mirror_collection_json) ==
-            mirror_collection)
-
-
-@pytest.mark.parametrize(
-    "invalid_yaml",
-    [
-        "playing_playlist: {{ action }} playlist {{ playlist_name }}"
-    ]
-)
-def test_invalid_yaml_mirror_collection(invalid_yaml):
-    with pytest.raises(SpackYAMLError) as e:
-        ramble.mirror.MirrorCollection.from_yaml(invalid_yaml)
-    exc_msg = str(e.value)
-    assert exc_msg.startswith("error parsing YAML mirror collection:")
-    assert invalid_yaml in exc_msg
-
-
-@pytest.mark.parametrize(
-    "invalid_json, error_message",
-    [
-        ("{13:", "Expecting property name")
-    ]
-)
-def test_invalid_json_mirror_collection(invalid_json, error_message):
-    with pytest.raises(sjson.SpackJSONError) as e:
-        ramble.mirror.MirrorCollection.from_json(invalid_json)
-    exc_msg = str(e.value)
-    assert exc_msg.startswith("error parsing JSON mirror collection:")
-    assert error_message in exc_msg
 
 
 class MockFetcher(object):
@@ -148,3 +54,83 @@ def test_mirror_cache_symlinks(tmpdir):
     assert os.path.exists(link_target)
     assert (os.path.normpath(link_target) ==
             os.path.join(cache.root, reference.storage_path))
+
+
+# Create an archive for the test input, with the correct file name
+def create_archive(archive_dir, app_class):
+    tar = spack.util.executable.which('tar', required=True)
+
+    for input_name, conf in app_class.all_inputs_and_fetchers().items():
+        archive_dir.ensure(input_name, dir=True)
+        archive_name = os.path.basename(conf['fetcher'].url)
+        test_file_path = str(archive_dir.join(input_name, 'input-file'))
+        with open(test_file_path, 'w+') as f:
+            f.write('Input File\n')
+
+        with archive_dir.as_cwd():
+            tar('-czf', archive_name, input_name)
+            with open(archive_name, 'rb') as f:
+                bytes = f.read()
+                conf['fetcher'].digest = hashlib.sha256(bytes).hexdigest()
+                app_class.inputs[conf['input_name']]['sha256'] = conf['fetcher'].digest
+
+
+def check_mirror(mirror_path, app_name, app_class):
+    for input_name, conf in app_class.all_inputs_and_fetchers().items():
+        archive_name = '%s.%s' % (input_name, conf['fetcher'].extension)
+        assert os.path.exists(os.path.join(mirror_path, app_name, archive_name))
+
+
+@pytest.mark.parametrize('app_name', [
+    'input-test'
+])
+def test_mirror_create(tmpdir, mutable_mock_repo,
+                       mutable_mock_workspace_path,
+                       config, app_name, tmpdir_factory):
+
+    test_config = f"""
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{{n_ranks}}'
+  batch:
+    submit: '{{execute_experiment}}'
+  applications:
+    {app_name}:
+      workloads:
+        test:
+          experiments:
+            unit-test:
+              variables:
+                n_ranks: '1'
+                n_nodes: '1'
+                processes_per_node: '1'
+spack:
+  concretized: true
+  compilers: {{}}
+  mpi_libraries: {{}}
+  applications: {{}}
+"""
+
+    archive_dir = tmpdir_factory.mktemp('mock-archives-dir')
+    mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
+
+    with archive_dir.as_cwd():
+        app_class = ramble.repository.path.get_app_class(app_name)('test')
+        create_archive(archive_dir, app_class)
+
+        # Create workspace
+        ws_name = f'workspace-mirror-{app_name}'
+
+        with ramble.workspace.create(ws_name) as workspace:
+            workspace.write()
+            config_path = os.path.join(workspace.config_dir, ramble.workspace.config_file_name)
+            with open(config_path, 'w+') as f:
+                f.write(test_config)
+            workspace._re_read()
+            workspace.run_pipeline('setup')
+            ramble.mirror.create(str(mirror_dir), workspace)
+
+        check_mirror(str(mirror_dir), app_name, app_class)

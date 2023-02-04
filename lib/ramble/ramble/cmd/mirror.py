@@ -45,7 +45,7 @@ def setup_parser(subparser):
                                 metavar='mirror_name',
                                 type=str,
                                 help="find mirror to destroy by name")
-    destroy_target.add_argument('--mirror-url',
+    destroy_target.add_argument('-u', '--mirror-url',
                                 metavar='mirror_url',
                                 type=str,
                                 help="find mirror to destroy by url")
@@ -135,14 +135,14 @@ def mirror_set_url(args):
 
     items = [
         (
-            (n, u)
-            if n != args.name else (
-                (n, {"fetch": fetch_url, "push": push_url})
-                if fetch_url != push_url else (n, {"fetch": fetch_url,
-                                                   "push": fetch_url})
+            (mirror_name, mirror_url)
+            if mirror_name != args.name else (
+                (mirror_name, {"fetch": fetch_url, "push": push_url})
+                if fetch_url != push_url else (mirror_name, {"fetch": fetch_url,
+                                                             "push": fetch_url})
             )
         )
-        for n, u in mirrors.items()
+        for mirror_name, mirror_url in mirrors.items()
     ]
 
     mirrors = syaml_dict(items)
