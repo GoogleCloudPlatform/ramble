@@ -108,7 +108,6 @@ class DirectiveMeta(type):
 
         super(DirectiveMeta, cls).__init__(name, bases, attr_dict)
 
-
     @classmethod
     def directive(cls, dicts=None):
         """Decorator for Ramble directives.
@@ -204,7 +203,6 @@ class DirectiveMeta(type):
             return _wrapper
 
         return _decorator
-
 
 
 class DirectiveError(ramble.error.RambleError):
