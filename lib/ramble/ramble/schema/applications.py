@@ -95,10 +95,9 @@ applications_schema = {
                                 'default': {},
                                 'properties': {},
                                 'additionalProperties': {
-                                    'type': ['object'],
+                                    'type': 'object',
                                     'default': {},
                                     'additionalProperties': {
-                                        'type': ['object'],
                                         'variables': variables_def,
                                         'matrix': matrix_def,
                                         'matrices': matrices_def,
