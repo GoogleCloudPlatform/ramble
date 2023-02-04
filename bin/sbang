@@ -24,6 +24,7 @@
 #
 
 # Generic error handling
+echo "sbang... bang bang"
 die() {
     echo "$@" 1>&2;
     exit 1
