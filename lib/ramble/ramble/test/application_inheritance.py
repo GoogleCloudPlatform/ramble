@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import pytest
-
 
 def test_basic_inheritance(mutable_mock_repo):
     app_inst = mutable_mock_repo.get('basic-inherited')
@@ -55,5 +53,3 @@ def test_basic_inheritance(mutable_mock_repo):
 
     assert app_inst.workload_variables['test_wl']['my_var']['description'] \
         == 'Example var'
-
-

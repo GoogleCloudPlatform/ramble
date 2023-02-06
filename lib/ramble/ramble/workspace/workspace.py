@@ -1079,7 +1079,6 @@ class Workspace(object):
 
         os.symlink(out_file, latest_file)
 
-
     def dump_results(self, output_formats=['text']):
         """
         Write out result file in desired format
@@ -1142,7 +1141,6 @@ class Workspace(object):
 
         if not results_written:
             tty.die('Results were not written.')
-
 
         tty.msg('Results are written to:')
         for out_file in results_written:

@@ -20,6 +20,7 @@ steps:
         . /opt/spack/share/spack/setup-env.sh
         spack config add "config:install_tree:root:/workspace/spack_install"
         spack install miniconda3
+
     id: spack-install-conda
     entrypoint: /bin/bash
   - name: spack/centos7
@@ -37,10 +38,13 @@ steps:
         . /opt/spack/share/spack/setup-env.sh
         . /workspace/share/ramble/setup-env.sh
 
-        /workspace/share/ramble/qa/run-flake8-tests
+        ramble flake8 -U
+        flake_err=$$?
+
+        ramble license verify
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
-        flake_err=$$?
+        license_err=$$?
 
         COVERAGE=true /workspace/share/ramble/qa/run-unit-tests
         # $$ characters are required for cloud-build:
@@ -55,6 +59,14 @@ steps:
         if [ $$flake_err -gt 0 ]; then
           echo "Flake error = $$flake_err"
           echo " ***** Flake8 tests failed"
+          error=1
+        fi
+        
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$license_err -gt 0 ]; then
+          echo "License check error = $$license_err"
+          echo " ***** License check failed"
           error=1
         fi
 
