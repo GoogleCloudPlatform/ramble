@@ -14,6 +14,8 @@
 
 import ramble.schema.licenses
 
+
+# FIXME: should this use the vector notation which type natively supports?
 string_or_num = {
     'anyOf': [
         {'type': 'string'},
@@ -33,7 +35,7 @@ array_or_scalar_of_strings_or_nums = {
 }
 
 variables_def = {
-    'type': 'object',
+    'type': ['object', 'null'],
     'default': {},
     'properties': {},
     'additionalProperties': array_or_scalar_of_strings_or_nums

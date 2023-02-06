@@ -504,7 +504,7 @@ class Expander(object):
 
     def set_experiment_vars(self, experiment_vars):
         self._expansion_dict = None
-        if experiment_vars:
+        if experiment_vars is not None:
             self.experiment_vars = experiment_vars.copy()
         else:
             self.experiment_vars = None
@@ -657,7 +657,7 @@ class Expander(object):
                 expansions.update(self.package_paths)
             if self.workspace_vars:
                 expansions.update(self.workspace_vars)
-            if self.application_vars:
+            if self.application_vars is not None:
                 expansions.update(self.application_vars)
             if self.workload_vars:
                 expansions.update(self.workload_vars)

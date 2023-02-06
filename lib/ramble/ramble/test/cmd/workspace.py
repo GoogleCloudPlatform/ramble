@@ -1238,3 +1238,50 @@ spack:
     assert os.path.exists(ws1.latest_archive_path + '.tar.gz')
 
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + '.tar.gz'))
+
+
+def test_dryrun_noexpvars_setup():
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment: {}
+spack:
+  concretized: true
+"""
+
+    workspace_name = 'test_dryrun'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+    assert "Would download file:///tmp/test_file.log" in output
+    assert os.path.exists(os.path.join(ws1.root, 'experiments',
+                                       'basic', 'test_wl',
+                                       'test_experiment',
+                                       'execute_experiment'))
