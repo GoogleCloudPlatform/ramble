@@ -1218,6 +1218,8 @@ class Workspace(object):
                         app_inst = ramble.repository.get(expander.application_name)
                         for phase in app_inst.get_pipeline_phases(pipeline):
                             app_inst.run_phase(phase, self, expander)
+                        # Tidy up deduced variable values
+                        expander.unset_mpi_vars()
 
         if pipeline == 'setup':
             all_experiments_file.close()
