@@ -1239,6 +1239,7 @@ spack:
 
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + '.tar.gz'))
 
+
 def test_dryrun_noexpvars_setup():
     test_config = """
 ramble:

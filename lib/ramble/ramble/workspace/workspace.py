@@ -821,9 +821,7 @@ class Workspace(object):
         experiments = workload[experiment_namespace]
         for experiment, contents in experiments.items():
 
-            # FIXME: what is the cleanest way to do this?
-            import ruamel
-            experiment_vars = ruamel.yaml.comments.CommentedMap()
+            experiment_vars = syaml.syaml_dict()
             experiment_env_vars = None
 
             if variables_namespace in contents:
