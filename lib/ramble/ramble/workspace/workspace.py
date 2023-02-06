@@ -1059,18 +1059,44 @@ class Workspace(object):
 
         self.results.update(result)
 
+    def simlink_result(self, filename_base, latest_base, file_extension):
+        """
+        Create simlink of result file so that results.latest.txt always points
+        to the most recent analysis. This clobbers the existing link
+        """
+        out_file = os.path.join(self.root, filename_base + file_extension)
+        latest_file = os.path.join(self.root, latest_base + file_extension)
+
+        if os.path.islink(latest_file):
+            os.unlink(latest_file)
+
+        os.symlink(out_file, latest_file)
+
+
     def dump_results(self, output_formats=['text']):
+        """
+        Write out result file in desired format
+
+        This attempts to avoid the loss of previous results data by appending
+        the datetime to the filename, but is willing to clobber the file
+        results.latest.<extension>
+
+        """
         if not self.results:
             self.results = {}
 
         results_written = []
 
         dt = self._date_string()
-        filename_base = 'results.' + dt
+        inner_delim = '.'
+        filename_base = 'results' + inner_delim + dt
+        latest_base = 'results' + inner_delim + 'latest'
 
         if 'text' in output_formats:
 
-            out_file = os.path.join(self.root, filename_base + '.txt')
+            file_extension = '.txt'
+            out_file = os.path.join(self.root, filename_base + file_extension)
+
             results_written.append(out_file)
 
             with open(out_file, 'w+') as f:
@@ -1089,20 +1115,27 @@ class Workspace(object):
                                                          fom['value'],
                                                          fom['units'])
                                 f.write('    %s\n' % (output.strip()))
+            self.simlink_result(filename_base, latest_base, file_extension)
+
         if 'json' in output_formats:
-            out_file = os.path.join(self.root, filename_base + '.json')
+            file_extension = '.json'
+            out_file = os.path.join(self.root, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, 'w+') as f:
                 sjson.dump(self.results, f)
+            self.simlink_result(filename_base, latest_base, file_extension)
 
         if 'yaml' in output_formats:
-            out_file = os.path.join(self.root, filename_base + '.yaml')
+            file_extension = '.yaml'
+            out_file = os.path.join(self.root, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, 'w+') as f:
                 syaml.dump(self.results, stream=f)
+            self.simlink_result(filename_base, latest_base, file_extension)
 
         if not results_written:
             tty.die('Results were not written.')
+
 
         tty.msg('Results are written to:')
         for out_file in results_written:
