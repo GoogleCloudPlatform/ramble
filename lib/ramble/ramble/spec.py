@@ -6,10 +6,13 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 import six
 
 import llnl.util.tty as tty
+import llnl.util.tty.color as clr
 
+import ramble.repository
 import ramble.error
 
 import spack.parse
@@ -19,6 +22,10 @@ HASH, DEP, AT, COLON, COMMA, ON, OFF, PCT, EQ, ID, VAL, FILE = range(12)
 
 #: Regex for fully qualified spec names. (e.g., builtin.hdf5)
 spec_id_re = r'\w[\w.-]*'
+
+color_formats = {}
+
+default_format = '{name}'
 
 
 class SpecLexer(spack.parse.Lexer):
@@ -134,6 +141,7 @@ class Spec(object):
         self.namespace = None
 
         self._application = None
+        self._application_class = None
         self.workloads = {}
 
         if isinstance(spec_like, six.string_types):
@@ -152,8 +160,143 @@ class Spec(object):
         self.name = other.name
         self.namespace = other.namespace
 
+    def format(self, format_string=default_format, **kwargs):
+        r"""Prints out particular pieces of a spec, depending on what is
+        in the format string.
+
+        Using the ``{attribute}`` syntax, any field of the spec can be
+        selected.  Those attributes can be recursive.
+
+        Commonly used attributes of the Spec for format strings include::
+
+            name
+            workloads
+
+        Args:
+            format_string (str): string containing the format to be expanded
+
+        Keyword Args:
+            color (bool): True if returned string is colored
+            transform (dict): maps full-string formats to a callable \
+                that accepts a string and returns another one
+
+        """
+
+        color = kwargs.get("color", False)
+        transform = kwargs.get("transform", {})
+
+        out = six.StringIO()
+
+        def write(s, c=None):
+            f = clr.cescape(s)
+            if c is not None:
+                f = color_formats[c] + f + "@."
+            clr.cwrite(f, stream=out, color=color)
+
+        def write_attribute(spec, attribute, color):
+            current = spec
+
+            if attribute == "":
+                raise SpecFormatStringError("Format string attributes must be non-empty")
+            attribute = attribute.lower()
+
+            parts = attribute.split(".")
+            assert parts
+
+            # find the morph function for our attribute
+            morph = transform.get(attribute, lambda s, x: x)
+
+            # Iterate over components using getattr to get next element
+            for idx, part in enumerate(parts):
+                if not part:
+                    raise SpecFormatStringError("Format string attributes must be non-empty")
+                if part.startswith("_"):
+                    raise SpecFormatStringError("Attempted to format private attribute")
+                else:
+                    try:
+                        current = getattr(current, part)
+                    except AttributeError:
+                        parent = ".".join(parts[:idx])
+                        m = "Attempted to format attribute %s." % attribute
+                        m += "Spec %s has no attribute %s" % (parent, part)
+                        raise SpecFormatStringError(m)
+
+                    if callable(current):
+                        raise SpecFormatStringError("Attempted to format callable object")
+                    if not current:
+                        # We're not printing anything
+                        return
+
+            # Finally, write the output
+            col = None
+            write(morph(spec, str(current)), col)
+
+        attribute = ""
+        in_attribute = False
+        escape = False
+
+        for c in format_string:
+            if escape:
+                out.write(c)
+                escape = False
+            elif c == "\\":
+                escape = True
+            elif in_attribute:
+                if c == "}":
+                    write_attribute(self, attribute, color)
+                    attribute = ""
+                    in_attribute = False
+                else:
+                    attribute += c
+            else:
+                if c == "}":
+                    raise SpecFormatStringError("Encountered closing } before opening {")
+                elif c == "{":
+                    in_attribute = True
+                else:
+                    out.write(c)
+        if in_attribute:
+            raise SpecFormatStringError(
+                "Format string terminated while reading attribute." "Missing terminating }."
+            )
+
+        formatted_spec = out.getvalue()
+        return formatted_spec.strip()
+
+    def cformat(self, *args, **kwargs):
+        """Same as format, but color defaults to auto instead of False."""
+        kwargs = kwargs.copy()
+        kwargs.setdefault("color", None)
+        return self.format(*args, **kwargs)
+
     def __str__(self):
         return self.name
+
+    @property
+    def fullname(self):
+        return (
+            ("%s.%s" % (self.namespace, self.name))
+            if self.namespace
+            else (self.name if self.name else "")
+        )
+
+    @property
+    def application(self):
+        if not self._application:
+            self._application = ramble.repository.path.get(self)
+        return self._application
+
+    @property
+    def application_class(self):
+        if not self._application_class:
+            self._application_class = ramble.repository.path.get_app_class(self.fullname)
+        return self._application_class
+
+    @property
+    def application_file_path(self):
+        file_dir = ramble.repository.path.dirname_for_application_name(self.fullname)
+        app_file = ramble.repository.path.filename_for_application_name(self.fullname)
+        return os.path.join(file_dir, app_file)
 
 
 def parse(string):
@@ -167,3 +310,7 @@ class SpecParseError(ramble.error.SpecError):
     def __init__(self, parse_error):
         super(SpecParseError, self).__init__(parse_error.message)
         self.string = parse_error.string
+
+
+class SpecFormatStringError(spack.error.SpecError):
+    """Called for errors in Spec format strings."""

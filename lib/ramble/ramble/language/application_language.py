@@ -174,7 +174,8 @@ def figure_of_merit(name, log_file, fom_regex, group_name, units='',
 
 
 @application_directive('inputs')
-def input_file(name, url, description, target_dir='{workload_name}', **kwargs):
+def input_file(name, url, description, target_dir='{workload_name}', sha256=None, extension=None,
+               expand=True, **kwargs):
     """Adds an input file defintion to this appliaction
 
     Defines a new input file.
@@ -186,13 +187,20 @@ def input_file(name, url, description, target_dir='{workload_name}', **kwargs):
       - description: Description of this input file
       - target_dir (Optional): The directory where the archive will be
                                expanded. Defaults to 'input'
+      - sha256 (Optional): The expected sha256 checksum for the input file
+      - extension (Optional): The extension to use for the input, if it isn't part of the
+                              file name.
+      - expand (Optional): Whether the input should be expanded or not. Defaults to True
     """
 
     def _execute_input_file(app):
         app.inputs[name] = {
             'url': url,
             'description': description,
-            'target_dir': target_dir
+            'target_dir': target_dir,
+            'sha256': sha256,
+            'extension': extension,
+            'expand': expand
         }
 
     return _execute_input_file
@@ -234,7 +242,6 @@ def workload_variable(name, default, description, values=None, workload=None,
             }
             if values:
                 app.workload_variables[wl_name][name]['values'] = values
-
 
     return _execute_workload_variable
 

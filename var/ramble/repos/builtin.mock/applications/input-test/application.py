@@ -6,15 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
 
-from ramble.app.builtin.mock.basic import Basic as BaseBasic
 
+class InputTest(ExecutableApplication):
+    name = "input-test"
 
-class BasicInherited(BaseBasic):
-    name = "Basic Inheritance Test Application"
+    executable('test', 'echo "repo test"', use_mpi=False)
 
-    input_file('inherited_input', url='file:///tmp/inherited_file.log',
-               description='Again, not a file', extension='.log')
+    cwd = os.getcwd()
+    input_file('test', url=f'file://{cwd}/input.tar.gz',
+               description='Test input')
 
-    workload('test_wl3', executable='foo', input='inherited_input')
+    workload('test', executables=['test'], inputs=['test'])

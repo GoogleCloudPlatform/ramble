@@ -45,6 +45,11 @@ properties['config']['spack_flags'] = {
     'additionalProperties': False,
 }
 
+properties['config']['input_cache'] = {
+    'type': 'string',
+    'default': '$ramble/var/ramble/cache'
+}
+
 #: Full schema with metadata
 schema = {
     '$schema': 'http://json-schema.org/schema#',

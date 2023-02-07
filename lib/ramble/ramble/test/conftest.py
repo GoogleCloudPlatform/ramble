@@ -19,9 +19,12 @@ from llnl.util.filesystem import remove_linked_tree
 import ramble.config
 import ramble.paths
 import ramble.repository
+import ramble.stage
+from ramble.fetch_strategy import FetchError, FetchStrategyComposite, URLFetchStrategy
 
 import spack.platforms
 import spack.util.spack_yaml as syaml
+import spack.util.executable
 
 
 def _can_access(path, perms):
@@ -129,7 +132,7 @@ def mock_repo_path():
 
 
 @pytest.fixture(scope='function')
-def mock_applications(mock_repo_path, mock_app_install):
+def mock_applications(mock_repo_path):
     """Use the 'builtin.mock' repository instead of 'builtin'"""
     with ramble.repository.use_repositories(mock_repo_path) as mock_repo:
         yield mock_repo
@@ -391,3 +394,104 @@ def mutable_mock_workspace_path(tmpdir_factory):
 @pytest.fixture
 def no_path_access(monkeypatch):
     monkeypatch.setattr(os, 'access', _can_access)
+
+##########
+# Fake archives and repositories
+##########
+
+
+@pytest.fixture(scope='session', params=[('.tar.gz', 'z')])
+def mock_archive(request, tmpdir_factory):
+    """Creates a very simple archive directory with a configure script and a
+    makefile that installs to a prefix. Tars it up into an archive.
+    """
+    tar = spack.util.executable.which('tar', required=True)
+
+    tmpdir = tmpdir_factory.mktemp('mock-archive-dir')
+    tmpdir.ensure(ramble.stage._input_subdir, dir=True)
+    repodir = tmpdir.join(ramble.stage._input_subdir)
+
+    # Create the configure script
+    configure_path = str(tmpdir.join(ramble.stage._input_subdir,
+                                     'configure'))
+    with open(configure_path, 'w') as f:
+        f.write(
+            "#!/bin/sh\n"
+            "prefix=$(echo $1 | sed 's/--prefix=//')\n"
+            "cat > Makefile <<EOF\n"
+            "all:\n"
+            "\techo Building...\n\n"
+            "install:\n"
+            "\tmkdir -p $prefix\n"
+            "\ttouch $prefix/dummy_file\n"
+            "EOF\n"
+        )
+    os.chmod(configure_path, 0o755)
+
+    # Archive it
+    with tmpdir.as_cwd():
+        archive_name = '{0}{1}'.format(ramble.stage._input_subdir,
+                                       request.param[0])
+        tar('-c{0}f'.format(request.param[1]), archive_name,
+            ramble.stage._input_subdir)
+
+    Archive = collections.namedtuple('Archive',
+                                     ['url', 'path', 'archive_file',
+                                      'expanded_archive_basedir'])
+    archive_file = str(tmpdir.join(archive_name))
+    url = ('file://' + archive_file)
+
+    # Return the url
+    yield Archive(
+        url=url,
+        archive_file=archive_file,
+        path=str(repodir),
+        expanded_archive_basedir=ramble.stage._input_subdir)
+
+
+@pytest.fixture(scope='function')
+def install_mockery_mutable_config(
+        mutable_config, mock_applications
+):
+    """Hooks fake applications and config directory into Ramble.
+
+    This is specifically for tests which want to use 'install_mockery' but
+    also need to modify configuration (and hence would want to use
+    'mutable config'): 'install_mockery' does not support this.
+    """
+    # We use a fake package, so temporarily disable checksumming
+    with ramble.config.override('config:checksum', False):
+        yield
+
+
+class MockCache(object):
+    def store(self, copy_cmd, relative_dest):
+        pass
+
+    def fetcher(self, target_path, digest, **kwargs):
+        return MockCacheFetcher()
+
+
+class MockCacheFetcher(object):
+    def fetch(self):
+        raise FetchError('Mock cache always fails for tests')
+
+    def __str__(self):
+        return "[mock fetch cache]"
+
+
+@pytest.fixture(autouse=True)
+def mock_fetch_cache(monkeypatch):
+    """Substitutes ramble.paths.fetch_cache with a mock object that does nothing
+    and raises on fetch.
+    """
+    monkeypatch.setattr(ramble.caches, 'fetch_cache', MockCache())
+
+
+@pytest.fixture()
+def mock_fetch(mock_archive, monkeypatch):
+    """Fake the URL for an input so it downloads from a file."""
+    mock_fetcher = FetchStrategyComposite()
+    mock_fetcher.append(URLFetchStrategy(mock_archive.url))
+
+    yield mock_fetcher

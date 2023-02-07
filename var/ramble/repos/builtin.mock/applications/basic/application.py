@@ -16,7 +16,7 @@ class Basic(ExecutableApplication):
     executable('bar', 'baz', use_mpi=True)
 
     input_file('input', url='file:///tmp/test_file.log',
-               description='Not a file')
+               description='Not a file', extension='.log')
 
     workload('test_wl', executable='foo', input='input')
     workload('test_wl2', executable='bar', input='input')

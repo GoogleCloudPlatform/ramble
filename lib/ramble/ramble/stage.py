@@ -26,18 +26,18 @@ from llnl.util.filesystem import mkdirp, can_access, install, install_tree
 from llnl.util.filesystem import partition_path, remove_linked_tree
 
 import spack.paths
-import spack.caches
 import spack.config
-import spack.mirror
 import spack.util.pattern as pattern
 import spack.util.path as sup
 import spack.util.url as url_util
 
 from spack.util.crypto import prefix_bits, bit_length
 
+import ramble.caches
 import ramble.fetch_strategy as fs
 import ramble.util.lock
 import ramble.error
+import ramble.mirror
 
 
 # The well-known stage source subdirectory name.
@@ -164,7 +164,7 @@ _stage_root = None
 # TODO (dwj): If we want to support multiple mirrors, we'll need to
 #             figure out how to pass them to the stage.
 def _mirror_roots():
-    mirrors = spack.config.get('mirrors')
+    mirrors = ramble.config.get('mirrors')
     return [
         sup.substitute_path_variables(root) if root.endswith(os.sep)
         else sup.substitute_path_variables(root) + os.sep
@@ -405,7 +405,7 @@ class InputStage(object):
             # urljoin() will strip everything past the final '/' in
             # the root, so we add a '/' if it is not present.
             mirror_urls = []
-            for mirror in spack.mirror.MirrorCollection().values():
+            for mirror in ramble.mirror.MirrorCollection().values():
                 for rel_path in self.mirror_paths:
                     mirror_urls.append(
                         url_util.join(mirror.fetch_url, rel_path))
@@ -434,7 +434,7 @@ class InputStage(object):
 
             if self.default_fetcher.cachable:
                 for rel_path in reversed(list(self.mirror_paths)):
-                    cache_fetcher = spack.caches.fetch_cache.fetcher(
+                    cache_fetcher = ramble.caches.fetch_cache.fetcher(
                         rel_path, digest, expand=expand,
                         extension=extension)
                     fetchers.insert(0, cache_fetcher)
@@ -516,7 +516,7 @@ class InputStage(object):
         if self.fetcher is not self.default_fetcher and \
            self.skip_checksum_for_mirror:
             tty.warn("Fetching from mirror without a checksum!",
-                     "This package is normally checked out from a version "
+                     "This input is normally checked out from a version "
                      "control system, but it has been archived on a "
                      "mirror.  This means we cannot know a checksum for the "
                      "tarball in advance. Be sure that your connection to "
@@ -525,7 +525,7 @@ class InputStage(object):
             self.fetcher.check()
 
     def cache_local(self):
-        spack.caches.fetch_cache.store(
+        ramble.caches.fetch_cache.store(
             self.fetcher, self.mirror_paths.storage_path)
 
     def cache_mirror(self, mirror, stats):
@@ -546,8 +546,7 @@ class InputStage(object):
             # must examine the type of the fetcher.
             return
 
-        if (mirror.skip_unstable_versions and
-            not fs.stable_target(self.default_fetcher)):
+        if not fs.stable_target(self.default_fetcher):
             return
 
         absolute_storage_path = os.path.join(
@@ -792,7 +791,7 @@ def get_checksums_for_versions(
 
     Args:
         url_dict (dict): A dictionary of the form: version -> URL
-        name (str): The name of the package
+        name (str): The name of the input
         first_stage_function (callable): function that takes a Stage and a URL;
             this is run on the stage of the first URL downloaded
         keep_stage (bool): whether to keep staging area when command completes
@@ -894,7 +893,7 @@ class RestageError(StageError):
 
 
 class VersionFetchError(StageError):
-    """Raised when we can't determine a URL to fetch a package."""
+    """Raised when we can't determine a URL to fetch an input."""
 
 
 # Keep this in namespace for convenience

@@ -22,9 +22,12 @@ from llnl.util.tty.colify import colified
 import spack.util.executable
 import spack.util.spack_json
 import spack.util.environment
+import spack.util.compression
 
 import ramble.config
 import ramble.stage
+import ramble.mirror
+import ramble.fetch_strategy
 
 from ramble.language.application_language import ApplicationMeta
 from ramble.error import RambleError
@@ -342,6 +345,40 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         expander.set_var('spack_setup', '', 'experiment')
 
+    def all_inputs_and_fetchers(self):
+        expected_files = {}
+        for workload_name, workload in self.workloads.items():
+            for input_file in workload['inputs']:
+                input_conf = self.inputs[input_file]
+
+                fetcher = ramble.fetch_strategy.URLFetchStrategy(**input_conf)
+
+                file_name = os.path.basename(input_conf['url'])
+                if not fetcher.extension:
+                    fetcher.extension = spack.util.compression.extension(file_name)
+
+                file_name = file_name.replace(f'.{fetcher.extension}', '')
+
+                namespace = f'{self.name}.{workload_name}'
+
+                expected_files[file_name] = {'fetcher': fetcher,
+                                             'namespace': namespace,
+                                             'extension': fetcher.extension,
+                                             'input_name': input_file}
+
+        return expected_files
+
+    def mirror_inputs(self, mirror_root, mirror, mirror_stats):
+        required_inputs = self.all_inputs_and_fetchers()
+        for input_name, conf in required_inputs.items():
+            mirror_paths = ramble.mirror.mirror_archive_paths(
+                conf['fetcher'], os.path.join(self.name, input_name))
+            stage = ramble.stage.InputStage(conf['fetcher'], name=conf['namespace'],
+                                            path=mirror_root,
+                                            mirror_paths=mirror_paths, lock=False)
+
+            stage.cache_mirror(mirror, mirror_stats)
+
     def _get_inputs(self, workspace, expander):
         workload_namespace = '%s.%s' % (expander.application_name,
                                         expander.workload_name)
@@ -352,19 +389,30 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             input_conf = self.inputs[input_file]
             input_url = input_conf['url']
 
-            tty.msg('      Staging inputs for %s' % workload_namespace)
-            with ramble.stage.InputStage(input_url, name=workload_namespace,
-                                         path=expander.application_input_dir) \
-                    as stage:
-                stage.set_subdir(expander.expand_var(input_conf['target_dir']))
-                if not workspace.dry_run:
+            if not workspace.dry_run:
+                fetcher = ramble.fetch_strategy.URLFetchStrategy(**input_conf)
+
+                file_name = '.'.join(os.path.basename(input_url).split('.')[0:-1])
+
+                mirror_paths = ramble.mirror.mirror_archive_paths(
+                    fetcher, os.path.join(self.name, file_name))
+
+                with ramble.stage.InputStage(fetcher, name=workload_namespace,
+                                             path=expander.application_input_dir,
+                                             mirror_paths=mirror_paths) \
+                        as stage:
+                    stage.set_subdir(expander.expand_var(input_conf['target_dir']))
                     stage.fetch()
-                    try:
-                        stage.expand_archive()
-                    except spack.util.executable.ProcessError:
-                        pass
-                else:
-                    tty.msg('DRY-RUN: Would download %s' % input_url)
+                    if input_conf['sha256']:
+                        stage.check()
+                    stage.cache_local()
+                    if input_conf['expand']:
+                        try:
+                            stage.expand_archive()
+                        except spack.util.executable.ProcessError:
+                            pass
+            else:
+                tty.msg('DRY-RUN: Would download %s' % input_url)
 
     def _make_experiments(self, workspace, expander):
         experiment_run_dir = expander.experiment_run_dir
