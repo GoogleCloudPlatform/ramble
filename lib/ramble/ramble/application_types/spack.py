@@ -44,6 +44,7 @@ class SpackApplication(ApplicationBase):
     def __init__(self, file_path):
         super().__init__(file_path)
         self._setup_phases = [
+            'create_spack_env',
             'install_software',
             'get_inputs',
             'make_experiments'
@@ -84,38 +85,42 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _install_software(self, workspace, expander):
-        import os
+    def _extract_specs(self, workspace, expander, spec_name, app_name):
+        """Build a list of all specs the named spec requires
+
+        Traverse a spec and all of its dependencies to extract a list
+        of specs
+        """
+        spec_list = []
+        spec = workspace.get_named_spec(spec_name, app_name)
+        if 'dependencies' in spec:
+            for dep in spec['dependencies']:
+                spec_list.extend(
+                    extract_specs(workspace,
+                                  expander,
+                                  dep, app_name))
+        spec['application_name'] = app_name
+        spec_list.append((spec_name, spec))
+        return spec_list
+
+    def _create_spack_env(self, workspace, expander):
+        """Write create the spack environment for this experiment
+
+        Extract all specs this experiment uses, and write the spack environment
+        file that for it.
+        """
 
         # See if we cached this already, and if so return
         namespace = expander.spec_namespace
         if not namespace:
             raise ApplicationError('Ramble spec_namespace is set to None.')
 
-        cache_tupl = ('spack', namespace)
+        cache_tupl = ('spack-env', namespace)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
-
-        def extract_specs(workspace, expander, spec_name, app_name):
-            """Build a list of all specs the named spec requires
-
-            Traverse a spec and all of its dependencies to extract a list
-            of specs
-            """
-            spec_list = []
-            spec = workspace.get_named_spec(spec_name, app_name)
-            if 'dependencies' in spec:
-                for dep in spec['dependencies']:
-                    spec_list.extend(
-                        extract_specs(workspace,
-                                      expander,
-                                      dep, app_name))
-            spec['application_name'] = app_name
-            spec_list.append((spec_name, spec))
-            return spec_list
 
         try:
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
@@ -145,7 +150,7 @@ class SpackApplication(ApplicationBase):
                     runner.add_spec(workspace.spec_string(mpi_spec,
                                                           use_custom_specifier=True))
 
-                pkg_specs = extract_specs(workspace, expander, name,
+                pkg_specs = self._extract_specs(workspace, expander, name,
                                           app_context)
                 for pkg_name, pkg_info in pkg_specs:
                     if pkg_name not in added_specs:
@@ -169,20 +174,46 @@ class SpackApplication(ApplicationBase):
                         tty.die('Required spec %s is not ' % name +
                                 'defined in ramble.yaml')
 
+            runner.finalize_env()
+
+        except ramble.spack_runner.RunnerError as e:
+            tty.die(e)
+
+    def _install_software(self, workspace, expander):
+        """Install application's software using spack"""
+        import os
+
+        # See if we cached this already, and if so return
+        namespace = expander.spec_namespace
+        if not namespace:
+            raise ApplicationError('Ramble spec_namespace is set to None.')
+
+        cache_tupl = ('spack-install', namespace)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already in cache.'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
+            runner.set_env(expander.expand_var('{spack_env}'))
+
+            runner.activate()
             runner.concretize()
             runner.install()
 
+            app_context = expander.expand_var('{spec_name}')
             for name, spec_info in \
                     workspace.all_application_specs(app_context):
-                if 'mpi' in spec_info and \
-                        spec_info['mpi'] not in mpi_added:
+                if 'mpi' in spec_info:
                     mpi_spec = workspace.get_named_spec(spec_info['mpi'],
                                                         'mpi_library')
                     spec_str = workspace.spec_string(mpi_spec)
                     package_path = runner.get_package_path(spec_str)
                     expander.set_package_path(name, package_path)
 
-                pkg_specs = extract_specs(workspace, expander, name,
+                pkg_specs = self._extract_specs(workspace, expander, name,
                                           app_context)
                 for pkg_name, pkg_info in pkg_specs:
                     spec = workspace._build_spec_dict(pkg_info,
