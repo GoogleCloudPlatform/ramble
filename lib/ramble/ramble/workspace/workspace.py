@@ -62,7 +62,10 @@ ramble_workspace_var = 'RAMBLE_WORKSPACE'
 _active_workspace = None
 
 #: Path where workspaces are stored
-workspace_path = os.path.join(ramble.paths.var_path, 'workspaces')
+try:
+    workspace_path = os.path.expanduser(ramble.config.get('config:user:workspace_dir'))
+except:
+    workspace_path = os.path.join(ramble.paths.var_path, 'workspaces')
 
 #: Subdirectory where workspace configs are stored
 workspace_config_path = 'configs'
