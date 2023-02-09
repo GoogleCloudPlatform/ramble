@@ -154,6 +154,15 @@ _repos() {
     RAMBLE_COMPREPLY="$RAMBLE_REPOS"
 }
 
+_workspaces() {
+
+    if [[ -z "${RAMBLE_WORKSPACES:-}" ]]
+    then
+        RAMBLE_WORKSPACES="$(ramble workspace list)"
+    fi
+    RAMBLE_COMPREPLY="$RAMBLE_WORKSPACES"
+}
+
 _tests() {
     if [[ -z "${RAMBLE_TESTS:-}" ]]
     then
