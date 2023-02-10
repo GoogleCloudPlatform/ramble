@@ -30,10 +30,13 @@ import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
 import ramble.success_criteria
+from ramble.mirror import MirrorStats
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
 from spack.util.executable import CommandNotFoundError, which
+import spack.util.url as url_util
+import spack.util.web as web_util
 
 import ramble.schema.workspace
 import ramble.schema.applications
@@ -429,6 +432,13 @@ class Workspace(object):
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
         self._templates = {}
         self._auxiliary_software_files = {}
+        self._software_mirror_path = None
+        self._input_mirror_path = None
+        self._mirror_existed = None
+        self._software_mirror_stats = None
+        self._input_mirror_stats = None
+        self._input_mirror_cache = None
+        self._software_mirror_cache = None
 
         self.specs = []
 
@@ -1169,6 +1179,26 @@ class Workspace(object):
 
         experiment_script()
 
+    def create_mirror(self, mirror_root):
+        parsed_url = url_util.parse(mirror_root)
+        self._mirror_path = url_util.local_file_path(parsed_url)
+        self._mirror_existed = web_util.url_exists(self._mirror_path)
+        self._input_mirror_path = os.path.join(self._mirror_path, 'inputs')
+        self._software_mirror_path = os.path.join(self._mirror_path, 'software')
+        mirror_dirs = [self._mirror_path, self._input_mirror_path, self._software_mirror_path]
+        for subdir in mirror_dirs:
+            if not os.path.isdir(subdir):
+                try:
+                    fs.mkdirp(subdir)
+                except OSError as e:
+                    raise ramble.mirror.MirrorError(
+                        "Cannot create directory '%s':" % subdir, str(e))
+
+        self._software_mirror_stats = MirrorStats()
+        self._input_mirror_stats = MirrorStats()
+        self._input_mirror_cache = ramble.caches.MirrorCache(self._input_mirror_path)
+        self._software_mirror_cache = ramble.caches.MirrorCache(self._software_mirror_path)
+
     def run_pipeline(self, pipeline):
         all_experiments_file = None
         expander = ramble.expander.Expander(self)
@@ -1240,6 +1270,26 @@ class Workspace(object):
                                                 workspace_all_experiments_file)
             os.chmod(all_experiments_path, stat.S_IRWXU | stat.S_IRWXG
                      | stat.S_IROTH | stat.S_IXOTH)
+        elif pipeline == 'mirror':
+            verb = "updated" if self._mirror_existed else "created"
+            tty.msg(
+                "Successfully %s spack software in %s" % (verb, self._mirror_path),
+                "Archive stats:",
+                "  %-4d already present"  % len(self._software_mirror_stats.present),
+                "  %-4d added"            % len(self._software_mirror_stats.new),
+                "  %-4d failed to fetch." % len(self._software_mirror_stats.errors))
+
+            tty.msg(
+                "Successfully %s inputs in %s" % (verb, self._mirror_path),
+                "Archive stats:",
+                "  %-4d already present"  % len(self._input_mirror_stats.present),
+                "  %-4d added"            % len(self._input_mirror_stats.new),
+                "  %-4d failed to fetch." % len(self._input_mirror_stats.errors))
+
+            if self._input_mirror_stats.errors:
+                tty.error("Failed downloads:")
+                tty.colify(s.cformat("{name}") for s in list(self._input_mirror_stats.errors))
+                tty.die('Mirroring has errors.')
 
     @property
     def latest_archive_path(self):

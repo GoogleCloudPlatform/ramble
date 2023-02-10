@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 import llnl.util.tty as tty
 
 from ramble.application import ApplicationBase, ApplicationError
@@ -52,6 +54,11 @@ class SpackApplication(ApplicationBase):
 
         self._analyze_phases = ['analyze_experiments']
         self._archive_phases = ['archive_experiments']
+        self._mirror_phases = [
+            'mirror_inputs',
+            'create_spack_env',
+            'mirror_software'
+        ]
 
         self.application_class = 'SpackApplication'
 
@@ -86,7 +93,7 @@ class SpackApplication(ApplicationBase):
             tty.die(e)
 
     def _extract_specs(self, workspace, expander, spec_name, app_name):
-        """Build a list of all specs the named spec requires
+        """Build a list of all specs which the named spec requires
 
         Traverse a spec and all of its dependencies to extract a list
         of specs
@@ -96,18 +103,18 @@ class SpackApplication(ApplicationBase):
         if 'dependencies' in spec:
             for dep in spec['dependencies']:
                 spec_list.extend(
-                    extract_specs(workspace,
-                                  expander,
-                                  dep, app_name))
+                    self._extract_specs(workspace,
+                                        expander,
+                                        dep, app_name))
         spec['application_name'] = app_name
         spec_list.append((spec_name, spec))
         return spec_list
 
     def _create_spack_env(self, workspace, expander):
-        """Write create the spack environment for this experiment
+        """Create the spack environment for this experiment
 
         Extract all specs this experiment uses, and write the spack environment
-        file that for it.
+        file for it.
         """
 
         # See if we cached this already, and if so return
@@ -151,7 +158,7 @@ class SpackApplication(ApplicationBase):
                                                           use_custom_specifier=True))
 
                 pkg_specs = self._extract_specs(workspace, expander, name,
-                                          app_context)
+                                                app_context)
                 for pkg_name, pkg_info in pkg_specs:
                     if pkg_name not in added_specs:
                         added_specs[pkg_name] = True
@@ -174,14 +181,13 @@ class SpackApplication(ApplicationBase):
                         tty.die('Required spec %s is not ' % name +
                                 'defined in ramble.yaml')
 
-            runner.finalize_env()
+            runner.concretize()
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
     def _install_software(self, workspace, expander):
         """Install application's software using spack"""
-        import os
 
         # See if we cached this already, and if so return
         namespace = expander.spec_namespace
@@ -200,7 +206,6 @@ class SpackApplication(ApplicationBase):
             runner.set_env(expander.expand_var('{spack_env}'))
 
             runner.activate()
-            runner.concretize()
             runner.install()
 
             app_context = expander.expand_var('{spec_name}')
@@ -214,7 +219,7 @@ class SpackApplication(ApplicationBase):
                     expander.set_package_path(name, package_path)
 
                 pkg_specs = self._extract_specs(workspace, expander, name,
-                                          app_context)
+                                                app_context)
                 for pkg_name, pkg_info in pkg_specs:
                     spec = workspace._build_spec_dict(pkg_info,
                                                       app_name=app_context)
@@ -222,6 +227,64 @@ class SpackApplication(ApplicationBase):
                                                      as_dep=False)
                     package_path = runner.get_package_path(spec_str)
                     expander.set_package_path(pkg_name, package_path)
+
+        except ramble.spack_runner.RunnerError as e:
+            tty.die(e)
+
+    def _mirror_software(self, workspace, expander):
+        """Mirror software source for this experiment using spack"""
+        import re
+
+        # See if we cached this already, and if so return
+        namespace = expander.spec_namespace
+        if not namespace:
+            raise ApplicationError('Ramble spec_namespace is set to None.')
+
+        cache_tupl = ('spack-mirror', namespace)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already in cache.'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
+            runner.set_env(expander.expand_var('{spack_env}'))
+
+            runner.activate()
+
+            mirror_output = runner.mirror_environment(workspace._software_mirror_path)
+
+            present = 0
+            added = 0
+            failed = 0
+
+            present_regex = re.compile(r'\s+(?P<num>[0-9]+)\s+already present')
+            present_match = present_regex.search(mirror_output)
+            if present_match:
+                present = int(present_match.group('num'))
+
+            added_regex = re.compile(r'\s+(?P<num>[0-9]+)\s+added')
+            added_match = added_regex.search(mirror_output)
+            if added_match:
+                added = int(added_match.group('num'))
+
+            failed_regex = re.compile(r'\s+(?P<num>[0-9]+)\s+failed to fetch.')
+            failed_match = failed_regex.search(mirror_output)
+            if failed_match:
+                failed = int(failed_match.group('num'))
+
+            added_start = len(workspace._software_mirror_stats.new)
+            for i in range(added_start, added_start + added):
+                workspace._software_mirror_stats.new[i] = i
+
+            present_start = len(workspace._software_mirror_stats.present)
+            for i in range(present_start, present_start + present):
+                workspace._software_mirror_stats.present[i] = i
+
+            error_start = len(workspace._software_mirror_stats.errors)
+            for i in range(error_start, error_start + failed):
+                workspace._software_mirror_stats.errors.add(i)
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)

@@ -478,7 +478,7 @@ class MirrorStats(object):
     def __init__(self):
         self.present = {}
         self.new = {}
-        self.errors = set()
+        self.errors = {}
 
         self.current_spec = None
         self.added_resources = set()
@@ -503,15 +503,12 @@ class MirrorStats(object):
         return list(self.present), list(self.new), list(self.errors)
 
     def already_existed(self, resource):
-        # If an error occurred after caching a subset of a spec's
-        # resources, a secondary attempt may consider them already added
-        if resource not in self.added_resources:
-            self.existing_resources.add(resource)
+        self.present[resource] = True
 
     def added(self, resource):
-        self.added_resources.add(resource)
+        self.new[resource] = True
 
-    def error(self):
+    def error(self, resource):
         self.errors.add(self.current_spec)
 
 

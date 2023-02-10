@@ -553,13 +553,19 @@ class InputStage(object):
             mirror.root, self.mirror_paths.storage_path)
 
         if os.path.exists(absolute_storage_path):
+            tty.debug('Already existed: %s' % absolute_storage_path)
             stats.already_existed(absolute_storage_path)
+            tty.debug('   Stats? %s' % stats.present)
         else:
             self.fetch()
             self.check()
             mirror.store(
                 self.fetcher, self.mirror_paths.storage_path)
+            tty.debug('Added: %s' % absolute_storage_path)
             stats.added(absolute_storage_path)
+
+        if not os.path.exists(absolute_storage_path):
+            stats.error(absolute_storage_path)
 
         mirror.symlink(self.mirror_paths)
 

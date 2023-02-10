@@ -27,6 +27,7 @@ class Wrfv3(SpackApplication):
                description='2.5 km resolution mesh of the continental United States.')
 
     input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/bench/conus12km_v3911/bench_12km.tar.bz2',
+               sha256='0c5ecfc85f2a982f0fa0191371401c1474cf562a7cf97192acd3c9b91ebcc48d',
                description='12 km resolution mesh of the continental United States.')
 
     executable('cleanup', 'rm -f rsl.* wrfout*', use_mpi=False)

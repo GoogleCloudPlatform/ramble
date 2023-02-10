@@ -265,11 +265,14 @@ class SpackRunner(object):
         if spec not in self.env_contents:
             self.env_contents.append(spec)
 
-    def finalize_env(self):
-        """Write the spack.yaml file
+    def concretize(self):
+        """
+        Concretize a spack environment.
 
-        This method writes the spack environment file, which completes creating
-        the environment prior to concretizing and installing it.
+        This happens by generating a spack.yaml file to build
+        the packages that should be in the environment.
+
+        This command requires an active spack environment.
         """
         self._check_active()
 
@@ -284,17 +287,6 @@ class SpackRunner(object):
         # Write spack.yaml to environment before concretizing
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
             syaml.dump_config(env_file, f, default_flow_style=False)
-
-    def concretize(self):
-        """
-        Concretize a spack environment.
-
-        This happens by generating a spack.yaml file to build
-        the packages that should be in the environment.
-
-        This command requires an active spack environment.
-        """
-        self._check_active()
 
         concretize_flags = ramble.config.get('config:spack_flags:concretize')
 
@@ -357,7 +349,29 @@ class SpackRunner(object):
             return self.exe(*args, output=str).strip()
         else:
             self._dry_run_print(args)
-            return '/dry-run/path/to/%s' % package_spec.split()[0]
+            return os.path.join('dry-run', 'path', 'to', package_spec.split()[0])
+
+    def mirror_environment(self, mirror_path):
+        """Create a spack mirror from the activated environment"""
+        self._check_active()
+
+        args = [
+            "mirror",
+            "create",
+            "--all",  # All packages in the environment
+            "-D",  # Include dependencies
+            "-d",
+            mirror_path
+        ]
+
+        if not self.dry_run:
+            return self.exe(*args, output=str).strip()
+        else:
+            self._dry_run_print(args)
+            return """
+  %-4d already present
+  %-4d added
+  %-4d failed to fetch.""" % (0, 0, 0)
 
     def _dry_run_print(self, args):
         tty.msg('DRY-RUN: would run %s' % self.exe.command)

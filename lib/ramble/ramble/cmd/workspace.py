@@ -46,6 +46,7 @@ subcommands = [
     'analyze',
     'info',
     'edit',
+    'mirror',
     ['list', 'ls'],
     ['remove', 'rm'],
 ]
@@ -570,6 +571,31 @@ def workspace_archive(args):
 
     ws.archive(create_tar=args.tar_archive,
                archive_url=args.upload_url)
+
+
+def workspace_mirror_setup_parser(subparser):
+    """mirror current workspace state"""
+    subparser.add_argument(
+        '-d', dest='mirror_path',
+        default=None,
+        help='Path to create mirror in.')
+
+    subparser.add_argument(
+        '--dry-run', dest='dry_run',
+        action='store_true',
+        help='perform a dry run. Creates spack environments, ' +
+             'prints commands that would be executed ' +
+             'for installation, and files that would be downloaded.')
+
+
+def workspace_mirror(args):
+    ws = ramble.cmd.require_active_workspace(cmd_name='workspace archive')
+
+    if args.dry_run:
+        ws.dry_run = True
+
+    ws.create_mirror(args.mirror_path)
+    ws.run_pipeline('mirror')
 
 
 #: Dictionary mapping subcommand names and aliases to functions
