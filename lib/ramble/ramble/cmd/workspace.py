@@ -243,8 +243,8 @@ def _workspace_create(name_or_path, dir=False,
 
     if template_execute:
         with open(template_execute, 'r') as f:
-            workspace._read_execution_template(f.read())
-            workspace._write_execution_template()
+            workspace._read_template('execute_experiment', f.read())
+            workspace._write_templates()
 
     return workspace
 
