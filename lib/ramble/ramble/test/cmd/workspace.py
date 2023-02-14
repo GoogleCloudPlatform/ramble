@@ -200,6 +200,7 @@ cmake -DTEST=1 -h
 
         workspace('create', '-d', '-t', tpl_path, '.')
 
+        assert os.path.exists(tmpdir + '/configs/tmp_test.tpl')
         assert os.path.exists(tmpdir + '/configs/ramble.yaml')
         num_templates = 0
         for filename in os.listdir(tmpdir + '/configs'):
