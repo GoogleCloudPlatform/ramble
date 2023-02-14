@@ -192,7 +192,6 @@ cmake -DTEST=1 -h
 
 {command}
         """
-        print(tmpdir)
         tpl_path = os.path.join(tmpdir, 'tmp_test.tpl')
         with open(tpl_path, 'w+') as f:
             f.write(tpl_in)
