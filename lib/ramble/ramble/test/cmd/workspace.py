@@ -182,6 +182,34 @@ def test_workspace_dir(tmpdir):
         assert num_templates > 0
 
 
+def test_workspace_from_template(tmpdir):
+    with tmpdir.as_cwd():
+        tpl_in = """
+cd "{experiment_run_dir}"
+
+cmake -DTEST=1 -h
+{spack_setup}
+
+{command}
+        """
+        tpl_path = os.path.join(tmpdir, 'tmp_test.tpl')
+        with open(tpl_path, 'w+') as f:
+            f.write(tpl_in)
+
+        assert os.path.exists(tpl_path)
+
+        workspace('create', '-d', '-t', tpl_path, '.')
+
+        assert os.path.exists(tmpdir + '/configs/tmp_test.tpl')
+        assert os.path.exists(tmpdir + '/configs/ramble.yaml')
+        num_templates = 0
+        for filename in os.listdir(tmpdir + '/configs'):
+            if filename.endswith('.tpl'):
+                num_templates += 1
+
+        assert num_templates > 0
+
+
 def test_remove_workspace(capfd):
     workspace('create', 'foo')
     workspace('create', 'bar')

@@ -243,8 +243,10 @@ def _workspace_create(name_or_path, dir=False,
 
     if template_execute:
         with open(template_execute, 'r') as f:
-            workspace._read_execution_template(f.read())
-            workspace._write_execution_template()
+            _, file_name = os.path.split(template_execute)
+            template_name = os.path.splitext(file_name)[0]
+            workspace._read_template(template_name, f.read())
+            workspace._write_templates()
 
     return workspace
 
