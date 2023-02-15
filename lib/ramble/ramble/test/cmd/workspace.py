@@ -16,8 +16,9 @@ import ramble.workspace
 from ramble.main import RambleCommand, RambleCommandError
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path',
+                                     'mutable_mock_repo')
 
 config = RambleCommand('config')
 workspace = RambleCommand('workspace')
@@ -208,6 +209,39 @@ cmake -DTEST=1 -h
                 num_templates += 1
 
         assert num_templates > 0
+
+
+def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        # Make a temp directory,
+        # Set it up as the workspace_dirs path,
+        # make a test workspace there, and
+        # verify the workspace was created where
+        # it would be expected
+        wsdir1 = os.path.join(os.getcwd(), 'ws1')
+        os.makedirs(wsdir1)
+        ramble.workspace.set_workspace_path(wsdir1)
+        workspace('create', 'test1')
+        out = workspace('list')
+        assert 'test1' in out
+
+        # Now make a second temp directory,
+        # follow same process to make another test
+        # workspace, and verify that the first
+        # test workspace is not found while the
+        # second is
+        wsdir2 = os.path.join(os.getcwd(), 'ws2')
+        os.makedirs(wsdir2)
+        ramble.workspace.set_workspace_path(wsdir2)
+        workspace('create', 'test2')
+        out = workspace('list')
+        assert 'test2' in out
+        assert 'test1' not in out
+
+        # Cleanup after test
+        workspace('remove', '-y', 'test2')
+        ramble.workspace.set_workspace_path(wsdir1)
+        workspace('remove', '-y', 'test1')
 
 
 def test_remove_workspace(capfd):

@@ -62,7 +62,7 @@ def pytest_collection_modifyitems(config, items):
 #
 @pytest.fixture(scope='function', autouse=True)
 def no_chdir():
-    """Ensure that no test changes Ramble's working dirctory.
+    """Ensure that no test changes Ramble's working directory.
 
     This prevents Ramble tests (and therefore Ramble commands) from
     changing the working directory and causing other tests to fail
@@ -231,8 +231,11 @@ def mutable_config(tmpdir_factory, configuration_dir):
     mutable_dir = tmpdir_factory.mktemp('mutable_config').join('tmp')
     configuration_dir.copy(mutable_dir)
 
-    scopes = [ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
-              for name in ['site', 'system', 'user']]
+    defaults = ramble.config.InternalConfigScope('_builtin',
+                                                 ramble.config.config_defaults)
+    scopes  = [defaults]
+    scopes += [ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
+               for name in ['site', 'system', 'user']]
 
     with ramble.config.use_configuration(*scopes) as cfg:
         yield cfg
@@ -381,14 +384,14 @@ def mock_executable(tmpdir):
     return _factory
 
 
-@pytest.fixture()
-def mutable_mock_workspace_path(tmpdir_factory):
+@pytest.fixture(scope='function')
+def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
     """Fixture for mocking the internal ramble workspaces directory."""
-    saved_path = ramble.workspace.workspace_path
+    saved_path = ramble.workspace.get_workspace_path()
     mock_path = tmpdir_factory.mktemp('mock-workspace-path')
-    ramble.workspace.workspace.workspace_path = str(mock_path)
+    ramble.workspace.set_workspace_path(str(mock_path))
     yield mock_path
-    ramble.workspace.workspace.workspace_path = saved_path
+    ramble.workspace.set_workspace_path(saved_path)
 
 
 @pytest.fixture

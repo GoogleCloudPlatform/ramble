@@ -12,8 +12,10 @@ import ramble.workspace
 import ramble.expander
 from ramble.main import RambleCommand
 
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path',
+                                     'mutable_mock_repo',
+                                     )
 
 workspace  = RambleCommand('workspace')
 add  = RambleCommand('add')

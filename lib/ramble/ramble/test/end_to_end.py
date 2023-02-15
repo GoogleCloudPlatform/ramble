@@ -15,13 +15,13 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path')
 
 workspace = RambleCommand('workspace')
 
 
-def test_wrfv4_dry_run():
+def test_wrfv4_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
   mpi:

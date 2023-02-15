@@ -23,7 +23,11 @@ import spack.util.executable
 
 pytestmark = [pytest.mark.skipif(sys.platform == "win32",
                                  reason="does not run on windows"),
-              pytest.mark.usefixtures('mutable_config', 'mutable_mock_repo')]
+              pytest.mark.usefixtures('tmpdir',
+                                      'tmpdir_factory',
+                                      'mutable_config',
+                                      'mutable_mock_workspace_path',
+                                      'mutable_mock_repo')]
 
 
 class MockFetcher(object):
@@ -86,7 +90,7 @@ def check_mirror(mirror_path, app_name, app_class):
 ])
 def test_mirror_create(tmpdir, mutable_mock_repo,
                        mutable_mock_workspace_path,
-                       config, app_name, tmpdir_factory):
+                       app_name, tmpdir_factory):
 
     test_config = f"""
 ramble:
