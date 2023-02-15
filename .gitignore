@@ -2,3 +2,5 @@ __pycache__/
 *.x
 *.txt
 var/ramble/cache
+.tags
+TAGS

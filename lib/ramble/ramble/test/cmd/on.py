@@ -40,6 +40,8 @@ def test_on_command():
 
         on()
 
+    workspace('remove', '-y', 'test')
+
 
 def test_execute_nothing():
     ws_name = 'test'
@@ -57,3 +59,5 @@ def test_execute_nothing():
         assert os.path.exists(ws.root + '/all_experiments')
 
         ws.run_experiments()
+
+    workspace('remove', '-y', 'test')

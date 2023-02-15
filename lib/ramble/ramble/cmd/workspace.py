@@ -106,19 +106,22 @@ def workspace_activate(args):
     # Temporary workspace
     if args.temp:
         workspace = create_temp_workspace_directory()
-        workspace_path = os.path.abspath(workspace)
-        short_name = os.path.basename(workspace_path)
+        wspath_dir = os.path.abspath(workspace)
+        ramble.workspace.set_workspace_path(wspath_dir)
+        short_name = os.path.basename(wspath_dir)
         ramble.workspace.Workspace(workspace).write()
 
     # Named workspace
     elif ramble.workspace.exists(workspace_name_or_dir) and not args.dir:
-        workspace_path = ramble.workspace.root(workspace_name_or_dir)
+        wspath_dir = ramble.workspace.root(workspace_name_or_dir)
+        ramble.workspace.set_workspace_path(wspath_dir)
         short_name = workspace_name_or_dir
 
     # Workspace directory
     elif ramble.workspace.is_workspace_dir(workspace_name_or_dir):
-        workspace_path = os.path.abspath(workspace_name_or_dir)
-        short_name = os.path.basename(workspace_path)
+        workspace_path_dir = os.path.abspath(workspace_name_or_dir)
+        ramble.workspace.set_workspace_path(workspace_path_dir)
+        short_name = os.path.basename(workspace_path_dir)
 
     else:
         tty.die("No such workspace: '%s'" % workspace_name_or_dir)
@@ -134,7 +137,8 @@ def workspace_activate(args):
         env_mods = ramble.workspace.shell.deactivate()
 
     # Activate new workspace
-    active_workspace = ramble.workspace.Workspace(workspace_path)
+    workspace_path_dir = ramble.workspace.get_workspace_path()
+    active_workspace = ramble.workspace.Workspace(workspace_path_dir)
     cmds += ramble.workspace.shell.activate_header(
         ws=active_workspace,
         shell=args.shell,

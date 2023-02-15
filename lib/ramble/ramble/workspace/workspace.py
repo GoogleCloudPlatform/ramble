@@ -61,9 +61,6 @@ ramble_workspace_var = 'RAMBLE_WORKSPACE'
 #: Currently activated workspace
 _active_workspace = None
 
-#: Path where workspaces are stored
-workspace_path = ramble.util.path.canonicalize_path(ramble.config.get('config:workspace_dirs'))
-
 #: Subdirectory where workspace configs are stored
 workspace_config_path = 'configs'
 
@@ -253,10 +250,11 @@ def all_workspace_names():
     """List the names of workspaces that currently exist."""
     # just return empty if the workspace path does not exist.  A read-only
     # operation like list should not try to create a directory.
-    if not os.path.exists(workspace_path):
+    wspath = _get_workspace_path()
+    if not os.path.exists(wspath):
         return []
 
-    candidates = sorted(os.listdir(workspace_path))
+    candidates = sorted(os.listdir(wspath))
     names = []
     for candidate in candidates:
         configured = True
@@ -281,9 +279,30 @@ def active_workspace():
     return _active_workspace
 
 
+def get_workspace_path():
+    """Returns current directory of ramble-managed workspaces"""
+    return _get_workspace_path()
+
+
+def _get_workspace_path():
+    """Non-validating version of get_workspace_path, to be used internally."""
+    path_in_config = ramble.config.get('config:workspace_dirs')
+    if not path_in_config:
+        path_in_config = '$ramble/var/ramble/GET_WORKSPACE_ERROR/'
+
+    wspath = ramble.util.path.canonicalize_path(path_in_config)
+    return wspath
+
+
+def set_workspace_path(dirname):
+    """Sets the parent directory of ramble-managed workspaces"""
+    ramble.config.set('config:workspace_dirs:', dirname)
+
+
 def _root(name):
     """Non-validating version of root(), to be used internally."""
-    return os.path.join(workspace_path, name)
+    wspath = _get_workspace_path()
+    return os.path.join(wspath, name)
 
 
 def root(name):
@@ -1384,7 +1403,8 @@ class Workspace(object):
     @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
-        return self.path.startswith(workspace_path)
+        wspath = _get_workspace_path()
+        return self.path.startswith(wspath)
 
     @property
     def name(self):

@@ -271,3 +271,6 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, 'rsl.out.0000'))
             for i in range(0, 5):
                 assert os.path.exists(os.path.join(exp_dir, f'rsl.error.000{i}'))
+
+    if workspace_name in workspace('list'):
+        workspace('remove', '-y', workspace_name)
