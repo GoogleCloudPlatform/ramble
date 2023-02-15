@@ -250,7 +250,7 @@ def all_workspace_names():
     """List the names of workspaces that currently exist."""
     # just return empty if the workspace path does not exist.  A read-only
     # operation like list should not try to create a directory.
-    wspath = _get_workspace_path()
+    wspath = get_workspace_path()
     if not os.path.exists(wspath):
         return []
 
@@ -281,11 +281,6 @@ def active_workspace():
 
 def get_workspace_path():
     """Returns current directory of ramble-managed workspaces"""
-    return _get_workspace_path()
-
-
-def _get_workspace_path():
-    """Non-validating version of get_workspace_path, to be used internally."""
     path_in_config = ramble.config.get('config:workspace_dirs')
     if not path_in_config:
         path_in_config = '$ramble/var/ramble/GET_WORKSPACE_ERROR/'
@@ -301,7 +296,7 @@ def set_workspace_path(dirname):
 
 def _root(name):
     """Non-validating version of root(), to be used internally."""
-    wspath = _get_workspace_path()
+    wspath = get_workspace_path()
     return os.path.join(wspath, name)
 
 
@@ -1403,7 +1398,7 @@ class Workspace(object):
     @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
-        wspath = _get_workspace_path()
+        wspath = get_workspace_path()
         return self.path.startswith(wspath)
 
     @property
