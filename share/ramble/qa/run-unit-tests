@@ -42,4 +42,4 @@ bin/ramble help -a
 #-----------------------------------------------------------
 # Run unit tests with code coverage
 #-----------------------------------------------------------
-$coverage_run $(which ramble) unit-test -x
+$coverage_run $(which ramble) unit-test -x --verbose
