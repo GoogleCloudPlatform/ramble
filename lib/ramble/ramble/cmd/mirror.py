@@ -5,8 +5,6 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-import sys
-
 import llnl.util.tty as tty
 
 import ramble.cmd.common.arguments as arguments
@@ -31,11 +29,6 @@ def setup_parser(subparser):
 
     sp = subparser.add_subparsers(
         metavar='SUBCOMMAND', dest='mirror_command')
-
-    # Create
-    create_parser = sp.add_parser('create', help=mirror_create.__doc__)
-    create_parser.add_argument('-d', '--directory', default=None,
-                               help="directory in which to create mirror")
 
     # Destroy
     destroy_parser = sp.add_parser('destroy', help=mirror_destroy.__doc__)
@@ -182,36 +175,6 @@ def _read_specs_from_file(filename):
     return specs
 
 
-def mirror_create(args):
-    """Create a directory to be used as a ramble mirror, and fill it with
-       input archives."""
-    ws = ramble.cmd.require_active_workspace(cmd_name='mirror create')
-
-    mirror = ramble.mirror.Mirror(
-        args.directory or ramble.config.get('config:input_cache'))
-
-    directory = url_util.format(mirror.push_url)
-
-    existed = web_util.url_exists(directory)
-
-    # Actually do the work to create the mirror
-    present, mirrored, error = ramble.mirror.create(
-        directory, ws)
-    p, m, e = len(present), len(mirrored), len(error)
-
-    verb = "updated" if existed else "created"
-    tty.msg(
-        "Successfully %s mirror in %s" % (verb, directory),
-        "Archive stats:",
-        "  %-4d already present"  % p,
-        "  %-4d added"            % m,
-        "  %-4d failed to fetch." % e)
-    if error:
-        tty.error("Failed downloads:")
-        tty.colify(s.cformat("{name}") for s in error)
-        sys.exit(1)
-
-
 def mirror_destroy(args):
     """Given a url, recursively delete everything under it."""
     mirror_url = None
@@ -226,8 +189,7 @@ def mirror_destroy(args):
 
 
 def mirror(parser, args):
-    action = {'create': mirror_create,
-              'destroy': mirror_destroy,
+    action = {'destroy': mirror_destroy,
               'add': mirror_add,
               'remove': mirror_remove,
               'rm': mirror_remove,

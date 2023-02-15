@@ -64,7 +64,7 @@ def test_mirror_cache_symlinks(tmpdir):
 def create_archive(archive_dir, app_class):
     tar = spack.util.executable.which('tar', required=True)
 
-    for input_name, conf in app_class.all_inputs_and_fetchers().items():
+    for input_name, conf in app_class._inputs_and_fetchers().items():
         archive_dir.ensure(input_name, dir=True)
         archive_name = os.path.basename(conf['fetcher'].url)
         test_file_path = str(archive_dir.join(input_name, 'input-file'))
@@ -80,9 +80,9 @@ def create_archive(archive_dir, app_class):
 
 
 def check_mirror(mirror_path, app_name, app_class):
-    for input_name, conf in app_class.all_inputs_and_fetchers().items():
+    for input_name, conf in app_class._inputs_and_fetchers().items():
         archive_name = '%s.%s' % (input_name, conf['fetcher'].extension)
-        assert os.path.exists(os.path.join(mirror_path, app_name, archive_name))
+        assert os.path.exists(os.path.join(mirror_path, 'inputs', app_name, archive_name))
 
 
 @pytest.mark.parametrize('app_name', [
@@ -134,7 +134,7 @@ spack:
             with open(config_path, 'w+') as f:
                 f.write(test_config)
             workspace._re_read()
-            workspace.run_pipeline('setup')
-            ramble.mirror.create(str(mirror_dir), workspace)
+            workspace.create_mirror(str(mirror_dir))
+            workspace.run_pipeline('mirror')
 
         check_mirror(str(mirror_dir), app_name, app_class)
