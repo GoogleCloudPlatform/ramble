@@ -13,12 +13,12 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.workspace
-import ramble.config
 from ramble.main import RambleCommand, RambleCommandError
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path',
+                                     'mutable_mock_repo')
 
 config = RambleCommand('config')
 workspace = RambleCommand('workspace')
@@ -90,28 +90,25 @@ def check_results(ws):
     assert os.path.exists(os.path.join(ws.root, fn + '.yaml'))
 
 
-def test_workspace_add(mutable_mock_workspace_path):
-    ws = ramble.workspace.create('test_workspace_add')
+def test_workspace_add():
+    ws = ramble.workspace.create('test')
     ws.add('basic')
     check_basic(ws)
-    # ws.destroy()
 
 
-def test_workspace_remove(mutable_mock_workspace_path):
-    ws = ramble.workspace.create('test_workspace_remove')
+def test_workspace_remove():
+    ws = ramble.workspace.create('test')
     ws.add('basic')
     check_basic(ws)
 
     ws.remove('basic')
     check_no_basic(ws)
-    # ws.destroy()
 
 
 def test_workspace_activate_fails(mutable_mock_workspace_path):
     workspace('create', 'foo')
     out = workspace('activate', 'foo')
     assert "To set up shell support" in out
-    workspace('remove', '-y', 'foo')
 
 
 def test_add_command():
@@ -123,8 +120,6 @@ def test_add_command():
 
         assert 'basic' in workspace('info')
         check_basic(ws)
-
-    workspace('remove', '-y', 'test')
 
 
 def test_remove_command():
@@ -143,11 +138,8 @@ def test_remove_command():
         assert 'basic' not in workspace('info')
         check_no_basic(ws)
 
-    workspace('remove', '-y', 'test')
-
 
 def test_workspace_list(mutable_mock_workspace_path):
-
     workspace('create', 'foo')
     workspace('create', 'bar')
     workspace('create', 'baz')
@@ -167,9 +159,6 @@ def test_workspace_list(mutable_mock_workspace_path):
     assert 'bar' in out
     assert 'baz' in out
     assert '.DS_Store' not in out
-    workspace('remove', '-y', 'foo')
-    workspace('remove', '-y', 'bar')
-    workspace('remove', '-y', 'baz')
 
 
 def test_workspace_info(mutable_mock_workspace_path):
@@ -180,7 +169,6 @@ def test_workspace_info(mutable_mock_workspace_path):
         out = workspace('info')
 
     check_info_basic(out)
-    workspace('remove', '-y', 'foo')
 
 
 def test_workspace_dir(tmpdir):
@@ -292,8 +280,6 @@ def test_concretize_command():
         workspace('concretize')
         assert ws.is_concretized()
 
-    workspace('remove', '-y', ws_name)
-
 
 def test_concretize_nothing():
     ws_name = 'test'
@@ -306,8 +292,6 @@ def test_concretize_nothing():
 
         ws.concretize()
         assert ws.is_concretized()
-
-    workspace('remove', '-y', 'test')
 
 
 def test_setup_command():
@@ -323,8 +307,6 @@ def test_setup_command():
 
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
-
-    workspace('remove', '-y', ws_name)
 
 
 def test_setup_nothing():
@@ -342,10 +324,8 @@ def test_setup_nothing():
         ws.run_pipeline('setup')
         assert os.path.exists(ws.root + '/all_experiments')
 
-    workspace('remove', '-y', 'test')
 
-
-def test_analyze_command():
+def test_anlyze_command():
     ws_name = 'test'
     workspace('create', ws_name)
 
@@ -361,8 +341,6 @@ def test_analyze_command():
 
         workspace('analyze')
         check_results(ws)
-
-    workspace('remove', '-y', 'test')
 
 
 def test_analyze_nothing():
@@ -382,8 +360,6 @@ def test_analyze_nothing():
 
         ws.run_pipeline('analyze')
         check_results(ws)
-
-    workspace('remove', '-y', 'test')
 
 
 def test_workspace_flag_named():
@@ -413,8 +389,6 @@ def test_workspace_flag_named():
     with ramble.workspace.read(ws_name) as ws:
         check_no_basic(ws)
 
-    # workspace('remove', '-y', ws_name)
-
 
 def test_workspace_flag_anon(tmpdir):
     ws_path = str(tmpdir.join('test_ws_dir_flag'))
@@ -442,8 +416,6 @@ def test_workspace_flag_anon(tmpdir):
     remove('basic', global_args=flag_args)
     with ramble.workspace.Workspace(ws_path) as ws:
         check_no_basic(ws)
-
-    # workspace('remove', '-y', ws_name)
 
 
 def test_no_workspace_flag():
@@ -485,43 +457,37 @@ def test_no_workspace_flag():
 
 
 def test_edit_edits_correct_paths():
-    ws_name = 'test_edit_edits_correct_paths'
-    ws = ramble.workspace.create(ws_name)
+    ws = ramble.workspace.create('test')
     ws.write()
 
     config_file = ramble.workspace.config_file(ws.root)
     default_template_path = ws.template_path('execute_experiment')
 
-    ws_args = ['-w', ws_name]
+    ws_args = ['-w', 'test']
     assert workspace('edit', '--print-file', global_args=ws_args).strip() == config_file
     assert workspace('edit', '-t', 'execute_experiment',
                      '--print-file', global_args=ws_args).strip() \
         == default_template_path
 
-    ws.destroy()
 
-
-def test_edit_fails_with_invalid_template(mutable_mock_workspace_path):
-    ws_name = 'test_edit_fails_with_invalid_template'
-    ws = ramble.workspace.create(ws_name)
+def test_edit_fails_with_invalid_template():
+    ws = ramble.workspace.create('test')
     ws.write()
 
-    ws_args = ['-w', ws_name]
+    ws_args = ['-w', 'test']
     output = workspace('edit', '-t', 'template_does_not_exist',
                        global_args=ws_args, fail_on_error=False)
     assert 'does not exist' in output
 
-    ws.destroy()
 
-
-def test_edit_fails_without_workspace(mutable_mock_workspace_path):
+def test_edit_fails_without_workspace():
     output = workspace('edit', global_args=['-W'], fail_on_error=False)
     assert "ramble workspace edit requires either a " \
            + "command line workspace or an active workspace" \
            in output
 
 
-def test_edit_override_gets_correct_path(mutable_mock_workspace_path):
+def test_edit_override_gets_correct_path():
     ws1 = ramble.workspace.create('test1')
     ws2 = ramble.workspace.create('test2')
 
@@ -535,11 +501,8 @@ def test_edit_override_gets_correct_path(mutable_mock_workspace_path):
         output = workspace('edit', '--print-file', global_args=ws_args).strip()
         assert output == config_path
 
-    ws1.destroy()
-    ws2.destroy()
 
-
-def test_edit_creates_template(mutable_mock_workspace_path):
+def test_edit_creates_template():
     ws = ramble.workspace.create('test')
     ws.write()
 
@@ -553,8 +516,6 @@ def test_edit_creates_template(mutable_mock_workspace_path):
     workspace('edit', '-t', template_name, '-c', '--print-file',
               global_args=ws_args, fail_on_error=False)
     assert os.path.exists(template_file)
-
-    ws.destroy()
 
 
 def test_dryrun_setup():
@@ -604,8 +565,6 @@ spack:
                                        'basic', 'test_wl',
                                        'test_experiment',
                                        'execute_experiment'))
-
-    ws1.destroy()
 
 
 def test_matrix_vector_workspace_full():
@@ -685,8 +644,6 @@ spack:
     for exp in expected_experiments:
         assert os.path.exists(os.path.join(exp_base, exp))
 
-    ws1.destroy()
-
 
 def test_invalid_vector_workspace():
     test_config = """
@@ -744,8 +701,6 @@ spack:
     assert "Size of vector" in output
     assert "is not the same as max" in output
 
-    ws1.destroy()
-
 
 def test_invalid_size_matrices_workspace():
     test_config = """
@@ -801,8 +756,6 @@ spack:
     assert "Matrices defined in experiment" in output
     assert "do not result in the same number of elements." in output
 
-    ws1.destroy()
-
 
 def test_undefined_var_matrices_workspace():
     test_config = """
@@ -850,8 +803,6 @@ spack:
                        global_args=workspace_flags,
                        fail_on_error=False)
     assert "variable foo has not been defined yet" in output
-
-    ws1.destroy()
 
 
 def test_non_vector_var_matrices_workspace():
@@ -903,8 +854,6 @@ spack:
                        fail_on_error=False)
     assert "variable foo does not refer to a vector" in output
 
-    ws1.destroy()
-
 
 def test_multi_use_vector_var_matrices_workspace():
     test_config = """
@@ -955,8 +904,6 @@ spack:
                        global_args=workspace_flags,
                        fail_on_error=False)
     assert "Variable foo has been used in multiple matrices" in output
-
-    ws1.destroy()
 
 
 def test_reconcretize_in_configs_dir(tmpdir):
@@ -1092,8 +1039,6 @@ spack:
         archived_path = file.replace(ws1.root, ws1.latest_archive_path)
         assert os.path.exists(archived_path)
 
-    ws1.destroy()
-
 
 def test_workspace_tar_archive():
     test_config = """
@@ -1176,8 +1121,6 @@ spack:
         assert os.path.exists(archived_path)
 
     assert os.path.exists(ws1.latest_archive_path + '.tar.gz')
-
-    ws1.destroy()
 
 
 def test_workspace_tar_upload_archive():
@@ -1266,8 +1209,6 @@ spack:
     assert os.path.exists(ws1.latest_archive_path + '.tar.gz')
 
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + '.tar.gz'))
-
-    ws1.destroy()
 
 
 def test_workspace_tar_upload_archive_config_url():
@@ -1360,8 +1301,6 @@ spack:
 
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + '.tar.gz'))
 
-    ws1.destroy()
-
 
 def test_dryrun_noexpvars_setup():
     test_config = """
@@ -1408,5 +1347,3 @@ spack:
                                        'basic', 'test_wl',
                                        'test_experiment',
                                        'execute_experiment'))
-
-    ws1.destroy()

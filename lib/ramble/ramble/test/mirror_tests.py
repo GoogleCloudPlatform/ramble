@@ -8,7 +8,6 @@
 
 
 import os
-import os.path
 import sys
 import hashlib
 
@@ -24,10 +23,11 @@ import spack.util.executable
 
 pytestmark = [pytest.mark.skipif(sys.platform == "win32",
                                  reason="does not run on windows"),
-              pytest.mark.usefixtures('mutable_config',
+              pytest.mark.usefixtures('tmpdir',
+                                      'tmpdir_factory',
+                                      'mutable_config',
                                       'mutable_mock_workspace_path',
-                                      'mutable_mock_repo',
-                                      'tmpdir')]
+                                      'mutable_mock_repo')]
 
 
 class MockFetcher(object):
@@ -90,7 +90,7 @@ def check_mirror(mirror_path, app_name, app_class):
 ])
 def test_mirror_create(tmpdir, mutable_mock_repo,
                        mutable_mock_workspace_path,
-                       config, app_name, tmpdir_factory):
+                       app_name, tmpdir_factory):
 
     test_config = f"""
 ramble:
@@ -121,10 +121,6 @@ spack:
     archive_dir = tmpdir_factory.mktemp('mock-archives-dir')
     mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
 
-    # Avoid leaving cruft around:
-    saved_path = ramble.workspace.get_workspace_path()
-    ramble.workspace.set_workspace_path(os.path.join(tmpdir, 'mirror_test'))
-
     with archive_dir.as_cwd():
         app_class = ramble.repository.path.get_app_class(app_name)('test')
         create_archive(archive_dir, app_class)
@@ -142,6 +138,3 @@ spack:
             ramble.mirror.create(str(mirror_dir), workspace)
 
         check_mirror(str(mirror_dir), app_name, app_class)
-
-    # Put everything back again
-    ramble.workspace.set_workspace_path(saved_path)

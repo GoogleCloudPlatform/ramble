@@ -15,13 +15,13 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path')
 
 workspace = RambleCommand('workspace')
 
 
-def test_wrfv4_dry_run():
+def test_wrfv4_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
   mpi:
@@ -271,6 +271,3 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, 'rsl.out.0000'))
             for i in range(0, 5):
                 assert os.path.exists(os.path.join(exp_dir, f'rsl.error.000{i}'))
-
-    if workspace_name in workspace('list'):
-        workspace('remove', '-y', workspace_name)

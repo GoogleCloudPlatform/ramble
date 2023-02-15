@@ -12,14 +12,14 @@ import ramble.workspace
 import ramble.expander
 from ramble.main import RambleCommand
 
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path',
+                                     'mutable_mock_repo',
+                                     )
 
 workspace  = RambleCommand('workspace')
 add  = RambleCommand('add')
 remove  = RambleCommand('remove')
-
-ramble_config = RambleCommand('config')
 
 
 def test_expansions(mutable_mock_workspace_path):
@@ -44,8 +44,6 @@ def test_expansions(mutable_mock_workspace_path):
         assert exp.expand_var('2**4') == '16'
 
         assert exp.expand_var('((((16-10+2)/4)**2)*4)') == '16.0'
-
-    workspace('remove', '-y', 'test')
 
 
 def test_layered_expansions(mutable_mock_workspace_path):
@@ -89,8 +87,6 @@ def test_layered_expansions(mutable_mock_workspace_path):
             result = exp.expand_var(expansion)
             assert result == val
 
-    workspace('remove', '-y', 'test')
-
 
 def test_experiment_name_expansions(mutable_mock_workspace_path):
     workspace('create', 'test')
@@ -113,8 +109,6 @@ def test_experiment_name_expansions(mutable_mock_workspace_path):
         exp._finalize_experiment()
 
         assert exp.experiment_name == 'exp_name_2'
-
-    workspace('remove', '-y', 'test')
 
 
 def test_vector_expansions(mutable_mock_workspace_path):
@@ -152,8 +146,6 @@ def test_vector_expansions(mutable_mock_workspace_path):
 
     assert len(expected_exp_names) == 0
 
-    workspace('remove', '-y', 'test')
-
 
 def test_zipped_vector_expansions(mutable_mock_workspace_path):
     workspace('create', 'test')
@@ -189,8 +181,6 @@ def test_zipped_vector_expansions(mutable_mock_workspace_path):
             expected_exp_names.remove(exp.experiment_name)
 
     assert len(expected_exp_names) == 0
-
-    workspace('remove', '-y', 'test')
 
 
 def test_matrix_expansions(mutable_mock_workspace_path):
@@ -233,8 +223,6 @@ def test_matrix_expansions(mutable_mock_workspace_path):
             expected_exp_names.remove(exp.experiment_name)
 
     assert len(expected_exp_names) == 0
-
-    workspace('remove', '-y', 'test')
 
 
 def test_multi_matrix_expansions(mutable_mock_workspace_path):
@@ -281,8 +269,6 @@ def test_multi_matrix_expansions(mutable_mock_workspace_path):
 
     assert len(expected_exp_names) == 0
 
-    workspace('remove', '-y', 'test')
-
 
 def test_matrix_vector_expansions(mutable_mock_workspace_path):
     import itertools
@@ -310,23 +296,20 @@ def test_matrix_vector_expansions(mutable_mock_workspace_path):
                                                               config[1],
                                                               config[2]))
 
-    # with ramble.workspace.read('test') as ws:
-    ws = ramble.workspace.read('test')
-    exp = ramble.expander.Expander(ws)
-    exp.set_application('basic')
-    exp.set_application_vars({})
+    with ramble.workspace.read('test') as ws:
+        exp = ramble.expander.Expander(ws)
+        exp.set_application('basic')
+        exp.set_application_vars({})
 
-    exp.set_workload('test_wl')
-    exp.set_workload_vars({})
+        exp.set_workload('test_wl')
+        exp.set_workload_vars({})
 
-    exp.set_experiment(experiment_name_template)
-    exp.set_experiment_vars(exp_vars_vector)
-    exp.set_experiment_matrices(exp_matrix_vecs)
+        exp.set_experiment(experiment_name_template)
+        exp.set_experiment_vars(exp_vars_vector)
+        exp.set_experiment_matrices(exp_matrix_vecs)
 
-    for _ in exp.rendered_experiments():
-        assert exp.experiment_name in expected_exp_names
-        expected_exp_names.remove(exp.experiment_name)
+        for _ in exp.rendered_experiments():
+            assert exp.experiment_name in expected_exp_names
+            expected_exp_names.remove(exp.experiment_name)
 
     assert len(expected_exp_names) == 0
-
-    workspace('remove', '-y', 'test')

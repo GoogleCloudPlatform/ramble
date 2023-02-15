@@ -15,8 +15,9 @@ import ramble.test.cmd.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path',
+                                     'mutable_mock_repo')
 
 workspace = RambleCommand('workspace')
 add = RambleCommand('add')
@@ -24,7 +25,7 @@ remove = RambleCommand('remove')
 on = RambleCommand('on')
 
 
-def test_on_command():
+def test_on_command(mutable_mock_workspace_path):
     ws_name = 'test'
     workspace('create', ws_name)
 
@@ -40,10 +41,8 @@ def test_on_command():
 
         on()
 
-    workspace('remove', '-y', 'test')
 
-
-def test_execute_nothing():
+def test_execute_nothing(mutable_mock_workspace_path):
     ws_name = 'test'
     workspace('create', ws_name)
     assert ws_name in workspace('list')
@@ -59,5 +58,3 @@ def test_execute_nothing():
         assert os.path.exists(ws.root + '/all_experiments')
 
         ws.run_experiments()
-
-    workspace('remove', '-y', 'test')
