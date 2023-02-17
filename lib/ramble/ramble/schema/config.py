@@ -26,6 +26,35 @@ properties['config']['shell'] = {
     'enum': ['sh', 'bash', 'csh', 'tcsh', 'fish']
 }
 
+properties['config']['spack_flags'] = {
+    'type': 'object',
+    'default': {
+        'install': '--reuse',
+        'concretize': '--reuse'
+    },
+    'properties': {
+        'install': {
+            'type': 'string',
+            'default': '--reuse'
+        },
+        'concretize': {
+            'type': 'string',
+            'default': '--reuse'
+        }
+    },
+    'additionalProperties': False,
+}
+
+properties['config']['input_cache'] = {
+    'type': 'string',
+    'default': '$ramble/var/ramble/cache'
+}
+
+properties['config']['workspace_dirs'] = {
+    'type': 'string',
+    'default': '$ramble/var/ramble/workspaces'
+}
+
 #: Full schema with metadata
 schema = {
     '$schema': 'http://json-schema.org/schema#',

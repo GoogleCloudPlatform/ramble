@@ -354,10 +354,14 @@ def test_input_file_directive(app_class):
     assert hasattr(app_inst, 'inputs')
     for input_name, conf in test_defs.items():
         assert input_name in app_inst.inputs
+
         for conf_name, conf_val in conf.items():
             assert conf_name in app_inst.inputs[input_name]
             assert app_inst.inputs[input_name][conf_name] \
                 == conf_val
+
+        assert 'extension' in app_inst.inputs[input_name]
+        assert 'expand' in app_inst.inputs[input_name]
 
 
 @pytest.mark.parametrize('app_class', app_types)

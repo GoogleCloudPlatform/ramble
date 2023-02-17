@@ -59,6 +59,7 @@ import ramble.schema.repos
 import ramble.schema.workspace
 import ramble.schema.applications
 import ramble.schema.licenses
+import ramble.schema.mirrors
 
 from ramble.error import RambleError
 
@@ -71,6 +72,7 @@ section_schemas = {
     'config': ramble.schema.config.schema,
     'repos': ramble.schema.repos.schema,
     'licenses': ramble.schema.licenses.schema,
+    'mirrors': ramble.schema.mirrors.schema,
 }
 
 # Same as above, but including keys for environments
@@ -112,6 +114,12 @@ config_defaults = {
         'concretizer': 'clingo',
         'license_dir': spack.paths.default_license_dir,
         'shell': 'sh',
+        'spack_flags': {
+            'install': '--reuse',
+            'concretize': '--reuse'
+        },
+        'input_cache': '$ramble/var/ramble/cache',
+        'workspace_dirs': '$ramble/var/ramble/workspaces'
     }
 }
 

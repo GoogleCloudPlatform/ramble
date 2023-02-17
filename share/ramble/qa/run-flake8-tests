@@ -21,7 +21,7 @@
 check_dependencies flake8
 
 # verify that the code style is correct
-ramble flake8
+ramble flake8 -U
 
 # verify that the license headers are present
 ramble license verify

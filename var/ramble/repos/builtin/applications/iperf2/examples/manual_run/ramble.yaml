@@ -1,0 +1,56 @@
+# This is a ramble workspace config file.
+#
+# It describes the experiments, the software stack
+# and all variables required for ramble to configure
+# experiments.
+# As an example, experiments can be defined as follows.
+# applications:
+#   variables:
+#     processes_per_node: '30'
+#   hostname:
+#     variables:
+#       iterations: '5'
+#     workloads:
+#       serial:
+#         variables:
+#           type: 'test'
+#         experiments:
+#           single_node:
+#             variables:
+#               n_ranks: '{processes_per_node}'
+
+ramble:
+  mpi: {}
+  batch:
+    submit: '{execute_experiment}'
+  variables:
+    processes_per_node: -1
+  applications:
+    iperf2:
+      workloads:
+        iperf2_client:
+          experiments:
+            test_client:
+              variables:
+                time: 10
+                interval: 10
+                host: "my_hostname"
+                num_threads: 2
+        iperf2_server:
+          experiments:
+            test_server:
+                variables:
+                    additional_flags: "-t 120"
+spack:
+  concretized: true
+  compilers:
+    gcc9:
+      base: gcc
+      version: 9.3.0
+  mpi_libraries: {}
+  applications:
+    iperf2:
+      iperf2:
+        base: iperf2
+        version: 2.0.12
+        required: true

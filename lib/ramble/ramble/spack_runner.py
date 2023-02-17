@@ -20,6 +20,7 @@ import llnl.util.filesystem as fs
 from spack.util.executable import which, CommandNotFoundError, ProcessError
 import spack.util.spack_yaml as syaml
 
+import ramble.config
 import ramble.error
 
 spack_namespace = 'spack'
@@ -72,6 +73,12 @@ class SpackRunner(object):
         self.active = False
         self.compilers = []
         self.dry_run = dry_run
+
+    def set_env(self, env_path):
+        if not os.path.isdir(env_path) or not os.path.exists(os.path.join(env_path, 'spack.yaml')):
+            tty.die(f'Path {env_path} is not a spack environment')
+
+        self.env_path = env_path
 
     def generate_expand_vars(self, expander, specs=[], shell='bash'):
         """
@@ -281,10 +288,12 @@ class SpackRunner(object):
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
             syaml.dump_config(env_file, f, default_flow_style=False)
 
+        concretize_flags = ramble.config.get('config:spack_flags:concretize')
+
         args = [
-            'concretize',
-            '--reuse'
+            'concretize'
         ]
+        args.extend(concretize_flags.split())
         if not self.dry_run:
             self.exe(*args)
         else:
@@ -298,10 +307,12 @@ class SpackRunner(object):
         """
         self._check_active()
 
+        install_flags = ramble.config.get('config:spack_flags:install')
+
         args = [
-            'install',
-            '--reuse'
+            'install'
         ]
+        args.extend(install_flags.split())
         if not self.dry_run:
             self.exe(*args)
         else:
@@ -338,7 +349,29 @@ class SpackRunner(object):
             return self.exe(*args, output=str).strip()
         else:
             self._dry_run_print(args)
-            return '/dry-run/path/to/%s' % package_spec.split()[0]
+            return os.path.join('dry-run', 'path', 'to', package_spec.split()[0])
+
+    def mirror_environment(self, mirror_path):
+        """Create a spack mirror from the activated environment"""
+        self._check_active()
+
+        args = [
+            "mirror",
+            "create",
+            "--all",  # All packages in the environment
+            "-D",  # Include dependencies
+            "-d",
+            mirror_path
+        ]
+
+        if not self.dry_run:
+            return self.exe(*args, output=str).strip()
+        else:
+            self._dry_run_print(args)
+            return """
+  %-4d already present
+  %-4d added
+  %-4d failed to fetch.""" % (0, 0, 0)
 
     def _dry_run_print(self, args):
         tty.msg('DRY-RUN: would run %s' % self.exe.command)

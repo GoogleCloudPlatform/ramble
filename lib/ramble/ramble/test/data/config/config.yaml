@@ -1,2 +1,5 @@
 config:
     test_stage: ~/.ramble/test
+    spack_flags:
+      install: --reuse
+      concretize: --reuse

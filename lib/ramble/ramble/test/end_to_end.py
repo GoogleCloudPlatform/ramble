@@ -15,13 +15,13 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config')
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path')
 
 workspace = RambleCommand('workspace')
 
 
-def test_wrfv4_dry_run():
+def test_wrfv4_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
   mpi:
@@ -48,6 +48,11 @@ ramble:
         CONUS_12km:
           experiments:
             scaling_{n_nodes}_{partition}_{spec_name}:
+              success_criteria:
+              - name: 'timing'
+                mode: 'string'
+                match: '.*Timing for main.*'
+                file: '{experiment_run_dir}/rsl.out.0000'
               env-vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
@@ -110,11 +115,20 @@ licenses:
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
         license_path = os.path.join(ws1.config_dir, 'licenses.yaml')
 
+        aux_software_path = os.path.join(ws1.config_dir,
+                                         ramble.workspace.auxiliary_software_dir_name)
+        aux_software_files = ['packages.yaml', 'my_test.sh']
+
         with open(config_path, 'w+') as f:
             f.write(test_config)
 
         with open(license_path, 'w+') as f:
             f.write(test_licenses)
+
+        for file in aux_software_files:
+            file_path = os.path.join(aux_software_path, file)
+            with open(file_path, 'w+') as f:
+                f.write('')
 
         # Write a command template
         with open(os.path.join(ws1.config_dir, 'full_command.tpl'), 'w+') as f:
@@ -124,6 +138,20 @@ licenses:
 
         output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
         assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus12km.tar.gz" in output
+
+        # Test software directories
+        software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
+        software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
+        assert os.path.exists(software_base_dir)
+        for software_dir in software_dirs:
+            software_path = os.path.join(software_base_dir, software_dir)
+            assert os.path.exists(software_path)
+
+            spack_file = os.path.join(software_path, 'spack.yaml')
+            assert os.path.exists(spack_file)
+            for file in aux_software_files:
+                file_path = os.path.join(software_path, file)
+                assert os.path.exists(file_path)
 
         expected_experiments = [
             'scaling_1_part1_wrfv4',
@@ -211,12 +239,14 @@ licenses:
 
         output = workspace('analyze', '-f', 'text',
                            'json', 'yaml', global_args=['-w', workspace_name])
+        text_simlink_results_files = glob.glob(os.path.join(ws1.root, 'results.latest.txt'))
         text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
         json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
         yaml_results_files = glob.glob(os.path.join(ws1.root, 'results*.yaml'))
-        assert len(text_results_files) == 1
-        assert len(json_results_files) == 1
-        assert len(yaml_results_files) == 1
+        assert len(text_simlink_results_files) == 1
+        assert len(text_results_files) == 2
+        assert len(json_results_files) == 2
+        assert len(yaml_results_files) == 2
 
         with open(text_results_files[0], 'r') as f:
             data = f.read()

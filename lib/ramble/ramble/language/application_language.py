@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import llnl.util.tty as tty
+
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
 
@@ -172,7 +174,8 @@ def figure_of_merit(name, log_file, fom_regex, group_name, units='',
 
 
 @application_directive('inputs')
-def input_file(name, url, description, target_dir='{workload_name}', **kwargs):
+def input_file(name, url, description, target_dir='{workload_name}', sha256=None, extension=None,
+               expand=True, **kwargs):
     """Adds an input file defintion to this appliaction
 
     Defines a new input file.
@@ -184,20 +187,27 @@ def input_file(name, url, description, target_dir='{workload_name}', **kwargs):
       - description: Description of this input file
       - target_dir (Optional): The directory where the archive will be
                                expanded. Defaults to 'input'
+      - sha256 (Optional): The expected sha256 checksum for the input file
+      - extension (Optional): The extension to use for the input, if it isn't part of the
+                              file name.
+      - expand (Optional): Whether the input should be expanded or not. Defaults to True
     """
 
     def _execute_input_file(app):
         app.inputs[name] = {
             'url': url,
             'description': description,
-            'target_dir': target_dir
+            'target_dir': target_dir,
+            'sha256': sha256,
+            'extension': extension,
+            'expand': expand
         }
 
     return _execute_input_file
 
 
 @application_directive('workload_variables')
-def workload_variable(name, default, description, workload=None,
+def workload_variable(name, default, description, values=None, workload=None,
                       workloads=None, **kwargs):
     """Define a new variable to be used in experiments
 
@@ -230,6 +240,8 @@ def workload_variable(name, default, description, workload=None,
                 'default': default,
                 'description': description
             }
+            if values:
+                app.workload_variables[wl_name][name]['values'] = values
 
     return _execute_workload_variable
 
@@ -325,3 +337,33 @@ def software_spec(name, base, version=None, variants=None,
             }
 
     return _execute_software_spec
+
+
+@application_directive('success_criteria')
+def success_criteria(name, mode, match, file):
+    """Defines a success criteria used by experiments of this application
+
+    Adds a new success criteria to this application definition.
+
+    These will be checked during the analyze step to see if a job exited properly.
+
+    Arguments:
+      - name: The name of this success criteria
+      - mode: The type of success criteria that will be validated
+              Valid values are: 'string'
+      - match: The value to check indicate success (if found, it would mark success)
+      - file: Which file the success criteria should be located in
+    """
+
+    def _execute_success_criteria(app):
+        valid_modes = ['string']
+        if mode not in valid_modes:
+            tty.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
+
+        app.success_criteria[name] = {
+            'mode': mode,
+            'match': match,
+            'file': file
+        }
+
+    return _execute_success_criteria

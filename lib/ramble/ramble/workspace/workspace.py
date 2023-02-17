@@ -29,10 +29,14 @@ import ramble.expander
 import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
+import ramble.success_criteria
+from ramble.mirror import MirrorStats
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
 from spack.util.executable import CommandNotFoundError, which
+import spack.util.url as url_util
+import spack.util.web as web_util
 
 import ramble.schema.workspace
 import ramble.schema.applications
@@ -47,6 +51,7 @@ application_namespace = 'applications'
 workload_namespace = 'workloads'
 experiment_namespace = 'experiments'
 variables_namespace = 'variables'
+success_namespace = 'success_criteria'
 env_var_namespace = 'env-vars'
 mpi_namespace = 'mpi'
 batch_namespace = 'batch'
@@ -58,9 +63,6 @@ ramble_workspace_var = 'RAMBLE_WORKSPACE'
 
 #: Currently activated workspace
 _active_workspace = None
-
-#: Path where workspaces are stored
-workspace_path = os.path.join(ramble.paths.var_path, 'workspaces')
 
 #: Subdirectory where workspace configs are stored
 workspace_config_path = 'configs'
@@ -89,6 +91,9 @@ applications_schema = ramble.schema.applications.schema
 
 #: Extension for template files
 workspace_template_extension = '.tpl'
+
+#: Directory name for auxiliary software files
+auxiliary_software_dir_name = 'auxiliary_software_files'
 
 #: Config file information for workspaces.
 #: Keys are filenames, values are dictionaries describing the config files.
@@ -248,10 +253,11 @@ def all_workspace_names():
     """List the names of workspaces that currently exist."""
     # just return empty if the workspace path does not exist.  A read-only
     # operation like list should not try to create a directory.
-    if not os.path.exists(workspace_path):
+    wspath = get_workspace_path()
+    if not os.path.exists(wspath):
         return []
 
-    candidates = sorted(os.listdir(workspace_path))
+    candidates = sorted(os.listdir(wspath))
     names = []
     for candidate in candidates:
         configured = True
@@ -276,9 +282,25 @@ def active_workspace():
     return _active_workspace
 
 
+def get_workspace_path():
+    """Returns current directory of ramble-managed workspaces"""
+    path_in_config = ramble.config.get('config:workspace_dirs')
+    if not path_in_config:
+        path_in_config = '$ramble/var/ramble/GET_WORKSPACE_ERROR/'
+
+    wspath = ramble.util.path.canonicalize_path(path_in_config)
+    return wspath
+
+
+def set_workspace_path(dirname):
+    """Sets the parent directory of ramble-managed workspaces"""
+    ramble.config.set('config:workspace_dirs:', dirname)
+
+
 def _root(name):
     """Non-validating version of root(), to be used internally."""
-    return os.path.join(workspace_path, name)
+    wspath = get_workspace_path()
+    return os.path.join(wspath, name)
 
 
 def root(name):
@@ -423,6 +445,14 @@ class Workspace(object):
 
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
         self._templates = {}
+        self._auxiliary_software_files = {}
+        self._software_mirror_path = None
+        self._input_mirror_path = None
+        self._mirror_existed = None
+        self._software_mirror_stats = None
+        self._input_mirror_stats = None
+        self._input_mirror_cache = None
+        self._software_mirror_cache = None
 
         self.specs = []
 
@@ -431,6 +461,8 @@ class Workspace(object):
         self.install_cache = ramble.util.install_cache.SetCache()
 
         self.results = None
+
+        self.success_list = ramble.success_criteria.ScopedCriteriaList()
 
         # Key for each application config should be it's filepath
         # Format for an application config should be:
@@ -483,6 +515,12 @@ class Workspace(object):
                     template_path = os.path.join(self.config_dir, filename)
                     with open(template_path, 'r') as f:
                         self._read_template(template_name, f.read())
+
+            if os.path.exists(self.auxiliary_software_dir):
+                for filename in os.listdir(self.auxiliary_software_dir):
+                    aux_file_path = os.path.join(self.auxiliary_software_dir, filename)
+                    with open(aux_file_path, 'r') as f:
+                        self._read_auxiliary_software_file(filename, f.read())
 
         if read_default_script:
             template_name = workspace_execution_template[0:-ext_len]
@@ -544,6 +582,10 @@ class Workspace(object):
     def _read_template(self, name, f):
         """Read a tempalte file"""
         self._templates[name] = f
+
+    def _read_auxiliary_software_file(self, name, f):
+        """Read an auxiliary software file for generated software directories"""
+        self._auxiliary_software_files[name] = f
 
     def add(self, user_spec):
         """Add a single workload spec to the workspace
@@ -661,6 +703,7 @@ class Workspace(object):
         # Ensure required directory structure exists
         fs.mkdirp(self.path)
         fs.mkdirp(self.config_dir)
+        fs.mkdirp(self.auxiliary_software_dir)
         fs.mkdirp(self.log_dir)
         fs.mkdirp(self.experiment_dir)
         fs.mkdirp(self.input_dir)
@@ -696,6 +739,35 @@ class Workspace(object):
         self._previous_active = None      # previously active environment
         self.specs = []
 
+    def extract_success_criteria(self, scope, contents):
+        """Extract success citeria, and inject it into the scoped list
+
+        Extract success criteria from a contents dictionary, and inject it into
+        the scoped success list within the right scope.
+        """
+        self.success_list.flush_scope(scope)
+
+        if success_namespace in contents:
+            tty.debug(' ---- Found success in %s' % scope)
+            for conf in contents[success_namespace]:
+                tty.debug(' ---- Adding criteria %s' % conf['name'])
+                self.success_list.add_criteria(scope, conf['name'],
+                                               conf['mode'],
+                                               conf['match'],
+                                               conf['file'])
+
+    def all_specs(self):
+        import ramble.spec
+
+        specs = []
+        for app, workloads, _, _ in self.all_applications():
+            for workload, _, _, _ in self.all_workloads(workloads):
+                app_spec = ramble.spec.Spec(app)
+                app_spec.workloads[workload] = True
+                specs.append(app_spec)
+
+        return specs
+
     def all_applications(self):
         """Iterator over applications
 
@@ -710,13 +782,17 @@ class Workspace(object):
         # Iterate over applications in ramble.yaml first
         if application_namespace in ws_dict[ramble_namespace]:
             app_dict = ws_dict[ramble_namespace][application_namespace]
+
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
+
                 if variables_namespace in contents:
                     application_vars = contents[variables_namespace]
+
                 if env_var_namespace in contents:
                     application_env_vars = contents[env_var_namespace]
+                self.extract_success_criteria('application', contents)
 
                 yield application, contents, application_vars, \
                     application_env_vars
@@ -738,6 +814,7 @@ class Workspace(object):
                         contents[variables_namespace]
                 if env_var_namespace in contents:
                     application_env_vars = contents[env_var_namespace]
+                self.extract_success_criteria('application', contents)
                 yield application, contents, application_vars, application_env_vars
 
     def all_workloads(self, application):
@@ -761,6 +838,7 @@ class Workspace(object):
                 workload_variables = contents[variables_namespace]
             if env_var_namespace in contents:
                 workload_env_vars = contents[env_var_namespace]
+            self.extract_success_criteria('workload', contents)
 
             yield workload, contents, workload_variables, workload_env_vars
 
@@ -778,12 +856,17 @@ class Workspace(object):
 
         experiments = workload[experiment_namespace]
         for experiment, contents in experiments.items():
-            experiment_vars = None
+
+            experiment_vars = syaml.syaml_dict()
             experiment_env_vars = None
+
             if variables_namespace in contents:
                 experiment_vars = contents[variables_namespace]
+
             if env_var_namespace in contents:
                 experiment_env_vars = contents[env_var_namespace]
+
+            self.extract_success_criteria('experiment', contents)
 
             matrices = []
             if 'matrix' in contents:
@@ -1019,18 +1102,43 @@ class Workspace(object):
 
         self.results.update(result)
 
+    def simlink_result(self, filename_base, latest_base, file_extension):
+        """
+        Create simlink of result file so that results.latest.txt always points
+        to the most recent analysis. This clobbers the existing link
+        """
+        out_file = os.path.join(self.root, filename_base + file_extension)
+        latest_file = os.path.join(self.root, latest_base + file_extension)
+
+        if os.path.islink(latest_file):
+            os.unlink(latest_file)
+
+        os.symlink(out_file, latest_file)
+
     def dump_results(self, output_formats=['text']):
+        """
+        Write out result file in desired format
+
+        This attempts to avoid the loss of previous results data by appending
+        the datetime to the filename, but is willing to clobber the file
+        results.latest.<extension>
+
+        """
         if not self.results:
             self.results = {}
 
         results_written = []
 
         dt = self._date_string()
-        filename_base = 'results.' + dt
+        inner_delim = '.'
+        filename_base = 'results' + inner_delim + dt
+        latest_base = 'results' + inner_delim + 'latest'
 
         if 'text' in output_formats:
 
-            out_file = os.path.join(self.root, filename_base + '.txt')
+            file_extension = '.txt'
+            out_file = os.path.join(self.root, filename_base + file_extension)
+
             results_written.append(out_file)
 
             with open(out_file, 'w+') as f:
@@ -1049,17 +1157,23 @@ class Workspace(object):
                                                          fom['value'],
                                                          fom['units'])
                                 f.write('    %s\n' % (output.strip()))
+            self.simlink_result(filename_base, latest_base, file_extension)
+
         if 'json' in output_formats:
-            out_file = os.path.join(self.root, filename_base + '.json')
+            file_extension = '.json'
+            out_file = os.path.join(self.root, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, 'w+') as f:
                 sjson.dump(self.results, f)
+            self.simlink_result(filename_base, latest_base, file_extension)
 
         if 'yaml' in output_formats:
-            out_file = os.path.join(self.root, filename_base + '.yaml')
+            file_extension = '.yaml'
+            out_file = os.path.join(self.root, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, 'w+') as f:
                 syaml.dump(self.results, stream=f)
+            self.simlink_result(filename_base, latest_base, file_extension)
 
         if not results_written:
             tty.die('Results were not written.')
@@ -1079,6 +1193,26 @@ class Workspace(object):
 
         experiment_script()
 
+    def create_mirror(self, mirror_root):
+        parsed_url = url_util.parse(mirror_root)
+        self._mirror_path = url_util.local_file_path(parsed_url)
+        self._mirror_existed = web_util.url_exists(self._mirror_path)
+        self._input_mirror_path = os.path.join(self._mirror_path, 'inputs')
+        self._software_mirror_path = os.path.join(self._mirror_path, 'software')
+        mirror_dirs = [self._mirror_path, self._input_mirror_path, self._software_mirror_path]
+        for subdir in mirror_dirs:
+            if not os.path.isdir(subdir):
+                try:
+                    fs.mkdirp(subdir)
+                except OSError as e:
+                    raise ramble.mirror.MirrorError(
+                        "Cannot create directory '%s':" % subdir, str(e))
+
+        self._software_mirror_stats = MirrorStats()
+        self._input_mirror_stats = MirrorStats()
+        self._input_mirror_cache = ramble.caches.MirrorCache(self._input_mirror_path)
+        self._software_mirror_cache = ramble.caches.MirrorCache(self._software_mirror_path)
+
     def run_pipeline(self, pipeline):
         all_experiments_file = None
         expander = ramble.expander.Expander(self)
@@ -1091,6 +1225,8 @@ class Workspace(object):
                             'Then ensure its software_stack.yaml file is ' + \
                             'properly configured.'
             tty.die(error_message)
+
+        self.extract_success_criteria('workspace', self._get_workspace_dict()[ramble_namespace])
 
         if pipeline == 'setup':
             all_experiments_path = os.path.join(self.root,
@@ -1138,6 +1274,8 @@ class Workspace(object):
                         app_inst = ramble.repository.get(expander.application_name)
                         for phase in app_inst.get_pipeline_phases(pipeline):
                             app_inst.run_phase(phase, self, expander)
+                        # Tidy up deduced variable values
+                        expander.unset_mpi_vars()
 
         if pipeline == 'setup':
             all_experiments_file.close()
@@ -1146,6 +1284,26 @@ class Workspace(object):
                                                 workspace_all_experiments_file)
             os.chmod(all_experiments_path, stat.S_IRWXU | stat.S_IRWXG
                      | stat.S_IROTH | stat.S_IXOTH)
+        elif pipeline == 'mirror':
+            verb = "updated" if self._mirror_existed else "created"
+            tty.msg(
+                "Successfully %s spack software in %s" % (verb, self._mirror_path),
+                "Archive stats:",
+                "  %-4d already present"  % len(self._software_mirror_stats.present),
+                "  %-4d added"            % len(self._software_mirror_stats.new),
+                "  %-4d failed to fetch." % len(self._software_mirror_stats.errors))
+
+            tty.msg(
+                "Successfully %s inputs in %s" % (verb, self._mirror_path),
+                "Archive stats:",
+                "  %-4d already present"  % len(self._input_mirror_stats.present),
+                "  %-4d added"            % len(self._input_mirror_stats.new),
+                "  %-4d failed to fetch." % len(self._input_mirror_stats.errors))
+
+            if self._input_mirror_stats.errors:
+                tty.error("Failed downloads:")
+                tty.colify(s.cformat("{name}") for s in list(self._input_mirror_stats.errors))
+                tty.die('Mirroring has errors.')
 
     @property
     def latest_archive_path(self):
@@ -1208,10 +1366,12 @@ class Workspace(object):
         # Copy current configs
         archive_configs = os.path.join(self.latest_archive_path, workspace_config_path)
         fs.mkdirp(archive_configs)
-        for file in os.listdir(self.config_dir):
-            src = os.path.join(self.config_dir, file)
-            dest = src.replace(self.config_dir, archive_configs)
-            shutil.copyfile(src, dest)
+        for root, dirs, files in os.walk(self.config_dir):
+            for name in files:
+                src = os.path.join(self.config_dir, root, name)
+                dest = src.replace(self.config_dir, archive_configs)
+                fs.mkdirp(os.path.dirname(dest))
+                shutil.copyfile(src, dest)
 
         # Copy current software spack.yamls
         archive_software = os.path.join(self.latest_archive_path, workspace_software_path)
@@ -1288,7 +1448,8 @@ class Workspace(object):
     @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
-        return self.path.startswith(workspace_path)
+        wspath = get_workspace_path()
+        return self.path.startswith(wspath)
 
     @property
     def name(self):
@@ -1345,6 +1506,11 @@ class Workspace(object):
         return os.path.join(self.root, workspace_config_path)
 
     @property
+    def auxiliary_software_dir(self):
+        """Path to the auxiliary software files directory"""
+        return os.path.join(self.config_dir, auxiliary_software_dir_name)
+
+    @property
     def config_file_path(self):
         """Path to the configuration file directory"""
         return os.path.join(self.config_dir, config_file_name)
@@ -1363,6 +1529,11 @@ class Workspace(object):
     def all_templates(self):
         """Iterator over each template in the workspace"""
         for name, value in self._templates.items():
+            yield name, value
+
+    def all_auxiliary_software_files(self):
+        """Iterator over each file in $workspace/configs/auxiliary_software_files"""
+        for name, value in self._auxiliary_software_files.items():
             yield name, value
 
     def included_config_scopes(self):

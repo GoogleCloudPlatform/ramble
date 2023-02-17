@@ -46,6 +46,7 @@ subcommands = [
     'analyze',
     'info',
     'edit',
+    'mirror',
     ['list', 'ls'],
     ['remove', 'rm'],
 ]
@@ -106,19 +107,22 @@ def workspace_activate(args):
     # Temporary workspace
     if args.temp:
         workspace = create_temp_workspace_directory()
-        workspace_path = os.path.abspath(workspace)
-        short_name = os.path.basename(workspace_path)
+        wspath_dir = os.path.abspath(workspace)
+        ramble.workspace.set_workspace_path(wspath_dir)
+        short_name = os.path.basename(wspath_dir)
         ramble.workspace.Workspace(workspace).write()
 
     # Named workspace
     elif ramble.workspace.exists(workspace_name_or_dir) and not args.dir:
-        workspace_path = ramble.workspace.root(workspace_name_or_dir)
+        wspath_dir = ramble.workspace.root(workspace_name_or_dir)
+        ramble.workspace.set_workspace_path(wspath_dir)
         short_name = workspace_name_or_dir
 
     # Workspace directory
     elif ramble.workspace.is_workspace_dir(workspace_name_or_dir):
-        workspace_path = os.path.abspath(workspace_name_or_dir)
-        short_name = os.path.basename(workspace_path)
+        workspace_path_dir = os.path.abspath(workspace_name_or_dir)
+        ramble.workspace.set_workspace_path(workspace_path_dir)
+        short_name = os.path.basename(workspace_path_dir)
 
     else:
         tty.die("No such workspace: '%s'" % workspace_name_or_dir)
@@ -134,7 +138,8 @@ def workspace_activate(args):
         env_mods = ramble.workspace.shell.deactivate()
 
     # Activate new workspace
-    active_workspace = ramble.workspace.Workspace(workspace_path)
+    workspace_path_dir = ramble.workspace.get_workspace_path()
+    active_workspace = ramble.workspace.Workspace(workspace_path_dir)
     cmds += ramble.workspace.shell.activate_header(
         ws=active_workspace,
         shell=args.shell,
@@ -243,8 +248,10 @@ def _workspace_create(name_or_path, dir=False,
 
     if template_execute:
         with open(template_execute, 'r') as f:
-            workspace._read_execution_template(f.read())
-            workspace._write_execution_template()
+            _, file_name = os.path.split(template_execute)
+            template_name = os.path.splitext(file_name)[0]
+            workspace._read_template(template_name, f.read())
+            workspace._write_templates()
 
     return workspace
 
@@ -455,15 +462,13 @@ def workspace_info(args):
         color.cprint(nested_1('  Compilers:'))
         for name, info in spack_dict[comp_str].items():
             spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec,
-                                      long=True).replace('@', '@@')
+            spec_str = ws.spec_string(spec).replace('@', '@@')
             color.cprint('    %s = %s' % (name, spec_str))
     if mpi_str in spack_dict:
         color.cprint(nested_1('  MPI Libraries:'))
         for name, info in spack_dict[mpi_str].items():
             spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec,
-                                      long=True).replace('@', '@@')
+            spec_str = ws.spec_string(spec).replace('@', '@@')
             color.cprint('    %s = %s' % (name, spec_str))
     if app_str in spack_dict:
         color.cprint(nested_1('  Application Specs:'))
@@ -472,8 +477,7 @@ def workspace_info(args):
             for name, info in specs.items():
                 spec = ws._build_spec_dict(info, app)
                 spec['application_name'] = app
-                spec_str = ws.spec_string(spec,
-                                          long=True).replace('@', '@@')
+                spec_str = ws.spec_string(spec).replace('@', '@@')
                 color.cprint('      %s = %s' % (name, spec_str))
                 ws_name = ' ' * (len(name) + 2)
                 if 'compiler' in info:
@@ -573,6 +577,31 @@ def workspace_archive(args):
 
     ws.archive(create_tar=args.tar_archive,
                archive_url=args.upload_url)
+
+
+def workspace_mirror_setup_parser(subparser):
+    """mirror current workspace state"""
+    subparser.add_argument(
+        '-d', dest='mirror_path',
+        default=None,
+        help='Path to create mirror in.')
+
+    subparser.add_argument(
+        '--dry-run', dest='dry_run',
+        action='store_true',
+        help='perform a dry run. Creates spack environments, ' +
+             'prints commands that would be executed ' +
+             'for installation, and files that would be downloaded.')
+
+
+def workspace_mirror(args):
+    ws = ramble.cmd.require_active_workspace(cmd_name='workspace archive')
+
+    if args.dry_run:
+        ws.dry_run = True
+
+    ws.create_mirror(args.mirror_path)
+    ws.run_pipeline('mirror')
 
 
 #: Dictionary mapping subcommand names and aliases to functions

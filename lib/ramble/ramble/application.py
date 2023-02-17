@@ -22,9 +22,12 @@ from llnl.util.tty.colify import colified
 import spack.util.executable
 import spack.util.spack_json
 import spack.util.environment
+import spack.util.compression
 
 import ramble.config
 import ramble.stage
+import ramble.mirror
+import ramble.fetch_strategy
 
 from ramble.language.application_language import ApplicationMeta
 from ramble.error import RambleError
@@ -53,6 +56,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._setup_phases = []
         self._analyze_phases = []
         self._archive_phases = ['archive_experiments']
+        self._mirror_phases = ['mirror_inputs']
 
         self._file_path = file_path
 
@@ -106,9 +110,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         var_str = '\t\tDescription: ' + \
                             workload_vars[var]['description'] + '\n'
                         out_str.append(var_str)
+
                         var_str = '\t\tDefault: ' + \
                             workload_vars[var]['default'] + '\n'
                         out_str.append(var_str)
+
+                        if 'values' in workload_vars[var].keys():
+                            var_str = '\t\tSuggested Values: ' + \
+                                str(workload_vars[var]['values']) + '\n'
+                            out_str.append(var_str)
+
                     out_str.append('\n')
 
         return out_str
@@ -335,29 +346,75 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         expander.set_var('spack_setup', '', 'experiment')
 
+    def _inputs_and_fetchers(self, workload=None):
+        """Extract all inputs for a given workload
+
+        Take a workload name and extract all inputs for the workload.
+        If the workload is set to None, extract all inputs for all workloads.
+        """
+
+        workload_names = [workload] if workload else self.workloads.keys()
+
+        inputs = {}
+        for workload_name in workload_names:
+            workload = self.workloads[workload_name]
+
+            for input_file in workload['inputs']:
+                input_conf = self.inputs[input_file]
+
+                fetcher = ramble.fetch_strategy.URLFetchStrategy(**input_conf)
+
+                file_name = os.path.basename(input_conf['url'])
+                if not fetcher.extension:
+                    fetcher.extension = spack.util.compression.extension(file_name)
+
+                file_name = file_name.replace(f'.{fetcher.extension}', '')
+
+                namespace = f'{self.name}.{workload_name}'
+
+                inputs[file_name] = {'fetcher': fetcher,
+                                     'namespace': namespace,
+                                     'target_dir': input_conf['target_dir'],
+                                     'extension': fetcher.extension,
+                                     'input_name': input_file}
+        return inputs
+
+    def _mirror_inputs(self, workspace, expander):
+        for input_file, input_conf in self._inputs_and_fetchers(expander.workload_name).items():
+            mirror_paths = ramble.mirror.mirror_archive_paths(
+                input_conf['fetcher'], os.path.join(self.name, input_file))
+            fetch_dir = os.path.join(workspace._input_mirror_path, self.name)
+            fs.mkdirp(fetch_dir)
+            stage = ramble.stage.InputStage(input_conf['fetcher'], name=input_conf['namespace'],
+                                            path=fetch_dir, mirror_paths=mirror_paths, lock=False)
+
+            stage.cache_mirror(workspace._input_mirror_cache, workspace._input_mirror_stats)
+
     def _get_inputs(self, workspace, expander):
         workload_namespace = '%s.%s' % (expander.application_name,
                                         expander.workload_name)
 
-        workload = self.workloads[expander.workload_name]
+        for input_file, input_conf in self._inputs_and_fetchers(expander.workload_name).items():
+            if not workspace.dry_run:
+                mirror_paths = ramble.mirror.mirror_archive_paths(
+                    input_conf['fetcher'], os.path.join(self.name, input_file))
 
-        for input_file in workload['inputs']:
-            input_conf = self.inputs[input_file]
-            input_url = input_conf['url']
-
-            tty.msg('      Staging inputs for %s' % workload_namespace)
-            with ramble.stage.InputStage(input_url, name=workload_namespace,
-                                         path=expander.application_input_dir) \
-                    as stage:
-                stage.set_subdir(expander.expand_var(input_conf['target_dir']))
-                if not workspace.dry_run:
+                with ramble.stage.InputStage(input_conf['fetcher'], name=workload_namespace,
+                                             path=expander.application_input_dir,
+                                             mirror_paths=mirror_paths) \
+                        as stage:
+                    stage.set_subdir(expander.expand_var(input_conf['target_dir']))
                     stage.fetch()
-                    try:
-                        stage.expand_archive()
-                    except spack.util.executable.ProcessError:
-                        pass
-                else:
-                    tty.msg('DRY-RUN: Would download %s' % input_url)
+                    if input_conf['fetcher'].digest:
+                        stage.check()
+                    stage.cache_local()
+                    if input_conf['expand']:
+                        try:
+                            stage.expand_archive()
+                        except spack.util.executable.ProcessError:
+                            pass
+            else:
+                tty.msg('DRY-RUN: Would download %s' % input_conf['fetcher'].url)
 
     def _make_experiments(self, workspace, expander):
         experiment_run_dir = expander.experiment_run_dir
@@ -398,7 +455,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 shutil.copy(src, archive_experiment_dir)
 
         # Copy all figure of merit files
-        analysis_files, _, _ = self._analysis_dicts(expander)
+        criteria_list = workspace.success_list
+        analysis_files, _, _ = self._analysis_dicts(expander, criteria_list)
         for file, file_conf in analysis_files.items():
             if os.path.exists(file):
                 shutil.copy(file, archive_experiment_dir)
@@ -416,7 +474,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         fom_values[context][fom]
 
-        A fom can show up in multiple contexts, but
+        A fom can show up in any number of explicit contexts (including zero).
+        If the number of explicit contexts is zero, the fom is associated with
+        the default '(null)' context.
+
+        Success is determined at analysis time as well. This happens by checking if:
+         - At least one FOM is extracted
+         AND
+         - Any defined success criteria pass
+
+        Success criteria are defined within the application.py, but can also be
+        injected in a workspace config.
         """
 
         def format_context(context_match, context_format):
@@ -433,7 +501,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         fom_values = {}
 
-        files, contexts, foms = self._analysis_dicts(expander)
+        criteria_list = workspace.success_list
+
+        files, contexts, foms = self._analysis_dicts(expander, criteria_list)
+
         # Iterate over files. We already know they exist
         for file, file_conf in files.items():
 
@@ -443,6 +514,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             with open(file, 'r') as f:
                 for line in f.readlines():
+
+                    for criteria in file_conf['success_criteria']:
+                        tty.debug('Looking for criteria %s' % criteria)
+                        criteria_obj = criteria_list.find_criteria(criteria)
+                        if criteria_obj.matches(line):
+                            criteria_obj.mark_found()
+
                     for context in file_conf['contexts']:
                         context_conf = contexts[context]
                         context_match = context_conf['regex'].match(line)
@@ -489,8 +567,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         exp_ns = expander.experiment_namespace
         results[exp_ns] = {}
 
+        success = True if fom_values else False
+        success = success and criteria_list.passed()
+
         tty.debug('fom_vals = %s' % fom_values)
-        if fom_values:
+        if success:
             results[exp_ns]['RAMBLE_STATUS'] = 'SUCCESS'
             results[exp_ns]['RAMBLE_VARIABLES'] = expander.all_vars()
             results[exp_ns]['CONTEXTS'] = {}
@@ -503,11 +584,20 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         workspace.append_result(results)
 
-    def _analysis_dicts(self, expander):
+    def _new_file_dict(self):
+        return {
+            'success_criteria': [],
+            'contexts': [],
+            'foms': []
+        }
+
+    def _analysis_dicts(self, expander, criteria_list):
         """Extract files that need to be analyzed.
 
         Process figures_of_merit, and return the manipulated dictionaries
         to allow them to be extracted.
+
+        Additionally, ensure the success criteria list is complete.
 
         Returns:
            - files (dict): All files that need to be processed
@@ -519,12 +609,29 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         contexts = {}
         foms = {}
 
+        # Add the application defined criteria
+        criteria_list.flush_scope('application_definition')
+        for criteria, conf in self.success_criteria.items():
+            if conf['mode'] == 'string':
+                criteria_list.add_criteria('application_definition', criteria,
+                                           conf['mode'], re.compile(conf['match']),
+                                           conf['file'])
+
+        # Extract file paths for all criteria
+        for criteria in criteria_list.all_criteria():
+            log_path = expander.expand_var(criteria.file)
+            if log_path not in files and os.path.exists(log_path):
+                files[log_path] = self._new_file_dict()
+
+            if log_path in files:
+                files[log_path]['success_criteria'].append(criteria.name)
+
         # Remap fom / context / file data
         # Could push this into the language features in the future
         for fom, conf in self.figures_of_merit.items():
             log_path = expander.expand_var(conf['log_file'])
             if log_path not in files and os.path.exists(log_path):
-                files[log_path] = {'contexts': [], 'foms': []}
+                files[log_path] = self._new_file_dict()
 
             if log_path in files:
                 tty.debug('Log = %s' % log_path)

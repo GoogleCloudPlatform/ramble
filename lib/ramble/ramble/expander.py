@@ -239,6 +239,14 @@ class Expander(object):
             return '%s.%s' % (app_name, wl_name)
         return None
 
+    @property
+    def spec_namespace(self):
+        app_name = self.expand_var('{spec_name}')
+        wl_name = self.workload_name
+        if app_name and wl_name:
+            return '%s.%s' % (app_name, wl_name)
+        return None
+
     def set_experiment(self, exp_name):
         tty.debug('Expander: Setting exp name %s' % exp_name)
         if not self.workload_name:
@@ -444,6 +452,7 @@ class Expander(object):
             if final_exp_name in rendered_experiments:
                 tty.die('Experiment %s is not unique.' % final_exp_name)
             rendered_experiments.add(final_exp_name)
+
             yield
 
     def set_application_env_vars(self, application_env_vars):
@@ -496,7 +505,7 @@ class Expander(object):
 
     def set_experiment_vars(self, experiment_vars):
         self._expansion_dict = None
-        if experiment_vars:
+        if experiment_vars is not None:
             self.experiment_vars = experiment_vars.copy()
         else:
             self.experiment_vars = None
@@ -508,6 +517,13 @@ class Expander(object):
             self.experiment_matrices = experiment_matrices.copy()
         else:
             self.experiment_matrices = None
+
+    def unset_mpi_vars(self):
+        self.remove_var(self.nodes_key, level='experiment')
+        self.remove_var(self.threads_key, level='experiment')
+        self.remove_var(self.ranks_key, level='experiment')
+        self.remove_var(self.ppn_key, level='experiment')
+        self.remove_var(self.nodes_key, level='experiment')
 
     def _compute_mpi_vars(self):
         n_ranks = self._find_key(self.ranks_key)
@@ -649,7 +665,7 @@ class Expander(object):
                 expansions.update(self.package_paths)
             if self.workspace_vars:
                 expansions.update(self.workspace_vars)
-            if self.application_vars:
+            if self.application_vars is not None:
                 expansions.update(self.application_vars)
             if self.workload_vars:
                 expansions.update(self.workload_vars)

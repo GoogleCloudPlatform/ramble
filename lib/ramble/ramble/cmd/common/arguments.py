@@ -73,3 +73,10 @@ def workspace():
 def specs():
     return Args(
         'specs', nargs=argparse.REMAINDER, help='one or more workload specs')
+
+
+@arg
+def no_checksum():
+    return Args(
+        '-n', '--no-checksum', action='store_true', default=False,
+        help="do not use checksums to verify downloaded files (unsafe)")
