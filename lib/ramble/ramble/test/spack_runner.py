@@ -165,3 +165,24 @@ def test_config_install_flags(tmpdir, capsys, mutable_config):
         assert expected_str in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
+
+
+def test_env_include(tmpdir, capsys, mutable_config):
+    try:
+        env_path = tmpdir.join('spack-env')
+        sr = ramble.spack_runner.SpackRunner(dry_run=True)
+        sr.create_env(env_path)
+        sr.activate()
+        sr.add_spec('zlib')
+        good_include_path = '/path/to/include/config.yaml'
+        bad_include_path = '/path/to/include/junk.yaml'
+        sr.add_include_file(good_include_path)
+        sr.add_include_file(bad_include_path)
+        sr.concretize()
+
+        with open(os.path.join(env_path, 'spack.yaml'), 'r') as f:
+            data = f.read()
+            assert good_include_path in data
+            assert bad_include_path not in data
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)

@@ -48,6 +48,12 @@ class SpackRunner(object):
 
     compiler_find_args = ['compiler', 'find']
 
+    _allowed_config_files = ['compilers.yaml', 'concretizer.yaml',
+                             'mirrors.yaml', 'repos.yaml',
+                             'packages.yaml', 'modules.yaml',
+                             'config.yaml', 'upstreams.yaml',
+                             'bootstrap.yaml', 'spack.yaml']
+
     def __init__(self, shell='bash', dry_run=False):
         """
         Ensure spack is found in the path, and setup some default variables.
@@ -72,6 +78,7 @@ class SpackRunner(object):
         self.env_path = None
         self.active = False
         self.compilers = []
+        self.includes = []
         self.dry_run = dry_run
 
     def set_env(self, env_path):
@@ -265,6 +272,18 @@ class SpackRunner(object):
         if spec not in self.env_contents:
             self.env_contents.append(spec)
 
+    def add_include_file(self, include_file):
+        """
+        Add an include file to this spack environment.
+
+        This file needs to be a config section supported by spack, otherwise
+        spack will error. So, we validate against a list of supported sections.
+        """
+
+        file_name = os.path.basename(include_file)
+        if file_name in self._allowed_config_files:
+            self.includes.append(include_file)
+
     def concretize(self):
         """
         Concretize a spack environment.
@@ -283,6 +302,8 @@ class SpackRunner(object):
 
         env_file[spack_namespace]['specs'] = []
         env_file[spack_namespace]['specs'].extend(self.env_contents)
+
+        env_file[spack_namespace]['include'] = self.includes
 
         # Write spack.yaml to environment before concretizing
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
