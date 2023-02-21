@@ -378,7 +378,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                      'extension': fetcher.extension,
                                      'input_name': input_file,
                                      'expand': input_conf['expand']
-                                    }
+                                     }
         return inputs
 
     def _mirror_inputs(self, workspace, expander):
