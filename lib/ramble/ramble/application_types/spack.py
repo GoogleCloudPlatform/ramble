@@ -137,8 +137,9 @@ class SpackApplication(ApplicationBase):
             # Write auxiliary software files into created spack env.
             for name, contents in workspace.all_auxiliary_software_files():
                 aux_file_path = expander.expand_var(os.path.join('{spack_env}', f'{name}'))
+                runner.add_include_file(aux_file_path)
                 with open(aux_file_path, 'w+') as f:
-                    f.write(contents)
+                    f.write(expander.expand_var(contents))
 
             runner.activate()
 
@@ -154,8 +155,10 @@ class SpackApplication(ApplicationBase):
                     mpi_spec = workspace.get_named_spec(spec_info['mpi'],
                                                         'mpi_library')
                     mpi_added[spec_info['mpi']] = True
-                    runner.add_spec(workspace.spec_string(mpi_spec,
-                                                          use_custom_specifier=True))
+                    runner.add_spec(
+                        expander.expand_var(workspace.spec_string(mpi_spec,
+                                            use_custom_specifier=True))
+                    )
 
                 pkg_specs = self._extract_specs(workspace, expander, name,
                                                 app_context)
@@ -166,14 +169,14 @@ class SpackApplication(ApplicationBase):
                         spec_str = workspace.spec_string(pkg_info,
                                                          as_dep=False)
 
-                        runner.add_spec(spec_str)
+                        runner.add_spec(expander.expand_var(spec_str))
 
                 if name not in added_specs:
                     added_specs[name] = True
                     spec_str = workspace.spec_string(spec_info,
                                                      as_dep=False)
 
-                    runner.add_spec(spec_str)
+                    runner.add_spec(expander.expand_var(spec_str))
 
             for name, spec_info in self.software_specs.items():
                 if 'required' in spec_info and spec_info['required']:
