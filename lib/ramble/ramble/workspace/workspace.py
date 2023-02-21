@@ -904,7 +904,8 @@ class Workspace(object):
 
         for name, val in info_dict.items():
             if val:
-                spec[name] = val
+                if name != 'required':
+                    spec[name] = val
 
         if app_name:
             spec['application_name'] = app_name
