@@ -376,7 +376,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                      'namespace': namespace,
                                      'target_dir': input_conf['target_dir'],
                                      'extension': fetcher.extension,
-                                     'input_name': input_file}
+                                     'input_name': input_file,
+                                     'expand': input_conf['expand']
+                                     }
         return inputs
 
     def _mirror_inputs(self, workspace, expander):
@@ -408,6 +410,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     if input_conf['fetcher'].digest:
                         stage.check()
                     stage.cache_local()
+
                     if input_conf['expand']:
                         try:
                             stage.expand_archive()
