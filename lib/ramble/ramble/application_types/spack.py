@@ -78,21 +78,25 @@ class SpackApplication(ApplicationBase):
 
         return ''.join(out_str)
 
-    def _add_expand_vars(self, expander):
-        super()._add_expand_vars(expander)
+    def _add_expand_vars(self):
+        """Add spack specific expansion variables
+
+        This defines spack specific expansion variables, including:
+        - spack_setup: contains the commands the load spack and the experiment's spack environment
+        """
+        super()._add_expand_vars()
         try:
             runner = ramble.spack_runner.SpackRunner()
 
-            runner.create_env(expander.expand_var('{spack_env}'))
+            runner.create_env(self.expander.expand_var('{spack_env}'))
             runner.activate()
-            runner_vars = runner.generate_expand_vars(expander,
-                                                      self.software_specs)
-            expander.set_var('spack_setup', runner_vars, 'experiment')
+            runner_vars = runner.generate_expand_vars()
+            self.variables['spack_setup'] = runner_vars
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _extract_specs(self, workspace, expander, spec_name, app_name):
+    def _extract_specs(self, workspace, spec_name, app_name):
         """Build a list of all specs which the named spec requires
 
         Traverse a spec and all of its dependencies to extract a list
@@ -104,13 +108,12 @@ class SpackApplication(ApplicationBase):
             for dep in spec['dependencies']:
                 spec_list.extend(
                     self._extract_specs(workspace,
-                                        expander,
                                         dep, app_name))
         spec['application_name'] = app_name
         spec_list.append((spec_name, spec))
         return spec_list
 
-    def _create_spack_env(self, workspace, expander):
+    def _create_spack_env(self, workspace):
         """Create the spack environment for this experiment
 
         Extract all specs this experiment uses, and write the spack environment
@@ -118,7 +121,7 @@ class SpackApplication(ApplicationBase):
         """
 
         # See if we cached this already, and if so return
-        namespace = expander.spec_namespace
+        namespace = self.expander.spec_namespace
         if not namespace:
             raise ApplicationError('Ramble spec_namespace is set to None.')
 
@@ -132,21 +135,21 @@ class SpackApplication(ApplicationBase):
         try:
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
 
-            runner.create_env(expander.expand_var('{spack_env}'))
+            runner.create_env(self.expander.expand_var('{spack_env}'))
 
             # Write auxiliary software files into created spack env.
             for name, contents in workspace.all_auxiliary_software_files():
-                aux_file_path = expander.expand_var(os.path.join('{spack_env}', f'{name}'))
+                aux_file_path = self.expander.expand_var(os.path.join('{spack_env}', f'{name}'))
                 runner.add_include_file(aux_file_path)
                 with open(aux_file_path, 'w+') as f:
-                    f.write(expander.expand_var(contents))
+                    f.write(self.expander.expand_var(contents))
 
             runner.activate()
 
             added_specs = {}
             mpi_added = {}
 
-            app_context = expander.expand_var('{spec_name}')
+            app_context = self.expander.expand_var('{spec_name}')
             for name, spec_info in \
                     workspace.all_application_specs(app_context):
 
@@ -156,12 +159,11 @@ class SpackApplication(ApplicationBase):
                                                         'mpi_library')
                     mpi_added[spec_info['mpi']] = True
                     runner.add_spec(
-                        expander.expand_var(workspace.spec_string(mpi_spec,
-                                            use_custom_specifier=True))
+                        self.expander.expand_var(workspace.spec_string(mpi_spec,
+                                                 use_custom_specifier=True))
                     )
 
-                pkg_specs = self._extract_specs(workspace, expander, name,
-                                                app_context)
+                pkg_specs = self._extract_specs(workspace, name, app_context)
                 for pkg_name, pkg_info in pkg_specs:
                     if pkg_name not in added_specs:
                         added_specs[pkg_name] = True
@@ -169,14 +171,14 @@ class SpackApplication(ApplicationBase):
                         spec_str = workspace.spec_string(pkg_info,
                                                          as_dep=False)
 
-                        runner.add_spec(expander.expand_var(spec_str))
+                        runner.add_spec(self.expander.expand_var(spec_str))
 
                 if name not in added_specs:
                     added_specs[name] = True
                     spec_str = workspace.spec_string(spec_info,
                                                      as_dep=False)
 
-                    runner.add_spec(expander.expand_var(spec_str))
+                    runner.add_spec(self.expander.expand_var(spec_str))
 
             for name, spec_info in self.software_specs.items():
                 if 'required' in spec_info and spec_info['required']:
@@ -189,11 +191,11 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _install_software(self, workspace, expander):
+    def _install_software(self, workspace):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
-        namespace = expander.spec_namespace
+        namespace = self.expander.spec_namespace
         if not namespace:
             raise ApplicationError('Ramble spec_namespace is set to None.')
 
@@ -206,12 +208,12 @@ class SpackApplication(ApplicationBase):
 
         try:
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
-            runner.set_env(expander.expand_var('{spack_env}'))
+            runner.set_env(self.expander.expand_var('{spack_env}'))
 
             runner.activate()
             runner.install()
 
-            app_context = expander.expand_var('{spec_name}')
+            app_context = self.expander.expand_var('{spec_name}')
             for name, spec_info in \
                     workspace.all_application_specs(app_context):
                 if 'mpi' in spec_info:
@@ -219,27 +221,26 @@ class SpackApplication(ApplicationBase):
                                                         'mpi_library')
                     spec_str = workspace.spec_string(mpi_spec)
                     package_path = runner.get_package_path(spec_str)
-                    expander.set_package_path(name, package_path)
+                    self.variables[name] = package_path
 
-                pkg_specs = self._extract_specs(workspace, expander, name,
-                                                app_context)
+                pkg_specs = self._extract_specs(workspace, name, app_context)
                 for pkg_name, pkg_info in pkg_specs:
                     spec = workspace._build_spec_dict(pkg_info,
                                                       app_name=app_context)
                     spec_str = workspace.spec_string(spec,
                                                      as_dep=False)
                     package_path = runner.get_package_path(spec_str)
-                    expander.set_package_path(pkg_name, package_path)
+                    self.variables[pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _mirror_software(self, workspace, expander):
+    def _mirror_software(self, workspace):
         """Mirror software source for this experiment using spack"""
         import re
 
         # See if we cached this already, and if so return
-        namespace = expander.spec_namespace
+        namespace = self.expander.spec_namespace
         if not namespace:
             raise ApplicationError('Ramble spec_namespace is set to None.')
 
@@ -252,7 +253,7 @@ class SpackApplication(ApplicationBase):
 
         try:
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
-            runner.set_env(expander.expand_var('{spack_env}'))
+            runner.set_env(self.expander.expand_var('{spack_env}'))
 
             runner.activate()
 

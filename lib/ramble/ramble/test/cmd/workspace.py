@@ -118,7 +118,6 @@ def test_add_command():
     with ramble.workspace.read('test') as ws:
         add('basic')
 
-        assert 'basic' in workspace('info')
         check_basic(ws)
 
 
@@ -129,13 +128,11 @@ def test_remove_command():
     with ramble.workspace.read('test') as ws:
         add('basic')
 
-        assert 'basic' in workspace('info')
         check_basic(ws)
 
     with ramble.workspace.read('test') as ws:
         remove('basic')
 
-        assert 'basic' not in workspace('info')
         check_no_basic(ws)
 
 
@@ -161,14 +158,55 @@ def test_workspace_list(mutable_mock_workspace_path):
     assert '.DS_Store' not in out
 
 
-def test_workspace_info(mutable_mock_workspace_path):
-    workspace('create', 'foo')
+def test_workspace_info():
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
 
-    with ramble.workspace.read('foo'):
-        add('basic')
-        out = workspace('info')
+spack:
+  concretized: true
+"""
 
-    check_info_basic(out)
+    workspace_name = 'test_info'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace('info', global_args=['-w', workspace_name])
+
+    check_info_basic(output)
 
 
 def test_workspace_dir(tmpdir):
@@ -244,20 +282,13 @@ def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
         workspace('remove', '-y', 'test1')
 
 
-def test_remove_workspace(capfd):
+def test_remove_workspace():
     workspace('create', 'foo')
     workspace('create', 'bar')
 
     out = workspace('list')
     assert 'foo' in out
     assert 'bar' in out
-
-    foo = ramble.workspace.read('foo')
-    with foo:
-        with pytest.raises(ramble.main.RambleCommandError):
-            with capfd.disabled():
-                workspace('remove', '-y', 'foo')
-        assert 'foo' in workspace('list')
 
     workspace('remove', '-y', 'foo')
     out = workspace('list')

@@ -28,6 +28,7 @@ import ramble.config
 import ramble.stage
 import ramble.mirror
 import ramble.fetch_strategy
+import ramble.expander
 
 from ramble.language.application_language import ApplicationMeta
 from ramble.error import RambleError
@@ -57,6 +58,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._analyze_phases = []
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
+
+        self.expander = None
+        self.variables = None
+        self._env_variable_sets = None
 
         self._file_path = file_path
 
@@ -124,6 +129,20 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         return out_str
 
+    def set_env_variable_sets(self, env_variable_sets):
+        """Set internal reference to environment variable sets"""
+
+        self._env_variable_sets = env_variable_sets.copy()
+
+    def set_variables(self, variables):
+        """Set internal reference to variables
+
+        Also, create an application specific expander class.
+        """
+
+        self.variables = variables.copy()
+        self.expander = ramble.expander.Expander(self.variables)
+
     def get_pipeline_phases(self, pipeline):
         phases = []
         if hasattr(self, '_%s_phases' % pipeline):
@@ -155,13 +174,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         return results.getvalue()
 
     # Phase execution helpers
-    def run_phase(self, phase, workspace, expander):
-        """Run a phase, by getting it's function pointer"""
+    def run_phase(self, phase, workspace):
+        """Run a phase, by getting its function pointer"""
         if hasattr(self, '_%s' % phase):
             tty.msg('    Executing phase ' + phase)
-            self._add_expand_vars(expander)
+            self._add_expand_vars()
             phase_func = getattr(self, '_%s' % phase)
-            phase_func(workspace, expander)
+            phase_func(workspace)
 
     def _get_env_set_commands(self, var_conf, var_set, shell='sh'):
         env_mods = spack.util.environment.EnvironmentModifications()
@@ -232,25 +251,31 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         return (env_cmds_arr.split('\n'), var_set_orig)
 
-    def _add_expand_vars(self, expander):
-        executables = self.workloads[expander.workload_name]['executables']
-        inputs = self.workloads[expander.workload_name]['inputs']
+    def _add_expand_vars(self):
+        """Add application specific expansion variables
+
+        Applications require several variables to be defined to function properly.
+        This method defines these variables, including:
+        - command: set to the commands needed to execute the experiment
+        - spack_setup: set to an empty string, so spack applications can override this
+        """
+        executables = self.workloads[self.expander.workload_name]['executables']
+        inputs = self.workloads[self.expander.workload_name]['inputs']
 
         for input_file in inputs:
             input_conf = self.inputs[input_file]
             input_path = \
-                os.path.join(expander.get_var('application_input_dir'),
+                os.path.join(self.expander.application_input_dir,
                              input_conf['target_dir'])
-            expander.set_var(input_file, input_path, 'experiment')
+            self.variables[input_file] = input_path
 
         # Set default experiment variables, if they haven't been set already
-        if expander.workload_name in self.workload_variables:
-            current_expansions = expander.get_expansion_dict()
-            wl_vars = self.workload_variables[expander.workload_name]
+        if self.expander.workload_name in self.workload_variables:
+            wl_vars = self.workload_variables[self.expander.workload_name]
 
             for var, conf in wl_vars.items():
-                if var not in current_expansions:
-                    expander.set_var(var, conf['default'], 'experiment')
+                if var not in self.variables.keys():
+                    self.variables[var] = conf['default']
 
         command = []
 
@@ -285,7 +310,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             command.append(cmd)
 
         # Process environment variable actions
-        for env_var_set in expander.all_env_var_sets():
+        for env_var_set in self._env_variable_sets:
             for action, conf in env_var_set.items():
                 (env_cmds, _) = action_funcs[action](conf,
                                                      set(),
@@ -300,25 +325,25 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for executable in executables:
             command_config = self.executables[executable]
             if command_config['redirect']:
-                logs.add(expander.expand_var(command_config['redirect']))
+                logs.add(command_config['redirect'])
 
         for log in logs:
             command.append('rm -f "%s"' % log)
             command.append('touch "%s"' % log)
 
         for executable in executables:
-            expander.set_var('executable_name', executable)
+            self.variables['executable_name'] = executable
             exec_vars = {}
             command_config = self.executables[executable]
 
             if command_config['mpi']:
                 exec_vars['mpi_command'] = \
-                    expander.expand_var('{mpi_command} ')
+                    self.expander.expand_var('{mpi_command} ')
             else:
                 exec_vars['mpi_command'] = ''
 
             if command_config['redirect']:
-                out_log = expander.expand_var(command_config['redirect'])
+                out_log = self.expander.expand_var(command_config['redirect'])
                 exec_vars['redirect'] = ' >> "%s"' % out_log
             else:
                 exec_vars['redirect'] = ''
@@ -327,24 +352,23 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 for part in command_config['template']:
                     command_part = '{mpi_command}%s{redirect}' % \
                         part
-                    command.append(expander.expand_var(command_part,
-                                                       exec_vars))
+                    command.append(self.expander.expand_var(command_part,
+                                                            exec_vars))
             elif isinstance(command_config['template'],
                             six.string_types):
                 command_part = '{mpi_command}%s{redirect}' % \
                     command_config['template']
-                command.append(expander.expand_var(command_part,
-                                                   exec_vars))
+                command.append(self.expander.expand_var(command_part,
+                                                        exec_vars))
             else:
                 app_err = 'Unsupported template type in executable '
                 app_err += '%s' % executable
                 raise ApplicationError(app_err)
 
-            expander.remove_var('executable_name')
+            del self.variables['executable_name']
 
-        expander.set_var('command', '\n'.join(command), 'experiment')
-
-        expander.set_var('spack_setup', '', 'experiment')
+        self.variables['command'] = '\n'.join(command)
+        self.variables['spack_setup'] = ''
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
@@ -381,8 +405,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                      }
         return inputs
 
-    def _mirror_inputs(self, workspace, expander):
-        for input_file, input_conf in self._inputs_and_fetchers(expander.workload_name).items():
+    def _mirror_inputs(self, workspace):
+        """Mirror application inputs
+
+        Perform mirroring of inputs within this application class.
+        """
+        for input_file, input_conf in \
+                self._inputs_and_fetchers(self.expander.workload_name).items():
             mirror_paths = ramble.mirror.mirror_archive_paths(
                 input_conf['fetcher'], os.path.join(self.name, input_file))
             fetch_dir = os.path.join(workspace._input_mirror_path, self.name)
@@ -392,20 +421,24 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             stage.cache_mirror(workspace._input_mirror_cache, workspace._input_mirror_stats)
 
-    def _get_inputs(self, workspace, expander):
-        workload_namespace = '%s.%s' % (expander.application_name,
-                                        expander.workload_name)
+    def _get_inputs(self, workspace):
+        """Download application inputs
 
-        for input_file, input_conf in self._inputs_and_fetchers(expander.workload_name).items():
+        Download application inputs into the proper directory within the workspace.
+        """
+        workload_namespace = self.expander.workload_namespace
+
+        for input_file, input_conf in \
+                self._inputs_and_fetchers(self.expander.workload_name).items():
             if not workspace.dry_run:
                 mirror_paths = ramble.mirror.mirror_archive_paths(
                     input_conf['fetcher'], os.path.join(self.name, input_file))
 
                 with ramble.stage.InputStage(input_conf['fetcher'], name=workload_namespace,
-                                             path=expander.application_input_dir,
+                                             path=self.expander.application_input_dir,
                                              mirror_paths=mirror_paths) \
                         as stage:
-                    stage.set_subdir(expander.expand_var(input_conf['target_dir']))
+                    stage.set_subdir(self.expander.expand_var(input_conf['target_dir']))
                     stage.fetch()
                     if input_conf['fetcher'].digest:
                         stage.check()
@@ -419,31 +452,46 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             else:
                 tty.msg('DRY-RUN: Would download %s' % input_conf['fetcher'].url)
 
-    def _make_experiments(self, workspace, expander):
-        experiment_run_dir = expander.experiment_run_dir
+    def _make_experiments(self, workspace):
+        """Create experiment directories
+
+        Create the experiment this application encapsulates. This includes
+        creating the experiment run directory, rendering the necessary
+        templates, and injecting the experiment into the workspace all
+        experiments file.
+        """
+        experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)
 
         for template_name, template_val in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
-            expander.set_var(template_name, expand_path, 'experiment')
+            self.variables[template_name] = expand_path
 
         for template_name, template_val in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
 
             with open(expand_path, 'w+') as f:
-                f.write(expander.expand_var(template_val))
+                f.write(self.expander.expand_var(template_val))
             os.chmod(expand_path, stat.S_IRWXU | stat.S_IRWXG
                      | stat.S_IROTH | stat.S_IXOTH)
 
-        experiment_script = expander.get_var('experiments_file')
-        experiment_script.write(expander.expand_var('{batch_submit}\n'))
+        experiment_script = workspace.experiments_script
+        experiment_script.write(self.expander.expand_var('{batch_submit}\n'))
 
         for template_name, template_val in workspace.all_templates():
-            expander.remove_var(template_name)
+            del self.variables[template_name]
 
-    def _archive_experiments(self, workspace, expander):
+    def _archive_experiments(self, workspace):
+        """Archive an experiment directory
+
+        Perform the archiving action on an experiment.
+        This includes capturing:
+        - Rendered templates within the experiment directory
+        - All files that contain a figure of merit or success criteria
+        - Any files that match an archive pattern
+        """
         import glob
-        experiment_run_dir = expander.experiment_run_dir
+        experiment_run_dir = self.expander.experiment_run_dir
         ws_archive_dir = workspace.latest_archive_path
 
         archive_experiment_dir = experiment_run_dir.replace(workspace.root,
@@ -459,18 +507,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # Copy all figure of merit files
         criteria_list = workspace.success_list
-        analysis_files, _, _ = self._analysis_dicts(expander, criteria_list)
+        analysis_files, _, _ = self._analysis_dicts(criteria_list)
         for file, file_conf in analysis_files.items():
             if os.path.exists(file):
                 shutil.copy(file, archive_experiment_dir)
 
         # Copy all archive patterns
         for pattern in self.archive_patterns.keys():
-            exp_pattern = expander.expand_var(pattern)
+            exp_pattern = self.expander.expand_var(pattern)
             for file in glob.glob(exp_pattern):
                 shutil.copy(file, archive_experiment_dir)
 
-    def _analyze_experiments(self, workspace, expander):
+    def _analyze_experiments(self, workspace):
         """Perform experiment analysis.
 
         This method will build up the fom_values dictionary. Its structure is:
@@ -506,7 +554,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         criteria_list = workspace.success_list
 
-        files, contexts, foms = self._analysis_dicts(expander, criteria_list)
+        files, contexts, foms = self._analysis_dicts(criteria_list)
 
         # Iterate over files. We already know they exist
         for file, file_conf in files.items():
@@ -567,7 +615,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                 }
 
         results = {}
-        exp_ns = expander.experiment_namespace
+        exp_ns = self.expander.experiment_namespace
         results[exp_ns] = {}
 
         success = True if fom_values else False
@@ -576,7 +624,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         tty.debug('fom_vals = %s' % fom_values)
         if success:
             results[exp_ns]['RAMBLE_STATUS'] = 'SUCCESS'
-            results[exp_ns]['RAMBLE_VARIABLES'] = expander.all_vars()
+            results[exp_ns]['RAMBLE_VARIABLES'] = self.variables
             results[exp_ns]['CONTEXTS'] = {}
 
             for context, foms in fom_values.items():
@@ -588,13 +636,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         workspace.append_result(results)
 
     def _new_file_dict(self):
+        """Create a dictonary to represent a new log file"""
         return {
             'success_criteria': [],
             'contexts': [],
             'foms': []
         }
 
-    def _analysis_dicts(self, expander, criteria_list):
+    def _analysis_dicts(self, criteria_list):
         """Extract files that need to be analyzed.
 
         Process figures_of_merit, and return the manipulated dictionaries
@@ -622,7 +671,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # Extract file paths for all criteria
         for criteria in criteria_list.all_criteria():
-            log_path = expander.expand_var(criteria.file)
+            log_path = self.expander.expand_var(criteria.file)
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()
 
@@ -632,7 +681,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Remap fom / context / file data
         # Could push this into the language features in the future
         for fom, conf in self.figures_of_merit.items():
-            log_path = expander.expand_var(conf['log_file'])
+            log_path = self.expander.expand_var(conf['log_file'])
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()
 

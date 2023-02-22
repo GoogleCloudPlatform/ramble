@@ -10,7 +10,7 @@ from ramble.appkit import *
 
 
 class Basic(ExecutableApplication):
-    name = "Basic Test Application"
+    name = "basic"
 
     executable('foo', 'bar', use_mpi=False)
     executable('bar', 'baz', use_mpi=True)
