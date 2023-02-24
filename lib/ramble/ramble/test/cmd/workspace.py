@@ -220,9 +220,9 @@ def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
         # it would be expected
         wsdir1 = os.path.join(os.getcwd(), 'ws1')
         os.makedirs(wsdir1)
-        ramble.workspace.set_workspace_path(wsdir1)
-        workspace('create', 'test1')
-        out = workspace('list')
+        with ramble.config.override('config:workspace_dirs', wsdir1):
+            workspace('create', 'test1')
+            out = workspace('list')
         assert 'test1' in out
 
         # Now make a second temp directory,
@@ -232,9 +232,9 @@ def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
         # second is
         wsdir2 = os.path.join(os.getcwd(), 'ws2')
         os.makedirs(wsdir2)
-        ramble.workspace.set_workspace_path(wsdir2)
-        workspace('create', 'test2')
-        out = workspace('list')
+        with ramble.config.override('config:workspace_dirs', wsdir2):
+            workspace('create', 'test2')
+            out = workspace('list')
         assert 'test2' in out
         assert 'test1' not in out
 

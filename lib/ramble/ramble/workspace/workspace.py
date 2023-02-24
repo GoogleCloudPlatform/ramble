@@ -286,13 +286,8 @@ def get_workspace_path():
         # command above should have worked, so if it doesn't, error out:
         tty.die()
 
-    wspath = ramble.util.path.canonicalize_path(path_in_config)
+    wspath = ramble.util.path.canonicalize_path(str(path_in_config))
     return wspath
-
-
-def set_workspace_path(dirname):
-    """Sets the parent directory of ramble-managed workspaces"""
-    ramble.config.set('config:workspace_dirs', dirname)
 
 
 def _root(name):
