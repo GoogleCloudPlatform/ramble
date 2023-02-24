@@ -281,9 +281,10 @@ def active_workspace():
 
 def get_workspace_path():
     """Returns current directory of ramble-managed workspaces"""
-    path_in_config = ramble.config.get('config:workspace_dirs', scope='user')
+    path_in_config = ramble.config.get('config:workspace_dirs')
     if not path_in_config:
-        path_in_config = ramble.config.get('config:workspace_dirs', scope='_builtin')
+        # command above should have worked, so if it doesn't, error out:
+        tty.die()
 
     wspath = ramble.util.path.canonicalize_path(path_in_config)
     return wspath
@@ -291,7 +292,7 @@ def get_workspace_path():
 
 def set_workspace_path(dirname):
     """Sets the parent directory of ramble-managed workspaces"""
-    ramble.config.set('config:workspace_dirs', dirname, scope='user')
+    ramble.config.set('config:workspace_dirs', dirname)
 
 
 def _root(name):
