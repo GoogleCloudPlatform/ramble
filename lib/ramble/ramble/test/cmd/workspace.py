@@ -238,10 +238,15 @@ def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
         assert 'test2' in out
         assert 'test1' not in out
 
-        # Cleanup after test
-        workspace('remove', '-y', 'test2')
-        ramble.workspace.set_workspace_path(wsdir1)
-        workspace('remove', '-y', 'test1')
+
+def test_workspace_dirs_with_activation(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        workspace('create', 'test1')
+        workspace('activate', 'test1')
+        workspace('create', 'test2')
+        out = workspace('list')
+        workspace('deactivate')
+        assert 'test2' in out
 
 
 def test_remove_workspace(capfd):
