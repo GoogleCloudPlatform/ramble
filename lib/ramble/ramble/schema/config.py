@@ -40,6 +40,10 @@ properties['config']['spack_flags'] = {
         'concretize': {
             'type': 'string',
             'default': '--reuse'
+        },
+        'global_args': {
+            'type': 'string',
+            'default': ''
         }
     },
     'additionalProperties': False,

@@ -39,6 +39,8 @@ class SpackRunner(object):
     """
     env_key = 'SPACK_ENV'
 
+    global_arg_config_name = 'config:spack_flags:global_args'
+
     env_create_args = [
         'env',
         'create',
@@ -62,6 +64,14 @@ class SpackRunner(object):
             self.exe = which('spack', required=True)
         except CommandNotFoundError:
             raise RunnerError("Spack command is not found in path")
+
+        # Add default arguments to spack command.
+        # This allows us to inject custom config scope dirs
+        # primarily for unit testing.
+        global_args = ramble.config.get(self.global_arg_config_name)
+        if global_args:
+            for arg in global_args.split():
+                self.exe.add_default_arg(arg)
 
         self.spack_dir = os.path.dirname(os.path.dirname(self.exe.exe[0]))
         self.shell = shell
@@ -186,14 +196,15 @@ class SpackRunner(object):
             active_env = self.exe.default_env[self.env_key]
             del self.exe.default_env[self.env_key]
 
-        find_args = [
-            'find',
+        comp_info_args = [
+            'compiler',
+            'info',
             spec
         ]
 
         try:
-            self.exe(*find_args, output=os.devnull, error=os.devnull)
-            tty.debug('%s is already an installed compiler' % spec)
+            self.exe(*comp_info_args, output=os.devnull, error=os.devnull)
+            tty.msg(f'{spec} is already an available compiler')
         except ProcessError:
             args = [
                 'install',
@@ -206,17 +217,17 @@ class SpackRunner(object):
             else:
                 self._dry_run_print(args)
 
-        self.load_compiler(spec)
+            self.load_compiler(spec)
 
-        if not self.dry_run:
-            self.exe(*self.compiler_find_args)
+            if not self.dry_run:
+                self.exe(*self.compiler_find_args)
 
-            self.compilers.append(spec)
+                self.compilers.append(spec)
 
-            if self.active:
-                self.exe.add_default_env(self.env_key, active_env)
-        else:
-            self._dry_run_print(self.compiler_find_args)
+                if self.active:
+                    self.exe.add_default_env(self.env_key, active_env)
+            else:
+                self._dry_run_print(self.compiler_find_args)
 
     def add_compiler(self, spec):
         """Add a compiler to an environment.
