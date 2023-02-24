@@ -245,7 +245,7 @@ def test_workspace_dirs_with_activation(tmpdir, mutable_mock_workspace_path):
         workspace('activate', 'test1')
         workspace('create', 'test2')
         out = workspace('list')
-        workspace('deactivate')
+        assert 'test1' in out
         assert 'test2' in out
 
 
