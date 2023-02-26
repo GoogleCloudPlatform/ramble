@@ -419,11 +419,11 @@ def workspace_info(args):
                 print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
                 print_experiment_set.set_application_context(app, app_vars, app_env_vars)
                 print_experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars)
+                                                          workload_env_vars)
                 print_experiment_set.set_experiment_context(exp,
-                                                      exp_vars,
-                                                      exp_env_vars,
-                                                      exp_matrices)
+                                                            exp_vars,
+                                                            exp_env_vars,
+                                                            exp_matrices)
 
                 color.cprint(nested_1('  Application: ') + app)
                 color.cprint(nested_2('    Workload: ') + workload)
@@ -438,28 +438,36 @@ def workspace_info(args):
                                          section_title('Workspace') + ':')
                             for var, val in workspace_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}'.replace('@', '@@'))
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
                         if app_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          nested_1('Application') + ':')
                             for var, val in app_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}'.replace('@', '@@'))
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
                         if workload_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          nested_2('Workload') + ':')
                             for var, val in workload_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}'.replace('@', '@@'))
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
                         if exp_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          nested_3('Experiment') + ':')
                             for var, val in exp_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}'.replace('@', '@@'))
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
     # Print MPI command
     color.cprint('')

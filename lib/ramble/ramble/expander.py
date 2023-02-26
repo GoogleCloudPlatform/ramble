@@ -11,6 +11,8 @@ import ast
 import six
 import operator
 
+import llnl.util.tty as tty
+
 import ramble.error
 
 supported_math_operators = {
@@ -37,8 +39,10 @@ class Expander(object):
     Additionally, math will be evaluated as part of expansion.
     """
 
-    def __init__(self, variables):
+    def __init__(self, variables, experiment_set):
         self._variables = variables
+
+        self._experiment_set = experiment_set
 
         self._application_name = None
         self._workload_name = None
@@ -162,8 +166,8 @@ class Expander(object):
                 math_ast = ast.parse(str(expanded), mode='eval')
                 evaluated = self.eval_math(math_ast.body)
                 expanded = evaluated
-            except MathEvaluationError:
-                pass
+            except MathEvaluationError as e:
+                tty.debug(e)
             except SyntaxError:
                 pass
 
@@ -179,27 +183,6 @@ class Expander(object):
         for kw in self._all_keywords(in_str):
             return False
         return True
-
-    def eval_math(self, node):
-        """Evaluate math from parsing the AST
-
-        Does not assume a specific type of operands.
-        Some operators will generate floating point, while
-        others will generate integers (if the inputs are integers).
-        """
-        if isinstance(node, ast.Num):
-            return node.n
-        elif isinstance(node, ast.BinOp):
-            left_eval = self.eval_math(node.left)
-            right_eval = self.eval_math(node.right)
-            op = supported_math_operators[type(node.op)]
-            return op(left_eval, right_eval)
-        elif isinstance(node, ast.UnaryOp):
-            operand = self.eval_math(node.operand)
-            op = supported_math_operators[type(node.op)]
-            return op(operand)
-        else:
-            raise MathEvaluationError('Invalid node')
 
     def _partial_expand(self, expansion_vars, in_str):
         """Perform expansion of a string with some variables
@@ -226,13 +209,92 @@ class Expander(object):
                         math_ast = ast.parse(str(val), mode='eval')
                         evaluated = self.eval_math(math_ast.body)
                         exp_dict[kw] = evaluated
-                    except MathEvaluationError:
-                        pass
+                    except MathEvaluationError as e:
+                        tty.debug(e)
                     except SyntaxError:
                         pass
 
             return in_str.format_map(exp_dict)
         return in_str
+
+    def eval_math(self, node):
+        """Evaluate math from parsing the AST
+
+        Does not assume a specific type of operands.
+        Some operators will generate floating point, while
+        others will generate integers (if the inputs are integers).
+        """
+        if isinstance(node, ast.Num):
+            return self._ast_num(node)
+        elif isinstance(node, ast.Constant):
+            return self._ast_constant(node)
+        elif isinstance(node, ast.Name):
+            return self._ast_name(node)
+        elif isinstance(node, ast.Attribute):
+            return self._ast_attr(node)
+        elif isinstance(node, ast.BinOp):
+            return self._eval_binary_ops(node)
+        elif isinstance(node, ast.UnaryOp):
+            return self._eval_unary_ops(node)
+        else:
+            node_type = str(type(node))
+            raise MathEvaluationError(f'Unsupported math AST node {node_type}:\n' +
+                                      f'\t{node.__dict__}')
+
+    # Ast logic helper methods
+    def __raise_syntax_error(self, node):
+        node_type = str(type(node))
+        raise RambleSyntaxError(f'Syntax error while processing {node_type} node:\n' +
+                                f'{node.__dict__}')
+
+    def _ast_num(self, node):
+        """Handle a number node in the ast"""
+        return node.n
+
+    def _ast_constant(self, node):
+        """Handle a constant node in the ast"""
+        return node.value
+
+    def _ast_name(self, node):
+        """Handle a name node in the ast"""
+        return node.id
+
+    def _ast_attr(self, node):
+        """Handle an attribute node in the ast"""
+        if isinstance(node.value, ast.Attribute):
+            base = self._ast_attr(node.value)
+        elif isinstance(node.value, ast.Name):
+            base = self._ast_name(node.value)
+        else:
+            self.__raise_syntax_error(node)
+
+        val = f'{base}.{node.attr}'
+        return val
+
+    def _eval_binary_ops(self, node):
+        """Evaluate binary operators in the ast
+
+        Extract the binary operator, and evaluate it.
+        """
+        try:
+            left_eval = self.eval_math(node.left)
+            right_eval = self.eval_math(node.right)
+            op = supported_math_operators[type(node.op)]
+            return op(left_eval, right_eval)
+        except KeyError:
+            raise SyntaxError('Unsupported binary operator')
+
+    def _eval_unary_ops(self, node):
+        """Evaluate unary operators in the ast
+
+        Extract the unary operator, and evaluate it.
+        """
+        try:
+            operand = self.eval_math(node.operand)
+            op = supported_math_operators[type(node.op)]
+            return op(operand)
+        except KeyError:
+            raise SyntaxError('Unsupported unary operator')
 
 
 class ExpanderError(ramble.error.RambleError):
@@ -243,6 +305,10 @@ class MathEvaluationError(ExpanderError):
     """Raised when an error happens while evaluating math during
     expansion
     """
+
+
+class RambleSyntaxError(ExpanderError):
+    """Raised when a syntax error happens within variable definitions"""
 
 
 class ApplicationNotDefinedError(ExpanderError):

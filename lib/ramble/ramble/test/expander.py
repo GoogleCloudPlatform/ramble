@@ -32,7 +32,7 @@ def exp_dict():
 def test_expansions():
     expansion_vars = exp_dict()
 
-    expander = ramble.expander.Expander(expansion_vars)
+    expander = ramble.expander.Expander(expansion_vars, None)
 
     assert expander.expand_var('{var1}') == '3'
     assert expander.expand_var('{var2}') == '3'
@@ -49,7 +49,7 @@ def test_expansions():
 def test_expansion_namespaces():
     expansion_vars = exp_dict()
 
-    expander = ramble.expander.Expander(expansion_vars)
+    expander = ramble.expander.Expander(expansion_vars, None)
 
     assert expander.application_namespace == 'foo'
     assert expander.workload_namespace == 'foo.bar'

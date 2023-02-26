@@ -52,7 +52,7 @@ def test_single_experiment_in_set(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None)
 
-        assert 'series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
 
 
 def test_vector_experiment_in_set(mutable_mock_workspace_path):
@@ -87,8 +87,8 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None)
 
-        assert 'series1_4' in exp_set.experiments.keys()
-        assert 'series1_8' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
 
 
 def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
@@ -159,8 +159,8 @@ def test_zipped_vector_experiments(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None)
 
-        assert 'series1_4_2' in exp_set.experiments.keys()
-        assert 'series1_16_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_16_4' in exp_set.experiments.keys()
 
 
 def test_matrix_experiments(mutable_mock_workspace_path):
@@ -199,8 +199,8 @@ def test_matrix_experiments(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
 
-        assert 'series1_4' in exp_set.experiments.keys()
-        assert 'series1_6' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
 
 
 def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
@@ -239,12 +239,12 @@ def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
 
-        assert 'series1_2' in exp_set.experiments.keys()
-        assert 'series1_8' in exp_set.experiments.keys()
-        assert 'series1_12' in exp_set.experiments.keys()
-        assert 'series1_4' in exp_set.experiments.keys()
-        assert 'series1_16' in exp_set.experiments.keys()
-        assert 'series1_24' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_12' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_16' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_24' in exp_set.experiments.keys()
 
 
 def test_matrix_vector_experiments(mutable_mock_workspace_path):
@@ -283,10 +283,10 @@ def test_matrix_vector_experiments(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
 
-        assert 'series1_4' in exp_set.experiments.keys()
-        assert 'series1_8' in exp_set.experiments.keys()
-        assert 'series1_6' in exp_set.experiments.keys()
-        assert 'series1_12' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_12' in exp_set.experiments.keys()
 
 
 def test_multi_matrix_experiments(mutable_mock_workspace_path):
@@ -326,8 +326,8 @@ def test_multi_matrix_experiments(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
 
-        assert 'series1_4_2' in exp_set.experiments.keys()
-        assert 'series1_12_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
 
 
 def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
@@ -409,8 +409,8 @@ def test_experiment_names_match(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
 
-        assert 'series1_4_2' in exp_set.experiments.keys()
-        assert 'series1_12_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
 
         for exp, app in exp_set.all_experiments():
-            assert exp == app.variables['experiment_name']
+            assert exp == app.expander.expand_var('{experiment_namespace}')
