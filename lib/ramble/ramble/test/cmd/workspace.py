@@ -464,9 +464,8 @@ def test_edit_edits_correct_paths():
     default_template_path = ws.template_path('execute_experiment')
 
     ws_args = ['-w', 'test']
-    assert workspace('edit', '--print-file', global_args=ws_args).strip() == config_file
-    assert workspace('edit', '-t', 'execute_experiment',
-                     '--print-file', global_args=ws_args).strip() \
+    assert workspace('edit', '-c', '--print-file', global_args=ws_args).strip() == config_file
+    assert workspace('edit', '-t', '--print-file', global_args=ws_args).strip() \
         == default_template_path
 
 
@@ -498,7 +497,7 @@ def test_edit_override_gets_correct_path():
 
     with ws1:
         ws_args = ['-D', ws2.root]
-        output = workspace('edit', '--print-file', global_args=ws_args).strip()
+        output = workspace('edit', '-c', '--print-file', global_args=ws_args).strip()
         assert output == config_path
 
 

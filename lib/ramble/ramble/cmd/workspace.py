@@ -520,17 +520,20 @@ def workspace_list(args):
 def workspace_edit_setup_parser(subparser):
     """edit workspace config or template"""
     subparser.add_argument(
-        '-t', '--template', dest='edit_template',
-        default='',
-        help='template name to edit. If not set, defaults to editing ramble.yaml. '
-             + 'Errors if template does not exist and `--create` is not used',
+        '-c', '--config_only', dest='config_only',
+        action='store_true',
+        help='Only open config files',
         required=False)
+
     subparser.add_argument(
-        '--print-file', action='store_true',
+        '-t', '--template_only', dest='template_only',
+        action='store_true',
+        help='Only open template files',
+        required=False)
+
+    subparser.add_argument(
+        '-p', '--print-file', action='store_true',
         help='print the file name that would be edited')
-    subparser.add_argument(
-        '--create', '-c', action='store_true',
-        help='create template if it does not exist.')
 
 
 def workspace_edit(args):
@@ -540,23 +543,21 @@ def workspace_edit(args):
         tty.die('ramble workspace edit requires either a command '
                 'line workspace or an active workspace')
 
-    if not args.edit_template:
-        edit_file = ramble.workspace.config_file(ramble_ws)
-    else:
-        edit_file = ramble.workspace.template_path(ramble_ws,
-                                                   args.edit_template)
+    config_file = ramble.workspace.config_file(ramble_ws)
+    template_files = ramble.workspace.all_templates(ramble_ws)
 
-        if args.create and not os.path.exists(edit_file):
-            f = open(edit_file, 'w+')
-            f.close()
+    edit_files = [config_file] + template_files
 
-        if not os.path.exists(edit_file):
-            tty.die('File for template %s does not exist.' % (args.edit_template))
+    if args.config_only:
+        edit_files = [config_file]
+    elif args.template_only:
+        edit_files = template_files
 
     if args.print_file:
-        print(edit_file)
+        for f in edit_files:
+            print(f)
     else:
-        editor(edit_file)
+        editor(*edit_files)
 
 
 def workspace_archive_setup_parser(subparser):

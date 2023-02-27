@@ -336,6 +336,18 @@ def template_path(ws_path, requested_template_name):
     return template_path
 
 
+def all_templates(path):
+    """Returns (abs) path to available template files in the workspace"""
+    templates = []
+
+    config_path = os.path.join(path, workspace_config_path)
+    for f in os.listdir(config_path):
+        if f.endswith(workspace_template_extension):
+            templates.append(os.path.join(config_path, f))
+
+    return templates
+
+
 def is_workspace_dir(path):
     """Whether a directory contains a ramble workspace."""
     ret_val = os.path.isdir(path)
