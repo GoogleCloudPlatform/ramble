@@ -81,12 +81,12 @@ class Wrfv4(SpackApplication):
     archive_pattern('{experiment_run_dir}/rsl.out.*')
     archive_pattern('{experiment_run_dir}/rsl.error.*')
 
-    def _analyze_experiments(self, workspace, expander):
+    def _analyze_experiments(self, workspace):
         import glob
         import re
         # Generate stats file
 
-        file_list = glob.glob(expander.expand_var('{experiment_run_dir}/rsl.out.*'))
+        file_list = glob.glob(self.expander.expand_var('{experiment_run_dir}/rsl.out.*'))
 
         if file_list:
             timing_regex = re.compile(r'Timing for main.*(?P<main_time>[0-9]+\.[0-9]*).*')
@@ -108,7 +108,7 @@ class Wrfv4(SpackApplication):
 
             avg_time = sum_time / max(count, 1)
 
-            stats_path = expander.expand_var('{experiment_run_dir}/stats.out')
+            stats_path = self.expander.expand_var('{experiment_run_dir}/stats.out')
             with open(stats_path, 'w+') as f:
                 f.write('Average time: %s s\n' % (avg_time))
                 f.write('Cumulative time: %s s\n' % (sum_time))
@@ -117,4 +117,4 @@ class Wrfv4(SpackApplication):
                 f.write('Avg time / Max time: %s s\n' % (avg_time / max(max_time, float(1.0))))
                 f.write('Number of times: %s\n' % (count))
 
-        super()._analyze_experiments(workspace, expander)
+        super()._analyze_experiments(workspace)

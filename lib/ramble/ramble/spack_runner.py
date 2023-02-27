@@ -97,7 +97,7 @@ class SpackRunner(object):
 
         self.env_path = env_path
 
-    def generate_expand_vars(self, expander, specs=[], shell='bash'):
+    def generate_expand_vars(self, shell='bash'):
         """
         Generate a string to load a spack environment within a generated
         script.

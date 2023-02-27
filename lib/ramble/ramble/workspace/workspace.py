@@ -25,7 +25,7 @@ import ramble.util.path
 import ramble.error
 import ramble.repository
 import ramble.spack_runner
-import ramble.expander
+import ramble.experiment_set
 import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
@@ -469,6 +469,8 @@ class Workspace(object):
         #     'yaml': <yaml>
         #  }
         self.application_configs = {}
+
+        self._experiment_script = None
 
         self._read()
 
@@ -1211,7 +1213,7 @@ class Workspace(object):
 
     def run_pipeline(self, pipeline):
         all_experiments_file = None
-        expander = ramble.expander.Expander(self)
+        experiment_set = ramble.experiment_set.ExperimentSet(self)
 
         if not self.is_concretized():
             error_message = 'Cannot run %s in a ' % pipeline + \
@@ -1229,8 +1231,9 @@ class Workspace(object):
                                                 workspace_all_experiments_file)
             all_experiments_file = open(all_experiments_path, 'w+')
             all_experiments_file.write('#!/bin/sh\n')
+            self._experiment_script = all_experiments_file
 
-            expander.set_var('experiments_file', all_experiments_file)
+            experiment_set.set_base_var('experiments_file', all_experiments_file)
 
             runner = ramble.spack_runner.SpackRunner(dry_run=self.dry_run)
             spack_dict = self.get_spack_dict()
@@ -1243,35 +1246,24 @@ class Workspace(object):
                     runner.install_compiler(comp_str)
 
         for app, workloads, app_vars, app_env_vars in self.all_applications():
-            expander.set_application(app)
-            expander.set_application_vars(app_vars)
-            expander.set_application_env_vars(app_env_vars)
-            tty.debug('Getting application: %s' % app)
-            tty.debug('Getting application: %s' % expander.application_name)
-            app_inst = ramble.repository.get(expander.application_name)
-
-            tty.msg('  Working on ' + app_inst.application_class +
-                    ' ' + app_inst.name)
+            experiment_set.set_application_context(app, app_vars, app_env_vars)
 
             for workload, experiments, workload_vars, workload_env_vars in \
                     self.all_workloads(workloads):
-                expander.set_workload(workload)
-                expander.set_workload_vars(workload_vars)
-                expander.set_workload_env_vars(workload_env_vars)
+                experiment_set.set_workload_context(workload, workload_vars,
+                                                    workload_env_vars)
 
                 for experiment, _, exp_vars, exp_env_vars, exp_matrices in \
                         self.all_experiments(experiments):
-                    expander.set_experiment(experiment)
-                    expander.set_experiment_vars(exp_vars)
-                    expander.set_experiment_env_vars(exp_env_vars)
-                    expander.set_experiment_matrices(exp_matrices)
+                    experiment_set.set_experiment_context(experiment,
+                                                          exp_vars,
+                                                          exp_env_vars,
+                                                          exp_matrices)
 
-                    for _ in expander.rendered_experiments():
-                        app_inst = ramble.repository.get(expander.application_name)
-                        for phase in app_inst.get_pipeline_phases(pipeline):
-                            app_inst.run_phase(phase, self, expander)
-                        # Tidy up deduced variable values
-                        expander.unset_mpi_vars()
+        for exp, app_inst in experiment_set.all_experiments():
+            tty.debug('On experiment: %s' % exp)
+            for phase in app_inst.get_pipeline_phases(pipeline):
+                app_inst.run_phase(phase, self)
 
         if pipeline == 'setup':
             all_experiments_file.close()
@@ -1300,6 +1292,10 @@ class Workspace(object):
                 tty.error("Failed downloads:")
                 tty.colify(s.cformat("{name}") for s in list(self._input_mirror_stats.errors))
                 tty.die('Mirroring has errors.')
+
+    @property
+    def experiments_script(self):
+        return self._experiment_script
 
     @property
     def latest_archive_path(self):
