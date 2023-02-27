@@ -336,7 +336,7 @@ def template_path(ws_path, requested_template_name):
     return template_path
 
 
-def all_templates(path):
+def all_template_paths(path):
     """Returns (abs) path to available template files in the workspace"""
     templates = []
 

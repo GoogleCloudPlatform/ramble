@@ -544,7 +544,7 @@ def workspace_edit(args):
                 'line workspace or an active workspace')
 
     config_file = ramble.workspace.config_file(ramble_ws)
-    template_files = ramble.workspace.all_templates(ramble_ws)
+    template_files = ramble.workspace.all_template_paths(ramble_ws)
 
     edit_files = [config_file] + template_files
 
