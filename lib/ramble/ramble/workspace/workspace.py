@@ -284,7 +284,7 @@ def get_workspace_path():
     path_in_config = ramble.config.get('config:workspace_dirs')
     if not path_in_config:
         # command above should have worked, so if it doesn't, error out:
-        tty.die()
+        tty.die('No config:workspace_dirs setting found in configuration!')
 
     wspath = ramble.util.path.canonicalize_path(str(path_in_config))
     return wspath
