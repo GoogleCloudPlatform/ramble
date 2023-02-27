@@ -387,11 +387,9 @@ def mock_executable(tmpdir):
 @pytest.fixture(scope='function')
 def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
     """Fixture for mocking the internal ramble workspaces directory."""
-    saved_path = ramble.workspace.get_workspace_path()
     mock_path = tmpdir_factory.mktemp('mock-workspace-path')
-    ramble.workspace.set_workspace_path(str(mock_path))
-    yield mock_path
-    ramble.workspace.set_workspace_path(saved_path)
+    with ramble.config.override('config:workspace_dirs', str(mock_path)):
+        yield mock_path
 
 
 @pytest.fixture
