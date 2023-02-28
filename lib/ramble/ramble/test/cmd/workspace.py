@@ -490,20 +490,9 @@ def test_edit_edits_correct_paths():
     default_template_path = ws.template_path('execute_experiment')
 
     ws_args = ['-w', 'test']
-    assert workspace('edit', '--print-file', global_args=ws_args).strip() == config_file
-    assert workspace('edit', '-t', 'execute_experiment',
-                     '--print-file', global_args=ws_args).strip() \
+    assert workspace('edit', '-c', '--print-file', global_args=ws_args).strip() == config_file
+    assert workspace('edit', '-t', '--print-file', global_args=ws_args).strip() \
         == default_template_path
-
-
-def test_edit_fails_with_invalid_template():
-    ws = ramble.workspace.create('test')
-    ws.write()
-
-    ws_args = ['-w', 'test']
-    output = workspace('edit', '-t', 'template_does_not_exist',
-                       global_args=ws_args, fail_on_error=False)
-    assert 'does not exist' in output
 
 
 def test_edit_fails_without_workspace():
@@ -524,24 +513,8 @@ def test_edit_override_gets_correct_path():
 
     with ws1:
         ws_args = ['-D', ws2.root]
-        output = workspace('edit', '--print-file', global_args=ws_args).strip()
+        output = workspace('edit', '-c', '--print-file', global_args=ws_args).strip()
         assert output == config_path
-
-
-def test_edit_creates_template():
-    ws = ramble.workspace.create('test')
-    ws.write()
-
-    template_name = 'new_template'
-    template_file = os.path.join(ws.root,
-                                 ramble.workspace.workspace.workspace_config_path,
-                                 template_name +
-                                 ramble.workspace.workspace.workspace_template_extension)
-
-    ws_args = ['-w', 'test']
-    workspace('edit', '-t', template_name, '-c', '--print-file',
-              global_args=ws_args, fail_on_error=False)
-    assert os.path.exists(template_file)
 
 
 def test_dryrun_setup():
