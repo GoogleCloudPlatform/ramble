@@ -262,20 +262,8 @@ def _commands(parser, args):
     # if we're updating an existing file, only write output if a command
     # or the header is newer than the file.
     if args.update:
-        if os.path.exists(args.update):
-            files = [
-                # pyc -> py
-                ramble.cmd.get_module(command).__file__.rstrip('c')
-                for command in ramble.cmd.all_commands()]
-            if args.header:
-                files.append(args.header)
-            last_update = os.path.getmtime(args.update)
-            if not any(os.path.getmtime(f) > last_update for f in files):
-                tty.msg('File is up to date: %s' % args.update)
-                return
-
-        tty.msg('Updating file: %s' % args.update)
-        with open(args.update, 'w') as f:
+        tty.msg('Generating file: %s' % args.update)
+        with open(args.update, 'w+') as f:
             prepend_header(args, f)
             formatter(args, f)
 
