@@ -334,6 +334,13 @@ def workspace_analyze_setup_parser(subparser):
              'Supported formats are json, yaml, or text',
         required=False)
 
+    subparser.add_argument(
+        '-u', '--upload',
+        dest='upload',
+        action='store_true',
+        help='Push experiment data to remote store (as defined in config)',
+        required=False)
+
 
 def workspace_analyze(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
@@ -342,6 +349,10 @@ def workspace_analyze(args):
     with ws.write_transaction():
         ws.run_pipeline('analyze')
         ws.dump_results(output_formats=args.output_formats)
+
+    # FIXME: this will fire the analyze logic of twice currently
+    if args.upload:
+        ws.upload_results()
 
 
 header_color = '@*b'
