@@ -267,7 +267,7 @@ _ramble() {
     then
         RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
-        RAMBLE_COMPREPLY="add commands config edit flake8 help info license list on remove rm repo unit-test workspace"
+        RAMBLE_COMPREPLY="add clean commands config debug edit flake8 help info license list mirror on remove rm repo unit-test workspace"
     fi
 }
 
@@ -278,6 +278,10 @@ _ramble_add() {
     else
         _all_applications
     fi
+}
+
+_ramble_clean() {
+    RAMBLE_COMPREPLY="-h --help -d --downloads -m --misc-cache -p --python-cache -a --all"
 }
 
 _ramble_commands() {
@@ -374,6 +378,19 @@ _ramble_config_revert() {
     fi
 }
 
+_ramble_debug() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMPREPLY="report"
+    fi
+}
+
+_ramble_debug_report() {
+    RAMBLE_COMPREPLY="-h --help"
+}
+
 _ramble_edit() {
     if $list_options
     then
@@ -434,6 +451,59 @@ _ramble_list() {
     else
         _all_applications
     fi
+}
+
+_ramble_mirror() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -n --no-checksum"
+    else
+        RAMBLE_COMPREPLY="destroy add remove rm set-url list"
+    fi
+}
+
+_ramble_mirror_destroy() {
+    RAMBLE_COMPREPLY="-h --help -m --mirror-name -u --mirror-url"
+}
+
+_ramble_mirror_add() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --scope"
+    else
+        RAMBLE=""
+    fi
+}
+
+_ramble_mirror_remove() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --scope"
+    else
+        RAMBLE=""
+    fi
+}
+
+_ramble_mirror_rm() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --scope"
+    else
+        RAMBLE=""
+    fi
+}
+
+_ramble_mirror_set_url() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --push --scope"
+    else
+        RAMBLE=""
+    fi
+}
+
+_ramble_mirror_list() {
+    RAMBLE_COMPREPLY="-h --help --scope"
 }
 
 _ramble_on() {
@@ -521,7 +591,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze info edit list ls remove rm"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze info edit mirror list ls remove rm"
     fi
 }
 
@@ -564,11 +634,15 @@ _ramble_workspace_analyze() {
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help -v --verbose"
 }
 
 _ramble_workspace_edit() {
-    RAMBLE_COMPREPLY="-h --help -t --template --print-file --create -c"
+    RAMBLE_COMPREPLY="-h --help -c --config_only -t --template_only -p --print-file"
+}
+
+_ramble_workspace_mirror() {
+    RAMBLE_COMPREPLY="-h --help -d --dry-run"
 }
 
 _ramble_workspace_list() {
