@@ -271,3 +271,85 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, 'rsl.out.0000'))
             for i in range(0, 5):
                 assert os.path.exists(os.path.join(exp_dir, f'rsl.error.000{i}'))
+
+
+def test_dependency_dry_run(mutable_config, mutable_mock_workspace_path):
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    partition: 'part1'
+    processes_per_node: '16'
+    n_threads: '1'
+  applications:
+    openfoam:
+      workloads:
+        motorbike:
+          experiments:
+            simple_test:
+              variables:
+                n_nodes: 1
+spack:
+  concretized: true
+  compilers:
+    gcc:
+      base: gcc
+      version: 8.5.0
+  mpi_libraries:
+    intel:
+      base: intel-mpi
+      version: 2018.4.274
+  applications:
+    openfoam:
+      flex:
+        base: flex
+        version: 2.6.4
+      openfoam:
+        base: openfoam
+        compiler: gcc
+        mpi: intel
+        target: 'x86_64'
+        dependencies:
+          - flex
+"""
+    workspace_name = 'test_dependant_spec'
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+        ws._re_read()
+
+        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+        deps = ws.get_spack_dict()['applications']['openfoam']['openfoam']['dependencies']
+        assert 'flex' in deps
+
+        software_dir = 'openfoam.motorbike'
+        software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
+        assert os.path.exists(software_base_dir)
+
+        software_path = os.path.join(software_base_dir, software_dir)
+        assert os.path.exists(software_path)
+
+        spack_file = os.path.join(software_path, 'spack.yaml')
+
+        import re
+        regex = re.compile(r".*openfoam.*\^flex.*")
+        with open(spack_file, 'r') as f:
+            data = f.read()
+            result = regex.search(data)
+
+            assert result
