@@ -88,7 +88,7 @@ class SpackApplication(ApplicationBase):
         try:
             runner = ramble.spack_runner.SpackRunner()
 
-            runner.create_env(self.expander.expand_var('{spack_env}'))
+            runner.configure_env(self.expander.expand_var('{spack_env}'))
             runner.activate()
             runner_vars = runner.generate_expand_vars()
             self.variables['spack_setup'] = runner_vars
