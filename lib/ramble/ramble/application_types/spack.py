@@ -206,6 +206,17 @@ class SpackApplication(ApplicationBase):
         else:
             workspace.add_to_cache(cache_tupl)
 
+        # Verify that any software we install has all required components
+        app_context = self.expander.expand_var('{spec_name}')
+        for name, spec_info in workspace.all_application_specs(app_context):
+            if ('required' in spec_info) and spec_info['required']:
+                try:
+                    spec = workspace.get_named_spec(name, app_context)
+                except RambleWorkspaceError:
+                    err_message = ("Base application {} is required by {}, "
+                                   "but is not found in workspace config").format(name, app_context)
+                    tty.die(err_message)
+
         try:
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
             runner.set_env(self.expander.expand_var('{spack_env}'))
