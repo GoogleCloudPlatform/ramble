@@ -21,6 +21,7 @@ from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
 
 import ramble.paths
+import ramble.workspace
 
 description = "run ramble's unit tests (wrapper around pytest)"
 section = "developer"
@@ -174,4 +175,5 @@ def unit_test(parser, args, unknown_args):
             do_list(args, pytest_args)
             return
 
-        return pytest.main(pytest_args)
+        with ramble.workspace.no_active_workspace():
+            return pytest.main(pytest_args)

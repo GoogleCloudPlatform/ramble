@@ -1745,11 +1745,17 @@ def no_active_workspace():
     """Deactivate the active workspace for the duration of the context. Has no
        effect when there is no active workspace."""
     ws = active_workspace()
+    env_var = None
+    if ramble_workspace_var in os.environ.keys():
+        env_var = os.environ[ramble_workspace_var]
+        del os.environ[ramble_workspace_var]
+
     try:
         deactivate()
         yield
     finally:
         if ws:
+            os.environ[ramble_workspace_var] = env_var
             activate(ws)
 
 
