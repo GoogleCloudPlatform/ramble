@@ -239,6 +239,42 @@ number of elements, as they are flattened and zipped together. In this case,
 there would be 4 experiments, each defined by a unique
 ``(processes_per_node, partition, n_nodes)`` tuple.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cross Experiment Variable References:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Variables can be defined to pull the value of a variable out of a different
+experiment. This is particularly useful when an experiment needs the path to
+something ramble automatically generates in a different experiment.
+
+.. code-block:: yaml
+
+    ramble:
+      ...
+      variables:
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                test_exp1:
+                  variables:
+                    n_ranks: '1'
+                    real_value: 'exp1_value'
+                test_exp2:
+                  variables:
+                    n_ranks: '1'
+                    test_value: real_value in hostname.serial.test_exp1
+
+In the above example, ``test_value`` extracts the value of ``real_value`` as
+defined in the experiment ``hostname.serial.test_exp1``. When evaluated, this
+will set ``test_value`` to ``'exp1_value'``.
+
 ^^^^^^^^^^^^^^^^^^^
 Reserved Variables:
 ^^^^^^^^^^^^^^^^^^^

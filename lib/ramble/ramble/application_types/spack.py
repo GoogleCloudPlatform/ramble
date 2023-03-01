@@ -78,13 +78,13 @@ class SpackApplication(ApplicationBase):
 
         return ''.join(out_str)
 
-    def _add_expand_vars(self):
+    def add_expand_vars(self, workspace):
         """Add spack specific expansion variables
 
         This defines spack specific expansion variables, including:
         - spack_setup: contains the commands the load spack and the experiment's spack environment
         """
-        super()._add_expand_vars()
+        super().add_expand_vars(workspace)
         try:
             runner = ramble.spack_runner.SpackRunner()
 

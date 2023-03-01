@@ -410,7 +410,7 @@ class ExperimentSet(object):
                                                                         '{' + self.wl_name_key
                                                                         + '}'))
 
-            expander = ramble.expander.Expander(context_variables)
+            expander = ramble.expander.Expander(context_variables, self)
             self._compute_mpi_vars(expander, context_variables)
             final_app_name = expander.expand_var('{' + self.app_name_key + '}')
             final_wl_name = expander.expand_var('{' + self.wl_name_key + '}')
@@ -419,6 +419,8 @@ class ExperimentSet(object):
             context_variables[self.app_name_key] = final_app_name
             context_variables[self.wl_name_key] = final_wl_name
             context_variables[self.exp_name_key] = final_exp_name
+
+            experiment_namespace = expander.experiment_namespace
 
             log_file = expander.expand_var(os.path.join('{experiment_run_dir}',
                                                         '{experiment_name}.out'))
@@ -432,12 +434,36 @@ class ExperimentSet(object):
             rendered_experiments.add(final_exp_name)
 
             app_inst = ramble.repository.get(final_app_name)
-            app_inst.set_variables(context_variables)
+            app_inst.set_variables(context_variables, self)
             app_inst.set_env_variable_sets(ordered_env_variables)
+            app_inst.add_expand_vars(self._workspace)
 
-            self.experiments[final_exp_name] = app_inst
+            self.experiments[experiment_namespace] = app_inst
 
     def all_experiments(self):
         """Iteartor over all experiments in this set"""
         for exp, inst in self.experiments.items():
             yield exp, inst
+
+    def get_experiment(self, experiment):
+        if experiment in self.experiments.keys():
+            return self.experiments[experiment]
+        return None
+
+    def get_var_from_experiment(self, experiment, variable):
+        """Lookup a variable in a given experiment
+
+        Does not error if invalid values are passed in, to allow @ symbol to
+        pass through to rendered content.
+
+        Args:
+          experiment: A fully qualified experiment name (application.workload.experiment)
+          varialbe: Name of variable to look up
+        """
+
+        if experiment not in self.experiments.keys():
+            return None
+
+        exp_app = self.experiments[experiment]
+
+        return exp_app.expander.expand_var(variable)

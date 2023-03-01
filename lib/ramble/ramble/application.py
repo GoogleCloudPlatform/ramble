@@ -61,6 +61,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.expander = None
         self.variables = None
+        self.experiment_set = None
         self._env_variable_sets = None
 
         self._file_path = file_path
@@ -134,14 +135,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self._env_variable_sets = env_variable_sets.copy()
 
-    def set_variables(self, variables):
+    def set_variables(self, variables, experiment_set):
         """Set internal reference to variables
 
         Also, create an application specific expander class.
         """
 
         self.variables = variables.copy()
-        self.expander = ramble.expander.Expander(self.variables)
+        self.experiment_set = experiment_set
+        self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
 
     def get_pipeline_phases(self, pipeline):
         phases = []
@@ -178,7 +180,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Run a phase, by getting its function pointer"""
         if hasattr(self, '_%s' % phase):
             tty.msg('    Executing phase ' + phase)
-            self._add_expand_vars()
             phase_func = getattr(self, '_%s' % phase)
             phase_func(workspace)
 
@@ -251,7 +252,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         return (env_cmds_arr.split('\n'), var_set_orig)
 
-    def _add_expand_vars(self):
+    def add_expand_vars(self, workspace):
         """Add application specific expansion variables
 
         Applications require several variables to be defined to function properly.
@@ -370,6 +371,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.variables['command'] = '\n'.join(command)
         self.variables['spack_setup'] = ''
 
+        # Define variables for template paths
+        for template_name, template_val in workspace.all_templates():
+            expand_path = os.path.join(
+                self.expander.expand_var(f'{{experiment_run_dir}}'),  # noqa: F541
+                template_name)
+            self.variables[template_name] = expand_path
+
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
 
@@ -462,10 +470,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """
         experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)
-
-        for template_name, template_val in workspace.all_templates():
-            expand_path = os.path.join(experiment_run_dir, template_name)
-            self.variables[template_name] = expand_path
 
         for template_name, template_val in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)

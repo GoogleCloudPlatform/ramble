@@ -395,14 +395,12 @@ def workspace_info(args):
     # Print workspace variables information
     workspace_vars = ws.get_workspace_vars()
 
-    # Print experiment information
-    color.cprint('')
-    color.cprint(section_title('Experiments:'))
+    # Build experiment set
+    experiment_set = ramble.experiment_set.ExperimentSet(ws)
     for app, workloads, app_vars, app_env_vars in ws.all_applications():
         for workload, experiments, workload_vars, workload_env_vars in \
                 ws.all_workloads(workloads):
             for exp, _, exp_vars, exp_env_vars, exp_matrices in ws.all_experiments(experiments):
-                experiment_set = ramble.experiment_set.ExperimentSet(ws)
                 experiment_set.set_application_context(app, app_vars, app_env_vars)
                 experiment_set.set_workload_context(workload, workload_vars,
                                                     workload_env_vars)
@@ -411,10 +409,27 @@ def workspace_info(args):
                                                       exp_env_vars,
                                                       exp_matrices)
 
+    # Print experiment information
+    color.cprint('')
+    color.cprint(section_title('Experiments:'))
+    for app, workloads, app_vars, app_env_vars in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars in \
+                ws.all_workloads(workloads):
+            for exp, _, exp_vars, exp_env_vars, exp_matrices in ws.all_experiments(experiments):
+                print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
+                print_experiment_set.set_application_context(app, app_vars, app_env_vars)
+                print_experiment_set.set_workload_context(workload, workload_vars,
+                                                          workload_env_vars)
+                print_experiment_set.set_experiment_context(exp,
+                                                            exp_vars,
+                                                            exp_env_vars,
+                                                            exp_matrices)
+
                 color.cprint(nested_1('  Application: ') + app)
                 color.cprint(nested_2('    Workload: ') + workload)
 
-                for exp_name, app_inst in experiment_set.all_experiments():
+                for exp_name, _ in print_experiment_set.all_experiments():
+                    app_inst = experiment_set.get_experiment(exp_name)
                     color.cprint(nested_3('      Experiment: ') + exp_name)
 
                     if args.verbose >= 1:
@@ -423,28 +438,36 @@ def workspace_info(args):
                                          section_title('Workspace') + ':')
                             for var, val in workspace_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
                         if app_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          nested_1('Application') + ':')
                             for var, val in app_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
                         if workload_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          nested_2('Workload') + ':')
                             for var, val in workload_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
                         if exp_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          nested_3('Experiment') + ':')
                             for var, val in exp_vars.items():
                                 expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(f'          {var} = {val} ==> {expanded}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
     # Print MPI command
     color.cprint('')
