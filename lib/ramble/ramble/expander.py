@@ -232,6 +232,8 @@ class Expander(object):
             return self._ast_name(node)
         elif isinstance(node, ast.Attribute):
             return self._ast_attr(node)
+        elif isinstance(node, ast.Compare):
+            return self._eval_comparisons(node)
         elif isinstance(node, ast.BinOp):
             return self._eval_binary_ops(node)
         elif isinstance(node, ast.UnaryOp):
@@ -271,6 +273,34 @@ class Expander(object):
         val = f'{base}.{node.attr}'
         return val
 
+    def _eval_comparisons(self, node):
+        """Handle a comparison node in the ast"""
+
+        # Extract In nodes, and call their helper
+        if len(node.ops) == 1 and isinstance(node.ops[0], ast.In):
+            return self._eval_comp_in(node)
+        return node
+
+    def _eval_comp_in(self, node):
+        """Handle in nodes in the ast
+
+        Perform extraction of `<variable> in <experiment>` syntax.
+
+        Raises an exception if the experiment does not exist.
+        """
+        if isinstance(node.left, ast.Name):
+            var_name = self._ast_name(node.left)
+            if isinstance(node.comparators[0], ast.Attribute):
+                namespace = self.eval_math(node.comparators[0])
+                val = self._experiment_set.get_var_from_experiment(namespace,
+                                                                   f'{{{var_name}}}')
+                if not val:
+                    raise RambleSyntaxError(f'{namespace} does not exist in: ' +
+                                            f'"{var_name} in {namespace}"')
+                    self.__raise_syntax_error(node)
+                return val
+        self.__raise_syntax_error(node)
+
     def _eval_binary_ops(self, node):
         """Evaluate binary operators in the ast
 
@@ -281,6 +311,8 @@ class Expander(object):
             right_eval = self.eval_math(node.right)
             op = supported_math_operators[type(node.op)]
             return op(left_eval, right_eval)
+        except TypeError:
+            raise SyntaxError('Unsupported operand type in binary operator')
         except KeyError:
             raise SyntaxError('Unsupported binary operator')
 
@@ -293,6 +325,8 @@ class Expander(object):
             operand = self.eval_math(node.operand)
             op = supported_math_operators[type(node.op)]
             return op(operand)
+        except TypeError:
+            raise SyntaxError('Unsupported operand type in unary operator')
         except KeyError:
             raise SyntaxError('Unsupported unary operator')
 
