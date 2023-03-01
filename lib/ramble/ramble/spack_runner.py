@@ -112,6 +112,14 @@ class SpackRunner(object):
 
         return '\n'.join(commands)
 
+    def configure_env(self, path):
+        """
+        Configured the spack environment path for subsequent spack commands
+        """
+
+        # Ensure subsequent commands use the created env now.
+        self.env_path = path
+
     def create_env(self, path, output=None, error=None):
         """
         Ensure a spack environment is created, and set the path to it within
