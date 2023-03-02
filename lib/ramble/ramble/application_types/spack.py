@@ -209,14 +209,13 @@ class SpackApplication(ApplicationBase):
 
         # Verify that any software we install has all required components
         app_context = self.expander.expand_var('{spec_name}')
-        app_name = self.expander.expand_var('{app_name}')
         for name, spec_info in workspace.all_application_specs(app_context):
             if ('required' in spec_info) and spec_info['required']:
                 try:
                     spec = workspace.get_named_spec(name, app_context)
                 except ramble.workspace.RambleWorkspaceError:
                     err_message = ("Software spec {} not defined in context {} "
-                                   "but required by {}").format(name, app_context, app_name)
+                                   "but required by {}").format(name, app_context, self.name)
                     tty.die(err_message)
 
         try:
