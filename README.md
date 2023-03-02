@@ -35,7 +35,7 @@ Documentation
 For help with Ramble’s commands, run `ramble help` or `ramble help --all`.
 
 For more information on concepts in Ramble, see Ramble’s
-[Getting Started](./docs/Getting_Started.md) guide.
+[Getting Started](./docs/getting_started.rst) guide.
 
 Example configuration files are also contained in the
 [examples](./examples) directory.
