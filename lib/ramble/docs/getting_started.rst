@@ -20,7 +20,7 @@ requirements.txt file.
 In addition to the listed python dependencies, Ramble depends on
 spack for some application definition files.
 
-Please see [Spack's documentation](https://spack.readthedocs.io/en/latest/getting_started.html)
+Please see `Spack's documentation<https://spack.readthedocs.io/en/latest/getting_started.html>`_
 for getting spack installed.
 
 
@@ -29,7 +29,7 @@ Installation:
 -------------
 
 Installing ramble is easy. You can clone it from the
-[github repository](https://github.com/GoogleCloudPlatform/ramble) using this command:
+`github repository<https://github.com/GoogleCloudPlatform/ramble>`_ using this command:
 
 .. code-block:: console
    $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
