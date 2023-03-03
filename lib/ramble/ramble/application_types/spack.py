@@ -12,7 +12,6 @@ import llnl.util.tty as tty
 
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
-import ramble.workspace
 
 header_color = '@*b'
 level1_color = '@*g'
@@ -184,8 +183,10 @@ class SpackApplication(ApplicationBase):
             for name, spec_info in self.software_specs.items():
                 if 'required' in spec_info and spec_info['required']:
                     if name not in added_specs:
-                        tty.die('Required spec %s is not ' % name +
-                                'defined in ramble.yaml')
+                        tty.die(('Software spec {} is not defined '
+                                 'in context {}, but is required '
+                                 'to be in the spack spec for {} '
+                                 'in ramble.yaml').format(name, app_context, self.name))
 
             runner.concretize()
 
@@ -206,17 +207,6 @@ class SpackApplication(ApplicationBase):
             return
         else:
             workspace.add_to_cache(cache_tupl)
-
-        # Verify that any software we install has all required components
-        app_context = self.expander.expand_var('{spec_name}')
-        for name, spec_info in workspace.all_application_specs(app_context):
-            if ('required' in spec_info) and spec_info['required']:
-                try:
-                    spec = workspace.get_named_spec(name, app_context)
-                except ramble.workspace.RambleWorkspaceError:
-                    err_message = ("Software spec {} not defined in context {} "
-                                   "but required by {}").format(name, app_context, self.name)
-                    tty.die(err_message)
 
         try:
             runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
