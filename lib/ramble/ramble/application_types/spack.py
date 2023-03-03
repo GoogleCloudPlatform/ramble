@@ -185,8 +185,10 @@ class SpackApplication(ApplicationBase):
                     if name not in added_specs:
                         tty.die(('Software spec {} is not defined '
                                  'in context {}, but is required '
-                                 'to be in the spack spec for {} '
-                                 'in ramble.yaml').format(name, app_context, self.name))
+                                 'to by the {} application '
+                                 'definition').format(name,
+                                                      app_context,
+                                                      self.name))
 
             runner.concretize()
 
