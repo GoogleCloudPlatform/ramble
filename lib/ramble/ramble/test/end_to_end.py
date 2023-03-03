@@ -353,3 +353,70 @@ spack:
             result = regex.search(data)
 
             assert result
+
+
+def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
+    """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - -n
+    - '{n_ranks}'
+    - -ppn
+    - '{processes_per_node}'
+    - -hostfile
+    - hostfile
+  batch:
+    submit: 'sbatch {execute_experiment}'
+  variables:
+    processes_per_node: 30
+    n_ranks: '{processes_per_node}*{n_nodes}'
+    n_threads: '1'
+  applications:
+    wrfv3:
+      workloads:
+        CONUS_2p5km:
+          experiments:
+            eight_node:
+              variables:
+                n_nodes: '8'
+spack:
+  concretized: true
+  compilers:
+    gcc8:
+      base: gcc
+      version: 8.2.0
+      target: x86_64
+  mpi_libraries:
+    impi2018:
+      base: intel-mpi
+      version: 2018.4.274
+      target: x86_64
+  applications:
+    wrfv3:
+      my-wrf:
+        base: wrf
+        version: 3.9.1.1
+        variants: build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
+        compiler: gcc8
+        mpi: impi2018
+"""
+
+    workspace_name = 'test_missing_required_dry_run'
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+        ws._re_read()
+
+        output = workspace('setup',
+                           '--dry-run',
+                           global_args=['-w', workspace_name],
+                           fail_on_error=False)
+
+        assert "Software spec wrf is not defined in context wrfv3" in output
