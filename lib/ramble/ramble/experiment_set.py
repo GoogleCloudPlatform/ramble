@@ -81,9 +81,11 @@ class ExperimentSet(object):
 
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
-        if workspace_vars:
-            for var, val in workspace_vars.items():
-                self.set_base_var(var, val)
+        workspace_env_vars = workspace.get_workspace_env_vars()
+        self._set_context(self._contexts.base,
+                          workspace.name,
+                          workspace_vars,
+                          workspace_env_vars)
 
         # Set some base variables from the workspace definition.
         self.set_base_var(self.mpi_key, workspace.mpi_command)
