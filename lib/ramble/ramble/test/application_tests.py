@@ -35,10 +35,10 @@ def test_basic_app(mutable_mock_repo):
     assert basic_inst.executables['bar']['mpi']
 
     assert 'test_wl' in basic_inst.workloads
-    assert basic_inst.workloads['test_wl']['executables'] == ['foo']
+    assert basic_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']
     assert basic_inst.workloads['test_wl']['inputs'] == ['input']
     assert 'test_wl2' in basic_inst.workloads
-    assert basic_inst.workloads['test_wl2']['executables'] == ['bar']
+    assert basic_inst.workloads['test_wl2']['executables'] == ['builtin::env_vars', 'bar']
     assert basic_inst.workloads['test_wl2']['inputs'] == ['input']
 
     assert 'test_fom' in basic_inst.figures_of_merit
