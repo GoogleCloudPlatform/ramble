@@ -367,3 +367,41 @@ def success_criteria(name, mode, match, file):
         }
 
     return _execute_success_criteria
+
+
+@application_directive('builtins')
+def register_builtin(name, required=False):
+    """Register a builtin
+
+    Builtins are methods that return lists of strings. These methods represent
+    a way to write python code to generate executables for building up
+    workloads.
+
+    Builtins can be referred to in a list of executables as:
+    `builtin::method_name`. As an example, ApplicationBase has a builtin
+    defined as follows:
+
+    ```
+    register_builtin('env_vars', required=True)
+    def env_vars(self):
+       ...
+    ```
+
+    This can be used in a workload as:
+    `workload(..., executables=['builtin::env_vars', ...] ...)`
+
+    The 'required' attribute marks a builtin as required for all workloads. This
+    will ensure the builtin is added to the workload if it is not explicitly
+    added. If required builtins are not explicitly added to a workload, they
+    are injected at the beginning of the list of executables.
+
+    Application classes that want to disable auto-injecting a builtin into
+    their executable lists can use:
+    ```
+    register_builtin('env_vars', required=False)
+    ```
+    """
+    def _store_builtin(app):
+        app.builtins[f'builtin::{name}'] = {'name': name,
+                                            'required': required}
+    return _store_builtin

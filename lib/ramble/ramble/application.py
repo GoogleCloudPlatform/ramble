@@ -30,12 +30,13 @@ import ramble.mirror
 import ramble.fetch_strategy
 import ramble.expander
 
-from ramble.language.application_language import ApplicationMeta
+from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
 
 header_color = '@*b'
 level1_color = '@*g'
+level2_color = '@*r'
 plain_format = '@.'
 
 
@@ -47,9 +48,16 @@ def subsection_title(s):
     return level1_color + s + plain_format
 
 
+def nested_2_color(s):
+    return level2_color + s + plain_format
+
+
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
     uses_spack = False
+    _exec_prefix_builtin = 'builtin::'
+    _builtin_required_key = 'required'
+    _workload_exec_key = 'executables'
 
     def __init__(self, file_path):
         super().__init__()
@@ -69,11 +77,23 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.application_class = 'ApplicationBase'
 
         self._verbosity = 'short'
+        self._inject_required_builtins()
+
+    def _inject_required_builtins(self):
+        required_builtins = []
+        for builtin, blt_conf in self.builtins.items():
+            if blt_conf[self._builtin_required_key]:
+                required_builtins.append(builtin)
+
+        for workload, wl_conf in self.workloads.items():
+            if self._workload_exec_key in wl_conf:
+                for builtin in required_builtins:
+                    if builtin not in wl_conf[self._workload_exec_key]:
+                        wl_conf[self._workload_exec_key].insert(0, builtin)
 
     def _long_print(self):
         out_str = []
-        out_str.append('%s\n' % section_title('Application: '))
-        out_str.append('%s\n' % self.name)
+        out_str.append(section_title('Application: ') + f'{self.name}\n')
         out_str.append('\n')
 
         out_str.append('%s\n' % section_title('Description:'))
@@ -100,34 +120,29 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, 'workloads'):
             out_str.append('\n')
-            out_str.append(section_title('Workloads:\n'))
-            out_str.append(colified(self.workloads.keys(), tty=True))
+            for wl_name, wl_conf in self.workloads.items():
+                out_str.append(section_title('Workload:') + f' {wl_name}\n')
+                out_str.append('\t' + subsection_title('Executables: ') +
+                               f'{wl_conf["executables"]}\n')
+                out_str.append('\t' + subsection_title('Inputs: ') +
+                               f'{wl_conf["inputs"]}\n')
+
+                if wl_name in self.workload_variables:
+                    out_str.append('\t' + subsection_title('Variables:') + '\n')
+                    for var, conf in self.workload_variables[wl_name].items():
+                        indent = '\t\t'
+
+                        out_str.append(nested_2_color(f'{indent}{var}:\n'))
+                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
+                        out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
+                        if 'values' in conf:
+                            out_str.append(f'{indent}\tSuggested Values: {conf["values"]}\n')
+
             out_str.append('\n')
 
-            for workload in self.workloads.keys():
-                if workload in self.workload_variables:
-                    title = '%s variables:\n' % workload
-                    out_str.append(section_title(title))
-                    workload_vars = self.workload_variables[workload]
-                    for var in workload_vars:
-                        var_str = '\t%s\n' % var
-                        out_str.append(subsection_title(var_str))
-
-                        var_str = '\t\tDescription: ' + \
-                            workload_vars[var]['description'] + '\n'
-                        out_str.append(var_str)
-
-                        var_str = '\t\tDefault: ' + \
-                            workload_vars[var]['default'] + '\n'
-                        out_str.append(var_str)
-
-                        if 'values' in workload_vars[var].keys():
-                            var_str = '\t\tSuggested Values: ' + \
-                                str(workload_vars[var]['values']) + '\n'
-                            out_str.append(var_str)
-
-                    out_str.append('\n')
-
+        if hasattr(self, 'builtins'):
+            out_str.append(section_title('Builtin Executables:\n'))
+            out_str.append('\t' + colified(self.builtins.keys(), tty=True) + '\n')
         return out_str
 
     def set_env_variable_sets(self, env_variable_sets):
@@ -280,93 +295,64 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         command = []
 
-        # ensure license variables are set / modified
-        # Process one scope at a time, to ensure
-        # highest-precendence scopes are processed last
-        config_scopes = ramble.config.scopes()
-        shell = ramble.config.get('config:shell')
-        var_set = set()
-
-        action_funcs = {
-            'set': self._get_env_set_commands,
-            'unset': self._get_env_unset_commands,
-            'append': self._get_env_append_commands,
-            'prepend': self._get_env_prepend_commands
-        }
-
-        for scope in config_scopes:
-            license_conf = ramble.config.config.get_config('licenses',
-                                                           scope=scope)
-            if license_conf:
-                app_licenses = license_conf[self.name] if self.name \
-                    in license_conf else {}
-
-                for action, conf in app_licenses.items():
-                    (env_cmds, var_set) = action_funcs[action](conf,
-                                                               var_set,
-                                                               shell=shell)
-
-                    for cmd in env_cmds:
-                        if cmd:
-                            command.append(cmd)
-
-        # Process environment variable actions
-        for env_var_set in self._env_variable_sets:
-            for action, conf in env_var_set.items():
-                (env_cmds, _) = action_funcs[action](conf,
-                                                     set(),
-                                                     shell=shell)
-
-                for cmd in env_cmds:
-                    if cmd:
-                        command.append(cmd)
-
         # ensure all log files are purged and set up
         logs = set()
+        builtin_regex = re.compile(r'%s(?P<func>.*)' % self._exec_prefix_builtin)
         for executable in executables:
-            command_config = self.executables[executable]
-            if command_config['redirect']:
-                logs.add(command_config['redirect'])
+            if not builtin_regex.match(executable):
+                command_config = self.executables[executable]
+                if command_config['redirect']:
+                    logs.add(command_config['redirect'])
 
         for log in logs:
             command.append('rm -f "%s"' % log)
             command.append('touch "%s"' % log)
 
         for executable in executables:
-            self.variables['executable_name'] = executable
-            exec_vars = {}
-            command_config = self.executables[executable]
+            builtin_match = builtin_regex.match(executable)
+            if builtin_match:
+                # Process builtin executables
 
-            if command_config['mpi']:
-                exec_vars['mpi_command'] = \
-                    self.expander.expand_var('{mpi_command} ')
+                # Get internal method:
+                func_name = f'{builtin_match.group("func")}'
+                func = getattr(self, func_name)
+                command.extend(func())
             else:
-                exec_vars['mpi_command'] = ''
+                # Process directive defined executables
+                self.variables['executable_name'] = executable
+                exec_vars = {}
+                command_config = self.executables[executable]
 
-            if command_config['redirect']:
-                out_log = self.expander.expand_var(command_config['redirect'])
-                exec_vars['redirect'] = ' >> "%s"' % out_log
-            else:
-                exec_vars['redirect'] = ''
+                if command_config['mpi']:
+                    exec_vars['mpi_command'] = \
+                        self.expander.expand_var('{mpi_command} ')
+                else:
+                    exec_vars['mpi_command'] = ''
 
-            if isinstance(command_config['template'], list):
-                for part in command_config['template']:
+                if command_config['redirect']:
+                    out_log = self.expander.expand_var(command_config['redirect'])
+                    exec_vars['redirect'] = ' >> "%s"' % out_log
+                else:
+                    exec_vars['redirect'] = ''
+
+                if isinstance(command_config['template'], list):
+                    for part in command_config['template']:
+                        command_part = '{mpi_command}%s{redirect}' % \
+                            part
+                        command.append(self.expander.expand_var(command_part,
+                                                                exec_vars))
+                elif isinstance(command_config['template'],
+                                six.string_types):
                     command_part = '{mpi_command}%s{redirect}' % \
-                        part
+                        command_config['template']
                     command.append(self.expander.expand_var(command_part,
                                                             exec_vars))
-            elif isinstance(command_config['template'],
-                            six.string_types):
-                command_part = '{mpi_command}%s{redirect}' % \
-                    command_config['template']
-                command.append(self.expander.expand_var(command_part,
-                                                        exec_vars))
-            else:
-                app_err = 'Unsupported template type in executable '
-                app_err += '%s' % executable
-                raise ApplicationError(app_err)
+                else:
+                    app_err = 'Unsupported template type in executable '
+                    app_err += '%s' % executable
+                    raise ApplicationError(app_err)
 
-            del self.variables['executable_name']
+                del self.variables['executable_name']
 
         self.variables['command'] = '\n'.join(command)
         self.variables['spack_setup'] = ''
@@ -716,6 +702,53 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         'format': format_str
                     }
         return files, contexts, foms
+
+    register_builtin('env_vars', required=True)
+
+    def env_vars(self):
+        command = []
+        # ensure license variables are set / modified
+        # Process one scope at a time, to ensure
+        # highest-precendence scopes are processed last
+        config_scopes = ramble.config.scopes()
+        shell = ramble.config.get('config:shell')
+        var_set = set()
+
+        action_funcs = {
+            'set': self._get_env_set_commands,
+            'unset': self._get_env_unset_commands,
+            'append': self._get_env_append_commands,
+            'prepend': self._get_env_prepend_commands
+        }
+
+        for scope in config_scopes:
+            license_conf = ramble.config.config.get_config('licenses',
+                                                           scope=scope)
+            if license_conf:
+                app_licenses = license_conf[self.name] if self.name \
+                    in license_conf else {}
+
+                for action, conf in app_licenses.items():
+                    (env_cmds, var_set) = action_funcs[action](conf,
+                                                               var_set,
+                                                               shell=shell)
+
+                    for cmd in env_cmds:
+                        if cmd:
+                            command.append(cmd)
+
+        # Process environment variable actions
+        for env_var_set in self._env_variable_sets:
+            for action, conf in env_var_set.items():
+                (env_cmds, _) = action_funcs[action](conf,
+                                                     set(),
+                                                     shell=shell)
+
+                for cmd in env_cmds:
+                    if cmd:
+                        command.append(cmd)
+
+        return command
 
 
 class ApplicationError(RambleError):
