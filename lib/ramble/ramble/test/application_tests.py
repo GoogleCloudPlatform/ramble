@@ -11,7 +11,8 @@ import pytest
 
 
 @pytest.mark.parametrize('app', [
-    'basic', 'basic-inherited'
+    'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
+    'register-builtin'
 ])
 def test_app_features(mutable_mock_repo, app):
     app_inst = mutable_mock_repo.get(app)
@@ -23,6 +24,7 @@ def test_app_features(mutable_mock_repo, app):
     assert hasattr(app_inst, 'mpi_libraries')
     assert hasattr(app_inst, 'software_specs')
     assert hasattr(app_inst, 'workload_variables')
+    assert hasattr(app_inst, 'builtins')
 
 
 def test_basic_app(mutable_mock_repo):
@@ -162,3 +164,40 @@ def test_env_var_unset_command_gen(mutable_mock_repo):
     out_cmds, _ = basic_inst._get_env_unset_commands(tests, set())
     for cmd in answer:
         assert cmd in out_cmds
+
+
+@pytest.mark.parametrize('app', [
+    'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
+    'register-builtin'
+])
+def test_required_builtins(mutable_mock_repo, app):
+    app_inst = mutable_mock_repo.get(app)
+
+    required_builtins = []
+    for builtin, conf in app_inst.builtins.items():
+        if conf[app_inst._builtin_required_key]:
+            required_builtins.append(builtin)
+
+    for workload, wl_conf in app_inst.workloads.items():
+        if app_inst._workload_exec_key in wl_conf:
+            for builtin in required_builtins:
+                assert builtin in wl_conf[app_inst._workload_exec_key]
+
+
+def test_register_builtin_app(mutable_mock_repo):
+    app_inst = mutable_mock_repo.get('register-builtin')
+
+    required_builtins = []
+    excluded_builtins = []
+    for builtin, conf in app_inst.builtins.items():
+        if conf[app_inst._builtin_required_key]:
+            required_builtins.append(builtin)
+        else:
+            excluded_builtins.append(builtin)
+
+    for workload, wl_conf in app_inst.workloads.items():
+        if app_inst._workload_exec_key in wl_conf:
+            for builtin in required_builtins:
+                assert builtin in wl_conf[app_inst._workload_exec_key]
+            for builtin in excluded_builtins:
+                assert builtin not in wl_conf[app_inst._workload_exec_key]

@@ -48,7 +48,7 @@ def subsection_title(s):
     return level1_color + s + plain_format
 
 
-def nested_2(s):
+def nested_2_color(s):
     return level2_color + s + plain_format
 
 
@@ -56,6 +56,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
     uses_spack = False
     _exec_prefix_builtin = 'builtin::'
+    _builtin_required_key = 'required'
+    _workload_exec_key = 'executables'
 
     def __init__(self, file_path):
         super().__init__()
@@ -80,14 +82,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def _inject_required_builtins(self):
         required_builtins = []
         for builtin, blt_conf in self.builtins.items():
-            if blt_conf['required']:
+            if blt_conf[self._builtin_required_key]:
                 required_builtins.append(builtin)
 
         for workload, wl_conf in self.workloads.items():
-            if 'executables' in wl_conf:
+            if self._workload_exec_key in wl_conf:
                 for builtin in required_builtins:
-                    if builtin not in wl_conf['executables']:
-                        wl_conf['executables'].insert(0, builtin)
+                    if builtin not in wl_conf[self._workload_exec_key]:
+                        wl_conf[self._workload_exec_key].insert(0, builtin)
 
     def _long_print(self):
         out_str = []
@@ -130,7 +132,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     for var, conf in self.workload_variables[wl_name].items():
                         indent = '\t\t'
 
-                        out_str.append(nested_2(f'{indent}{var}:\n'))
+                        out_str.append(nested_2_color(f'{indent}{var}:\n'))
                         out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
                         out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
                         if 'values' in conf:
