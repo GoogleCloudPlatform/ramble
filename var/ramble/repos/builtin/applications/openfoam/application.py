@@ -68,6 +68,20 @@ class Openfoam(SpackApplication):
                       description='Max global cells for simulation',
                       workload='hpc_motorbike')
 
+    workload_variable('x_decomp', default='{n_ranks}',
+                      description='Workload X decomposition',
+                      workload='motorbike')
+    workload_variable('y_decomp', default='1',
+                      description='Workload Y decomposition',
+                      workload='motorbike')
+    workload_variable('z_decomp', default='1',
+                      description='Workload Z decomposition',
+                      workload='motorbike')
+
+    workload_variable('decomp', default='({x_decomp} {y_decomp} {z_decomp})',
+                      description='Workload decomposition',
+                      workload='motorbike')
+
     workload_variable('hex_flags', default='-overwrite -parallel',
                       description='Flags for snappyHexMesh',
                       workloads=['hpc_motorbike', 'motorbike'])
@@ -110,6 +124,7 @@ class Openfoam(SpackApplication):
 
     executable('configure', template=['sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
                                       'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
+                                      'sed "s/(3 2 1)/{decomp}/" -i {decomposition_path}',
                                       'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
                                       'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
                                       'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
