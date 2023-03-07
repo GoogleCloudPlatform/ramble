@@ -1120,8 +1120,9 @@ class Workspace(object):
             # Read upload type and push it there
             if ramble.config.get('config:upload:type') == 'BigQuery':  # TODO: enum?
                 formatted_data = ramble.experimental.uploader.format_data(self.results)
-                uploader = ramble.experimental.uploader.BigQueryUploader() # TODO: strategy object?
 
+                # TODO: strategy object?
+                uploader = ramble.experimental.uploader.BigQueryUploader()
 
                 uri = ramble.config.get('config:upload:uri')
                 if not uri:
@@ -1133,11 +1134,11 @@ class Workspace(object):
                 raise ConfigError("Unknown config:upload:type value")
 
         else:
-           raise ConfigError("Missing correct conifg:upload parameters" )
+            raise ConfigError("Missing correct conifg:upload parameters")
 
     def append_result(self, result):
         if not self.results:
-            self.results = { 'experiments': [] }
+            self.results = {'experiments': []}
 
         self.results['experiments'].append(result)
 

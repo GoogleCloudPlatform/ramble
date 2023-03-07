@@ -605,7 +605,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                 }
 
         exp_ns = self.expander.experiment_namespace
-        results = { 'name': exp_ns }
+        results = {'name': exp_ns}
 
         success = True if fom_values else False
         success = success and criteria_list.passed()
@@ -617,7 +617,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             results['CONTEXTS'] = []
 
             for context, fom_map in fom_values.items():
-                context_map = { 'name': context, 'foms': []}
+                context_map = {'name': context, 'foms': []}
 
                 for fom_name, fom in fom_map.items():
                     fom_copy = fom.copy()
