@@ -31,6 +31,8 @@ import ramble.fetch_strategy
 import ramble.util.install_cache
 import ramble.success_criteria
 from ramble.mirror import MirrorStats
+from ramble.config import ConfigError
+import ramble.experimental.uploader
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
@@ -1107,11 +1109,37 @@ class Workspace(object):
         self.write()
         return
 
+    def write_json_results(self):
+        out_file = os.path.join(self.root, 'results.json')
+        with open(out_file, 'w+') as f:
+            sjson.dump(self.results, f)
+        return out_file
+
+    def upload_results(self):
+        if ramble.config.get('config:upload'):
+            # Read upload type and push it there
+            if ramble.config.get('config:upload:type') == 'BigQuery':  # TODO: enum?
+                formatted_data = ramble.experimental.uploader.format_data(self.results)
+                uploader = ramble.experimental.uploader.BigQueryUploader() # TODO: strategy object?
+
+
+                uri = ramble.config.get('config:upload:uri')
+                if not uri:
+                    tty.die('No upload URI (config:upload:uri) in config.')
+
+                tty.msg('Uploading Results to ' + uri)
+                uploader.perform_upload(uri, self.name, formatted_data)
+            else:
+                raise ConfigError("Unknown config:upload:type value")
+
+        else:
+           raise ConfigError("Missing correct conifg:upload parameters" )
+
     def append_result(self, result):
         if not self.results:
-            self.results = {}
+            self.results = { 'experiments': [] }
 
-        self.results.update(result)
+        self.results['experiments'].append(result)
 
     def simlink_result(self, filename_base, latest_base, file_extension):
         """
@@ -1153,21 +1181,24 @@ class Workspace(object):
             results_written.append(out_file)
 
             with open(out_file, 'w+') as f:
-                for exp, results in self.results.items():
-                    f.write('Experiment %s figures of merit:\n' %
-                            exp)
-                    f.write('  Status = %s\n' %
-                            results['RAMBLE_STATUS'])
-                    if results['RAMBLE_STATUS'] == 'SUCCESS':
-                        for context, foms in \
-                                results['CONTEXTS'].items():
-                            f.write('  %s figures of merit:\n' %
-                                    context)
-                            for name, fom in foms.items():
-                                output = '%s = %s %s' % (name,
-                                                         fom['value'],
-                                                         fom['units'])
-                                f.write('    %s\n' % (output.strip()))
+                if 'experiments' in self.results:
+                    for exp in self.results['experiments']:
+                        f.write('Experiment %s figures of merit:\n' %
+                                exp['name'])
+                        f.write('  Status = %s\n' %
+                                exp['RAMBLE_STATUS'])
+                        if exp['RAMBLE_STATUS'] == 'SUCCESS':
+                            for context in exp['CONTEXTS']:
+                                f.write('  %s figures of merit:\n' %
+                                        context['name'])
+                                for fom in context['foms']:
+                                    output = '%s = %s %s' % (fom['name'],
+                                                             fom['value'],
+                                                             fom['units'])
+                                    f.write('    %s\n' % (output.strip()))
+                else:
+                    tty.msg('No results to write')
+
             self.simlink_result(filename_base, latest_base, file_extension)
 
         if 'json' in output_formats:

@@ -604,24 +604,30 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                     'units': fom_conf['units']
                                 }
 
-        results = {}
         exp_ns = self.expander.experiment_namespace
-        results[exp_ns] = {}
+        results = { 'name': exp_ns }
 
         success = True if fom_values else False
         success = success and criteria_list.passed()
 
         tty.debug('fom_vals = %s' % fom_values)
         if success:
-            results[exp_ns]['RAMBLE_STATUS'] = 'SUCCESS'
-            results[exp_ns]['RAMBLE_VARIABLES'] = self.variables
-            results[exp_ns]['CONTEXTS'] = {}
+            results['RAMBLE_STATUS'] = 'SUCCESS'
+            results['RAMBLE_VARIABLES'] = self.variables
+            results['CONTEXTS'] = []
 
-            for context, foms in fom_values.items():
-                results[exp_ns]['CONTEXTS'][context] = foms.copy()
+            for context, fom_map in fom_values.items():
+                context_map = { 'name': context, 'foms': []}
+
+                for fom_name, fom in fom_map.items():
+                    fom_copy = fom.copy()
+                    fom_copy['name'] = fom_name
+                    context_map['foms'].append(fom_copy)
+
+                results['CONTEXTS'].append(context_map)
 
         else:
-            results[exp_ns]['RAMBLE_STATUS'] = 'FAILED'
+            results['RAMBLE_STATUS'] = 'FAILED'
 
         workspace.append_result(results)
 

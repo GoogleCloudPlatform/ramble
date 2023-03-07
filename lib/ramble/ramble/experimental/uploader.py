@@ -1,3 +1,5 @@
+import llnl.util.tty as tty
+
 class Uploader():
     # TODO: should the class store the base uri?
     def perform_upload(self, uri, workspace_name, data):
@@ -76,7 +78,8 @@ results[table][row][data] ?
 '''
 @staticmethod
 def format_data(data_in):
-    print(data_in)
+    tty.debug("Format Data in")
+    tty.debug(data_in)
     results = []
 
     # TODO: what is the nice way to deal with the distinction between
@@ -102,14 +105,8 @@ def format_data(data_in):
 
 
 
-class CloudSpannerUploader(Uploader):
-    def insert_data(self, uri: str, workspace_name, data) -> None:
-        pass
-
-    def perform_upload(self, uri, workspace_name, results):
-        pass
-
 class BigQueryUploader(Uploader):
+    from google.cloud import bigquery
 
     def insert_data(self, uri: str, workspace_name, results) -> None:
 
@@ -117,7 +114,6 @@ class BigQueryUploader(Uploader):
         exp_table_id = "{uri}.{table_name}".format(uri=uri, table_name="experiments")
         fom_table_id = "{uri}.{table_name}".format(uri=uri, table_name="foms")
 
-        from google.cloud import bigquery
         client = bigquery.Client()
 
         exps_to_insert = []
@@ -129,9 +125,6 @@ class BigQueryUploader(Uploader):
         exps_hash = "{name}::{date}".format(name=workspace_name, date=current_dateTime)
 
         for experiment in results:
-            # TODO: remove
-            print(experiment.__dict__)
-
             experiment.generate_hash()
             experiment.bulk_hash = exps_hash
 
@@ -143,7 +136,8 @@ class BigQueryUploader(Uploader):
                 fom_data['experiment_name'] = experiment.name
                 foms_to_insert.append( fom_data )
 
-        print(exps_to_insert)
+        tty.debug("Experiments to insert:")
+        tty.debug(exps_to_insert)
 
         # Make an API request.
         errors1 = client.insert_rows_json(exp_table_id, exps_to_insert)
@@ -153,9 +147,9 @@ class BigQueryUploader(Uploader):
 
         for errors, name in zip([errors1, errors2], ['exp','fom']):
             if errors == []:
-                print("New rows have been added in {}.".format(name))
+                tty.msg("New rows have been added in {}.".format(name))
             else:
-                print("Encountered errors while inserting rows: {}".format(errors))
+                tty.die("Encountered errors while inserting rows: {}".format(errors))
 
 
     def perform_upload(self, uri, workspace_name, results):
