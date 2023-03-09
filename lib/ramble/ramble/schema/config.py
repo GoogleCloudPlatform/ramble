@@ -59,6 +59,20 @@ properties['config']['workspace_dirs'] = {
     'default': '$ramble/var/ramble/workspaces'
 }
 
+properties['config']['upload'] = {
+    'type': 'object',
+    'properties': {
+        'uri': {
+            'type': 'string',
+            'default': ''
+        },
+        'type': {
+            'type': 'string',
+            'default': 'BigQuery'
+        },
+    }
+}
+
 #: Full schema with metadata
 schema = {
     '$schema': 'http://json-schema.org/schema#',
