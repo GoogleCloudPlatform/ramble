@@ -356,6 +356,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 del self.variables['executable_name']
 
         self.variables['command'] = '\n'.join(command)
+
+        # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
+        #             this is no longer needed, as spack was converted to builtins.
         self.variables['spack_setup'] = ''
 
         # Define variables for template paths

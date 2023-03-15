@@ -10,6 +10,7 @@ import os
 
 import llnl.util.tty as tty
 
+from ramble.language.application_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
 
@@ -60,6 +61,7 @@ class SpackApplication(ApplicationBase):
             'mirror_software'
         ]
 
+        self.spack_runner = ramble.spack_runner.SpackRunner()
         self.application_class = 'SpackApplication'
 
     def _long_print(self):
@@ -77,24 +79,6 @@ class SpackApplication(ApplicationBase):
                                                               info[key]))
 
         return ''.join(out_str)
-
-    def add_expand_vars(self, workspace):
-        """Add spack specific expansion variables
-
-        This defines spack specific expansion variables, including:
-        - spack_setup: contains the commands the load spack and the experiment's spack environment
-        """
-        super().add_expand_vars(workspace)
-        try:
-            runner = ramble.spack_runner.SpackRunner()
-
-            runner.configure_env(self.expander.expand_var('{spack_env}'))
-            runner.activate()
-            runner_vars = runner.generate_expand_vars()
-            self.variables['spack_setup'] = runner_vars
-
-        except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
 
     def _extract_specs(self, workspace, spec_name, app_name):
         """Build a list of all specs which the named spec requires
@@ -133,18 +117,17 @@ class SpackApplication(ApplicationBase):
             workspace.add_to_cache(cache_tupl)
 
         try:
-            runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
-
-            runner.create_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.create_env(self.expander.expand_var('{spack_env}'))
 
             # Write auxiliary software files into created spack env.
             for name, contents in workspace.all_auxiliary_software_files():
                 aux_file_path = self.expander.expand_var(os.path.join('{spack_env}', f'{name}'))
-                runner.add_include_file(aux_file_path)
+                self.spack_runner.add_include_file(aux_file_path)
                 with open(aux_file_path, 'w+') as f:
                     f.write(self.expander.expand_var(contents))
 
-            runner.activate()
+            self.spack_runner.activate()
 
             added_specs = {}
             mpi_added = {}
@@ -158,7 +141,7 @@ class SpackApplication(ApplicationBase):
                     mpi_spec = workspace.get_named_spec(spec_info['mpi'],
                                                         'mpi_library')
                     mpi_added[spec_info['mpi']] = True
-                    runner.add_spec(
+                    self.spack_runner.add_spec(
                         self.expander.expand_var(workspace.spec_string(mpi_spec,
                                                  use_custom_specifier=True))
                     )
@@ -171,14 +154,14 @@ class SpackApplication(ApplicationBase):
                         spec_str = workspace.spec_string(pkg_info,
                                                          as_dep=False)
 
-                        runner.add_spec(self.expander.expand_var(spec_str))
+                        self.spack_runner.add_spec(self.expander.expand_var(spec_str))
 
                 if name not in added_specs:
                     added_specs[name] = True
                     spec_str = workspace.spec_string(spec_info,
                                                      as_dep=False)
 
-                    runner.add_spec(self.expander.expand_var(spec_str))
+                    self.spack_runner.add_spec(self.expander.expand_var(spec_str))
 
             for name, spec_info in self.software_specs.items():
                 if 'required' in spec_info and spec_info['required']:
@@ -190,7 +173,7 @@ class SpackApplication(ApplicationBase):
                                                       app_context,
                                                       self.name))
 
-            runner.concretize()
+            self.spack_runner.concretize()
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
@@ -211,11 +194,11 @@ class SpackApplication(ApplicationBase):
             workspace.add_to_cache(cache_tupl)
 
         try:
-            runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
-            runner.set_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.set_env(self.expander.expand_var('{spack_env}'))
 
-            runner.activate()
-            runner.install()
+            self.spack_runner.activate()
+            self.spack_runner.install()
 
             app_context = self.expander.expand_var('{spec_name}')
             for name, spec_info in \
@@ -224,7 +207,7 @@ class SpackApplication(ApplicationBase):
                     mpi_spec = workspace.get_named_spec(spec_info['mpi'],
                                                         'mpi_library')
                     spec_str = workspace.spec_string(mpi_spec)
-                    package_path = runner.get_package_path(spec_str)
+                    package_path = self.spack_runner.get_package_path(spec_str)
                     self.variables[name] = package_path
 
                 pkg_specs = self._extract_specs(workspace, name, app_context)
@@ -233,7 +216,7 @@ class SpackApplication(ApplicationBase):
                                                       app_name=app_context)
                     spec_str = workspace.spec_string(spec,
                                                      as_dep=False)
-                    package_path = runner.get_package_path(spec_str)
+                    package_path = self.spack_runner.get_package_path(spec_str)
                     self.variables[pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:
@@ -256,12 +239,12 @@ class SpackApplication(ApplicationBase):
             workspace.add_to_cache(cache_tupl)
 
         try:
-            runner = ramble.spack_runner.SpackRunner(dry_run=workspace.dry_run)
-            runner.set_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.set_env(self.expander.expand_var('{spack_env}'))
 
-            runner.activate()
+            self.spack_runner.activate()
 
-            mirror_output = runner.mirror_environment(workspace._software_mirror_path)
+            mirror_output = self.spack_runner.mirror_environment(workspace._software_mirror_path)
 
             present = 0
             added = 0
@@ -296,3 +279,20 @@ class SpackApplication(ApplicationBase):
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
+
+    register_builtin('spack_source', required=True)
+    register_builtin('spack_activate', required=True)
+    register_builtin('spack_deactivate', required=False)
+
+    def spack_source(self):
+        return self.spack_runner.generate_source_command()
+
+    def spack_activate(self):
+        self.spack_runner.configure_env(self.expander.expand_var('{spack_env}'))
+        self.spack_runner.activate()
+        cmds = self.spack_runner.generate_activate_command()
+        self.spack_runner.deactivate()
+        return cmds
+
+    def spack_deactivate(self):
+        return self.spack_runner.generate_deactivate_command()

@@ -166,8 +166,6 @@ template_execute_script = """\
 # Some example variables are:
 #   - experiment_run_dir (Will be replaced with the experiment directory)
 #   - command (Will be replaced with the command to run the experiment)
-#   - spack_setup (Will be replaced with the commands needed to setup
-#                  and load a spack environment for a given experiment)
 #   - log_dir (Will be replaced with the logs directory)
 #   - experiment_name (Will be replaced with the name of the experiment)
 #   - workload_run_dir (Will be replaced with the directory of the workload
@@ -176,8 +174,6 @@ template_execute_script = """\
 #   Any experiment parameters will be available as variables as well.
 
 cd "{experiment_run_dir}"
-
-{spack_setup}
 
 {command}
 """

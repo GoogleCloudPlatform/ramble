@@ -91,26 +91,49 @@ class SpackRunner(object):
         self.includes = []
         self.dry_run = dry_run
 
+    def set_dry_run(self, dry_run=False):
+        """
+        Set the dry_run state of this spack runner
+        """
+        self.dry_run = dry_run
+
     def set_env(self, env_path):
         if not os.path.isdir(env_path) or not os.path.exists(os.path.join(env_path, 'spack.yaml')):
             tty.die(f'Path {env_path} is not a spack environment')
 
         self.env_path = env_path
 
-    def generate_expand_vars(self, shell='bash'):
+    def generate_source_command(self, shell='bash'):
         """
-        Generate a string to load a spack environment within a generated
-        script.
+        Generate a string to source spack into an environment
         """
 
-        commands = ['source %s' % self.source_script]
+        commands = ['. %s' % self.source_script]
 
+        return commands
+
+    def generate_activate_command(self, shell='bash'):
+        """
+        Generate a string to activate a spack environment
+        """
+
+        commands = []
         if self.active:
             commands.append('spack env activate %s' % self.env_path)
 
-        commands.append('source %s/loads' % self.env_path)
+        return commands
 
-        return '\n'.join(commands)
+    def generate_deactivate_command(self, shell='bash'):
+        """
+        Generate a string to deactivate a spack environment
+        """
+
+        commands = []
+
+        if self.active:
+            commands.append('spack env deactivate')
+
+        return commands
 
     def configure_env(self, path):
         """
