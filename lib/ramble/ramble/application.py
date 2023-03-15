@@ -87,7 +87,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for workload, wl_conf in self.workloads.items():
             if self._workload_exec_key in wl_conf:
-                for builtin in required_builtins:
+                # Insert in reverse order, to make sure they are correctly ordered.
+                for builtin in reversed(required_builtins):
                     if builtin not in wl_conf[self._workload_exec_key]:
                         wl_conf[self._workload_exec_key].insert(0, builtin)
 
@@ -355,6 +356,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 del self.variables['executable_name']
 
         self.variables['command'] = '\n'.join(command)
+
+        # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
+        #             this is no longer needed, as spack was converted to builtins.
         self.variables['spack_setup'] = ''
 
         # Define variables for template paths

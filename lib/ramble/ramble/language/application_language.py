@@ -402,6 +402,7 @@ def register_builtin(name, required=False):
     ```
     """
     def _store_builtin(app):
-        app.builtins[f'builtin::{name}'] = {'name': name,
-                                            'required': required}
+        builtin_name = f'builtin::{name}'
+        app.builtins[builtin_name] = {'name': name,
+                                      'required': required}
     return _store_builtin
