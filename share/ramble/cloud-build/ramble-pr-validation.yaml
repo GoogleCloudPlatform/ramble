@@ -101,6 +101,37 @@ steps:
         exit $$error
     id: ramble-tests
     entrypoint: sh
+  - name: spack/centos7
+    args:
+      - '-c'
+      - |
+        export PATH="$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}"
+        conda uninstall --force-remove pytest
+        yum install -y -q which mercurial
+
+        cd /workspace
+
+        git branch develop origin/develop
+
+        . /opt/spack/share/spack/setup-env.sh
+        . /workspace/share/ramble/setup-env.sh
+
+        ramble help
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        missing_req_err=$$?
+
+        if [ $$missing_req_err -gt 0 ]; then
+          echo " ***** Ramble failed to work when requirements.txt were not installed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        exit $$error
+    id: ramble-missing-req-test
+    entrypoint: sh
+
 timeout: 600s
 options:
   machineType: N1_HIGHCPU_8
