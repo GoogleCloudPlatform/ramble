@@ -20,7 +20,7 @@ import ramble.schema.workspace
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
-    ramble.schema.applications.properties,
+    ramble.schema.applications.applications_schema,
     ramble.schema.config.properties,
     ramble.schema.repos.properties,
     ramble.schema.workspace.properties
