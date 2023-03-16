@@ -13,9 +13,9 @@ import collections
 import sys
 import re
 import argparse
-import pytest
 from six import StringIO
 
+import llnl.util.tty as tty
 import llnl.util.tty.color as color
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
@@ -75,7 +75,11 @@ def do_list(args, extra_args):
     old_output = sys.stdout
     try:
         sys.stdout = output = StringIO()
-        pytest.main(['--collect-only'] + extra_args)
+        try:
+            import pytest
+            pytest.main(['--collect-only'] + extra_args)
+        except ImportError:
+            tty.die('Pytest python module not found. Ensure requirements.txt are installed.')
     finally:
         sys.stdout = old_output
 
@@ -156,7 +160,11 @@ def unit_test(parser, args, unknown_args):
     if args.pytest_help:
         # make the pytest.main help output more accurate
         sys.argv[0] = 'ramble test'
-        return pytest.main(['-h'])
+        try:
+            import pytest
+            return pytest.main(['-h'])
+        except ImportError:
+            tty.die('Pytest python module not found. Ensure requirements.txt are installed.')
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
@@ -176,4 +184,8 @@ def unit_test(parser, args, unknown_args):
             return
 
         with ramble.workspace.no_active_workspace():
-            return pytest.main(pytest_args)
+            try:
+                import pytest
+                return pytest.main(pytest_args)
+            except ImportError:
+                tty.die('Pytest python module not found. Ensure requirements.txt are installed.')

@@ -9,7 +9,9 @@ These can include anything from:
  - Performance focused scalaing studies
  - Compiler flag sweeps
 
-To install ramble and configure your experiment workspace, make sure you have Python.
+To install ramble and configure your experiment workspace, make sure you have
+Python, and Ramble’s dependencies are installed as per the dependency section
+below.
 Then:
 
     $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
