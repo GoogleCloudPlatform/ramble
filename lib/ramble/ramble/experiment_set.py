@@ -412,21 +412,23 @@ class ExperimentSet(object):
                                                                         '{' + self.wl_name_key
                                                                         + '}'))
 
-            expander = ramble.expander.Expander(context_variables, self)
-            self._compute_mpi_vars(expander, context_variables)
+            experiment_vars = context_variables.copy()
+
+            expander = ramble.expander.Expander(experiment_vars, self)
+            self._compute_mpi_vars(expander, experiment_vars)
             final_app_name = expander.expand_var('{' + self.app_name_key + '}')
             final_wl_name = expander.expand_var('{' + self.wl_name_key + '}')
             final_exp_name = expander.expand_var(experiment_template_name)
 
-            context_variables[self.app_name_key] = final_app_name
-            context_variables[self.wl_name_key] = final_wl_name
-            context_variables[self.exp_name_key] = final_exp_name
+            experiment_vars[self.app_name_key] = final_app_name
+            experiment_vars[self.wl_name_key] = final_wl_name
+            experiment_vars[self.exp_name_key] = final_exp_name
 
             experiment_namespace = expander.experiment_namespace
 
             log_file = expander.expand_var(os.path.join('{experiment_run_dir}',
                                                         '{experiment_name}.out'))
-            context_variables['log_file'] = log_file
+            experiment_vars['log_file'] = log_file
 
             tty.debug('   Exp vars: %s' % exp)
             tty.debug('   Final name: %s' % final_exp_name)
@@ -436,7 +438,7 @@ class ExperimentSet(object):
             rendered_experiments.add(final_exp_name)
 
             app_inst = ramble.repository.get(final_app_name)
-            app_inst.set_variables(context_variables, self)
+            app_inst.set_variables(experiment_vars, self)
             app_inst.set_env_variable_sets(ordered_env_variables)
             app_inst.add_expand_vars(self._workspace)
 
