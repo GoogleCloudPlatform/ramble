@@ -506,3 +506,118 @@ def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path)
             exp1_app.expander.expand_var('{test_var}')
             expected = f'basic.test_wl_does_not_exist does not exist in "{exp1_vars["test_var"]}"'
             assert e.error == expected
+
+
+def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+            'processes_per_node': '2'
+        }
+        exp_name = 'series1_{n_ranks}'
+        exp_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_nodes': ['2', '3']
+        }
+
+        exp_matrices = [
+            ['n_nodes']
+        ]
+
+        exp_set.set_application_context(app_name, app_vars, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
+
+
+def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': ['4', '6']
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+            'processes_per_node': '2'
+        }
+        exp_name = 'series1_{n_ranks}_{n_nodes}'
+        exp_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+        }
+
+        exp_matrices = [
+            ['n_ranks']
+        ]
+
+        exp_set.set_application_context(app_name, app_vars, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+
+        assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6_3' in exp_set.experiments.keys()
+
+
+def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+        # Remove workspace vars, which default to a `processes_per_node = -1` definition.
+        exp_set._variables[exp_set._contexts.base] = {}
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': ['4', '6']
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+        exp_name = 'series1_{n_ranks}_{processes_per_node}'
+        exp_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_nodes': ['2', '3']
+        }
+
+        exp_set.set_application_context(app_name, app_vars, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+
+        assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6_2' in exp_set.experiments.keys()

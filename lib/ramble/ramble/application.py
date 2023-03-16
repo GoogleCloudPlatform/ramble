@@ -157,7 +157,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         Also, create an application specific expander class.
         """
 
-        self.variables = variables.copy()
+        self.variables = variables
         self.experiment_set = experiment_set
         self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
 
