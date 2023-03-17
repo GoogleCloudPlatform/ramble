@@ -35,36 +35,12 @@ class ExperimentSet(object):
                                   'workload', 'experiment',
                                   'required'])
 
-    app_name_key = 'application_name'
-    app_run_dir_key = 'application_run_dir'
-    app_input_dir_key = 'application_input_dir'
-
-    wl_name_key = 'workload_name'
-    wl_run_dir_key = 'workload_run_dir'
-    wl_input_dir_key = 'workload_input_dir'
-    spack_key = 'spack_env'
-
-    exp_name_key = 'experiment_name'
-    exp_run_dir_key = 'experiment_run_dir'
-
-    ranks_key = 'n_ranks'
-    ppn_key = 'processes_per_node'
-    nodes_key = 'n_nodes'
-    threads_key = 'n_threads'
-
-    mpi_key = 'mpi_command'
-    batch_submit_key = 'batch_submit'
-    spec_name_key = 'spec_name'
-
-    log_dir_key = 'log_dir'
-    log_file_key = 'log_file'
-    err_file_key = 'err_file'
+    keywords = ramble.keywords.keywords
 
     def __init__(self, workspace):
         """Create experiment set class"""
         self.experiments = {}
         self._workspace = workspace
-        self.keywords = ramble.keywords.Keywords()
 
         self._env_variables = {}
         self._variables = {}
@@ -99,10 +75,11 @@ class ExperimentSet(object):
                           workspace_env_vars)
 
         # Set some base variables from the workspace definition.
-        self.set_base_var(self.mpi_key, workspace.mpi_command)
-        self.set_base_var(self.log_dir_key, workspace.log_dir)
-        self.set_base_var(self.batch_submit_key, workspace.batch_submit)
-        self.set_base_var(self.spec_name_key, '{application_name}')
+        self.set_base_var(self.keywords.mpi_command, workspace.mpi_command)
+        self.set_base_var(self.keywords.log_dir, workspace.log_dir)
+        self.set_base_var(self.keywords.batch_submit, workspace.batch_submit)
+        self.set_base_var(self.keywords.spec_name,
+                          ramble.expander.Expander.expansion_str(self.keywords.application_name))
 
     def set_base_var(self, var, val):
         """Set a base variable definition"""
@@ -217,13 +194,13 @@ class ExperimentSet(object):
         - processes_per_node
         - n_threads
         """
-        n_ranks = variables[self.ranks_key] if self.ranks_key in \
+        n_ranks = variables[self.keywords.n_ranks] if self.keywords.n_ranks in \
             variables.keys() else None
-        ppn = variables[self.ppn_key] if self.ppn_key in variables.keys() else \
-            None
-        n_nodes = variables[self.nodes_key] if self.nodes_key in \
+        ppn = variables[self.keywords.processes_per_node] if self.keywords.processes_per_node \
+            in variables.keys() else None
+        n_nodes = variables[self.keywords.n_nodes] if self.keywords.n_nodes in \
             variables.keys() else None
-        n_threads = variables[self.threads_key] if self.threads_key in \
+        n_threads = variables[self.keywords.n_threads] if self.keywords.n_threads in \
             variables.keys() else None
 
         if n_ranks:
@@ -248,22 +225,22 @@ class ExperimentSet(object):
             elif not n_nodes:
                 tty.debug('Defining n_nodes in %s' %
                           self.experiment_namespace)
-                variables[self.nodes_key] = test_n_nodes
+                variables[self.keywords.n_nodes] = test_n_nodes
         elif n_ranks and n_nodes:
             ppn = math.ceil(int(n_ranks) / int(n_nodes))
             tty.debug('Defining processes_per_node in %s' %
                       self.experiment_namespace)
-            variables[self.ppn_key] = ppn
+            variables[self.keywords.processes_per_node] = ppn
         elif ppn and n_nodes:
             n_ranks = ppn * n_nodes
             tty.debug('Defining n_ranks in %s' %
                       self.experiment_namespace)
-            variables[self.ranks_key] = n_ranks
+            variables[self.keywords.n_ranks] = n_ranks
         elif not n_nodes:
-            variables[self.nodes_key] = 1
+            variables[self.keywords.n_nodes] = 1
 
         if not n_threads:
-            variables[self.threads_key] = 1
+            variables[self.keywords.n_threads] = 1
 
     def _ingest_experiments(self):
         """Ingest experiments based on the current context.
@@ -312,21 +289,28 @@ class ExperimentSet(object):
         context_variables['workload_namespace'] = self.workload_namespace
         context_variables['experiment_namespace'] = self.experiment_namespace
 
+        expansion_str = ramble.expander.Expander.expansion_str
+
         # Set required variables for directories.
-        context_variables[self.app_run_dir_key] = os.path.join(self._workspace.experiment_dir,
-                                                               '{%s}' % self.app_name_key)
-        context_variables[self.app_input_dir_key] = os.path.join(self._workspace.input_dir,
-                                                                 '{%s}' % self.app_name_key)
+        context_variables[self.keywords.application_run_dir] = \
+            os.path.join(self._workspace.experiment_dir,
+                         expansion_str(self.keywords.application_name))
+        context_variables[self.keywords.application_input_dir] = \
+            os.path.join(self._workspace.input_dir,
+                         expansion_str(self.keywords.application_name))
 
-        context_variables[self.wl_run_dir_key] = os.path.join('{%s}' % self.app_run_dir_key,
-                                                              '{%s}' % self.wl_name_key)
-        context_variables[self.wl_input_dir_key] = os.path.join('{%s}' % self.app_input_dir_key,
-                                                                '{%s}' % self.wl_name_key)
+        context_variables[self.keywords.workload_run_dir] = \
+            os.path.join(expansion_str(self.keywords.application_run_dir),
+                         expansion_str(self.keywords.workload_name))
+        context_variables[self.keywords.workload_input_dir] = \
+            os.path.join(expansion_str(self.keywords.application_input_dir),
+                         expansion_str(self.keywords.workload_name))
 
-        context_variables[self.exp_run_dir_key] = os.path.join('{%s}' % self.wl_run_dir_key,
-                                                               '{%s}' % self.exp_name_key)
+        context_variables[self.keywords.experiment_run_dir] = \
+            os.path.join(expansion_str(self.keywords.workload_run_dir),
+                         expansion_str(self.keywords.experiment_name))
 
-        experiment_template_name = context_variables[self.exp_name_key]
+        experiment_template_name = context_variables[self.keywords.experiment_name]
         new_experiments = []
         matrix_experiments = []
 
@@ -445,27 +429,28 @@ class ExperimentSet(object):
             tty.debug('Rendering experiment:')
             for var, val in exp.items():
                 context_variables[var] = val
-            context_variables[self.spack_key] = os.path.join(self._workspace.software_dir,
-                                                             '%s.%s' % ('{spec_name}',
-                                                                        '{' + self.wl_name_key
-                                                                        + '}'))
+            context_variables[self.keywords.spack_env] = \
+                os.path.join(self._workspace.software_dir,
+                             expansion_str(self.keywords.spec_name) + '.' +
+                             expansion_str(self.keywords.workload_name))
 
             experiment_vars = context_variables.copy()
 
             expander = ramble.expander.Expander(experiment_vars, self)
             self._compute_mpi_vars(expander, experiment_vars)
-            final_app_name = expander.expand_var('{' + self.app_name_key + '}')
-            final_wl_name = expander.expand_var('{' + self.wl_name_key + '}')
+            final_app_name = expander.expand_var(expansion_str(self.keywords.application_name))
+            final_wl_name = expander.expand_var(expansion_str(self.keywords.workload_name))
             final_exp_name = expander.expand_var(experiment_template_name)
 
-            experiment_vars[self.app_name_key] = final_app_name
-            experiment_vars[self.wl_name_key] = final_wl_name
-            experiment_vars[self.exp_name_key] = final_exp_name
+            experiment_vars[self.keywords.application_name] = final_app_name
+            experiment_vars[self.keywords.workload_name] = final_wl_name
+            experiment_vars[self.keywords.experiment_name] = final_exp_name
 
             experiment_namespace = expander.experiment_namespace
 
-            log_file = expander.expand_var(os.path.join('{experiment_run_dir}',
-                                                        '{experiment_name}.out'))
+            log_file = expander.expand_var(
+                os.path.join(expansion_str(self.keywords.experiment_run_dir),
+                             expansion_str(self.keywords.experiment_name) + '.out'))
             experiment_vars['log_file'] = log_file
 
             tty.debug('   Exp vars: %s' % exp)

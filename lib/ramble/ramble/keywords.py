@@ -99,7 +99,7 @@ class Keywords(object):
         for definition in definitions.keys():
             if cls.is_reserved(definition):
                 raise RambleKeywordError(f'Keyword "{definition}" has been defined, ' +
-                                          'but is reserved by ramble.')
+                                         'but is reserved by ramble.')
 
     @classmethod
     def check_required_keys(cls, definitions):
@@ -124,6 +124,7 @@ class Keywords(object):
 
 
 keywords = llnl.util.lang.Singleton(Keywords)
+
 
 class RambleKeywordError(ramble.error.RambleError):
     """Superclass for all errors to do with Ramble Keywords"""

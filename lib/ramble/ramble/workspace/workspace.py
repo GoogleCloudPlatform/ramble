@@ -508,7 +508,7 @@ class Workspace(object):
             'yaml': None
         }
 
-        keywords = ramble.keywords.Keywords()
+        keywords = ramble.keywords.keywords
 
         read_default = not os.path.exists(self.config_file_path)
         if read_default:
