@@ -1346,3 +1346,64 @@ spack:
                                        'basic', 'test_wl',
                                        'test_experiment',
                                        'execute_experiment'))
+
+
+def test_workspace_include():
+
+    workspace_name = 'test_info'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_file = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    inc_file = os.path.join(ws1.config_dir, "test_include.yaml")
+
+    test_include = """
+ramble:
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+"""
+
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  include:
+     - '%s'
+spack:
+  concretized: true
+""" % inc_file
+
+    with open(inc_file, 'w+') as f:
+        f.write(test_include)
+
+    with open(config_file, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace('info', global_args=['-w', workspace_name])
+
+    check_info_basic(output)

@@ -42,6 +42,7 @@ import spack.util.web as web_util
 
 import ramble.schema.workspace
 import ramble.schema.applications
+import ramble.schema.merged
 
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
