@@ -594,7 +594,7 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
     with ramble.workspace.read('test') as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
         # Remove workspace vars, which default to a `processes_per_node = -1` definition.
-        exp_set._variables[exp_set._contexts.base] = {}
+        exp_set._variables[exp_set._contexts.workspace] = {}
 
         app_name = 'basic'
         app_vars = {
@@ -621,3 +621,149 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6_2' in exp_set.experiments.keys()
+
+
+@pytest.mark.parametrize('var', [
+    'command', 'spack_env'
+])
+def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': ['4', '6'],
+            var: 'should_fail'
+        }
+
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            exp_set.set_application_context(app_name, app_vars, None)
+            captured = capsys.readouterr()
+            assert "In application basic" in captured
+            assert f"{var}" in captured
+            assert "is reserved by ramble" in captured
+
+
+@pytest.mark.parametrize('var', [
+    'command', 'spack_env'
+])
+def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': ['4', '6']
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+            var: 'should_fail'
+        }
+
+        exp_set.set_application_context(app_name, app_vars, None)
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            exp_set.set_workload_context(wl_name, wl_vars, None)
+            captured = capsys.readouterr()
+            assert "In workload basic.test_wl" in captured
+            assert f"{var}" in captured
+            assert "is reserved by ramble" in captured
+
+
+@pytest.mark.parametrize('var', [
+    'command', 'spack_env'
+])
+def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+        # Remove workspace vars, which default to a `processes_per_node = -1` definition.
+        exp_set._variables[exp_set._contexts.base] = {}
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': ['4', '6']
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+        exp_name = 'series1_{n_ranks}_{processes_per_node}'
+        exp_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_nodes': ['2', '3'],
+            var: 'should_fail'
+        }
+
+        exp_set.set_application_context(app_name, app_vars, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None)
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+            captured = capsys.readouterr()
+            assert "In experiment basic.test_wl.series1_{n_ranks}_{processes_per_node}" in captured
+            assert f"{var}" in captured
+            assert "is reserved by ramble" in captured
+
+
+@pytest.mark.parametrize('var', [
+    'batch_submit', 'mpi_command'
+])
+def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+        if var in exp_set._variables[exp_set._contexts.base]:
+            del exp_set._variables[exp_set._contexts.base]
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': ['4', '6']
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+        exp_name = 'series1_{n_ranks}_{processes_per_node}'
+        exp_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_nodes': ['2', '3']
+        }
+
+        exp_set.set_application_context(app_name, app_vars, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None)
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+            captured = capsys.readouterr()
+            assert f'Required key "{var}" is not defined' in captured
+            assert 'One or more required keys are not defined within an experiment.' in captured
+            assert "In experiment basic.test_wl.series1_{n_ranks}_{processes_per_node}" in captured

@@ -15,6 +15,8 @@ import llnl.util.tty as tty
 
 import ramble.expander
 import ramble.repository
+import ramble.keywords
+import ramble.error
 
 
 class ExperimentSet(object):
@@ -29,7 +31,7 @@ class ExperimentSet(object):
     """
 
     # In order of lowest to highest precedence
-    _contexts = Enum('contexts', ['base', 'application',
+    _contexts = Enum('contexts', ['base', 'workspace', 'application',
                                   'workload', 'experiment',
                                   'required'])
 
@@ -62,6 +64,7 @@ class ExperimentSet(object):
         """Create experiment set class"""
         self.experiments = {}
         self._workspace = workspace
+        self.keywords = ramble.keywords.Keywords()
 
         self._env_variables = {}
         self._variables = {}
@@ -82,7 +85,15 @@ class ExperimentSet(object):
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
         workspace_env_vars = workspace.get_workspace_env_vars()
-        self._set_context(self._contexts.base,
+
+        try:
+            self.keywords.check_reserved_keys(workspace_vars)
+        except ramble.keywords.RambleKeywordError as e:
+            raise RambleVariableDefinitionError(
+                f'Workspace variable error: {e}'
+            )
+
+        self._set_context(self._contexts.workspace,
                           workspace.name,
                           workspace_vars,
                           workspace_env_vars)
@@ -104,7 +115,9 @@ class ExperimentSet(object):
     def _set_context(self, context, name, variables, env_variables):
         """Abstraction method to set context attributes"""
         if context not in self._contexts:
-            tty.die(f'Context {context} is not a valid context.')
+            raise RambleVariableDefinitionError(
+                f'Context {context} is not a valid context.'
+            )
 
         self._context_names[context] = name
         self._variables[context] = variables
@@ -115,6 +128,13 @@ class ExperimentSet(object):
                                 application_env_variables):
         """Set up current application context"""
 
+        try:
+            self.keywords.check_reserved_keys(application_variables)
+        except ramble.keywords.RambleKeywordError as e:
+            raise RambleVariableDefinitionError(
+                f'In application {application_name}: {e}'
+            )
+
         self._set_context(self._contexts.application, application_name,
                           application_variables, application_env_variables)
 
@@ -122,6 +142,15 @@ class ExperimentSet(object):
                              workload_variables,
                              workload_env_variables):
         """Set up current workload context"""
+
+        try:
+            self.keywords.check_reserved_keys(workload_variables)
+        except ramble.keywords.RambleKeywordError as e:
+            namespace = f'{self.application_namespace}.{workload_name}'
+            raise RambleVariableDefinitionError(
+                f'In workload {namespace}: {e}'
+            )
+
         self._set_context(self._contexts.workload, workload_name,
                           workload_variables, workload_env_variables)
 
@@ -130,6 +159,15 @@ class ExperimentSet(object):
                                experiment_env_variables,
                                experiment_matrices):
         """Set up current experiment context"""
+
+        try:
+            self.keywords.check_reserved_keys(experiment_variables)
+        except ramble.keywords.RambleKeywordError as e:
+            namespace = f'{self.workload_namespace}.{experiment_template}'
+            raise RambleVariableDefinitionError(
+                f'In experiment {namespace}: {e}'
+            )
+
         self._set_context(self._contexts.experiment, experiment_template,
                           experiment_variables, experiment_env_variables)
 
@@ -260,9 +298,9 @@ class ExperimentSet(object):
         ordered_env_variables = []
 
         for context in self._contexts:
-            if self._variables[context]:
+            if context in self._variables and self._variables[context]:
                 context_variables.update(self._variables[context])
-            if self._env_variables[context]:
+            if context in self._env_variables and self._env_variables[context]:
                 ordered_env_variables.append(self._env_variables[context])
 
         for context in self._contexts:
@@ -437,6 +475,13 @@ class ExperimentSet(object):
                 tty.die('Experiment %s is not unique.' % final_exp_name)
             rendered_experiments.add(final_exp_name)
 
+            try:
+                self.keywords.check_required_keys(experiment_vars)
+            except ramble.keywords.RambleKeywordError as e:
+                raise RambleVariableDefinitionError(
+                    f'In experiment {self.experiment_namespace}: {e}'
+                )
+
             app_inst = ramble.repository.get(final_app_name)
             app_inst.set_variables(experiment_vars, self)
             app_inst.set_env_variable_sets(ordered_env_variables)
@@ -471,3 +516,11 @@ class ExperimentSet(object):
         exp_app = self.experiments[experiment]
 
         return exp_app.expander.expand_var(variable)
+
+
+class RambleExperimentSetError(ramble.error.RambleError):
+    """Super class for all experiment set errors"""
+
+
+class RambleVariableDefinitionError(RambleExperimentSetError):
+    """Error when a ramble variable definition is invalid"""
