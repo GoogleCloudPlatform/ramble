@@ -47,19 +47,20 @@ import ramble.schema.merged
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
 
-ramble_namespace = 'ramble'
-spack_namespace = 'spack'
-application_dir_namespace = 'application_directories'
-application_namespace = 'applications'
-workload_namespace = 'workloads'
-experiment_namespace = 'experiments'
-variables_namespace = 'variables'
-success_namespace = 'success_criteria'
-env_var_namespace = 'env-vars'
-mpi_namespace = 'mpi'
-batch_namespace = 'batch'
-compiler_namespace = 'compilers'
-mpi_lib_namespace = 'mpi_libraries'
+class namespace:
+    ramble = 'ramble'
+    spack = 'spack'
+    application_dir = 'application_directories'
+    application = 'applications'
+    workload = 'workloads'
+    experiment = 'experiments'
+    variables = 'variables'
+    success = 'success_criteria'
+    env_var = 'env-vars'
+    mpi = 'mpi'
+    batch = 'batch'
+    compiler = 'compilers'
+    mpi_lib = 'mpi_libraries'
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = 'RAMBLE_WORKSPACE'
@@ -542,9 +543,9 @@ class Workspace(object):
             'workspace': self.root,
             'workspace_config': self.config_dir
         }
-        ramble_dict = self._get_workspace_dict()[ramble_namespace]
-        if application_dir_namespace in ramble_dict:
-            app_dirs = ramble_dict[application_dir_namespace]
+        ramble_dict = self._get_workspace_dict()[namespace.ramble]
+        if namespace.application_dir in ramble_dict:
+            app_dirs = ramble_dict[namespace.application_dir]
             for raw_dir in app_dirs:
                 app_dir = substitute_path_variables(raw_dir,
                                                     path_replacements)
@@ -617,7 +618,7 @@ class Workspace(object):
         # Check if application is in the list of workloads already
         if spec.name not in all_apps:
             all_apps[spec.name] = syaml.syaml_dict()
-            all_apps[spec.name][workload_namespace] = syaml.syaml_dict()
+            all_apps[spec.name][namespace.workload] = syaml.syaml_dict()
             changed = True
 
         app_file = ramble.repository.path.filename_for_application_name(
@@ -628,7 +629,7 @@ class Workspace(object):
         app_inst = ramble.repository.path.get_app_class(spec.name)(
             app_filepath)
 
-        app_workloads = all_apps[spec.name][workload_namespace]
+        app_workloads = all_apps[spec.name][namespace.workload]
 
         workload_dict = syaml.syaml_dict()
         workload_dict.update(app_workloads.keys())
@@ -681,7 +682,7 @@ class Workspace(object):
             msg = 'application %s is not present in the workspace' % spec.name
             raise RambleWorkspaceError(msg)
 
-        app_workloads = all_apps[spec.name][workload_namespace]
+        app_workloads = all_apps[spec.name][namespace.workload]
 
         workload_dict = syaml.syaml_dict()
         workload_dict.update(app_workloads)
@@ -756,9 +757,9 @@ class Workspace(object):
         """
         self.success_list.flush_scope(scope)
 
-        if success_namespace in contents:
+        if namespace.success in contents:
             tty.debug(' ---- Found success in %s' % scope)
-            for conf in contents[success_namespace]:
+            for conf in contents[namespace.success]:
                 tty.debug(' ---- Adding criteria %s' % conf['name'])
                 self.success_list.add_criteria(scope, conf['name'],
                                                conf['mode'],
@@ -789,18 +790,18 @@ class Workspace(object):
         tty.debug(' With ws dict: %s' % (ws_dict))
 
         # Iterate over applications in ramble.yaml first
-        if application_namespace in ws_dict[ramble_namespace]:
-            app_dict = ws_dict[ramble_namespace][application_namespace]
+        if namespace.application in ws_dict[namespace.ramble]:
+            app_dict = ws_dict[namespace.ramble][namespace.application]
 
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
 
-                if variables_namespace in contents:
-                    application_vars = contents[variables_namespace]
+                if namespace.variables in contents:
+                    application_vars = contents[namespace.variables]
 
-                if env_var_namespace in contents:
-                    application_env_vars = contents[env_var_namespace]
+                if namespace.env_var in contents:
+                    application_env_vars = contents[namespace.env_var]
                 self.extract_success_criteria('application', contents)
 
                 yield application, contents, application_vars, \
@@ -811,18 +812,18 @@ class Workspace(object):
         # files after the ramble.yaml file is complete
         for app_conf in self.application_configs:
             config = self._get_application_dict_config(app_conf)
-            if application_namespace not in config:
+            if namespace.application not in config:
                 tty.msg('No applications in config file %s'
                         % app_conf)
-            app_dict = config[application_namespace]
+            app_dict = config[namespace.application]
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
-                if variables_namespace in contents:
+                if namespace.variables in contents:
                     application_vars = \
-                        contents[variables_namespace]
-                if env_var_namespace in contents:
-                    application_env_vars = contents[env_var_namespace]
+                        contents[namespace.variables]
+                if namespace.env_var in contents:
+                    application_env_vars = contents[namespace.env_var]
                 self.extract_success_criteria('application', contents)
                 yield application, contents, application_vars, application_env_vars
 
@@ -834,19 +835,19 @@ class Workspace(object):
         should be applied.
         """
 
-        if workload_namespace not in application:
+        if namespace.workload not in application:
             tty.msg('No workloads in application')
             return
 
-        workloads = application[workload_namespace]
+        workloads = application[namespace.workload]
 
         for workload, contents in workloads.items():
             workload_variables = None
             workload_env_vars = None
-            if variables_namespace in contents:
-                workload_variables = contents[variables_namespace]
-            if env_var_namespace in contents:
-                workload_env_vars = contents[env_var_namespace]
+            if namespace.variables in contents:
+                workload_variables = contents[namespace.variables]
+            if namespace.env_var in contents:
+                workload_env_vars = contents[namespace.env_var]
             self.extract_success_criteria('workload', contents)
 
             yield workload, contents, workload_variables, workload_env_vars
@@ -859,21 +860,21 @@ class Workspace(object):
         should be applied.
         """
 
-        if experiment_namespace not in workload:
+        if namespace.experiment not in workload:
             tty.msg('No experiments in workload')
             return
 
-        experiments = workload[experiment_namespace]
+        experiments = workload[namespace.experiment]
         for experiment, contents in experiments.items():
 
             experiment_vars = syaml.syaml_dict()
             experiment_env_vars = None
 
-            if variables_namespace in contents:
-                experiment_vars = contents[variables_namespace]
+            if namespace.variables in contents:
+                experiment_vars = contents[namespace.variables]
 
-            if env_var_namespace in contents:
-                experiment_env_vars = contents[env_var_namespace]
+            if namespace.env_var in contents:
+                experiment_env_vars = contents[namespace.env_var]
 
             self.extract_success_criteria('experiment', contents)
 
@@ -944,23 +945,23 @@ class Workspace(object):
         spack_dict = self.get_spack_dict()
 
         if spec_context == 'compiler':
-            if compiler_namespace not in spack_dict:
+            if namespace.compiler not in spack_dict:
                 raise RambleWorkspaceError('No compilers ' +
                                            'defined in workspace')
-            spec_dict = spack_dict[compiler_namespace]
+            spec_dict = spack_dict[namespace.compiler]
         elif spec_context == 'mpi_library':
-            if mpi_lib_namespace not in spack_dict:
+            if namespace.mpi_lib not in spack_dict:
                 raise RambleWorkspaceError('No MPI libraries ' +
                                            'defined in workspace')
-            spec_dict = spack_dict[mpi_lib_namespace]
+            spec_dict = spack_dict[namespace.mpi_lib]
         else:
-            if application_namespace not in spack_dict:
+            if namespace.application not in spack_dict:
                 raise RambleWorkspaceError('No applications ' +
                                            'defined in workspace')
             if spec_context not in spack_dict['applications']:
                 raise RambleWorkspaceError('Invalid context ' +
                                            '%s' % spec_context)
-            spec_dict = spack_dict[application_namespace][spec_context]
+            spec_dict = spack_dict[namespace.application][spec_context]
             return self._build_spec_dict(spec_dict[spec_name], app_name=spec_context)
 
         return self._build_spec_dict(spec_dict[spec_name])
@@ -1025,16 +1026,16 @@ class Workspace(object):
     def all_application_specs(self, app_name):
         spack_dict = self.get_spack_dict()
 
-        if application_namespace not in spack_dict:
+        if namespace.application not in spack_dict:
             raise RambleWorkspaceError('No applications defined ' +
                                        'in spack config section')
 
-        if app_name not in spack_dict[application_namespace]:
+        if app_name not in spack_dict[namespace.application]:
             raise RambleWorkspaceError('Application %s ' % app_name +
                                        'not defined in spack ' +
                                        'config section')
 
-        app_specs = spack_dict[application_namespace][app_name]
+        app_specs = spack_dict[namespace.application][app_name]
         for name, info in app_specs.items():
             spec = self._build_spec_dict(info)
             yield name, spec
@@ -1047,19 +1048,19 @@ class Workspace(object):
                                        'already concretized ' +
                                        'workspace')
 
-        if compiler_namespace not in spack_dict or \
-                not spack_dict[compiler_namespace]:
-            spack_dict[compiler_namespace] = syaml.syaml_dict()
-        if mpi_lib_namespace not in spack_dict or \
-                not spack_dict[mpi_lib_namespace]:
-            spack_dict[mpi_lib_namespace] = syaml.syaml_dict()
-        if application_namespace not in spack_dict or \
-                not spack_dict[application_namespace]:
-            spack_dict[application_namespace] = syaml.syaml_dict()
+        if namespace.compiler not in spack_dict or \
+                not spack_dict[namespace.compiler]:
+            spack_dict[namespace.compiler] = syaml.syaml_dict()
+        if namespace.mpi_lib not in spack_dict or \
+                not spack_dict[namespace.mpi_lib]:
+            spack_dict[namespace.mpi_lib] = syaml.syaml_dict()
+        if namespace.application not in spack_dict or \
+                not spack_dict[namespace.application]:
+            spack_dict[namespace.application] = syaml.syaml_dict()
 
-        compilers_dict = spack_dict[compiler_namespace]
-        mpi_dict = spack_dict[mpi_lib_namespace]
-        applications_dict = spack_dict[application_namespace]
+        compilers_dict = spack_dict[namespace.compiler]
+        mpi_dict = spack_dict[namespace.mpi_lib]
+        applications_dict = spack_dict[namespace.application]
 
         for app_name, _, _, _ in self.all_applications():
             app_inst = ramble.repository.get(app_name)
@@ -1102,7 +1103,7 @@ class Workspace(object):
                         raise RambleConflictingDefinitionError(err)
 
         workspace_dict = self._get_workspace_dict()
-        workspace_dict[spack_namespace]['concretized'] = True
+        workspace_dict[namespace.spack]['concretized'] = True
         self.write()
         return
 
@@ -1266,7 +1267,7 @@ class Workspace(object):
                             'properly configured.'
             tty.die(error_message)
 
-        self.extract_success_criteria('workspace', self._get_workspace_dict()[ramble_namespace])
+        self.extract_success_criteria('workspace', self._get_workspace_dict()[namespace.ramble])
 
         if pipeline == 'setup':
             all_experiments_path = os.path.join(self.root,
@@ -1279,9 +1280,9 @@ class Workspace(object):
 
             runner = ramble.spack_runner.SpackRunner(dry_run=self.dry_run)
             spack_dict = self.get_spack_dict()
-            if compiler_namespace in spack_dict:
+            if namespace.compiler in spack_dict:
                 for comp_name, comp_spec in \
-                        spack_dict[compiler_namespace].items():
+                        spack_dict[namespace.compiler].items():
                     comp_str = self.spec_string(comp_spec,
                                                 as_dep=False,
                                                 use_custom_specifier=False)
@@ -1443,7 +1444,7 @@ class Workspace(object):
     def mpi_command(self):
         if not hasattr(self, 'mpi_template') or not self.mpi_template:
             mpi_config = \
-                self._get_workspace_dict()[ramble_namespace][mpi_namespace]
+                self._get_workspace_dict()[namespace.ramble][namespace.mpi]
 
             self.mpi_template = ''
             if 'pre_command' in mpi_config:
@@ -1469,9 +1470,9 @@ class Workspace(object):
                 self.batch_submit_command:
 
             workspace_dict = self._get_workspace_dict()
-            if batch_namespace in workspace_dict[ramble_namespace]:
+            if namespace.batch in workspace_dict[namespace.ramble]:
                 batch_section = \
-                    workspace_dict[ramble_namespace][batch_namespace]
+                    workspace_dict[namespace.ramble][namespace.batch]
                 batch_submit = batch_section['submit']
             else:
                 batch_submit = ''
@@ -1654,8 +1655,8 @@ class Workspace(object):
 
     def is_concretized(self):
         ws_dict = self._get_workspace_dict()
-        if 'concretized' in ws_dict[spack_namespace]:
-            return (True if ws_dict[spack_namespace]['concretized']
+        if 'concretized' in ws_dict[namespace.spack]:
+            return (True if ws_dict[namespace.spack]['concretized']
                     else False)
         return False
 
@@ -1663,23 +1664,23 @@ class Workspace(object):
         """Return a dict of workspace variables"""
         workspace_dict = self._get_workspace_dict()
 
-        return workspace_dict[ramble_namespace][variables_namespace] \
-            if variables_namespace in \
-            workspace_dict[ramble_namespace] else syaml.syaml_dict()
+        return workspace_dict[namespace.ramble][namespace.variables] \
+            if namespace.variables in \
+            workspace_dict[namespace.ramble] else syaml.syaml_dict()
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
         workspace_dict = self._get_workspace_dict()
 
-        return workspace_dict[ramble_namespace][env_var_namespace] \
-            if env_var_namespace in \
-            workspace_dict[ramble_namespace] else None
+        return workspace_dict[namespace.ramble][namespace.env_var] \
+            if namespace.env_var in \
+            workspace_dict[namespace.ramble] else None
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
         ws_dict = self._get_workspace_dict()
-        if spack_namespace in ws_dict:
-            return ws_dict[spack_namespace]
+        if namespace.spack in ws_dict:
+            return ws_dict[namespace.spack]
         return syaml.syaml_dict()
 
     def get_applications(self):
@@ -1687,10 +1688,10 @@ class Workspace(object):
         tty.debug('Getting app dict.')
         tty.debug(' %s ' % self._get_workspace_dict())
         workspace_dict = self._get_workspace_dict()
-        if application_namespace not in workspace_dict[ramble_namespace]:
-            workspace_dict[ramble_namespace][application_namespace] = \
+        if namespace.application not in workspace_dict[namespace.ramble]:
+            workspace_dict[namespace.ramble][namespace.application] = \
                 syaml.syaml_dict()
-        return workspace_dict[ramble_namespace][application_namespace]
+        return workspace_dict[namespace.ramble][namespace.application]
 
     def write_transaction(self):
         """Get a write lock context manager for use in a `with` block."""
