@@ -15,6 +15,7 @@ import llnl.util.tty as tty
 
 import ramble.expander
 import ramble.repository
+import ramble.workspace
 
 
 class ExperimentSet(object):
@@ -29,7 +30,7 @@ class ExperimentSet(object):
     """
 
     # In order of lowest to highest precedence
-    _contexts = Enum('contexts', ['base', 'application',
+    _contexts = Enum('contexts', ['site', 'base', 'application',
                                   'workload', 'experiment',
                                   'required'])
 
@@ -58,6 +59,7 @@ class ExperimentSet(object):
     log_file_key = 'log_file'
     err_file_key = 'err_file'
 
+
     def __init__(self, workspace):
         """Create experiment set class"""
         self.experiments = {}
@@ -79,6 +81,8 @@ class ExperimentSet(object):
             self._contexts.experiment: None
         }
 
+        self.read_site_vars(workspace)
+
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
         workspace_env_vars = workspace.get_workspace_env_vars()
@@ -92,6 +96,29 @@ class ExperimentSet(object):
         self.set_base_var(self.log_dir_key, workspace.log_dir)
         self.set_base_var(self.batch_submit_key, workspace.batch_submit)
         self.set_base_var(self.spec_name_key, '{application_name}')
+
+
+    def read_site_vars(self, workspace):
+        site_vars = self.get_site_vars(workspace)
+        site_env_vars = self.get_site_env_vars(workspace)
+        site_name = 'site' # TODO: we must have this in a var somehwere
+        self._set_context(self._contexts.site,
+                          site_name,
+                          site_vars,
+                          site_env_vars)
+
+    # TODO: Where is the right place for these reads?
+    def get_site_vars(self, workspace):
+        site_conf = ramble.config.config.get_config('config', scope='site')
+        if site_conf:
+            site_vars = site_conf[ramble.workspace.namespace.variables] # TODO: if we read this here that means it should probably be defined elsehwere
+            return site_vars
+        return None
+
+    def get_site_env_vars(self, workspace):
+        site_conf = ramble.config.config.get_config('config', scope='site')
+        if site_conf:
+            pass
 
     def set_base_var(self, var, val):
         """Set a base variable definition"""
