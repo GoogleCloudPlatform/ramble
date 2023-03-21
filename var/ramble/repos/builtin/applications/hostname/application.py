@@ -23,6 +23,7 @@ class Hostname(ExecutableApplication):
 
     workload('serial', executable='serial', inputs=['test'])
     workload('parallel', executable='parallel', inputs=['test'])
+    workload('test', executable='parallel')
 
     figure_of_merit('user time', log_file='{experiment_run_dir}/{experiment_name}.out',
                     fom_regex=r'(?P<user_time>[0-9]+\.[0-9]+)user.*',
