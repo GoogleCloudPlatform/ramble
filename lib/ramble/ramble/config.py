@@ -8,20 +8,19 @@
 """This module implements Ramble's configuration file handling.
 
 This implements Ramble's configuration system, which handles merging
-multiple scopes with different levels of precedence.  See the
-documentation on :ref:`configuration-scopes` for details on how Ramble's
-configuration system behaves.  The scopes are:
+multiple scopes with different levels of precedence.
+
+The scopes are:
 
   #. ``default``
   #. ``system``
   #. ``site``
   #. ``user``
 
-And corresponding :ref:`per-platform scopes <platform-scopes>`. Important
-functions in this module are:
+Important functions in this module are:
 
-* :py:func:`get_config`
-* :py:func:`update_config`
+* :py:func:`Configuration.get_config`
+* :py:func:`Configuration.update_config`
 
 ``get_config`` reads in YAML data for a particular scope and returns
 it. Callers can then modify the data and write it back with
@@ -1192,7 +1191,7 @@ def default_modify_scope(section='config'):
     priority scope.
 
     Arguments:
-        section (boolean): Section for which to get the default scope.
+        section (bool): Section for which to get the default scope.
             If this is not 'experiments', a general (non-workspace) scope is
             used.
     """
