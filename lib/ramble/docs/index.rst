@@ -2,9 +2,7 @@
 Ramble
 ===================
 
-If you're new to Ramble and want to start using it, see :doc:`getting_started`,
-or refer to the full manual below.
-
+If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 
 .. toctree::
    :maxdepth: 2
@@ -24,6 +22,7 @@ or refer to the full manual below.
    :maxdepth: 2
    :caption: Contributing
 
+   Contributing Guidelines <https://github.com/GoogleCloudPlatform/ramble#contributing>
    developer_guide
 
 .. toctree::
