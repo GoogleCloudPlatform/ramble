@@ -30,6 +30,7 @@ import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
 import ramble.success_criteria
+import ramble.keywords
 from ramble.mirror import MirrorStats
 from ramble.config import ConfigError
 import ramble.experimental.uploader
@@ -507,6 +508,8 @@ class Workspace(object):
             'yaml': None
         }
 
+        keywords = ramble.keywords.keywords
+
         read_default = not os.path.exists(self.config_file_path)
         if read_default:
             self._read_config(config_section, default_config_yaml())
@@ -522,6 +525,13 @@ class Workspace(object):
                     read_default_script = False
                     template_name = filename[0:-ext_len]
                     template_path = os.path.join(self.config_dir, filename)
+                    if keywords.is_reserved(template_name):
+                        raise RambleInvalidTemplateNameError(
+                            f'Template file {filename} results in a '
+                            f'template name of {template_name}'
+                            + ' which is reserved by ramble.'
+                        )
+
                     with open(template_path, 'r') as f:
                         self._read_template(template_name, f.read())
 
@@ -1791,6 +1801,10 @@ def no_active_workspace():
 
 class RambleWorkspaceError(ramble.error.RambleError):
     """Superclass for all errors to do with Ramble Workspaces"""
+
+
+class RambleInvalidTemplateNameError(ramble.error.RambleError):
+    """Error when an invalid template name is provided"""
 
 
 class RambleConflictingDefinitionError(RambleWorkspaceError):

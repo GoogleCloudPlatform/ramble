@@ -14,7 +14,10 @@ import math
 import llnl.util.tty as tty
 
 import ramble.expander
+from ramble.expander import Expander
 import ramble.repository
+import ramble.keywords
+import ramble.error
 
 
 class ExperimentSet(object):
@@ -29,34 +32,11 @@ class ExperimentSet(object):
     """
 
     # In order of lowest to highest precedence
-    _contexts = Enum('contexts', ['base', 'application',
+    _contexts = Enum('contexts', ['base', 'workspace', 'application',
                                   'workload', 'experiment',
                                   'required'])
 
-    app_name_key = 'application_name'
-    app_run_dir_key = 'application_run_dir'
-    app_input_dir_key = 'application_input_dir'
-
-    wl_name_key = 'workload_name'
-    wl_run_dir_key = 'workload_run_dir'
-    wl_input_dir_key = 'workload_input_dir'
-    spack_key = 'spack_env'
-
-    exp_name_key = 'experiment_name'
-    exp_run_dir_key = 'experiment_run_dir'
-
-    ranks_key = 'n_ranks'
-    ppn_key = 'processes_per_node'
-    nodes_key = 'n_nodes'
-    threads_key = 'n_threads'
-
-    mpi_key = 'mpi_command'
-    batch_submit_key = 'batch_submit'
-    spec_name_key = 'spec_name'
-
-    log_dir_key = 'log_dir'
-    log_file_key = 'log_file'
-    err_file_key = 'err_file'
+    keywords = ramble.keywords.keywords
 
     def __init__(self, workspace):
         """Create experiment set class"""
@@ -82,16 +62,25 @@ class ExperimentSet(object):
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
         workspace_env_vars = workspace.get_workspace_env_vars()
-        self._set_context(self._contexts.base,
+
+        try:
+            self.keywords.check_reserved_keys(workspace_vars)
+        except ramble.keywords.RambleKeywordError as e:
+            raise RambleVariableDefinitionError(
+                f'Workspace variable error: {e}'
+            )
+
+        self._set_context(self._contexts.workspace,
                           workspace.name,
                           workspace_vars,
                           workspace_env_vars)
 
         # Set some base variables from the workspace definition.
-        self.set_base_var(self.mpi_key, workspace.mpi_command)
-        self.set_base_var(self.log_dir_key, workspace.log_dir)
-        self.set_base_var(self.batch_submit_key, workspace.batch_submit)
-        self.set_base_var(self.spec_name_key, '{application_name}')
+        self.set_base_var(self.keywords.mpi_command, workspace.mpi_command)
+        self.set_base_var(self.keywords.log_dir, workspace.log_dir)
+        self.set_base_var(self.keywords.batch_submit, workspace.batch_submit)
+        self.set_base_var(self.keywords.spec_name,
+                          Expander.expansion_str(self.keywords.application_name))
 
     def set_base_var(self, var, val):
         """Set a base variable definition"""
@@ -104,7 +93,9 @@ class ExperimentSet(object):
     def _set_context(self, context, name, variables, env_variables):
         """Abstraction method to set context attributes"""
         if context not in self._contexts:
-            tty.die(f'Context {context} is not a valid context.')
+            raise RambleVariableDefinitionError(
+                f'Context {context} is not a valid context.'
+            )
 
         self._context_names[context] = name
         self._variables[context] = variables
@@ -115,6 +106,13 @@ class ExperimentSet(object):
                                 application_env_variables):
         """Set up current application context"""
 
+        try:
+            self.keywords.check_reserved_keys(application_variables)
+        except ramble.keywords.RambleKeywordError as e:
+            raise RambleVariableDefinitionError(
+                f'In application {application_name}: {e}'
+            )
+
         self._set_context(self._contexts.application, application_name,
                           application_variables, application_env_variables)
 
@@ -122,6 +120,15 @@ class ExperimentSet(object):
                              workload_variables,
                              workload_env_variables):
         """Set up current workload context"""
+
+        try:
+            self.keywords.check_reserved_keys(workload_variables)
+        except ramble.keywords.RambleKeywordError as e:
+            namespace = f'{self.application_namespace}.{workload_name}'
+            raise RambleVariableDefinitionError(
+                f'In workload {namespace}: {e}'
+            )
+
         self._set_context(self._contexts.workload, workload_name,
                           workload_variables, workload_env_variables)
 
@@ -130,6 +137,15 @@ class ExperimentSet(object):
                                experiment_env_variables,
                                experiment_matrices):
         """Set up current experiment context"""
+
+        try:
+            self.keywords.check_reserved_keys(experiment_variables)
+        except ramble.keywords.RambleKeywordError as e:
+            namespace = f'{self.workload_namespace}.{experiment_template}'
+            raise RambleVariableDefinitionError(
+                f'In experiment {namespace}: {e}'
+            )
+
         self._set_context(self._contexts.experiment, experiment_template,
                           experiment_variables, experiment_env_variables)
 
@@ -179,13 +195,13 @@ class ExperimentSet(object):
         - processes_per_node
         - n_threads
         """
-        n_ranks = variables[self.ranks_key] if self.ranks_key in \
+        n_ranks = variables[self.keywords.n_ranks] if self.keywords.n_ranks in \
             variables.keys() else None
-        ppn = variables[self.ppn_key] if self.ppn_key in variables.keys() else \
-            None
-        n_nodes = variables[self.nodes_key] if self.nodes_key in \
+        ppn = variables[self.keywords.processes_per_node] if self.keywords.processes_per_node \
+            in variables.keys() else None
+        n_nodes = variables[self.keywords.n_nodes] if self.keywords.n_nodes in \
             variables.keys() else None
-        n_threads = variables[self.threads_key] if self.threads_key in \
+        n_threads = variables[self.keywords.n_threads] if self.keywords.n_threads in \
             variables.keys() else None
 
         if n_ranks:
@@ -210,22 +226,22 @@ class ExperimentSet(object):
             elif not n_nodes:
                 tty.debug('Defining n_nodes in %s' %
                           self.experiment_namespace)
-                variables[self.nodes_key] = test_n_nodes
+                variables[self.keywords.n_nodes] = test_n_nodes
         elif n_ranks and n_nodes:
             ppn = math.ceil(int(n_ranks) / int(n_nodes))
             tty.debug('Defining processes_per_node in %s' %
                       self.experiment_namespace)
-            variables[self.ppn_key] = ppn
+            variables[self.keywords.processes_per_node] = ppn
         elif ppn and n_nodes:
             n_ranks = ppn * n_nodes
             tty.debug('Defining n_ranks in %s' %
                       self.experiment_namespace)
-            variables[self.ranks_key] = n_ranks
+            variables[self.keywords.n_ranks] = n_ranks
         elif not n_nodes:
-            variables[self.nodes_key] = 1
+            variables[self.keywords.n_nodes] = 1
 
         if not n_threads:
-            variables[self.threads_key] = 1
+            variables[self.keywords.n_threads] = 1
 
     def _ingest_experiments(self):
         """Ingest experiments based on the current context.
@@ -260,9 +276,9 @@ class ExperimentSet(object):
         ordered_env_variables = []
 
         for context in self._contexts:
-            if self._variables[context]:
+            if context in self._variables and self._variables[context]:
                 context_variables.update(self._variables[context])
-            if self._env_variables[context]:
+            if context in self._env_variables and self._env_variables[context]:
                 ordered_env_variables.append(self._env_variables[context])
 
         for context in self._contexts:
@@ -275,20 +291,25 @@ class ExperimentSet(object):
         context_variables['experiment_namespace'] = self.experiment_namespace
 
         # Set required variables for directories.
-        context_variables[self.app_run_dir_key] = os.path.join(self._workspace.experiment_dir,
-                                                               '{%s}' % self.app_name_key)
-        context_variables[self.app_input_dir_key] = os.path.join(self._workspace.input_dir,
-                                                                 '{%s}' % self.app_name_key)
+        context_variables[self.keywords.application_run_dir] = \
+            os.path.join(self._workspace.experiment_dir,
+                         Expander.expansion_str(self.keywords.application_name))
+        context_variables[self.keywords.application_input_dir] = \
+            os.path.join(self._workspace.input_dir,
+                         Expander.expansion_str(self.keywords.application_name))
 
-        context_variables[self.wl_run_dir_key] = os.path.join('{%s}' % self.app_run_dir_key,
-                                                              '{%s}' % self.wl_name_key)
-        context_variables[self.wl_input_dir_key] = os.path.join('{%s}' % self.app_input_dir_key,
-                                                                '{%s}' % self.wl_name_key)
+        context_variables[self.keywords.workload_run_dir] = \
+            os.path.join(Expander.expansion_str(self.keywords.application_run_dir),
+                         Expander.expansion_str(self.keywords.workload_name))
+        context_variables[self.keywords.workload_input_dir] = \
+            os.path.join(Expander.expansion_str(self.keywords.application_input_dir),
+                         Expander.expansion_str(self.keywords.workload_name))
 
-        context_variables[self.exp_run_dir_key] = os.path.join('{%s}' % self.wl_run_dir_key,
-                                                               '{%s}' % self.exp_name_key)
+        context_variables[self.keywords.experiment_run_dir] = \
+            os.path.join(Expander.expansion_str(self.keywords.workload_run_dir),
+                         Expander.expansion_str(self.keywords.experiment_name))
 
-        experiment_template_name = context_variables[self.exp_name_key]
+        experiment_template_name = context_variables[self.keywords.experiment_name]
         new_experiments = []
         matrix_experiments = []
 
@@ -407,27 +428,30 @@ class ExperimentSet(object):
             tty.debug('Rendering experiment:')
             for var, val in exp.items():
                 context_variables[var] = val
-            context_variables[self.spack_key] = os.path.join(self._workspace.software_dir,
-                                                             '%s.%s' % ('{spec_name}',
-                                                                        '{' + self.wl_name_key
-                                                                        + '}'))
+            context_variables[self.keywords.spack_env] = \
+                os.path.join(self._workspace.software_dir,
+                             Expander.expansion_str(self.keywords.spec_name) + '.' +
+                             Expander.expansion_str(self.keywords.workload_name))
 
             experiment_vars = context_variables.copy()
 
             expander = ramble.expander.Expander(experiment_vars, self)
             self._compute_mpi_vars(expander, experiment_vars)
-            final_app_name = expander.expand_var('{' + self.app_name_key + '}')
-            final_wl_name = expander.expand_var('{' + self.wl_name_key + '}')
+            final_app_name = expander.expand_var(
+                Expander.expansion_str(self.keywords.application_name))
+            final_wl_name = expander.expand_var(
+                Expander.expansion_str(self.keywords.workload_name))
             final_exp_name = expander.expand_var(experiment_template_name)
 
-            experiment_vars[self.app_name_key] = final_app_name
-            experiment_vars[self.wl_name_key] = final_wl_name
-            experiment_vars[self.exp_name_key] = final_exp_name
+            experiment_vars[self.keywords.application_name] = final_app_name
+            experiment_vars[self.keywords.workload_name] = final_wl_name
+            experiment_vars[self.keywords.experiment_name] = final_exp_name
 
             experiment_namespace = expander.experiment_namespace
 
-            log_file = expander.expand_var(os.path.join('{experiment_run_dir}',
-                                                        '{experiment_name}.out'))
+            log_file = expander.expand_var(
+                os.path.join(Expander.expansion_str(self.keywords.experiment_run_dir),
+                             Expander.expansion_str(self.keywords.experiment_name) + '.out'))
             experiment_vars['log_file'] = log_file
 
             tty.debug('   Exp vars: %s' % exp)
@@ -436,6 +460,13 @@ class ExperimentSet(object):
             if final_exp_name in rendered_experiments:
                 tty.die('Experiment %s is not unique.' % final_exp_name)
             rendered_experiments.add(final_exp_name)
+
+            try:
+                self.keywords.check_required_keys(experiment_vars)
+            except ramble.keywords.RambleKeywordError as e:
+                raise RambleVariableDefinitionError(
+                    f'In experiment {self.experiment_namespace}: {e}'
+                )
 
             app_inst = ramble.repository.get(final_app_name)
             app_inst.set_variables(experiment_vars, self)
@@ -471,3 +502,11 @@ class ExperimentSet(object):
         exp_app = self.experiments[experiment]
 
         return exp_app.expander.expand_var(variable)
+
+
+class RambleExperimentSetError(ramble.error.RambleError):
+    """Super class for all experiment set errors"""
+
+
+class RambleVariableDefinitionError(RambleExperimentSetError):
+    """Error when a ramble variable definition is invalid"""
