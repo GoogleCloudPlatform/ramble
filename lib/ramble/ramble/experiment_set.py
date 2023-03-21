@@ -116,7 +116,6 @@ class ExperimentSet(object):
         site_conf = ramble.config.config.get_config('config', scope='site')
         if site_conf and ramble.workspace.namespace.env_var in site_conf:
             site_env_vars = site_conf[ramble.workspace.namespace.env_var]
-            print(site_env_vars)
             return site_env_vars
         return None
 
