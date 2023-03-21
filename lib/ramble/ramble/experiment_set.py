@@ -14,6 +14,7 @@ import math
 import llnl.util.tty as tty
 
 import ramble.expander
+from ramble.expander import Expander
 import ramble.repository
 import ramble.keywords
 import ramble.error
@@ -79,7 +80,7 @@ class ExperimentSet(object):
         self.set_base_var(self.keywords.log_dir, workspace.log_dir)
         self.set_base_var(self.keywords.batch_submit, workspace.batch_submit)
         self.set_base_var(self.keywords.spec_name,
-                          ramble.expander.Expander.expansion_str(self.keywords.application_name))
+                          Expander.expansion_str(self.keywords.application_name))
 
     def set_base_var(self, var, val):
         """Set a base variable definition"""
@@ -289,26 +290,24 @@ class ExperimentSet(object):
         context_variables['workload_namespace'] = self.workload_namespace
         context_variables['experiment_namespace'] = self.experiment_namespace
 
-        expansion_str = ramble.expander.Expander.expansion_str
-
         # Set required variables for directories.
         context_variables[self.keywords.application_run_dir] = \
             os.path.join(self._workspace.experiment_dir,
-                         expansion_str(self.keywords.application_name))
+                         Expander.expansion_str(self.keywords.application_name))
         context_variables[self.keywords.application_input_dir] = \
             os.path.join(self._workspace.input_dir,
-                         expansion_str(self.keywords.application_name))
+                         Expander.expansion_str(self.keywords.application_name))
 
         context_variables[self.keywords.workload_run_dir] = \
-            os.path.join(expansion_str(self.keywords.application_run_dir),
-                         expansion_str(self.keywords.workload_name))
+            os.path.join(Expander.expansion_str(self.keywords.application_run_dir),
+                         Expander.expansion_str(self.keywords.workload_name))
         context_variables[self.keywords.workload_input_dir] = \
-            os.path.join(expansion_str(self.keywords.application_input_dir),
-                         expansion_str(self.keywords.workload_name))
+            os.path.join(Expander.expansion_str(self.keywords.application_input_dir),
+                         Expander.expansion_str(self.keywords.workload_name))
 
         context_variables[self.keywords.experiment_run_dir] = \
-            os.path.join(expansion_str(self.keywords.workload_run_dir),
-                         expansion_str(self.keywords.experiment_name))
+            os.path.join(Expander.expansion_str(self.keywords.workload_run_dir),
+                         Expander.expansion_str(self.keywords.experiment_name))
 
         experiment_template_name = context_variables[self.keywords.experiment_name]
         new_experiments = []
@@ -431,15 +430,17 @@ class ExperimentSet(object):
                 context_variables[var] = val
             context_variables[self.keywords.spack_env] = \
                 os.path.join(self._workspace.software_dir,
-                             expansion_str(self.keywords.spec_name) + '.' +
-                             expansion_str(self.keywords.workload_name))
+                             Expander.expansion_str(self.keywords.spec_name) + '.' +
+                             Expander.expansion_str(self.keywords.workload_name))
 
             experiment_vars = context_variables.copy()
 
             expander = ramble.expander.Expander(experiment_vars, self)
             self._compute_mpi_vars(expander, experiment_vars)
-            final_app_name = expander.expand_var(expansion_str(self.keywords.application_name))
-            final_wl_name = expander.expand_var(expansion_str(self.keywords.workload_name))
+            final_app_name = expander.expand_var(
+                Expander.expansion_str(self.keywords.application_name))
+            final_wl_name = expander.expand_var(
+                Expander.expansion_str(self.keywords.workload_name))
             final_exp_name = expander.expand_var(experiment_template_name)
 
             experiment_vars[self.keywords.application_name] = final_app_name
@@ -449,8 +450,8 @@ class ExperimentSet(object):
             experiment_namespace = expander.experiment_namespace
 
             log_file = expander.expand_var(
-                os.path.join(expansion_str(self.keywords.experiment_run_dir),
-                             expansion_str(self.keywords.experiment_name) + '.out'))
+                os.path.join(Expander.expansion_str(self.keywords.experiment_run_dir),
+                             Expander.expansion_str(self.keywords.experiment_name) + '.out'))
             experiment_vars['log_file'] = log_file
 
             tty.debug('   Exp vars: %s' % exp)
