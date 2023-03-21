@@ -46,12 +46,14 @@ class ExperimentSet(object):
 
         self._env_variables = {}
         self._variables = {}
+        self._internals = {}
         self._context_names = {}
 
         for context in self._contexts:
             self._context_names[context] = None
             self._env_variables[context] = None
             self._variables[context] = None
+            self._internals[context] = None
 
         self._variables[self._contexts.base] = {}
         self._variables[self._contexts.required] = {}
@@ -65,6 +67,7 @@ class ExperimentSet(object):
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
         workspace_env_vars = workspace.get_workspace_env_vars()
+        workspace_internals = workspace.get_workspace_internals()
 
         try:
             self.keywords.check_reserved_keys(workspace_vars)
@@ -76,7 +79,8 @@ class ExperimentSet(object):
         self._set_context(self._contexts.workspace,
                           workspace.name,
                           workspace_vars,
-                          workspace_env_vars)
+                          workspace_env_vars,
+                          workspace_internals)
 
         # Set some base variables from the workspace definition.
         self.set_base_var(self.keywords.mpi_command, workspace.mpi_command)
@@ -92,7 +96,8 @@ class ExperimentSet(object):
         self._set_context(self._contexts.global_conf,
                           site_name,
                           site_vars,
-                          site_env_vars)
+                          site_env_vars,
+                          None)
 
     def get_config_vars(self, workspace):
         conf = ramble.config.config.get_config('config')
@@ -116,7 +121,7 @@ class ExperimentSet(object):
         """Set a required variable definition"""
         self._variables[self._contexts.required][var] = val
 
-    def _set_context(self, context, name, variables, env_variables):
+    def _set_context(self, context, name, variables, env_variables, internals):
         """Abstraction method to set context attributes"""
         if context not in self._contexts:
             raise RambleVariableDefinitionError(
@@ -126,10 +131,12 @@ class ExperimentSet(object):
         self._context_names[context] = name
         self._variables[context] = variables
         self._env_variables[context] = env_variables
+        self._internals[context] = internals
 
     def set_application_context(self, application_name,
                                 application_variables,
-                                application_env_variables):
+                                application_env_variables,
+                                application_internals):
         """Set up current application context"""
 
         try:
@@ -140,11 +147,13 @@ class ExperimentSet(object):
             )
 
         self._set_context(self._contexts.application, application_name,
-                          application_variables, application_env_variables)
+                          application_variables, application_env_variables,
+                          application_internals)
 
     def set_workload_context(self, workload_name,
                              workload_variables,
-                             workload_env_variables):
+                             workload_env_variables,
+                             workload_internals):
         """Set up current workload context"""
 
         try:
@@ -156,12 +165,14 @@ class ExperimentSet(object):
             )
 
         self._set_context(self._contexts.workload, workload_name,
-                          workload_variables, workload_env_variables)
+                          workload_variables, workload_env_variables,
+                          workload_internals)
 
     def set_experiment_context(self, experiment_template,
                                experiment_variables,
                                experiment_env_variables,
-                               experiment_matrices):
+                               experiment_matrices,
+                               experiment_internals):
         """Set up current experiment context"""
 
         try:
@@ -173,7 +184,8 @@ class ExperimentSet(object):
             )
 
         self._set_context(self._contexts.experiment, experiment_template,
-                          experiment_variables, experiment_env_variables)
+                          experiment_variables, experiment_env_variables,
+                          experiment_internals)
 
         self._matrices[self._contexts.experiment] = experiment_matrices
         self._ingest_experiments()
@@ -300,12 +312,33 @@ class ExperimentSet(object):
 
         context_variables = {}
         ordered_env_variables = []
+        merged_internals = {}
+
+        internal_sections = [ramble.workspace.namespace.custom_executables,
+                             ramble.workspace.namespace.executables]
 
         for context in self._contexts:
             if context in self._variables and self._variables[context]:
                 context_variables.update(self._variables[context])
             if context in self._env_variables and self._env_variables[context]:
                 ordered_env_variables.append(self._env_variables[context])
+            if self._internals[context]:
+                for internal_section in internal_sections:
+                    if internal_section in self._internals[context]:
+                        if isinstance(self._internals[context][internal_section], dict):
+                            if internal_section not in merged_internals:
+                                merged_internals[internal_section] = {}
+                            section_dict = self._internals[context][internal_section]
+                            for key, val in section_dict.items():
+                                merged_internals[internal_section][key] = val
+                        elif isinstance(self._internals[context][internal_section], list):
+                            if internal_section not in merged_internals:
+                                merged_internals[internal_section] = []
+                            merged_internals[internal_section].extend(
+                                self._internals[context][internal_section])
+                        else:
+                            merged_internals[internal_section] = \
+                                self._internals[context][internal_section]
 
         for context in self._contexts:
             var_name = f'{context.name}_name'
@@ -497,6 +530,7 @@ class ExperimentSet(object):
             app_inst = ramble.repository.get(final_app_name)
             app_inst.set_variables(experiment_vars, self)
             app_inst.set_env_variable_sets(ordered_env_variables)
+            app_inst.set_internals(merged_internals)
             app_inst.add_expand_vars(self._workspace)
 
             self.experiments[experiment_namespace] = app_inst

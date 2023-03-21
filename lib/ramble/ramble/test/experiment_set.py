@@ -48,9 +48,9 @@ def test_single_experiment_in_set(mutable_mock_workspace_path):
             'n_nodes': '2',
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
 
@@ -83,9 +83,9 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
             'n_nodes': ['2', '4']
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
@@ -119,10 +119,10 @@ def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
             'n_nodes': ['2', '4']
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
         with pytest.raises(SystemExit):
-            exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+            exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
             captured = capsys.readouterr()
             assert "is not unique." in captured
 
@@ -155,9 +155,9 @@ def test_zipped_vector_experiments(mutable_mock_workspace_path):
             'n_nodes': ['2', '4']
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_16_4' in exp_set.experiments.keys()
@@ -195,9 +195,9 @@ def test_matrix_experiments(mutable_mock_workspace_path):
             ['n_nodes']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
@@ -235,9 +235,9 @@ def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
             ['n_nodes', 'processes_per_node']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
@@ -279,9 +279,9 @@ def test_matrix_vector_experiments(mutable_mock_workspace_path):
             ['n_nodes']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
@@ -322,9 +322,9 @@ def test_multi_matrix_experiments(mutable_mock_workspace_path):
             ['processes_per_node']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
@@ -363,11 +363,11 @@ def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
             ['foo']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
 
         with pytest.raises(SystemExit):
-            exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+            exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
             captured = capsys.readouterr()
             assert "variable foo has not been defined yet." in captured
 
@@ -405,9 +405,9 @@ def test_experiment_names_match(mutable_mock_workspace_path):
             ['processes_per_node']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
@@ -453,10 +453,10 @@ def test_cross_experiment_variable_references(mutable_mock_workspace_path):
             'test_var': 'test_var in basic.test_wl.series1_4'
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None)
-        exp_set.set_experiment_context(exp2_name, exp2_vars, None, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None)
+        exp_set.set_experiment_context(exp2_name, exp2_vars, None, None, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series2_4' in exp_set.experiments.keys()
@@ -494,9 +494,9 @@ def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path)
             'test_var': 'processes_per_node in basic.test_wl.does_not_exist'
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
 
@@ -539,9 +539,9 @@ def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
             ['n_nodes']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
@@ -578,9 +578,9 @@ def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
             ['n_ranks']
         ]
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None)
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6_3' in exp_set.experiments.keys()
@@ -615,9 +615,9 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
             'n_nodes': ['2', '3']
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
-        exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
+        exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6_2' in exp_set.experiments.keys()
@@ -643,7 +643,7 @@ def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var
         }
 
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
-            exp_set.set_application_context(app_name, app_vars, None)
+            exp_set.set_application_context(app_name, app_vars, None, None)
             captured = capsys.readouterr()
             assert "In application basic" in captured
             assert f"{var}" in captured
@@ -675,9 +675,9 @@ def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var, c
             var: 'should_fail'
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
-            exp_set.set_workload_context(wl_name, wl_vars, None)
+            exp_set.set_workload_context(wl_name, wl_vars, None, None)
             captured = capsys.readouterr()
             assert "In workload basic.test_wl" in captured
             assert f"{var}" in captured
@@ -717,10 +717,10 @@ def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var,
             var: 'should_fail'
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
-            exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+            exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
             captured = capsys.readouterr()
             assert "In experiment basic.test_wl.series1_{n_ranks}_{processes_per_node}" in captured
             assert f"{var}" in captured
@@ -759,10 +759,10 @@ def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsy
             'n_nodes': ['2', '3']
         }
 
-        exp_set.set_application_context(app_name, app_vars, None)
-        exp_set.set_workload_context(wl_name, wl_vars, None)
+        exp_set.set_application_context(app_name, app_vars, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None)
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
-            exp_set.set_experiment_context(exp_name, exp_vars, None, None)
+            exp_set.set_experiment_context(exp_name, exp_vars, None, None, None)
             captured = capsys.readouterr()
             assert f'Required key "{var}" is not defined' in captured
             assert 'One or more required keys are not defined within an experiment.' in captured

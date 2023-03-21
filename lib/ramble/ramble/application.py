@@ -70,6 +70,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.expander = None
         self.variables = None
         self.experiment_set = None
+        self.internals = None
         self._env_variable_sets = None
 
         self._file_path = file_path
@@ -160,6 +161,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.variables = variables
         self.experiment_set = experiment_set
         self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
+
+    def set_internals(self, internals):
+        """Set internal refernece to application internals
+        """
+
+        self.internals = internals
 
     def get_pipeline_phases(self, pipeline):
         phases = []
@@ -276,8 +283,23 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         - command: set to the commands needed to execute the experiment
         - spack_setup: set to an empty string, so spack applications can override this
         """
+        from ramble.workspace import namespace
+
         executables = self.workloads[self.expander.workload_name]['executables']
         inputs = self.workloads[self.expander.workload_name]['inputs']
+
+        # Use yaml defined executable order, if defined
+        if namespace.executables in self.internals:
+            executables = self.internals[namespace.executables]
+
+        # Define custom executables
+        if namespace.custom_executables in self.internals.keys():
+            for name, conf in self.internals[namespace.custom_executables].items():
+                self.executables[name] = {
+                    'template': conf['template'],
+                    'mpi': conf['mpi'] if 'mpi' in conf else False,
+                    'redirect': conf['redirect'] if 'redirect' in conf else '{log_file}',
+                }
 
         for input_file in inputs:
             input_conf = self.inputs[input_file]

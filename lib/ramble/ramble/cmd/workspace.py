@@ -408,33 +408,38 @@ def workspace_info(args):
 
     # Build experiment set
     experiment_set = ramble.experiment_set.ExperimentSet(ws)
-    for app, workloads, app_vars, app_env_vars in ws.all_applications():
-        for workload, experiments, workload_vars, workload_env_vars in \
+    for app, workloads, app_vars, app_env_vars, app_internals in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars, workload_internals in \
                 ws.all_workloads(workloads):
-            for exp, _, exp_vars, exp_env_vars, exp_matrices in ws.all_experiments(experiments):
-                experiment_set.set_application_context(app, app_vars, app_env_vars)
+            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals in \
+                    ws.all_experiments(experiments):
+                experiment_set.set_application_context(app, app_vars, app_env_vars, app_internals)
                 experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars)
+                                                    workload_env_vars, workload_internals)
                 experiment_set.set_experiment_context(exp,
                                                       exp_vars,
                                                       exp_env_vars,
-                                                      exp_matrices)
+                                                      exp_matrices,
+                                                      exp_internals)
 
     # Print experiment information
     color.cprint('')
     color.cprint(section_title('Experiments:'))
-    for app, workloads, app_vars, app_env_vars in ws.all_applications():
-        for workload, experiments, workload_vars, workload_env_vars in \
+    for app, workloads, app_vars, app_env_vars, app_internals in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars, workload_internals in \
                 ws.all_workloads(workloads):
-            for exp, _, exp_vars, exp_env_vars, exp_matrices in ws.all_experiments(experiments):
+            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals in \
+                    ws.all_experiments(experiments):
                 print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
-                print_experiment_set.set_application_context(app, app_vars, app_env_vars)
+                print_experiment_set.set_application_context(app, app_vars,
+                                                             app_env_vars, app_internals)
                 print_experiment_set.set_workload_context(workload, workload_vars,
-                                                          workload_env_vars)
+                                                          workload_env_vars, workload_internals)
                 print_experiment_set.set_experiment_context(exp,
                                                             exp_vars,
                                                             exp_env_vars,
-                                                            exp_matrices)
+                                                            exp_matrices,
+                                                            exp_internals)
 
                 color.cprint(nested_1('  Application: ') + app)
                 color.cprint(nested_2('    Workload: ') + workload)
@@ -479,6 +484,17 @@ def workspace_info(args):
                                 color.cprint(
                                     f'          {var} = {val} ==> {expanded}'.replace('@',
                                                                                       '@@'))
+
+                        if app_inst.internals:
+                            if ramble.workspace.namespace.custom_executables in app_inst.internals:
+                                color.cprint(nested_4('        Custom Executables') + ':')
+                                for name in app_inst.internals[
+                                        ramble.workspace.namespace.custom_executables]:
+
+                                    color.cprint(f'          {name}')
+                            if ramble.workspace.namespace.executables in app_inst.internals:
+                                color.cprint(nested_4('        Executable Order') + ': ' +
+                                             str(app_inst.internals['executables']))
 
     # Print MPI command
     color.cprint('')

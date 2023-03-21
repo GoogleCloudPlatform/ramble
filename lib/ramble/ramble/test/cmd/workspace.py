@@ -41,7 +41,7 @@ def check_basic(ws):
     for app, workloads, *_ in ws.all_applications():
         if app == 'basic':
             found_basic = True
-        for workload, experiments, _, _ in ws.all_workloads(workloads):
+        for workload, experiments, *_ in ws.all_workloads(workloads):
             if workload == 'test_wl':
                 found_test_wl = True
             elif workload == 'test_wl2':
@@ -57,10 +57,10 @@ def check_no_basic(ws):
     found_test_wl = False
     found_test_wl2 = False
 
-    for app, workloads, _, _ in ws.all_applications():
+    for app, workloads, *_ in ws.all_applications():
         if app == 'basic':
             found_basic = True
-        for workload, experiments, _, _ in ws.all_workloads(workloads):
+        for workload, experiments, *_ in ws.all_workloads(workloads):
             if workload == 'test_wl':
                 found_test_wl = True
             elif workload == 'test_wl2':
@@ -1460,3 +1460,137 @@ spack:
         err_str = f"Template file {tpl_name}.tpl results in a template name of" + \
                   f"{tpl_name} which is reserved by ramble"
         assert err_str in captured
+
+
+def test_custom_executables_info():
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    basic:
+      internals:
+        custom_executables:
+          app_level_cmd:
+            template:
+            - 'app_level_cmd'
+            use_mpi: false
+            redirect: '{log_file}'
+      workloads:
+        test_wl:
+          internals:
+            custom_executables:
+              wl_level_cmd:
+                template:
+                - 'wl_level_cmd'
+                use_mpi: false
+                redirect: '{log_file}'
+          experiments:
+            test_experiment:
+              internals:
+                custom_executables:
+                  exp_level_cmd:
+                    template:
+                    - 'exp_level_cmd'
+                    use_mpi: false
+                    redirect: '{log_file}'
+spack:
+  concretized: true
+"""
+
+    workspace_name = 'test_custom_executables_info'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace('info', '-v', global_args=['-w', workspace_name])
+
+    assert 'app_level_cmd' in output
+    assert 'wl_level_cmd' in output
+    assert 'exp_level_cmd' in output
+
+
+def test_custom_executables_order_info():
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    basic:
+      internals:
+        custom_executables:
+          app_level_cmd:
+            template:
+            - 'app_level_cmd'
+            use_mpi: false
+            redirect: '{log_file}'
+      workloads:
+        test_wl:
+          internals:
+            custom_executables:
+              wl_level_cmd:
+                template:
+                - 'wl_level_cmd'
+                use_mpi: false
+                redirect: '{log_file}'
+          experiments:
+            test_experiment:
+              internals:
+                custom_executables:
+                  exp_level_cmd:
+                    template:
+                    - 'exp_level_cmd'
+                    use_mpi: false
+                    redirect: '{log_file}'
+                executables:
+                - exp_level_cmd
+                - wl_level_cmd
+                - app_level_cmd
+spack:
+  concretized: true
+"""
+
+    workspace_name = 'test_custom_executables_info'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace('info', '-v', global_args=['-w', workspace_name])
+
+    assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
