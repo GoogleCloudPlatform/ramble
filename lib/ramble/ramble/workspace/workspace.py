@@ -47,6 +47,7 @@ import ramble.schema.merged
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
 
+
 class namespace:
     ramble = 'ramble'
     spack = 'spack'
@@ -61,6 +62,7 @@ class namespace:
     batch = 'batch'
     compiler = 'compilers'
     mpi_lib = 'mpi_libraries'
+
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = 'RAMBLE_WORKSPACE'

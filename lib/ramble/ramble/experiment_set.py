@@ -59,7 +59,6 @@ class ExperimentSet(object):
     log_file_key = 'log_file'
     err_file_key = 'err_file'
 
-
     def __init__(self, workspace):
         """Create experiment set class"""
         self.experiments = {}
@@ -97,28 +96,29 @@ class ExperimentSet(object):
         self.set_base_var(self.batch_submit_key, workspace.batch_submit)
         self.set_base_var(self.spec_name_key, '{application_name}')
 
-
     def read_site_vars(self, workspace):
         site_vars = self.get_site_vars(workspace)
         site_env_vars = self.get_site_env_vars(workspace)
-        site_name = 'site' # TODO: we must have this in a var somehwere
+        site_name = 'site'  # FIXME: DRY out these magic strings
         self._set_context(self._contexts.site,
                           site_name,
                           site_vars,
                           site_env_vars)
 
-    # TODO: Where is the right place for these reads?
     def get_site_vars(self, workspace):
         site_conf = ramble.config.config.get_config('config', scope='site')
-        if site_conf:
-            site_vars = site_conf[ramble.workspace.namespace.variables] # TODO: if we read this here that means it should probably be defined elsehwere
+        if site_conf and ramble.workspace.namespace.variables in site_conf:
+            site_vars = site_conf[ramble.workspace.namespace.variables]
             return site_vars
         return None
 
     def get_site_env_vars(self, workspace):
         site_conf = ramble.config.config.get_config('config', scope='site')
-        if site_conf:
-            pass
+        if site_conf and ramble.workspace.namespace.env_var in site_conf:
+            site_env_vars = site_conf[ramble.workspace.namespace.env_var]
+            print(site_env_vars)
+            return site_env_vars
+        return None
 
     def set_base_var(self, var, val):
         """Set a base variable definition"""
