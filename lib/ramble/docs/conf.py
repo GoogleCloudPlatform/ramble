@@ -4,9 +4,9 @@
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
+# except according to those terms.
 
 import os
-import re
 import subprocess
 import sys
 from glob import glob
@@ -16,6 +16,13 @@ from sphinx.domains.python import PythonDomain
 from sphinx.ext.apidoc import main as sphinx_apidoc
 from sphinx.parsers import RSTParser
 
+# The name of the Pygments (syntax highlighting) style to use.
+# We use our own extension of the default style with a few modifications
+from pygments.styles.default import DefaultStyle
+from pygments.token import Generic
+
+import pkg_resources
+
 # -- Ramble customizations -----------------------------------------------------
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -23,8 +30,11 @@ from sphinx.parsers import RSTParser
 link_name = os.path.abspath("_ramble_root")
 if not os.path.exists(link_name):
     os.symlink(os.path.abspath("../../.."), link_name, target_is_directory=True)
+
 sys.path.insert(0, os.path.abspath("_ramble_root/lib/ramble/external"))
 sys.path.append(os.path.abspath("_ramble_root/lib/ramble/"))
+
+import ramble  # noqa: E402
 
 # Add the Ramble bin directory to the path so that we can use its output in docs.
 os.environ["RAMBLE_ROOT"] = os.path.abspath("_ramble_root")
@@ -74,6 +84,7 @@ sphinx_apidoc(
 # Enable todo items
 todo_include_todos = True
 
+
 #
 # Disable duplicate cross-reference warnings.
 #
@@ -117,7 +128,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
-    #"sphinx_design",
     "sphinxcontrib.programoutput",
 ]
 
@@ -154,8 +164,6 @@ copyright = "2022-2023, Google LLC"
 # built documents.
 #
 # The short X.Y version.
-import ramble
-
 version = ".".join(str(s) for s in ramble.ramble_version_info[:2])
 # The full version, including alpha/beta/rc tags.
 release = ramble.ramble_version
@@ -209,12 +217,6 @@ nitpick_ignore = [
 # output. They are ignored by default.
 # show_authors = False
 
-# The name of the Pygments (syntax highlighting) style to use.
-# We use our own extension of the default style with a few modifications
-from pygments.style import Style
-from pygments.styles.default import DefaultStyle
-from pygments.token import Comment, Generic, Text
-
 
 class RambleStyle(DefaultStyle):
     styles = DefaultStyle.styles.copy()
@@ -223,15 +225,11 @@ class RambleStyle(DefaultStyle):
     styles[Generic.Prompt] = "bold #346ec9"
 
 
-import pkg_resources
-
 dist = pkg_resources.Distribution(__file__)
 sys.path.append(".")  # make 'conf' module findable
 ep = pkg_resources.EntryPoint.parse("ramble = conf:RambleStyle", dist=dist)
 dist._ep_map = {"pygments.styles": {"plugin1": ep}}
 pkg_resources.working_set.add(dist)
-
-#pygments_style = "ramble"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -321,11 +319,11 @@ htmlhelp_basename = "Rambledoc"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
+    # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
+    # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
+    # 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
