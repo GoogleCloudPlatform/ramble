@@ -30,7 +30,7 @@ class ExperimentSet(object):
     """
 
     # In order of lowest to highest precedence
-    _contexts = Enum('contexts', ['site', 'base', 'application',
+    _contexts = Enum('contexts', ['global_conf', 'base', 'application',
                                   'workload', 'experiment',
                                   'required'])
 
@@ -80,7 +80,7 @@ class ExperimentSet(object):
             self._contexts.experiment: None
         }
 
-        self.read_site_vars(workspace)
+        self.read_config_vars(workspace)
 
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
@@ -96,26 +96,26 @@ class ExperimentSet(object):
         self.set_base_var(self.batch_submit_key, workspace.batch_submit)
         self.set_base_var(self.spec_name_key, '{application_name}')
 
-    def read_site_vars(self, workspace):
-        site_vars = self.get_site_vars(workspace)
-        site_env_vars = self.get_site_env_vars(workspace)
-        site_name = 'site'  # FIXME: DRY out these magic strings
-        self._set_context(self._contexts.site,
+    def read_config_vars(self, workspace):
+        site_vars = self.get_config_vars(workspace)
+        site_env_vars = self.get_config_env_vars(workspace)
+        site_name = self._contexts.global_conf
+        self._set_context(self._contexts.global_conf,
                           site_name,
                           site_vars,
                           site_env_vars)
 
-    def get_site_vars(self, workspace):
-        site_conf = ramble.config.config.get_config('config', scope='site')
-        if site_conf and ramble.workspace.namespace.variables in site_conf:
-            site_vars = site_conf[ramble.workspace.namespace.variables]
+    def get_config_vars(self, workspace):
+        conf = ramble.config.config.get_config('config')
+        if conf and ramble.workspace.namespace.variables in conf:
+            site_vars = conf[ramble.workspace.namespace.variables]
             return site_vars
         return None
 
-    def get_site_env_vars(self, workspace):
-        site_conf = ramble.config.config.get_config('config', scope='site')
-        if site_conf and ramble.workspace.namespace.env_var in site_conf:
-            site_env_vars = site_conf[ramble.workspace.namespace.env_var]
+    def get_config_env_vars(self, workspace):
+        conf = ramble.config.config.get_config('config')
+        if conf and ramble.workspace.namespace.env_var in conf:
+            site_env_vars = conf[ramble.workspace.namespace.env_var]
             return site_env_vars
         return None
 

@@ -537,20 +537,26 @@ spack:
             assert cmd_found and export_found
 
 
-def test_sitevar_dry_run(mutable_config, mutable_mock_workspace_path):
+def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path):
+    test_scopes = ['site', 'system', 'user']
+
+    var_name1 = 'test1'
+    var_name2 = 'envtestvar'
+    var_val = 3
+
     test_config = """
 ramble:
   mpi:
     command: mpirun
     args:
     - '-n'
-    - '{n_ranks}'
+    - '{{n_ranks}}'
     - '-ppn'
-    - '{processes_per_node}'
+    - '{{processes_per_node}}'
     - '-hostfile'
     - 'hostfile'
   batch:
-    submit: 'batch_submit {execute_experiment}'
+    submit: 'batch_submit {{execute_experiment}}'
   variables:
     partition: 'part1'
     processes_per_node: '16'
@@ -560,9 +566,15 @@ ramble:
       workloads:
         motorbike:
           experiments:
-            "site_test_{test1}":
+            "{}_test_{{{var_name}}}":
               variables:
-                n_ranks: "{test1}"
+                n_ranks: "{{{var_name}}}"
+            "{}_test_{{{var_name}}}":
+              variables:
+                n_ranks: "{{{var_name}}}"
+            "{}_test_{{{var_name}}}":
+              variables:
+                n_ranks: "{{{var_name}}}"
 spack:
   concretized: true
   compilers:
@@ -580,15 +592,17 @@ spack:
         compiler: gcc
         mpi: intel
         target: 'x86_64'
-"""
-
-    var_name1 = 'test1'
-    var_name2 = 'test2'
-    var_val = 3
+""" .format(*test_scopes, var_name=var_name1)
 
     config = ramble.main.RambleCommand('config')
-    config('--scope', 'site', 'add', f'config:variables:{var_name1}:{var_val}')
-    config('--scope', 'site', 'add', f'config:env-vars:set:{var_name2}:{var_val}')
+
+    expected_experiments = []
+    for scope in test_scopes:
+        config('--scope', scope, 'add', f'config:variables:{var_name1}:{var_val}')
+        expected_experiments.append(f'{scope}_test_{var_val}')
+
+    for i, scope in enumerate(test_scopes):
+        config('--scope', scope, 'add', f'config:env-vars:set:{var_name2}{i}:{var_val}')
 
     workspace_name = 'test_sitevar'
     with ramble.workspace.create(workspace_name) as ws:
@@ -609,8 +623,7 @@ spack:
         software_path = os.path.join(software_base_dir, software_dir)
         assert os.path.exists(software_path)
 
-        expected_experiments = [f'site_test_{var_val}']
-        for exp in expected_experiments:
+        for i, exp in enumerate(expected_experiments):
             exp_dir = os.path.join(ws.root, 'experiments', 'openfoam', 'motorbike', exp)
             assert os.path.isdir(exp_dir)
             assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
@@ -618,4 +631,4 @@ spack:
             with open(os.path.join(exp_dir, 'execute_experiment'), 'r') as f:
                 data = f.read()
                 # Test the license exists
-                assert f"export {var_name2}={var_val}" in data
+                assert f"export {var_name2}{i}={var_val}" in data
