@@ -14,6 +14,7 @@ import operator
 import llnl.util.tty as tty
 
 import ramble.error
+import ramble.keywords
 
 supported_math_operators = {
     ast.Add: operator.add, ast.Sub: operator.sub,
@@ -39,6 +40,8 @@ class Expander(object):
     Additionally, math will be evaluated as part of expansion.
     """
 
+    _keywords = ramble.keywords.keywords
+
     def __init__(self, variables, experiment_set):
         self._variables = variables
 
@@ -63,21 +66,24 @@ class Expander(object):
     @property
     def application_name(self):
         if not self._application_name:
-            self._application_name = self.expand_var('{application_name}')
+            var = self.expansion_str(self._keywords.application_name)
+            self._application_name = self.expand_var(var)
 
         return self._application_name
 
     @property
     def workload_name(self):
         if not self._workload_name:
-            self._workload_name = self.expand_var('{workload_name}')
+            var = self.expansion_str(self._keywords.workload_name)
+            self._workload_name = self.expand_var(var)
 
         return self._workload_name
 
     @property
     def experiment_name(self):
         if not self._experiment_name:
-            self._experiment_name = self.expand_var('{experiment_name}')
+            var = self.expansion_str(self._keywords.experiment_name)
+            self._experiment_name = self.expand_var(var)
 
         return self._experiment_name
 
@@ -108,42 +114,49 @@ class Expander(object):
     @property
     def spec_namespace(self):
         if not self._spec_namespace:
-            self._spec_namespace = self.expand_var('{spec_name}.{workload_name}')
+            var = self.expansion_str(self._keywords.spec_name) + \
+                '.' + self.expansion_str(self._keywords.workload_name)
+            self._spec_namespace = self.expand_var(var)
 
         return self._spec_namespace
 
     @property
     def application_input_dir(self):
         if not self._application_input_dir:
-            self._application_input_dir = self.expand_var('{application_input_dir}')
+            var = self.expansion_str(self._keywords.application_input_dir)
+            self._application_input_dir = self.expand_var(var)
 
         return self._application_input_dir
 
     @property
     def workload_input_dir(self):
         if not self._workload_input_dir:
-            self._workload_input_dir = self.expand_var('{workload_input_dir}')
+            var = self.expansion_str(self._keywords.workload_input_dir)
+            self._workload_input_dir = self.expand_var(var)
 
         return self._workload_input_dir
 
     @property
     def application_run_dir(self):
         if not self._application_run_dir:
-            self._application_run_dir = self.expand_var('{application_run_dir}')
+            var = self.expansion_str(self._keywords.application_run_dir)
+            self._application_run_dir = self.expand_var(var)
 
         return self._application_run_dir
 
     @property
     def workload_run_dir(self):
         if not self._workload_run_dir:
-            self._workload_run_dir = self.expand_var('{workload_run_dir}')
+            var = self.expansion_str(self._keywords.workload_run_dir)
+            self._workload_run_dir = self.expand_var(var)
 
         return self._workload_run_dir
 
     @property
     def experiment_run_dir(self):
         if not self._experiment_run_dir:
-            self._experiment_run_dir = self.expand_var('{experiment_run_dir}')
+            var = self.expansion_str(self._keywords.experiment_run_dir)
+            self._experiment_run_dir = self.expand_var(var)
 
         return self._experiment_run_dir
 
@@ -172,6 +185,12 @@ class Expander(object):
                 pass
 
         return str(expanded).lstrip()
+
+    @staticmethod
+    def expansion_str(in_str):
+        l_delimiter = '{'
+        r_delimiter = '}'
+        return f'{l_delimiter}{in_str}{r_delimiter}'
 
     def _all_keywords(self, in_str):
         if isinstance(in_str, six.string_types):
@@ -293,7 +312,7 @@ class Expander(object):
             if isinstance(node.comparators[0], ast.Attribute):
                 namespace = self.eval_math(node.comparators[0])
                 val = self._experiment_set.get_var_from_experiment(namespace,
-                                                                   f'{{{var_name}}}')
+                                                                   self.expansion_str(var_name))
                 if not val:
                     raise RambleSyntaxError(f'{namespace} does not exist in: ' +
                                             f'"{var_name} in {namespace}"')

@@ -1360,8 +1360,7 @@ def test_workspace_include():
     test_include = """
 ramble:
   variables:
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
+    test_var: '1'
 """
 
     test_config = """
@@ -1377,6 +1376,9 @@ ramble:
     - 'hostfile'
   batch:
     submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
     basic:
       workloads:
@@ -1407,3 +1409,54 @@ spack:
     output = workspace('info', global_args=['-w', workspace_name])
 
     check_info_basic(output)
+
+
+@pytest.mark.parametrize('tpl_name', [
+    'command'
+])
+def test_invalid_template_name_errors(tpl_name, capsys):
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment: {}
+spack:
+  concretized: true
+"""
+
+    workspace_name = 'test_invalid_template_name'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    template_path = os.path.join(ws1.config_dir, f'{tpl_name}.tpl')
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    with open(template_path, 'w+') as f:
+        f.write('{command}')
+
+    with pytest.raises(ramble.workspace.RambleInvalidTemplateNameError):
+        ws1._re_read()
+        captured = capsys.readouterr()
+        err_str = f"Template file {tpl_name}.tpl results in a template name of" + \
+                  f"{tpl_name} which is reserved by ramble"
+        assert err_str in captured
