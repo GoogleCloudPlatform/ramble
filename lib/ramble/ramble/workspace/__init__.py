@@ -40,6 +40,7 @@ from .workspace import (
     read,
     root,
     ramble_workspace_var,
+    namespace,
 )
 
 __all__ = [
@@ -73,4 +74,5 @@ __all__ = [
     'read',
     'root',
     'ramble_workspace_var',
+    'namespace',
 ]

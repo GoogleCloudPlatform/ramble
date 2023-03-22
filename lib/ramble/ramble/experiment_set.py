@@ -16,6 +16,7 @@ import llnl.util.tty as tty
 import ramble.expander
 from ramble.expander import Expander
 import ramble.repository
+import ramble.workspace
 import ramble.keywords
 import ramble.error
 
@@ -32,8 +33,8 @@ class ExperimentSet(object):
     """
 
     # In order of lowest to highest precedence
-    _contexts = Enum('contexts', ['base', 'workspace', 'application',
-                                  'workload', 'experiment',
+    _contexts = Enum('contexts', ['global_conf', 'base', 'workspace',
+                                  'application', 'workload', 'experiment',
                                   'required'])
 
     keywords = ramble.keywords.keywords
@@ -59,6 +60,8 @@ class ExperimentSet(object):
             self._contexts.experiment: None
         }
 
+        self.read_config_vars(workspace)
+
         # Set all workspace variables as base variables.
         workspace_vars = workspace.get_workspace_vars()
         workspace_env_vars = workspace.get_workspace_env_vars()
@@ -81,6 +84,29 @@ class ExperimentSet(object):
         self.set_base_var(self.keywords.batch_submit, workspace.batch_submit)
         self.set_base_var(self.keywords.spec_name,
                           Expander.expansion_str(self.keywords.application_name))
+
+    def read_config_vars(self, workspace):
+        site_vars = self.get_config_vars(workspace)
+        site_env_vars = self.get_config_env_vars(workspace)
+        site_name = self._contexts.global_conf.name
+        self._set_context(self._contexts.global_conf,
+                          site_name,
+                          site_vars,
+                          site_env_vars)
+
+    def get_config_vars(self, workspace):
+        conf = ramble.config.config.get_config('config')
+        if conf and ramble.workspace.namespace.variables in conf:
+            site_vars = conf[ramble.workspace.namespace.variables]
+            return site_vars
+        return None
+
+    def get_config_env_vars(self, workspace):
+        conf = ramble.config.config.get_config('config')
+        if conf and ramble.workspace.namespace.env_var in conf:
+            site_env_vars = conf[ramble.workspace.namespace.env_var]
+            return site_env_vars
+        return None
 
     def set_base_var(self, var, val):
         """Set a base variable definition"""
