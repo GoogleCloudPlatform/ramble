@@ -532,8 +532,8 @@ class InputStage(object):
         """Perform a fetch if the resource is not already cached
 
         Arguments:
-            mirror (MirrorCache): the mirror to cache this Stage's resource in
-            stats (MirrorStats): this is updated depending on whether the
+            mirror (ramble.caches.MirrorCache): the mirror to cache this Stage's resource in
+            stats (ramble.mirror.MirrorStats): this is updated depending on whether the
                 caching operation succeeded or failed
         """
         if isinstance(self.default_fetcher, fs.BundleFetchStrategy):
@@ -798,7 +798,7 @@ def get_checksums_for_versions(
     Args:
         url_dict (dict): A dictionary of the form: version -> URL
         name (str): The name of the input
-        first_stage_function (callable): function that takes a Stage and a URL;
+        first_stage_function (Callable): function that takes a Stage and a URL;
             this is run on the stage of the first URL downloaded
         keep_stage (bool): whether to keep staging area when command completes
         batch (bool): whether to ask user how many versions to fetch (false)

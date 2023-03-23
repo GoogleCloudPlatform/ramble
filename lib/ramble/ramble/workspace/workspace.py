@@ -427,8 +427,9 @@ class Workspace(object):
 
     Each workspace must have a config directory, that contains 2
     files by default.
-       - ramble.yaml
-       - execute_experiment.tpl
+
+    - ramble.yaml
+    - execute_experiment.tpl
 
     The ramble.yaml file is the overall configuration file for
     this workspace. It defines all experiments, variables, and
@@ -1387,8 +1388,9 @@ class Workspace(object):
 
         None of the input, or output files aside from these are archived.
         However, the archive should useful to perform the following actions:
-         - Re-extract figures of merit based on previous experiments
-         - Regenerate experiments, using the archived configuration.
+
+        - Re-extract figures of merit based on previous experiments
+        - Regenerate experiments, using the archived configuration.
 
         If an archive url is configured for ramble at config:archive_url this
         will automatically upload tar archives to that location.

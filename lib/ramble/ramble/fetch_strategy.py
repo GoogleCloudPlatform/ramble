@@ -1492,7 +1492,7 @@ def from_kwargs(**kwargs):
             ``version()`` directive in a package.
 
     Returns:
-        fetch_strategy: The fetch strategy that matches the args, based
+        FetchStrategy: The fetch strategy that matches the args, based
             on attribute names (e.g., ``git``, ``hg``, etc.)
 
     Raises:
