@@ -52,6 +52,7 @@ spec_def = {
     }
 }
 
+
 keys = ('ramble', 'workspace')
 
 #: Properties for inclusion in other schemas
@@ -96,6 +97,14 @@ properties = {
                     'submit': {'type': 'string'}
                 },
                 'additionalProperties': False
+            },
+            'variables': ramble.schema.applications.variables_def,
+            'internals': ramble.schema.applications.internals_def,
+            'success_criteria': ramble.schema.applications.success_list_def,
+            'include': {
+                'type': 'array',
+                'default': [],
+                'items': {'type': 'string'},
             },
             'applications': {
                 'type': applications_properties['type'],

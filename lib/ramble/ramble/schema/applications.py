@@ -23,6 +23,12 @@ string_or_num = {
     ]
 }
 
+array_of_strings_or_nums = {
+    'type': 'array',
+    'default': [],
+    'items': string_or_num
+}
+
 array_or_scalar_of_strings_or_nums = {
     'anyOf': [
         {
@@ -63,6 +69,54 @@ matrices_def = {
     }
 }
 
+success_criteria_def = {
+    'type': 'object',
+    'default': {},
+    'properties': {
+        'name': {'type': 'string'},
+        'mode': {'type': 'string'},
+        'match': {'type': 'string'},
+        'file': {'type': 'string'}
+    },
+    'additionalProperties': False,
+}
+
+success_list_def = {
+    'type': 'array',
+    'default': [],
+    'items': success_criteria_def
+}
+
+custom_executables_def = {
+    'type': 'object',
+    'properties': {},
+    'additionalProperties': {
+        'type': 'object',
+        'default': {
+            'template': [],
+            'use_mpi': False,
+            'redirect': '{log_file}'
+        },
+        'properties': {
+            'template': array_or_scalar_of_strings_or_nums,
+            'use_mpi': {'type': 'boolean'},
+            'redirect': string_or_num,
+        }
+    },
+    'default': {},
+}
+
+executables_def = array_of_strings_or_nums
+
+internals_def = {
+    'type': 'object',
+    'default': {},
+    'properties': {
+        'custom_executables': custom_executables_def,
+        'executables': executables_def,
+    },
+    'additionalProperties': False
+}
 
 #: Properties for inclusion in other schemas
 applications_schema = {
@@ -73,11 +127,12 @@ applications_schema = {
         'additionalProperties': {
             'type': 'object',
             'default': '{}',
-            'additionalProperties': {
-                'variables': variables_def,
-                'env-vars': ramble.schema.licenses.env_var_actions
-            },
+            'additionalProperties': False,
             'properties': {
+                'variables': variables_def,
+                'env-vars': ramble.schema.licenses.env_var_actions,
+                'internals': internals_def,
+                'success_criteria': success_list_def,
                 'workloads': {
                     'type': 'object',
                     'default': {},
@@ -85,11 +140,12 @@ applications_schema = {
                     'additionalProperties': {
                         'type': 'object',
                         'default': {},
-                        'additionalProperties': {
-                            'variables': variables_def,
-                            'env-vars': ramble.schema.licenses.env_var_actions
-                        },
+                        'additionalProperties': False,
                         'properties': {
+                            'variables': variables_def,
+                            'env-vars': ramble.schema.licenses.env_var_actions,
+                            'internals': internals_def,
+                            'success_criteria': success_list_def,
                             'experiments': {
                                 'type': 'object',
                                 'default': {},
@@ -97,13 +153,15 @@ applications_schema = {
                                 'additionalProperties': {
                                     'type': 'object',
                                     'default': {},
-                                    'additionalProperties': {
+                                    'additionalProperties': False,
+                                    'properties': {
                                         'variables': variables_def,
                                         'matrix': matrix_def,
                                         'matrices': matrices_def,
-                                        'env-vars': ramble.schema.licenses.env_var_actions
-                                    },
-                                    'properties': {}
+                                        'env-vars': ramble.schema.licenses.env_var_actions,
+                                        'internals': internals_def,
+                                        'success_criteria': success_list_def,
+                                    }
                                 }
                             }
                         }

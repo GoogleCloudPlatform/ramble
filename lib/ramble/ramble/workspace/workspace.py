@@ -58,6 +58,9 @@ class namespace:
     experiment = 'experiments'
     variables = 'variables'
     success = 'success_criteria'
+    internals = 'internals'
+    custom_executables = 'custom_executables'
+    executables = 'executables'
     env_var = 'env-vars'
     mpi = 'mpi'
     batch = 'batch'
@@ -783,8 +786,8 @@ class Workspace(object):
         import ramble.spec
 
         specs = []
-        for app, workloads, _, _ in self.all_applications():
-            for workload, _, _, _ in self.all_workloads(workloads):
+        for app, workloads, *_ in self.all_applications():
+            for workload, *_ in self.all_workloads(workloads):
                 app_spec = ramble.spec.Spec(app)
                 app_spec.workloads[workload] = True
                 specs.append(app_spec)
@@ -809,16 +812,21 @@ class Workspace(object):
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
+                application_internals = None
 
                 if namespace.variables in contents:
                     application_vars = contents[namespace.variables]
 
                 if namespace.env_var in contents:
                     application_env_vars = contents[namespace.env_var]
+
+                if namespace.internals in contents:
+                    application_internals = contents[namespace.internals]
+
                 self.extract_success_criteria('application', contents)
 
                 yield application, contents, application_vars, \
-                    application_env_vars
+                    application_env_vars, application_internals
 
         tty.debug('  Iterating over configs in directories...')
         # Iterate over applications defined in application directories
@@ -832,13 +840,17 @@ class Workspace(object):
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
+                application_internals = None
                 if namespace.variables in contents:
                     application_vars = \
                         contents[namespace.variables]
                 if namespace.env_var in contents:
                     application_env_vars = contents[namespace.env_var]
+                if namespace.internals in contents:
+                    application_internals = contents[namespace.internals]
                 self.extract_success_criteria('application', contents)
-                yield application, contents, application_vars, application_env_vars
+                yield application, contents, application_vars, \
+                    application_env_vars, application_internals
 
     def all_workloads(self, application):
         """Iterator over workloads in an application dict
@@ -857,13 +869,17 @@ class Workspace(object):
         for workload, contents in workloads.items():
             workload_variables = None
             workload_env_vars = None
+            workload_internals = None
             if namespace.variables in contents:
                 workload_variables = contents[namespace.variables]
             if namespace.env_var in contents:
                 workload_env_vars = contents[namespace.env_var]
+            if namespace.internals in contents:
+                workload_internals = contents[namespace.internals]
             self.extract_success_criteria('workload', contents)
 
-            yield workload, contents, workload_variables, workload_env_vars
+            yield workload, contents, workload_variables, \
+                workload_env_vars, workload_internals
 
     def all_experiments(self, workload):
         """Iterator over experiments in a workload dict
@@ -882,12 +898,16 @@ class Workspace(object):
 
             experiment_vars = syaml.syaml_dict()
             experiment_env_vars = None
+            experiment_internals = None
 
             if namespace.variables in contents:
                 experiment_vars = contents[namespace.variables]
 
             if namespace.env_var in contents:
                 experiment_env_vars = contents[namespace.env_var]
+
+            if namespace.internals in contents:
+                experiment_internals = contents[namespace.internals]
 
             self.extract_success_criteria('experiment', contents)
 
@@ -910,7 +930,7 @@ class Workspace(object):
                         matrices.append(matrix)
 
             yield experiment, contents, experiment_vars, \
-                experiment_env_vars, matrices
+                experiment_env_vars, matrices, experiment_internals
 
     def _build_spec_dict(self, info_dict, app_name=None, for_config=False):
         spec = {}
@@ -1075,7 +1095,7 @@ class Workspace(object):
         mpi_dict = spack_dict[namespace.mpi_lib]
         applications_dict = spack_dict[namespace.application]
 
-        for app_name, _, _, _ in self.all_applications():
+        for app_name, *_ in self.all_applications():
             app_inst = ramble.repository.get(app_name)
 
             for comp, info in app_inst.default_compilers.items():
@@ -1301,20 +1321,21 @@ class Workspace(object):
                                                 use_custom_specifier=False)
                     runner.install_compiler(comp_str)
 
-        for app, workloads, app_vars, app_env_vars in self.all_applications():
-            experiment_set.set_application_context(app, app_vars, app_env_vars)
+        for app, workloads, app_vars, app_env_vars, app_ints in self.all_applications():
+            experiment_set.set_application_context(app, app_vars, app_env_vars, app_ints)
 
-            for workload, experiments, workload_vars, workload_env_vars in \
+            for workload, experiments, workload_vars, workload_env_vars, workload_ints in \
                     self.all_workloads(workloads):
                 experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars)
+                                                    workload_env_vars, workload_ints)
 
-                for experiment, _, exp_vars, exp_env_vars, exp_matrices in \
+                for experiment, _, exp_vars, exp_env_vars, exp_matrices, exp_ints in \
                         self.all_experiments(experiments):
                     experiment_set.set_experiment_context(experiment,
                                                           exp_vars,
                                                           exp_env_vars,
-                                                          exp_matrices)
+                                                          exp_matrices,
+                                                          exp_ints)
 
         for exp, app_inst in experiment_set.all_experiments():
             tty.debug('On experiment: %s' % exp)
@@ -1674,21 +1695,25 @@ class Workspace(object):
                     else False)
         return False
 
-    def get_workspace_vars(self):
-        """Return a dict of workspace variables"""
+    def _get_workspace_section(self, section):
+        """Return a dict of a workspace section"""
         workspace_dict = self._get_workspace_dict()
 
-        return workspace_dict[namespace.ramble][namespace.variables] \
-            if namespace.variables in \
+        return workspace_dict[namespace.ramble][section] \
+            if section in \
             workspace_dict[namespace.ramble] else syaml.syaml_dict()
+
+    def get_workspace_vars(self):
+        """Return a dict of workspace variables"""
+        return self._get_workspace_section(namespace.variables)
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        workspace_dict = self._get_workspace_dict()
+        return self._get_workspace_section(namespace.env_var)
 
-        return workspace_dict[namespace.ramble][namespace.env_var] \
-            if namespace.env_var in \
-            workspace_dict[namespace.ramble] else None
+    def get_workspace_internals(self):
+        """Return a dict of workspace internals"""
+        return self._get_workspace_section(namespace.internals)
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""

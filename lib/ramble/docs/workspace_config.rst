@@ -275,6 +275,75 @@ In the above example, ``test_value`` extracts the value of ``real_value`` as
 defined in the experiment ``hostname.serial.test_exp1``. When evaluated, this
 will set ``test_value`` to ``'exp1_value'``.
 
+^^^^^^^^^^^^^^^^^^^^^^
+Controlling Internals:
+^^^^^^^^^^^^^^^^^^^^^^
+
+Within a workspace config, an internals dictionary can be used to control
+several internal aspects of the application, workload, and experiment.
+
+An internals dictionary can be defined anywhere a variables dictionary can be
+defined (i.e. within a workspace, a specific application, a specific workload,
+or a specific experiment). This section will describe the features available
+within the internals dictionary.
+
+"""""""""""""""""""
+Custom Executables:
+"""""""""""""""""""
+
+Custom executables can be created within the internals dictionary. Below is an
+example, showing how to create a ``lscpu`` executable at the application level.
+
+.. code-block:: yaml
+
+    ramble:
+      applications:
+        hostname:
+          internals:
+            custom_executables:
+              lscpu:
+                template:
+                - 'lscpu'
+                use_mpi: false
+                redirect: '{log_file}'
+         ...
+
+The above example creates a custom executable, named ``lscpu`` that will inject
+the command ``lscpu`` into the command for an experiment when it is used. It is
+important to note that this only creates the executable, and does not use it.
+
+
+"""""""""""""""""""""""""""""
+Controlling Executable Order:
+"""""""""""""""""""""""""""""
+
+The internals dictionary allows the ability to control the order pre-defined
+executables (or custom executables) are pieced together to build an experiment.
+
+.. code-block:: yaml
+
+   ramble:
+     applications:
+       hostname:
+         internals:
+           custom_executables:
+             lscpu:
+               template:
+               - 'lscpu'
+               use_mpi: false
+               redirect: '{log_file}'
+           executables:
+           - serial
+           - builtin::env_vars
+           - lscpu
+
+The above example builds off of the custom executable example, and shows how
+one can control the order of the executables in the ``{command}`` expansion.
+
+The default for the hostname application is ``[builtin::env_vars,
+serial/parallel]`` but this changes the order and injects ``lscpu`` into the
+expansion.
+
 ^^^^^^^^^^^^^^^^^^^
 Reserved Variables:
 ^^^^^^^^^^^^^^^^^^^
@@ -286,7 +355,7 @@ to function properly. This section will describe them.
 Required Variables:
 """""""""""""""""""
 
-Ramble requires the following variables to be define:
+Ramble requires the following variables to be defined:
 
 * ``n_ranks`` - Defines the number of MPI ranks to use. If not explicitly set,
   is defined as: ``{processes_per_node}*{n_nodes}``
@@ -334,6 +403,8 @@ Ramble automatically generates definitions for the following varialbes:
 * ``command`` - Set to all of the commands needed to perform an experiment.
 * ``spack_setup`` - Set to the commands needed to load a spack environment for
   an experiment. Set to an empty string for non-spack applications
+* ``mpi_command`` - By default, set to the contents of ``ramble:mpi```
+* ``batch_submit`` - By default, set to the contents of ``ramble:batch:submit``
 
 """""""""""""""""""""""""""""""""""
 Spack Specific Generated Variables:
@@ -344,16 +415,6 @@ When using spack applications, Ramble also geneates the following variables:
   <spec>`` for packages defined in a ramble ``spec_name`` package set.
   ``<software_spec_name>`` is set to the name of the package (one level lower
   than ramble's ``spec_name``).
-
-"""""""""""""""""""
-Reserved Variables:
-"""""""""""""""""""
-
-Ramble's internals use the following definitions. Overriding them within a
-config file can negatively impact the functionality of ramble.
-
-* ``mpi_command``
-* ``batch_submit``
 
 -----------------
 Spack Dictionary:
