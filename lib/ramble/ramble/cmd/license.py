@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2023-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -119,7 +119,7 @@ class LicenseError(object):
 
 def _check_license(lines, path):
     license_lines = [
-        r'Copyright 2022-2023 Google LLC',  # noqa: E501
+        r'Copyright 2023-2023 Google LLC',  # noqa: E501
         r'Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or',  # noqa: E501
         r'https://www.apache.org/licenses/LICENSE-2.0> or the MIT license',  # noqa: E501
         r'<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your',  # noqa: E501
@@ -127,7 +127,7 @@ def _check_license(lines, path):
         r'except according to those terms.'  # noqa: E501
     ]
 
-    strict_date = r'Copyright 2022'
+    strict_date = r'Copyright 2023'
 
     found = []
 

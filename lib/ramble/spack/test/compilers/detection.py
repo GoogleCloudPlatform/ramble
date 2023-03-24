@@ -1,4 +1,4 @@
-# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -206,9 +206,9 @@ def test_intel_version_detection(version_str, expected_version):
         '2021.4.0'
     ),
     (  # IFX
-        'ifx (IFORT) 2022.0.0 20211123\n'
+        'ifx (IFORT) 2023.0.0 20211123\n'
         'Copyright (C) 1985-2021 Intel Corporation. All rights reserved.',
-        '2022.0.0'
+        '2023.0.0'
     ),
 ])
 def test_oneapi_version_detection(version_str, expected_version):
