@@ -785,8 +785,8 @@ class Workspace(object):
         import ramble.spec
 
         specs = []
-        for app, workloads, _, _, _ in self.all_applications():
-            for workload, _, _, _, _ in self.all_workloads(workloads):
+        for app, workloads, *_ in self.all_applications():
+            for workload, *_ in self.all_workloads(workloads):
                 app_spec = ramble.spec.Spec(app)
                 app_spec.workloads[workload] = True
                 specs.append(app_spec)
@@ -1094,7 +1094,7 @@ class Workspace(object):
         mpi_dict = spack_dict[namespace.mpi_lib]
         applications_dict = spack_dict[namespace.application]
 
-        for app_name, _, _, _, _ in self.all_applications():
+        for app_name, *_ in self.all_applications():
             app_inst = ramble.repository.get(app_name)
 
             for comp, info in app_inst.default_compilers.items():
@@ -1693,29 +1693,25 @@ class Workspace(object):
                     else False)
         return False
 
-    def get_workspace_vars(self):
-        """Return a dict of workspace variables"""
+    def _get_workspace_section(self, section):
+        """Return a dict of a workspace section"""
         workspace_dict = self._get_workspace_dict()
 
-        return workspace_dict[namespace.ramble][namespace.variables] \
-            if namespace.variables in \
+        return workspace_dict[namespace.ramble][section] \
+            if section in \
             workspace_dict[namespace.ramble] else syaml.syaml_dict()
+
+    def get_workspace_vars(self):
+        """Return a dict of workspace variables"""
+        return self._get_workspace_section(namespace.variables)
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        workspace_dict = self._get_workspace_dict()
-
-        return workspace_dict[namespace.ramble][namespace.env_var] \
-            if namespace.env_var in \
-            workspace_dict[namespace.ramble] else None
+        return self._get_workspace_section(namespace.env_var)
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""
-        workspace_dict = self._get_workspace_dict()
-
-        return workspace_dict[namespace.ramble][namespace.internals] \
-            if namespace.internals in \
-            workspace_dict[namespace.ramble] else None
+        return self._get_workspace_section(namespace.internals)
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""

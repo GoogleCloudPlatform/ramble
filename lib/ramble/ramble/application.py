@@ -30,6 +30,8 @@ import ramble.mirror
 import ramble.fetch_strategy
 import ramble.expander
 
+from ramble.workspace import namespace
+
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
@@ -283,8 +285,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         - command: set to the commands needed to execute the experiment
         - spack_setup: set to an empty string, so spack applications can override this
         """
-        from ramble.workspace import namespace
-
         executables = self.workloads[self.expander.workload_name]['executables']
         inputs = self.workloads[self.expander.workload_name]['inputs']
 
