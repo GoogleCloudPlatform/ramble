@@ -64,7 +64,7 @@ class Lulesh(SpackApplication):
                     fom_regex=r'\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
                     group_name='iterations', units='')
 
-    def _make_experiments(self, workspace, expander):
+    def _make_experiments(self, workspace):
         """
         LULESH requires the number of ranks to be a cube root of an integer.
 
@@ -74,12 +74,11 @@ class Lulesh(SpackApplication):
         We also need to recompute the number of nodes, or the value of
         processes per node here too.
         """
-        num_ranks = int(expander.expand_var('{n_ranks}'))
+        num_ranks = int(self.expander.expand_var('{n_ranks}'))
 
         cube_root = int(num_ranks ** (1. / 3.))
 
-        expander.set_var('n_ranks', cube_root**3, 'experiment')
-        expander._compute_mpi_vars()
+        self.expander.set_var('n_ranks', cube_root**3, 'experiment')
+        self.expander._compute_mpi_vars()
 
-        super()._add_expand_vars(expander)
-        super()._make_experiments(workspace, expander)
+        super()._make_experiments(workspace)
