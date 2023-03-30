@@ -12,9 +12,7 @@ import os
 import platform
 import re
 from datetime import datetime
-from glob import glob
 
-import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
 
 import ramble.config

@@ -6,11 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import pytest
+# import pytest
 
 from ramble.main import RambleCommand
 
 debug = RambleCommand('debug')
+
 
 def test_debug_report():
     output = debug('report')
@@ -18,4 +19,3 @@ def test_debug_report():
     assert "* **Ramble:**" in output
     assert "* **Python:**" in output
     assert "* **Platform:**" in output
-
