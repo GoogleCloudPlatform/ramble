@@ -476,3 +476,161 @@ is as follows:
 
 Not all of the options are required, but generally a spec object should contain
 at least ``base``, and ``version``.
+
+--------------------------------------------
+Controlling MPI Libraries and Batch Systems:
+--------------------------------------------
+
+Some workspaces might be configured with the goal of exploring the performance
+of different MPI libraries (e.g. MPICH vs. Open MPI), or of performing the same
+experiment in multiple batch schedulers (e.g. SLURM, PBS Pro, and Flux).
+
+This section will show how to perform these experiments within a workspace
+configuration file.
+
+
+^^^^^^^^^^^^^^^^^^^^
+MPI Command Control:
+^^^^^^^^^^^^^^^^^^^^
+
+When writing a ramble configuration file to perform the same experiment with
+different MPI libraries, the MPI section within the Ramble dictionary is
+insufficient for changing the flags used based on the MPI library used.
+
+However, Ramble's variable definitions can be used to control this on a
+per-experiment basis.
+
+Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
+
+.. code-block:: yaml
+
+    ramble:
+      mpi:
+        command: ''
+        args: []
+      batch:
+        submit: '{execute_experiment}'
+      variables:
+        mpi_command:
+        - 'mpirun -n {n_ranks} -ppn {processes_per_node} ' # MPICH
+        - 'mpirun -n {n_ranks} -nperhost {processes_per_node} ' # OpenMPI
+      applications:
+        gromacs:
+          workloads:
+            water_bare:
+              experiments:
+                '{spec_name}':
+                  variables:
+                    n_ranks: '1'
+                    n_nodes: '1'
+                    spec_name: ['gromacs-mpich', 'gromacs-ompi']
+    spack:
+      compilers:
+        gcc9:
+          base: gcc
+          version: 9.3.0
+          target: x86_64
+      mpi_libraries:
+        mpich:
+          base: mpich
+          version: 4.0.2
+          target: x86_64
+        ompi:
+          base: openmpi
+          version: 4.1.4
+          target: x86_64
+      applications:
+        gromacs-ompi:
+          gromacs:
+            base: gromacs
+            version: 2022.4
+            compiler: gcc9
+            mpi: ompi
+        gromacs-mpich:
+          gromacs:
+            base: gromacs
+            version: 2022.4
+            compiler: gcc9
+            mpi: mpich
+
+In the above example, you can see how ``spec_name`` is used to test both an
+OpenMPI and MPICH version of Gromacs. Additionally, the ``mpi_command``
+variable is used to define how ``mpirun`` should look for each of the MPI
+libraries.
+
+Using the previously described Ramble vector syntax, this configuration file
+will generate 2 experiments. Both ``spec_name`` and ``mpi_command`` will be
+zipped together, giving each experiment a tuple of: ``(mpi_command,
+spec_name)`` which allows us to pair a specific MPI command to the
+corresponding Gromacs spec.
+
+
+^^^^^^^^^^^^^^^^^^^^^
+Batch System Control:
+^^^^^^^^^^^^^^^^^^^^^
+
+Similar to the previously describe MPI command control, experiments can use
+different batch systems by overriding the ``batch_submit`` variable.
+
+As in the MPI command example, the ``ramble:batch:submit`` definition is
+insufficient for changing how each experiment is submitted to a batch system
+(or even what batch system the experiment is submitted to).
+
+Below is an example configuration file showing how the ``batch_submit``
+variable can be used to submit the same experiment to multiple batch systems.
+
+.. code-block:: yaml
+
+    ramble:
+      mpi:
+        command: mpirun
+        args:
+        - '-n'
+        - '{n_ranks}'
+        - '-ppn'
+        - '{processes_per_node}'
+      batch:
+        submit: ''
+      variables:
+        batch_system:
+        - slurm
+        - pbs
+        batch_submit:
+        - 'sbatch {execute_slurm}'
+        - 'qsub {execute_pbs}'
+      applications:
+        gromacs:
+          workloads:
+            water_bare:
+              experiments:
+                '{batch_system}'
+                  variables:
+                    n_ranks: '1'
+                    n_nodes: '1'
+    spack:
+      compilers:
+        gcc9:
+          base: gcc
+          version: 9.3.0
+          target: x86_64
+      mpi_libraries:
+        impi2018:
+          base: intel-mpi
+          version: 2018.4.274
+          target: x86_64
+      applications:
+        gromacs:
+          gromacs:
+            base: gromacs
+            version: 2022.4
+            compiler: gcc9
+            mpi: impi2018
+
+The above example overrides the generated ``batch_submit`` variable to change
+how different experiments are submitted. In this example, we submit the same
+experiment to both SLURM and PBS.
+
+Note that each of the two ``batch_submit`` commands submits a different
+template. This means the workspace's configs directory should have two files:
+``execute_slurm.tpl`` and ``execute_pbs.tpl`` which will be template submission
+scripts to each of the batch systems.
