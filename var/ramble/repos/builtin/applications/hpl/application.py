@@ -188,11 +188,11 @@ class Hpl(SpackApplication):
             expander.set_var('N-DEPTHs', '1')
             expander.set_var('DEPTHs', '1')
 
-    def _make_experiments(self, workspace, expander):
-        super()._make_experiments(workspace, expander)
-        self._calculate_values(workspace, expander)
+    def _make_experiments(self, workspace):
+        super()._make_experiments(workspace)
+        self._calculate_values(workspace, self.expander)
 
-        input_path = expander.expand_var('{experiment_run_dir}/HPL.dat')
+        input_path = self.expander.expand_var('{experiment_run_dir}/HPL.dat')
 
         settings = ['output_file', 'device_out', 'N-Ns', 'Ns', 'N-NBs', 'NBs',
                     'PMAP', 'N-Grids', 'Ps', 'Qs', 'threshold', 'NPFACTS',
@@ -206,4 +206,4 @@ class Hpl(SpackApplication):
             f.write('Innovative Computing Laboratory, University of Tennessee\n')
 
             for setting in settings:
-                f.write(expander.expand_var('{' + setting + '}') + '\n')
+                f.write(self.expander.expand_var('{' + setting + '}') + '\n')

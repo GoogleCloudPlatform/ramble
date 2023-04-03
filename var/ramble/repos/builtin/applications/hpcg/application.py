@@ -74,13 +74,13 @@ class Hpcg(SpackApplication):
                     fom_regex=r'Final Summary::HPCG 2\.4 rating.*=(?P<rating>[0-9]+\.*[0-9]*)',
                     group_name='rating', units='')
 
-    def _make_experiments(self, workspace, expander):
-        super()._make_experiments(workspace, expander)
+    def _make_experiments(self, workspace):
+        super()._make_experiments(workspace)
 
-        input_path = expander.expand_var('{experiment_run_dir}/hpcg.dat')
+        input_path = self.expander.expand_var('{experiment_run_dir}/hpcg.dat')
 
         with open(input_path, 'w+') as f:
             f.write('HPCG benchmark input file\n')
             f.write('Sandia National Laboratories; University of Tennessee, Knoxville\n')
-            f.write(expander.expand_var('{matrix_size}\n'))
-            f.write(expander.expand_var('{iterations}\n'))
+            f.write(self.expander.expand_var('{matrix_size}\n'))
+            f.write(self.expander.expand_var('{iterations}\n'))
