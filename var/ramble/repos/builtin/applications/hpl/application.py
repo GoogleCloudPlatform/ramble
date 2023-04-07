@@ -83,7 +83,7 @@ class Hpl(SpackApplication):
     workload_variable('N-RFACTs', default='3            # of recursive panel fact.',
                       description='Number of RFACTs',
                       workloads=['standard'])
-    workload_variable('RACFTs', default='0 1 2        RFACTs (0=left, 1=Crout, 2=Right)',
+    workload_variable('RFACTs', default='0 1 2        RFACTs (0=left, 1=Crout, 2=Right)',
                       description='RFACT values',
                       workloads=['standard'])
     workload_variable('N-BCASTs', default='1            # of broadcast',
@@ -197,7 +197,7 @@ class Hpl(SpackApplication):
         settings = ['output_file', 'device_out', 'N-Ns', 'Ns', 'N-NBs', 'NBs',
                     'PMAP', 'N-Grids', 'Ps', 'Qs', 'threshold', 'NPFACTS',
                     'PFACTS', 'N-NBMINs', 'NBMINs', 'N-NDIVs', 'NDIVs', 'N-RFACTs',
-                    'RACFTs', 'N-BCASTs', 'BCASTs', 'N-DEPTHs', 'DEPTHs', 'SWAP',
+                    'RFACTs', 'N-BCASTs', 'BCASTs', 'N-DEPTHs', 'DEPTHs', 'SWAP',
                     'swapping_threshold', 'L1', 'U', 'Equilibration',
                     'mem_alignment']
 
