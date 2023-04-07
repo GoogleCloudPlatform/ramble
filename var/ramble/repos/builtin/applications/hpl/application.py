@@ -168,25 +168,25 @@ class Hpl(SpackApplication):
             bestQ = int(totalCores / bestP)
 
             for var, config in self.workload_variables['standard'].items():
-                expander.set_var(var, config['default'])
+                self.variables[var] = config['default']
 
-            expander.set_var('N-Ns', '1')
-            expander.set_var('Ns', int(problemSize))
-            expander.set_var('N-NBs', '1')
-            expander.set_var('NBs', blockSize)
-            expander.set_var('N-Grids', '1')
-            expander.set_var('Ps', int(bestP))
-            expander.set_var('Qs', int(bestQ))
-            expander.set_var('NPFACTS', '1')
-            expander.set_var('PFACTS', '2')
-            expander.set_var('N-NBMINs', '1')
-            expander.set_var('NBMINs', '4')
-            expander.set_var('N-RFACTs', '1')
-            expander.set_var('RFACTs', '1')
-            expander.set_var('N-BCASTs', '1')
-            expander.set_var('BCASTs', '1')
-            expander.set_var('N-DEPTHs', '1')
-            expander.set_var('DEPTHs', '1')
+            self.variables['N-Ns'] = '1'
+            self.variables['Ns'] = int(problemSize)
+            self.variables['N-NBs'] = '1'
+            self.variables['NBs'] = blockSize
+            self.variables['N-Grids'] = '1'
+            self.variables['Ps'] = int(bestP)
+            self.variables['Qs'] = int(bestQ)
+            self.variables['NPFACTS'] = '1'
+            self.variables['PFACTS'] = '2'
+            self.variables['N-NBMINs'] = '1'
+            self.variables['NBMINs'] = '4'
+            self.variables['N-RFACTs'] = '1'
+            self.variables['RFACTs'] = '1'
+            self.variables['N-BCASTs'] = '1'
+            self.variables['BCASTs'] = '1'
+            self.variables['N-DEPTHs'] = '1'
+            self.variables['DEPTHs'] = '1'
 
     def _make_experiments(self, workspace):
         super()._make_experiments(workspace)
