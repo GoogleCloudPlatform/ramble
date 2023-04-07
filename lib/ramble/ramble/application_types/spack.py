@@ -180,47 +180,56 @@ class SpackApplication(ApplicationBase):
             mpi_added = {}
 
             app_context = self.expander.expand_var('{spec_name}')
-            for name, spec_info in \
-                    workspace.all_application_specs(app_context):
 
-                if 'mpi' in spec_info and \
-                        spec_info['mpi'] not in mpi_added:
-                    mpi_spec = workspace.get_named_spec(spec_info['mpi'],
-                                                        'mpi_library')
-                    mpi_added[spec_info['mpi']] = True
-                    self.spack_runner.add_spec(
-                        self.expander.expand_var(workspace.spec_string(mpi_spec,
-                                                 use_custom_specifier=True))
-                    )
+            env_concretized = False
+            external_spack_env = workspace.external_spack_env(app_context)
+            if external_spack_env:
+                env_concretized = self.spack_runner.copy_from_external_env(external_spack_env)
+            else:
+                for name, spec_info in \
+                        workspace.all_application_specs(app_context):
 
-                pkg_specs = self._extract_specs(workspace, name, app_context)
-                for pkg_name, pkg_info in pkg_specs:
-                    if pkg_name not in added_specs:
-                        added_specs[pkg_name] = True
+                    if 'mpi' in spec_info and \
+                            spec_info['mpi'] not in mpi_added:
+                        mpi_spec = workspace.get_named_spec(spec_info['mpi'],
+                                                            'mpi_library')
+                        mpi_added[spec_info['mpi']] = True
+                        self.spack_runner.add_spec(
+                            self.expander.expand_var(workspace.spec_string(mpi_spec,
+                                                     use_custom_specifier=True))
+                        )
 
-                        spec_str = workspace.spec_string(pkg_info,
+                    pkg_specs = self._extract_specs(workspace, name, app_context)
+                    for pkg_name, pkg_info in pkg_specs:
+                        if pkg_name not in added_specs:
+                            added_specs[pkg_name] = True
+
+                            spec_str = workspace.spec_string(pkg_info,
+                                                             as_dep=False)
+
+                            self.spack_runner.add_spec(self.expander.expand_var(spec_str))
+
+                    if name not in added_specs:
+                        added_specs[name] = True
+                        spec_str = workspace.spec_string(spec_info,
                                                          as_dep=False)
 
                         self.spack_runner.add_spec(self.expander.expand_var(spec_str))
 
-                if name not in added_specs:
-                    added_specs[name] = True
-                    spec_str = workspace.spec_string(spec_info,
-                                                     as_dep=False)
+                for name, spec_info in self.software_specs.items():
+                    if 'required' in spec_info and spec_info['required']:
+                        if name not in added_specs:
+                            tty.die(('Software spec {} is not defined '
+                                     'in context {}, but is required '
+                                     'to by the {} application '
+                                     'definition').format(name,
+                                                          app_context,
+                                                          self.name))
 
-                    self.spack_runner.add_spec(self.expander.expand_var(spec_str))
+                self.spack_runner.generate_env_file()
 
-            for name, spec_info in self.software_specs.items():
-                if 'required' in spec_info and spec_info['required']:
-                    if name not in added_specs:
-                        tty.die(('Software spec {} is not defined '
-                                 'in context {}, but is required '
-                                 'to by the {} application '
-                                 'definition').format(name,
-                                                      app_context,
-                                                      self.name))
-
-            self.spack_runner.concretize()
+            if not env_concretized:
+                self.spack_runner.concretize()
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)

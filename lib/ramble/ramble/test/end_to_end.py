@@ -946,3 +946,96 @@ def test_dryrun_real_workloads(mutable_config, mutable_mock_workspace_path, repo
 
                 workspace('concretize', global_args=cmd_global_args)
                 workspace('setup', '--dry-run', global_args=cmd_global_args)
+
+
+def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir):
+    test_spack_env = """
+spack:
+  specs: [ 'zlib' ]
+"""
+
+    env_path = str(tmpdir)
+    with open(os.path.join(env_path, 'spack.yaml'), 'w+') as f:
+        f.write(test_spack_env)
+
+    with open(os.path.join(env_path, 'spack.lock'), 'w+') as f:
+        f.write(test_spack_env)
+
+    test_config = f"""
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{{n_ranks}}'
+    - '-ppn'
+    - '{{processes_per_node}}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {{execute_experiment}}'
+  variables:
+    processes_per_node: '10'
+    n_ranks: '{{processes_per_node}}*{{n_nodes}}'
+    n_threads: '1'
+  applications:
+    wrfv4:
+      workloads:
+        CONUS_12km:
+          experiments:
+            test{{n_nodes}}_{{spec_name}}:
+              variables:
+                n_nodes: '1'
+spack:
+  concretized: true
+  compilers:
+    gcc8:
+      base: gcc
+      version: 8.5.0
+    gcc9:
+      base: gcc
+      version: 9.3.0
+    gcc10:
+      base: gcc
+      version: 10.1.0
+  mpi_libraries:
+    intel:
+      base: intel-mpi
+      version: 2018.4.274
+  applications:
+    wrfv4:
+      external_spack_env: {env_path}
+      wrf:
+        base: wrf
+        version: 4.2
+        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+        compiler: gcc8
+        mpi: intel
+"""
+
+    workspace_name = 'test_dryrun_copies_external_env'
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws.dry_run = True
+    ws._re_read()
+
+    ws.run_pipeline('setup')
+
+    env_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.yaml')
+    lock_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.lock')
+
+    assert os.path.exists(env_file)
+
+    with open(env_file, 'r') as f:
+        assert 'zlib' in f.read()
+
+    assert os.path.exists(lock_file)
+
+    with open(lock_file, 'r') as f:
+        assert 'zlib' in f.read()

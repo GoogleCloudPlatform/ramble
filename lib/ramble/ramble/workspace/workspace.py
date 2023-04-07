@@ -66,6 +66,7 @@ class namespace:
     batch = 'batch'
     compiler = 'compilers'
     mpi_lib = 'mpi_libraries'
+    external_spack_env = 'external_spack_env'
 
 
 #: Environment variable used to indicate the active workspace
@@ -1056,7 +1057,7 @@ class Workspace(object):
 
         return ' '.join(spec_str)
 
-    def all_application_specs(self, app_name):
+    def _spack_application_context(self, app_name):
         spack_dict = self.get_spack_dict()
 
         if namespace.application not in spack_dict:
@@ -1067,11 +1068,22 @@ class Workspace(object):
             raise RambleWorkspaceError('Application %s ' % app_name +
                                        'not defined in spack ' +
                                        'config section')
+        return spack_dict[namespace.application][app_name]
 
-        app_specs = spack_dict[namespace.application][app_name]
-        for name, info in app_specs.items():
-            spec = self._build_spec_dict(info)
-            yield name, spec
+    def external_spack_env(self, app_name):
+        app_context = self._spack_application_context(app_name)
+
+        if namespace.external_spack_env not in app_context:
+            return None
+        return app_context[namespace.external_spack_env]
+
+    def all_application_specs(self, app_name):
+        app_context = self._spack_application_context(app_name)
+
+        for name, info in app_context.items():
+            if name != namespace.external_spack_env:
+                spec = self._build_spec_dict(info)
+                yield name, spec
 
     def concretize(self):
         spack_dict = self.get_spack_dict()

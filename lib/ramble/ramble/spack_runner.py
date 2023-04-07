@@ -14,6 +14,7 @@ environment by calling an externally available spack.
 
 import os
 import re
+import shutil
 
 import llnl.util.tty as tty
 import llnl.util.filesystem as fs
@@ -326,14 +327,53 @@ class SpackRunner(object):
         if file_name in self._allowed_config_files:
             self.includes.append(include_file)
 
-    def concretize(self):
+    def copy_from_external_env(self, env_name_or_path):
         """
-        Concretize a spack environment.
+        Copy an external spack environment file into the generated environment.
 
-        This happens by generating a spack.yaml file to build
-        the packages that should be in the environment.
+        env_name_or_path can be either:
+         - Name of a named spack environment
+         - Path to an external spack environment
 
-        This command requires an active spack environment.
+        Returns:
+         - (bool) found_lock: True if a spack.lock file was copied. False otherwise.
+        """
+
+        self._check_active()
+
+        named_location_args = [
+            'location',
+            '-e',
+            env_name_or_path
+        ]
+
+        # If the path doesn't exist, check if it's a named environment
+        path = env_name_or_path
+        if not os.path.exists(path):
+            try:
+                path = self.exe(*named_location_args, output=str).strip('\n')
+            # If a named environment fails, copy directly from the path
+            except ProcessError:
+                raise InvalidExternalEnvironment(f'{path} is not a spack environment.')
+
+        found_lock = False
+
+        lock_file = os.path.join(path, 'spack.lock')
+        if os.path.exists(lock_file):
+            found_lock = True
+            shutil.copyfile(lock_file, os.path.join(self.env_path, 'spack.lock'))
+
+        conf_file = os.path.join(path, 'spack.yaml')
+        if not os.path.exists(conf_file):
+            raise InvalidExternalEnvironment(f'{path} is not a spack environment.')
+
+        shutil.copyfile(conf_file, os.path.join(self.env_path, 'spack.yaml'))
+
+        return found_lock
+
+    def generate_env_file(self):
+        """
+        Generate a spack environment file
         """
         self._check_active()
 
@@ -350,6 +390,14 @@ class SpackRunner(object):
         # Write spack.yaml to environment before concretizing
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
             syaml.dump_config(env_file, f, default_flow_style=False)
+
+    def concretize(self):
+        """
+        Concretize a spack environment.
+
+        This command requires an active spack environment.
+        """
+        self._check_active()
 
         concretize_flags = ramble.config.get('config:spack_flags:concretize')
 
@@ -452,3 +500,7 @@ class NoPathRunnerError(ramble.error.RambleError):
 class NoActiveEnvironmentError(RunnerError):
     """Raised when an environment command is executed without an active
     environment."""
+
+
+class InvalidExternalEnvironment(RunnerError):
+    """Raised when an invalid external spack environment is passed in"""
