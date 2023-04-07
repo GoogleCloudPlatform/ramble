@@ -8,6 +8,7 @@
 
 import os
 import glob
+import re
 
 import pytest
 
@@ -876,3 +877,72 @@ spack:
     assert required_compiler_str in captured.out
     assert unused_gcc9_str not in captured.out
     assert unused_gcc10_str not in captured.out
+
+
+@pytest.mark.long
+@pytest.mark.parametrize('repo_name,repo_arg', [('builtin', None), ('builtin.mock', '-m')])
+def test_dryrun_real_workloads(mutable_config, mutable_mock_workspace_path, repo_name, repo_arg):
+
+    base_config = """ramble:
+  mpi:
+    command: 'mpirun'
+    args:
+    - '-n'
+    - '{n_ranks}'
+  batch:
+    submit: '{execute_experiment}'
+  applications:\n"""
+
+    cmd_global_args = []
+    if repo_arg:
+        cmd_global_args = [repo_arg]
+
+    list_cmd = RambleCommand('list')
+    info_cmd = RambleCommand('info')
+
+    all_apps = list_cmd(global_args=cmd_global_args).split('\n')
+
+    workload_regex = re.compile(r'Workload: (?P<wl_name>.*)')
+
+    for app_str in all_apps:
+        app = app_str.replace(' ', '')
+        if app != '':
+            app_info = info_cmd(app, global_args=cmd_global_args)
+            workloads = []
+
+            for line in app_info.split('\n'):
+                match = workload_regex.search(line)
+                if match:
+                    workloads.append(match.group('wl_name').replace(' ', ''))
+
+            ws_name = f'test_all_workloads_{app}'
+            with ramble.workspace.create(ws_name) as ws:
+                ws.write()
+                config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+                with open(config_path, 'w+') as f:
+                    f.write(base_config)
+                    f.write(f'    {app.strip()}:\n')
+                    f.write('      workloads:\n')
+                    for workload in workloads:
+                        f.write(f"""        {workload.strip()}:
+          experiments:
+            test_experiment:
+              variables:
+                n_ranks: '1'
+                n_nodes: '1'
+                processes_per_node: '1'\n""")
+                    f.write("""spack:
+  concretized: false
+  compilers: {}
+  mpi_libraries: {}
+  applications: {}\n""")
+
+                ws._re_read()
+
+                cmd_global_args = ['-w', ws_name]
+                if repo_arg:
+                    cmd_global_args.append(repo_arg)
+
+                workspace('concretize', global_args=cmd_global_args)
+                workspace('setup', '--dry-run', global_args=cmd_global_args)

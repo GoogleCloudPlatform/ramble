@@ -54,7 +54,7 @@ steps:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         license_err=$$?
 
-        COVERAGE=true /workspace/share/ramble/qa/run-unit-tests
+        COVERAGE=true LONG=true /workspace/share/ramble/qa/run-unit-tests
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         unit_err=$$?
