@@ -16,7 +16,6 @@ import sys
 
 import six
 from six.moves import cPickle
-from six.moves import shlex_quote as cmd_quote
 
 import llnl.util.tty as tty
 from llnl.util.lang import dedupe
@@ -56,6 +55,24 @@ _shell_unset_strings = {
 
 
 tracing_enabled = False
+
+_find_unsafe = re.compile(r'[^\w@%+=:,./-]', re.ASCII).search
+
+def cmd_quote(s):
+    """Return a shell-escaped version of the string *s*.
+
+    This is similar to how shlex.quote works, but it escapes with double quotes
+    instead of single quotes, to allow environment variable expansion within
+    quoted strings.
+    """
+    if not s:
+        return '""'
+    if _find_unsafe(s) is None:
+        return s
+
+    # use double quotes, and escape double quotes in the string
+    # the string $"b is then quoted as "$\"b"
+    return '"' + s.replace('"', '\\"') + '"'
 
 
 def is_system_path(path):

@@ -190,7 +190,7 @@ licenses:
                 assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
-                assert "export OMP_NUM_THREADS='1'" in data
+                assert 'export OMP_NUM_THREADS="1"' in data
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
@@ -209,7 +209,7 @@ licenses:
                 assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
-                assert "export OMP_NUM_THREADS='1'" in data
+                assert 'export OMP_NUM_THREADS="1"' in data
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
