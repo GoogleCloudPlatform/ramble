@@ -22,6 +22,7 @@ import ramble.cmd
 import ramble.cmd.common.arguments
 import ramble.cmd.common.arguments as arguments
 
+import ramble.config
 import ramble.workspace
 import ramble.workspace.shell
 import ramble.experiment_set
@@ -355,12 +356,17 @@ def workspace_analyze(args):
         ws.upload_results()
 
 
+config_color = '@*Y'
 header_color = '@*b'
 level1_color = '@*g'
 level2_color = '@*r'
 level3_color = '@*c'
 level4_color = '@*m'
 plain_format = '@.'
+
+
+def config_title(s):
+    return config_color + s + plain_format
 
 
 def section_title(s):
@@ -449,6 +455,16 @@ def workspace_info(args):
                     color.cprint(nested_3('      Experiment: ') + exp_name)
 
                     if args.verbose >= 1:
+                        config_vars = ramble.config.config.get('config:variables')
+                        if config_vars:
+                            color.cprint(nested_4('        Variables from ') +
+                                         config_title('Config') + ':')
+                            for var, val in config_vars.items():
+                                expanded = app_inst.expander.expand_var('{' + var + '}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
+
                         if workspace_vars:
                             color.cprint(nested_4('        Variables from ') +
                                          section_title('Workspace') + ':')
