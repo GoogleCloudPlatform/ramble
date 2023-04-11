@@ -209,6 +209,68 @@ spack:
     check_info_basic(output)
 
 
+def test_workspace_info_prints_all_levels():
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      variables:
+        application_level: '1'
+      workloads:
+        test_wl:
+          variables:
+            workload_level: '1'
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+spack:
+  concretized: true
+"""
+
+    config_file = """
+config:
+  variables:
+    conf_level: 1
+"""
+
+    workspace_name = 'test_workspace_info_prints_all_levels'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    ramble_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_scope_path = os.path.join(ws1.config_dir, 'config.yaml')
+
+    with open(ramble_config_path, 'w+') as f:
+        f.write(test_config)
+
+    with open(config_scope_path, 'w+') as f:
+        f.write(config_file)
+
+    ws1._re_read()
+
+    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    assert 'Variables from Config:' in output
+    assert 'Variables from Workspace:' in output
+    assert 'Variables from Application:' in output
+    assert 'Variables from Workload:' in output
+    assert 'Variables from Experiment:' in output
+
+
 def test_workspace_dir(tmpdir):
     with tmpdir.as_cwd():
         workspace('create', '-d', '.')
