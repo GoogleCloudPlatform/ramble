@@ -138,7 +138,7 @@ licenses:
         ws1._re_read()
 
         output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus12km.tar.gz" in output
+        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz" in output
 
         # Test software directories
         software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']

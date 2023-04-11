@@ -23,10 +23,10 @@ class Wrfv4(SpackApplication):
                   variants='build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf',
                   compiler='gcc9', mpi='impi2018', required=True)
 
-    input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus2.5km.tar.gz',
+    input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus2.5km.tar.gz',
                description='2.5 km resolution mesh of the continental United States.')
 
-    input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus12km.tar.gz',
+    input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz',
                description='12 km resolution mesh of the continental United States.')
 
     executable('cleanup', 'rm -f rsl.* wrfout*', use_mpi=False)
