@@ -47,6 +47,7 @@ class SpackApplication(ApplicationBase):
     def __init__(self, file_path):
         super().__init__(file_path)
         self._setup_phases = [
+            'install_compilers',
             'create_spack_env',
             'install_software',
             'get_inputs',
@@ -96,6 +97,52 @@ class SpackApplication(ApplicationBase):
         spec['application_name'] = app_name
         spec_list.append((spec_name, spec))
         return spec_list
+
+    def _install_compilers(self, workspace):
+        """Install compilers an application uses"""
+
+        # See if we cached this already, and if so return
+        namespace = self.expander.spec_namespace
+        if not namespace:
+            raise ApplicationError('Ramble spec_namespace is set to None.')
+        spec_name = namespace.split('.')[0]
+
+        cache_tupl = ('spack-compilers', spec_name)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already in cache.'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
+
+            app_context = self.expander.expand_var('{spec_name}')
+
+            compilers = {}
+            for name, spec_info in \
+                    workspace.all_application_specs(app_context):
+                if 'compiler' in spec_info:
+                    comp_spec = workspace.get_named_spec(spec_info['compiler'],
+                                                         'compiler')
+                    spec_str = workspace.spec_string(comp_spec, as_dep=False,
+                                                     use_custom_specifier=False)
+                    compilers[spec_info['compiler']] = spec_str
+
+                pkg_specs = self._extract_specs(workspace, name, app_context)
+                for pkg_name, pkg_info in pkg_specs:
+                    if 'compiler' in pkg_info:
+                        comp_spec = workspace.get_named_spec(spec_info['compiler'],
+                                                             'compiler')
+                        spec_str = workspace.spec_string(comp_spec, as_dep=False,
+                                                         use_custom_specifier=False)
+                        compilers[spec_info['compiler']] = spec_str
+
+            for _, spec in compilers.items():
+                self.spack_runner.install_compiler(spec)
+
+        except ramble.spack_runner.RunnerError as e:
+            tty.die(e)
 
     def _create_spack_env(self, workspace):
         """Create the spack environment for this experiment

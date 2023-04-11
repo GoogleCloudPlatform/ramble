@@ -800,3 +800,79 @@ spack:
                 if export_found and not cmd_found and cmd_regex.search(line):
                     cmd_found = True
             assert custom_found and cmd_found and export_found
+
+
+def test_unused_compilers_are_skipped(mutable_config, mutable_mock_workspace_path, capsys):
+    test_config = """
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '10'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+    n_threads: '1'
+  applications:
+    wrfv4:
+      workloads:
+        CONUS_12km:
+          experiments:
+            test{n_nodes}_{spec_name}:
+              variables:
+                n_nodes: '1'
+spack:
+  concretized: true
+  compilers:
+    gcc8:
+      base: gcc
+      version: 8.5.0
+    gcc9:
+      base: gcc
+      version: 9.3.0
+    gcc10:
+      base: gcc
+      version: 10.1.0
+  mpi_libraries:
+    intel:
+      base: intel-mpi
+      version: 2018.4.274
+  applications:
+    wrfv4:
+      wrf:
+        base: wrf
+        version: 4.2
+        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+        compiler: gcc8
+        mpi: intel
+"""
+
+    workspace_name = 'test_unused_compilers_are_skipped'
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws.dry_run = True
+    ws._re_read()
+
+    ws.run_pipeline('setup')
+    captured = capsys.readouterr()
+
+    required_compiler_str = "gcc @8.5.0"
+    unused_gcc9_str = "gcc @9.3.0"
+    unused_gcc10_str = "gcc @10.1.0"
+
+    assert required_compiler_str in captured.out
+    assert unused_gcc9_str not in captured.out
+    assert unused_gcc10_str not in captured.out

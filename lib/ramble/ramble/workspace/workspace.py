@@ -1311,16 +1311,6 @@ class Workspace(object):
 
             experiment_set.set_base_var('experiments_file', all_experiments_file)
 
-            runner = ramble.spack_runner.SpackRunner(dry_run=self.dry_run)
-            spack_dict = self.get_spack_dict()
-            if namespace.compiler in spack_dict:
-                for comp_name, comp_spec in \
-                        spack_dict[namespace.compiler].items():
-                    comp_str = self.spec_string(comp_spec,
-                                                as_dep=False,
-                                                use_custom_specifier=False)
-                    runner.install_compiler(comp_str)
-
         for app, workloads, app_vars, app_env_vars, app_ints in self.all_applications():
             experiment_set.set_application_context(app, app_vars, app_env_vars, app_ints)
 
