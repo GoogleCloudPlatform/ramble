@@ -109,10 +109,10 @@ def test_env_var_append_command_gen(mutable_mock_repo):
     ]
 
     answer = [
-        "export var1='${var1},val1,val2';",
-        "export var2='${var2},val2,val1';",
-        "export path1='${path1}:path1';",
-        "export path2='${path2}:path2';"
+        'export var1="${var1},val1,val2";',
+        'export var2="${var2},val2,val1";',
+        'export path1="${path1}:path1";',
+        'export path2="${path2}:path2";'
     ]
 
     out_cmds, _ = basic_inst._get_env_append_commands(tests, set())
@@ -139,8 +139,8 @@ def test_env_var_prepend_command_gen(mutable_mock_repo):
     ]
 
     answer = [
-        "export path1='path2:path1:${path1}';",
-        "export path2='path1:path2:${path2}';"
+        'export path1="path2:path1:${path1}";',
+        'export path2="path1:path2:${path2}";'
     ]
 
     out_cmds, _ = basic_inst._get_env_prepend_commands(tests, set())
