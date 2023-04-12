@@ -78,7 +78,6 @@ class Lulesh(SpackApplication):
 
         cube_root = int(num_ranks ** (1. / 3.))
 
-        self.expander.set_var('n_ranks', cube_root**3, 'experiment')
-        self.expander._compute_mpi_vars()
+        self.variables['n_ranks'] = cube_root**3
 
         super()._make_experiments(workspace)
