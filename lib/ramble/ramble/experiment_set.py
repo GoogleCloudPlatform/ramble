@@ -502,6 +502,7 @@ class ExperimentSet(object):
                 Expander.expansion_str(self.keywords.workload_name))
             final_exp_name = expander.expand_var(experiment_template_name)
 
+            experiment_vars[self.keywords.experiment_template_name] = experiment_template_name
             experiment_vars[self.keywords.application_name] = final_app_name
             experiment_vars[self.keywords.workload_name] = final_wl_name
             experiment_vars[self.keywords.experiment_name] = final_exp_name
@@ -511,7 +512,7 @@ class ExperimentSet(object):
             log_file = expander.expand_var(
                 os.path.join(Expander.expansion_str(self.keywords.experiment_run_dir),
                              Expander.expansion_str(self.keywords.experiment_name) + '.out'))
-            experiment_vars['log_file'] = log_file
+            experiment_vars[self.keywords.log_file] = log_file
 
             tty.debug('   Exp vars: %s' % exp)
             tty.debug('   Final name: %s' % final_exp_name)
