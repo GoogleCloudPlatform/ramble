@@ -639,7 +639,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         tty.debug('fom_vals = %s' % fom_values)
         if success:
             results['RAMBLE_STATUS'] = 'SUCCESS'
-            results['RAMBLE_VARIABLES'] = self.variables
+            results['RAMBLE_VARIABLES'] = {}
+            results['RAMBLE_RAW_VARIABLES'] = {}
+            for var, val in self.variables.items():
+                results['RAMBLE_RAW_VARIABLES'][var] = val
+                results['RAMBLE_RAW_VARIABLES'][var] = self.expander.expand_var(val)
             results['CONTEXTS'] = []
 
             for context, fom_map in fom_values.items():

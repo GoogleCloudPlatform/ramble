@@ -56,6 +56,7 @@ class Keywords(object):
         'n_threads': key_type.required,
         'batch_submit': key_type.required,
         'mpi_command': key_type.required,
+        'experiment_template_name': key_type.required,
     }
 
     @classmethod
