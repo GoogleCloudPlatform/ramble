@@ -50,6 +50,7 @@ class SpackApplication(ApplicationBase):
             'install_compilers',
             'create_spack_env',
             'install_software',
+            'define_package_paths',
             'get_inputs',
             'make_experiments'
         ]
@@ -255,6 +256,32 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
             self.spack_runner.install()
+        except ramble.spack_runner.RunnerError as e:
+            tty.die(e)
+
+    def _define_package_paths(self, workspace):
+        """Define variables containing the path to all spack packages
+
+        For every spack package defined within an application context, define
+        a variable that refers to that packages installation location.
+
+        As an example:
+        <ramble.yaml>
+        spack:
+          applications:
+            wrfv4:
+              wrf:
+                base: wrf
+                version: 4.2.2
+
+        Would define a variable `wrf` that contains the installation path of
+        wrf@4.2.2
+        """
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.set_env(self.expander.expand_var('{spack_env}'))
+
+            self.spack_runner.activate()
 
             app_context = self.expander.expand_var('{spec_name}')
             for name, spec_info in \
