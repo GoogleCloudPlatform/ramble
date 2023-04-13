@@ -477,6 +477,47 @@ is as follows:
 Not all of the options are required, but generally a spec object should contain
 at least ``base``, and ``version``.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+External Spack Environment Support:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**NOTE**: Using external Spack environments is an advanced feature.
+
+Some experiments will want to use an externally defined Spack environment
+instead of having Ramble generate its own Spack environment file. This can be
+useful when the Spack environment a user wants to experiment with is
+complicated.
+
+This section shows how this feature can be used.
+
+.. code-block:: yaml
+
+    spack:
+      applications:
+        gromacs:
+          external_spack_env: name_or_path_to_spack_env
+          gromacs:
+            base: gromacs
+
+In the above example, the ``external_spack_env`` keyword refers an external
+Spack environment. This can be the name of a named Spack environment, or the
+path to a directory which contains a Spack environment. Ramble will copy the
+``spack.yaml`` file from this environment, instead of generating its own.
+
+This allows users to describe custom Spack environments and allow them to be
+used with Ramble generated experiments. However, users will still need to
+define some aspects of the ``spack:applications:<app_name>`` dictionary in the
+``ramble.yaml`` file. Specifically, any software specs that are required by the
+application.py file will need to have their ``base`` defined at a minimum.
+Ramble won't use any other information in the spec definition (i.e. ``version``
+or ``variants``), but adding the information to the ``ramble.yaml`` will
+enhance the provenance information that Ramble is able to track.
+
+It is important to note that Ramble copies in the external environment files
+every time ``ramble workspace setup`` is called. The new files will clobber the
+old files, changing the configuration of the environment that Ramble will use
+for the experiments it generates.
+
 --------------------------------------------
 Controlling MPI Libraries and Batch Systems:
 --------------------------------------------

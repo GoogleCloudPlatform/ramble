@@ -178,6 +178,7 @@ def test_env_include(tmpdir, capsys):
         bad_include_path = '/path/to/include/junk.yaml'
         sr.add_include_file(good_include_path)
         sr.add_include_file(bad_include_path)
+        sr.generate_env_file()
         sr.concretize()
 
         with open(os.path.join(env_path, 'spack.yaml'), 'r') as f:
@@ -242,3 +243,100 @@ packages:
                 assert "gcc@12.1.0 is already an available compiler" in captured.out
             except ramble.spack_runner.RunnerError as e:
                 pytest.skip('%s' % e)
+
+
+def test_external_env_copies(tmpdir):
+    src_spack_yaml = """
+spack:
+  specs: [ 'zlib' ]
+"""
+
+    src_spack_lock = """
+{
+  "_meta": {
+    "file-type": "spack-lockfile",
+    "lockfile-version": 4,
+    "specfile-version": 3
+  },
+  "roots": [
+    {
+      "hash": "hdw7vo7aap7mqx34ipo3nkzwshctnbnv",
+      "spec": "zlib"
+    }
+  ],
+  "concrete_specs": {
+    "hdw7vo7aap7mqx34ipo3nkzwshctnbnv": {
+      "name": "zlib",
+      "version": "1.2.13",
+      "arch": {
+        "platform": "test_platform",
+        "platform_os": "test_os",
+        "target": {
+          "name": "test_target",
+          "vendor": "test_vendor",
+          "features": [
+            "adx",
+          ],
+          "generation": 0,
+          "parents": [
+            "broadwell"
+          ]
+        }
+      },
+      "compiler": {
+        "name": "gcc",
+        "version": "12.2.0"
+      },
+      "namespace": "builtin",
+      "parameters": {
+        "build_system": "makefile",
+        "optimize": true,
+        "pic": true,
+        "shared": true,
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "package_hash": "y6ahhnjjjsfh5dx2y7sci7fhthq5aolyl5dgwif57qqbtjxwdwbq====",
+      "hash": "hdw7vo7aap7mqx34ipo3nkzwshctnbnv"
+    }
+  }
+}
+"""
+
+    with tmpdir.as_cwd():
+        with open(os.path.join(os.getcwd(), 'spack.yaml'), 'w+') as f:
+            f.write(src_spack_yaml)
+
+        with open(os.path.join(os.getcwd(), 'spack.lock'), 'w+') as f:
+            f.write(src_spack_lock)
+
+        try:
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            generated_env = os.path.join(os.getcwd(), 'dest_env')
+            sr.create_env(os.path.join(generated_env))
+            sr.activate()
+            sr.copy_from_external_env(os.getcwd())
+
+            assert os.path.exists(os.path.join(generated_env, 'spack.yaml'))
+
+            with open(os.path.join(generated_env, 'spack.yaml'), 'r') as f:
+                assert 'zlib' in f.read()
+        except ramble.spack_runner.RunnerError as e:
+            pytest.skip('%s' % e)
+
+
+def test_invalid_external_env_errors(tmpdir):
+    with tmpdir.as_cwd():
+        try:
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            generated_env = os.path.join(os.getcwd(), 'dest_env')
+            sr.create_env(os.path.join(generated_env))
+            sr.activate()
+            with pytest.raises(ramble.spack_runner.InvalidExternalEnvironment):
+                sr.copy_from_external_env(os.getcwd())
+        except ramble.spack_runner.RunnerError as e:
+            pytest.skip('%s' % e)
