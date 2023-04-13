@@ -27,20 +27,35 @@ class Experiment():
     '''
     Class representation of experiment data
     '''
-    def __init__(self, name, data):
+    def __init__(self, name, data, timestamp):
         self.name = name
         self.foms = []
         self.id = None  # This is essentially the hash
         self.data = data
         self.application_name = data['RAMBLE_VARIABLES']['application_name']
+        self.workspace_name = data['RAMBLE_VARIABLES']['workspace_name']
+        self.workload_name = data['RAMBLE_VARIABLES']['workload_name']
         self.bulk_hash = None  # proxy for workspace or "uploaded with"
         self.n_nodes = data['RAMBLE_VARIABLES']['n_nodes']
         self.processes_per_node = data['RAMBLE_VARIABLES']['processes_per_node']
         self.n_ranks = data['RAMBLE_VARIABLES']['n_ranks']
         self.n_threads = data['RAMBLE_VARIABLES']['n_threads']
-        # 'platform' # TODO: add this
+        # 'platform' # TODO: add this (it is hard to know without runtime data)
 
-        self.id = None  # TODO: find a good way to set this once the object is "finished"
+        # FIXME: this is no longer strictly needed since it is just a concat of known properties
+        exps_hash = "{workspace_name}::{application}::{workload}::{date}".format(
+            workspace_name=self.workspace_name,
+            application=self.application_name,
+            workload=self.workload_name,
+            date=timestamp
+        )
+
+        self.bulk_hash = exps_hash
+
+        self.timestamp = str(timestamp)
+
+        self.id = None
+        self.generate_hash()
 
     def generate_hash(self):
         # Avoid regenerating a hash when possible
@@ -95,9 +110,13 @@ def format_data(data_in):
 
     # TODO: what is the nice way to deal with the distinction between
     # numberic/float and string FOM values
+
+    from datetime import datetime
+    current_dateTime = datetime.now()
+
     for exp in data_in['experiments']:
         if exp['RAMBLE_STATUS'] == 'SUCCESS':
-            e = Experiment(exp['name'], exp)
+            e = Experiment(exp['name'], exp, current_dateTime)
             results.append(e)
             # experiment_id = exp.hash()
             # 'experiment_id': experiment_id,
@@ -129,15 +148,7 @@ class BigQueryUploader(Uploader):
         exps_to_insert = []
         foms_to_insert = []
 
-        from datetime import datetime
-        current_dateTime = datetime.now()
-
-        exps_hash = "{name}::{date}".format(name=workspace_name, date=current_dateTime)
-
         for experiment in results:
-            experiment.generate_hash()
-            experiment.bulk_hash = exps_hash
-
             exps_to_insert.append(experiment.to_json())
 
             for fom in experiment.foms:
