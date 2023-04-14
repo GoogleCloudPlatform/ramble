@@ -439,7 +439,7 @@ def workspace_info(args):
     for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps \
             in ws.all_applications():
         for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
-                workload_tempalte, workload_chained_exps in ws.all_workloads(workloads):
+                workload_template, workload_chained_exps in ws.all_workloads(workloads):
             for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals, exp_template, \
                     exp_chained_exps in ws.all_experiments(experiments):
                 print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
@@ -462,7 +462,10 @@ def workspace_info(args):
 
                 for exp_name, _ in print_experiment_set.all_experiments():
                     app_inst = experiment_set.get_experiment(exp_name)
-                    color.cprint(nested_3('      Experiment: ') + exp_name)
+                    if app_inst.is_template:
+                        color.cprint(nested_3('      Template Experiment: ') + exp_name)
+                    else:
+                        color.cprint(nested_3('      Experiment: ') + exp_name)
 
                     if args.verbose >= 1:
                         config_vars = ramble.config.config.get('config:variables')
@@ -521,6 +524,11 @@ def workspace_info(args):
                             if ramble.workspace.namespace.executables in app_inst.internals:
                                 color.cprint(nested_4('        Executable Order') + ': ' +
                                              str(app_inst.internals['executables']))
+
+                        if app_inst.chain_order:
+                            color.cprint(nested_4('        Experiment Chain') + ':')
+                            for exp in app_inst.chain_order:
+                                color.cprint(nested_4('         - ') + exp)
 
     # Print MPI command
     color.cprint('')

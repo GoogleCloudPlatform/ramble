@@ -331,25 +331,32 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             new_run_dir = os.path.join(self.expander.expand_var('{experiment_run_dir}'),
                                        'chained_experiments', chained_name)
 
-            new_inst = base_inst.copy()
-
-            if 'variables' in chained_exp:
-                for var, val in chained_exp['variables'].items():
-                    new_inst.variables[var] = val
-
-            new_inst.expander._experiment_namespace = new_name
-            new_inst.variables['experiment_run_dir'] = new_run_dir
-            new_inst.variables['experiment_name'] = new_name
-            new_inst.add_expand_vars(workspace)
-            chain_cmd = new_inst.expander.expand_var(chained_exp['command'])
-            chained_exp['command'] = chain_cmd
-            self.experiment_set.add_experiment(new_name, new_inst)
-
             if chained_exp['order'] == 'prepend':
                 self.chain_prepend.append(new_name)
             elif chained_exp['order'] == 'append':
                 self.chain_append.append(new_name)
-            self.chain_commands[new_name] = chain_cmd
+            self.chain_commands[new_name] = chained_exp['command']
+
+            # Skip editing the new instance if the base_inst doesn't work
+            # This happens if the originating command is `workspace info`
+            # The printing experiment set doesn't have access to all
+            # of the experiment, so the base_inst command above
+            # doesn't get an application instance.
+            if base_inst:
+                new_inst = base_inst.copy()
+
+                if 'variables' in chained_exp:
+                    for var, val in chained_exp['variables'].items():
+                        new_inst.variables[var] = val
+
+                new_inst.expander._experiment_namespace = new_name
+                new_inst.variables['experiment_run_dir'] = new_run_dir
+                new_inst.variables['experiment_name'] = new_name
+                new_inst.add_expand_vars(workspace)
+                chain_cmd = new_inst.expander.expand_var(chained_exp['command'])
+                self.chain_commands[new_name] = chain_cmd
+                chained_exp['command'] = chain_cmd
+                self.experiment_set.add_experiment(new_name, new_inst)
 
         for exp in self.chain_prepend:
             self.chain_order.append(exp)
@@ -359,11 +366,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for exp in self.chain_prepend:
             exp_inst = self.experiment_set.get_experiment(exp)
-            exp_inst.chain_order = self.chain_order.copy()
+            if exp_inst:
+                exp_inst.chain_order = self.chain_order.copy()
 
         for exp in self.chain_append:
             exp_inst = self.experiment_set.get_experiment(exp)
-            exp_inst.chain_order = self.chain_order.copy()
+            if exp_inst:
+                exp_inst.chain_order = self.chain_order.copy()
 
     def add_expand_vars(self, workspace):
         """Add application specific expansion variables
