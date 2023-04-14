@@ -1101,3 +1101,95 @@ spack:
         assert os.path.exists(script)
         with open(script, 'r') as f:
             assert r'{zlib}' not in f.read()
+
+
+def test_dryrun_chained_experiments(mutable_config,
+                                    mutable_mock_workspace_path):
+    test_config = r"""
+ramble:
+  mpi:
+    command: mpirun
+    args:
+    - '-n'
+    - '{n_ranks}'
+    - '-ppn'
+    - '{processes_per_node}'
+    - '-hostfile'
+    - 'hostfile'
+  batch:
+    submit: 'batch_submit {execute_experiment}'
+  variables:
+    processes_per_node: '10'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+    n_threads: '1'
+  applications:
+    intel-mpi-benchmarks:
+      template: true
+      workloads:
+        collective:
+          template: true
+          experiments:
+            to_chain:
+              template: true
+              variables:
+                n_ranks: '2'
+    gromacs:
+      chained_experiments:
+      - name: intel-mpi-benchmarks.collective.to_chain
+        command: '{execute_experiment}'
+        order: 'prepend'
+      workloads:
+        water_bare:
+          chained_experiments:
+          - name: intel-mpi-benchmarks.collective.to_chain
+            command: '{execute_experiment}'
+            order: 'prepend'
+          experiments:
+            parent_test:
+              chained_experiments:
+              - name: intel-mpi-benchmarks.collective.to_chain
+                command: '{execute_experiment}'
+                order: 'prepend'
+              variables:
+                n_nodes: '2'
+spack:
+  concretized: true
+  compilers:
+    gcc:
+      base: gcc
+      version: 9.3.0
+      target: x86_64
+  mpi_libraries:
+    impi2018:
+      base: intel-mpi
+      version: 2018.4.274
+  applications:
+    intel-mpi-benchmarks:
+      intel-mpi-benchmarks:
+        base: intel-mpi-benchmarks
+        compiler: gcc
+        mpi: impi2018
+    gromacs:
+      gromacs:
+        base: gromacs
+        compiler: gcc
+        mpi: impi2018
+"""
+
+    workspace_name = 'test_dryrun_chained_experiments'
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws.dry_run = True
+    ws._re_read()
+
+    ws.run_pipeline('setup')
+
+    script = os.path.join(ws.experiment_dir, 'gromacs', 'water_bare',
+                          'parent_test', 'execute_experiment')
+    assert os.path.exists(script)
