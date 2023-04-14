@@ -47,6 +47,8 @@ class ExperimentSet(object):
         self._env_variables = {}
         self._variables = {}
         self._internals = {}
+        self._templates = {}
+        self._chained_experiments = {}
         self._context_names = {}
 
         for context in self._contexts:
@@ -54,6 +56,8 @@ class ExperimentSet(object):
             self._env_variables[context] = None
             self._variables[context] = None
             self._internals[context] = None
+            self._templates[context] = None
+            self._chained_experiments[context] = None
 
         self._variables[self._contexts.base] = {}
         self._variables[self._contexts.required] = {}
@@ -97,6 +101,8 @@ class ExperimentSet(object):
                           site_name,
                           site_vars,
                           site_env_vars,
+                          None,
+                          False,
                           None)
 
     def get_config_vars(self, workspace):
@@ -121,7 +127,8 @@ class ExperimentSet(object):
         """Set a required variable definition"""
         self._variables[self._contexts.required][var] = val
 
-    def _set_context(self, context, name, variables, env_variables, internals):
+    def _set_context(self, context, name, variables, env_variables, internals,
+                     template=None, chained_experiments=None):
         """Abstraction method to set context attributes"""
         if context not in self._contexts:
             raise RambleVariableDefinitionError(
@@ -132,11 +139,15 @@ class ExperimentSet(object):
         self._variables[context] = variables
         self._env_variables[context] = env_variables
         self._internals[context] = internals
+        self._templates[context] = template
+        self._chained_experiments[context] = chained_experiments
 
     def set_application_context(self, application_name,
                                 application_variables,
                                 application_env_variables,
-                                application_internals):
+                                application_internals,
+                                application_template,
+                                application_chained_experiments):
         """Set up current application context"""
 
         try:
@@ -148,12 +159,15 @@ class ExperimentSet(object):
 
         self._set_context(self._contexts.application, application_name,
                           application_variables, application_env_variables,
-                          application_internals)
+                          application_internals, application_template,
+                          application_chained_experiments)
 
     def set_workload_context(self, workload_name,
                              workload_variables,
                              workload_env_variables,
-                             workload_internals):
+                             workload_internals,
+                             workload_template,
+                             workload_chained_experiments):
         """Set up current workload context"""
 
         try:
@@ -166,13 +180,16 @@ class ExperimentSet(object):
 
         self._set_context(self._contexts.workload, workload_name,
                           workload_variables, workload_env_variables,
-                          workload_internals)
+                          workload_internals, workload_template,
+                          workload_chained_experiments)
 
-    def set_experiment_context(self, experiment_template,
+    def set_experiment_context(self, experiment_name_template,
                                experiment_variables,
                                experiment_env_variables,
                                experiment_matrices,
-                               experiment_internals):
+                               experiment_internals,
+                               experiment_template,
+                               experiment_chained_experiments):
         """Set up current experiment context"""
 
         try:
@@ -183,9 +200,10 @@ class ExperimentSet(object):
                 f'In experiment {namespace}: {e}'
             )
 
-        self._set_context(self._contexts.experiment, experiment_template,
+        self._set_context(self._contexts.experiment, experiment_name_template,
                           experiment_variables, experiment_env_variables,
-                          experiment_internals)
+                          experiment_internals, experiment_template,
+                          experiment_chained_experiments)
 
         self._matrices[self._contexts.experiment] = experiment_matrices
         self._ingest_experiments()
@@ -313,6 +331,8 @@ class ExperimentSet(object):
         context_variables = {}
         ordered_env_variables = []
         merged_internals = {}
+        merged_chained_experiments = []
+        is_template = False
 
         internal_sections = [ramble.workspace.namespace.custom_executables,
                              ramble.workspace.namespace.executables]
@@ -339,6 +359,11 @@ class ExperimentSet(object):
                         else:
                             merged_internals[internal_section] = \
                                 self._internals[context][internal_section]
+            if self._chained_experiments[context]:
+                for chained_exp in self._chained_experiments[context]:
+                    merged_chained_experiments.append(chained_exp.copy())
+            if self._templates[context] is not None:
+                is_template = self._templates[context]
 
         for context in self._contexts:
             var_name = f'{context.name}_name'
@@ -509,10 +534,8 @@ class ExperimentSet(object):
 
             experiment_namespace = expander.experiment_namespace
 
-            log_file = expander.expand_var(
-                os.path.join(Expander.expansion_str(self.keywords.experiment_run_dir),
-                             Expander.expansion_str(self.keywords.experiment_name) + '.out'))
-            experiment_vars[self.keywords.log_file] = log_file
+            experiment_vars[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
+                                                                   '{experiment_name}.out')
 
             tty.debug('   Exp vars: %s' % exp)
             tty.debug('   Final name: %s' % final_exp_name)
@@ -532,6 +555,9 @@ class ExperimentSet(object):
             app_inst.set_variables(experiment_vars, self)
             app_inst.set_env_variable_sets(ordered_env_variables)
             app_inst.set_internals(merged_internals)
+            app_inst.set_template(is_template)
+            app_inst.set_chained_experiments(merged_chained_experiments)
+            app_inst.create_experiment_chain(self._workspace)
             app_inst.add_expand_vars(self._workspace)
 
             self.experiments[experiment_namespace] = app_inst
@@ -540,6 +566,12 @@ class ExperimentSet(object):
         """Iteartor over all experiments in this set"""
         for exp, inst in self.experiments.items():
             yield exp, inst
+
+    def add_experiment(self, name, instance):
+        if name in self.experiments.keys():
+            raise RambleExperimentSetError('Cannot add already defined ',
+                                           f'experiment {name} to this experiment set.')
+        self.experiments[name] = instance
 
     def get_experiment(self, experiment):
         if experiment in self.experiments.keys():

@@ -73,6 +73,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.variables = None
         self.experiment_set = None
         self.internals = None
+        self.is_template = False
+        self.chained_experiments = None
+        self.chain_order = []
+        self.chain_prepend = []
+        self.chain_append = []
+        self.chain_commands = {}
         self._env_variable_sets = None
 
         self._file_path = file_path
@@ -86,9 +92,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Deep copy an application instance"""
         new_copy = type(self)(self._file_path)
 
-        new_copy.set_env_variable_sets(self._env_variable_sets)
-        new_copy.set_variables(self.variables, self.experiment_set)
-        new_copy.set_internals(self.internals)
+        new_copy.set_env_variable_sets(self._env_variable_sets.copy())
+        new_copy.set_variables(self.variables.copy(), self.experiment_set)
+        new_copy.set_internals(self.internals.copy())
+        new_copy.set_template(False)
+        new_copy.set_chained_experiments(None)
 
         return new_copy
 
@@ -180,6 +188,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.internals = internals
 
+    def set_template(self, is_template):
+        """Set if this instance is a template or not"""
+        self.is_template = is_template
+
+    def set_chained_experiments(self, chained_experiments):
+        """Set chained experiments for this instance"""
+        self.chained_experiments = None
+        if chained_experiments:
+            self.chained_experiments = chained_experiments.copy()
+
     def get_pipeline_phases(self, pipeline):
         phases = []
         if hasattr(self, '_%s_phases' % pipeline):
@@ -213,6 +231,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     # Phase execution helpers
     def run_phase(self, phase, workspace):
         """Run a phase, by getting its function pointer"""
+        if self.is_template:
+            tty.debug(f'{self.name} is a template. Skipping phases')
+            return
+
         if hasattr(self, '_%s' % phase):
             tty.msg('    Executing phase ' + phase)
             phase_func = getattr(self, '_%s' % phase)
@@ -287,6 +309,62 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         return (env_cmds_arr.split('\n'), var_set_orig)
 
+    def create_experiment_chain(self, workspace):
+        """Create the necessary chained experiments for this instance
+
+        This method determines which experiments need to be chained, grabs the
+        base instance from the experiment set, creates a copy of it (with a
+        unique name), injects the copy back into the experiment set,
+        and builds an internal mapping from unique name to the chaining definition.
+        """
+
+        if not self.chained_experiments:
+            return
+
+        namespace = self.expander.experiment_namespace
+        for chain_idx, chained_exp in enumerate(self.chained_experiments):
+            base_inst = self.experiment_set.get_experiment(chained_exp['name'])
+
+            chained_name = f'{chain_idx}.{chained_exp["name"]}'
+            new_name = f'{namespace}.chain.{chained_name}'
+
+            new_run_dir = os.path.join(self.expander.expand_var('{experiment_run_dir}'),
+                                       'chained_experiments', chained_name)
+
+            new_inst = base_inst.copy()
+
+            if 'variables' in chained_exp:
+                for var, val in chained_exp['variables'].items():
+                    new_inst.variables[var] = val
+
+            new_inst.expander._experiment_namespace = new_name
+            new_inst.variables['experiment_run_dir'] = new_run_dir
+            new_inst.variables['experiment_name'] = new_name
+            new_inst.add_expand_vars(workspace)
+            chain_cmd = new_inst.expander.expand_var(chained_exp['command'])
+            chained_exp['command'] = chain_cmd
+            self.experiment_set.add_experiment(new_name, new_inst)
+
+            if chained_exp['order'] == 'prepend':
+                self.chain_prepend.append(new_name)
+            elif chained_exp['order'] == 'append':
+                self.chain_append.append(new_name)
+            self.chain_commands[new_name] = chain_cmd
+
+        for exp in self.chain_prepend:
+            self.chain_order.append(exp)
+        self.chain_order.append(self.expander.experiment_namespace)
+        for exp in self.chain_append:
+            self.chain_order.append(exp)
+
+        for exp in self.chain_prepend:
+            exp_inst = self.experiment_set.get_experiment(exp)
+            exp_inst.chain_order = self.chain_order.copy()
+
+        for exp in self.chain_append:
+            exp_inst = self.experiment_set.get_experiment(exp)
+            exp_inst.chain_order = self.chain_order.copy()
+
     def add_expand_vars(self, workspace):
         """Add application specific expansion variables
 
@@ -327,6 +405,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     self.variables[var] = conf['default']
 
         command = []
+
+        # Inject all prepended chained experiments
+        for chained_exp in self.chain_prepend:
+            command.append(self.chain_commands[chained_exp])
 
         # ensure all log files are purged and set up
         logs = set()
@@ -386,6 +468,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     raise ApplicationError(app_err)
 
                 del self.variables['executable_name']
+
+        # Inject all appended chained experiments
+        for chained_exp in self.chain_append:
+            command.append(self.chain_commands[chained_exp])
 
         self.variables['command'] = '\n'.join(command)
 
@@ -503,9 +589,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         experiment_script = workspace.experiments_script
         experiment_script.write(self.expander.expand_var('{batch_submit}\n'))
-
-        for template_name, template_val in workspace.all_templates():
-            del self.variables[template_name]
 
     def _archive_experiments(self, workspace):
         """Archive an experiment directory
@@ -647,6 +730,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         success = success and criteria_list.passed()
 
         tty.debug('fom_vals = %s' % fom_values)
+        results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
         if success:
             results['RAMBLE_STATUS'] = 'SUCCESS'
             results['RAMBLE_VARIABLES'] = {}

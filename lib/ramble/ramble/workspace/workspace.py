@@ -67,6 +67,8 @@ class namespace:
     compiler = 'compilers'
     mpi_lib = 'mpi_libraries'
     external_spack_env = 'external_spack_env'
+    template = 'template'
+    chained_experiments = 'chained_experiments'
 
 
 #: Environment variable used to indicate the active workspace
@@ -607,7 +609,7 @@ class Workspace(object):
                                                             config['schema'])
 
     def _read_template(self, name, f):
-        """Read a tempalte file"""
+        """Read a template file"""
         self._templates[name] = f
 
     def _read_auxiliary_software_file(self, name, f):
@@ -814,6 +816,8 @@ class Workspace(object):
                 application_vars = None
                 application_env_vars = None
                 application_internals = None
+                application_template = False
+                application_chained_experiments = None
 
                 if namespace.variables in contents:
                     application_vars = contents[namespace.variables]
@@ -824,10 +828,17 @@ class Workspace(object):
                 if namespace.internals in contents:
                     application_internals = contents[namespace.internals]
 
+                if namespace.template in contents:
+                    application_template = contents[namespace.template]
+
+                if namespace.chained_experiments in contents:
+                    application_chained_experiments = contents[namespace.chained_experiments]
+
                 self.extract_success_criteria('application', contents)
 
                 yield application, contents, application_vars, \
-                    application_env_vars, application_internals
+                    application_env_vars, application_internals, \
+                    application_template, application_chained_experiments
 
         tty.debug('  Iterating over configs in directories...')
         # Iterate over applications defined in application directories
@@ -842,16 +853,29 @@ class Workspace(object):
                 application_vars = None
                 application_env_vars = None
                 application_internals = None
+                application_template = False
+                application_chained_experiments = None
+
                 if namespace.variables in contents:
                     application_vars = \
                         contents[namespace.variables]
+
                 if namespace.env_var in contents:
                     application_env_vars = contents[namespace.env_var]
+
                 if namespace.internals in contents:
                     application_internals = contents[namespace.internals]
+
+                if namespace.template in contents:
+                    application_template = contents[namespace.template]
+
+                if namespace.chained_experiments in contents:
+                    application_chained_experiments = contents[namespace.chained_experiments]
+
                 self.extract_success_criteria('application', contents)
                 yield application, contents, application_vars, \
-                    application_env_vars, application_internals
+                    application_env_vars, application_internals, \
+                    application_template, application_chained_experiments
 
     def all_workloads(self, application):
         """Iterator over workloads in an application dict
@@ -871,16 +895,23 @@ class Workspace(object):
             workload_variables = None
             workload_env_vars = None
             workload_internals = None
+            workload_template = False
+            workload_chained_experiments = None
             if namespace.variables in contents:
                 workload_variables = contents[namespace.variables]
             if namespace.env_var in contents:
                 workload_env_vars = contents[namespace.env_var]
             if namespace.internals in contents:
                 workload_internals = contents[namespace.internals]
+            if namespace.template in contents:
+                workload_template = contents[namespace.template]
+            if namespace.chained_experiments in contents:
+                workload_chained_experiments = contents[namespace.chained_experiments]
             self.extract_success_criteria('workload', contents)
 
             yield workload, contents, workload_variables, \
-                workload_env_vars, workload_internals
+                workload_env_vars, workload_internals, \
+                workload_template, workload_chained_experiments
 
     def all_experiments(self, workload):
         """Iterator over experiments in a workload dict
@@ -900,6 +931,8 @@ class Workspace(object):
             experiment_vars = syaml.syaml_dict()
             experiment_env_vars = None
             experiment_internals = None
+            experiment_template = False
+            experiment_chained_experiments = None
 
             if namespace.variables in contents:
                 experiment_vars = contents[namespace.variables]
@@ -909,6 +942,12 @@ class Workspace(object):
 
             if namespace.internals in contents:
                 experiment_internals = contents[namespace.internals]
+
+            if namespace.template in contents:
+                experiment_template = contents[namespace.template]
+
+            if namespace.chained_experiments in contents:
+                experiment_chained_experiments = contents[namespace.chained_experiments]
 
             self.extract_success_criteria('experiment', contents)
 
@@ -931,7 +970,8 @@ class Workspace(object):
                         matrices.append(matrix)
 
             yield experiment, contents, experiment_vars, \
-                experiment_env_vars, matrices, experiment_internals
+                experiment_env_vars, matrices, experiment_internals, \
+                experiment_template, experiment_chained_experiments
 
     def _build_spec_dict(self, info_dict, app_name=None, for_config=False):
         spec = {}
@@ -1323,21 +1363,26 @@ class Workspace(object):
 
             experiment_set.set_base_var('experiments_file', all_experiments_file)
 
-        for app, workloads, app_vars, app_env_vars, app_ints in self.all_applications():
-            experiment_set.set_application_context(app, app_vars, app_env_vars, app_ints)
+        for app, workloads, app_vars, app_env_vars, app_ints, app_template, \
+                app_chained_exps in self.all_applications():
+            experiment_set.set_application_context(app, app_vars, app_env_vars, app_ints,
+                                                   app_template, app_chained_exps)
 
-            for workload, experiments, workload_vars, workload_env_vars, workload_ints in \
-                    self.all_workloads(workloads):
+            for workload, experiments, workload_vars, workload_env_vars, workload_ints, \
+                    workload_template, workload_chained_exps in self.all_workloads(workloads):
                 experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars, workload_ints)
+                                                    workload_env_vars, workload_ints,
+                                                    workload_template, workload_chained_exps)
 
-                for experiment, _, exp_vars, exp_env_vars, exp_matrices, exp_ints in \
-                        self.all_experiments(experiments):
+                for experiment, _, exp_vars, exp_env_vars, exp_matrices, exp_ints, \
+                        exp_template, exp_chained_exps in self.all_experiments(experiments):
                     experiment_set.set_experiment_context(experiment,
                                                           exp_vars,
                                                           exp_env_vars,
                                                           exp_matrices,
-                                                          exp_ints)
+                                                          exp_ints,
+                                                          exp_template,
+                                                          exp_chained_exps)
 
         for exp, app_inst in experiment_set.all_experiments():
             tty.debug('On experiment: %s' % exp)
