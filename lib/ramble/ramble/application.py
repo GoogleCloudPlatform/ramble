@@ -82,6 +82,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._verbosity = 'short'
         self._inject_required_builtins()
 
+    def copy(self):
+        """Deep copy an application instance"""
+        new_copy = type(self)(self._file_path)
+
+        new_copy.set_env_variable_sets(self._env_variable_sets)
+        new_copy.set_variables(self.variables, self.experiment_set)
+        new_copy.set_internals(self.internals)
+
+        return new_copy
+
     def _inject_required_builtins(self):
         required_builtins = []
         for builtin, blt_conf in self.builtins.items():

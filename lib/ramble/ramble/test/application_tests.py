@@ -166,6 +166,104 @@ def test_env_var_unset_command_gen(mutable_mock_repo):
         assert cmd in out_cmds
 
 
+@pytest.mark.parametrize('app_name', ['basic', 'zlib'])
+def test_application_copy_is_deep(mutable_mock_repo, app_name):
+    src_inst = mutable_mock_repo.get(app_name)
+
+    defined_variables = {
+        'test_var1': 'test_val1',
+        'test_var2': 'test_val2'
+    }
+
+    defined_env_vars = {
+        'set': {
+            'SET_ENV_VAR': 'TEST'
+        },
+        'unset': [
+            'UNSET_ENV_VAR'
+        ],
+        'append': [
+            {
+                'var-separator': ',',
+                'vars': {
+                    'APPEND_VAR': 'APPEND_TEST'
+                }
+            }
+        ],
+        'prepend': [
+            {
+                'var-separator': ',',
+                'vars': {
+                    'PREPEND_VAR': 'PREPEND_TEST'
+                }
+            }
+        ]
+    }
+
+    defined_internals = {
+        'custom_executables': {
+            'test_exec': {
+                'templates': [
+                    'test_exec'
+                ],
+                'use_mpi': False,
+                'redirect': '{log_file}'
+            }
+        }
+    }
+
+    src_inst.set_variables(defined_variables, None)
+    src_inst.set_env_variable_sets(defined_env_vars)
+    src_inst.set_internals(defined_internals)
+
+    copy_inst = src_inst.copy()
+
+    test_attrs = ['_setup_phases', '_analyze_phases', '_archive_phases',
+                  '_mirror_phases']
+
+    # Test Phases
+    for attr in test_attrs:
+        assert getattr(copy_inst, attr) == getattr(src_inst, attr)
+
+    # Test variables
+    for var, val in src_inst.variables.items():
+        assert var in copy_inst.variables.keys()
+        assert copy_inst.variables[var] == val
+
+    # Test env-vars
+    for var_set in src_inst._env_variable_sets.keys():
+        assert var_set in copy_inst._env_variable_sets.keys()
+        # Test set sets
+        if var_set == 'set':
+            for var, val in src_inst._env_variable_sets[var_set].items():
+                assert var in copy_inst._env_variable_sets[var_set]
+                assert copy_inst._env_variable_sets[var_set][var] == val
+        elif var_set == 'append' or var_set == 'prepend':
+            for idx, set_group in enumerate(src_inst._env_variable_sets[var_set]):
+                if 'var-separator' in set_group:
+                    assert 'var-separator' in copy_inst._env_variable_sets[var_set][idx]
+                    assert copy_inst._env_variable_sets[var_set][idx]['var-separator'] == \
+                           set_group['var-separator']
+                if 'vars' in set_group:
+                    assert 'vars' in copy_inst._env_variable_sets[var_set][idx]
+                    for var, val in set_group['vars'].items():
+                        assert var in copy_inst._env_variable_sets[var_set][idx]['vars']
+                        assert copy_inst._env_variable_sets[var_set][idx]['vars'][var] == val
+        elif var_set == 'unset':
+            for var in src_inst._env_variable_sets[var_set]:
+                assert var in copy_inst._env_variable_sets[var_set]
+
+    # Test internals:
+    for internal, conf in src_inst.internals.items():
+        assert internal in copy_inst.internals
+        if internal == 'custom_executables':
+            for exec_name, exec_conf in conf.items():
+                assert exec_name in copy_inst.internals[internal]
+                for option, value in exec_conf.items():
+                    assert option in copy_inst.internals[internal][exec_name]
+                    assert copy_inst.internals[internal][exec_name][option] == value
+
+
 @pytest.mark.parametrize('app', [
     'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
     'register-builtin'
