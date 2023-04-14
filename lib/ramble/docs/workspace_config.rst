@@ -275,6 +275,116 @@ In the above example, ``test_value`` extracts the value of ``real_value`` as
 defined in the experiment ``hostname.serial.test_exp1``. When evaluated, this
 will set ``test_value`` to ``'exp1_value'``.
 
+^^^^^^^^^^^^^^^^^^
+Experiment Chains:
+^^^^^^^^^^^^^^^^^^
+Experiments can be chained together, to allow multiple experiments to be
+executed within the same context. This can be useful for executing multiple
+experiments on the same set of hardware.
+
+There are two important parts for defining an experiment chain. The first of
+these is simply defining the experiment chain, and the second is suppressing
+generation of template experiments.
+
+The following example shows how to specify a chain of experiments:
+
+.. code-block:: yaml
+
+    ramble:
+      ...
+      variables:
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                test_exp1:
+                  variables:
+                    n_ranks: '1'
+                    real_value: 'exp1_value'
+                test_exp2:
+                  variables:
+                    n_ranks: '1'
+                    test_value: real_value in hostname.serial.test_exp1
+                  chained_experiments:
+                  - name: hostname.serial.test_exp1
+                    command: '{execute_experiment}'
+                    order: 'append'
+                    variables:
+                      n_ranks: '2'
+
+In the above example, the ``hostname.serial.test_exp2`` experiment defines an
+experiment chain. The chain is defined by mergining the ``chained_experiments``
+dictionaries and inserting itself at the appropriate location.
+
+Experiments can be defined with in the ``chained_experiments`` dictionary using
+the following format:
+
+.. code-block:: yaml
+
+   chained_experiments: # List of experiments to chain
+   - name: Fully qualified experiment namespace
+     command: Command that executes the sub experiment
+     order: Order to chain this experiment. Can be append, or prepend
+     variables: Variables dictionary to override the variables from the
+                original experiment
+
+Each chained experiment receives its own unique namespace. These take the form of:
+``<parent_experiment_namespace>.chain.<chain_index>.<chained_experiment_namespace>``
+
+In the above example, the chained experiment would have a namespace of:
+``hostname.serial.test_exp2.chain.0.hostname.serial.test_exp1``
+
+The ``name`` attribute can use `globbing
+syntax<https://docs.python.org/3/library/fnmatch.html#module-fnmatch>` to chain
+multiple experiments at once.
+
+The below example shows how to suppress generation of an experiment, by marking
+it as a template.
+
+.. code-block:: yaml
+
+    ramble:
+      ...
+      variables:
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                test_exp1:
+                  template: true
+                  variables:
+                    n_ranks: '1'
+                    real_value: 'exp1_value'
+                test_exp2:
+                  variables:
+                    n_ranks: '1'
+                    test_value: real_value in hostname.serial.test_exp1
+                  chained_experiments:
+                  - name: hostname.serial.test_exp1
+                    command: '{execute_experiment}'
+                    order: 'append'
+                    variables:
+                      n_ranks: '2'
+
+In the above example, the ``template`` keyword is used to mark
+``hostname.serial.test_exp1`` as a template experiment. This prevents it from
+being used as a stand-alone experiment, but it will still be generated and used
+when it's chained into other experiments.
+
 ^^^^^^^^^^^^^^^^^^^^^^
 Controlling Internals:
 ^^^^^^^^^^^^^^^^^^^^^^
