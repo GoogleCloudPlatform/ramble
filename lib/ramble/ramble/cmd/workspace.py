@@ -432,6 +432,7 @@ def workspace_info(args):
                                                       exp_internals,
                                                       exp_template,
                                                       exp_chained_exps)
+    experiment_set.finalize_set()
 
     # Print experiment information
     color.cprint('')
@@ -456,6 +457,8 @@ def workspace_info(args):
                                                             exp_internals,
                                                             exp_template,
                                                             exp_chained_exps)
+
+                print_experiment_set.finalize_set()
 
                 color.cprint(nested_1('  Application: ') + app)
                 color.cprint(nested_2('    Workload: ') + workload)

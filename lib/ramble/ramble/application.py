@@ -322,41 +322,45 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             return
 
         namespace = self.expander.experiment_namespace
-        for chain_idx, chained_exp in enumerate(self.chained_experiments):
-            base_inst = self.experiment_set.get_experiment(chained_exp['name'])
+        chain_idx = 0
+        for chained_exp in self.chained_experiments:
+            for chain_exp_name in self.experiment_set.search_experiments(chained_exp['name']):
+                base_inst = self.experiment_set.get_experiment(chain_exp_name)
 
-            chained_name = f'{chain_idx}.{chained_exp["name"]}'
-            new_name = f'{namespace}.chain.{chained_name}'
+                chained_name = f'{chain_idx}.{chain_exp_name}'
+                new_name = f'{namespace}.chain.{chained_name}'
 
-            new_run_dir = os.path.join(self.expander.expand_var('{experiment_run_dir}'),
-                                       'chained_experiments', chained_name)
+                new_run_dir = os.path.join(self.expander.expand_var('{experiment_run_dir}'),
+                                           'chained_experiments', chained_name)
 
-            if chained_exp['order'] == 'prepend':
-                self.chain_prepend.append(new_name)
-            elif chained_exp['order'] == 'append':
-                self.chain_append.append(new_name)
-            self.chain_commands[new_name] = chained_exp['command']
+                if chained_exp['order'] == 'prepend':
+                    self.chain_prepend.append(new_name)
+                elif chained_exp['order'] == 'append':
+                    self.chain_append.append(new_name)
+                self.chain_commands[new_name] = chained_exp['command']
 
-            # Skip editing the new instance if the base_inst doesn't work
-            # This happens if the originating command is `workspace info`
-            # The printing experiment set doesn't have access to all
-            # of the experiment, so the base_inst command above
-            # doesn't get an application instance.
-            if base_inst:
-                new_inst = base_inst.copy()
+                # Skip editing the new instance if the base_inst doesn't work
+                # This happens if the originating command is `workspace info`
+                # The printing experiment set doesn't have access to all
+                # of the experiment, so the base_inst command above
+                # doesn't get an application instance.
+                if base_inst:
+                    new_inst = base_inst.copy()
 
-                if 'variables' in chained_exp:
-                    for var, val in chained_exp['variables'].items():
-                        new_inst.variables[var] = val
+                    if 'variables' in chained_exp:
+                        for var, val in chained_exp['variables'].items():
+                            new_inst.variables[var] = val
 
-                new_inst.expander._experiment_namespace = new_name
-                new_inst.variables['experiment_run_dir'] = new_run_dir
-                new_inst.variables['experiment_name'] = new_name
-                new_inst.add_expand_vars(workspace)
-                chain_cmd = new_inst.expander.expand_var(chained_exp['command'])
-                self.chain_commands[new_name] = chain_cmd
-                chained_exp['command'] = chain_cmd
-                self.experiment_set.add_experiment(new_name, new_inst)
+                    new_inst.expander._experiment_namespace = new_name
+                    new_inst.variables['experiment_run_dir'] = new_run_dir
+                    new_inst.variables['experiment_name'] = new_name
+                    new_inst.add_expand_vars(workspace)
+                    chain_cmd = new_inst.expander.expand_var(chained_exp['command'])
+                    self.chain_commands[new_name] = chain_cmd
+                    chained_exp['command'] = chain_cmd
+                    self.experiment_set.add_experiment(new_name, new_inst)
+
+                chain_idx += 1
 
         for exp in self.chain_prepend:
             self.chain_order.append(exp)

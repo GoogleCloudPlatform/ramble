@@ -1139,13 +1139,13 @@ ramble:
                 n_ranks: '2'
     gromacs:
       chained_experiments:
-      - name: intel-mpi-benchmarks.collective.to_chain
+      - name: intel-mpi-benchmarks.collective.*
         command: '{execute_experiment}'
         order: 'append'
       workloads:
         water_bare:
           chained_experiments:
-          - name: intel-mpi-benchmarks.collective.to_chain
+          - name: intel-mpi-benchmarks.*.to_chain
             command: '{execute_experiment}'
             order: 'prepend'
             variables:

@@ -10,6 +10,7 @@ from enum import Enum
 import os
 import itertools
 import math
+import fnmatch
 
 import llnl.util.tty as tty
 
@@ -42,6 +43,7 @@ class ExperimentSet(object):
     def __init__(self, workspace):
         """Create experiment set class"""
         self.experiments = {}
+        self.experiment_order = []
         self._workspace = workspace
 
         self._env_variables = {}
@@ -557,10 +559,16 @@ class ExperimentSet(object):
             app_inst.set_internals(merged_internals)
             app_inst.set_template(is_template)
             app_inst.set_chained_experiments(merged_chained_experiments)
-            app_inst.create_experiment_chain(self._workspace)
-            app_inst.add_expand_vars(self._workspace)
-
             self.experiments[experiment_namespace] = app_inst
+            self.experiment_order.append(experiment_namespace)
+
+    def finalize_set(self):
+        base_experiments = self.experiment_order.copy()
+
+        for experiment in base_experiments:
+            instance = self.experiments[experiment]
+            instance.create_experiment_chain(self._workspace)
+            instance.add_expand_vars(self._workspace)
 
     def all_experiments(self):
         """Iteartor over all experiments in this set"""
@@ -569,9 +577,13 @@ class ExperimentSet(object):
 
     def add_experiment(self, name, instance):
         if name in self.experiments.keys():
-            raise RambleExperimentSetError('Cannot add already defined ',
+            raise RambleExperimentSetError('Cannot add already defined ' +
                                            f'experiment {name} to this experiment set.')
         self.experiments[name] = instance
+        self.experiment_order.append(name)
+
+    def search_experiments(self, pattern):
+        return fnmatch.filter(self.experiment_order, pattern)
 
     def get_experiment(self, experiment):
         if experiment in self.experiments.keys():
