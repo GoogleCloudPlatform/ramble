@@ -30,6 +30,7 @@ import ramble.mirror
 import ramble.fetch_strategy
 import ramble.expander
 
+from ramble.keywords import keywords
 from ramble.workspace import namespace
 
 from ramble.language.application_language import ApplicationMeta, register_builtin
@@ -318,26 +319,84 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         and builds an internal mapping from unique name to the chaining definition.
         """
 
-        if not self.chained_experiments:
+        if not self.chained_experiments or self.is_template:
             return
 
-        namespace = self.expander.experiment_namespace
+        # Build initial stack. Uses a reversal of the current instance's
+        # chained experiments
+        parent_namespace = self.expander.experiment_namespace
+        classes_in_stack = set([self])
         chain_idx = 0
-        for chained_exp in self.chained_experiments:
-            for chain_exp_name in self.experiment_set.search_experiments(chained_exp['name']):
-                base_inst = self.experiment_set.get_experiment(chain_exp_name)
+        chain_stack = []
+        for exp in reversed(self.chained_experiments):
+            for exp_name in self.experiment_set.search_primary_experiments(exp['name']):
+                child_inst = self.experiment_set.get_experiment(exp_name)
 
-                chained_name = f'{chain_idx}.{chain_exp_name}'
-                new_name = f'{namespace}.chain.{chained_name}'
+                if child_inst in classes_in_stack:
+                    raise ChainCycleDetectedError('Cycle detected in experiment chain:\n' +
+                                                  f'    Primary experiment {parent_namespace}\n' +
+                                                  f'    Chained expeirment name: {exp_name}\n' +
+                                                  f'    Chain definition: {str(exp)}')
+                chain_stack.append((exp_name, exp))
 
-                new_run_dir = os.path.join(self.expander.expand_var('{experiment_run_dir}'),
-                                           'chained_experiments', chained_name)
+        parent_run_dir = self.expander.expand_var(
+            self.expander.expansion_str(keywords.experiment_run_dir)
+        )
 
-                if chained_exp['order'] == 'prepend':
+        # Continue until the stack is empty
+        while len(chain_stack) > 0:
+            cur_exp_name = chain_stack[-1][0]
+            cur_exp_def = chain_stack[-1][1]
+
+            # Perform basic validation on the chained experiment definition
+            if 'name' not in cur_exp_def:
+                raise InvalidChainError('Invalid experiment chain defined:\n' +
+                                        f'    Primary experiment {parent_namespace}\n' +
+                                        f'    Chain definition: {str(exp)}\n' +
+                                        '    "name" keyword must be defined')
+
+            if 'order' in cur_exp_def:
+                if cur_exp_def['order'] not in ['append', 'prepend']:
+                    raise InvalidChainError('Invalid experiment chain defined:\n' +
+                                            f'    Primary experiment {parent_namespace}\n' +
+                                            f'    Chain definition: {str(exp)}\n' +
+                                            '    Optional keyword "order" must ' +
+                                            'be "append" or "prepend"\n')
+
+            if 'command' not in cur_exp_def.keys():
+                raise InvalidChainError('Invalid experiment chain defined:\n' +
+                                        f'    Primary experiment {parent_namespace}\n' +
+                                        f'    Chain definition: {str(exp)}\n' +
+                                        '    "command" keyword must be defined')
+
+            if 'variables' in cur_exp_def:
+                if not isinstance(cur_exp_def['variables'], dict):
+                    raise InvalidChainError('Invalid experiment chain defined:\n' +
+                                            f'    Primary experiment {parent_namespace}\n' +
+                                            f'    Chain definition: {str(exp)}\n' +
+                                            '    Optional keyword "variables" ' +
+                                            'must be a dictionary')
+
+            base_inst = self.experiment_set.get_experiment(cur_exp_name)
+            if base_inst in classes_in_stack:
+                chain_stack.pop()
+                classes_in_stack.remove(base_inst)
+
+                order = 'append'
+                if 'order' in cur_exp_def:
+                    order = cur_exp_def['order']
+
+                chained_name = f'{chain_idx}.{cur_exp_name}'
+                new_name = f'{parent_namespace}.chain.{chained_name}'
+
+                new_run_dir = os.path.join(parent_run_dir,
+                                           namespace.chained_experiments, chained_name)
+
+                if order == 'prepend':
                     self.chain_prepend.append(new_name)
-                elif chained_exp['order'] == 'append':
-                    self.chain_append.append(new_name)
-                self.chain_commands[new_name] = chained_exp['command']
+                elif order == 'append':
+                    self.chain_append.insert(0, new_name)
+                self.chain_commands[new_name] = cur_exp_def[keywords.command]
 
                 # Skip editing the new instance if the base_inst doesn't work
                 # This happens if the originating command is `workspace info`
@@ -347,27 +406,51 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 if base_inst:
                     new_inst = base_inst.copy()
 
-                    if 'variables' in chained_exp:
-                        for var, val in chained_exp['variables'].items():
+                    if namespace.variables in cur_exp_def:
+                        for var, val in cur_exp_def[namespace.variables].items():
                             new_inst.variables[var] = val
 
                     new_inst.expander._experiment_namespace = new_name
-                    new_inst.variables['experiment_run_dir'] = new_run_dir
-                    new_inst.variables['experiment_name'] = new_name
+                    new_inst.variables[keywords.experiment_run_dir] = new_run_dir
+                    new_inst.variables[keywords.experiment_name] = new_name
                     new_inst.add_expand_vars(workspace)
-                    chain_cmd = new_inst.expander.expand_var(chained_exp['command'])
+                    chain_cmd = new_inst.expander.expand_var(cur_exp_def[keywords.command])
                     self.chain_commands[new_name] = chain_cmd
-                    chained_exp['command'] = chain_cmd
-                    self.experiment_set.add_experiment(new_name, new_inst)
+                    cur_exp_def[keywords.command] = chain_cmd
+                    self.experiment_set.add_chained_experiment(new_name, new_inst)
 
                 chain_idx += 1
+            else:
+                # Avoid cycles, from children
+                if base_inst in classes_in_stack:
+                    chain_stack.pop()
+                else:
+                    if base_inst.chained_experiments:
+                        for exp in reversed(base_inst.chained_experiments):
+                            for exp_name in \
+                                    self.experiment_set.search_primary_experiments(exp['name']):
+                                child_inst = self.experiment_set.get_experiment(exp_name)
+                                if child_inst in classes_in_stack:
+                                    raise ChainCycleDetectedError('Cycle detected in ' +
+                                                                  'experiment chain:\n' +
+                                                                  '    Primary experiment ' +
+                                                                  f'{parent_namespace}\n' +
+                                                                  '    Chained expeirment name: ' +
+                                                                  f'{cur_exp_name}\n' +
+                                                                  '    Chain definition: ' +
+                                                                  f'{str(cur_exp_def)}')
 
+                                chain_stack.append((exp_name, exp))
+                    classes_in_stack.add(base_inst)
+
+        # Create the final chain order
         for exp in self.chain_prepend:
             self.chain_order.append(exp)
         self.chain_order.append(self.expander.experiment_namespace)
         for exp in self.chain_append:
             self.chain_order.append(exp)
 
+        # Inject the chain order into the children experiments
         for exp in self.chain_prepend:
             exp_inst = self.experiment_set.get_experiment(exp)
             if exp_inst:
@@ -897,4 +980,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 class ApplicationError(RambleError):
     """
     Exception that is raised by applications
+    """
+
+
+class ChainCycleDetectedError(ApplicationError):
+    """
+    Exception raised when a cycle is detected in a defined experiment chain
+    """
+
+
+class InvalidChainError(ApplicationError):
+    """
+    Exception raised when a invalid chained experiment is defined
     """

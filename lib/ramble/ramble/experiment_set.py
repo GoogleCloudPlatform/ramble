@@ -44,6 +44,8 @@ class ExperimentSet(object):
         """Create experiment set class"""
         self.experiments = {}
         self.experiment_order = []
+        self.chained_experiments = {}
+        self.chained_order = []
         self._workspace = workspace
 
         self._env_variables = {}
@@ -575,19 +577,28 @@ class ExperimentSet(object):
         for exp, inst in self.experiments.items():
             yield exp, inst
 
-    def add_experiment(self, name, instance):
-        if name in self.experiments.keys():
-            raise RambleExperimentSetError('Cannot add already defined ' +
-                                           f'experiment {name} to this experiment set.')
-        self.experiments[name] = instance
-        self.experiment_order.append(name)
+        for exp, inst in self.chained_experiments.items():
+            yield exp, inst
 
-    def search_experiments(self, pattern):
+    def add_chained_experiment(self, name, instance):
+        if name in self.chained_experiments.keys():
+            raise RambleExperimentSetError('Cannot add already defined chained ' +
+                                           f'experiment {name} to this experiment set.')
+        self.chained_experiments[name] = instance
+        self.chained_order.append(name)
+
+    def search_primary_experiments(self, pattern):
+        """Search primary experiments using a glob syntax.
+
+        NOTE: This does not search experiments defined in an experiment chain
+        """
         return fnmatch.filter(self.experiment_order, pattern)
 
     def get_experiment(self, experiment):
         if experiment in self.experiments.keys():
             return self.experiments[experiment]
+        if experiment in self.chained_experiments.keys():
+            return self.chained_experiments[experiment]
         return None
 
     def get_var_from_experiment(self, experiment, variable):

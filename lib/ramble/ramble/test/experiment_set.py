@@ -11,6 +11,7 @@ import pytest
 
 import ramble.workspace
 import ramble.experiment_set
+from ramble.application import ChainCycleDetectedError, InvalidChainError
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures('mutable_config',
@@ -52,6 +53,7 @@ def test_single_experiment_in_set(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
 
@@ -87,6 +89,7 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
@@ -159,6 +162,7 @@ def test_zipped_vector_experiments(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_16_4' in exp_set.experiments.keys()
@@ -199,6 +203,7 @@ def test_matrix_experiments(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
@@ -239,6 +244,7 @@ def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
@@ -283,6 +289,7 @@ def test_matrix_vector_experiments(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
@@ -326,6 +333,7 @@ def test_multi_matrix_experiments(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
@@ -410,6 +418,7 @@ def test_experiment_names_match(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
@@ -459,6 +468,7 @@ def test_cross_experiment_variable_references(mutable_mock_workspace_path):
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None, None, None)
         exp_set.set_experiment_context(exp2_name, exp2_vars, None, None, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series2_4' in exp_set.experiments.keys()
@@ -499,6 +509,7 @@ def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path)
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
 
@@ -544,6 +555,7 @@ def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
@@ -583,6 +595,7 @@ def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, exp_matrices, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6_3' in exp_set.experiments.keys()
@@ -620,6 +633,7 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp_name, exp_vars, None, None, None, None, None)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_6_2' in exp_set.experiments.keys()
@@ -820,19 +834,20 @@ def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_pat
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None, None, None)
         exp_set.set_experiment_context(exp2_name, exp2_vars, None, None, None, None, exp2_chains)
+        exp_set.finalize_set()
 
         assert 'basic.test_wl.series2_4' in \
             exp_set.experiments
         assert 'basic.test_wl.series2_4.chain.0.basic.test_wl.test1' in \
-            exp_set.experiments
+            exp_set.chained_experiments
         assert 'basic.test_wl.series2_4.chain.1.basic.test_wl.test1' in \
-            exp_set.experiments
+            exp_set.chained_experiments
         assert 'basic.test_wl.series2_6' in \
             exp_set.experiments
         assert 'basic.test_wl.series2_6.chain.0.basic.test_wl.test1' in \
-            exp_set.experiments
+            exp_set.chained_experiments
         assert 'basic.test_wl.series2_6.chain.1.basic.test_wl.test1' in \
-            exp_set.experiments
+            exp_set.chained_experiments
         assert 'basic.test_wl.test1' in exp_set.experiments
 
 
@@ -879,12 +894,13 @@ def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path, c
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None, None, None)
         exp_set.set_experiment_context(exp2_name, exp2_vars, None, None, None, None, exp2_chains)
+        exp_set.finalize_set()
 
         parent_name = 'basic.test_wl.series2_4'
         chained_name = 'basic.test_wl.series2_4.chain.0.basic.test_wl.test1'
         chained_dir = '0.basic.test_wl.test1'
         assert parent_name in exp_set.experiments
-        assert chained_name in exp_set.experiments
+        assert chained_name in exp_set.chained_experiments
 
         parent_inst = exp_set.get_experiment(parent_name)
         chained_inst = exp_set.get_experiment(chained_name)
@@ -892,3 +908,101 @@ def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path, c
         parent_run_dir = parent_inst.expander.expand_var('{experiment_run_dir}')
         expected_dir = os.path.join(parent_run_dir, 'chained_experiments', chained_dir)
         assert chained_inst.variables['experiment_run_dir'] == expected_dir
+
+
+def test_chained_cycle_errors(mutable_mock_workspace_path, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'processes_per_node': '1',
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+        exp1_name = 'test1'
+        exp1_vars = {
+            'n_ranks': '2'
+        }
+        exp2_name = 'series2_{n_ranks}'
+        exp2_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_ranks': '4'
+        }
+        exp2_chains = [
+            {
+                'name': 'basic.test_wl.series2_4',
+                'order': 'prepend',
+                'command': '{execute_experiment}',
+                'variables': {}
+            },
+        ]
+
+        exp_set.set_application_context(app_name, app_vars, None, None, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
+        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None, None, None)
+        exp_set.set_experiment_context(exp2_name, exp2_vars, None, None, None, None, exp2_chains)
+        with pytest.raises(ChainCycleDetectedError):
+            exp_set.finalize_set()
+            captured = capsys.readouterr
+            assert "Cycle detected in experiment chain" in captured
+
+
+def test_chained_invalid_order_errors(mutable_mock_workspace_path, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'processes_per_node': '1',
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+        exp1_name = 'test1'
+        exp1_vars = {
+            'n_ranks': '2'
+        }
+        exp2_name = 'series2_{n_ranks}'
+        exp2_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_ranks': '4'
+        }
+        exp2_chains = [
+            {
+                'name': 'basic.test_wl.test1',
+                'order': 'foo',
+                'command': '{execute_experiment}',
+                'variables': {}
+            },
+        ]
+
+        exp_set.set_application_context(app_name, app_vars, None, None, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
+        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None, None, None)
+        exp_set.set_experiment_context(exp2_name, exp2_vars, None, None, None, None, exp2_chains)
+        with pytest.raises(InvalidChainError):
+            exp_set.finalize_set()
+            captured = capsys.readouterr
+            assert "Invalid experiment chain defined:" in captured
