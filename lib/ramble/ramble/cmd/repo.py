@@ -40,6 +40,15 @@ def setup_parser(subparser):
     create_parser.add_argument(
         'namespace', help="namespace to identify applications in the repository. "
         "defaults to the directory name", nargs='?')
+    create_parser.add_argument(
+        '-d', '--subdirectory',
+        action='store',
+        default=ramble.repository.APPLICATIONS_DIR_NAME,
+        help=(
+            "subdirectory to store applications in the repository."
+            "Default 'applications'. Use an empty string for no subdirectory."
+        ),
+    )
 
     # List
     list_parser = sp.add_parser('list', help=repo_list.__doc__)
@@ -72,7 +81,7 @@ def setup_parser(subparser):
 def repo_create(args):
     """Create a new application repository."""
     full_path, namespace = ramble.repository.create_repo(
-        args.directory, args.namespace
+        args.directory, args.namespace, args.subdirectory
     )
     tty.msg("Created repo with namespace '%s'." % namespace)
     tty.msg("To register it with ramble, run this command:",

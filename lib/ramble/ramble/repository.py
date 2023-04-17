@@ -52,11 +52,11 @@ def get_full_namespace(namespace):
 
 
 # Top-level filename for repo config.
-repo_config_name = 'repo.yaml'
+REPO_CONFIG_NAME = 'repo.yaml'
 # Top-level repo directory containing applcations
-applications_dir_name = 'applications'
+APPLICATIONS_DIR_NAME = 'applications'
 # Filename for applications in a repo.
-application_file_name = 'application.py'
+APPLICATION_FILE_NAME = 'application.py'
 
 #: Guaranteed unused default value for some functions.
 NOT_PROVIDED = object()
@@ -170,7 +170,7 @@ class FastApplicationChecker(Mapping):
 
             # Construct the file name from the directory
             app_file = os.path.join(
-                self.applications_path, app_name, application_file_name
+                self.applications_path, app_name, APPLICATION_FILE_NAME
             )
 
             # Use stat here to avoid lots of calls to the filesystem.
@@ -680,25 +680,27 @@ class Repo(object):
                 raise BadRepoError(msg)
 
         # Validate repository layout.
-        self.config_file = os.path.join(self.root, repo_config_name)
+        self.config_file = os.path.join(self.root, REPO_CONFIG_NAME)
         check(os.path.isfile(self.config_file),
-              "No %s found in '%s'" % (repo_config_name, root))
-
-        self.applications_path = os.path.join(self.root, applications_dir_name)
-        check(os.path.isdir(self.applications_path),
-              "No directory '%s' found in '%s'" % (applications_dir_name,
-                                                   root))
+              "No %s found in '%s'" % (REPO_CONFIG_NAME, root))
 
         # Read configuration and validate namespace
         config = self._read_config()
         check('namespace' in config, '%s must define a namespace.'
-              % os.path.join(root, repo_config_name))
+              % os.path.join(root, REPO_CONFIG_NAME))
 
         self.namespace = config['namespace']
         check(re.match(r'[a-zA-Z][a-zA-Z0-9_.]+', self.namespace),
               ("Invalid namespace '%s' in repo '%s'. "
                % (self.namespace, self.root)) +
               "Namespaces must be valid python identifiers separated by '.'")
+
+        applications_dir = config["subdirectory"] if "subdirectory" in config else \
+            APPLICATIONS_DIR_NAME
+        self.applications_path = os.path.join(self.root, applications_dir)
+        check(os.path.isdir(self.applications_path),
+              "No directory '%s' found in '%s'" % (applications_dir,
+                                                   root))
 
         # Set up 'full_namespace' to include the super-namespace
         self.full_namespace = get_full_namespace(self.namespace)
@@ -837,7 +839,7 @@ class Repo(object):
                 if (not yaml_data or 'repo' not in yaml_data or
                         not isinstance(yaml_data['repo'], dict)):
                     tty.die("Invalid %s in repository %s" % (
-                        repo_config_name, self.root))
+                        REPO_CONFIG_NAME, self.root))
 
                 return yaml_data['repo']
 
@@ -921,7 +923,7 @@ class Repo(object):
            the application exists before importing.
         """
         app_dir = self.dirname_for_application_name(app_name)
-        return os.path.join(app_dir, application_file_name)
+        return os.path.join(app_dir, APPLICATION_FILE_NAME)
 
     @property
     def _app_checker(self):
@@ -1052,7 +1054,7 @@ class Repo(object):
         return self.exists(app_name)
 
 
-def create_repo(root, namespace=None):
+def create_repo(root, namespace=None, subdir=APPLICATIONS_DIR_NAME):
     """Create a new repository in root with the specified namespace.
 
        If the namespace is not provided, use basename of root.
@@ -1089,13 +1091,15 @@ def create_repo(root, namespace=None):
             "Cannot create repository in %s: can't access parent!" % root)
 
     try:
-        config_path = os.path.join(root, repo_config_name)
-        applications_path = os.path.join(root, applications_dir_name)
+        config_path = os.path.join(root, REPO_CONFIG_NAME)
+        applications_path = os.path.join(root, subdir)
 
         fs.mkdirp(applications_path)
         with open(config_path, 'w') as config:
             config.write("repo:\n")
-            config.write("  namespace: '%s'\n" % namespace)
+            config.write(f"  namespace: '{namespace}'\n")
+            if subdir != APPLICATIONS_DIR_NAME:
+                config.write(f"  subdirectory: '{subdir}'\n")
 
     except (IOError, OSError) as e:
         # try to clean up.

@@ -540,7 +540,7 @@ _ramble_repo() {
 _ramble_repo_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help"
+        RAMBLE_COMPREPLY="-h --help -d --subdirectory"
     else
         _repos
     fi
