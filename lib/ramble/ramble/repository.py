@@ -27,6 +27,7 @@ except ImportError:
 
 
 import six
+from enum import Enum
 
 import ruamel.yaml as yaml
 
@@ -684,11 +685,6 @@ class Repo(object):
         check(os.path.isfile(self.config_file),
               "No %s found in '%s'" % (repo_config_name, root))
 
-        self.applications_path = os.path.join(self.root, applications_dir_name)
-        check(os.path.isdir(self.applications_path),
-              "No directory '%s' found in '%s'" % (applications_dir_name,
-                                                   root))
-
         # Read configuration and validate namespace
         config = self._read_config()
         check('namespace' in config, '%s must define a namespace.'
@@ -699,6 +695,13 @@ class Repo(object):
               ("Invalid namespace '%s' in repo '%s'. "
                % (self.namespace, self.root)) +
               "Namespaces must be valid python identifiers separated by '.'")
+
+        applications_dir = config["subdirectory"] if "subdirectory" in config else \
+            applications_dir_name
+        self.applications_path = os.path.join(self.root, applications_dir)
+        check(os.path.isdir(self.applications_path),
+              "No directory '%s' found in '%s'" % (applications_dir,
+                                                   root))
 
         # Set up 'full_namespace' to include the super-namespace
         self.full_namespace = get_full_namespace(self.namespace)
@@ -1052,7 +1055,7 @@ class Repo(object):
         return self.exists(app_name)
 
 
-def create_repo(root, namespace=None):
+def create_repo(root, namespace=None, subdir=applications_dir_name):
     """Create a new repository in root with the specified namespace.
 
        If the namespace is not provided, use basename of root.
@@ -1090,12 +1093,14 @@ def create_repo(root, namespace=None):
 
     try:
         config_path = os.path.join(root, repo_config_name)
-        applications_path = os.path.join(root, applications_dir_name)
+        applications_path = os.path.join(root, subdir)
 
         fs.mkdirp(applications_path)
         with open(config_path, 'w') as config:
             config.write("repo:\n")
-            config.write("  namespace: '%s'\n" % namespace)
+            config.write(f"  namespace: '{namespace}'\n")
+            if subdir != applications_dir_name:
+                config.write(f"  subdirectory: '{subdir}'\n")
 
     except (IOError, OSError) as e:
         # try to clean up.
