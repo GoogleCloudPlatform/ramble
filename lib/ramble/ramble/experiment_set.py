@@ -564,13 +564,12 @@ class ExperimentSet(object):
             self.experiments[experiment_namespace] = app_inst
             self.experiment_order.append(experiment_namespace)
 
-    def finalize_set(self):
+    def build_experiment_chains(self):
         base_experiments = self.experiment_order.copy()
 
         for experiment in base_experiments:
             instance = self.experiments[experiment]
             instance.create_experiment_chain(self._workspace)
-            instance.add_expand_vars(self._workspace)
 
     def all_experiments(self):
         """Iteartor over all experiments in this set"""

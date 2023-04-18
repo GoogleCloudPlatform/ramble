@@ -70,6 +70,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
 
+        self._vars_are_expanded = False
         self.expander = None
         self.variables = None
         self.experiment_set = None
@@ -232,6 +233,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     # Phase execution helpers
     def run_phase(self, phase, workspace):
         """Run a phase, by getting its function pointer"""
+        self.add_expand_vars(workspace)
         if self.is_template:
             tty.debug(f'{self.name} is a template. Skipping phases')
             return
@@ -356,12 +358,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                         '    "name" keyword must be defined')
 
             if 'order' in cur_exp_def:
-                if cur_exp_def['order'] not in ['append', 'prepend']:
+                possible_orders = ['after_chain', 'after_root', 'before_chain', 'before_root']
+                if cur_exp_def['order'] not in possible_orders:
                     raise InvalidChainError('Invalid experiment chain defined:\n' +
                                             f'    Primary experiment {parent_namespace}\n' +
                                             f'    Chain definition: {str(exp)}\n' +
                                             '    Optional keyword "order" must ' +
-                                            'be "append" or "prepend"\n')
+                                            f'be one of {str(possible_orders)}\n')
 
             if 'command' not in cur_exp_def.keys():
                 raise InvalidChainError('Invalid experiment chain defined:\n' +
@@ -382,7 +385,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 chain_stack.pop()
                 classes_in_stack.remove(base_inst)
 
-                order = 'append'
+                order = 'after_root'
                 if 'order' in cur_exp_def:
                     order = cur_exp_def['order']
 
@@ -392,10 +395,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 new_run_dir = os.path.join(parent_run_dir,
                                            namespace.chained_experiments, chained_name)
 
-                if order == 'prepend':
+                if order == 'before_chain':
+                    self.chain_prepend.insert(0, new_name)
+                elif order == 'before_root':
                     self.chain_prepend.append(new_name)
-                elif order == 'append':
+                elif order == 'after_root':
                     self.chain_append.insert(0, new_name)
+                elif order == 'after_chain':
+                    self.chain_append.append(new_name)
                 self.chain_commands[new_name] = cur_exp_def[keywords.command]
 
                 # Skip editing the new instance if the base_inst doesn't work
@@ -413,6 +420,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     new_inst.expander._experiment_namespace = new_name
                     new_inst.variables[keywords.experiment_run_dir] = new_run_dir
                     new_inst.variables[keywords.experiment_name] = new_name
+
+                    # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)
                     chain_cmd = new_inst.expander.expand_var(cur_exp_def[keywords.command])
                     self.chain_commands[new_name] = chain_cmd
@@ -469,6 +478,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         - command: set to the commands needed to execute the experiment
         - spack_setup: set to an empty string, so spack applications can override this
         """
+        if self._vars_are_expanded:
+            return
+
         executables = self.workloads[self.expander.workload_name]['executables']
         inputs = self.workloads[self.expander.workload_name]['inputs']
 
@@ -581,6 +593,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 self.expander.expand_var(f'{{experiment_run_dir}}'),  # noqa: F541
                 template_name)
             self.variables[template_name] = expand_path
+
+        self._vars_are_expanded = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload

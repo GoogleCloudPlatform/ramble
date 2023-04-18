@@ -1151,13 +1151,13 @@ ramble:
       chained_experiments:
       - name: intel-mpi-benchmarks.collective.*
         command: '{execute_experiment}'
-        order: 'append'
+        order: 'after_root'
       workloads:
         water_bare:
           chained_experiments:
           - name: intel-mpi-benchmarks.*.collective_chain
             command: '{execute_experiment}'
-            order: 'prepend'
+            order: 'before_root'
             variables:
               n_ranks: '4'
           experiments:
@@ -1165,7 +1165,7 @@ ramble:
               chained_experiments:
               - name: intel-mpi-benchmarks.collective.collective_chain
                 command: '{execute_experiment}'
-                order: 'prepend'
+                order: 'before_root'
               variables:
                 n_nodes: '2'
 spack:

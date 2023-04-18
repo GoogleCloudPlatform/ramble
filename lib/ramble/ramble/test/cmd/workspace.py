@@ -354,7 +354,7 @@ ramble:
             test_experiment:
               chained_experiments:
               - name: basic.test_wl.test_experiment
-                order: 'append'
+                order: 'after_root'
                 command: '{execute_experiment}'
               variables:
                 n_nodes: '2'

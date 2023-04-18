@@ -680,14 +680,16 @@ scripts to each of the batch systems.
 Experiment Chains:
 ------------------
 
-Experiments can be chained together, to allow multiple experiments to be
-executed within the same context. This can be useful for executing multiple
-experiments on the same set of hardware.
+Multiple experiments can be executed within the same context by a process known
+as chaining, this allows multiple experiments (potentially from multiple
+applications) to be executed in the same context and is useful for many
+potential use cases such as running multiple experiments on the same physical
+hardware
 
 There are two important parts for defining an experiment chain. The first of
-these is simply defining the experiment chain, and the second is suppressing
-generation of template experiments.
-
+these is simply defining the experiment chain, and the second is defining
+experiments which are only intended to be used when chained into another
+experiment, known as template experiments.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Defining Experiment Chains:
@@ -736,7 +738,7 @@ the following format:
    chained_experiments: # List of experiments to chain
    - name: Fully qualified experiment namespace
      command: Command that executes the sub experiment
-     order: Order to chain this experiment. Can be append, or prepend
+     order: Order to chain this experiment. Defaults to 'after_root'
      variables: Variables dictionary to override the variables from the
                 original experiment
 
@@ -750,7 +752,15 @@ The ``name`` attribute can use `globbing
 syntax<https://docs.python.org/3/library/fnmatch.html#module-fnmatch>` to chain
 multiple experiments at once.
 
-The ``order`` keyword is optional. It defaults to a valud of ``append``.
+The ``order`` keyword is optional. Valid options include:
+* ``before_chain`` Chained experiment is injected at the beginning of the chain
+* ``before_root`` Chained experiment is injected right before the root experiment in the chain
+* ``after_root`` Chained experiment is injected right after the root experiment in the chain
+* ``after_chain`` Chained experiment is injected at the end of the chain
+
+The ``root`` experiment is defined as the initial experiment that started the
+chain. When examining the entire chain, the root experiment is the only one
+that does not have ``chain.{idx}`` in its name.
 
 The ``variables`` keyword is optional. It can be used to override the
 definition of variables from the chained experiment if needed.

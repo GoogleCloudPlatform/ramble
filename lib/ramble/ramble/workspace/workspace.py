@@ -1384,7 +1384,7 @@ class Workspace(object):
                                                           exp_template,
                                                           exp_chained_exps)
 
-        experiment_set.finalize_set()
+        experiment_set.build_experiment_chains()
 
         for exp, app_inst in experiment_set.all_experiments():
             tty.debug('On experiment: %s' % exp)
