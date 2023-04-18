@@ -118,6 +118,22 @@ internals_def = {
     'additionalProperties': False
 }
 
+chained_experiment_def = {
+    'type': 'array',
+    'default': [],
+    'items': {
+        'type': 'object',
+        'default': {},
+        'properties': {
+            'name': {'type': 'string'},
+            'command': {'type': 'string'},
+            'order': {'type': 'string'},
+            'variables': variables_def,
+        },
+        'additionalProperties': False
+    }
+}
+
 #: Properties for inclusion in other schemas
 applications_schema = {
     'applications': {
@@ -133,6 +149,8 @@ applications_schema = {
                 'env-vars': ramble.schema.licenses.env_var_actions,
                 'internals': internals_def,
                 'success_criteria': success_list_def,
+                'chained_experiments': chained_experiment_def,
+                'template': {'type': 'boolean'},
                 'workloads': {
                     'type': 'object',
                     'default': {},
@@ -146,6 +164,8 @@ applications_schema = {
                             'env-vars': ramble.schema.licenses.env_var_actions,
                             'internals': internals_def,
                             'success_criteria': success_list_def,
+                            'chained_experiments': chained_experiment_def,
+                            'template': {'type': 'boolean'},
                             'experiments': {
                                 'type': 'object',
                                 'default': {},
@@ -161,6 +181,8 @@ applications_schema = {
                                         'env-vars': ramble.schema.licenses.env_var_actions,
                                         'internals': internals_def,
                                         'success_criteria': success_list_def,
+                                        'chained_experiments': chained_experiment_def,
+                                        'template': {'type': 'boolean'},
                                     }
                                 }
                             }

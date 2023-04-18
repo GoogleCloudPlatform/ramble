@@ -675,3 +675,186 @@ Note that each of the two ``batch_submit`` commands submits a different
 template. This means the workspace's configs directory should have two files:
 ``execute_slurm.tpl`` and ``execute_pbs.tpl`` which will be template submission
 scripts to each of the batch systems.
+
+------------------
+Experiment Chains:
+------------------
+
+Multiple experiments can be executed within the same context by a process known
+as chaining, this allows multiple experiments (potentially from multiple
+applications) to be executed in the same context and is useful for many
+potential use cases such as running multiple experiments on the same physical
+hardware
+
+There are two important parts for defining an experiment chain. The first of
+these is simply defining the experiment chain, and the second is defining
+experiments which are only intended to be used when chained into another
+experiment, known as template experiments.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining Experiment Chains:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following example shows how to specify a chain of experiments:
+
+.. code-block:: yaml
+
+    ramble:
+      ...
+      variables:
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                test_exp1:
+                  variables:
+                    n_ranks: '1'
+                test_exp2:
+                  variables:
+                    n_ranks: '1'
+                  chained_experiments:
+                  - name: hostname.serial.test_exp1
+                    command: '{execute_experiment}'
+                    order: 'append'
+                    variables:
+                      n_ranks: '2'
+
+In the above example, the ``hostname.serial.test_exp2`` experiment defines an
+experiment chain. The chain is defined by mergining the ``chained_experiments``
+dictionaries and inserting itself at the appropriate location.
+
+Experiments can be defined with in the ``chained_experiments`` dictionary using
+the following format:
+
+.. code-block:: yaml
+
+   chained_experiments: # List of experiments to chain
+   - name: Fully qualified experiment namespace
+     command: Command that executes the sub experiment
+     order: Order to chain this experiment. Defaults to 'after_root'
+     variables: Variables dictionary to override the variables from the
+                original experiment
+
+Each chained experiment receives its own unique namespace. These take the form of:
+``<parent_experiment_namespace>.chain.<chain_index>.<chained_experiment_namespace>``
+
+In the above example, the chained experiment would have a namespace of:
+``hostname.serial.test_exp2.chain.0.hostname.serial.test_exp1``
+
+The ``name`` attribute can use `globbing
+syntax<https://docs.python.org/3/library/fnmatch.html#module-fnmatch>` to chain
+multiple experiments at once.
+
+The ``order`` keyword is optional. Valid options include:
+* ``before_chain`` Chained experiment is injected at the beginning of the chain
+* ``before_root`` Chained experiment is injected right before the root experiment in the chain
+* ``after_root`` Chained experiment is injected right after the root experiment in the chain
+* ``after_chain`` Chained experiment is injected at the end of the chain
+
+The ``root`` experiment is defined as the initial experiment that started the
+chain. When examining the entire chain, the root experiment is the only one
+that does not have ``chain.{idx}`` in its name.
+
+The ``variables`` keyword is optional. It can be used to override the
+definition of variables from the chained experiment if needed.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Suppressing Experiments:
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The below example shows how to suppress generation of an experiment, by marking
+it as a template.
+
+.. code-block:: yaml
+
+    ramble:
+      ...
+      variables:
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                test_exp1:
+                  template: true
+                  variables:
+                    n_ranks: '1'
+                test_exp2:
+                  variables:
+                    n_ranks: '1'
+                  chained_experiments:
+                  - name: hostname.serial.test_exp1
+                    command: '{execute_experiment}'
+                    order: 'append'
+                    variables:
+                      n_ranks: '2'
+
+In the above example, the ``template`` keyword is used to mark
+``hostname.serial.test_exp1`` as a template experiment. This prevents it from
+being used as a stand-alone experiment, but it will still be generated and used
+when it's chained into other experiments.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining Chains of Chains:
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble supports the ability to define chains of experiment chains. This allows
+an experiment to automatically implicity include all of the experiments chained
+into the explicitly chained experiment.
+
+Below is an example showing how chains of chains can be defined:
+
+.. code-block:: yaml
+
+    ramble:
+      ...
+      variables:
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                child_level2_experiment:
+                  template: true
+                  variables: '1'
+                child_level1_experiment:
+                  template: true
+                  variables:
+                    n_ranks: '1'
+                  chained_experiments:
+                  - name: hostname.serial.child_level2_experiment
+                    order: 'prepend'
+                    command: '{execute_experiment}'
+                parent_experiment:
+                  variables:
+                    n_ranks: '1'
+                  chained_experiments:
+                  - name: hostname.serial.child_level1_experiment
+                    command: '{execute_experiment}'
+
+In the above example, the resulting experiment chain would be:
+
+.. code-block:: yaml
+
+    - hostname.serial.parent_experiment.chain.0.hostname.serial.child_level2_experiment
+    - hostname.serial.parent_experiment
+    - hostname.serial.parent_experiment.chain.1.hostname.serial.child_level1_experiment

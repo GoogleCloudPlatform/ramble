@@ -414,45 +414,61 @@ def workspace_info(args):
 
     # Build experiment set
     experiment_set = ramble.experiment_set.ExperimentSet(ws)
-    for app, workloads, app_vars, app_env_vars, app_internals in ws.all_applications():
-        for workload, experiments, workload_vars, workload_env_vars, workload_internals in \
-                ws.all_workloads(workloads):
-            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals in \
-                    ws.all_experiments(experiments):
-                experiment_set.set_application_context(app, app_vars, app_env_vars, app_internals)
+    for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps \
+            in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
+                workload_template, workload_chained_exps in ws.all_workloads(workloads):
+            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals, exp_template, \
+                    exp_chained_exps in ws.all_experiments(experiments):
+                experiment_set.set_application_context(app, app_vars, app_env_vars, app_internals,
+                                                       app_template, app_chained_exps)
                 experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars, workload_internals)
+                                                    workload_env_vars, workload_internals,
+                                                    workload_template, workload_chained_exps)
                 experiment_set.set_experiment_context(exp,
                                                       exp_vars,
                                                       exp_env_vars,
                                                       exp_matrices,
-                                                      exp_internals)
+                                                      exp_internals,
+                                                      exp_template,
+                                                      exp_chained_exps)
+    experiment_set.build_experiment_chains()
 
     # Print experiment information
     color.cprint('')
     color.cprint(section_title('Experiments:'))
-    for app, workloads, app_vars, app_env_vars, app_internals in ws.all_applications():
-        for workload, experiments, workload_vars, workload_env_vars, workload_internals in \
-                ws.all_workloads(workloads):
-            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals in \
-                    ws.all_experiments(experiments):
+    for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps \
+            in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
+                workload_template, workload_chained_exps in ws.all_workloads(workloads):
+            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals, exp_template, \
+                    exp_chained_exps in ws.all_experiments(experiments):
                 print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
                 print_experiment_set.set_application_context(app, app_vars,
-                                                             app_env_vars, app_internals)
+                                                             app_env_vars, app_internals,
+                                                             app_template, app_chained_exps)
                 print_experiment_set.set_workload_context(workload, workload_vars,
-                                                          workload_env_vars, workload_internals)
+                                                          workload_env_vars, workload_internals,
+                                                          workload_template, workload_chained_exps)
                 print_experiment_set.set_experiment_context(exp,
                                                             exp_vars,
                                                             exp_env_vars,
                                                             exp_matrices,
-                                                            exp_internals)
+                                                            exp_internals,
+                                                            exp_template,
+                                                            exp_chained_exps)
+
+                print_experiment_set.build_experiment_chains()
 
                 color.cprint(nested_1('  Application: ') + app)
                 color.cprint(nested_2('    Workload: ') + workload)
 
                 for exp_name, _ in print_experiment_set.all_experiments():
                     app_inst = experiment_set.get_experiment(exp_name)
-                    color.cprint(nested_3('      Experiment: ') + exp_name)
+                    if app_inst.is_template:
+                        color.cprint(nested_3('      Template Experiment: ') + exp_name)
+                    else:
+                        color.cprint(nested_3('      Experiment: ') + exp_name)
 
                     if args.verbose >= 1:
                         config_vars = ramble.config.config.get('config:variables')
@@ -511,6 +527,11 @@ def workspace_info(args):
                             if ramble.workspace.namespace.executables in app_inst.internals:
                                 color.cprint(nested_4('        Executable Order') + ': ' +
                                              str(app_inst.internals['executables']))
+
+                        if app_inst.chain_order:
+                            color.cprint(nested_4('        Experiment Chain') + ':')
+                            for exp in app_inst.chain_order:
+                                color.cprint(nested_4('         - ') + exp)
 
     # Print MPI command
     color.cprint('')
