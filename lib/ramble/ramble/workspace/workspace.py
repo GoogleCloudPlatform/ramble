@@ -1574,13 +1574,9 @@ class Workspace(object):
     def name(self):
         """Human-readable representation of the workspace.
 
-        This is the path for directory workspaces and just the name
-        for named workspaces.
+        The name of the workspace is the basename of its path
         """
-        if self.internal:
-            return os.path.basename(self.path)
-        else:
-            return self.path
+        return os.path.basename(self.path)
 
     @property
     def path(self):
