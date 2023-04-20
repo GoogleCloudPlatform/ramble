@@ -156,9 +156,10 @@ class SpackRunner(object):
             fs.mkdirp(path)
 
         # Create a spack env
-        if not os.path.exists(os.path.join(path, 'spack.yaml')):
-            with fs.working_dir(path):
-                self.exe(*self.env_create_args)
+        if not self.dry_run:
+            if not os.path.exists(os.path.join(path, 'spack.yaml')):
+                with fs.working_dir(path):
+                    self.exe(*self.env_create_args)
 
         # Ensure subsequent commands use the created env now.
         self.env_path = path
@@ -446,6 +447,7 @@ class SpackRunner(object):
             'env',
             'loads'
         ]
+
         if not self.dry_run:
             self.exe(*args)
         else:

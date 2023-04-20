@@ -71,19 +71,31 @@ def test_env_concretize(tmpdir):
         pytest.skip('%s' % e)
 
 
-def test_env_install(tmpdir):
+def test_env_install(tmpdir, capsys):
     try:
-        env_path = tmpdir.join('spack-env')
-        sr = ramble.spack_runner.SpackRunner()
+        env_path = str(tmpdir.join('spack-env'))
+        # Dry run so we don't actually install zlib
+        sr = ramble.spack_runner.SpackRunner(dry_run=True)
         sr.create_env(env_path)
         sr.activate()
         sr.add_spec('zlib')
+        sr.generate_env_file()
         sr.concretize()
         sr.install()
+
+        captured = capsys.readouterr()
+        assert "with args: ['install'" in captured.out
+        assert "with args: ['env', 'loads']" in captured.out
+
         sr.deactivate()
 
-        assert os.path.exists(os.path.join(env_path, 'spack.yaml'))
-        assert os.path.exists(os.path.join(env_path, 'loads'))
+        env_file = os.path.join(env_path, 'spack.yaml')
+
+        assert os.path.exists(env_file)
+
+        with open(env_file, 'r') as f:
+            assert 'zlib' in f.read()
+
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
