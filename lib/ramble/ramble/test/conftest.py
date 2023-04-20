@@ -496,3 +496,18 @@ def mock_fetch(mock_archive, monkeypatch):
     mock_fetcher.append(URLFetchStrategy(mock_archive.url))
 
     yield mock_fetcher
+
+
+def pytest_generate_tests(metafunc):
+    if "application" in metafunc.fixturenames:
+        from ramble.main import RambleCommand
+        list_cmd = RambleCommand('list')
+
+        all_applications = []
+        repo_apps = list_cmd().split('\n')
+
+        for app_str in repo_apps:
+            if app_str != '':
+                all_applications.append(app_str.strip())
+
+        metafunc.parametrize("application", all_applications)

@@ -116,17 +116,17 @@ class Openfoam(SpackApplication):
                use_mpi=False)
 
     executable('build_mesh', template=['cp -R {input_path}/* {experiment_run_dir}/.',
-                                       'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
+                                       r'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
                                        'chmod a+x All*',
                                        'mv Allmesh* Allmesh',
                                        './Allmesh'],
                use_mpi=False)
 
-    executable('configure', template=['sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
-                                      'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
+    executable('configure', template=[r'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
+                                      r'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
                                       'sed "s/(3 2 1)/{decomp}/" -i {decomposition_path}',
-                                      'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
-                                      'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
+                                      r'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
+                                      r'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
                                       'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
                                       'sed "s/maxLocalCells 100000/maxLocalCells {max_local_cells}/" -i {hex_mesh_path}',
                                       'sed "s/maxGlobalCells 2000000/maxGlobalCells {max_global_cells}/" -i {hex_mesh_path}',
