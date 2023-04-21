@@ -126,18 +126,20 @@ class Minixyce(SpackApplication):
                 f.write(setting + ' = ' + self.expander.expand_var('{' + setting + '}') + '\n')
 
     def _analyze_experiments(self, workspace):
+        import os
 
         output_file = self.expander.expand_var('{experiment_run_dir}/{workload_name}_tran_results.prn')
         processed_output_path = self.expander.expand_var('{experiment_run_dir}/processed_output.txt')
 
-        names = []
-        with open(output_file, 'r') as f:
-            names = f.readline().split()
-            for line in (f.readlines()[-1:]):
-                values = line.split()
+        if os.path.isfile(output_file):
+            names = []
+            with open(output_file, 'r') as f:
+                names = f.readline().split()
+                for line in (f.readlines()[-1:]):
+                    values = line.split()
 
-        with open(processed_output_path, 'w+') as f:
-            for i, (name, value) in enumerate(zip(names[1:-2], values[1:-2])):
-                f.write("{}: {} = {}\n".format((i + 1), name, value))
+            with open(processed_output_path, 'w+') as f:
+                for i, (name, value) in enumerate(zip(names[1:-2], values[1:-2])):
+                    f.write("{}: {} = {}\n".format((i + 1), name, value))
 
         super()._analyze_experiments(workspace)
