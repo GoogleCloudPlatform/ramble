@@ -30,18 +30,9 @@ workspace = RambleCommand('workspace')
 def test_wrfv4_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: ['part1', 'part2']
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'
@@ -282,18 +273,9 @@ licenses:
 def test_hpl_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: 16
     n_threads: 1
   applications:
@@ -364,18 +346,9 @@ spack:
 def test_dependency_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -447,18 +420,9 @@ def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
     """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - -n
-    - '{n_ranks}'
-    - -ppn
-    - '{processes_per_node}'
-    - -hostfile
-    - hostfile
-  batch:
-    submit: 'sbatch {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: 30
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -513,18 +477,9 @@ spack:
 def test_env_var_builtin(mutable_config, mutable_mock_workspace_path, mock_applications):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -633,18 +588,9 @@ def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path):
 
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{{n_ranks}}'
-    - '-ppn'
-    - '{{processes_per_node}}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {{execute_experiment}}'
   variables:
+    mpi_command: 'mpirun -n {{n_ranks}} -ppn {{processes_per_node}}'
+    batch_submit: 'batch_submit {{execute_experiment}}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -724,18 +670,9 @@ spack:
 def test_custom_executables(mutable_config, mutable_mock_workspace_path, mock_applications):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -810,18 +747,9 @@ spack:
 def test_unused_compilers_are_skipped(mutable_config, mutable_mock_workspace_path, capsys):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '10'
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -898,18 +826,9 @@ spack:
 
     test_config = f"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{{n_ranks}}'
-    - '-ppn'
-    - '{{processes_per_node}}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {{execute_experiment}}'
   variables:
+    mpi_command: 'mpirun -n {{n_ranks}} -ppn {{processes_per_node}}'
+    batch_submit: 'batch_submit {{execute_experiment}}'
     processes_per_node: '10'
     n_ranks: '{{processes_per_node}}*{{n_nodes}}'
     n_threads: '1'
@@ -981,18 +900,9 @@ def test_dryrun_series_contains_package_paths(mutable_config,
                                               mock_applications):
     test_config = r"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '10'
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -1042,18 +952,9 @@ def test_dryrun_chained_experiments(mutable_config,
                                     mutable_mock_workspace_path):
     test_config = r"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '10'
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -1232,13 +1133,9 @@ def test_known_applications(application):
     ws_name = f'test_all_apps_{application}'
 
     base_config = """ramble:
-  mpi:
-    command: 'mpirun'
-    args:
-    - '-n'
-    - '{n_ranks}'
-  batch:
-    submit: '{execute_experiment}'
+  variables:
+    mpi_command: 'mpirun -n {n_ranks}'
+    batch_submit: '{execute_experiment}'
   applications:\n"""
 
     app_info = info_cmd(application)

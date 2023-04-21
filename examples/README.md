@@ -106,5 +106,6 @@ The slurm execute experiment script shows an example of creating an
 `execute_experiment` script for use in a slurm cluster.
 
 To use this, place it in the configs directory for your workspace, and change
-the `ramble:batch:submit` definition in your ramble.yaml to: `sbatch {slurm_execute_experiment}`.
-Then when performing `ramble workspace setup`, the `all_experiments` script will submit to slurm.
+the `ramble:variables:batch_submit` definition in your ramble.yaml to:
+`sbatch {slurm_execute_experiment}`. Then when performing `ramble workspace
+setup`, the `all_experiments` script will submit to slurm.

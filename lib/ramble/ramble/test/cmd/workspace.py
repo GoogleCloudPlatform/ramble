@@ -80,8 +80,6 @@ def check_info_basic(output):
     assert 'Workload' in output
     assert 'Experiment' in output
 
-    assert 'MPI Command' in output
-
 
 def check_results(ws):
     fn = ws.dump_results(output_formats=['text', 'json', 'yaml'])
@@ -161,18 +159,9 @@ def test_workspace_list(mutable_mock_workspace_path):
 def test_workspace_info():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -212,18 +201,9 @@ spack:
 def test_workspace_info_prints_all_levels():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -274,18 +254,9 @@ config:
 def test_workspace_info_with_templates():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -326,18 +297,9 @@ spack:
 def test_workspace_info_with_experiment_chain():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -692,18 +654,9 @@ def test_edit_override_gets_correct_path():
 def test_dryrun_setup():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -741,18 +694,9 @@ spack:
 def test_matrix_vector_workspace_full():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: [2, 4]
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -819,18 +763,9 @@ spack:
 def test_invalid_vector_workspace():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: [2, 4]
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -876,17 +811,9 @@ spack:
 def test_invalid_size_matrices_workspace():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
   applications:
     basic:
       workloads:
@@ -931,17 +858,9 @@ spack:
 def test_undefined_var_matrices_workspace():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
   applications:
     basic:
       workloads:
@@ -979,17 +898,9 @@ spack:
 def test_non_vector_var_matrices_workspace():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
   applications:
     basic:
       workloads:
@@ -1029,17 +940,9 @@ spack:
 def test_multi_use_vector_var_matrices_workspace():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
   applications:
     basic:
       workloads:
@@ -1084,11 +987,9 @@ def test_reconcretize_in_configs_dir(tmpdir):
     """
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args: []
-  batch:
-    submit: '{execute_experiment}'
+  variables:
+    mpi_command: 'mpirun'
+    batch_submit: '{execute_experiment}'
   applications:
     basic:
       workloads:
@@ -1133,18 +1034,9 @@ spack:
 def test_workspace_archive():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -1214,18 +1106,9 @@ spack:
 def test_workspace_tar_archive():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -1297,18 +1180,9 @@ spack:
 def test_workspace_tar_upload_archive():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -1385,18 +1259,9 @@ spack:
 def test_workspace_tar_upload_archive_config_url():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -1476,18 +1341,9 @@ spack:
 def test_dryrun_noexpvars_setup():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}'
   applications:
@@ -1537,18 +1393,9 @@ ramble:
 
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -1589,18 +1436,9 @@ spack:
 def test_invalid_template_name_errors(tpl_name, capsys):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}'
   applications:
@@ -1637,18 +1475,9 @@ spack:
 def test_custom_executables_info():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}'
   applications:
@@ -1703,18 +1532,9 @@ spack:
 def test_custom_executables_order_info():
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '5'
     n_ranks: '{processes_per_node}'
   applications:

@@ -20,15 +20,12 @@
 #               n_ranks: '{processes_per_node}'
 
 ramble:
-  mpi:
-    command: mpirun
-    args: []
-  batch:
-    submit: '{execute_experiment}'
   env-vars:
     set:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
+    mpi_command: 'mpirun'
+    batch_submit: '{execute_experiment}'
     processes_per_node: -1
   applications:
     hostname:

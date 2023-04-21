@@ -37,13 +37,9 @@ responsible for configuring, executing, analyzing, and archiving.
 .. code-block:: yaml
 
     ramble:
-      mpi:
-        command: mpirun
-        args:
-        - '-n'
-        - '{n_ranks}'
-      batch:
-        submit: '{execute_experiment}'
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
       applications:
         hostname:
           workloads:
@@ -85,6 +81,8 @@ string, and can take variables for expansion.
               experiments:
                 test_{n_ranks}_{n_nodes}:
                   variables:
+                    mpi_command: 'mpirun -n {n_ranks}'
+                    batch_submit: '{execute_experiment}'
                     n_ranks: '1'
                     n_nodes: '1'
 
@@ -114,8 +112,9 @@ individual experiments take precendence.
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         processes_per_node: '16'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
@@ -145,8 +144,9 @@ math and variable expansion syntax as defined above).
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         processes_per_node: '16'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
@@ -182,8 +182,9 @@ consumes.
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
         hostname:
@@ -211,8 +212,9 @@ Mulitple matrices are allowed to be defined:
    :linenos:
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
         hostname:
@@ -249,8 +251,9 @@ something ramble automatically generates in a different experiment.
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         processes_per_node: '16'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
@@ -364,6 +367,8 @@ Ramble requires the following variables to be defined:
   ``ceiling({n_ranks}/{processes_per_node})``
 * ``processes_per_node`` - Defines how many ranks should be on each node. If
   not explicitly set, is defined as: ``ceiling({n_ranks}/{n_nodes})``
+* ``mpi_command`` - Template for generating an MPI command
+* ``batch_submit`` - Template for generating a batch system submit command
 
 """"""""""""""""""""
 Generated Variables:
@@ -403,8 +408,6 @@ Ramble automatically generates definitions for the following varialbes:
 * ``command`` - Set to all of the commands needed to perform an experiment.
 * ``spack_setup`` - Set to the commands needed to load a spack environment for
   an experiment. Set to an empty string for non-spack applications
-* ``mpi_command`` - By default, set to the contents of ``ramble:mpi```
-* ``batch_submit`` - By default, set to the contents of ``ramble:batch:submit``
 
 """""""""""""""""""""""""""""""""""
 Spack Specific Generated Variables:
@@ -546,12 +549,8 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
 .. code-block:: yaml
 
     ramble:
-      mpi:
-        command: ''
-        args: []
-      batch:
-        submit: '{execute_experiment}'
       variables:
+        batch_submit: '{execute_experiment}'
         mpi_command:
         - 'mpirun -n {n_ranks} -ppn {processes_per_node} ' # MPICH
         - 'mpirun -n {n_ranks} -nperhost {processes_per_node} ' # OpenMPI
@@ -613,26 +612,14 @@ Batch System Control:
 Similar to the previously describe MPI command control, experiments can use
 different batch systems by overriding the ``batch_submit`` variable.
 
-As in the MPI command example, the ``ramble:batch:submit`` definition is
-insufficient for changing how each experiment is submitted to a batch system
-(or even what batch system the experiment is submitted to).
-
 Below is an example configuration file showing how the ``batch_submit``
 variable can be used to submit the same experiment to multiple batch systems.
 
 .. code-block:: yaml
 
     ramble:
-      mpi:
-        command: mpirun
-        args:
-        - '-n'
-        - '{n_ranks}'
-        - '-ppn'
-        - '{processes_per_node}'
-      batch:
-        submit: ''
       variables:
+        mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
         batch_system:
         - slurm
         - pbs
@@ -700,8 +687,9 @@ The following example shows how to specify a chain of experiments:
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         processes_per_node: '16'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
@@ -775,8 +763,9 @@ it as a template.
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         processes_per_node: '16'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
@@ -820,8 +809,9 @@ Below is an example showing how chains of chains can be defined:
 .. code-block:: yaml
 
     ramble:
-      ...
       variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
         processes_per_node: '16'
         n_ranks: '{n_nodes}*{processes_per_node}'
       applications:
