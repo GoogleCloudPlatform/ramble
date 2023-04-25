@@ -8,7 +8,6 @@
 
 from enum import Enum
 import os
-import itertools
 import math
 import fnmatch
 
@@ -20,6 +19,7 @@ import ramble.repository
 import ramble.workspace
 import ramble.keywords
 import ramble.error
+import ramble.renderer
 
 
 class ExperimentSet(object):
@@ -396,130 +396,17 @@ class ExperimentSet(object):
                          Expander.expansion_str(self.keywords.experiment_name))
 
         experiment_template_name = context_variables[self.keywords.experiment_name]
-        new_experiments = []
-        matrix_experiments = []
 
-        if self._matrices[self._contexts.experiment]:
-            """ Matrix syntax is:
-               matrix:
-               - <var1>
-               - <var2>
-               - [1, 2, 3, 4] # inline vector
-               matrices:
-               - matrix_a:
-                 - <var1>
-                 - <var2>
-               - matrix:b:
-                 - <var_3>
-                 - <var_4>
-
-                 Matrices consume vector variables.
-            """
-
-            # Perform some error checking
-            last_size = -1
-            matrix_vars = set()
-            matrix_vectors = []
-            matrix_variables = []
-            for matrix in self._matrices[self._contexts.experiment]:
-                matrix_size = 1
-                vectors = []
-                variable_names = []
-                for var in matrix:
-                    if var in matrix_vars:
-                        tty.die('Variable %s has been used in multiple matrices.\n' % var
-                                + 'Ensure each variable is only used once across all matrices')
-                    matrix_vars.add(var)
-
-                    if var not in context_variables:
-                        tty.die(f'In experiment {context_variables["experiment_name"]}'
-                                + f' variable {var} has not been defined yet.')
-
-                    if not isinstance(context_variables[var], list):
-                        tty.die(f'In experiment {context_variables["experiment_name"]}'
-                                + f' variable {var} does not refer to a vector.')
-
-                    matrix_size = matrix_size * len(context_variables[var])
-
-                    vectors.append(context_variables[var])
-                    variable_names.append(var)
-
-                    # Remove the variable, so it's not proccessed as a vector anymore.
-                    del context_variables[var]
-
-                if last_size == -1:
-                    last_size = matrix_size
-
-                if last_size != matrix_size:
-                    tty.die('Matrices defined in experiment '
-                            + f'{context_variables["experiment_name"]}'
-                            + ' do not result in the same number of elements.')
-
-                matrix_vectors.append(vectors)
-                matrix_variables.append(variable_names)
-
-            # Create the empty initial dictionairies
-            matrix_experiments = []
-            for _ in range(matrix_size):
-                matrix_experiments.append({})
-
-            # Generate all of the exp var dicts
-            for names, vectors in zip(matrix_variables, matrix_vectors):
-                for exp_idx, entry in enumerate(itertools.product(*vectors)):
-                    for name_idx, name in enumerate(names):
-                        matrix_experiments[exp_idx][name] = entry[name_idx]
-
-        # After matrices have been processed, extract any remaining vector variables
-        vector_vars = {}
-
-        # Extract vector variables
-        max_vector_size = 0
-        for var, val in context_variables.items():
-            if isinstance(val, list):
-                vector_vars[var] = val.copy()
-                max_vector_size = max(len(val), max_vector_size)
-
-        if vector_vars:
-            # Check that sizes are the same
-            for var, val in vector_vars.items():
-                if len(val) != max_vector_size:
-                    tty.die(f'Size of vector {var} is not'
-                            + ' the same as max %s' % len(val)
-                            + f'. In experiment {context_variables["experiment_name"]}.')
-
-            # Iterate over the vector length, and set the value in the
-            # experiment dict to the index value.
-            for i in range(0, max_vector_size):
-                exp_vars = {}
-                for var, val in vector_vars.items():
-                    exp_vars[var] = val[i]
-
-                if matrix_experiments:
-                    for matrix_experiment in matrix_experiments:
-                        for var, val in matrix_experiment.items():
-                            exp_vars[var] = val
-
-                        new_experiments.append(exp_vars.copy())
-                else:
-                    new_experiments.append(exp_vars.copy())
-
-        elif matrix_experiments:
-            new_experiments = matrix_experiments
-        else:
-            # Ensure at least one experiment is rendered, if everything was a scalar
-            new_experiments.append({})
+        renderer = ramble.renderer.Renderer('experiment')
 
         rendered_experiments = set()
-        for exp in new_experiments:
-            tty.debug('Rendering experiment:')
-            for var, val in exp.items():
-                context_variables[var] = val
-            context_variables[self.keywords.spack_env] = \
+        for experiment_vars in \
+                renderer.render_objects(context_variables,
+                                        self._matrices[self._contexts.experiment]):
+            experiment_vars[self.keywords.spack_env] = \
                 os.path.join(self._workspace.software_dir,
                              Expander.expansion_str(self.keywords.spec_name) + '.' +
                              Expander.expansion_str(self.keywords.workload_name))
-
-            experiment_vars = context_variables.copy()
 
             expander = ramble.expander.Expander(experiment_vars, self)
             self._compute_mpi_vars(expander, experiment_vars)
@@ -539,7 +426,6 @@ class ExperimentSet(object):
             experiment_vars[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
                                                                    '{experiment_name}.out')
 
-            tty.debug('   Exp vars: %s' % exp)
             tty.debug('   Final name: %s' % final_exp_name)
 
             if final_exp_name in rendered_experiments:
