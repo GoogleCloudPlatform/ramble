@@ -120,27 +120,10 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var('{spec_name}')
 
-            compilers = {}
-            for name, spec_info in \
-                    workspace.all_application_specs(app_context):
-                if 'compiler' in spec_info:
-                    comp_spec = workspace.get_named_spec(spec_info['compiler'],
-                                                         'compiler')
-                    spec_str = workspace.spec_string(comp_spec, as_dep=False,
-                                                     use_custom_specifier=False)
-                    compilers[spec_info['compiler']] = spec_str
-
-                pkg_specs = self._extract_specs(workspace, name, app_context)
-                for pkg_name, pkg_info in pkg_specs:
-                    if 'compiler' in pkg_info:
-                        comp_spec = workspace.get_named_spec(spec_info['compiler'],
-                                                             'compiler')
-                        spec_str = workspace.spec_string(comp_spec, as_dep=False,
-                                                         use_custom_specifier=False)
-                        compilers[spec_info['compiler']] = spec_str
-
-            for _, spec in compilers.items():
-                self.spack_runner.install_compiler(spec)
+            for _, comp_spec in workspace.software_environments.get_specs(app_context,
+                                                                          spec_type='compiler'):
+                tty.debug(f'Trying to install {comp_spec}')
+                self.spack_runner.install_compiler(comp_spec)
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
@@ -177,9 +160,6 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            added_specs = {}
-            mpi_added = {}
-
             app_context = self.expander.expand_var('{spec_name}')
 
             env_concretized = False
@@ -187,39 +167,14 @@ class SpackApplication(ApplicationBase):
             if external_spack_env:
                 env_concretized = self.spack_runner.copy_from_external_env(external_spack_env)
             else:
-                for name, spec_info in \
-                        workspace.all_application_specs(app_context):
-
-                    if 'mpi' in spec_info and \
-                            spec_info['mpi'] not in mpi_added:
-                        mpi_spec = workspace.get_named_spec(spec_info['mpi'],
-                                                            'mpi_library')
-                        mpi_added[spec_info['mpi']] = True
-                        self.spack_runner.add_spec(
-                            self.expander.expand_var(workspace.spec_string(mpi_spec,
-                                                     use_custom_specifier=True))
-                        )
-
-                    pkg_specs = self._extract_specs(workspace, name, app_context)
-                    for pkg_name, pkg_info in pkg_specs:
-                        if pkg_name not in added_specs:
-                            added_specs[pkg_name] = True
-
-                            spec_str = workspace.spec_string(pkg_info,
-                                                             as_dep=False)
-
-                            self.spack_runner.add_spec(self.expander.expand_var(spec_str))
-
-                    if name not in added_specs:
-                        added_specs[name] = True
-                        spec_str = workspace.spec_string(spec_info,
-                                                         as_dep=False)
-
-                        self.spack_runner.add_spec(self.expander.expand_var(spec_str))
+                spec_names = set()
+                for pkg_name, pkg_spec in workspace.software_environments.get_specs(app_context):
+                    self.spack_runner.add_spec(pkg_spec)
+                    spec_names.add(pkg_name)
 
                 for name, spec_info in self.software_specs.items():
                     if 'required' in spec_info and spec_info['required']:
-                        if name not in added_specs:
+                        if name not in spec_names:
                             tty.die(('Software spec {} is not defined '
                                      'in context {}, but is required '
                                      'to by the {} application '
@@ -284,23 +239,11 @@ class SpackApplication(ApplicationBase):
             self.spack_runner.activate()
 
             app_context = self.expander.expand_var('{spec_name}')
-            for name, spec_info in \
-                    workspace.all_application_specs(app_context):
-                if 'mpi' in spec_info:
-                    mpi_spec = workspace.get_named_spec(spec_info['mpi'],
-                                                        'mpi_library')
-                    spec_str = workspace.spec_string(mpi_spec)
-                    package_path = self.spack_runner.get_package_path(spec_str)
-                    self.variables[name] = package_path
 
-                pkg_specs = self._extract_specs(workspace, name, app_context)
-                for pkg_name, pkg_info in pkg_specs:
-                    spec = workspace._build_spec_dict(pkg_info,
-                                                      app_name=app_context)
-                    spec_str = workspace.spec_string(spec,
-                                                     as_dep=False)
-                    package_path = self.spack_runner.get_package_path(spec_str)
-                    self.variables[pkg_name] = package_path
+            for pkg_name, pkg_spec in \
+                    workspace.software_environments.get_specs(app_context):
+                package_path = self.spack_runner.get_package_path(pkg_spec)
+                self.variables[pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
