@@ -1,3 +1,4 @@
+#!/bin/sh
 # Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -24,9 +25,13 @@
 # Run a few initial commands and set up test environment
 #-----------------------------------------------------------
 ORIGINAL_PATH="$PATH"
+ERROR=0
 
 . "$(dirname $0)/setup.sh"
 check_dependencies $coverage git hg svn
+if [ $? != 0 ]; then
+    ERROR=1
+fi
 
 # Move to root directory of Spack
 # Allows script to be run from anywhere
@@ -34,7 +39,13 @@ cd "$RAMBLE_ROOT"
 
 # Run spack help to cover command import
 bin/ramble -h
+if [ $? != 0 ]; then
+    ERROR=1
+fi
 bin/ramble help -a
+if [ $? != 0 ]; then
+    ERROR=1
+fi
 
 # Profile and print top 20 lines for a simple call to spack spec
 #ramble -p --lines 20 spec mpileaks%gcc ^elfutils@0.170
@@ -46,4 +57,11 @@ if [ -z $LONG ]; then
     $coverage_run $(which ramble) unit-test -x --verbose -m "not long"
 else
     $coverage_run $(which ramble) unit-test -x --verbose
+fi
+if [ $? != 0 ]; then
+    ERROR=1
+fi
+
+if [ $ERROR == 1 ]; then
+    exit 1
 fi
