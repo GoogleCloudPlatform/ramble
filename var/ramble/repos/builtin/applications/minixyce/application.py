@@ -76,10 +76,9 @@ class Minixyce(SpackApplication):
     result_regex = r'.*\s+(?P<num_iters>[0-9]+)\s+(?P<num_restarts>[0-9]+)'
 
     floating_point_regex = r'[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*'
-    close_paren = r')'
 
     figure_of_merit('Time', log_file=log_file,
-                    fom_regex=r'\s+(?P<time>' + floating_point_regex + close_paren,
+                    fom_regex=r'\s+(?P<time>' + floating_point_regex + r')',
                     group_name='time',
                     units='s'
                     )
@@ -123,7 +122,7 @@ class Minixyce(SpackApplication):
 
         with open(input_path, 'w+') as f:
             for setting in settings:
-                f.write(setting + ' = ' + self.expander.expand_var('{' + setting + '}') + '\n')
+                f.write(setting + ' = ' + self.expander.expansion_str(setting) + '\n')
 
     def _analyze_experiments(self, workspace):
         import os
