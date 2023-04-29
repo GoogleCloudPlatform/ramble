@@ -18,7 +18,7 @@ import argparse
 from llnl.util.filesystem import working_dir, mkdirp
 
 import ramble.paths
-from spack.util.executable import which
+from spack.util.executable import which, ProcessError
 
 
 description = "runs source code style checks on Ramble. requires flake8"
@@ -128,7 +128,7 @@ def changed_files(base=None, untracked=True, all_files=False):
     changed = set()
 
     for arg_list in git_args:
-        files = git(*arg_list, output=str).split('\n')
+        files = git(*arg_list, output=str, error=str).split('\n')
 
         for f in files:
             # Ignore non-Python files
@@ -261,8 +261,23 @@ def flake8(parser, args):
             file_list = [prefix_relative(p) for p in file_list]
 
         with working_dir(ramble.paths.prefix):
-            if not file_list:
-                file_list = changed_files(args.base, args.untracked, args.all)
+            arg_flags = []
+            # First, try with the original flags
+            arg_flags.append([args.base, args.untracked, args.all])
+            # Next, try with the a base of `origin/develop`
+            arg_flags.append(['origin/develop', args.untracked, args.all])
+            # Next, try with the a base of `origin/main`
+            arg_flags.append(['origin/main', args.untracked, args.all])
+            # Next, force listing all files
+            arg_flags.append(['HEAD', args.untracked, True])
+            while not file_list:
+                try:
+                    base, untracked, list_all = arg_flags.pop(0)
+                    file_list = changed_files(base, untracked, list_all)
+                except ProcessError as e:
+                    file_list = None
+                    if not arg_flags:
+                        raise e
 
         print('=======================================================')
         print('flake8: running flake8 code checks on ramble.')
@@ -301,7 +316,7 @@ def flake8(parser, args):
             f = '.flake8'
             shutil.copy(f, primary_dest_dir)
             qa_dir = os.path.join(primary_dest_dir, 'share', 'ramble', 'qa')
-            os.makedirs(qa_dir)
+            os.makedirs(qa_dir, exist_ok=True)
             shutil.copy('share/ramble/qa/flake8_formatter.py', qa_dir)
 
             with working_dir(primary_dest_dir):
