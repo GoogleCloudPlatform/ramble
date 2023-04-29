@@ -594,6 +594,37 @@ class Workspace(object):
         """Read configuration file"""
         config = self.config_sections[section]
         self._read_yaml(config, f, raw_yaml)
+        self._check_deprecated(config['yaml'])
+
+    def _check_deprecated(self, config):
+        """
+        Trap and warn (or error) on deprecated configuration settings
+        in the workspace config.
+        """
+
+        error_sections = []
+        deprecated_sections = []
+        # Trap and warn on deprecated config options.
+        if namespace.ramble in config:
+            # TODO: (dwj) Remove the following deprecation check
+            # DEPRECATED
+            if 'mpi' in config[namespace.ramble]:
+                deprecated_sections.append('ramble:mpi')
+            if 'batch' in config[namespace.ramble]:
+                deprecated_sections.append('ramble:batch')
+
+        if len(deprecated_sections) > 0:
+            tty.warn('Your workspace configuration contains deprecated sections:')
+            for section in deprecated_sections:
+                tty.warn(f'     {section}')
+            tty.warn('Please see the current workspace documentation and update')
+            tty.warn('to ensure your workspace continues to function properly')
+
+        if len(error_sections) > 0:
+            tty.warn('Your workspace configuration contains invalid sections:')
+            for section in deprecated_sections:
+                tty.warn(f'     {section}')
+            tty.die('Please update to the latest format.')
 
     def _read_yaml(self, config, f, raw_yaml=None):
         if raw_yaml:
