@@ -15,13 +15,15 @@ class Wrfv3(SpackApplication):
 
     tags = ['nwp', 'weather']
 
-    default_compiler('gcc8', base='gcc', version='8.2.0')
+    default_compiler('gcc8', spack_spec='gcc@8.2.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274', compiler='gcc8')
 
-    software_spec('wrf', base='wrf', version='3.9.1.1',
-                  variants='build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf',
-                  compiler='gcc8', mpi='impi2018', required=True)
+    software_spec('wrf',
+                  spack_spec='wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf',
+                  compiler='gcc8')
+
+    required_package('wrf')
 
     input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/bench/conus2.5km_v3911/bench_2.5km.tar.bz2',
                description='2.5 km resolution mesh of the continental United States.')

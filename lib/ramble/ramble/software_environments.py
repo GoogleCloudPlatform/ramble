@@ -13,6 +13,7 @@ import ramble.workspace
 import ramble.keywords
 import ramble.error
 import ramble.renderer
+import ramble.expander
 
 
 class sw_namespace:
@@ -23,6 +24,10 @@ class sw_namespace:
     spack_spec = 'spack_spec'
     compiler_spec = 'compiler_spec'
     packages = 'packages'
+    environments = 'environments'
+    variables = 'variables'
+    matrices = 'matrices'
+    matrix = 'matrix'
     external_env = 'external_spack_env'
 
 
@@ -35,11 +40,10 @@ class SoftwareEnvironments(object):
 
     keywords = ramble.keywords.keywords
 
-    supported_confs = ['v1']
+    supported_confs = ['v1', 'v2']
 
     def __init__(self, workspace):
 
-        self._compilers = {}
         self._packages = {}
         self._environments = {}
         self._workspace = workspace
@@ -55,11 +59,13 @@ class SoftwareEnvironments(object):
 
         if conf_type == 'v1':
             self._v1_setup()
+        elif conf_type == 'v2':
+            self._v2_setup()
 
     def _detect_conf_type(self):
         """Auto-detect the type of configuration provided.
 
-        Default configuration type is v1.
+        Default configuration type is v2.
 
         v1 configurations follow the format:
 
@@ -68,30 +74,43 @@ class SoftwareEnvironments(object):
           applications: {}
           compilers: {}
           mpi_libraries: {}
+
+        v2 configurations follow the format:
+
+        spack:
+          concretized: [true/false]
+          packages: {}
+          environments: {}
         """
 
-        tty.debug(f'Spack dict: {str(self.spack_dict)}')
+        conf_type = 'v2'
 
-        conf_type = 'v1'
-
-        if sw_namespace.applications in self.spack_dict and \
-                sw_namespace.compilers in self.spack_dict and \
+        if sw_namespace.applications in self.spack_dict or \
+                sw_namespace.compilers in self.spack_dict or \
                 sw_namespace.mpi_lib in self.spack_dict:
             conf_type = 'v1'
+        if sw_namespace.packages in self.spack_dict and \
+                sw_namespace.environments in self.spack_dict:
+            conf_type = 'v2'
+
+        tty.debug(f'Detected config type of: {conf_type}')
 
         return conf_type
 
     def _v1_setup(self):
         """Process a v1 `spack:` dictionary in the workspace configuration."""
         tty.debug('Performing v1 software setup.')
+        tty.warn('Your workspace configuration uses the v1 format for the spack section')
+        tty.warn('Please update to the latest format to ensure it keeps functioning properly.')
+        tty.warn('v1 support will be removed in the future.')
 
         if sw_namespace.compilers in self.spack_dict:
             for compiler, conf in self.spack_dict[sw_namespace.compilers].items():
-                self._compilers[compiler] = {}
+                self._packages[compiler] = {}
 
                 spec_dict = self.get_named_spec(compiler)
-                self._compilers[compiler][sw_namespace.spack_spec] = self.spec_string(spec_dict)
-                self._compilers[compiler][sw_namespace.compiler_spec] = \
+                self._packages[compiler][sw_namespace.spack_spec] = self.spec_string(spec_dict)
+                self._packages[compiler][sw_namespace.compiler_spec] = \
                     self.spec_string(spec_dict, use_custom_specifier=True)
 
         if sw_namespace.mpi_lib in self.spack_dict:
@@ -129,25 +148,159 @@ class SoftwareEnvironments(object):
                                 conf['mpi']
                             )
 
-    def get_specs(self, environment_name, spec_type='package'):
-        """Return all of the specs of a given type used by an environment"""
+    def _v2_setup(self):
+        """Process a v2 `spack:` dictionary in the workspace configuration."""
+        tty.debug('Performing v2 software setup.')
+
+        pkg_renderer = ramble.renderer.Renderer('package')
+        env_renderer = ramble.renderer.Renderer('environment')
+
+        expander = ramble.expander.Expander({}, None)
+
+        if sw_namespace.packages in self.spack_dict:
+            for pkg_template, pkg_info in self.spack_dict[sw_namespace.packages].items():
+                pkg_vars = {}
+                pkg_matrices = []
+
+                if sw_namespace.variables in pkg_info:
+                    pkg_vars = pkg_info[sw_namespace.variables].copy()
+
+                if sw_namespace.matrices in pkg_info:
+                    pkg_matrices = pkg_info[sw_namespace.matrices].copy()
+
+                if sw_namespace.matrix in pkg_info:
+                    pkg_matrices.append(pkg_info[sw_namespace.matrix].copy())
+
+                pkg_vars['package_name'] = pkg_template
+
+                for rendered_vars in pkg_renderer.render_objects(pkg_vars, pkg_matrices):
+                    expansion_str = expander.expansion_str('package_name')
+                    final_name = expander.expand_var(expansion_str,
+                                                     extra_vars=rendered_vars)
+                    self._packages[final_name] = {}
+
+                    spack_spec = expander.expand_var(pkg_info['spack_spec'],
+                                                     extra_vars=rendered_vars)
+                    self._packages[final_name]['spack_spec'] = spack_spec
+
+                    if 'compiler_spec' in pkg_info:
+                        comp_spec = expander.expand_var(pkg_info['compiler_spec'],
+                                                        extra_vars=rendered_vars)
+                        self._packages[final_name]['compiler_spec'] = comp_spec
+
+                    if 'compiler' in pkg_info:
+                        comp = expander.expand_var(pkg_info['compiler'],
+                                                   extra_vars=rendered_vars)
+                        self._packages[final_name]['compiler'] = comp
+
+        if sw_namespace.environments in self.spack_dict:
+            for env_template, env_info in self.spack_dict[sw_namespace.environments].items():
+                env_vars = {}
+                env_matrices = []
+
+                if sw_namespace.variables in env_info:
+                    env_vars = env_info[sw_namespace.variables].copy()
+
+                if sw_namespace.matrices in env_info:
+                    env_matrices = env_info[sw_namespace.matrices].copy()
+
+                if sw_namespace.matrix in env_info:
+                    env_matrices.append(env_info[sw_namespace.matrix].copy())
+
+                env_vars['environment_name'] = env_template
+
+                for rendered_vars in env_renderer.render_objects(env_vars, env_matrices):
+                    expansion_str = expander.expansion_str('environment_name')
+                    final_name = expander.expand_var(expansion_str,
+                                                     extra_vars=rendered_vars)
+
+                    self._environments[final_name] = {}
+
+                    if sw_namespace.external_env in env_info:
+                        external_env = expander.expand_var(env_info[sw_namespace.external_env],
+                                                           extra_vars=rendered_vars)
+                        self._environments[final_name][sw_namespace.external_env] = \
+                            external_env
+
+                    if sw_namespace.packages in env_info:
+                        self._environments[final_name][sw_namespace.packages] = []
+                        env_packages = self._environments[final_name][sw_namespace.packages]
+
+                        for pkg_name in env_info[sw_namespace.packages]:
+                            expanded_pkg = expander.expand_var(pkg_name,
+                                                               extra_vars=rendered_vars)
+                            env_packages.append(expanded_pkg)
+
+    def get_env(self, environment_name):
+        """Return a reference to the environment definition"""
         if environment_name not in self._environments:
             raise RambleSoftwareEnvironmentError(
                 f'Environment {environment_name} is not defined.'
             )
 
-        namespace = None
-        spec_dict = None
-        if spec_type == 'compiler':
-            namespace = sw_namespace.compilers
-            spec_dict = self._compilers
-        elif spec_type == 'package':
-            namespace = sw_namespace.packages
-            spec_dict = self._packages
+        return self._environments[environment_name]
+
+    def get_spec_string(self, package_name):
+        """Return the full spec string given a package name"""
+        if package_name not in self._packages:
+            raise RambleSoftwareEnvironmentError(
+                f'Package {package_name} is not defined.'
+            )
+
+        spec_string = self._packages[package_name]['spack_spec']
+        compiler_str = ''
+        if 'compiler' in self._packages[package_name]:
+            comp_name = self._packages[package_name]['compiler']
+            comp_spec = self.get_spec(comp_name)
+            compiler_str = f'%{comp_spec["spack_spec"]}'
+            if 'compiler_spec' in comp_spec:
+                compiler_str = f'%{comp_spec["compiler_spec"]}'
+        return spec_string + compiler_str
+
+    def get_spec(self, package_name):
+        """Return a single spec given its name"""
+        if package_name not in self._packages:
+            raise RambleSoftwareEnvironmentError(
+                f'Package {package_name} is not defined.'
+            )
+
+        return self._packages[package_name]
+
+    def get_env_packages(self, environment_name):
+        """Return all of the packages used by an environment"""
+        if environment_name not in self._environments:
+            raise RambleSoftwareEnvironmentError(
+                f'Environment {environment_name} is not defined.'
+            )
+
+        namespace = sw_namespace.packages
 
         if namespace in self._environments[environment_name]:
             for name in self._environments[environment_name][namespace]:
-                yield name, spec_dict[name][sw_namespace.spack_spec]
+                yield name
+
+    def specs_equiv(self, spec1, spec2):
+        all_keys = set(spec1.keys())
+        all_keys.update(set(spec2.keys()))
+
+        if len(all_keys) != len(spec1.keys()):
+            return False
+
+        if 'application_name' in all_keys:
+            all_keys.remove('application_name')
+
+        if 'spec_type' in all_keys:
+            all_keys.remove('spec_type')
+
+        for key in all_keys:
+            if key not in spec1:
+                return False
+            if key not in spec2:
+                return False
+            if spec1[key] != spec2[key]:
+                return False
+
+        return True
 
     def get_named_spec(self, spec_name, spec_context='compiler'):
         """Extract a named spec from a v1 spack dictionary"""

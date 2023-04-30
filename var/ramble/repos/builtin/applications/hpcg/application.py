@@ -15,13 +15,17 @@ class Hpcg(SpackApplication):
 
     tags = ['benchmark-app', 'mini-app', 'benchmark']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018',
+                  spack_spec='intel-mpi@2018.4.274',
+                  compiler='gcc9')
 
-    software_spec('hpcg', base='hpcg', version='3.1',
-                  variants='+openmp',
-                  compiler='gcc9', mpi='impi2018', required=True)
+    software_spec('hpcg',
+                  spack_spec='hpcg@3.1 +openmp',
+                  compiler='gcc9')
+
+    required_package('hpcg')
 
     executable('execute', 'xhpcg', use_mpi=True)
 

@@ -120,10 +120,12 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var('{spec_name}')
 
-            for _, comp_spec in workspace.software_environments.get_specs(app_context,
-                                                                          spec_type='compiler'):
-                tty.debug(f'Trying to install {comp_spec}')
-                self.spack_runner.install_compiler(comp_spec)
+            for pkg_name in workspace.software_environments.get_env_packages(app_context):
+                pkg_spec = workspace.software_environments.get_spec(pkg_name)
+                if 'compiler' in pkg_spec:
+                    tty.debug(f'Trying to install compiler: {pkg_spec["compiler"]}')
+                    comp_spec = workspace.software_environments.get_spec(pkg_spec['compiler'])
+                    self.spack_runner.install_compiler(comp_spec['spack_spec'])
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
@@ -160,27 +162,27 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            app_context = self.expander.expand_var('{spec_name}')
+            env_context = self.expander.expand_var('{spec_name}')
 
             env_concretized = False
-            external_spack_env = workspace.external_spack_env(app_context)
+            external_spack_env = workspace.external_spack_env(env_context)
             if external_spack_env:
                 env_concretized = self.spack_runner.copy_from_external_env(external_spack_env)
             else:
-                spec_names = set()
-                for pkg_name, pkg_spec in workspace.software_environments.get_specs(app_context):
-                    self.spack_runner.add_spec(pkg_spec)
-                    spec_names.add(pkg_name)
+                for pkg_name in workspace.software_environments.get_env_packages(env_context):
+                    spec_str = workspace.software_environments.get_spec_string(pkg_name)
+                    self.spack_runner.add_spec(spec_str)
 
-                for name, spec_info in self.software_specs.items():
-                    if 'required' in spec_info and spec_info['required']:
-                        if name not in spec_names:
-                            tty.die(('Software spec {} is not defined '
-                                     'in context {}, but is required '
-                                     'to by the {} application '
-                                     'definition').format(name,
-                                                          app_context,
-                                                          self.name))
+                added_packages = set(self.spack_runner.added_packages())
+
+                for pkg in self.required_packages.keys():
+                    if pkg not in added_packages:
+                        tty.die(('Software spec {} is not defined '
+                                 'in environment {}, but is required '
+                                 'to by the {} application '
+                                 'definition').format(pkg,
+                                                      env_context,
+                                                      self.name))
 
                 self.spack_runner.generate_env_file()
 
@@ -240,9 +242,10 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var('{spec_name}')
 
-            for pkg_name, pkg_spec in \
-                    workspace.software_environments.get_specs(app_context):
-                package_path = self.spack_runner.get_package_path(pkg_spec)
+            for pkg_name in \
+                    workspace.software_environments.get_env_packages(app_context):
+                spec_str = workspace.software_environments.get_spec_string(pkg_name)
+                package_path = self.spack_runner.get_package_path(spec_str)
                 self.variables[pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:

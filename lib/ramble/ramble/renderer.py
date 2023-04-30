@@ -19,6 +19,14 @@ class Renderer(object):
             self.object = 'experiment'
             self.objects = 'experiments'
             self.context = "experiment_name"
+        elif obj_type == 'package':
+            self.object = 'package'
+            self.objects = 'packages'
+            self.context = 'package_name'
+        elif obj_type == 'environment':
+            self.object = 'environment'
+            self.objects = 'environments'
+            self.context = 'environment_name'
         else:
             tty.die(f'Object type {obj_type} is not valid to render.\n' +
                     'Valid options are: "experiment"')

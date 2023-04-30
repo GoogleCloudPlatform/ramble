@@ -1652,3 +1652,45 @@ spack:
     assert 'Your workspace configuration contains deprecated sections' in captured.err
     assert 'ramble:mpi' in captured.err
     assert 'ramble:batch' in captured.err
+
+
+def test_v1_spack_config_warns(capsys):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_ranks: '1'
+spack:
+  concretized: true
+  compilers: {}
+  mpi_libraries: {}
+  applications:
+    zlib:
+      zlib:
+        base: zlib
+"""
+
+    workspace_name = 'test_v1_spack_config_warns'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+    ramble.software_environments.SoftwareEnvironments(ws1)
+    captured = capsys.readouterr()
+    assert 'Your workspace configuration uses the v1 format for the spack section' in captured.err
+    assert 'v1 support will be removed in the future.' in captured.err

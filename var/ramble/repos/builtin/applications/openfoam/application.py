@@ -15,13 +15,20 @@ class Openfoam(SpackApplication):
 
     tags = ['cfd', 'fluid', 'dynamics']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
-    mpi_library('ompi412', base='openmpi', version='4.1.2',
-                variants='+legacylaunchers +pmi +thread_multiple +cxx')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    software_spec('flex', base='flex', version='2.6.4', compiler='gcc9')
-    software_spec('openfoam', base='openfoam-org', version='7', compiler='gcc9',
-                  mpi='ompi412', dependencies=['flex'])
+    software_spec('ompi412',
+                  spack_spec='openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx',
+                  compiler='gcc9')
+
+    software_spec('flex',
+                  spack_spec='flex@2.6.4',
+                  compiler='gcc9')
+    software_spec('openfoam',
+                  spack_spec='openfoam-org@7',
+                  compiler='gcc9')
+
+    required_package('openfoam-org')
 
     workload('motorbike', executables=['get_inputs', 'configure', 'serial_decompose',
                                        'snappyHexMesh', 'patchSummary', 'potentialFoam',

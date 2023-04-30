@@ -15,14 +15,13 @@ class Streamc(SpackApplication):
 
     tags = ['memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark']
 
-    default_compiler('gcc12', base='gcc', version='12.2.0')
+    default_compiler('gcc12', spack_spec='gcc@12.2.0')
 
     software_spec('streamc',
-                  base='stream',
-                  version='5.10',
-                  compiler='gcc12',
-                  variants='+openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
-                  required=True)
+                  spack_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
+                  compiler='gcc12')
+
+    required_package('stream')
 
     executable('execute_c', 'stream_c.exe')
 

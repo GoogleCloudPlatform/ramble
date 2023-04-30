@@ -17,6 +17,7 @@ import spack.util.spack_json as sjson
 
 import ramble.workspace
 import ramble.config
+import ramble.software_environments
 from ramble.main import RambleCommand
 
 
@@ -72,30 +73,28 @@ ramble:
               - spec_name
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
+      spack_spec: gcc@8.5.0
+    intel-mpi:
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc
     wrfv4:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
-        compiler: gcc
-        mpi: intel
+      spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+      compiler: gcc
     wrfv4-portable:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
-        compiler: gcc
-        mpi: intel
-        target: 'x86_64'
+      spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
+        nesting=basic ~chem ~pnetcdf target=x86_64'
+      compiler: gcc
+  environments:
+    wrfv4:
+      packages:
+      - wrfv4
+      - intel-mpi
+    wrfv4-portable:
+      packages:
+      - wrfv4-portable
+      - intel-mpi
 """
 
     test_licenses = """
@@ -288,22 +287,20 @@ ramble:
                 n_ranks: 4
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc9:
-      base: gcc
-      version: 9.3.0
-  mpi_libraries:
+      spack_spec: gcc@9.3.0
     impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc9
     hpl:
-      hpl:
-        base: hpl
-        version: '2.3'
-        variants: +openmp
-        compiler: gcc9
-        mpi: impi2018
+      spack_spec: hpl@2.3 +openmp
+      compiler: gcc9
+  environments:
+    hpl:
+      packages:
+      - hpl
+      - impi2018
 """
 
     workspace_name = 'test_end_to_end_hpl'
@@ -343,79 +340,6 @@ spack:
             assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
 
 
-def test_dependency_dry_run(mutable_config, mutable_mock_workspace_path):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    partition: 'part1'
-    processes_per_node: '16'
-    n_threads: '1'
-  applications:
-    openfoam:
-      workloads:
-        motorbike:
-          experiments:
-            simple_test:
-              variables:
-                n_nodes: 1
-spack:
-  concretized: true
-  compilers:
-    gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    openfoam:
-      flex:
-        base: flex
-        version: 2.6.4
-      openfoam:
-        base: openfoam
-        compiler: gcc
-        mpi: intel
-        target: 'x86_64'
-        dependencies:
-          - flex
-"""
-    workspace_name = 'test_dependant_spec'
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
-
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-        with open(config_path, 'w+') as f:
-            f.write(test_config)
-        ws._re_read()
-
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-
-        deps = ws.get_spack_dict()['applications']['openfoam']['openfoam']['dependencies']
-        assert 'flex' in deps
-
-        software_dir = 'openfoam.motorbike'
-        software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
-        assert os.path.exists(software_base_dir)
-
-        software_path = os.path.join(software_base_dir, software_dir)
-        assert os.path.exists(software_path)
-
-        spack_file = os.path.join(software_path, 'spack.yaml')
-
-        import re
-        regex = re.compile(r".*openfoam.*\^flex.*")
-        with open(spack_file, 'r') as f:
-            data = f.read()
-            result = regex.search(data)
-
-            assert result
-
-
 def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
     """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
     test_config = """
@@ -436,24 +360,20 @@ ramble:
                 n_nodes: '8'
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc8:
-      base: gcc
-      version: 8.2.0
-      target: x86_64
-  mpi_libraries:
+      spack_spec: gcc@8.2.0 target=x86_64
     impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-      target: x86_64
-  applications:
+      spack_spec: intel-mpi@2018.4.274 target=x86_64
+      compiler: gcc8
     wrfv3:
-      my-wrf:
-        base: wrf
-        version: 3.9.1.1
-        variants: build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
-        compiler: gcc8
-        mpi: impi2018
+      spack_spec: my_wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
+      compiler: gcc8
+  environments:
+    wrfv3:
+      packages:
+      - impi2018
+      - wrfv3
 """
 
     workspace_name = 'test_missing_required_dry_run'
@@ -471,7 +391,7 @@ spack:
                            global_args=['-w', workspace_name],
                            fail_on_error=False)
 
-        assert "Software spec wrf is not defined in context wrfv3" in output
+        assert "Software spec wrf is not defined in environment wrfv3" in output
 
 
 def test_env_var_builtin(mutable_config, mutable_mock_workspace_path, mock_applications):
@@ -610,21 +530,20 @@ ramble:
                 n_ranks: "{{{var_name}}}"
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
+      spack_spec: gcc@8.5.0
     intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc
     openfoam:
-      openfoam:
-        base: openfoam
-        compiler: gcc
-        mpi: intel
-        target: 'x86_64'
+      spack_spec: openfoam-org
+      compiler: gcc
+  environments:
+    openfoam:
+      packages:
+      - openfoam
+      - intel
 """ .format(*test_scopes, var_name=var_name1)
 
     config = ramble.main.RambleCommand('config')
@@ -700,9 +619,8 @@ ramble:
                   MY_VAR: 'TEST'
 spack:
   concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
+  packages: {}
+  environments: {}
 """
     workspace_name = 'test_custom_executables'
     with ramble.workspace.create(workspace_name) as ws:
@@ -763,28 +681,24 @@ ramble:
                 n_nodes: '1'
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc8:
-      base: gcc
-      version: 8.5.0
+      spack_spec: gcc@8.5.0
     gcc9:
-      base: gcc
-      version: 9.3.0
+      spack_spec: gcc@9.3.0
     gcc10:
-      base: gcc
-      version: 10.1.0
-  mpi_libraries:
+      spack_spec: gcc@10.1.0
     intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc8
+    wrf:
+      spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+      compiler: gcc8
+  environments:
     wrfv4:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
-        compiler: gcc8
-        mpi: intel
+      packages:
+      - wrf
+      - intel
 """
 
     workspace_name = 'test_unused_compilers_are_skipped'
@@ -802,9 +716,9 @@ spack:
     ws.run_pipeline('setup')
     captured = capsys.readouterr()
 
-    required_compiler_str = "gcc @8.5.0"
-    unused_gcc9_str = "gcc @9.3.0"
-    unused_gcc10_str = "gcc @10.1.0"
+    required_compiler_str = "gcc@8.5.0"
+    unused_gcc9_str = "gcc@9.3.0"
+    unused_gcc10_str = "gcc@10.1.0"
 
     assert required_compiler_str in captured.out
     assert unused_gcc9_str not in captured.out
@@ -842,29 +756,10 @@ ramble:
                 n_nodes: '1'
 spack:
   concretized: true
-  compilers:
-    gcc8:
-      base: gcc
-      version: 8.5.0
-    gcc9:
-      base: gcc
-      version: 9.3.0
-    gcc10:
-      base: gcc
-      version: 10.1.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
+  packages: {{}}
+  environments:
     wrfv4:
       external_spack_env: {env_path}
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
-        compiler: gcc8
-        mpi: intel
 """
 
     workspace_name = 'test_dryrun_copies_external_env'
@@ -917,12 +812,13 @@ ramble:
                 test_id: [1, 2]
 spack:
   concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications:
+  packages:
     zlib:
-      zlib:
-        base: zlib
+      spack_spec: zlib
+  environments:
+    zlib:
+      packages:
+      - zlib
 """
 
     workspace_name = 'test_dryrun_series_contains_package_paths'
@@ -1002,26 +898,27 @@ ramble:
                 n_nodes: '2'
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc:
-      base: gcc
-      version: 9.3.0
-      target: x86_64
-  mpi_libraries:
+      spack_spec: gcc@9.3.0 target=x86_64
     impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    intel-mpi-benchmarks:
-      intel-mpi-benchmarks:
-        base: intel-mpi-benchmarks
-        compiler: gcc
-        mpi: impi2018
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc
+    imb:
+      spack_spec: intel-mpi-benchmarks
+      compiler: gcc
     gromacs:
-      gromacs:
-        base: gromacs
-        compiler: gcc
-        mpi: impi2018
+      spack_spec: gromacs
+      compiler: gcc
+  environments:
+    intel-mpi-benchmarks:
+      packages:
+      - imb
+      - impi2018
+    gromacs:
+      packages:
+      - gromacs
+      - impi2018
 """
 
     mock_output_data = """
@@ -1163,9 +1060,8 @@ def test_known_applications(application):
                 processes_per_node: '1'\n""")
             f.write("""spack:
   concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}\n""")
+  packages: {}
+  environments: {}\n""")
 
         ws._re_read()
         ws.concretize()
