@@ -82,30 +82,13 @@ class SpackApplication(ApplicationBase):
 
         return ''.join(out_str)
 
-    def _extract_specs(self, workspace, spec_name, app_name):
-        """Build a list of all specs which the named spec requires
-
-        Traverse a spec and all of its dependencies to extract a list
-        of specs
-        """
-        spec_list = []
-        spec = workspace.get_named_spec(spec_name, app_name)
-        if 'dependencies' in spec:
-            for dep in spec['dependencies']:
-                spec_list.extend(
-                    self._extract_specs(workspace,
-                                        dep, app_name))
-        spec['application_name'] = app_name
-        spec_list.append((spec_name, spec))
-        return spec_list
-
     def _install_compilers(self, workspace):
         """Install compilers an application uses"""
 
         # See if we cached this already, and if so return
-        namespace = self.expander.spec_namespace
+        namespace = self.expander.env_namespace
         if not namespace:
-            raise ApplicationError('Ramble spec_namespace is set to None.')
+            raise ApplicationError('Ramble env_namespace is set to None.')
         spec_name = namespace.split('.')[0]
 
         cache_tupl = ('spack-compilers', spec_name)
@@ -118,7 +101,7 @@ class SpackApplication(ApplicationBase):
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
 
-            app_context = self.expander.expand_var('{spec_name}')
+            app_context = self.expander.expand_var('{env_name}')
 
             for pkg_name in workspace.software_environments.get_env_packages(app_context):
                 pkg_spec = workspace.software_environments.get_spec(pkg_name)
@@ -138,9 +121,9 @@ class SpackApplication(ApplicationBase):
         """
 
         # See if we cached this already, and if so return
-        namespace = self.expander.spec_namespace
+        namespace = self.expander.env_namespace
         if not namespace:
-            raise ApplicationError('Ramble spec_namespace is set to None.')
+            raise ApplicationError('Ramble env_namespace is set to None.')
 
         cache_tupl = ('spack-env', namespace)
         if workspace.check_cache(cache_tupl):
@@ -162,7 +145,7 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            env_context = self.expander.expand_var('{spec_name}')
+            env_context = self.expander.expand_var('{env_name}')
 
             env_concretized = False
             external_spack_env = workspace.external_spack_env(env_context)
@@ -196,9 +179,9 @@ class SpackApplication(ApplicationBase):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
-        namespace = self.expander.spec_namespace
+        namespace = self.expander.env_namespace
         if not namespace:
-            raise ApplicationError('Ramble spec_namespace is set to None.')
+            raise ApplicationError('Ramble env_namespace is set to None.')
 
         cache_tupl = ('spack-install', namespace)
         if workspace.check_cache(cache_tupl):
@@ -240,7 +223,7 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            app_context = self.expander.expand_var('{spec_name}')
+            app_context = self.expander.expand_var('{env_name}')
 
             for pkg_name in \
                     workspace.software_environments.get_env_packages(app_context):
@@ -256,9 +239,9 @@ class SpackApplication(ApplicationBase):
         import re
 
         # See if we cached this already, and if so return
-        namespace = self.expander.spec_namespace
+        namespace = self.expander.env_namespace
         if not namespace:
-            raise ApplicationError('Ramble spec_namespace is set to None.')
+            raise ApplicationError('Ramble env_namespace is set to None.')
 
         cache_tupl = ('spack-mirror', namespace)
         if workspace.check_cache(cache_tupl):

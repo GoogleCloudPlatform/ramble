@@ -41,11 +41,11 @@ ramble:
   applications:
     wrfv4:
       variables:
-        spec_name: ['wrfv4', 'wrfv4-portable']
+        env_name: ['wrfv4', 'wrfv4-portable']
       workloads:
         CONUS_12km:
           experiments:
-            scaling_{n_nodes}_{partition}_{spec_name}:
+            scaling_{n_nodes}_{partition}_{env_name}:
               success_criteria:
               - name: 'timing'
                 mode: 'string'
@@ -70,7 +70,7 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - spec_name
+              - env_name
 spack:
   concretized: true
   packages:
@@ -676,7 +676,7 @@ ramble:
       workloads:
         CONUS_12km:
           experiments:
-            test{n_nodes}_{spec_name}:
+            test{n_nodes}_{env_name}:
               variables:
                 n_nodes: '1'
 spack:
@@ -751,7 +751,7 @@ ramble:
       workloads:
         CONUS_12km:
           experiments:
-            test{{n_nodes}}_{{spec_name}}:
+            test{{n_nodes}}_{{env_name}}:
               variables:
                 n_nodes: '1'
 spack:

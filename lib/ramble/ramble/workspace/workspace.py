@@ -130,13 +130,8 @@ ramble:
   applications: {}
 spack:
   concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
-    # app_name
-    #   spec_name:
-    #     base: ''
-    #     version: ''
+  packages: {}
+  environments: {}
 """
 
 

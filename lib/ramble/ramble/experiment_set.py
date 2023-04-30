@@ -92,7 +92,7 @@ class ExperimentSet(object):
 
         # Set some base variables from the workspace definition.
         self.set_base_var(self.keywords.log_dir, workspace.log_dir)
-        self.set_base_var(self.keywords.spec_name,
+        self.set_base_var(self.keywords.env_name,
                           Expander.expansion_str(self.keywords.application_name))
 
     def read_config_vars(self, workspace):
@@ -397,6 +397,11 @@ class ExperimentSet(object):
 
         experiment_template_name = context_variables[self.keywords.experiment_name]
 
+        # Check deprecated variable definitions
+        if self.keywords.spec_name in context_variables:
+            tty.warn('Workspace config uses the "spec_name" variable')
+            tty.die('Please update to using the "env_name" variable instead')
+
         renderer = ramble.renderer.Renderer('experiment')
 
         rendered_experiments = set()
@@ -405,7 +410,7 @@ class ExperimentSet(object):
                                         self._matrices[self._contexts.experiment]):
             experiment_vars[self.keywords.spack_env] = \
                 os.path.join(self._workspace.software_dir,
-                             Expander.expansion_str(self.keywords.spec_name) + '.' +
+                             Expander.expansion_str(self.keywords.env_name) + '.' +
                              Expander.expansion_str(self.keywords.workload_name))
 
             expander = ramble.expander.Expander(experiment_vars, self)

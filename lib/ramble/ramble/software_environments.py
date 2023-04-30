@@ -238,9 +238,9 @@ class SoftwareEnvironments(object):
         if 'compiler' in self._packages[package_name]:
             comp_name = self._packages[package_name]['compiler']
             comp_spec = self.get_spec(comp_name)
-            compiler_str = f'%{comp_spec["spack_spec"]}'
+            compiler_str = f' %{comp_spec["spack_spec"]}'
             if 'compiler_spec' in comp_spec:
-                compiler_str = f'%{comp_spec["compiler_spec"]}'
+                compiler_str = f' %{comp_spec["compiler_spec"]}'
         return spec_string + compiler_str
 
     def get_spec(self, package_name):
