@@ -48,26 +48,7 @@ import ramble.schema.merged
 
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
-
-
-class namespace:
-    ramble = 'ramble'
-    spack = 'spack'
-    application_dir = 'application_directories'
-    application = 'applications'
-    workload = 'workloads'
-    experiment = 'experiments'
-    variables = 'variables'
-    success = 'success_criteria'
-    internals = 'internals'
-    custom_executables = 'custom_executables'
-    executables = 'executables'
-    env_var = 'env-vars'
-    packages = 'packages'
-    environments = 'environments'
-    external_spack_env = 'external_spack_env'
-    template = 'template'
-    chained_experiments = 'chained_experiments'
+from ramble.namespace import namespace
 
 
 #: Environment variable used to indicate the active workspace
@@ -1004,9 +985,9 @@ class Workspace(object):
     def external_spack_env(self, env_name):
         env_context = self.software_environments.get_env(env_name)
 
-        if namespace.external_spack_env not in env_context:
+        if namespace.external_env not in env_context:
             return None
-        return env_context[namespace.external_spack_env]
+        return env_context[namespace.external_env]
 
     def concretize(self):
         spack_dict = self.get_spack_dict()

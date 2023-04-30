@@ -14,21 +14,7 @@ import ramble.keywords
 import ramble.error
 import ramble.renderer
 import ramble.expander
-
-
-class sw_namespace:
-    spack = 'spack'
-    applications = 'applications'
-    mpi_lib = 'mpi_libraries'
-    compilers = 'compilers'
-    spack_spec = 'spack_spec'
-    compiler_spec = 'compiler_spec'
-    packages = 'packages'
-    environments = 'environments'
-    variables = 'variables'
-    matrices = 'matrices'
-    matrix = 'matrix'
-    external_env = 'external_spack_env'
+from ramble.namespace import namespace
 
 
 class SoftwareEnvironments(object):
@@ -85,12 +71,12 @@ class SoftwareEnvironments(object):
 
         conf_type = 'v2'
 
-        if sw_namespace.applications in self.spack_dict or \
-                sw_namespace.compilers in self.spack_dict or \
-                sw_namespace.mpi_lib in self.spack_dict:
+        if namespace.application in self.spack_dict or \
+                namespace.compilers in self.spack_dict or \
+                namespace.mpi_lib in self.spack_dict:
             conf_type = 'v1'
-        if sw_namespace.packages in self.spack_dict and \
-                sw_namespace.environments in self.spack_dict:
+        if namespace.packages in self.spack_dict and \
+                namespace.environments in self.spack_dict:
             conf_type = 'v2'
 
         tty.debug(f'Detected config type of: {conf_type}')
@@ -104,47 +90,47 @@ class SoftwareEnvironments(object):
         tty.warn('Please update to the latest format to ensure it keeps functioning properly.')
         tty.warn('v1 support will be removed in the future.')
 
-        if sw_namespace.compilers in self.spack_dict:
-            for compiler, conf in self.spack_dict[sw_namespace.compilers].items():
+        if namespace.compilers in self.spack_dict:
+            for compiler, conf in self.spack_dict[namespace.compilers].items():
                 self._packages[compiler] = {}
 
                 spec_dict = self.get_named_spec(compiler)
-                self._packages[compiler][sw_namespace.spack_spec] = self.spec_string(spec_dict)
-                self._packages[compiler][sw_namespace.compiler_spec] = \
+                self._packages[compiler][namespace.spack_spec] = self.spec_string(spec_dict)
+                self._packages[compiler][namespace.compiler_spec] = \
                     self.spec_string(spec_dict, use_custom_specifier=True)
 
-        if sw_namespace.mpi_lib in self.spack_dict:
-            for mpi, conf in self.spack_dict[sw_namespace.mpi_lib].items():
+        if namespace.mpi_lib in self.spack_dict:
+            for mpi, conf in self.spack_dict[namespace.mpi_lib].items():
                 self._packages[mpi] = {}
 
                 spec_dict = self.get_named_spec(mpi, 'mpi_library')
-                self._packages[mpi][sw_namespace.spack_spec] = self.spec_string(spec_dict)
+                self._packages[mpi][namespace.spack_spec] = self.spec_string(spec_dict)
 
-        if sw_namespace.applications in self.spack_dict:
-            for env, pkgs in self.spack_dict[sw_namespace.applications].items():
+        if namespace.application in self.spack_dict:
+            for env, pkgs in self.spack_dict[namespace.application].items():
                 self._environments[env] = {}
-                self._environments[env][sw_namespace.packages] = []
-                self._environments[env][sw_namespace.compilers] = []
-                self._environments[env][sw_namespace.external_env] = None
+                self._environments[env][namespace.packages] = []
+                self._environments[env][namespace.compilers] = []
+                self._environments[env][namespace.external_env] = None
 
-                if sw_namespace.external_env in pkgs:
-                    self._environments[env][sw_namespace.external_env] = \
-                        pkgs[sw_namespace.external_env]
+                if namespace.external_env in pkgs:
+                    self._environments[env][namespace.external_env] = \
+                        pkgs[namespace.external_env]
 
                 for pkg, conf in pkgs.items():
-                    if pkg != sw_namespace.external_env:
+                    if pkg != namespace.external_env:
                         self._packages[pkg] = {}
                         spec_dict = self.get_named_spec(pkg, spec_context=env)
-                        self._packages[pkg][sw_namespace.spack_spec] = self.spec_string(spec_dict)
-                        self._environments[env][sw_namespace.packages].append(pkg)
+                        self._packages[pkg][namespace.spack_spec] = self.spec_string(spec_dict)
+                        self._environments[env][namespace.packages].append(pkg)
 
                         if 'compiler' in conf:
-                            self._environments[env][sw_namespace.compilers].append(
+                            self._environments[env][namespace.compilers].append(
                                 conf['compiler']
                             )
 
                         if 'mpi' in conf:
-                            self._environments[env][sw_namespace.packages].append(
+                            self._environments[env][namespace.packages].append(
                                 conf['mpi']
                             )
 
@@ -157,19 +143,19 @@ class SoftwareEnvironments(object):
 
         expander = ramble.expander.Expander({}, None)
 
-        if sw_namespace.packages in self.spack_dict:
-            for pkg_template, pkg_info in self.spack_dict[sw_namespace.packages].items():
+        if namespace.packages in self.spack_dict:
+            for pkg_template, pkg_info in self.spack_dict[namespace.packages].items():
                 pkg_vars = {}
                 pkg_matrices = []
 
-                if sw_namespace.variables in pkg_info:
-                    pkg_vars = pkg_info[sw_namespace.variables].copy()
+                if namespace.variables in pkg_info:
+                    pkg_vars = pkg_info[namespace.variables].copy()
 
-                if sw_namespace.matrices in pkg_info:
-                    pkg_matrices = pkg_info[sw_namespace.matrices].copy()
+                if namespace.matrices in pkg_info:
+                    pkg_matrices = pkg_info[namespace.matrices].copy()
 
-                if sw_namespace.matrix in pkg_info:
-                    pkg_matrices.append(pkg_info[sw_namespace.matrix].copy())
+                if namespace.matrix in pkg_info:
+                    pkg_matrices.append(pkg_info[namespace.matrix].copy())
 
                 pkg_vars['package_name'] = pkg_template
 
@@ -193,19 +179,19 @@ class SoftwareEnvironments(object):
                                                    extra_vars=rendered_vars)
                         self._packages[final_name]['compiler'] = comp
 
-        if sw_namespace.environments in self.spack_dict:
-            for env_template, env_info in self.spack_dict[sw_namespace.environments].items():
+        if namespace.environments in self.spack_dict:
+            for env_template, env_info in self.spack_dict[namespace.environments].items():
                 env_vars = {}
                 env_matrices = []
 
-                if sw_namespace.variables in env_info:
-                    env_vars = env_info[sw_namespace.variables].copy()
+                if namespace.variables in env_info:
+                    env_vars = env_info[namespace.variables].copy()
 
-                if sw_namespace.matrices in env_info:
-                    env_matrices = env_info[sw_namespace.matrices].copy()
+                if namespace.matrices in env_info:
+                    env_matrices = env_info[namespace.matrices].copy()
 
-                if sw_namespace.matrix in env_info:
-                    env_matrices.append(env_info[sw_namespace.matrix].copy())
+                if namespace.matrix in env_info:
+                    env_matrices.append(env_info[namespace.matrix].copy())
 
                 env_vars['environment_name'] = env_template
 
@@ -216,17 +202,17 @@ class SoftwareEnvironments(object):
 
                     self._environments[final_name] = {}
 
-                    if sw_namespace.external_env in env_info:
-                        external_env = expander.expand_var(env_info[sw_namespace.external_env],
+                    if namespace.external_env in env_info:
+                        external_env = expander.expand_var(env_info[namespace.external_env],
                                                            extra_vars=rendered_vars)
-                        self._environments[final_name][sw_namespace.external_env] = \
+                        self._environments[final_name][namespace.external_env] = \
                             external_env
 
-                    if sw_namespace.packages in env_info:
-                        self._environments[final_name][sw_namespace.packages] = []
-                        env_packages = self._environments[final_name][sw_namespace.packages]
+                    if namespace.packages in env_info:
+                        self._environments[final_name][namespace.packages] = []
+                        env_packages = self._environments[final_name][namespace.packages]
 
-                        for pkg_name in env_info[sw_namespace.packages]:
+                        for pkg_name in env_info[namespace.packages]:
                             expanded_pkg = expander.expand_var(pkg_name,
                                                                extra_vars=rendered_vars)
                             env_packages.append(expanded_pkg)
@@ -273,10 +259,8 @@ class SoftwareEnvironments(object):
                 f'Environment {environment_name} is not defined.'
             )
 
-        namespace = sw_namespace.packages
-
-        if namespace in self._environments[environment_name]:
-            for name in self._environments[environment_name][namespace]:
+        if namespace.packages in self._environments[environment_name]:
+            for name in self._environments[environment_name][namespace.packages]:
                 yield name
 
     def specs_equiv(self, spec1, spec2):
@@ -305,23 +289,23 @@ class SoftwareEnvironments(object):
     def get_named_spec(self, spec_name, spec_context='compiler'):
         """Extract a named spec from a v1 spack dictionary"""
         if spec_context == 'compiler':
-            if sw_namespace.compilers not in self.spack_dict:
+            if namespace.compilers not in self.spack_dict:
                 raise RambleSoftwareEnvironmentError('No compilers ' +
                                                      'defined in workspace')
-            spec_dict = self.spack_dict[sw_namespace.compilers]
+            spec_dict = self.spack_dict[namespace.compilers]
         elif spec_context == 'mpi_library':
-            if sw_namespace.mpi_lib not in self.spack_dict:
+            if namespace.mpi_lib not in self.spack_dict:
                 raise RambleSoftwareEnvironmentError('No MPI libraries ' +
                                                      'defined in workspace')
-            spec_dict = self.spack_dict[sw_namespace.mpi_lib]
+            spec_dict = self.spack_dict[namespace.mpi_lib]
         else:
-            if sw_namespace.applications not in self.spack_dict:
+            if namespace.application not in self.spack_dict:
                 raise RambleSoftwareEnvironmentError('No applications ' +
                                                      'defined in workspace')
             if spec_context not in self.spack_dict['applications']:
                 raise RambleSoftwareEnvironmentError('Invalid context ' +
                                                      '%s' % spec_context)
-            spec_dict = self.spack_dict[sw_namespace.applications][spec_context]
+            spec_dict = self.spack_dict[namespace.application][spec_context]
             return self._build_spec_dict(spec_dict[spec_name], app_name=spec_context)
 
         return self._build_spec_dict(spec_dict[spec_name])
