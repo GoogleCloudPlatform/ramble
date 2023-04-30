@@ -379,7 +379,7 @@ Ramble automatically generates definitions for the following varialbes:
 * ``application_name`` - Set to the name of the application
 * ``workload_name`` - Set to the name of the workload within the application
 * ``experiment_name`` - Set to the name of the experiment
-* ``spec_name`` - By default defined as ``{application_name}``. Can be
+* ``env_name`` - By default defined as ``{application_name}``. Can be
   overriden to control the spack definition to use.
 * ``application_run_dir`` - Absolute path to
   ``$workspace_root/experiments/{application_name}``
@@ -392,7 +392,7 @@ Ramble automatically generates definitions for the following varialbes:
 * ``workload_input_dir`` - Absolute path to
   ``$workspace_root/inputs/{application_name}/{workload_name}``
 * ``spack_env`` - Absolute path to
-  ``$workspace_root/software/{spec_name}.{workload_name}``
+  ``$workspace_root/software/{env_name}.{workload_name}``
 * ``log_dir`` - Absolute path to ``$workspace_root/logs``
 * ``log_file`` - Absolute path to
   ``{experiment_run_dir}/{experiment_name}.out``
@@ -416,8 +416,8 @@ When using spack applications, Ramble also geneates the following variables:
 
 * ``<software_spec_name>`` - Set to the equivalent of ``spack location -i
   <spec>`` for packages defined in a ramble ``spec_name`` package set.
-  ``<software_spec_name>`` is set to the name of the package (one level lower
-  than ramble's ``spec_name``).
+  ``<software_spec_name>`` is set to the name of the package as defined in the
+  ``spack:packages`` dictionary.
 
 -----------------
 Spack Dictionary:
@@ -431,54 +431,27 @@ Below is an annotated example of the spack dictionary.
 .. code-block:: yaml
 
     spack:
-      compilers:
-        gcc9: # Abstract name to refer to this compiler
-          base: gcc # Spack packge name
-          version: 9.3.0 # Spack package version
-          target: x86_64 # Spack target option
-      mpi_libraries:
-        impi2018: # Abstract name to refer to this MPI
-          base: intel-mpi
-          version: 2018.4.274
-          target: x86_64
-      applications:
-        gromacs: # Ramble's spec_name variable
-          gromacs: # application.py named software_spec, name of Ramble spec object
-            base: gromacs # Spack package name
-            version: 2022.4 # Spack package version
-            compiler: gcc9 # Ramble compiler name
-            mpi: impi2018 # Ramble MPI name
+      packages:
+        gcc9: # Abstract name to refer to this package
+          spack_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
+        impi2018:
+          spack_spec: intel-mpi@2018.4.274 target=x86_64
+          compiler: gcc9 # Other package name to use as compiler for this package
+        gromacs:
+          spack_spec: gromacs@2022.4
+          compiler: gcc9
+      environments:
+        gromacs:
+          packages: # List of packages to include in this environment
+          - impi2018
+          - gromacs
 
 Application definition files can define one or more ``software_spec``
-directives, which are packages the application might need to run properly. Some
-are marked as required, and others might not be.
+directives, which are packages the application might need to run properly.
+Additionally, spack packages can be marked as required through the
+``required_package`` directive.
 
-Multiple compilers and MPI libraries can be defined, even if they are not used.
-
-^^^^^^^^^^^^^^^^^^^
-Ramble Spec Format:
-^^^^^^^^^^^^^^^^^^^
-
-When writing Spack spec information in Ramble configuration files, the format
-is as follows:
-
-.. code-block:: yaml
-
-   <software_spec:name>:
-     base: # Takes the Spack package name
-     version: # Takes the version, which would be passed in with @
-     compiler: # Takes the name of the ramble spec object to use
-               # to compile this package
-
-     variants: # Takes any variant strings the package should be built with
-     mpi: # Takes the name of the Ramble spec object to use for an MPI dependency
-     arch: # Takes the input to the Spack `arch` option
-     target: # Takes the input to the Spack `target` option
-     dependencies: # YAML List containing Ramble spec object names this
-                   # package depends on
-
-Not all of the options are required, but generally a spec object should contain
-at least ``base``, and ``version``.
+Packages that are not used in an environment are not installed.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 External Spack Environment Support:
@@ -496,11 +469,9 @@ This section shows how this feature can be used.
 .. code-block:: yaml
 
     spack:
-      applications:
+      environments:
         gromacs:
           external_spack_env: name_or_path_to_spack_env
-          gromacs:
-            base: gromacs
 
 In the above example, the ``external_spack_env`` keyword refers an external
 Spack environment. This can be the name of a named Spack environment, or the
@@ -508,13 +479,7 @@ path to a directory which contains a Spack environment. Ramble will copy the
 ``spack.yaml`` file from this environment, instead of generating its own.
 
 This allows users to describe custom Spack environments and allow them to be
-used with Ramble generated experiments. However, users will still need to
-define some aspects of the ``spack:applications:<app_name>`` dictionary in the
-``ramble.yaml`` file. Specifically, any software specs that are required by the
-application.py file will need to have their ``base`` defined at a minimum.
-Ramble won't use any other information in the spec definition (i.e. ``version``
-or ``variants``), but adding the information to the ``ramble.yaml`` will
-enhance the provenance information that Ramble is able to track.
+used with Ramble generated experiments.
 
 It is important to note that Ramble copies in the external environment files
 every time ``ramble workspace setup`` is called. The new files will clobber the
@@ -559,49 +524,41 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
           workloads:
             water_bare:
               experiments:
-                '{spec_name}':
+                '{env_name}':
                   variables:
                     n_ranks: '1'
                     n_nodes: '1'
-                    spec_name: ['gromacs-mpich', 'gromacs-ompi']
+                    env_name: ['gromacs-mpich', 'gromacs-ompi']
     spack:
-      compilers:
+      packages:
         gcc9:
-          base: gcc
-          version: 9.3.0
-          target: x86_64
-      mpi_libraries:
+          spack_spec: gcc@9.3.0 target=x86_64
         mpich:
-          base: mpich
-          version: 4.0.2
-          target: x86_64
+          spack_spec: mpich@4.0.2 target=x86_64
+          compiler: gcc9
         ompi:
-          base: openmpi
-          version: 4.1.4
-          target: x86_64
-      applications:
-        gromacs-ompi:
-          gromacs:
-            base: gromacs
-            version: 2022.4
-            compiler: gcc9
-            mpi: ompi
-        gromacs-mpich:
-          gromacs:
-            base: gromacs
-            version: 2022.4
-            compiler: gcc9
-            mpi: mpich
+          spack_spec: openmpi@4.1.4 target=x86_64
+          compiler: gcc9
+        gromacs:
+          spack_spec: gromacs@2022.4
+          compiler: gcc9
+      environments:
+        gromacs-{mpi}:
+          variables:
+            mpi: ['mpich', 'ompi']
+          packages:
+          - gromacs
+          - '{mpi}'
 
-In the above example, you can see how ``spec_name`` is used to test both an
+In the above example, you can see how ``env_name`` is used to test both an
 OpenMPI and MPICH version of Gromacs. Additionally, the ``mpi_command``
 variable is used to define how ``mpirun`` should look for each of the MPI
 libraries.
 
 Using the previously described Ramble vector syntax, this configuration file
-will generate 2 experiments. Both ``spec_name`` and ``mpi_command`` will be
+will generate 2 experiments. Both ``env_name`` and ``mpi_command`` will be
 zipped together, giving each experiment a tuple of: ``(mpi_command,
-spec_name)`` which allows us to pair a specific MPI command to the
+env_name)`` which allows us to pair a specific MPI command to the
 corresponding Gromacs spec.
 
 
@@ -636,23 +593,20 @@ variable can be used to submit the same experiment to multiple batch systems.
                     n_ranks: '1'
                     n_nodes: '1'
     spack:
-      compilers:
+      packages:
         gcc9:
-          base: gcc
-          version: 9.3.0
-          target: x86_64
-      mpi_libraries:
+          spack_spec: gcc@9.3.0 target=x86_64
         impi2018:
-          base: intel-mpi
-          version: 2018.4.274
-          target: x86_64
-      applications:
+          spack_spec: intel-mpi@2018.4.274 target=x86_64
+          compiler: gcc9
         gromacs:
-          gromacs:
-            base: gromacs
-            version: 2022.4
-            compiler: gcc9
-            mpi: impi2018
+          spack_spec: gromacs@2022.4
+          compiler: gcc9
+      environments:
+        gromacs:
+          packages:
+          - impi2018
+          - gromacs
 
 The above example overrides the generated ``batch_submit`` variable to change
 how different experiments are submitted. In this example, we submit the same
