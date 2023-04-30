@@ -16,14 +16,14 @@ from llnl.util.lang import union_dicts
 import ramble.schema.applications
 import ramble.schema.config
 import ramble.schema.repos
-import ramble.schema.workspace
+import ramble.schema.spack
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
     ramble.schema.applications.applications_schema,
     ramble.schema.config.properties,
     ramble.schema.repos.properties,
-    ramble.schema.workspace.properties
+    ramble.schema.spack.properties,
 )
 
 

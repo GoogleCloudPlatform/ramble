@@ -128,10 +128,10 @@ ramble:
     batch_submit: '{execute_experiment}'
     processes_per_node: -1
   applications: {}
-spack:
-  concretized: false
-  packages: {}
-  environments: {}
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
 
@@ -1010,7 +1010,20 @@ class Workspace(object):
 
             for comp, info in app_inst.default_compilers.items():
                 if comp not in packages_dict:
-                    packages_dict[comp] = info.copy()
+                    packages_dict[comp] = syaml.syaml_dict()
+                    packages_dict[comp]['spack_spec'] = info['spack_spec']
+                    ramble.config.add(f'spack:packages:{comp}:spack_spec:{info["spack_spec"]}',
+                                      scope=self.ws_file_config_scope_name())
+                    if 'compiler_spec' in info and info['compiler_spec']:
+                        packages_dict[comp]['compiler_spec'] = info['compiler_spec']
+                        config_path = f'spack:packages:{comp}:' + \
+                            f'compiler_spec:{info["compiler_spec"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                    if 'compiler' in info and info['compiler']:
+                        packages_dict[comp]['compiler'] = info['compiler']
+                        config_path = f'spack:packages:{comp}:' + \
+                            f'compiler:{info["compiler"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
                 elif not self.software_environments.specs_equiv(info, packages_dict[comp]):
                     raise RambleConflictingDefinitionError(
                         f'Compiler {comp} defined in multiple conflicting ways'
@@ -1023,17 +1036,34 @@ class Workspace(object):
             app_packages = environments_dict[app_name][namespace.packages]
             for spec_name, info in app_inst.software_specs.items():
                 if spec_name not in packages_dict:
-                    packages_dict[spec_name] = info.copy()
+                    packages_dict[spec_name] = syaml.syaml_dict()
+                    packages_dict[spec_name]['spack_spec'] = info['spack_spec']
+                    ramble.config.add(f'spack:packages:{spec_name}:' +
+                                      f'spack_spec:{info["spack_spec"]}',
+                                      scope=self.ws_file_config_scope_name())
+                    if 'compiler_spec' in info and info['compiler_spec']:
+                        packages_dict[spec_name]['compiler_spec'] = info['compiler_spec']
+                        config_path = f'spack:packages:{spec_name}:' + \
+                            f'compiler_spec:{info["compiler_spec"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                    if 'compiler' in info and info['compiler']:
+                        packages_dict[spec_name]['compiler'] = info['compiler']
+                        config_path = f'spack:packages:{spec_name}:' + \
+                            f'compiler:{info["compiler"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+
                 elif not self.software_environments.specs_equiv(info, packages_dict[spec_name]):
                     raise RambleConflictingDefinitionError(
                         f'Package {spec_name} defined in multiple conflicting ways'
                     )
 
+                ramble.config.add(f'spack:environments:{app_name}:packages:[{spec_name}]',
+                                  scope=self.ws_file_config_scope_name())
+
                 app_packages.append(spec_name)
 
-        workspace_dict = self._get_workspace_dict()
-        workspace_dict[namespace.spack]['concretized'] = True
-        self.write()
+        ramble.config.add('spack:concretized:true', scope=self.ws_file_config_scope_name())
+
         return
 
     def write_json_results(self):
@@ -1194,7 +1224,7 @@ class Workspace(object):
                             'non-conretized workspace\n' + \
                             'Run `ramble workspace concretize` on this ' + \
                             'workspace first.\n' + \
-                            'Then ensure its software_stack.yaml file is ' + \
+                            'Then ensure its spack configuration is ' + \
                             'properly configured.'
             tty.die(error_message)
 
@@ -1540,9 +1570,9 @@ class Workspace(object):
             in self.application_configs else None
 
     def is_concretized(self):
-        ws_dict = self._get_workspace_dict()
-        if 'concretized' in ws_dict[namespace.spack]:
-            return (True if ws_dict[namespace.spack]['concretized']
+        spack_dict = self.get_spack_dict()
+        if 'concretized' in spack_dict:
+            return (True if spack_dict['concretized']
                     else False)
         return False
 
@@ -1569,8 +1599,15 @@ class Workspace(object):
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
         ws_dict = self._get_workspace_dict()
+        # TODO (dwj): Remove after deprecation period
+        # DEPRECATED
         if namespace.spack in ws_dict:
+            tty.warn('The spack dictionary is moving to its own config section.')
+            tty.warn('Please update to ensure your config continues to function properly.')
+            tty.warn('See the documentation for the new format.')
             return ws_dict[namespace.spack]
+        else:
+            return ramble.config.config.get_config('spack')
         return syaml.syaml_dict()
 
     def get_applications(self):

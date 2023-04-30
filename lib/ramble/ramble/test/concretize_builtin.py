@@ -68,11 +68,10 @@ ramble:
               matrix:
               - n_nodes
               - env_name
-spack:
-  concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
     import re

@@ -998,8 +998,6 @@ ramble:
             exp_series_{foo}:
               variables:
                 foo: 1
-spack:
-  concretized: false
 """
 
     import py
@@ -1386,7 +1384,7 @@ def test_workspace_include():
     inc_file = os.path.join(ws1.config_dir, "test_include.yaml")
 
     test_include = """
-ramble:
+config:
   variables:
     test_var: '1'
 """

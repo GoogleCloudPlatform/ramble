@@ -59,6 +59,7 @@ import ramble.schema.workspace
 import ramble.schema.applications
 import ramble.schema.licenses
 import ramble.schema.mirrors
+import ramble.schema.spack
 
 from ramble.error import RambleError
 
@@ -72,6 +73,7 @@ section_schemas = {
     'repos': ramble.schema.repos.schema,
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
+    'spack': ramble.schema.spack.schema,
 }
 
 # Same as above, but including keys for environments
