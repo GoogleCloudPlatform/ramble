@@ -30,8 +30,12 @@ class SoftwareEnvironments(object):
 
     def __init__(self, workspace):
 
+        self._raw_packages = {}
         self._packages = {}
+        self._package_map = {}
+        self._raw_environments = {}
         self._environments = {}
+        self._environment_map = {}
         self._workspace = workspace
         self.spack_dict = self._workspace.get_spack_dict().copy()
 
@@ -93,6 +97,7 @@ class SoftwareEnvironments(object):
         if namespace.compilers in self.spack_dict:
             for compiler, conf in self.spack_dict[namespace.compilers].items():
                 self._packages[compiler] = {}
+                self._package_map[compiler] = [compiler]
 
                 spec_dict = self.get_named_spec(compiler)
                 self._packages[compiler][namespace.spack_spec] = self.spec_string(spec_dict)
@@ -102,12 +107,14 @@ class SoftwareEnvironments(object):
         if namespace.mpi_lib in self.spack_dict:
             for mpi, conf in self.spack_dict[namespace.mpi_lib].items():
                 self._packages[mpi] = {}
+                self._package_map[mpi] = [mpi]
 
                 spec_dict = self.get_named_spec(mpi, 'mpi_library')
                 self._packages[mpi][namespace.spack_spec] = self.spec_string(spec_dict)
 
         if namespace.application in self.spack_dict:
             for env, pkgs in self.spack_dict[namespace.application].items():
+                self._environment_map[env] = [env]
                 self._environments[env] = {}
                 self._environments[env][namespace.packages] = []
                 self._environments[env][namespace.compilers] = []
@@ -120,6 +127,7 @@ class SoftwareEnvironments(object):
                 for pkg, conf in pkgs.items():
                     if pkg != namespace.external_env:
                         self._packages[pkg] = {}
+                        self._package_map[pkg] = [pkg]
                         spec_dict = self.get_named_spec(pkg, spec_context=env)
                         self._packages[pkg][namespace.spack_spec] = self.spec_string(spec_dict)
                         self._environments[env][namespace.packages].append(pkg)
@@ -133,6 +141,8 @@ class SoftwareEnvironments(object):
                             self._environments[env][namespace.packages].append(
                                 conf['mpi']
                             )
+        self._raw_packages = self._packages
+        self._raw_environments = self._environments
 
     def _v2_setup(self):
         """Process a v2 `spack:` dictionary in the workspace configuration."""
@@ -145,6 +155,8 @@ class SoftwareEnvironments(object):
 
         if namespace.packages in self.spack_dict:
             for pkg_template, pkg_info in self.spack_dict[namespace.packages].items():
+                self._raw_packages[pkg_template] = pkg_info
+                self._package_map[pkg_template] = []
                 pkg_vars = {}
                 pkg_matrices = []
 
@@ -164,6 +176,7 @@ class SoftwareEnvironments(object):
                     final_name = expander.expand_var(expansion_str,
                                                      extra_vars=rendered_vars)
                     self._packages[final_name] = {}
+                    self._package_map[pkg_template].append(final_name)
 
                     spack_spec = expander.expand_var(pkg_info['spack_spec'],
                                                      extra_vars=rendered_vars)
@@ -183,6 +196,8 @@ class SoftwareEnvironments(object):
             for env_template, env_info in self.spack_dict[namespace.environments].items():
                 env_vars = {}
                 env_matrices = []
+                self._raw_environments[env_template] = env_info
+                self._environment_map[env_template] = []
 
                 if namespace.variables in env_info:
                     env_vars = env_info[namespace.variables].copy()
@@ -199,6 +214,7 @@ class SoftwareEnvironments(object):
                     expansion_str = expander.expansion_str('environment_name')
                     final_name = expander.expand_var(expansion_str,
                                                      extra_vars=rendered_vars)
+                    self._environment_map[env_template].append(final_name)
 
                     self._environments[final_name] = {}
 
@@ -262,6 +278,69 @@ class SoftwareEnvironments(object):
         if namespace.packages in self._environments[environment_name]:
             for name in self._environments[environment_name][namespace.packages]:
                 yield name
+
+    def _require_raw_package(self, pkg):
+        """Raise an error if the raw package is not defined"""
+        if pkg not in self._raw_packages.keys():
+            raise RambleSoftwareEnvironmentError(
+                f'Package {pkg} is not defined.'
+            )
+
+    def _require_raw_environment(self, env):
+        """Raise an error if the raw environment is not defined"""
+        if env not in self._raw_environments.keys():
+            raise RambleSoftwareEnvironmentError(
+                f'Environment {env} is not defined.'
+            )
+
+    def all_packages(self):
+        """Yield each package name"""
+        for pkg in self._packages.keys():
+            yield pkg
+
+    def all_raw_packages(self):
+        """Yield each raw package name"""
+        for pkg in self._raw_packages.keys():
+            yield pkg
+
+    def raw_package_info(self, raw_pkg):
+        """Return the information for a raw package"""
+        self._require_raw_package(raw_pkg)
+
+        return self._raw_packages[raw_pkg]
+
+    def mapped_packages(self, raw_pkg):
+        """Yield each package rendered from a raw package"""
+        self._require_raw_package(raw_pkg)
+
+        for pkg in self._package_map[raw_pkg]:
+            yield pkg
+
+    def all_environments(self):
+        """Yield each environment name"""
+        for env in self._environments.keys():
+            yield env
+
+    def all_raw_environments(self):
+        """Yield raw environment names"""
+        for env in self._raw_environments.keys():
+            yield env
+
+    def raw_environment_info(self, env):
+        """Return the information for a raw environment"""
+        if env not in self._raw_environments.keys():
+            raise RambleSoftwareEnvironmentError(
+                f'Environment {env} is not defined.'
+            )
+
+        return self._raw_environments[env]
+
+    def mapped_environments(self, raw_env):
+        """Yield each environment rendered from a raw environment"""
+        self._require_raw_environment(raw_env)
+
+        for env in self._environment_map[raw_env]:
+            yield env
 
     def specs_equiv(self, spec1, spec2):
         all_keys = set(spec1.keys())

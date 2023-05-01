@@ -43,3 +43,4 @@ class namespace:
     environments = 'environments'
     spack_spec = 'spack_spec'
     compiler_spec = 'compiler_spec'
+    compiler = 'compiler'

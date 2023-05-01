@@ -26,6 +26,8 @@ import ramble.config
 import ramble.workspace
 import ramble.workspace.shell
 import ramble.experiment_set
+import ramble.software_environments
+from ramble.namespace import namespace
 
 if sys.version_info >= (3, 3):
     from collections.abc import Sequence  # novm noqa: F401
@@ -536,39 +538,76 @@ def workspace_info(args):
     # Print software stack information
     color.cprint('')
     color.cprint(section_title('Software Stack:'))
-    comp_str = 'compilers'
-    mpi_str = 'mpi_libraries'
-    app_str = 'applications'
 
-    spack_dict = ws.get_spack_dict()
-    if comp_str in spack_dict:
-        color.cprint(nested_1('  Compilers:'))
-        for name, info in spack_dict[comp_str].items():
-            spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec).replace('@', '@@')
-            color.cprint('    %s = %s' % (name, spec_str))
-    if mpi_str in spack_dict:
-        color.cprint(nested_1('  MPI Libraries:'))
-        for name, info in spack_dict[mpi_str].items():
-            spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec).replace('@', '@@')
-            color.cprint('    %s = %s' % (name, spec_str))
-    if app_str in spack_dict:
-        color.cprint(nested_1('  Application Specs:'))
-        for app, specs in spack_dict[app_str].items():
-            color.cprint(nested_2('    %s:' % app))
-            for name, info in specs.items():
-                spec = ws._build_spec_dict(info, app)
-                spec['application_name'] = app
-                spec_str = ws.spec_string(spec).replace('@', '@@')
-                color.cprint('      %s = %s' % (name, spec_str))
-                ws_name = ' ' * (len(name) + 2)
-                if 'compiler' in info:
-                    color.cprint('      %s compiler = %s' %
-                                 (ws_name, info['compiler']))
-                if 'mpi' in info:
-                    color.cprint('      %s mpi = %s' %
-                                 (ws_name, info['mpi']))
+    software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+    color.cprint(nested_1('  Packages:'))
+    for raw_pkg in software_environments.all_raw_packages():
+        color.cprint(nested_2(f'    {raw_pkg}:'))
+
+        pkg_info = software_environments.raw_package_info(raw_pkg)
+
+        if args.verbose >= 1:
+            if namespace.variables in pkg_info and pkg_info[namespace.variables]:
+                color.cprint(nested_3('      Variables:'))
+                for var, val in pkg_info[namespace.variables].items():
+                    color.cprint(f'        {var} = {val}')
+
+            if namespace.matrices in pkg_info and pkg_info[namespace.matrices]:
+                color.cprint(nested_3('      Matrices:'))
+                for matrix in pkg_info[namespace.matrices]:
+                    base_str = '        - '
+                    for var in matrix:
+                        color.cprint(f'{base_str}- {var}')
+                        base_str = '          '
+
+            if namespace.matrix in pkg_info and pkg_info[namespace.matrix]:
+                color.cprint(nested_3('      Matrix:'))
+                for var in pkg_info[namespace.matrix]:
+                    color.cprint(f'        - {var}')
+
+        color.cprint(nested_3('      Rendered Packages:'))
+        for pkg in software_environments.mapped_packages(raw_pkg):
+            color.cprint(nested_4(f'        {pkg}:'))
+            pkg_spec = software_environments.get_spec(pkg)
+            spec_str = pkg_spec[namespace.spack_spec].replace('@', '@@')
+            color.cprint(f'          Spack spec: {spec_str}')
+            if namespace.compiler_spec in pkg_spec and pkg_spec[namespace.compiler_spec]:
+                spec_str = pkg_spec[namespace.compiler_spec].replace('@', '@@')
+                color.cprint(f'          Compiler spec: {spec_str}')
+            if namespace.compiler in pkg_spec and pkg_spec[namespace.compiler]:
+                color.cprint(f'          Compiler: {pkg_spec[namespace.compiler]}')
+
+    color.cprint(nested_1('  Environments:'))
+    for raw_env in software_environments.all_raw_environments():
+        color.cprint(nested_2(f'    {raw_env}:'))
+
+        env_info = software_environments.raw_environment_info(raw_env)
+
+        if args.verbose >= 1:
+            if namespace.variables in env_info and env_info[namespace.variables]:
+                color.cprint(nested_3('      Variables:'))
+                for var, val in env_info[namespace.variables].items():
+                    color.cprint(f'        {var} = {val}')
+
+            if namespace.matrices in env_info and env_info[namespace.matrices]:
+                color.cprint(nested_3('      Matrices:'))
+                for matrix in env_info[namespace.matrices]:
+                    base_str = '        - '
+                    for var in matrix:
+                        color.cprint(f'{base_str}- {var}')
+                        base_str = '          '
+
+            if namespace.matrix in env_info and env_info[namespace.matrix]:
+                color.cprint(nested_3('      Matrix:'))
+                for var in env_info[namespace.matrix]:
+                    color.cprint(f'        - {var}')
+
+        color.cprint(nested_3('      Rendered Environments:'))
+        for env in software_environments.mapped_environments(raw_env):
+            color.cprint(nested_4(f'        {env} Packages:'))
+            for pkg in software_environments.get_env_packages(env):
+                color.cprint(f'          - {pkg}')
 
 
 #

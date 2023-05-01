@@ -79,6 +79,9 @@ def check_info_basic(output):
     assert 'Application' in output
     assert 'Workload' in output
     assert 'Experiment' in output
+    assert 'Software Stack' in output
+    assert 'Packages' in output
+    assert 'Environments' in output
 
 
 def check_results(ws):
