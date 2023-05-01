@@ -62,10 +62,12 @@ When you send your request, make ``develop`` the destination branch on the
 
 Your PR must pass Ramble's unit tests and documentation tests, and must be
 [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant.  We enforce
-these guidelines with our CI process. To run these tests locally,
-please use the test runners:
- - share/ramble/qa/run-unit-tests
- - share/ramble/qa/run-flake8-tests
+these guidelines with our CI process.
+
+These tests can be run locally through test runners in the share/ramble/qa/
+directory. Alternatively, [pre-commit](https://pre-commit.com/#install) can be
+used to manage our git hooks. To install the hooks, simply run:
+- pre-commit install
 
  For additional requirements about contributing, including Google’s CLA, see our
  [Contribution Guide](.github/CONTRIBUTING.md).

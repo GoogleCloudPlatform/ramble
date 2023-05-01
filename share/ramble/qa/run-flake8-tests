@@ -1,3 +1,4 @@
+#!/bin/sh
 # Copyright 2022-2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -17,11 +18,26 @@
 # Usage:
 #     run-flake8-tests
 #
+ERROR=0
 . "$(dirname $0)/setup.sh"
 check_dependencies flake8
+if [ $? != 0 ]; then
+  ERROR=1
+fi
+
 
 # verify that the code style is correct
 ramble flake8 -U
+if [ $? != 0 ]; then
+  ERROR=1
+fi
 
 # verify that the license headers are present
 ramble license verify
+if [ $? != 0 ]; then
+  ERROR=1
+fi
+
+if [ $ERROR == 1 ]; then
+    exit 1
+fi
