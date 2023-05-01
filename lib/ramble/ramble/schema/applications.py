@@ -14,6 +14,11 @@
 
 import ramble.schema.licenses
 
+class OUTPUT:
+    STDERR = "2>"
+    STDOUT = ">>"
+    ALL = "&>"
+    DEFAULT = STDOUT
 
 # FIXME: should this use the vector notation which type natively supports?
 string_or_num = {
@@ -95,7 +100,8 @@ custom_executables_def = {
         'default': {
             'template': [],
             'use_mpi': False,
-            'redirect': '{log_file}'
+            'redirect': '{log_file}',
+            'output_capture': OUTPUT.DEFAULT
         },
         'properties': {
             'template': array_or_scalar_of_strings_or_nums,

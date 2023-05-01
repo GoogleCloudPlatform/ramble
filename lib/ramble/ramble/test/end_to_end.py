@@ -752,6 +752,7 @@ ramble:
                     - 'lscpu'
                     use_mpi: false
                     redirect: '{log_file}'
+                    output_capture: '>>'
                 executables:
                 - lscpu
                 - builtin::env_vars

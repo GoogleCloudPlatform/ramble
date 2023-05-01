@@ -1678,6 +1678,7 @@ ramble:
                     - 'exp_level_cmd'
                     use_mpi: false
                     redirect: '{log_file}'
+                    output_capture: '&>'
 spack:
   concretized: true
 """

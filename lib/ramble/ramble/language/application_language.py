@@ -10,6 +10,7 @@ import llnl.util.tty as tty
 
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
+from ramble.schema.applications import OUTPUT
 
 
 class ApplicationMeta(ramble.language.language_base.DirectiveMeta):
@@ -75,7 +76,7 @@ def workload(name, executables=None, executable=None, input=None,
 
 
 @application_directive('executables')
-def executable(name, template, use_mpi=False, redirect='{log_file}', **kwargs):
+def executable(name, template, use_mpi=False, redirect='{log_file}', output_capture=OUTPUT.DEFAULT, **kwargs):
     """Adds an executable to this application
 
     Defines a new executable that can be used to configure workloads and
@@ -89,6 +90,8 @@ def executable(name, template, use_mpi=False, redirect='{log_file}', **kwargs):
                  wrapped with an `mpirun` like command or not.
      - redirect (optional): Sets the path for outputs to be written to.
                             defaults to {log_file}
+     - output_capture (optional): Declare which ouptu (stdout, stderr, both) to
+                                  capture. Defaults to stdout
 
     """
 
@@ -97,7 +100,8 @@ def executable(name, template, use_mpi=False, redirect='{log_file}', **kwargs):
             {
                 'template': template,
                 'mpi': use_mpi,
-                'redirect': redirect
+                'redirect': redirect,
+                'output_capture': output_capture
             }  # noqa: E123
 
     return _execute_executable
