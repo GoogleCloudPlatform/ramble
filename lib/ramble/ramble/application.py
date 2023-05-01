@@ -492,11 +492,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Define custom executables
         if namespace.custom_executables in self.internals.keys():
             for name, conf in self.internals[namespace.custom_executables].items():
+
+                output_capture = OUTPUT.DEFAULT
+                if 'output_capture' in conf:
+                    output_capture = conf['output_capture']
+
                 self.executables[name] = {
                     'template': conf['template'],
                     'mpi': conf['mpi'] if 'mpi' in conf else False,
-                    'redirect': conf['redirect'] if 'redirect' in conf else '{log_file}', # TODO: why do we need to duplicate this default
-                    'output_capture': conf['output_capture'] if 'output_capture' in conf else OUTPUT.DEFAULT
+                    'redirect': conf['redirect'] if 'redirect' in conf else '{log_file}',
+                    'output_capture': output_capture
                 }
 
         for input_file in inputs:

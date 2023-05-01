@@ -64,9 +64,9 @@ def add_executable(app_inst, exe_num=1):
     redirect_test = '{output_file}'
     output_capture = '>>'
 
-    executable(nompi_exec_name, 
+    executable(nompi_exec_name,
                template,  # noqa: F405
-               use_mpi=False, 
+               use_mpi=False,
                redirect=redirect_test,
                output_capture=output_capture)(app_inst)
 

@@ -14,11 +14,13 @@
 
 import ramble.schema.licenses
 
+
 class OUTPUT:
     STDERR = "2>"
     STDOUT = ">>"
     ALL = "&>"
     DEFAULT = STDOUT
+
 
 # FIXME: should this use the vector notation which type natively supports?
 string_or_num = {
