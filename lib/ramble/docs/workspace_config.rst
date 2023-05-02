@@ -424,7 +424,23 @@ Spack Dictionary:
 -----------------
 
 Within a ramble.yaml file, the ``spack:`` dictionary controlls the software
-stack installation that ramble performs.
+stack installation that ramble performs. This is accomplished by defining
+a packages dictionary, and an environments dictionary.
+
+The packages dictionary houses ramble descriptions of spack packages that can
+be used to construct environments with. A package is defined as software that
+spack should install for the user. These have one required attribute, and two
+optional attributes. The ``spack_spec`` attribute is required to be defined,
+and should be the spec passed to ``spack install`` on the command line for the
+package. Optionally, a package can defined a ``compiler_spec`` attribute, which
+will be the spec used when this package is used as a compiler for another
+package. Packages can also optionally defined a ``compiler`` attribute, which
+is the name of another package that should be used as it's compiler.
+
+The environments dictionary contains descriptions of spack environments that
+Ramble might generate based on the requested experiments. Environments are
+defined as a list of packages (in the aforementioned packages dictionary) that
+should be bundled into a spack environment.
 
 Below is an annotated example of the spack dictionary.
 
@@ -434,6 +450,7 @@ Below is an annotated example of the spack dictionary.
       packages:
         gcc9: # Abstract name to refer to this package
           spack_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
+          compiler_spec: gcc@9.3.0 # Spack compiler spec for this package
         impi2018:
           spack_spec: intel-mpi@2018.4.274 target=x86_64
           compiler: gcc9 # Other package name to use as compiler for this package
@@ -446,12 +463,70 @@ Below is an annotated example of the spack dictionary.
           - impi2018
           - gromacs
 
+
+The ``ramble workspace concretize`` command can help construct a functional
+spack dictionary based on the experiments listed.
+
+It is important to note that packages and environments that are not used by an
+experiment are not installed.
+
 Application definition files can define one or more ``software_spec``
 directives, which are packages the application might need to run properly.
 Additionally, spack packages can be marked as required through the
 ``required_package`` directive.
 
-Packages that are not used in an environment are not installed.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Vector and Matrix Packages and Environments:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As with experiments, package and environment definitions can generate many
+packages and environments following the same previously mentioned vector and
+matrix syntax.
+
+Below is an example of using this logic within the spack dictionary:
+
+.. code-block:: yaml
+
+    spack:
+      packages:
+        gcc-{ver}:
+          variables:
+            ver: ['9.3.0', '10.3.0', '12.2.0']
+          spack_spec: gcc@{ver} target=x86_64
+          compiler_spec: gcc@{ver}
+        intel-mpi-{comp}:
+          variables:
+            comp: gcc-{ver}
+            ver: ['9.3.0', '10.3.0', '12.2.0']
+          spack_spec: intel-mpi@2018.4.274
+          compiler: {comp}
+        openmpi-{comp}:
+          variables:
+            comp: gcc-{ver}
+            ver: ['9.3.0', '10.3.0', '12.2.0']
+          spack_spec: openmpi@4.1.4
+          compiler: {comp}
+        wrf-{comp}:
+          variables:
+            comp: gcc-{ver}
+            ver: ['9.3.0', '10.3.0', '12.2.0']
+          spack_spec: wrf@4.2
+          compiler: {comp}
+      environments:
+        wrf-{comp}-{mpi}:
+          variables:
+            comp: gcc-{ver}
+            ver: ['9.3.0', '10.3.0', '12.2.0']
+            mpi: [intel-mpi-{comp}, openmpi-{comp}']
+          matrix:
+          - mpi
+          packages:
+          - {mpi}
+          - wrf-{comp}
+
+The above file will generate 3 versions of ``gcc``, 3 versions each of ``wrf``,
+``intel-mpi`` and ``openmpi`` built with each ``gcc`` version, and 6 spack
+environments, with each combination of the 2 ``mpi`` libraries and 3 compilers.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 External Spack Environment Support:
