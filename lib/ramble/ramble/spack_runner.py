@@ -26,7 +26,7 @@ import ramble.error
 
 spack_namespace = 'spack'
 
-package_name_regex = re.compile(r"\s*(?P<package_name>[\w-]+).*")
+package_name_regex = re.compile(r"\s*(?P<package_name>[\w][\w-]+).*")
 
 
 class SpackRunner(object):
@@ -324,10 +324,17 @@ class SpackRunner(object):
         """
         self._check_active()
 
+        args = [
+            'find'
+        ]
+
         pkg_names = []
-        for spec in self.env_contents:
-            match = package_name_regex.match(spec)
-            pkg_names.append(match.group('package_name'))
+
+        for pkg in self.exe(*args, output=str).split('\n'):
+            match = package_name_regex.match(pkg)
+            if match:
+                pkg_names.append(match.group('package_name'))
+
         return pkg_names
 
     def add_include_file(self, include_file):

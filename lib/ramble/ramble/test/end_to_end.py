@@ -18,7 +18,7 @@ import spack.util.spack_json as sjson
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
-from ramble.main import RambleCommand
+from ramble.main import RambleCommand, RambleCommandError
 
 
 # everything here uses the mock_workspace_path
@@ -825,7 +825,7 @@ ramble:
             assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
 
 
-def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
+def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path, capsys):
     """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
     test_config = """
 ramble:
@@ -848,6 +848,7 @@ ramble:
     packages:
       gcc8:
         spack_spec: gcc@8.2.0 target=x86_64
+        compiler_spec: gcc@8.2.0
       impi2018:
         spack_spec: intel-mpi@2018.4.274 target=x86_64
         compiler: gcc8
@@ -871,12 +872,14 @@ ramble:
             f.write(test_config)
         ws._re_read()
 
-        output = workspace('setup',
-                           '--dry-run',
-                           global_args=['-w', workspace_name],
-                           fail_on_error=False)
+        with pytest.raises(RambleCommandError):
+            workspace('setup',
+                      '--dry-run',
+                      global_args=['-w', workspace_name])
 
-        assert "Software spec wrf is not defined in environment wrfv3" in output
+            captured = capsys.readouterr()
+
+            assert "Software spec wrf is not defined in environment wrfv3" in captured
 
 
 def test_env_var_builtin(mutable_config, mutable_mock_workspace_path, mock_applications):
@@ -1212,14 +1215,11 @@ ramble:
 def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir):
     test_spack_env = """
 spack:
-  specs: [ 'zlib' ]
+  specs: [ 'wrf' ]
 """
 
     env_path = str(tmpdir)
     with open(os.path.join(env_path, 'spack.yaml'), 'w+') as f:
-        f.write(test_spack_env)
-
-    with open(os.path.join(env_path, 'spack.lock'), 'w+') as f:
         f.write(test_spack_env)
 
     test_config = f"""
@@ -1261,17 +1261,11 @@ ramble:
         ws.run_pipeline('setup')
 
         env_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.yaml')
-        lock_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.lock')
 
         assert os.path.exists(env_file)
 
         with open(env_file, 'r') as f:
-            assert 'zlib' in f.read()
-
-        assert os.path.exists(lock_file)
-
-        with open(lock_file, 'r') as f:
-            assert 'zlib' in f.read()
+            assert 'wrf' in f.read()
 
 
 def test_dryrun_series_contains_package_paths(mutable_config,

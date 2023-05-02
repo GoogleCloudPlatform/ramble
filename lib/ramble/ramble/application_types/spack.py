@@ -156,18 +156,17 @@ class SpackApplication(ApplicationBase):
                     spec_str = workspace.software_environments.get_spec_string(pkg_name)
                     self.spack_runner.add_spec(spec_str)
 
-                added_packages = set(self.spack_runner.added_packages())
-
-                for pkg in self.required_packages.keys():
-                    if pkg not in added_packages:
-                        tty.die(('Software spec {} is not defined '
-                                 'in environment {}, but is required '
-                                 'to by the {} application '
-                                 'definition').format(pkg,
-                                                      env_context,
-                                                      self.name))
-
                 self.spack_runner.generate_env_file()
+
+            added_packages = set(self.spack_runner.added_packages())
+            for pkg in self.required_packages.keys():
+                if pkg not in added_packages:
+                    tty.die(('Software spec {} is not defined '
+                             'in environment {}, but is required '
+                             'to by the {} application '
+                             'definition').format(pkg,
+                                                  env_context,
+                                                  self.name))
 
             if not env_concretized:
                 self.spack_runner.concretize()
