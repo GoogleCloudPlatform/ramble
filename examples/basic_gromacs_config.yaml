@@ -1,17 +1,8 @@
 ramble:
     variables:
         processes_per_node: 16
-    mpi:
-        command: mpirun
-        args:
-        - '-n'
-        - '{n_ranks}'
-        - -ppn
-        - '{processes_per_node}'
-        - -hostfile
-        - hostfile
-    batch:
-        submit: '{execute_experiment}'
+        mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node} -hostfile hostfile'
+        batch_submit: '{execute_experiment}'
     applications:
         gromacs: # Application name
             workloads:

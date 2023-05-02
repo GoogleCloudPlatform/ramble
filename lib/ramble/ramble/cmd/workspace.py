@@ -533,11 +533,6 @@ def workspace_info(args):
                             for exp in app_inst.chain_order:
                                 color.cprint(nested_4('         - ') + exp)
 
-    # Print MPI command
-    color.cprint('')
-    color.cprint(section_title('MPI Command:'))
-    color.cprint('    %s' % ws.mpi_command)
-
     # Print software stack information
     color.cprint('')
     color.cprint(section_title('Software Stack:'))

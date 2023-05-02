@@ -20,10 +20,9 @@
 #               n_ranks: '{processes_per_node}'
 
 ramble:
-  mpi: {}
-  batch:
-    submit: '{execute_experiment}'
   variables:
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
     processes_per_node: -1
   applications:
     iperf2:

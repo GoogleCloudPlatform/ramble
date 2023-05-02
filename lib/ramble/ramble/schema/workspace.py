@@ -65,39 +65,6 @@ properties = {
                 'type': 'object',
                 'additionalProperties': {'type': 'string'},
             },
-            'mpi': {
-                'type': 'object',
-                'default': {
-                    'command': {
-                        'type': 'string',
-                        'default': 'mpirun'
-                    },
-                    'args': {
-                        'type': 'array',
-                        'default': []
-                    }
-                },
-                'properties': {
-                    'command': {
-                        'type': 'string',
-                        'default': 'mpirun'
-                    },
-                    'args': {
-                        'type': 'array',
-                        'default': []
-                    }
-                },
-            },
-            'batch': {
-                'type': 'object',
-                'default': {
-                    'submit': ''
-                },
-                'properties': {
-                    'submit': {'type': 'string'}
-                },
-                'additionalProperties': False
-            },
             'variables': ramble.schema.applications.variables_def,
             'internals': ramble.schema.applications.internals_def,
             'success_criteria': ramble.schema.applications.success_list_def,

@@ -62,8 +62,6 @@ class namespace:
     custom_executables = 'custom_executables'
     executables = 'executables'
     env_var = 'env-vars'
-    mpi = 'mpi'
-    batch = 'batch'
     compiler = 'compilers'
     mpi_lib = 'mpi_libraries'
     external_spack_env = 'external_spack_env'
@@ -140,15 +138,12 @@ def default_config_yaml():
 #               n_ranks: '{processes_per_node}'
 
 ramble:
-  mpi:
-    command: mpirun
-    args: []
-  batch:
-    submit: '{execute_experiment}'
   env-vars:
     set:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: '{execute_experiment}'
     processes_per_node: -1
   applications: {}
 spack:
@@ -599,6 +594,37 @@ class Workspace(object):
         """Read configuration file"""
         config = self.config_sections[section]
         self._read_yaml(config, f, raw_yaml)
+        self._check_deprecated(config['yaml'])
+
+    def _check_deprecated(self, config):
+        """
+        Trap and warn (or error) on deprecated configuration settings
+        in the workspace config.
+        """
+
+        error_sections = []
+        deprecated_sections = []
+        # Trap and warn on deprecated config options.
+        if namespace.ramble in config:
+            # TODO: (dwj) Remove the following deprecation check
+            # DEPRECATED
+            if 'mpi' in config[namespace.ramble]:
+                deprecated_sections.append('ramble:mpi')
+            if 'batch' in config[namespace.ramble]:
+                deprecated_sections.append('ramble:batch')
+
+        if len(deprecated_sections) > 0:
+            tty.warn('Your workspace configuration contains deprecated sections:')
+            for section in deprecated_sections:
+                tty.warn(f'     {section}')
+            tty.warn('Please see the current workspace documentation and update')
+            tty.warn('to ensure your workspace continues to function properly')
+
+        if len(error_sections) > 0:
+            tty.warn('Your workspace configuration contains invalid sections:')
+            for section in deprecated_sections:
+                tty.warn(f'     {section}')
+            tty.die('Please update to the latest format.')
 
     def _read_yaml(self, config, f, raw_yaml=None):
         if raw_yaml:
@@ -1523,46 +1549,6 @@ class Workspace(object):
     def _date_string(self):
         now = datetime.datetime.now()
         return now.strftime("%Y-%m-%d_%H.%M.%S")
-
-    @property
-    def mpi_command(self):
-        if not hasattr(self, 'mpi_template') or not self.mpi_template:
-            mpi_config = \
-                self._get_workspace_dict()[namespace.ramble][namespace.mpi]
-
-            self.mpi_template = ''
-            if 'pre_command' in mpi_config:
-                self.mpi_template += " %s" % mpi_config['pre_command']
-            if 'pre_command_args' in mpi_config:
-                self.mpi_template += " %s" % \
-                    ' '.join(mpi_config['pre_command_args'])
-            if 'command' in mpi_config:
-                self.mpi_template += " %s" % mpi_config['command']
-            if 'args' in mpi_config:
-                self.mpi_template += " %s" % ' '.join(mpi_config['args'])
-            if 'post_command' in mpi_config:
-                self.mpi_template += " %s" % mpi_config['post_command']
-            if 'post_command_args' in mpi_config:
-                self.mpi_template += " %s" % \
-                    ' '.join(mpi_config['post_command_args'])
-
-        return self.mpi_template
-
-    @property
-    def batch_submit(self):
-        if not hasattr(self, 'batch_submit_command') or not \
-                self.batch_submit_command:
-
-            workspace_dict = self._get_workspace_dict()
-            if namespace.batch in workspace_dict[namespace.ramble]:
-                batch_section = \
-                    workspace_dict[namespace.ramble][namespace.batch]
-                batch_submit = batch_section['submit']
-            else:
-                batch_submit = ''
-
-            self.batch_submit_command = batch_submit
-        return self.batch_submit_command
 
     @property
     def internal(self):

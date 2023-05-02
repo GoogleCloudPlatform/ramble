@@ -94,13 +94,9 @@ def test_mirror_create(tmpdir, mutable_mock_repo,
 
     test_config = f"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{{n_ranks}}'
-  batch:
-    submit: '{{execute_experiment}}'
+  variables:
+    mpi_command: 'mpirun -n {{n_ranks}}'
+    batch_submit: '{{execute_experiment}}'
   applications:
     {app_name}:
       workloads:

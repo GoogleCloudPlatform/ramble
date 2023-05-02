@@ -28,12 +28,9 @@ def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace
 
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args: []
-  batch:
-    submit: '{execute_experiment}'
   variables:
+    mpi_command: 'mpirun'
+    batch_submit: '{execute_experiment}'
     partition: ['part1', 'part2']
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'

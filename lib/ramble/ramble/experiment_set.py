@@ -91,9 +91,7 @@ class ExperimentSet(object):
                           workspace_internals)
 
         # Set some base variables from the workspace definition.
-        self.set_base_var(self.keywords.mpi_command, workspace.mpi_command)
         self.set_base_var(self.keywords.log_dir, workspace.log_dir)
-        self.set_base_var(self.keywords.batch_submit, workspace.batch_submit)
         self.set_base_var(self.keywords.spec_name,
                           Expander.expansion_str(self.keywords.application_name))
 
