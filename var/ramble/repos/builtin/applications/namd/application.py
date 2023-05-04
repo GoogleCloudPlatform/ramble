@@ -1,0 +1,326 @@
+# Copyright 2022-2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+import re
+import os
+from ramble.appkit import *
+from ramble.expander import Expander
+from ramble.keywords import keywords
+
+
+class Namd(SpackApplication):
+    '''Define NAMD application'''
+    name = 'namd'
+
+    tags = ['molecular-dynamics', 'charm++', 'task-parallelism']
+
+    default_compiler('gcc12', spack_spec='gcc@12.2.0', compiler_spec='gcc@12.2.0')
+
+    software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0', compiler='gcc12')
+
+    software_spec('charmpp', spack_spec='charmpp backend=mpi build-target=charm++', compiler='gcc12')
+
+    software_spec('namd', spack_spec='namd@2.14 interface=tcl', compiler='gcc12')
+
+    input_file('stmv', url='https://www.ks.uiuc.edu/Research/namd/utilities/stmv.tar.gz',
+               description='STMV (virus) benchmark (1,066,628 atoms, periodic, PME')
+
+    input_file('ApoA1', url='https://www.ks.uiuc.edu/Research/namd/utilities/apoa1.tar.gz',
+               description='ApoA1 benchmark (92,224 atoms, periodic, PME)')
+
+    input_file('ATPase', url='https://www.ks.uiuc.edu/Research/namd/utilities/f1atpase.tar.gz',
+               description='ATPase benchmark (327,506 atoms, periodic, PME)')
+
+    input_file('20STMV', url='https://www.ks.uiuc.edu/Research/namd/utilities/stmv_sc14.tar.gz',
+               description='20STMV and 210STMV benchmarks from SC14 paper')
+
+    input_file('tiny', url='https://www.ks.uiuc.edu/Research/namd/utilities/tiny.tar.gz',
+               description='tiny benchmark (507 atoms, periodic, PME)')
+
+    input_file('interactive_BPTI', url='https://www.ks.uiuc.edu/Research/namd/utilities/bpti_imd.tar.gz',
+               description='Interactive BPTI (882 atoms, small)')
+
+    input_file('ER-GRE', url='https://www.ks.uiuc.edu/Research/namd/utilities/er-gre.tar.gz',
+               description='ER-GRE benchmark (36573 atoms, spherical)')
+
+    input_file('decalanin', url='https://www.ks.uiuc.edu/Research/namd/utilities/alanin.tar.gz',
+               description='decalanin (66 atoms, tiny, ancient)')
+
+    input_file('tcl-forces', url='https://www.ks.uiuc.edu/Research/namd/utilities/tclforces.tar.gz',
+               description='Tcl forces (decalanin)')
+
+    executable('copy_inputs', 'cp {input_path}/* {experiment_run_dir}/.', use_mpi=False)
+    executable('execute', 'namd2 {namd_flags} {input_file}', use_mpi=True)
+
+    # Configure standard benchmark workloads and variables
+    # Assumes each benchmark workload has an input of the same name.
+    benchmark_workloads = [
+        ('stmv', ['stmv.namd']),
+        ('ApoA1', ['apoa1.namd']),
+        ('ATPase', ['f1atpase.namd']),
+        ('20STMV', ['1stmv2fs.namd', '210stmv2fs.namd', 'compress_20stmv.namd']),
+        ('tiny', ['tiny.namd']),
+        ('interactive_BPTI', ['bpti.namd']),
+        ('ER-GRE', ['er-gre.namd']),
+        ('decalanin', ['alanin.namd']),
+        ('tcl-forces', ['tclforces.namd']),
+    ]
+    for wl_def in benchmark_workloads:
+        workload(wl_def[0], executables=['copy_inputs', 'execute'],
+                 inputs=[wl_def[0]])
+
+        workload_variable(
+            'input_path',
+            default=Expander.expansion_str(wl_def[0]),
+            description=f'Path to the {wl_def[0]} inputs',
+            workloads=[wl_def[0]]
+        )
+
+        workload_variable(
+            'input_file',
+            default=wl_def[1][0],
+            values=wl_def[1],
+            description='Input file for namd',
+            workloads=[wl_def[0]]
+        )
+
+    log_file_str = Expander.expansion_str(keywords.log_file)
+
+    success_criteria(
+        'Completion',
+        mode='string',
+        match=r'.*End of program.*',
+        file=log_file_str
+    )
+
+    # Timing FOMs
+    timing_regex = r'TIMING:\s+(?P<itr>[0-9]+)\s+CPU:\s+(?P<cpu>[0-9]+\.[0-9]+),\s+(?P<cpu_per_step>[0-9]+\.[0-9]+)/step\s+' + \
+                   r'Wall:\s+(?P<wall>[0-9]+\.[0-9]+),\s+(?P<wall_per_step>[0-9]+\.[0-9]+)/step,\s+(?P<remaining>[0-9]+\.*[0-9]*)\s+' + \
+                   r'hours\s+remaining,\s+(?P<mem>[0-9]+\.[0-9]+)\s+MB.*'
+    figure_of_merit_context(
+        'Perf iteration',
+        regex=timing_regex,
+        output_format='Timing Itertion: {itr}'
+    )
+
+    figure_of_merit(
+        'Timing iteration',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='itr',
+        units='',
+        contexts=['Perf iteration']
+    )
+
+    figure_of_merit(
+        'CPU time',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='cpu',
+        units='s',
+        contexts=['Perf iteration']
+    )
+
+    figure_of_merit(
+        'Avg. CPU time per time step',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='cpu_per_step',
+        units='s/timestep',
+        contexts=['Perf iteration']
+    )
+
+    figure_of_merit(
+        'Wall time',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='wall',
+        units='s',
+        contexts=['Perf iteration']
+    )
+
+    figure_of_merit(
+        'Avg. Wall time per time step',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='wall_per_step',
+        units='s/timestep',
+        contexts=['Perf iteration']
+    )
+
+    figure_of_merit(
+        'Wall time remaining',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='remaining',
+        units='hours',
+        contexts=['Perf iteration']
+    )
+
+    figure_of_merit(
+        'Memory used',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='mem',
+        units='MB',
+        contexts=['Perf iteration']
+    )
+
+    # Energy context
+    energy_regex = r'ENERGY:\s+(?P<itr>[0-9]+)'
+
+    # Name/group_name, units
+    energy_foms = [
+        ('BOND', ''),
+        ('ANGLE', ''),
+        ('DIHED', ''),
+        ('IMPRP', ''),
+        ('ELECT', ''),
+        ('VWD', ''),
+        ('BOUNDARY', ''),
+        ('MISC', ''),
+        ('KINETIC', ''),
+        ('TOTAL', ''),
+        ('TEMP', ''),
+        ('POTENTIAL', ''),
+        ('TOTAL3', ''),
+        ('TEMPAVG', ''),
+        ('PRESSURE', ''),
+        ('GPRESSURE', ''),
+        ('VOLUME', ''),
+        ('PRESSAVG', ''),
+        ('GPRESSAVG', ''),
+    ]
+
+    # Build energy regex...
+    for energy_fom in energy_foms:
+        energy_regex += r'\s+(?P<' + f'{energy_fom[0]}' + r'>-*[0-9]+\.*[0-9]*)'
+
+    figure_of_merit_context(
+        'Energy iteration',
+        regex=energy_regex,
+        output_format='Enery Iteration: {itr}'
+    )
+
+    figure_of_merit(
+        'Energy iteration',
+        log_file=log_file_str,
+        fom_regex=timing_regex,
+        group_name='itr',
+        units='',
+        contexts=['Energy iteration']
+    )
+
+    for energy_fom in energy_foms:
+        figure_of_merit(
+            energy_fom[0],
+            log_file=log_file_str,
+            fom_regex=energy_regex,
+            group_name=energy_fom[0],
+            units=energy_fom[1],
+            contexts=['Energy iteration']
+        )
+
+    # Benchmark foms
+    benchmark_regex = r'Info:\s+Benchmark\s+time:\s+(?P<cpus>[0-9]+)\s+CPUs\s+' + \
+                      r'(?P<wall_per_step>[0-9]+\.[0-9]+)\s+s/step\s+' + \
+                      r'(?P<days_per_ns>[0-9]+\.[0-9]+)\s+days/ns\s+' + \
+                      r'(?P<mem>[0-9]+\.[0-9]+)\s+MB\s+memory'
+
+    figure_of_merit(
+        'Number of CPUs',
+        log_file=log_file_str,
+        fom_regex=benchmark_regex,
+        group_name='cpus',
+        units=''
+    )
+
+    figure_of_merit(
+        'Benchmark wall time per step',
+        log_file=log_file_str,
+        fom_regex=benchmark_regex,
+        group_name='wall_per_step',
+        units='s'
+    )
+
+    figure_of_merit(
+        'Benchmark days per nanosecond',
+        log_file=log_file_str,
+        fom_regex=benchmark_regex,
+        group_name='days_per_ns',
+        units='days/ns'
+    )
+
+    figure_of_merit(
+        'Benchmark memory used',
+        log_file=log_file_str,
+        fom_regex=benchmark_regex,
+        group_name='mem',
+        units='MB'
+    )
+
+    # Global figures of merit
+    end_regex = r'\s*WallClock:\s+(?P<wall>[0-9]+\.[0-9]+)\s+CPUTime:\s+(?P<cpu>[0-9]+\.[0-9]+)\s+Memory:\s+(?P<mem>[0-9]+\.[0-9]+)\s+MB'
+    figure_of_merit(
+        'Final wall time',
+        log_file=log_file_str,
+        fom_regex=end_regex,
+        group_name='wall',
+        units='s'
+    )
+
+    figure_of_merit(
+        'Final CPU time',
+        log_file=log_file_str,
+        fom_regex=end_regex,
+        group_name='cpu',
+        units='s'
+    )
+
+    figure_of_merit(
+        'Final Memory',
+        log_file=log_file_str,
+        fom_regex=end_regex,
+        group_name='mem',
+        units='MB'
+    )
+
+    figure_of_merit(
+        'Nanoseconds per day',
+        log_file='{experiment_run_dir}/namd_nspd_stat.out',
+        fom_regex=r'(?P<ns_per_day>[0-9]+\.*[0-9]*) ns/day',
+        group_name='ns_per_day',
+        units='ns/day'
+    )
+
+    def _analyze_experiments(self, workspace):
+        """Generate ns/day metric for the experiment"""
+
+        log_path = self.expander.expand_var(self.log_file_str)
+        ns_regex = re.compile(self.benchmark_regex)
+
+        dpns = None
+
+        if os.path.isfile(log_path):
+            with open(log_path, 'r') as f:
+                for line in f.readlines():
+                    match = ns_regex.match(line)
+                    if match:
+                        dpns = float(match.group('days_per_ns'))
+
+        if dpns:
+            nspd = 1.0 / dpns
+            nspd_file_path = os.path.join(
+                self.expander.expand_var(
+                    self.expander.expansion_str(keywords.experiment_run_dir)
+                ), 'namd_nspd_stat.out'
+            )
+            with open(nspd_file_path, 'w+') as f:
+                f.write(f'{nspd} ns/day\n')
+
+        super()._analyze_experiments(workspace)
