@@ -38,11 +38,11 @@ ramble:
   applications:
     wrfv4:
       variables:
-        spec_name: 'wrfv4'
+        env_name: 'wrfv4'
       workloads:
         CONUS_12km:
           experiments:
-            scaling_{n_nodes}_{partition}_{spec_name}:
+            scaling_{n_nodes}_{partition}_{env_name}:
               success_criteria:
               - name: 'timing'
                 mode: 'string'
@@ -67,12 +67,11 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - spec_name
-spack:
-  concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
+              - env_name
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
     import re

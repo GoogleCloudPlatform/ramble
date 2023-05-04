@@ -387,13 +387,6 @@ def test_config_add_to_workspace_preserve_comments(mutable_empty_config,
     contents = """# comment
 ramble:  # comment
   # comment
-  mpi:
-    command: mpirun # OpenMPI
-    args:
-    - -n
-    - '{n_ranks}'
-    - -hostfile # comment
-    - hostfile
   applications:
     hostname: # comment
       workloads:

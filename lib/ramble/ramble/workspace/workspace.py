@@ -31,6 +31,7 @@ import ramble.fetch_strategy
 import ramble.util.install_cache
 import ramble.success_criteria
 import ramble.keywords
+import ramble.software_environments
 from ramble.mirror import MirrorStats
 from ramble.config import ConfigError
 import ramble.experimental.uploader
@@ -47,26 +48,7 @@ import ramble.schema.merged
 
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
-
-
-class namespace:
-    ramble = 'ramble'
-    spack = 'spack'
-    application_dir = 'application_directories'
-    application = 'applications'
-    workload = 'workloads'
-    experiment = 'experiments'
-    variables = 'variables'
-    success = 'success_criteria'
-    internals = 'internals'
-    custom_executables = 'custom_executables'
-    executables = 'executables'
-    env_var = 'env-vars'
-    compiler = 'compilers'
-    mpi_lib = 'mpi_libraries'
-    external_spack_env = 'external_spack_env'
-    template = 'template'
-    chained_experiments = 'chained_experiments'
+from ramble.namespace import namespace
 
 
 #: Environment variable used to indicate the active workspace
@@ -146,15 +128,10 @@ ramble:
     batch_submit: '{execute_experiment}'
     processes_per_node: -1
   applications: {}
-spack:
-  concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
-    # app_name
-    #   spec_name:
-    #     base: ''
-    #     version: ''
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
 
@@ -466,6 +443,7 @@ class Workspace(object):
         self._input_mirror_stats = None
         self._input_mirror_cache = None
         self._software_mirror_cache = None
+        self._software_environments = None
 
         self.specs = []
 
@@ -999,157 +977,12 @@ class Workspace(object):
                 experiment_env_vars, matrices, experiment_internals, \
                 experiment_template, experiment_chained_experiments
 
-    def _build_spec_dict(self, info_dict, app_name=None, for_config=False):
-        spec = {}
+    def external_spack_env(self, env_name):
+        env_context = self.software_environments.get_env(env_name)
 
-        for name, val in info_dict.items():
-            if val:
-                if name != 'required':
-                    spec[name] = val
-
-        if app_name:
-            spec['application_name'] = app_name
-
-        if for_config:
-            if 'application_name' in spec:
-                del spec['application_name']
-            if 'spec_type' in spec:
-                del spec['spec_type']
-
-        return spec
-
-    def specs_equiv(self, spec1, spec2):
-        all_keys = set(spec1.keys())
-        all_keys.update(set(spec2.keys()))
-
-        if len(all_keys) != len(spec1.keys()):
-            return False
-
-        if 'application_name' in all_keys:
-            all_keys.remove('application_name')
-
-        if 'spec_type' in all_keys:
-            all_keys.remove('spec_type')
-
-        for key in all_keys:
-            if key not in spec1:
-                return False
-            if key not in spec2:
-                return False
-            if spec1[key] != spec2[key]:
-                return False
-
-        return True
-
-    def get_named_spec(self, spec_name, spec_context='compiler'):
-        spack_dict = self.get_spack_dict()
-
-        if spec_context == 'compiler':
-            if namespace.compiler not in spack_dict:
-                raise RambleWorkspaceError('No compilers ' +
-                                           'defined in workspace')
-            spec_dict = spack_dict[namespace.compiler]
-        elif spec_context == 'mpi_library':
-            if namespace.mpi_lib not in spack_dict:
-                raise RambleWorkspaceError('No MPI libraries ' +
-                                           'defined in workspace')
-            spec_dict = spack_dict[namespace.mpi_lib]
-        else:
-            if namespace.application not in spack_dict:
-                raise RambleWorkspaceError('No applications ' +
-                                           'defined in workspace')
-            if spec_context not in spack_dict['applications']:
-                raise RambleWorkspaceError('Invalid context ' +
-                                           '%s' % spec_context)
-            spec_dict = spack_dict[namespace.application][spec_context]
-            return self._build_spec_dict(spec_dict[spec_name], app_name=spec_context)
-
-        return self._build_spec_dict(spec_dict[spec_name])
-
-    def spec_string(self, spec, as_dep=False, use_custom_specifier=False, deps_used=None):
-        """Create a string for a spec
-
-        Extract portions of the spec into a usable string.
-        """
-
-        if not deps_used:
-            deps_used = set()
-
-        spec_str = []
-
-        if spec['base'] in deps_used:
-            return ''
-        else:
-            deps_used.add(spec['base'])
-
-        if use_custom_specifier and 'custom_specifier' in spec:
-            return spec['custom_specifier']
-
-        if 'base' in spec:
-            spec_str.append(spec['base'])
-
-        if 'version' in spec:
-            spec_str.append('@%s' % spec['version'])
-
-        if 'variants' in spec:
-            spec_str.append(spec['variants'])
-
-        if 'compiler' in spec:
-            comp_spec = self.get_named_spec(spec['compiler'], 'compiler')
-
-            if comp_spec['base'] not in deps_used:
-                spec_str.append('%%%s' % self.spec_string(comp_spec,
-                                                          as_dep=True,
-                                                          use_custom_specifier=True,
-                                                          deps_used=deps_used))
-
-        if not as_dep:
-            if 'arch' in spec:
-                spec_str.append('arch=%s' % spec['arch'])
-
-            if 'target' in spec:
-                spec_str.append('target=%s' % spec['target'])
-
-        if 'dependencies' in spec:
-            for dep in spec['dependencies']:
-                dep_spec = self.get_named_spec(dep, spec['application_name'])
-
-                dep_str = self.spec_string(dep_spec, as_dep=True,
-                                           use_custom_specifier=False,
-                                           deps_used=deps_used)
-
-                if dep_str:
-                    spec_str.append(f'^{dep_str}')
-
-        return ' '.join(spec_str)
-
-    def _spack_application_context(self, app_name):
-        spack_dict = self.get_spack_dict()
-
-        if namespace.application not in spack_dict:
-            raise RambleWorkspaceError('No applications defined ' +
-                                       'in spack config section')
-
-        if app_name not in spack_dict[namespace.application]:
-            raise RambleWorkspaceError('Application %s ' % app_name +
-                                       'not defined in spack ' +
-                                       'config section')
-        return spack_dict[namespace.application][app_name]
-
-    def external_spack_env(self, app_name):
-        app_context = self._spack_application_context(app_name)
-
-        if namespace.external_spack_env not in app_context:
+        if namespace.external_env not in env_context:
             return None
-        return app_context[namespace.external_spack_env]
-
-    def all_application_specs(self, app_name):
-        app_context = self._spack_application_context(app_name)
-
-        for name, info in app_context.items():
-            if name != namespace.external_spack_env:
-                spec = self._build_spec_dict(info)
-                yield name, spec
+        return env_context[namespace.external_env]
 
     def concretize(self):
         spack_dict = self.get_spack_dict()
@@ -1159,63 +992,78 @@ class Workspace(object):
                                        'already concretized ' +
                                        'workspace')
 
-        if namespace.compiler not in spack_dict or \
-                not spack_dict[namespace.compiler]:
-            spack_dict[namespace.compiler] = syaml.syaml_dict()
-        if namespace.mpi_lib not in spack_dict or \
-                not spack_dict[namespace.mpi_lib]:
-            spack_dict[namespace.mpi_lib] = syaml.syaml_dict()
-        if namespace.application not in spack_dict or \
-                not spack_dict[namespace.application]:
-            spack_dict[namespace.application] = syaml.syaml_dict()
+        if namespace.packages not in spack_dict or \
+                not spack_dict[namespace.packages]:
+            spack_dict[namespace.packages] = syaml.syaml_dict()
+        if namespace.environments not in spack_dict or \
+                not spack_dict[namespace.environments]:
+            spack_dict[namespace.environments] = syaml.syaml_dict()
 
-        compilers_dict = spack_dict[namespace.compiler]
-        mpi_dict = spack_dict[namespace.mpi_lib]
-        applications_dict = spack_dict[namespace.application]
+        packages_dict = spack_dict[namespace.packages]
+        environments_dict = spack_dict[namespace.environments]
+
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
 
         for app_name, *_ in self.all_applications():
             app_inst = ramble.repository.get(app_name)
 
             for comp, info in app_inst.default_compilers.items():
-                spec = self._build_spec_dict(info, for_config=True)
-                if comp not in compilers_dict:
-                    compilers_dict[comp] = spec
-                else:
-                    comp_spec = self.get_named_spec(comp, 'compiler')
-                    if not self.specs_equiv(comp_spec, spec):
-                        err = 'Compiler %s defined multiple ' % comp + \
-                              'conflicting ways'
-                        raise RambleConflictingDefinitionError(err)
+                if comp not in packages_dict:
+                    packages_dict[comp] = syaml.syaml_dict()
+                    packages_dict[comp]['spack_spec'] = info['spack_spec']
+                    ramble.config.add(f'spack:packages:{comp}:spack_spec:{info["spack_spec"]}',
+                                      scope=self.ws_file_config_scope_name())
+                    if 'compiler_spec' in info and info['compiler_spec']:
+                        packages_dict[comp]['compiler_spec'] = info['compiler_spec']
+                        config_path = f'spack:packages:{comp}:' + \
+                            f'compiler_spec:{info["compiler_spec"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                    if 'compiler' in info and info['compiler']:
+                        packages_dict[comp]['compiler'] = info['compiler']
+                        config_path = f'spack:packages:{comp}:' + \
+                            f'compiler:{info["compiler"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                elif not self.software_environments.specs_equiv(info, packages_dict[comp]):
+                    raise RambleConflictingDefinitionError(
+                        f'Compiler {comp} defined in multiple conflicting ways'
+                    )
 
-            for mpi, info in app_inst.mpi_libraries.items():
-                spec = self._build_spec_dict(info, for_config=True)
-                if mpi not in mpi_dict:
-                    mpi_dict[mpi] = spec
-                else:
-                    mpi_spec = self.get_named_spec(mpi, 'mpi_library')
-                    if not self.specs_equiv(mpi_spec, spec):
-                        err = 'MPI Library %s defined multiple ' % mpi + \
-                              'conflicting ways'
-                        raise RambleConflictingDefinitionError(err)
+            if app_name not in environments_dict:
+                environments_dict[app_name] = syaml.syaml_dict()
+                environments_dict[app_name][namespace.packages] = []
 
-            if app_name not in applications_dict:
-                applications_dict[app_name] = syaml.syaml_dict()
-
-            app_specs = applications_dict[app_name]
+            app_packages = environments_dict[app_name][namespace.packages]
             for spec_name, info in app_inst.software_specs.items():
-                spec = self._build_spec_dict(info, for_config=True)
-                if spec_name not in app_specs:
-                    app_specs[spec_name] = spec
-                else:
-                    app_spec = self.get_named_spec(spec_name, app_name)
-                    if not self.specs_equiv(app_spec, spec):
-                        err = 'Spec %s defined multiple ' % spec_name + \
-                              'times in application %s' % app_name
-                        raise RambleConflictingDefinitionError(err)
+                if spec_name not in packages_dict:
+                    packages_dict[spec_name] = syaml.syaml_dict()
+                    packages_dict[spec_name]['spack_spec'] = info['spack_spec']
+                    ramble.config.add(f'spack:packages:{spec_name}:' +
+                                      f'spack_spec:{info["spack_spec"]}',
+                                      scope=self.ws_file_config_scope_name())
+                    if 'compiler_spec' in info and info['compiler_spec']:
+                        packages_dict[spec_name]['compiler_spec'] = info['compiler_spec']
+                        config_path = f'spack:packages:{spec_name}:' + \
+                            f'compiler_spec:{info["compiler_spec"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                    if 'compiler' in info and info['compiler']:
+                        packages_dict[spec_name]['compiler'] = info['compiler']
+                        config_path = f'spack:packages:{spec_name}:' + \
+                            f'compiler:{info["compiler"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
 
-        workspace_dict = self._get_workspace_dict()
-        workspace_dict[namespace.spack]['concretized'] = True
-        self.write()
+                elif not self.software_environments.specs_equiv(info, packages_dict[spec_name]):
+                    raise RambleConflictingDefinitionError(
+                        f'Package {spec_name} defined in multiple conflicting ways'
+                    )
+
+                ramble.config.add(f'spack:environments:{app_name}:packages:[{spec_name}]',
+                                  scope=self.ws_file_config_scope_name())
+
+                app_packages.append(spec_name)
+
+        ramble.config.add('spack:concretized:true', scope=self.ws_file_config_scope_name())
+
         return
 
     def write_json_results(self):
@@ -1368,13 +1216,15 @@ class Workspace(object):
     def run_pipeline(self, pipeline):
         all_experiments_file = None
         experiment_set = ramble.experiment_set.ExperimentSet(self)
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
 
         if not self.is_concretized():
             error_message = 'Cannot run %s in a ' % pipeline + \
                             'non-conretized workspace\n' + \
                             'Run `ramble workspace concretize` on this ' + \
                             'workspace first.\n' + \
-                            'Then ensure its software_stack.yaml file is ' + \
+                            'Then ensure its spack configuration is ' + \
                             'properly configured.'
             tty.die(error_message)
 
@@ -1720,9 +1570,9 @@ class Workspace(object):
             in self.application_configs else None
 
     def is_concretized(self):
-        ws_dict = self._get_workspace_dict()
-        if 'concretized' in ws_dict[namespace.spack]:
-            return (True if ws_dict[namespace.spack]['concretized']
+        spack_dict = self.get_spack_dict()
+        if 'concretized' in spack_dict:
+            return (True if spack_dict['concretized']
                     else False)
         return False
 
@@ -1749,8 +1599,15 @@ class Workspace(object):
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
         ws_dict = self._get_workspace_dict()
+        # TODO (dwj): Remove after deprecation period
+        # DEPRECATED
         if namespace.spack in ws_dict:
+            tty.warn('The spack dictionary is moving to its own config section.')
+            tty.warn('Please update to ensure your config continues to function properly.')
+            tty.warn('See the documentation for the new format.')
             return ws_dict[namespace.spack]
+        else:
+            return ramble.config.config.get_config('spack')
         return syaml.syaml_dict()
 
     def get_applications(self):

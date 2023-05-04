@@ -45,10 +45,5 @@ ramble:
                 processes_per_node: '16'
 spack:
   concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
-    # app_name
-    #   spec_name:
-    #     base: ''
-    #     version: ''
+  packages: {}
+  environments: {}

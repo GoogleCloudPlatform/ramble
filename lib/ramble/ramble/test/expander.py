@@ -19,7 +19,7 @@ def exp_dict():
         'application_run_dir': '/workspace/experiments/foo',
         'workload_run_dir': '/workspace/experiments/foo/bar',
         'experiment_run_dir': '/workspace/experiments/foo/bar/baz',
-        'spec_name': 'spack_foo.bar',
+        'env_name': 'spack_foo.bar',
         'n_ranks': '4',
         'processes_per_node': '2',
         'n_nodes': '2',

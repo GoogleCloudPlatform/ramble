@@ -13,6 +13,7 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.workspace
+from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
 
 # everything here uses the mock_workspace_path
@@ -79,6 +80,9 @@ def check_info_basic(output):
     assert 'Application' in output
     assert 'Workload' in output
     assert 'Experiment' in output
+    assert 'Software Stack' in output
+    assert 'Packages' in output
+    assert 'Environments' in output
 
 
 def check_results(ws):
@@ -178,8 +182,10 @@ ramble:
               variables:
                 n_nodes: '2'
 
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_info'
@@ -218,8 +224,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     config_file = """
@@ -274,8 +282,10 @@ ramble:
               variables:
                 n_nodes: '2'
 
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_workspace_info_with_templates'
@@ -321,8 +331,10 @@ ramble:
               variables:
                 n_nodes: '2'
 
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_workspace_info_with_experiment_chain'
@@ -667,8 +679,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_dryrun'
@@ -714,8 +728,10 @@ ramble:
                - - cells
                  - n_nodes
                - - idx
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     # Should be ppn * ( cells * n_nodes, idx ) = 12
@@ -779,8 +795,10 @@ ramble:
               variables:
                 n_nodes: [1, 2, 4]
                 idx: [1, 2, 3, 4, 5, 6]
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_invalid_vectors'
@@ -826,8 +844,10 @@ ramble:
               matrices:
                 - - n_nodes
                 - - idx
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_invalid_size_matrices'
@@ -869,8 +889,10 @@ ramble:
             exp_series_{foo}:
               matrices:
                 - - foo
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_invalid_input_matrices'
@@ -911,8 +933,10 @@ ramble:
                 foo: '1'
               matrices:
                 - - foo
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_non_vector_input_matrices'
@@ -954,8 +978,10 @@ ramble:
               matrices:
                 - - foo
                 - - foo
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_non_vector_input_matrices'
@@ -998,8 +1024,10 @@ ramble:
             exp_series_{foo}:
               variables:
                 foo: 1
-spack:
-  concretized: false
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
     import py
@@ -1047,8 +1075,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_basic_archive'
@@ -1119,8 +1149,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_basic_archive'
@@ -1193,8 +1225,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_basic_archive'
@@ -1272,8 +1306,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_basic_archive'
@@ -1352,8 +1388,10 @@ ramble:
         test_wl:
           experiments:
             test_experiment: {}
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_dryrun'
@@ -1386,7 +1424,7 @@ def test_workspace_include():
     inc_file = os.path.join(ws1.config_dir, "test_include.yaml")
 
     test_include = """
-ramble:
+config:
   variables:
     test_var: '1'
 """
@@ -1413,8 +1451,10 @@ ramble:
                 n_nodes: '2'
   include:
      - '%s'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """ % inc_file
 
     with open(inc_file, 'w+') as f:
@@ -1447,8 +1487,10 @@ ramble:
         test_wl:
           experiments:
             test_experiment: {}
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_invalid_template_name'
@@ -1507,8 +1549,10 @@ ramble:
                     - 'exp_level_cmd'
                     use_mpi: false
                     redirect: '{log_file}'
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_custom_executables_info'
@@ -1568,8 +1612,10 @@ ramble:
                 - exp_level_cmd
                 - wl_level_cmd
                 - app_level_cmd
-spack:
-  concretized: true
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
 
     workspace_name = 'test_custom_executables_info'
@@ -1636,6 +1682,8 @@ ramble:
                 - app_level_cmd
 spack:
   concretized: true
+  packages: {}
+  environments: {}
 """
 
     workspace_name = 'test_custom_executables_info'
@@ -1652,3 +1700,79 @@ spack:
     assert 'Your workspace configuration contains deprecated sections' in captured.err
     assert 'ramble:mpi' in captured.err
     assert 'ramble:batch' in captured.err
+
+
+def test_v1_spack_config_warns(capsys):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_ranks: '1'
+spack:
+  concretized: true
+  compilers: {}
+  mpi_libraries: {}
+  applications:
+    zlib:
+      zlib:
+        base: zlib
+"""
+
+    workspace_name = 'test_v1_spack_config_warns'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+    ramble.software_environments.SoftwareEnvironments(ws1)
+    captured = capsys.readouterr()
+    assert 'Your workspace configuration uses the v1 format for the spack section' in captured.err
+    assert 'v1 support will be removed in the future.' in captured.err
+
+
+def test_invalid_spack_config_errors(capsys):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}'
+  applications:
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_ranks: '1'
+"""
+
+    workspace_name = 'test_invalid_spack_config_errors'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+    with pytest.raises(RambleSoftwareEnvironmentError):
+        ramble.software_environments.SoftwareEnvironments(ws1)
+        captured = capsys.readouterr()
+        assert "Software configuration type invalid is not one of ['v1', 'v2']" in captured.err

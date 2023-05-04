@@ -44,12 +44,10 @@ spack:
   concretized: true
   compilers:
     gcc9:
-      base: gcc
-      version: 9.3.0
+      spack_spec: gcc@9.3.0
   mpi_libraries: {}
   applications:
     iperf2:
       iperf2:
-        base: iperf2
-        version: 2.0.12
-        required: true
+        spack_spec: iperf2@2.0.12
+        compiler: gcc9

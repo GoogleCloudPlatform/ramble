@@ -26,6 +26,8 @@ import ramble.error
 
 spack_namespace = 'spack'
 
+package_name_regex = re.compile(r"\s*(?P<package_name>[\w][\w-]+).*")
+
 
 class SpackRunner(object):
     """Runner for executing several spack commands
@@ -315,6 +317,25 @@ class SpackRunner(object):
 
         if spec not in self.env_contents:
             self.env_contents.append(spec)
+
+    def added_packages(self):
+        """
+        Return a list of base package names that are added to an environment
+        """
+        self._check_active()
+
+        args = [
+            'find'
+        ]
+
+        pkg_names = []
+
+        for pkg in self.exe(*args, output=str).split('\n'):
+            match = package_name_regex.match(pkg)
+            if match:
+                pkg_names.append(match.group('package_name'))
+
+        return pkg_names
 
     def add_include_file(self, include_file):
         """
