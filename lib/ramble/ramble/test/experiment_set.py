@@ -11,6 +11,7 @@ import pytest
 
 import ramble.workspace
 import ramble.experiment_set
+import ramble.renderer
 from ramble.application import ChainCycleDetectedError, InvalidChainError
 from ramble.main import RambleCommand
 
@@ -34,7 +35,9 @@ def test_single_experiment_in_set(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -70,7 +73,9 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -107,7 +112,9 @@ def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -143,7 +150,9 @@ def test_zipped_vector_experiments(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -180,7 +189,9 @@ def test_matrix_experiments(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -221,7 +232,9 @@ def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -266,7 +279,9 @@ def test_matrix_vector_experiments(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -309,7 +324,9 @@ def test_multi_matrix_experiments(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -351,7 +368,9 @@ def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -394,7 +413,9 @@ def test_experiment_names_match(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -439,7 +460,9 @@ def test_cross_experiment_variable_references(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -489,7 +512,9 @@ def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path)
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}'
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -533,6 +558,8 @@ def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -573,7 +600,9 @@ def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': ['4', '6']
+            'n_ranks': ['4', '6'],
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -615,7 +644,9 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': ['4', '6']
+            'n_ranks': ['4', '6'],
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -655,7 +686,9 @@ def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var
             'app_var1': '1',
             'app_var2': '2',
             'n_ranks': ['4', '6'],
-            var: 'should_fail'
+            var: 'should_fail',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
@@ -681,7 +714,9 @@ def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var, c
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': ['4', '6']
+            'n_ranks': ['4', '6'],
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -717,7 +752,9 @@ def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var,
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': ['4', '6']
+            'n_ranks': ['4', '6'],
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -753,14 +790,15 @@ def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsy
 
     with ramble.workspace.read('test') as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
-        if var in exp_set._variables[exp_set._contexts.base]:
-            del exp_set._variables[exp_set._contexts.base]
+        for context in exp_set._contexts:
+            if exp_set._variables[context] and var in exp_set._variables[context]:
+                del exp_set._variables[context][var]
 
         app_name = 'basic'
         app_vars = {
             'app_var1': '1',
             'app_var2': '2',
-            'n_ranks': ['4', '6']
+            'n_ranks': ['4', '6'],
         }
 
         wl_name = 'test_wl'
@@ -772,17 +810,24 @@ def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsy
         exp_vars = {
             'exp_var1': '1',
             'exp_var2': '2',
-            'n_nodes': ['2', '3']
+            'n_nodes': ['2', '3'],
+            'batch_submit': '',
+            'mpi_command': ''
         }
+
+        if var in exp_vars.keys():
+            del exp_vars[var]
 
         exp_set.set_application_context(app_name, app_vars, None, None, None, None)
         exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
             exp_set.set_experiment_context(exp_name, exp_vars, None, None, None, None, None)
             captured = capsys.readouterr()
-            assert f'Required key "{var}" is not defined' in captured
-            assert 'One or more required keys are not defined within an experiment.' in captured
-            assert "In experiment basic.test_wl.series1_{n_ranks}_{processes_per_node}" in captured
+            assert f'Required key "{var}" is not defined' in captured.err
+            assert 'One or more required keys are not defined within an experiment.' \
+                in captured.err
+            assert "In experiment basic.test_wl.series1_{n_ranks}_{processes_per_node}" \
+                in captured.err
 
 
 def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_path, capsys):
@@ -798,6 +843,8 @@ def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_pat
             'app_var1': '1',
             'app_var2': '2',
             'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -864,6 +911,8 @@ def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path, c
             'app_var1': '1',
             'app_var2': '2',
             'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -923,6 +972,8 @@ def test_chained_cycle_errors(mutable_mock_workspace_path, capsys):
             'app_var1': '1',
             'app_var2': '2',
             'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'
@@ -972,6 +1023,8 @@ def test_chained_invalid_order_errors(mutable_mock_workspace_path, capsys):
             'app_var1': '1',
             'app_var2': '2',
             'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
         }
 
         wl_name = 'test_wl'

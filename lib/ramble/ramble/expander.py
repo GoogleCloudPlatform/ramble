@@ -54,7 +54,7 @@ class Expander(object):
         self._application_namespace = None
         self._workload_namespace = None
         self._experiment_namespace = None
-        self._spec_namespace = None
+        self._env_namespace = None
 
         self._application_input_dir = None
         self._workload_input_dir = None
@@ -112,13 +112,13 @@ class Expander(object):
         return self._experiment_namespace
 
     @property
-    def spec_namespace(self):
-        if not self._spec_namespace:
-            var = self.expansion_str(self._keywords.spec_name) + \
+    def env_namespace(self):
+        if not self._env_namespace:
+            var = self.expansion_str(self._keywords.env_name) + \
                 '.' + self.expansion_str(self._keywords.workload_name)
-            self._spec_namespace = self.expand_var(var)
+            self._env_namespace = self.expand_var(var)
 
-        return self._spec_namespace
+        return self._env_namespace
 
     @property
     def application_input_dir(self):

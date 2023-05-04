@@ -17,13 +17,15 @@ class Hpl(SpackApplication):
 
     tags = ['benchmark-app', 'mini-app', 'benchmark']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274', compiler='gcc9')
 
-    software_spec('hpl', base='hpl', version='2.3',
-                  variants='+openmp',
-                  compiler='gcc9', mpi='impi2018', required=True)
+    software_spec('hpl',
+                  spack_spec='hpl@2.3 +openmp',
+                  compiler='gcc9')
+
+    required_package('hpl')
 
     executable('execute', 'xhpl', use_mpi=True)
 

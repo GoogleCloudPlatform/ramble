@@ -28,12 +28,9 @@ def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace
 
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args: []
-  batch:
-    submit: '{execute_experiment}'
   variables:
+    mpi_command: 'mpirun'
+    batch_submit: '{execute_experiment}'
     partition: ['part1', 'part2']
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'
@@ -41,11 +38,11 @@ ramble:
   applications:
     wrfv4:
       variables:
-        spec_name: 'wrfv4'
+        env_name: 'wrfv4'
       workloads:
         CONUS_12km:
           experiments:
-            scaling_{n_nodes}_{partition}_{spec_name}:
+            scaling_{n_nodes}_{partition}_{env_name}:
               success_criteria:
               - name: 'timing'
                 mode: 'string'
@@ -70,12 +67,11 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - spec_name
-spack:
-  concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
+              - env_name
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
     import re

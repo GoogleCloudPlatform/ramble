@@ -15,14 +15,16 @@ class Lammps(SpackApplication):
 
     tags = ['molecular-dynamics']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274',
+                  compiler='gcc9')
 
-    software_spec('lammps', base='lammps', version='20220623',
-                  compiler='gcc9', mpi='impi2018',
-                  variants='+opt+manybody+molecule+kspace+rigid',
-                  required=True)
+    software_spec('lammps',
+                  spack_spec='lammps@20220623 +opt+manybody+molecule+kspace+rigid',
+                  compiler='gcc9')
+
+    required_package('lammps')
 
     input_file('leonard-jones', url='https://www.lammps.org/inputs/in.lj.txt', expand=False,
                description='Atomic fluid. 32k atoms. 100 timesteps. https://www.lammps.org/bench.html#lj')

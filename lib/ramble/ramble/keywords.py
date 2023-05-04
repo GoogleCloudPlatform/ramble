@@ -49,6 +49,7 @@ class Keywords(object):
         'spack_env': key_type.reserved,
 
         'spec_name': key_type.optional,
+        'env_name': key_type.optional,
 
         'n_ranks': key_type.required,
         'n_nodes': key_type.required,

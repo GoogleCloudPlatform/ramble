@@ -17,7 +17,8 @@ import spack.util.spack_json as sjson
 
 import ramble.workspace
 import ramble.config
-from ramble.main import RambleCommand
+import ramble.software_environments
+from ramble.main import RambleCommand, RambleCommandError
 
 
 # everything here uses the mock_workspace_path
@@ -30,18 +31,9 @@ workspace = RambleCommand('workspace')
 def test_wrfv4_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: ['part1', 'part2']
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'
@@ -49,11 +41,11 @@ ramble:
   applications:
     wrfv4:
       variables:
-        spec_name: ['wrfv4', 'wrfv4-portable']
+        env_name: ['wrfv4', 'wrfv4-portable']
       workloads:
         CONUS_12km:
           experiments:
-            scaling_{n_nodes}_{partition}_{spec_name}:
+            scaling_{n_nodes}_{partition}_{env_name}:
               success_criteria:
               - name: 'timing'
                 mode: 'string'
@@ -78,33 +70,31 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - spec_name
-spack:
-  concretized: true
-  compilers:
-    gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    wrfv4:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+              - env_name
+  spack:
+    concretized: true
+    packages:
+      gcc:
+        spack_spec: gcc@8.5.0
+      intel-mpi:
+        spack_spec: intel-mpi@2018.4.274
         compiler: gcc
-        mpi: intel
-    wrfv4-portable:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+      wrfv4:
+        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
         compiler: gcc
-        mpi: intel
-        target: 'x86_64'
+      wrfv4-portable:
+        spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
+          nesting=basic ~chem ~pnetcdf target=x86_64'
+        compiler: gcc
+    environments:
+      wrfv4:
+        packages:
+        - wrfv4
+        - intel-mpi
+      wrfv4-portable:
+        packages:
+        - wrfv4-portable
+        - intel-mpi
 """
 
     test_licenses = """
@@ -279,21 +269,497 @@ licenses:
                 assert os.path.exists(os.path.join(exp_dir, f'rsl.error.000{i}'))
 
 
+def test_wrfv4_dry_run_non_config_spack(mutable_config, mutable_mock_workspace_path):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    partition: ['part1', 'part2']
+    processes_per_node: ['16', '36']
+    n_ranks: '{processes_per_node}*{n_nodes}'
+    n_threads: '1'
+  applications:
+    wrfv4:
+      variables:
+        env_name: ['wrfv4', 'wrfv4-portable']
+      workloads:
+        CONUS_12km:
+          experiments:
+            scaling_{n_nodes}_{partition}_{env_name}:
+              success_criteria:
+              - name: 'timing'
+                mode: 'string'
+                match: '.*Timing for main.*'
+                file: '{experiment_run_dir}/rsl.out.0000'
+              env-vars:
+                set:
+                  OMP_NUM_THREADS: '{n_threads}'
+                  TEST_VAR: '1'
+                append:
+                - var-separator: ', '
+                  vars:
+                    TEST_VAR: 'add_var'
+                - paths:
+                    TEST_VAR: 'new_path'
+                prepend:
+                - paths:
+                    TEST_VAR: 'pre_path'
+                unset:
+                - TEST_VAR
+              variables:
+                n_nodes: ['1', '2', '4', '8', '16']
+              matrix:
+              - n_nodes
+              - env_name
+spack:
+  concretized: true
+  packages:
+    gcc:
+      spack_spec: gcc@8.5.0
+    intel-mpi:
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc
+    wrfv4:
+      spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+      compiler: gcc
+    wrfv4-portable:
+      spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
+        nesting=basic ~chem ~pnetcdf target=x86_64'
+      compiler: gcc
+  environments:
+    wrfv4:
+      packages:
+      - wrfv4
+      - intel-mpi
+    wrfv4-portable:
+      packages:
+      - wrfv4-portable
+      - intel-mpi
+"""
+
+    test_licenses = """
+licenses:
+  wrfv4:
+    set:
+      WRF_LICENSE: port@server
+"""
+
+    workspace_name = 'test_end_to_end_wrfv4_non_config_spack'
+    with ramble.workspace.create(workspace_name) as ws1:
+        ws1.write()
+
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        license_path = os.path.join(ws1.config_dir, 'licenses.yaml')
+
+        aux_software_path = os.path.join(ws1.config_dir,
+                                         ramble.workspace.auxiliary_software_dir_name)
+        aux_software_files = ['packages.yaml', 'my_test.sh']
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+
+        with open(license_path, 'w+') as f:
+            f.write(test_licenses)
+
+        for file in aux_software_files:
+            file_path = os.path.join(aux_software_path, file)
+            with open(file_path, 'w+') as f:
+                f.write('')
+
+        # Write a command template
+        with open(os.path.join(ws1.config_dir, 'full_command.tpl'), 'w+') as f:
+            f.write('{command}')
+
+        ws1._re_read()
+
+        output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz" in output
+
+        # Test software directories
+        software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
+        software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
+        assert os.path.exists(software_base_dir)
+        for software_dir in software_dirs:
+            software_path = os.path.join(software_base_dir, software_dir)
+            assert os.path.exists(software_path)
+
+            spack_file = os.path.join(software_path, 'spack.yaml')
+            assert os.path.exists(spack_file)
+            for file in aux_software_files:
+                file_path = os.path.join(software_path, file)
+                assert os.path.exists(file_path)
+
+        expected_experiments = [
+            'scaling_1_part1_wrfv4',
+            'scaling_2_part1_wrfv4',
+            'scaling_4_part1_wrfv4',
+            'scaling_8_part1_wrfv4',
+            'scaling_16_part1_wrfv4',
+            'scaling_1_part2_wrfv4',
+            'scaling_2_part2_wrfv4',
+            'scaling_4_part2_wrfv4',
+            'scaling_8_part2_wrfv4',
+            'scaling_16_part2_wrfv4',
+            'scaling_1_part1_wrfv4-portable',
+            'scaling_2_part1_wrfv4-portable',
+            'scaling_4_part1_wrfv4-portable',
+            'scaling_8_part1_wrfv4-portable',
+            'scaling_16_part1_wrfv4-portable',
+            'scaling_1_part2_wrfv4-portable',
+            'scaling_2_part2_wrfv4-portable',
+            'scaling_4_part2_wrfv4-portable',
+            'scaling_8_part2_wrfv4-portable',
+            'scaling_16_part2_wrfv4-portable'
+        ]
+
+        # Test experiment directories
+        for exp in expected_experiments:
+            exp_dir = os.path.join(ws1.root, 'experiments', 'wrfv4', 'CONUS_12km', exp)
+            assert os.path.isdir(exp_dir)
+            assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
+            assert os.path.exists(os.path.join(exp_dir, 'full_command'))
+
+            with open(os.path.join(exp_dir, 'full_command'), 'r') as f:
+                data = f.read()
+                # Test the license exists
+                assert "export WRF_LICENSE=port@server" in data
+
+                # Test the required environment variables exist
+                assert 'export OMP_NUM_THREADS="1"' in data
+                assert "export TEST_VAR=1" in data
+                assert 'unset TEST_VAR' in data
+
+                # Test the expected portions of the exection command exist
+                assert "sed -i -e 's/ start_hour.*/ start_hour" in data
+                assert "sed -i -e 's/ restart .*/ restart" in data
+                assert "mpirun" in data
+                assert "wrf.exe" in data
+
+                # Test the run script has a reference to the experiment log file
+                assert os.path.join(exp_dir, f'{exp}.out') in data
+
+            with open(os.path.join(exp_dir, 'execute_experiment'), 'r') as f:
+                data = f.read()
+                # Test the license exists
+                assert "export WRF_LICENSE=port@server" in data
+
+                # Test the required environment variables exist
+                assert 'export OMP_NUM_THREADS="1"' in data
+                assert "export TEST_VAR=1" in data
+                assert 'unset TEST_VAR' in data
+
+                # Test the expected portions of the exection command exist
+                assert "sed -i -e 's/ start_hour.*/ start_hour" in data
+                assert "sed -i -e 's/ restart .*/ restart" in data
+                assert "mpirun" in data
+                assert "wrf.exe" in data
+
+                # Test the run script has a reference to the experiment log file
+                assert os.path.join(exp_dir, f'{exp}.out') in data
+
+                # Test that spack is used
+                assert "spack env activate" in data
+
+            # Create fake figures of merit.
+            with open(os.path.join(exp_dir, 'rsl.out.0000'), 'w+') as f:
+                for i in range(1, 6):
+                    f.write(f'Timing for main {i}{i}.{i}\n')
+
+            # Create files that match archive patterns
+            for i in range(0, 5):
+                new_name = 'rsl.error.000%s' % i
+                new_file = os.path.join(exp_dir, new_name)
+
+                f = open(new_file, 'w+')
+                f.close()
+
+        output = workspace('analyze', '-f', 'text',
+                           'json', 'yaml', global_args=['-w', workspace_name])
+        text_simlink_results_files = glob.glob(os.path.join(ws1.root, 'results.latest.txt'))
+        text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
+        json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
+        yaml_results_files = glob.glob(os.path.join(ws1.root, 'results*.yaml'))
+        assert len(text_simlink_results_files) == 1
+        assert len(text_results_files) == 2
+        assert len(json_results_files) == 2
+        assert len(yaml_results_files) == 2
+
+        with open(text_results_files[0], 'r') as f:
+            data = f.read()
+            assert 'Average Timestep Time = 3.3 s' in data
+            assert 'Cumulative Timestep Time = 16.5 s' in data
+            assert 'Minimum Timestep Time = 1.1 s' in data
+            assert 'Maximum Timestep Time = 5.5 s' in data
+            assert 'Avg. Max Ratio Time = 0.6' in data
+            assert 'Number of timesteps = 5' in data
+
+        output = workspace('archive', global_args=['-w', workspace_name])
+
+        assert ws1.latest_archive
+        assert os.path.exists(ws1.latest_archive_path)
+
+        for exp in expected_experiments:
+            exp_dir = os.path.join(ws1.latest_archive_path, 'experiments',
+                                   'wrfv4', 'CONUS_12km', exp)
+            assert os.path.isdir(exp_dir)
+            assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
+            assert os.path.exists(os.path.join(exp_dir, 'full_command'))
+            assert os.path.exists(os.path.join(exp_dir, 'rsl.out.0000'))
+            for i in range(0, 5):
+                assert os.path.exists(os.path.join(exp_dir, f'rsl.error.000{i}'))
+
+
+def test_wrfv4_dry_run_v1_spack(mutable_config, mutable_mock_workspace_path):
+    """Remove this test when v1 support is removed"""
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    partition: ['part1', 'part2']
+    processes_per_node: ['16', '36']
+    n_ranks: '{processes_per_node}*{n_nodes}'
+    n_threads: '1'
+  applications:
+    wrfv4:
+      variables:
+        env_name: ['wrfv4', 'wrfv4-portable']
+      workloads:
+        CONUS_12km:
+          experiments:
+            scaling_{n_nodes}_{partition}_{env_name}:
+              success_criteria:
+              - name: 'timing'
+                mode: 'string'
+                match: '.*Timing for main.*'
+                file: '{experiment_run_dir}/rsl.out.0000'
+              env-vars:
+                set:
+                  OMP_NUM_THREADS: '{n_threads}'
+                  TEST_VAR: '1'
+                append:
+                - var-separator: ', '
+                  vars:
+                    TEST_VAR: 'add_var'
+                - paths:
+                    TEST_VAR: 'new_path'
+                prepend:
+                - paths:
+                    TEST_VAR: 'pre_path'
+                unset:
+                - TEST_VAR
+              variables:
+                n_nodes: ['1', '2', '4', '8', '16']
+              matrix:
+              - n_nodes
+              - env_name
+  spack:
+    concretized: true
+    compilers:
+      gcc:
+        base: gcc
+        version: 8.5.0
+    mpi_libraries:
+      intel-mpi:
+        base: intel-mpi
+        version: 2018.4.274
+    applications:
+      wrfv4:
+        wrfv4:
+          base: wrf
+          version: 4.2
+          variants: build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+          compiler: gcc
+          mpi: intel-mpi
+      wrfv4-portable:
+        wrfv4:
+          base: wrf
+          version: 4.2
+          variants: build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+          target: x86_64
+          compiler: gcc
+          mpi: intel-mpi
+"""
+
+    test_licenses = """
+licenses:
+  wrfv4:
+    set:
+      WRF_LICENSE: port@server
+"""
+
+    workspace_name = 'test_end_to_end_wrfv4_v1_spack'
+    with ramble.workspace.create(workspace_name) as ws1:
+        ws1.write()
+
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        license_path = os.path.join(ws1.config_dir, 'licenses.yaml')
+
+        aux_software_path = os.path.join(ws1.config_dir,
+                                         ramble.workspace.auxiliary_software_dir_name)
+        aux_software_files = ['packages.yaml', 'my_test.sh']
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+
+        with open(license_path, 'w+') as f:
+            f.write(test_licenses)
+
+        for file in aux_software_files:
+            file_path = os.path.join(aux_software_path, file)
+            with open(file_path, 'w+') as f:
+                f.write('')
+
+        # Write a command template
+        with open(os.path.join(ws1.config_dir, 'full_command.tpl'), 'w+') as f:
+            f.write('{command}')
+
+        ws1._re_read()
+
+        output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz" in output
+
+        # Test software directories
+        software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
+        software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
+        assert os.path.exists(software_base_dir)
+        for software_dir in software_dirs:
+            software_path = os.path.join(software_base_dir, software_dir)
+            assert os.path.exists(software_path)
+
+            spack_file = os.path.join(software_path, 'spack.yaml')
+            assert os.path.exists(spack_file)
+            for file in aux_software_files:
+                file_path = os.path.join(software_path, file)
+                assert os.path.exists(file_path)
+
+        expected_experiments = [
+            'scaling_1_part1_wrfv4',
+            'scaling_2_part1_wrfv4',
+            'scaling_4_part1_wrfv4',
+            'scaling_8_part1_wrfv4',
+            'scaling_16_part1_wrfv4',
+            'scaling_1_part2_wrfv4',
+            'scaling_2_part2_wrfv4',
+            'scaling_4_part2_wrfv4',
+            'scaling_8_part2_wrfv4',
+            'scaling_16_part2_wrfv4',
+            'scaling_1_part1_wrfv4-portable',
+            'scaling_2_part1_wrfv4-portable',
+            'scaling_4_part1_wrfv4-portable',
+            'scaling_8_part1_wrfv4-portable',
+            'scaling_16_part1_wrfv4-portable',
+            'scaling_1_part2_wrfv4-portable',
+            'scaling_2_part2_wrfv4-portable',
+            'scaling_4_part2_wrfv4-portable',
+            'scaling_8_part2_wrfv4-portable',
+            'scaling_16_part2_wrfv4-portable'
+        ]
+
+        # Test experiment directories
+        for exp in expected_experiments:
+            exp_dir = os.path.join(ws1.root, 'experiments', 'wrfv4', 'CONUS_12km', exp)
+            assert os.path.isdir(exp_dir)
+            assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
+            assert os.path.exists(os.path.join(exp_dir, 'full_command'))
+
+            with open(os.path.join(exp_dir, 'full_command'), 'r') as f:
+                data = f.read()
+                # Test the license exists
+                assert "export WRF_LICENSE=port@server" in data
+
+                # Test the required environment variables exist
+                assert 'export OMP_NUM_THREADS="1"' in data
+                assert "export TEST_VAR=1" in data
+                assert 'unset TEST_VAR' in data
+
+                # Test the expected portions of the exection command exist
+                assert "sed -i -e 's/ start_hour.*/ start_hour" in data
+                assert "sed -i -e 's/ restart .*/ restart" in data
+                assert "mpirun" in data
+                assert "wrf.exe" in data
+
+                # Test the run script has a reference to the experiment log file
+                assert os.path.join(exp_dir, f'{exp}.out') in data
+
+            with open(os.path.join(exp_dir, 'execute_experiment'), 'r') as f:
+                data = f.read()
+                # Test the license exists
+                assert "export WRF_LICENSE=port@server" in data
+
+                # Test the required environment variables exist
+                assert 'export OMP_NUM_THREADS="1"' in data
+                assert "export TEST_VAR=1" in data
+                assert 'unset TEST_VAR' in data
+
+                # Test the expected portions of the exection command exist
+                assert "sed -i -e 's/ start_hour.*/ start_hour" in data
+                assert "sed -i -e 's/ restart .*/ restart" in data
+                assert "mpirun" in data
+                assert "wrf.exe" in data
+
+                # Test the run script has a reference to the experiment log file
+                assert os.path.join(exp_dir, f'{exp}.out') in data
+
+                # Test that spack is used
+                assert "spack env activate" in data
+
+            # Create fake figures of merit.
+            with open(os.path.join(exp_dir, 'rsl.out.0000'), 'w+') as f:
+                for i in range(1, 6):
+                    f.write(f'Timing for main {i}{i}.{i}\n')
+
+            # Create files that match archive patterns
+            for i in range(0, 5):
+                new_name = 'rsl.error.000%s' % i
+                new_file = os.path.join(exp_dir, new_name)
+
+                f = open(new_file, 'w+')
+                f.close()
+
+        output = workspace('analyze', '-f', 'text',
+                           'json', 'yaml', global_args=['-w', workspace_name])
+        text_simlink_results_files = glob.glob(os.path.join(ws1.root, 'results.latest.txt'))
+        text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
+        json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
+        yaml_results_files = glob.glob(os.path.join(ws1.root, 'results*.yaml'))
+        assert len(text_simlink_results_files) == 1
+        assert len(text_results_files) == 2
+        assert len(json_results_files) == 2
+        assert len(yaml_results_files) == 2
+
+        with open(text_results_files[0], 'r') as f:
+            data = f.read()
+            assert 'Average Timestep Time = 3.3 s' in data
+            assert 'Cumulative Timestep Time = 16.5 s' in data
+            assert 'Minimum Timestep Time = 1.1 s' in data
+            assert 'Maximum Timestep Time = 5.5 s' in data
+            assert 'Avg. Max Ratio Time = 0.6' in data
+            assert 'Number of timesteps = 5' in data
+
+        output = workspace('archive', global_args=['-w', workspace_name])
+
+        assert ws1.latest_archive
+        assert os.path.exists(ws1.latest_archive_path)
+
+        for exp in expected_experiments:
+            exp_dir = os.path.join(ws1.latest_archive_path, 'experiments',
+                                   'wrfv4', 'CONUS_12km', exp)
+            assert os.path.isdir(exp_dir)
+            assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
+            assert os.path.exists(os.path.join(exp_dir, 'full_command'))
+            assert os.path.exists(os.path.join(exp_dir, 'rsl.out.0000'))
+            for i in range(0, 5):
+                assert os.path.exists(os.path.join(exp_dir, f'rsl.error.000{i}'))
+
+
 def test_hpl_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: 16
     n_threads: 1
   applications:
@@ -304,24 +770,22 @@ ramble:
             test_exp:
               variables:
                 n_ranks: 4
-spack:
-  concretized: true
-  compilers:
-    gcc9:
-      base: gcc
-      version: 9.3.0
-  mpi_libraries:
-    impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    hpl:
-      hpl:
-        base: hpl
-        version: '2.3'
-        variants: +openmp
+  spack:
+    concretized: true
+    packages:
+      gcc9:
+        spack_spec: gcc@9.3.0
+      impi2018:
+        spack_spec: intel-mpi@2018.4.274
         compiler: gcc9
-        mpi: impi2018
+      hpl:
+        spack_spec: hpl@2.3 +openmp
+        compiler: gcc9
+    environments:
+      hpl:
+        packages:
+        - hpl
+        - impi2018
 """
 
     workspace_name = 'test_end_to_end_hpl'
@@ -361,104 +825,13 @@ spack:
             assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
 
 
-def test_dependency_dry_run(mutable_config, mutable_mock_workspace_path):
-    test_config = """
-ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
-  variables:
-    partition: 'part1'
-    processes_per_node: '16'
-    n_threads: '1'
-  applications:
-    openfoam:
-      workloads:
-        motorbike:
-          experiments:
-            simple_test:
-              variables:
-                n_nodes: 1
-spack:
-  concretized: true
-  compilers:
-    gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    openfoam:
-      flex:
-        base: flex
-        version: 2.6.4
-      openfoam:
-        base: openfoam
-        compiler: gcc
-        mpi: intel
-        target: 'x86_64'
-        dependencies:
-          - flex
-"""
-    workspace_name = 'test_dependant_spec'
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
-
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-        with open(config_path, 'w+') as f:
-            f.write(test_config)
-        ws._re_read()
-
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-
-        deps = ws.get_spack_dict()['applications']['openfoam']['openfoam']['dependencies']
-        assert 'flex' in deps
-
-        software_dir = 'openfoam.motorbike'
-        software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
-        assert os.path.exists(software_base_dir)
-
-        software_path = os.path.join(software_base_dir, software_dir)
-        assert os.path.exists(software_path)
-
-        spack_file = os.path.join(software_path, 'spack.yaml')
-
-        import re
-        regex = re.compile(r".*openfoam.*\^flex.*")
-        with open(spack_file, 'r') as f:
-            data = f.read()
-            result = regex.search(data)
-
-            assert result
-
-
-def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
+def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path, capsys):
     """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - -n
-    - '{n_ranks}'
-    - -ppn
-    - '{processes_per_node}'
-    - -hostfile
-    - hostfile
-  batch:
-    submit: 'sbatch {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: 30
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -470,26 +843,23 @@ ramble:
             eight_node:
               variables:
                 n_nodes: '8'
-spack:
-  concretized: true
-  compilers:
-    gcc8:
-      base: gcc
-      version: 8.2.0
-      target: x86_64
-  mpi_libraries:
-    impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-      target: x86_64
-  applications:
-    wrfv3:
-      my-wrf:
-        base: wrf
-        version: 3.9.1.1
-        variants: build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
+  spack:
+    concretized: true
+    packages:
+      gcc8:
+        spack_spec: gcc@8.2.0 target=x86_64
+        compiler_spec: gcc@8.2.0
+      impi2018:
+        spack_spec: intel-mpi@2018.4.274 target=x86_64
         compiler: gcc8
-        mpi: impi2018
+      wrfv3:
+        spack_spec: my_wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
+        compiler: gcc8
+    environments:
+      wrfv3:
+        packages:
+        - impi2018
+        - wrfv3
 """
 
     workspace_name = 'test_missing_required_dry_run'
@@ -502,29 +872,22 @@ spack:
             f.write(test_config)
         ws._re_read()
 
-        output = workspace('setup',
-                           '--dry-run',
-                           global_args=['-w', workspace_name],
-                           fail_on_error=False)
+        with pytest.raises(RambleCommandError):
+            workspace('setup',
+                      '--dry-run',
+                      global_args=['-w', workspace_name])
 
-        assert "Software spec wrf is not defined in context wrfv3" in output
+            captured = capsys.readouterr()
+
+            assert "Software spec wrf is not defined in environment wrfv3" in captured
 
 
 def test_env_var_builtin(mutable_config, mutable_mock_workspace_path, mock_applications):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -555,11 +918,10 @@ ramble:
               env-vars:
                 set:
                   MY_VAR: 'TEST'
-spack:
-  concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
     workspace_name = 'test_env_var_command'
     with ramble.workspace.create(workspace_name) as ws:
@@ -633,18 +995,9 @@ def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path):
 
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{{n_ranks}}'
-    - '-ppn'
-    - '{{processes_per_node}}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {{execute_experiment}}'
   variables:
+    mpi_command: 'mpirun -n {{n_ranks}} -ppn {{processes_per_node}}'
+    batch_submit: 'batch_submit {{execute_experiment}}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -662,23 +1015,22 @@ ramble:
             "{}_test_{{{var_name}}}":
               variables:
                 n_ranks: "{{{var_name}}}"
-spack:
-  concretized: true
-  compilers:
-    gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    openfoam:
-      openfoam:
-        base: openfoam
+  spack:
+    concretized: true
+    packages:
+      gcc:
+        spack_spec: gcc@8.5.0
+      intel:
+        spack_spec: intel-mpi@2018.4.274
         compiler: gcc
-        mpi: intel
-        target: 'x86_64'
+      openfoam:
+        spack_spec: openfoam-org
+        compiler: gcc
+    environments:
+      openfoam:
+        packages:
+        - openfoam
+        - intel
 """ .format(*test_scopes, var_name=var_name1)
 
     config = ramble.main.RambleCommand('config')
@@ -724,18 +1076,9 @@ spack:
 def test_custom_executables(mutable_config, mutable_mock_workspace_path, mock_applications):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
@@ -762,11 +1105,10 @@ ramble:
               env-vars:
                 set:
                   MY_VAR: 'TEST'
-spack:
-  concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
 """
     workspace_name = 'test_custom_executables'
     with ramble.workspace.create(workspace_name) as ws:
@@ -811,18 +1153,9 @@ spack:
 def test_unused_compilers_are_skipped(mutable_config, mutable_mock_workspace_path, capsys):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '10'
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -831,86 +1164,70 @@ ramble:
       workloads:
         CONUS_12km:
           experiments:
-            test{n_nodes}_{spec_name}:
+            test{n_nodes}_{env_name}:
               variables:
                 n_nodes: '1'
-spack:
-  concretized: true
-  compilers:
-    gcc8:
-      base: gcc
-      version: 8.5.0
-    gcc9:
-      base: gcc
-      version: 9.3.0
-    gcc10:
-      base: gcc
-      version: 10.1.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    wrfv4:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+  spack:
+    concretized: true
+    packages:
+      gcc8:
+        spack_spec: gcc@8.5.0
+      gcc9:
+        spack_spec: gcc@9.3.0
+      gcc10:
+        spack_spec: gcc@10.1.0
+      intel:
+        spack_spec: intel-mpi@2018.4.274
         compiler: gcc8
-        mpi: intel
+      wrf:
+        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        compiler: gcc8
+    environments:
+      wrfv4:
+        packages:
+        - wrf
+        - intel
 """
 
     workspace_name = 'test_unused_compilers_are_skipped'
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
 
-    ws.dry_run = True
-    ws._re_read()
+        ws.dry_run = True
+        ws._re_read()
 
-    ws.run_pipeline('setup')
-    captured = capsys.readouterr()
+        ws.run_pipeline('setup')
+        captured = capsys.readouterr()
 
-    required_compiler_str = "gcc @8.5.0"
-    unused_gcc9_str = "gcc @9.3.0"
-    unused_gcc10_str = "gcc @10.1.0"
+        required_compiler_str = "gcc@8.5.0"
+        unused_gcc9_str = "gcc@9.3.0"
+        unused_gcc10_str = "gcc@10.1.0"
 
-    assert required_compiler_str in captured.out
-    assert unused_gcc9_str not in captured.out
-    assert unused_gcc10_str not in captured.out
+        assert required_compiler_str in captured.out
+        assert unused_gcc9_str not in captured.out
+        assert unused_gcc10_str not in captured.out
 
 
 def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir):
     test_spack_env = """
 spack:
-  specs: [ 'zlib' ]
+  specs: [ 'wrf' ]
 """
 
     env_path = str(tmpdir)
     with open(os.path.join(env_path, 'spack.yaml'), 'w+') as f:
         f.write(test_spack_env)
 
-    with open(os.path.join(env_path, 'spack.lock'), 'w+') as f:
-        f.write(test_spack_env)
-
     test_config = f"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{{n_ranks}}'
-    - '-ppn'
-    - '{{processes_per_node}}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {{execute_experiment}}'
   variables:
+    mpi_command: 'mpirun -n {{n_ranks}} -ppn {{processes_per_node}}'
+    batch_submit: 'batch_submit {{execute_experiment}}'
     processes_per_node: '10'
     n_ranks: '{{processes_per_node}}*{{n_nodes}}'
     n_threads: '1'
@@ -919,62 +1236,37 @@ ramble:
       workloads:
         CONUS_12km:
           experiments:
-            test{{n_nodes}}_{{spec_name}}:
+            test{{n_nodes}}_{{env_name}}:
               variables:
                 n_nodes: '1'
-spack:
-  concretized: true
-  compilers:
-    gcc8:
-      base: gcc
-      version: 8.5.0
-    gcc9:
-      base: gcc
-      version: 9.3.0
-    gcc10:
-      base: gcc
-      version: 10.1.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    wrfv4:
-      external_spack_env: {env_path}
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
-        compiler: gcc8
-        mpi: intel
+  spack:
+    concretized: true
+    packages: {{}}
+    environments:
+      wrfv4:
+        external_spack_env: {env_path}
 """
 
     workspace_name = 'test_dryrun_copies_external_env'
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
 
-    ws.dry_run = True
-    ws._re_read()
+        ws.dry_run = True
+        ws._re_read()
 
-    ws.run_pipeline('setup')
+        ws.run_pipeline('setup')
 
-    env_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.yaml')
-    lock_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.lock')
+        env_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.yaml')
 
-    assert os.path.exists(env_file)
+        assert os.path.exists(env_file)
 
-    with open(env_file, 'r') as f:
-        assert 'zlib' in f.read()
-
-    assert os.path.exists(lock_file)
-
-    with open(lock_file, 'r') as f:
-        assert 'zlib' in f.read()
+        with open(env_file, 'r') as f:
+            assert 'wrf' in f.read()
 
 
 def test_dryrun_series_contains_package_paths(mutable_config,
@@ -982,18 +1274,9 @@ def test_dryrun_series_contains_package_paths(mutable_config,
                                               mock_applications):
     test_config = r"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '10'
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -1006,55 +1289,47 @@ ramble:
               variables:
                 n_nodes: '1'
                 test_id: [1, 2]
-spack:
-  concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications:
-    zlib:
+  spack:
+    concretized: true
+    packages:
       zlib:
-        base: zlib
+        spack_spec: zlib
+    environments:
+      zlib:
+        packages:
+        - zlib
 """
 
     workspace_name = 'test_dryrun_series_contains_package_paths'
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
 
-    ws.dry_run = True
-    ws._re_read()
+        ws.dry_run = True
+        ws._re_read()
 
-    ws.run_pipeline('setup')
+        ws.run_pipeline('setup')
 
-    for test in ['test_1', 'test_2']:
-        script = os.path.join(ws.experiment_dir, 'zlib', 'ensure_installed',
-                              test, 'execute_experiment')
+        for test in ['test_1', 'test_2']:
+            script = os.path.join(ws.experiment_dir, 'zlib', 'ensure_installed',
+                                  test, 'execute_experiment')
 
-        assert os.path.exists(script)
-        with open(script, 'r') as f:
-            assert r'{zlib}' not in f.read()
+            assert os.path.exists(script)
+            with open(script, 'r') as f:
+                assert r'{zlib}' not in f.read()
 
 
 def test_dryrun_chained_experiments(mutable_config,
                                     mutable_mock_workspace_path):
     test_config = r"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '10'
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
@@ -1100,28 +1375,29 @@ ramble:
                 order: 'before_root'
               variables:
                 n_nodes: '2'
-spack:
-  concretized: true
-  compilers:
-    gcc:
-      base: gcc
-      version: 9.3.0
-      target: x86_64
-  mpi_libraries:
-    impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    intel-mpi-benchmarks:
-      intel-mpi-benchmarks:
-        base: intel-mpi-benchmarks
+  spack:
+    concretized: true
+    packages:
+      gcc:
+        spack_spec: gcc@9.3.0 target=x86_64
+      impi2018:
+        spack_spec: intel-mpi@2018.4.274
         compiler: gcc
-        mpi: impi2018
-    gromacs:
+      imb:
+        spack_spec: intel-mpi-benchmarks
+        compiler: gcc
       gromacs:
-        base: gromacs
+        spack_spec: gromacs
         compiler: gcc
-        mpi: impi2018
+    environments:
+      intel-mpi-benchmarks:
+        packages:
+        - imb
+        - impi2018
+      gromacs:
+        packages:
+        - gromacs
+        - impi2018
 """
 
     mock_output_data = """
@@ -1129,100 +1405,100 @@ spack:
 """
 
     workspace_name = 'test_dryrun_chained_experiments'
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
 
-    ws.dry_run = True
-    ws._re_read()
+        ws.dry_run = True
+        ws._re_read()
 
-    ws.run_pipeline('setup')
+        ws.run_pipeline('setup')
 
-    template_dir = os.path.join(ws.experiment_dir, 'intel-mpi-benchmarks')
-    assert not os.path.exists(template_dir)
+        template_dir = os.path.join(ws.experiment_dir, 'intel-mpi-benchmarks')
+        assert not os.path.exists(template_dir)
 
-    parent_dir = os.path.join(ws.experiment_dir, 'gromacs', 'water_bare',
-                              'parent_test')
-    script = os.path.join(parent_dir, 'execute_experiment')
-    assert os.path.exists(script)
+        parent_dir = os.path.join(ws.experiment_dir, 'gromacs', 'water_bare',
+                                  'parent_test')
+        script = os.path.join(parent_dir, 'execute_experiment')
+        assert os.path.exists(script)
 
-    # Check all chained experiments are referenced
-    with open(script, 'r') as f:
-        parent_script_data = f.read()
+        # Check all chained experiments are referenced
+        with open(script, 'r') as f:
+            parent_script_data = f.read()
 
-    for chain_idx in [1, 3, 5]:
-        chained_script = os.path.join(parent_dir, 'chained_experiments',
-                                      f'{chain_idx}' +
-                                      r'.intel-mpi-benchmarks.collective.collective_chain',
-                                      'execute_experiment')
-        assert os.path.exists(chained_script)
-        assert chained_script in parent_script_data
+        for chain_idx in [1, 3, 5]:
+            chained_script = os.path.join(parent_dir, 'chained_experiments',
+                                          f'{chain_idx}' +
+                                          r'.intel-mpi-benchmarks.collective.collective_chain',
+                                          'execute_experiment')
+            assert os.path.exists(chained_script)
+            assert chained_script in parent_script_data
 
-        # Check that experiment 1 has n_ranks = 4 instead of 2
-        if chain_idx == 3:
-            with open(chained_script, 'r') as f:
-                assert 'mpirun -n 4' in f.read()
+            # Check that experiment 1 has n_ranks = 4 instead of 2
+            if chain_idx == 3:
+                with open(chained_script, 'r') as f:
+                    assert 'mpirun -n 4' in f.read()
 
-    expected_order = [
-        re.compile(r'.*3.intel-mpi-benchmarks.collective.collective_chain.*'),
-        re.compile(r'.*5.intel-mpi-benchmarks.collective.collective_chain.*'),
-        re.compile(r'.*4.intel-mpi-benchmarks.pingpong.pingpong_chain.*'),
-        re.compile(r'.*2.intel-mpi-benchmarks.pingpong.pingpong_chain.*'),
-        re.compile(r'.*1.intel-mpi-benchmarks.collective.collective_chain.*'),
-        re.compile(r'.*0.intel-mpi-benchmarks.pingpong.pingpong_chain.*')
-    ]
+        expected_order = [
+            re.compile(r'.*3.intel-mpi-benchmarks.collective.collective_chain.*'),
+            re.compile(r'.*5.intel-mpi-benchmarks.collective.collective_chain.*'),
+            re.compile(r'.*4.intel-mpi-benchmarks.pingpong.pingpong_chain.*'),
+            re.compile(r'.*2.intel-mpi-benchmarks.pingpong.pingpong_chain.*'),
+            re.compile(r'.*1.intel-mpi-benchmarks.collective.collective_chain.*'),
+            re.compile(r'.*0.intel-mpi-benchmarks.pingpong.pingpong_chain.*')
+        ]
 
-    # Check prepend / append order is correct
-    with open(script, 'r') as f:
+        # Check prepend / append order is correct
+        with open(script, 'r') as f:
 
-        for line in f.readlines():
-            if expected_order[0].match(line):
-                expected_order.pop(0)
+            for line in f.readlines():
+                if expected_order[0].match(line):
+                    expected_order.pop(0)
 
-    # Ensure results contain chain information, and properly extract figures of merit
-    chain_exp_name = r'3.intel-mpi-benchmarks.collective.collective_chain'
-    output_path_3 = os.path.join(parent_dir, 'chained_experiments',
-                                 chain_exp_name,
-                                 f'gromacs.water_bare.parent_test.chain.{chain_exp_name}.out')
+        # Ensure results contain chain information, and properly extract figures of merit
+        chain_exp_name = r'3.intel-mpi-benchmarks.collective.collective_chain'
+        output_path_3 = os.path.join(parent_dir, 'chained_experiments',
+                                     chain_exp_name,
+                                     f'gromacs.water_bare.parent_test.chain.{chain_exp_name}.out')
 
-    with open(output_path_3, 'w+') as f:
-        f.write(mock_output_data)
+        with open(output_path_3, 'w+') as f:
+            f.write(mock_output_data)
 
-    ws.run_pipeline('analyze')
-    ws.dump_results(output_formats=['json', 'yaml'])
+        ws.run_pipeline('analyze')
+        ws.dump_results(output_formats=['json', 'yaml'])
 
-    base_name = r'gromacs.water_bare.parent_test'
-    collective_name = r'intel-mpi-benchmarks.collective.collective_chain'
-    pingpong_name = r'intel-mpi-benchmarks.pingpong.pingpong_chain'
+        base_name = r'gromacs.water_bare.parent_test'
+        collective_name = r'intel-mpi-benchmarks.collective.collective_chain'
+        pingpong_name = r'intel-mpi-benchmarks.pingpong.pingpong_chain'
 
-    chain_def = [f'{base_name}.chain.3.{collective_name}',
-                 f'{base_name}.chain.5.{collective_name}',
-                 f'{base_name}',
-                 f'{base_name}.chain.4.{pingpong_name}',
-                 f'{base_name}.chain.2.{pingpong_name}',
-                 f'{base_name}.chain.1.{collective_name}',
-                 f'{base_name}.chain.0.{pingpong_name}',
-                 ]
+        chain_def = [f'{base_name}.chain.3.{collective_name}',
+                     f'{base_name}.chain.5.{collective_name}',
+                     f'{base_name}',
+                     f'{base_name}.chain.4.{pingpong_name}',
+                     f'{base_name}.chain.2.{pingpong_name}',
+                     f'{base_name}.chain.1.{collective_name}',
+                     f'{base_name}.chain.0.{pingpong_name}',
+                     ]
 
-    names = ['results.latest.json', 'results.latest.yaml']
-    loaders = [sjson.load, syaml.load]
-    for name, loader in zip(names, loaders):
-        with open(os.path.join(ws.root, name), 'r') as f:
-            data = loader(f)
+        names = ['results.latest.json', 'results.latest.yaml']
+        loaders = [sjson.load, syaml.load]
+        for name, loader in zip(names, loaders):
+            with open(os.path.join(ws.root, name), 'r') as f:
+                data = loader(f)
 
-            assert 'experiments' in data
+                assert 'experiments' in data
 
-            for exp_def in data['experiments']:
-                if exp_def['name'] == r'gromacs.water_bare.parent_test.' + \
-                        r'chain.3.intel-mpi-benchmarks.collective.collective_chain':
-                    assert exp_def['RAMBLE_STATUS'] == 'SUCCESS'
-                else:
-                    assert exp_def['RAMBLE_STATUS'] == 'FAILED'
-                assert exp_def['EXPERIMENT_CHAIN'] == chain_def
+                for exp_def in data['experiments']:
+                    if exp_def['name'] == r'gromacs.water_bare.parent_test.' + \
+                            r'chain.3.intel-mpi-benchmarks.collective.collective_chain':
+                        assert exp_def['RAMBLE_STATUS'] == 'SUCCESS'
+                    else:
+                        assert exp_def['RAMBLE_STATUS'] == 'FAILED'
+                    assert exp_def['EXPERIMENT_CHAIN'] == chain_def
 
 
 @pytest.mark.long
@@ -1233,13 +1509,9 @@ def test_known_applications(application):
     ws_name = f'test_all_apps_{application}'
 
     base_config = """ramble:
-  mpi:
-    command: 'mpirun'
-    args:
-    - '-n'
-    - '{n_ranks}'
-  batch:
-    submit: '{execute_experiment}'
+  variables:
+    mpi_command: 'mpirun -n {n_ranks}'
+    batch_submit: '{execute_experiment}'
   applications:\n"""
 
     app_info = info_cmd(application)
@@ -1265,11 +1537,10 @@ def test_known_applications(application):
                 n_ranks: '1'
                 n_nodes: '1'
                 processes_per_node: '1'\n""")
-            f.write("""spack:
-  concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}\n""")
+            f.write("""  spack:
+    concretized: false
+    packages: {}
+    environments: {}\n""")
 
         ws._re_read()
         ws.concretize()
