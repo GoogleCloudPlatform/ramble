@@ -47,10 +47,8 @@ class SoftwareEnvironments(object):
                 f'{str(self.supported_confs)}'
             )
 
-        if conf_type == 'v1':
-            self._v1_setup()
-        elif conf_type == 'v2':
-            self._v2_setup()
+        setup_method = getattr(self, f'_{conf_type}_setup')
+        setup_method()
 
     def _detect_conf_type(self):
         """Auto-detect the type of configuration provided.
