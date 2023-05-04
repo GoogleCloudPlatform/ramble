@@ -1,0 +1,4 @@
+spack:
+  concretized: false
+  packages: {}
+  environments: {}

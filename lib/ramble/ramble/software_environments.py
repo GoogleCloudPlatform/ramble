@@ -43,7 +43,7 @@ class SoftwareEnvironments(object):
 
         if conf_type not in self.supported_confs:
             raise RambleSoftwareEnvironmentError(
-                f'Configuration type {conf_type} is not one of ' +
+                f'Software configuration type {conf_type} is not one of ' +
                 f'{str(self.supported_confs)}'
             )
 
@@ -73,7 +73,7 @@ class SoftwareEnvironments(object):
           environments: {}
         """
 
-        conf_type = 'v2'
+        conf_type = 'invalid'
 
         if namespace.application in self.spack_dict or \
                 namespace.compilers in self.spack_dict or \
