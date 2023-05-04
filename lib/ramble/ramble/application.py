@@ -33,6 +33,7 @@ import ramble.expander
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
+from ramble.schema.applications import OUTPUT
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
@@ -491,10 +492,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Define custom executables
         if namespace.custom_executables in self.internals.keys():
             for name, conf in self.internals[namespace.custom_executables].items():
+
+                output_capture = OUTPUT.DEFAULT
+                if 'output_capture' in conf:
+                    output_capture = conf['output_capture']
+
                 self.executables[name] = {
                     'template': conf['template'],
                     'mpi': conf['mpi'] if 'mpi' in conf else False,
                     'redirect': conf['redirect'] if 'redirect' in conf else '{log_file}',
+                    'output_capture': output_capture
                 }
 
         for input_file in inputs:
@@ -554,7 +561,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                 if command_config['redirect']:
                     out_log = self.expander.expand_var(command_config['redirect'])
-                    exec_vars['redirect'] = ' >> "%s"' % out_log
+                    output_operator = command_config['output_capture']
+                    exec_vars['redirect'] = f' {output_operator} "{out_log}"'
                 else:
                     exec_vars['redirect'] = ''
 

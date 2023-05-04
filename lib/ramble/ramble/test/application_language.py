@@ -62,9 +62,13 @@ def add_executable(app_inst, exe_num=1):
     mpi_list_exec_name = 'MultiLineMpiExe%s' % exe_num
     template = 'application%s.x -i {input_path}' % exe_num
     redirect_test = '{output_file}'
+    output_capture = '>>'
 
-    executable(nompi_exec_name, template,  # noqa: F405
-               use_mpi=False, redirect=redirect_test)(app_inst)
+    executable(nompi_exec_name,
+               template,  # noqa: F405
+               use_mpi=False,
+               redirect=redirect_test,
+               output_capture=output_capture)(app_inst)
 
     executable(mpi_exec_name, template,  # noqa: F405
                use_mpi=True)(app_inst)
@@ -80,7 +84,8 @@ def add_executable(app_inst, exe_num=1):
         nompi_exec_name: {
             'template': template,
             'mpi': False,
-            'redirect': redirect_test
+            'redirect': redirect_test,
+            'output_capture': output_capture
         },
         mpi_exec_name: {
             'template': template,

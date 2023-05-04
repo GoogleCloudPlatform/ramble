@@ -23,3 +23,5 @@ from ramble.spec import Spec
 
 import ramble.language.application_language
 from ramble.language.application_language import *
+
+from ramble.schema.applications import OUTPUT
