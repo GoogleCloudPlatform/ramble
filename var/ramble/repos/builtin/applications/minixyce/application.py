@@ -77,6 +77,11 @@ class Minixyce(SpackApplication):
 
     floating_point_regex = r'[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*'
 
+    success_regex = r'^\s*TIME.*num_GMRES_iters\s*num_GMRES_restarts'
+    success_criteria('valid', mode='string',
+                     match=success_regex,
+                     file=log_file)
+
     figure_of_merit('Time', log_file=log_file,
                     fom_regex=r'\s+(?P<time>' + floating_point_regex + r')',
                     group_name='time',
