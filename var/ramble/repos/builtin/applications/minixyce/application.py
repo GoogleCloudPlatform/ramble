@@ -18,16 +18,11 @@ class Minixyce(SpackApplication):
 
     default_compiler('gcc12', base='gcc', version='12.2.0', target='x86_64')
 
-    mpi_library('ompi415', base='openmpi', version='4.1.5',
-                variants='+legacylaunchers +pmi +cxx')
+    software_spec('ompi415', spack_spec='openmpi@4.1.5 +legacylaunchers +pmi +cxx',
+                  compiler='gcc12')
 
-    software_spec('minixyce',
-                  base='minixyce',
-                  version='1.0',
-                  compiler='gcc12',
-                  variants='+mpi',
-                  mpi='ompi415',
-                  required=True)
+    software_spec('minixyce', spack_spec='minixyce@1.0 +mpi',
+                  compiler='gcc12')
 
     executable('execute', 'miniXyce.x --circuit {workload_name}.net --pf params.txt', use_mpi=True)
 
