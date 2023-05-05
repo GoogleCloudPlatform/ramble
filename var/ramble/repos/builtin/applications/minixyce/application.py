@@ -16,7 +16,7 @@ class Minixyce(SpackApplication):
 
     tags = ['circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark']
 
-    default_compiler('gcc12', base='gcc', version='12.2.0', target='x86_64')
+    default_compiler('gcc12', spack_spec="gcc@12.2.0 target=x86_64")
 
     software_spec('ompi415', spack_spec='openmpi@4.1.5 +legacylaunchers +pmi +cxx',
                   compiler='gcc12')
