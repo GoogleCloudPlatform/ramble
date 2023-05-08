@@ -1,0 +1,70 @@
+# Copyright 2022-2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+
+steps:
+  - name: gcr.io/cloud-builders/git
+    args:
+      - fetch
+      - '--unshallow'
+    id: ramble-clone
+  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-centos7:latest
+    args:
+      - '-c'
+      - |
+        cd /workspace
+
+        git branch develop origin/develop
+
+        export PATH=$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}
+
+        . /opt/spack/share/spack/setup-env.sh
+        . /workspace/share/ramble/setup-env.sh
+
+        COVERAGE=true LONG=true /workspace/share/ramble/qa/run-unit-tests
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        unit_err=$$?
+
+        coverage report -m --fail-under=74
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        coverage_err=$$?
+
+        error=0
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$unit_err -gt 0 ]; then
+          echo "Unit error = $$unit_err"
+          echo " ***** Unit tests failed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$coverage_err -gt 0 ]; then
+          if [ $$coverage_err == 2 ]; then
+            echo "Code coverage dropped below the minimum level."
+            echo " ***** Coverage decreased"
+          else
+            echo "Code coverage report generation failed."
+            echo " ***** Coverage report generic error"
+          fi
+
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        exit $$error
+    id: ramble-unit-tests
+    entrypoint: /bin/bash
+
+timeout: 600s
+options:
+  machineType: N1_HIGHCPU_8
