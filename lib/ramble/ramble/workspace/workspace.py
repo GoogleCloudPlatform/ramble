@@ -1032,6 +1032,8 @@ class Workspace(object):
             if app_name not in environments_dict:
                 environments_dict[app_name] = syaml.syaml_dict()
                 environments_dict[app_name][namespace.packages] = []
+                ramble.config.add(f'spack:environments:{app_name}:packages:[]',
+                                  scope=self.ws_file_config_scope_name())
 
             app_packages = environments_dict[app_name][namespace.packages]
             for spec_name, info in app_inst.software_specs.items():
