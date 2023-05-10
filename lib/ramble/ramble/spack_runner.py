@@ -264,14 +264,6 @@ class SpackRunner(object):
             else:
                 self._dry_run_print(self.compiler_find_args)
 
-    def add_compiler(self, spec):
-        """Add a compiler to an environment.
-        """
-        self._check_active()
-
-        if spec not in self.env_contents:
-            self.env_contents.append(spec)
-
     def activate(self):
         """
         Ensure the spack environment is active in subsequent commands.
@@ -282,7 +274,7 @@ class SpackRunner(object):
 
         self.exe.add_default_env(self.env_key, self.env_path)
 
-        self.env_contents = self.compilers.copy()
+        self.env_contents = []
 
         self.active = True
 
