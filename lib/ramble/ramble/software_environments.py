@@ -134,6 +134,7 @@ class SoftwareEnvironments(object):
                             self._environments[env][namespace.compilers].append(
                                 conf['compiler']
                             )
+                            self._packages[pkg]['compiler'] = conf['compiler']
 
                         if 'mpi' in conf:
                             self._environments[env][namespace.packages].append(
