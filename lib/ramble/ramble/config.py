@@ -54,12 +54,14 @@ import spack.platforms
 
 import ramble.schema
 import ramble.schema.config
+import ramble.schema.env_vars
 import ramble.schema.repos
 import ramble.schema.workspace
 import ramble.schema.applications
 import ramble.schema.licenses
 import ramble.schema.mirrors
 import ramble.schema.spack
+import ramble.schema.success_criteria
 import ramble.schema.variables
 
 from ramble.error import RambleError
@@ -71,10 +73,12 @@ from spack.util.cpus import cpus_available
 #: Dict from section names -> schema for that section
 section_schemas = {
     'config': ramble.schema.config.schema,
+    'env_vars': ramble.schema.env_vars.schema,
     'repos': ramble.schema.repos.schema,
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
     'spack': ramble.schema.spack.schema,
+    'success_criteria': ramble.schema.success_criteria.schema,
     'applications': ramble.schema.applications.schema,
     'variables': ramble.schema.variables.schema,
 }

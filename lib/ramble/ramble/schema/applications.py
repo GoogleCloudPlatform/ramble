@@ -13,10 +13,13 @@
 """  # noqa E501
 
 from llnl.util.lang import union_dicts
+from ramble.schema.success_criteria import success_list_def
 
-import ramble.schema.licenses
+import ramble.schema.env_vars
 import ramble.schema.types
 import ramble.schema.variables
+import ramble.schema.success_criteria
+import ramble.schema.licenses
 
 
 matrix_def = {
@@ -39,24 +42,6 @@ matrices_def = {
             }
         ]
     }
-}
-
-success_criteria_def = {
-    'type': 'object',
-    'default': {},
-    'properties': {
-        'name': {'type': 'string'},
-        'mode': {'type': 'string'},
-        'match': {'type': 'string'},
-        'file': {'type': 'string'}
-    },
-    'additionalProperties': False,
-}
-
-success_list_def = {
-    'type': 'array',
-    'default': [],
-    'items': success_criteria_def
 }
 
 custom_executables_def = {
@@ -111,10 +96,11 @@ chained_experiment_def = {
 
 sub_props = union_dicts(
     ramble.schema.variables.properties,
+    ramble.schema.success_criteria.properties,
+    ramble.schema.env_vars.properties,
     {
-        'env-vars': ramble.schema.licenses.env_var_actions,
         'internals': internals_def,
-        'success_criteria': success_list_def,
+        'env-vars': ramble.schema.licenses.env_var_actions,
         'chained_experiments': chained_experiment_def,
         'template': {'type': 'boolean'},
     }
@@ -157,8 +143,6 @@ properties = {
                                                 {
                                                     'matrix': matrix_def,
                                                     'matrices': matrices_def,
-                                                    'env-vars':
-                                                    ramble.schema.licenses.env_var_actions,
                                                     'internals': internals_def,
                                                     'success_criteria': success_list_def,
                                                 }

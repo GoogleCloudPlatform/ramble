@@ -16,6 +16,7 @@ import datetime
 
 import six
 
+from llnl.util.lang import union_dicts
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 
@@ -1119,7 +1120,8 @@ class Workspace(object):
                             'properly configured.'
             tty.die(error_message)
 
-        self.extract_success_criteria('workspace', self._get_workspace_dict()[namespace.ramble])
+        self.extract_success_criteria('workspace',
+                                      ramble.config.config.get_config('success_criteria'))
 
         if pipeline == 'setup':
             all_experiments_path = os.path.join(self.root,
@@ -1477,11 +1479,12 @@ class Workspace(object):
 
     def get_workspace_vars(self):
         """Return a dict of workspace variables"""
-        return self._get_workspace_section(namespace.variables)
+        return ramble.config.config.get_config('variables')
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        return self._get_workspace_section(namespace.env_var)
+        return union_dicts(ramble.config.config.get_config('env_vars'),
+                           self._get_workspace_section(namespace.env_var))
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""

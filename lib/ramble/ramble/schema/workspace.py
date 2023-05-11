@@ -17,6 +17,7 @@ from llnl.util.lang import union_dicts
 import spack.schema.env
 import ramble.schema.applications
 import ramble.schema.merged
+import ramble.schema.licenses
 
 env_properties = spack.schema.env.schema['patternProperties']
 spec_properties = env_properties['^env|spack$']
@@ -60,13 +61,12 @@ properties = {
                     'default': {}
                 },
                 'internals': ramble.schema.applications.internals_def,
-                'success_criteria': ramble.schema.applications.success_list_def,
-                'env-vars': ramble.schema.licenses.env_var_actions,
                 'include': {
                     'type': 'array',
                     'default': [],
                     'items': {'type': 'string'},
                 },
+                'env-vars': ramble.schema.licenses.env_var_actions,
                 'application_directories': {
                     'type': 'array',
                     'default': [],
