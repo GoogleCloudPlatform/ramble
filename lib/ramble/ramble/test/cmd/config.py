@@ -15,6 +15,7 @@ import llnl.util.filesystem as fs
 
 import ramble.config
 import ramble.workspace
+import ramble.test.cmd.workspace
 import ramble.main
 import spack.util.spack_yaml as syaml
 
@@ -100,8 +101,7 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_r
 
         assert 'basic' not in config('get')
 
-        ws.add('basic')
-        ws.write()
+        ramble.test.cmd.workspace.add_basic(ws)
 
         assert 'basic' in config('get')
 

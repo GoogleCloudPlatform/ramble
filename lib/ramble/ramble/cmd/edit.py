@@ -14,7 +14,6 @@ import llnl.util.tty as tty
 import ramble.cmd
 import ramble.paths
 import ramble.repository
-import ramble.spec
 
 from spack.util.editor import editor
 
@@ -40,14 +39,13 @@ def edit_application(name, repo_path, namespace):
         repo = ramble.repository.path
     path = repo.filename_for_application_name(name)
 
-    spec = ramble.spec.Spec(name)
     if os.path.exists(path):
         if not os.path.isfile(path):
             tty.die("Something is wrong. '{0}' is not a file!".format(path))
         if not os.access(path, os.R_OK):
             tty.die("Insufficient permissions on '%s'!" % path)
     else:
-        tty.die("No package for '{0}' was found.".format(spec.name),
+        tty.die("No package for '{0}' was found.".format(name),
                 "  Use `spack create` to create a new package")
 
     editor(path)
