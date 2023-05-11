@@ -17,6 +17,7 @@ import ramble.schema.applications
 import ramble.schema.config
 import ramble.schema.repos
 import ramble.schema.spack
+import ramble.schema.variables
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
@@ -24,6 +25,7 @@ properties = union_dicts(
     ramble.schema.config.properties,
     ramble.schema.repos.properties,
     ramble.schema.spack.properties,
+    ramble.schema.variables.properties,
 )
 
 #: Full schema with metadata

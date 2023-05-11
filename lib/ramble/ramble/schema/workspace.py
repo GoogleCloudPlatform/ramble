@@ -59,7 +59,6 @@ properties = {
                     'additionalProperties': False,
                     'default': {}
                 },
-                'variables': ramble.schema.applications.variables_def,
                 'internals': ramble.schema.applications.internals_def,
                 'success_criteria': ramble.schema.applications.success_list_def,
                 'env-vars': ramble.schema.licenses.env_var_actions,

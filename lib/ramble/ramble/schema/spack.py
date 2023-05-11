@@ -12,6 +12,7 @@
    :lines: 12-
 """  # noqa E501
 
+import ramble.schema.variables
 import ramble.schema.applications
 
 #: Properties for inclusion in other schemas
@@ -37,7 +38,7 @@ properties = {
                             'type': 'string',
                             'default': None,
                         },
-                        'variables': ramble.schema.applications.variables_def,
+                        'variables': ramble.schema.variables.variables_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
                     },
@@ -61,7 +62,7 @@ properties = {
                             'items': {'type': 'string'},
                             'default': []
                         },
-                        'variables': ramble.schema.applications.variables_def,
+                        'variables': ramble.schema.variables.variables_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
                     },

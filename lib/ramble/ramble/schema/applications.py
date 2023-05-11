@@ -12,16 +12,12 @@
    :lines: 12-
 """  # noqa E501
 
+from llnl.util.lang import union_dicts
+
 import ramble.schema.licenses
 import ramble.schema.types
+import ramble.schema.variables
 
-
-variables_def = {
-    'type': ['object', 'null'],
-    'default': {},
-    'properties': {},
-    'additionalProperties': ramble.schema.types.array_or_scalar_of_strings_or_nums
-}
 
 matrix_def = {
     'type': 'array',
@@ -101,15 +97,28 @@ chained_experiment_def = {
     'items': {
         'type': 'object',
         'default': {},
-        'properties': {
-            'name': {'type': 'string'},
-            'command': {'type': 'string'},
-            'order': {'type': 'string'},
-            'variables': variables_def,
-        },
+        'properties': union_dicts(
+            {
+                'name': {'type': 'string'},
+                'command': {'type': 'string'},
+                'order': {'type': 'string'},
+            },
+            ramble.schema.variables.properties
+        ),
         'additionalProperties': False
     }
 }
+
+sub_props = union_dicts(
+    ramble.schema.variables.properties,
+    {
+        'env-vars': ramble.schema.licenses.env_var_actions,
+        'internals': internals_def,
+        'success_criteria': success_list_def,
+        'chained_experiments': chained_experiment_def,
+        'template': {'type': 'boolean'},
+    }
+)
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -121,52 +130,47 @@ properties = {
             'type': 'object',
             'default': '{}',
             'additionalProperties': False,
-            'properties': {
-                'variables': variables_def,
-                'env-vars': ramble.schema.licenses.env_var_actions,
-                'internals': internals_def,
-                'success_criteria': success_list_def,
-                'chained_experiments': chained_experiment_def,
-                'template': {'type': 'boolean'},
-                'workloads': {
-                    'type': 'object',
-                    'default': {},
-                    'properties': {},
-                    'additionalProperties': {
+            'properties': union_dicts(
+                sub_props,
+                {
+                    'workloads': {
                         'type': 'object',
                         'default': {},
-                        'additionalProperties': False,
-                        'properties': {
-                            'variables': variables_def,
-                            'env-vars': ramble.schema.licenses.env_var_actions,
-                            'internals': internals_def,
-                            'success_criteria': success_list_def,
-                            'chained_experiments': chained_experiment_def,
-                            'template': {'type': 'boolean'},
-                            'experiments': {
-                                'type': 'object',
-                                'default': {},
-                                'properties': {},
-                                'additionalProperties': {
-                                    'type': 'object',
-                                    'default': {},
-                                    'additionalProperties': False,
-                                    'properties': {
-                                        'variables': variables_def,
-                                        'matrix': matrix_def,
-                                        'matrices': matrices_def,
-                                        'env-vars': ramble.schema.licenses.env_var_actions,
-                                        'internals': internals_def,
-                                        'success_criteria': success_list_def,
-                                        'chained_experiments': chained_experiment_def,
-                                        'template': {'type': 'boolean'},
+                        'properties': {},
+                        'additionalProperties': {
+                            'type': 'object',
+                            'default': {},
+                            'additionalProperties': False,
+                            'properties': union_dicts(
+                                sub_props,
+                                {
+                                    'experiments': {
+                                        'type': 'object',
+                                        'default': {},
+                                        'properties': {},
+                                        'additionalProperties': {
+                                            'type': 'object',
+                                            'default': {},
+                                            'additionalProperties': False,
+                                            'properties': union_dicts(
+                                                sub_props,
+                                                {
+                                                    'matrix': matrix_def,
+                                                    'matrices': matrices_def,
+                                                    'env-vars':
+                                                    ramble.schema.licenses.env_var_actions,
+                                                    'internals': internals_def,
+                                                    'success_criteria': success_list_def,
+                                                }
+                                            )
+                                        }
                                     }
                                 }
-                            }
+                            )
                         }
                     }
                 }
-            }
+            )
         }
     }
 }
