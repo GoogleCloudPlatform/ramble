@@ -1,0 +1,1150 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>ramble.stage &mdash; Ramble 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Ramble
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-add">ramble add</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-remove">ramble remove</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ramble.stage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ramble.stage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">stat</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.lang</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+<span class="kn">from</span> <span class="nn">llnl.util.filesystem</span> <span class="kn">import</span> <span class="n">mkdirp</span><span class="p">,</span> <span class="n">can_access</span><span class="p">,</span> <span class="n">install</span><span class="p">,</span> <span class="n">install_tree</span>
+<span class="kn">from</span> <span class="nn">llnl.util.filesystem</span> <span class="kn">import</span> <span class="n">partition_path</span><span class="p">,</span> <span class="n">remove_linked_tree</span>
+
+<span class="kn">import</span> <span class="nn">spack.paths</span>
+<span class="kn">import</span> <span class="nn">spack.config</span>
+<span class="kn">import</span> <span class="nn">spack.util.pattern</span> <span class="k">as</span> <span class="nn">pattern</span>
+<span class="kn">import</span> <span class="nn">spack.util.path</span> <span class="k">as</span> <span class="nn">sup</span>
+<span class="kn">import</span> <span class="nn">spack.util.url</span> <span class="k">as</span> <span class="nn">url_util</span>
+
+<span class="kn">from</span> <span class="nn">spack.util.crypto</span> <span class="kn">import</span> <span class="n">prefix_bits</span><span class="p">,</span> <span class="n">bit_length</span>
+
+<span class="kn">import</span> <span class="nn">ramble.caches</span>
+<span class="kn">import</span> <span class="nn">ramble.fetch_strategy</span> <span class="k">as</span> <span class="nn">fs</span>
+<span class="kn">import</span> <span class="nn">ramble.util.lock</span>
+<span class="kn">import</span> <span class="nn">ramble.error</span>
+<span class="kn">import</span> <span class="nn">ramble.mirror</span>
+
+
+<span class="c1"># The well-known stage source subdirectory name.</span>
+<span class="n">_input_subdir</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span>
+
+
+<div class="viewcode-block" id="create_stage_root"><a class="viewcode-back" href="../../ramble.html#ramble.stage.create_stage_root">[docs]</a><span class="k">def</span> <span class="nf">create_stage_root</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the stage root directory and ensure appropriate access perms.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Cannot create stage root </span><span class="si">{0}</span><span class="s1">: Access to </span><span class="si">{1}</span><span class="s1"> is denied&#39;</span>
+
+    <span class="c1"># TODO: (dwjacobsen) Reomve when owner_uid is removed below</span>
+    <span class="c1"># user_uid = os.getuid()</span>
+
+    <span class="c1"># Obtain lists of ancestor and descendant paths of the $user node, if any.</span>
+    <span class="n">group_paths</span><span class="p">,</span> <span class="n">user_node</span><span class="p">,</span> <span class="n">user_paths</span> <span class="o">=</span> <span class="n">partition_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
+                                                        <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group_paths</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="c1"># Ensure access controls of subdirs created above `$user` inherit</span>
+            <span class="c1"># from the parent and share the group.</span>
+            <span class="n">par_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+            <span class="n">mkdirp</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">)</span>
+
+            <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span> <span class="o">!=</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">{0}</span><span class="s2"> to have group </span><span class="si">{1}</span><span class="s2">, but it is </span><span class="si">{2}</span><span class="s2">&quot;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">,</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">!=</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">{0}</span><span class="s2"> to support mode </span><span class="si">{1}</span><span class="s2">, but it is </span><span class="si">{2}</span><span class="s2">&quot;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">,</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">can_access</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+
+    <span class="c1"># Add the path ending with the $user node to the user paths to ensure paths</span>
+    <span class="c1"># from $user (on down) meet the ownership and permission requirements.</span>
+    <span class="k">if</span> <span class="n">user_node</span><span class="p">:</span>
+        <span class="n">user_paths</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">user_node</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">user_paths</span><span class="p">:</span>
+        <span class="c1"># Ensure access controls of subdirs from `$user` on down are</span>
+        <span class="c1"># restricted to the user.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="n">mkdirp</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">)</span>
+
+            <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span> <span class="o">!=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">{0}</span><span class="s2"> to support mode </span><span class="si">{1}</span><span class="s2">, but it is </span><span class="si">{2}</span><span class="s2">&quot;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">,</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">))</span>
+
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># TODO: (dwjacobsen) Remove at some point</span>
+        <span class="c1"># if user_uid != p_stat.st_uid:</span>
+        <span class="c1">#     tty.warn(&quot;Expected user {0} to own {1}, but it is owned by {2}&quot;</span>
+        <span class="c1">#              .format(user_uid, p, owner_uid))</span>
+
+    <span class="n">input_subdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_input_subdir</span><span class="p">)</span>
+    <span class="c1"># When staging into a user-specified directory we need to ensure the</span>
+    <span class="c1"># `input` subdirectory exists, as we can&#39;t rely on it being created</span>
+    <span class="c1"># automatically by ramble.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">input_subdir</span><span class="p">):</span>
+        <span class="n">mkdirp</span><span class="p">(</span><span class="n">input_subdir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_first_accessible_path</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find the first path that is accessible, creating it if necessary.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Ensure the user has access, creating the directory if necessary.</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">can_access</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Now create the stage root with the proper group/perms.</span>
+                <span class="n">create_stage_root</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">path</span>
+
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;OSError while checking stage path </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                      <span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_resolve_paths</span><span class="p">(</span><span class="n">candidates</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resolve candidate paths and make user-related adjustments.</span>
+
+<span class="sd">    Adjustments involve removing extra $user from $tempdir if $tempdir includes</span>
+<span class="sd">    $user and appending $user if it is not present in the path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">temp_path</span> <span class="o">=</span> <span class="n">sup</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="s1">&#39;$tempdir&#39;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+    <span class="n">tmp_has_usr</span> <span class="o">=</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">temp_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="c1"># Remove the extra `$user` node from a `$tempdir/$user` entry for</span>
+        <span class="c1"># hosts that automatically append `$user` to `$tempdir`.</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;$tempdir&#39;</span><span class="p">,</span> <span class="s1">&#39;$user&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">tmp_has_usr</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/$user&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Ensure the path is unique per user.</span>
+        <span class="n">can_path</span> <span class="o">=</span> <span class="n">sup</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">can_path</span><span class="p">:</span>
+            <span class="n">can_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">can_path</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+
+        <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">can_path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">paths</span>
+
+
+<span class="c1"># Cached stage path root</span>
+<span class="n">_stage_root</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="c1"># TODO (dwj): If we want to support multiple mirrors, we&#39;ll need to</span>
+<span class="c1">#             figure out how to pass them to the stage.</span>
+<span class="k">def</span> <span class="nf">_mirror_roots</span><span class="p">():</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">sup</span><span class="o">.</span><span class="n">substitute_path_variables</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">sup</span><span class="o">.</span><span class="n">substitute_path_variables</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+        <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+
+<div class="viewcode-block" id="InputStage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage">[docs]</a><span class="k">class</span> <span class="nc">InputStage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manages a stage directory for containing input files.</span>
+
+<span class="sd">    A Stage object is a context manager that handles a directory where</span>
+<span class="sd">    some workload inputs are downloaded.</span>
+<span class="sd">    It handles fetching inputs, either as an archive to be</span>
+<span class="sd">    expanded or by checking it out of a repository.  A stage&#39;s</span>
+<span class="sd">    lifecycle looks like this::</span>
+
+<span class="sd">        with InputStage() as stage:      # Context manager creates the stage</span>
+<span class="sd">                                    # directory</span>
+<span class="sd">            stage.fetch()           # Fetch an input archive into the stage.</span>
+<span class="sd">            stage.expand_archive()  # Expand the archive into input_path.</span>
+
+<span class="sd">    Because the input files are needed to execute various experiments,</span>
+<span class="sd">    the stage is retained by default.</span>
+
+<span class="sd">    You can also use the stage&#39;s create/destroy functions manually,</span>
+<span class="sd">    like this::</span>
+
+<span class="sd">        stage = InputStage()</span>
+<span class="sd">        try:</span>
+<span class="sd">            stage.create()          # Explicitly create the stage directory.</span>
+<span class="sd">            stage.fetch()           # Fetch a source archive into the stage.</span>
+<span class="sd">            stage.expand_archive()  # Expand the archive into source_path.</span>
+<span class="sd">            &lt;install&gt;               # Build and install the archive.</span>
+<span class="sd">                                    # (handled by user of Stage)</span>
+<span class="sd">        finally:</span>
+<span class="sd">            stage.destroy()         # Explicitly destroy the stage directory.</span>
+
+<span class="sd">    InputStages are required to be named by default. The name should match</span>
+<span class="sd">    a workload namespace.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="sd">&quot;&quot;&quot;Shared dict of all stage locks.&quot;&quot;&quot;</span>
+    <span class="n">stage_locks</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="sd">&quot;&quot;&quot;Most staging is managed by Ramble.  DIYStage is one exception.&quot;&quot;&quot;</span>
+    <span class="n">managed_by_ramble</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">url_or_fetch_strategy</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mirror_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">search_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a stage object.</span>
+<span class="sd">           Parameters:</span>
+<span class="sd">             url_or_fetch_strategy</span>
+<span class="sd">                 URL of the archive to be downloaded into this stage, OR</span>
+<span class="sd">                 a valid FetchStrategy.</span>
+
+<span class="sd">             name</span>
+<span class="sd">                 If a name is provided, then this stage is a named stage</span>
+<span class="sd">                 and will persist between runs (or if you construct another</span>
+<span class="sd">                 stage object later).  If name is not provided, then this</span>
+<span class="sd">                 stage will be given a unique name automatically.</span>
+
+<span class="sd">             mirror_paths</span>
+<span class="sd">                 If provided, Stage will search Rambles&#39;s mirrors for</span>
+<span class="sd">                 this archive at each of the provided relative mirror paths</span>
+<span class="sd">                 before using the default fetch strategy.</span>
+
+<span class="sd">             keep</span>
+<span class="sd">                 By default, when used as a context manager, the Stage</span>
+<span class="sd">                 is deleted on exit when no exceptions are raised.</span>
+<span class="sd">                 Pass True to keep the stage intact even if no</span>
+<span class="sd">                 exceptions are raised.</span>
+
+<span class="sd">            path</span>
+<span class="sd">                 If provided, the stage path to use for associated builds.</span>
+
+<span class="sd">            lock</span>
+<span class="sd">                 True if the stage directory file lock is to be used, False</span>
+<span class="sd">                 otherwise.</span>
+
+<span class="sd">            search_fn</span>
+<span class="sd">                 The search function that provides the fetch strategy</span>
+<span class="sd">                 instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: fetch/stage coupling needs to be reworked -- the logic</span>
+        <span class="c1"># TODO: here is convoluted and not modular enough.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">from_url_scheme</span><span class="p">(</span><span class="n">url_or_fetch_strategy</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">FetchStrategy</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">url_or_fetch_strategy</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Can&#39;t construct Stage without url or fetch strategy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># self.fetcher can change with mirrors.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_fn</span> <span class="o">=</span> <span class="n">search_fn</span>
+        <span class="c1"># used for mirrored archives of repositories.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_subdir</span> <span class="o">=</span> <span class="n">_input_subdir</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StageError</span><span class="p">(</span><span class="s2">&quot;InputStage requires a name&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span> <span class="o">=</span> <span class="n">mirror_paths</span>
+
+        <span class="c1"># Use the provided path or construct an optionally named stage path.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+        <span class="c1"># Flag to decide whether to delete the stage folder on exit or not</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep</span> <span class="o">=</span> <span class="n">keep</span>
+
+        <span class="c1"># File lock for the stage directory.  We use one file for all</span>
+        <span class="c1"># stage locks. See spack.database.Database.prefix_lock for</span>
+        <span class="c1"># details on this approach.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">:</span>
+                <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                <span class="n">lock_id</span> <span class="o">=</span> <span class="n">prefix_bits</span><span class="p">(</span><span class="n">sha1</span><span class="p">,</span> <span class="n">bit_length</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">))</span>
+                <span class="n">stage_lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;.lock&#39;</span><span class="p">)</span>
+
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating stage lock </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">Lock</span><span class="p">(</span>
+                    <span class="n">stage_lock_path</span><span class="p">,</span> <span class="n">lock_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="c1"># When stages are reused, we need to know whether to re-create</span>
+        <span class="c1"># it.  This marks whether it has been created/destroyed.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Entering a stage context will create the stage directory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">acquire_write</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Exiting from a stage context will unlock the stage directory.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exc_type: exception type</span>
+<span class="sd">            exc_val: exception value</span>
+<span class="sd">            exc_tb: exception traceback</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">release_write</span><span class="p">()</span>
+
+        <span class="c1"># Delete when there are no exceptions, unless asked to keep.</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+
+<div class="viewcode-block" id="InputStage.set_subdir"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.set_subdir">[docs]</a>    <span class="k">def</span> <span class="nf">set_subdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subdir_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_subdir</span> <span class="o">=</span> <span class="n">subdir_name</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expected_archive_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Possible archive file paths.&quot;&quot;&quot;</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">fnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">expanded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">URLFetchStrategy</span><span class="p">):</span>
+            <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">expand_archive</span>
+            <span class="n">fnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">url</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">:</span>
+            <span class="n">fnames</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">)</span>
+
+        <span class="n">paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">expanded</span><span class="p">:</span>
+            <span class="c1"># If the download file is not compressed, the &quot;archive&quot; is a</span>
+            <span class="c1"># single file placed in Stage.source_path</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">paths</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">save_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">possible_filenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_archive_files</span>
+        <span class="k">if</span> <span class="n">possible_filenames</span><span class="p">:</span>
+            <span class="c1"># This prefers using the URL associated with the default fetcher if</span>
+            <span class="c1"># available, so that the fetched resource name matches the remote</span>
+            <span class="c1"># name</span>
+            <span class="k">return</span> <span class="n">possible_filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">archive_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path to the source archive within this stage directory.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_archive_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if source path expanded; else False.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the well-known source directory path.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_subdir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InputStage.fetch"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves the code or archive</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mirror_only (bool): only fetch from a mirror</span>
+<span class="sd">            err_msg (str or None): the error message to display if all fetchers</span>
+<span class="sd">                fail or ``None`` for the default fetch failure message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fetchers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mirror_only</span><span class="p">:</span>
+            <span class="n">fetchers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="p">)</span>
+
+        <span class="c1"># TODO: move mirror logic out of here and clean it up!</span>
+        <span class="c1"># TODO: Or @alalazo may have some ideas about how to use a</span>
+        <span class="c1"># TODO: CompositeFetchStrategy here.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">:</span>
+            <span class="c1"># Join URLs of mirror roots with mirror paths. Because</span>
+            <span class="c1"># urljoin() will strip everything past the final &#39;/&#39; in</span>
+            <span class="c1"># the root, so we add a &#39;/&#39; if it is not present.</span>
+            <span class="n">mirror_urls</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">rel_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">:</span>
+                    <span class="n">mirror_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">url_util</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">))</span>
+
+            <span class="c1"># If this archive is normally fetched from a tarball URL,</span>
+            <span class="c1"># then use the same digest.  `spack mirror` ensures that</span>
+            <span class="c1"># the checksum will be the same.</span>
+            <span class="n">digest</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">expand</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">extension</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">URLFetchStrategy</span><span class="p">):</span>
+                <span class="n">digest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">digest</span>
+                <span class="n">expand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">expand_archive</span>
+                <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">extension</span>
+
+            <span class="c1"># Have to skip the checksum for things archived from</span>
+            <span class="c1"># repositories.  How can this be made safer?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span>
+
+            <span class="c1"># Add URL strategies for all the mirrors with the digest</span>
+            <span class="c1"># Insert fetchers in the order that the URLs are provided.</span>
+            <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">mirror_urls</span><span class="p">):</span>
+                <span class="n">fetchers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">from_url_scheme</span><span class="p">(</span>
+                        <span class="n">url</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">cachable</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">rel_path</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">)):</span>
+                    <span class="n">cache_fetcher</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">fetch_cache</span><span class="o">.</span><span class="n">fetcher</span><span class="p">(</span>
+                        <span class="n">rel_path</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span>
+                        <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">)</span>
+                    <span class="n">fetchers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cache_fetcher</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">generate_fetchers</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">fetcher</span> <span class="ow">in</span> <span class="n">fetchers</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">fetcher</span>
+            <span class="c1"># The search function may be expensive, so wait until now to</span>
+            <span class="c1"># call it so the user can stop if a prior fetcher succeeded</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_fn</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mirror_only</span><span class="p">:</span>
+                <span class="n">dynamic_fetchers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_fn</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">fetcher</span> <span class="ow">in</span> <span class="n">dynamic_fetchers</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">fetcher</span>
+
+        <span class="k">def</span> <span class="nf">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fetcher</span> <span class="ow">in</span> <span class="n">generate_fetchers</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fetcher</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">fetcher</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="n">spack</span><span class="o">.</span><span class="n">fetch_strategy</span><span class="o">.</span><span class="n">NoCacheError</span><span class="p">:</span>
+                <span class="c1"># Don&#39;t bother reporting when something is not cached.</span>
+                <span class="k">continue</span>
+            <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Fetching from </span><span class="si">{0}</span><span class="s1"> failed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span>
+            <span class="k">raise</span> <span class="n">fs</span><span class="o">.</span><span class="n">FetchError</span><span class="p">(</span><span class="n">err_msg</span> <span class="ow">or</span> <span class="s1">&#39;All fetchers failed&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputStage.steal_source"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.steal_source">[docs]</a>    <span class="k">def</span> <span class="nf">steal_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Copy the source_path directory in its entirety to directory dest</span>
+
+<span class="sd">        This operation creates/fetches/expands the stage if it is not already,</span>
+<span class="sd">        and destroys the stage when it is done.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">created</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">expanded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">expanded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expand_archive</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dest</span><span class="p">):</span>
+            <span class="n">mkdirp</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+
+        <span class="c1"># glob all files and directories in the source path</span>
+        <span class="n">hidden_entries</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">))</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Move all files from stage to destination directory</span>
+        <span class="c1"># Include hidden files for VCS repo history</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">hidden_entries</span> <span class="o">+</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">entry</span><span class="p">))</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+
+        <span class="c1"># copy archive file if we downloaded from url -- replaces for vcs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive_file</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_file</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_file</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+
+        <span class="c1"># remove leftover stage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InputStage.check"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check the downloaded archive against a checksum digest.</span>
+<span class="sd">           No-op if this stage checks code out of a repository.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="ow">and</span> \
+           <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Fetching from mirror without a checksum!&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;This input is normally checked out from a version &quot;</span>
+                     <span class="s2">&quot;control system, but it has been archived on a &quot;</span>
+                     <span class="s2">&quot;mirror.  This means we cannot know a checksum for the &quot;</span>
+                     <span class="s2">&quot;tarball in advance. Be sure that your connection to &quot;</span>
+                     <span class="s2">&quot;this mirror is secure!&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:checksum&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">check</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InputStage.cache_local"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_local">[docs]</a>    <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">fetch_cache</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputStage.cache_mirror"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_mirror">[docs]</a>    <span class="k">def</span> <span class="nf">cache_mirror</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform a fetch if the resource is not already cached</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            mirror (ramble.caches.MirrorCache): the mirror to cache this Stage&#39;s resource in</span>
+<span class="sd">            stats (ramble.mirror.MirrorStats): this is updated depending on whether the</span>
+<span class="sd">                caching operation succeeded or failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">BundleFetchStrategy</span><span class="p">):</span>
+            <span class="c1"># BundleFetchStrategy has no source to fetch. The associated</span>
+            <span class="c1"># fetcher does nothing but the associated stage may still exist.</span>
+            <span class="c1"># There is currently no method available on the fetcher to</span>
+            <span class="c1"># distinguish this (&#39;cachable&#39; refers to whether the fetcher</span>
+            <span class="c1"># refers to a resource with a fixed ID, which is not the same</span>
+            <span class="c1"># concept as whether there is anything to fetch at all) so we</span>
+            <span class="c1"># must examine the type of the fetcher.</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fs</span><span class="o">.</span><span class="n">stable_target</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">absolute_storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">mirror</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Already existed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">absolute_storage_path</span><span class="p">)</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">already_existed</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   Stats? </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">stats</span><span class="o">.</span><span class="n">present</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+            <span class="n">mirror</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Added: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">absolute_storage_path</span><span class="p">)</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">added</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">):</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
+
+        <span class="n">mirror</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputStage.expand_archive"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.expand_archive">[docs]</a>    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Changes to the stage directory and attempt to expand the downloaded</span>
+<span class="sd">        archive.  Fail if the stage is not set up or if the archive is not yet</span>
+<span class="sd">        downloaded.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">expanded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created stage in </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Already staged </span><span class="si">{0}</span><span class="s1"> in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="InputStage.restage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.restage">[docs]</a>    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes the expanded archive path if it exists, then re-expands</span>
+<span class="sd">           the archive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InputStage.create"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures the top-level (config:build_stage) directory exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Emulate file permissions for tempfile.mkdtemp.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">)</span>
+
+        <span class="c1"># Make sure we can actually do something with the stage we made.</span>
+        <span class="n">ensure_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="InputStage.destroy"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes this stage directory.&quot;&quot;&quot;</span>
+        <span class="n">remove_linked_tree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="c1"># Make sure we don&#39;t end up in a removed directory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+
+        <span class="c1"># mark as destroyed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="ResourceStage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage">[docs]</a><span class="k">class</span> <span class="nc">ResourceStage</span><span class="p">(</span><span class="n">InputStage</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">resource</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ResourceStage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_stage</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+
+<div class="viewcode-block" id="ResourceStage.restage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage.restage">[docs]</a>    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ResourceStage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">restage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_root_stage</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResourceStage.expand_archive"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage.expand_archive">[docs]</a>    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ResourceStage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">expand_archive</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_root_stage</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_to_root_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Move the extracted resource to the root stage (according to placement).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">root_stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_stage</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span>
+
+        <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">placement</span><span class="p">:</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">placement</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">:</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_path</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">placement</span><span class="p">}</span>
+
+        <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">root_stage</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target_path</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">placement</span><span class="p">):</span>
+            <span class="n">destination_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">source_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">destination_path</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Moving resource stage</span><span class="se">\n\t</span><span class="s1">source : &#39;</span>
+                         <span class="s1">&#39;</span><span class="si">{stage}</span><span class="se">\n\t</span><span class="s1">destination : </span><span class="si">{destination}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                             <span class="n">stage</span><span class="o">=</span><span class="n">source_path</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">destination_path</span>
+                         <span class="p">))</span>
+
+                <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">src</span><span class="p">):</span>
+                    <span class="n">install_tree</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">install</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StageComposite"><a class="viewcode-back" href="../../ramble.html#ramble.stage.StageComposite">[docs]</a><span class="k">class</span> <span class="nc">StageComposite</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">Composite</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Composite for Stage type objects. The first item in this composite is</span>
+<span class="sd">    considered to be the root workload, and operations that return a value are</span>
+<span class="sd">    forwarded to it.&quot;&quot;&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1"># __enter__ and __exit__ delegate to all stages in the composite.</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StageComposite</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+            <span class="s1">&#39;fetch&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;check&#39;</span><span class="p">,</span> <span class="s1">&#39;expand_archive&#39;</span><span class="p">,</span> <span class="s1">&#39;restage&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="s1">&#39;cache_local&#39;</span><span class="p">,</span> <span class="s1">&#39;cache_mirror&#39;</span><span class="p">,</span> <span class="s1">&#39;steal_source&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;managed_by_ramble&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">keep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;keep&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Below functions act only on the *first* stage in the composite.</span>
+    <span class="c1">#</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">source_path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">expanded</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">archive_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">archive_file</span></div>
+
+
+<div class="viewcode-block" id="DIYStage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage">[docs]</a><span class="k">class</span> <span class="nc">DIYStage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple class that allows any directory to be a ramble input stage.</span>
+<span class="sd">    Consequently, it does not expect or require that the source path adhere to</span>
+<span class="sd">    the standard directory naming convention.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="sd">&quot;&quot;&quot;DIY staging is, by definition, not managed by Ramble.&quot;&quot;&quot;</span>
+    <span class="n">managed_by_ramble</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot construct DIYStage without a path.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">StagePathError</span><span class="p">(</span><span class="s2">&quot;The stage path directory does not exist:&quot;</span><span class="p">,</span>
+                                 <span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">archive_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># DIY stages do nothing as context managers.</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DIYStage.fetch"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No need to fetch for DIY.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DIYStage.check"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No checksum needed for DIY.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DIYStage.expand_archive"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.expand_archive">[docs]</a>    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Using source directory: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True since the source_path must exist.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="DIYStage.restage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.restage">[docs]</a>    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">RestageError</span><span class="p">(</span><span class="s2">&quot;Cannot restage a DIY stage.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DIYStage.create"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DIYStage.destroy"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># No need to destroy DIY stage.</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DIYStage.cache_local"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.cache_local">[docs]</a>    <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sources for DIY stages are not cached&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ensure_access"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ensure_access">[docs]</a><span class="k">def</span> <span class="nf">ensure_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ensure we can access a directory and die with an error if we can&#39;t.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">can_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Insufficient permissions for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span></div>
+
+
+<span class="c1"># TODO (dwj): Need to add checksums for inputs.</span>
+<div class="viewcode-block" id="get_checksums_for_versions"><a class="viewcode-back" href="../../ramble.html#ramble.stage.get_checksums_for_versions">[docs]</a><span class="k">def</span> <span class="nf">get_checksums_for_versions</span><span class="p">(</span>
+        <span class="n">url_dict</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">first_stage_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_stage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fetch_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetches and checksums archives from URLs.</span>
+
+<span class="sd">    This function is called by both ``ramble checksum`` and ``ramble</span>
+<span class="sd">    create``.  The ``first_stage_function`` argument allows the caller to</span>
+<span class="sd">    inspect the first downloaded archive, e.g., to determine the build</span>
+<span class="sd">    system.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url_dict (dict): A dictionary of the form: version -&gt; URL</span>
+<span class="sd">        name (str): The name of the input</span>
+<span class="sd">        first_stage_function (Callable): function that takes a Stage and a URL;</span>
+<span class="sd">            this is run on the stage of the first URL downloaded</span>
+<span class="sd">        keep_stage (bool): whether to keep staging area when command completes</span>
+<span class="sd">        batch (bool): whether to ask user how many versions to fetch (false)</span>
+<span class="sd">            or fetch all versions (true)</span>
+<span class="sd">        fetch_options (dict): Options used for the fetcher (such as timeout</span>
+<span class="sd">            or cookies)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (str): A multi-line string containing versions and corresponding hashes</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorted_versions</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">url_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Find length of longest string in the list for padding</span>
+    <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">)</span>
+    <span class="n">num_ver</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_versions</span><span class="p">)</span>
+
+    <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Found </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">num_ver</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_ver</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">elide_list</span><span class="p">(</span>
+                <span class="p">[</span><span class="s1">&#39;{0:</span><span class="si">{1}</span><span class="s1">}  </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+                 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">batch</span><span class="p">:</span>
+        <span class="n">archives_to_fetch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_versions</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">archives_to_fetch</span> <span class="o">=</span> <span class="n">tty</span><span class="o">.</span><span class="n">get_number</span><span class="p">(</span>
+            <span class="s2">&quot;How many would you like to checksum?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="s1">&#39;q&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">archives_to_fetch</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Aborted.&quot;</span><span class="p">)</span>
+
+    <span class="n">versions</span> <span class="o">=</span> <span class="n">sorted_versions</span><span class="p">[:</span><span class="n">archives_to_fetch</span><span class="p">]</span>
+    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">]</span>
+
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Downloading...&#39;</span><span class="p">)</span>
+    <span class="n">version_hashes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">versions</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fetch_options</span><span class="p">:</span>
+                <span class="n">url_or_fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">URLFetchStrategy</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span> <span class="n">fetch_options</span><span class="o">=</span><span class="n">fetch_options</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">url_or_fs</span> <span class="o">=</span> <span class="n">url</span>
+            <span class="k">with</span> <span class="n">InputStage</span><span class="p">(</span><span class="n">url_or_fs</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">keep_stage</span><span class="p">)</span> <span class="k">as</span> <span class="n">stage</span><span class="p">:</span>
+                <span class="c1"># Fetch the archive</span>
+                <span class="n">stage</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">first_stage_function</span><span class="p">:</span>
+                    <span class="c1"># Only run first_stage_function the first time,</span>
+                    <span class="c1"># no need to run it every time</span>
+                    <span class="n">first_stage_function</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+                <span class="c1"># Checksum the archive and add it to the list</span>
+                <span class="n">version_hashes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">version</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">crypto</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span>
+                    <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">,</span> <span class="n">stage</span><span class="o">.</span><span class="n">archive_file</span><span class="p">)))</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="n">FailedDownloadError</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Failed to fetch </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Something failed on </span><span class="si">{0}</span><span class="s1">, skipping.  (</span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">version_hashes</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Could not fetch any versions for </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="c1"># Find length of longest string in the list for padding</span>
+    <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">version_hashes</span><span class="p">)</span>
+
+    <span class="c1"># Generate the version directives to put in a package.py</span>
+    <span class="n">version_lines</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+        <span class="s2">&quot;    version(&#39;</span><span class="si">{0}</span><span class="s2">&#39;, </span><span class="si">{1}</span><span class="s2">sha256=&#39;</span><span class="si">{2}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">v</span><span class="p">,</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))),</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">version_hashes</span>
+    <span class="p">])</span>
+
+    <span class="n">num_hash</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">version_hashes</span><span class="p">)</span>
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Checksummed </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+              <span class="n">num_hash</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_hash</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">version_lines</span></div>
+
+
+<div class="viewcode-block" id="StageError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.StageError">[docs]</a><span class="k">class</span> <span class="nc">StageError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Superclass for all errors encountered during staging.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StagePathError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.StagePathError">[docs]</a><span class="k">class</span> <span class="nc">StagePathError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Error encountered with stage path.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RestageError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.RestageError">[docs]</a><span class="k">class</span> <span class="nc">RestageError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Error encountered during restaging.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="VersionFetchError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.VersionFetchError">[docs]</a><span class="k">class</span> <span class="nc">VersionFetchError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when we can&#39;t determine a URL to fetch an input.&quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># Keep this in namespace for convenience</span>
+<span class="n">FailedDownloadError</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">FailedDownloadError</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">
+        Last updated on May 11, 2023.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

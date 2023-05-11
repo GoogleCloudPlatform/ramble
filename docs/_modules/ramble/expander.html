@@ -1,0 +1,620 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>ramble.expander &mdash; Ramble 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Ramble
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-add">ramble add</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-remove">ramble remove</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ramble.expander</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ramble.expander</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+
+<span class="kn">import</span> <span class="nn">ramble.error</span>
+<span class="kn">import</span> <span class="nn">ramble.keywords</span>
+
+<span class="n">supported_math_operators</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span>
+    <span class="n">ast</span><span class="o">.</span><span class="n">Mult</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Div</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Pow</span><span class="p">:</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BitXor</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">USub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ExpansionDict"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionDict">[docs]</a><span class="k">class</span> <span class="nc">ExpansionDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__missing__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span></div>
+
+
+<div class="viewcode-block" id="Expander"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander">[docs]</a><span class="k">class</span> <span class="nc">Expander</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class that will track and expand keyword arguments</span>
+
+<span class="sd">    This class will track variables and their definitions, to allow for</span>
+<span class="sd">    expansion within string.</span>
+
+<span class="sd">    The variables can come from workspace variables, software stack variables,</span>
+<span class="sd">    and experiment variables.</span>
+
+<span class="sd">    Additionally, math will be evaluated as part of expansion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">experiment_set</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">=</span> <span class="n">variables</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span> <span class="o">=</span> <span class="n">experiment_set</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_application_namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workload_namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workload_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_namespace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_namespace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workload_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_namespace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_namespace</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_namespace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">experiment_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_namespace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_namespace</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_namespace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">env_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span> <span class="o">+</span> \
+                <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application_input_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_input_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workload_input_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_input_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_run_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workload_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_run_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">experiment_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">experiment_run_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span>
+
+<div class="viewcode-block" id="Expander.expand_var"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform expansion of a string</span>
+
+<span class="sd">        Expand a string by building up a dict of all</span>
+<span class="sd">        expansion variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
+        <span class="k">if</span> <span class="n">extra_vars</span><span class="p">:</span>
+            <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">expansions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_vars</span><span class="p">)</span>
+
+        <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansions</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_expanded</span><span class="p">(</span><span class="n">expanded</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">math_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">expanded</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
+                <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                <span class="n">expanded</span> <span class="o">=</span> <span class="n">evaluated</span>
+            <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Expander.expansion_str"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expansion_str">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">expansion_str</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
+        <span class="n">l_delimiter</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span>
+        <span class="n">r_delimiter</span> <span class="o">=</span> <span class="s1">&#39;}&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">l_delimiter</span><span class="si">}{</span><span class="n">in_str</span><span class="si">}{</span><span class="n">r_delimiter</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
+    <span class="k">def</span> <span class="nf">_all_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">keyword</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">yield</span> <span class="n">keyword</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_fully_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_partial_expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expansion_vars</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform expansion of a string with some variables</span>
+
+<span class="sd">        args:</span>
+<span class="sd">          expansion_vars (dict): Variables to perform expansion with</span>
+<span class="sd">          in_str (str): Input template string to expand</span>
+
+<span class="sd">        returns:</span>
+<span class="sd">          in_str (str): Expanded version of input string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">exp_dict</span> <span class="o">=</span> <span class="n">ExpansionDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">expansion_vars</span><span class="p">:</span>
+                    <span class="n">exp_dict</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansion_vars</span><span class="p">,</span>
+                                             <span class="n">expansion_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">kw</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">exp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_expanded</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">math_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
+                        <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                        <span class="n">exp_dict</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">evaluated</span>
+                    <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+            <span class="k">return</span> <span class="n">in_str</span><span class="o">.</span><span class="n">format_map</span><span class="p">(</span><span class="n">exp_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">in_str</span>
+
+<div class="viewcode-block" id="Expander.eval_math"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.eval_math">[docs]</a>    <span class="k">def</span> <span class="nf">eval_math</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate math from parsing the AST</span>
+
+<span class="sd">        Does not assume a specific type of operands.</span>
+<span class="sd">        Some operators will generate floating point, while</span>
+<span class="sd">        others will generate integers (if the inputs are integers).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Num</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_num</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_constant</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_name</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_attr</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Compare</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_comparisons</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_binary_ops</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryOp</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_unary_ops</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">MathEvaluationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported math AST node </span><span class="si">{</span><span class="n">node_type</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                                      <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="vm">__dict__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+    <span class="c1"># Ast logic helper methods</span>
+    <span class="k">def</span> <span class="nf">__raise_syntax_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">node_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Syntax error while processing </span><span class="si">{</span><span class="n">node_type</span><span class="si">}</span><span class="s1"> node:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="vm">__dict__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_ast_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle a number node in the ast&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">n</span>
+
+    <span class="k">def</span> <span class="nf">_ast_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle a constant node in the ast&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_ast_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle a name node in the ast&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="k">def</span> <span class="nf">_ast_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle an attribute node in the ast&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_attr</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_name</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__raise_syntax_error</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">_eval_comparisons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle a comparison node in the ast&quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract In nodes, and call their helper</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="o">.</span><span class="n">In</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_comp_in</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span>
+
+    <span class="k">def</span> <span class="nf">_eval_comp_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle in nodes in the ast</span>
+
+<span class="sd">        Perform extraction of `&lt;variable&gt; in &lt;experiment&gt;` syntax.</span>
+
+<span class="sd">        Raises an exception if the experiment does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_name</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">comparators</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
+                <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">comparators</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span><span class="o">.</span><span class="n">get_var_from_experiment</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span>
+                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s1"> does not exist in: &#39;</span> <span class="o">+</span>
+                                            <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__raise_syntax_error</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__raise_syntax_error</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_eval_binary_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate binary operators in the ast</span>
+
+<span class="sd">        Extract the binary operator, and evaluate it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">left_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+            <span class="n">right_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="n">supported_math_operators</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">left_eval</span><span class="p">,</span> <span class="n">right_eval</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported operand type in binary operator&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported binary operator&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_eval_unary_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate unary operators in the ast</span>
+
+<span class="sd">        Extract the unary operator, and evaluate it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">operand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">operand</span><span class="p">)</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="n">supported_math_operators</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported operand type in unary operator&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported unary operator&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExpanderError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpanderError">[docs]</a><span class="k">class</span> <span class="nc">ExpanderError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an error happens within an expander&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="MathEvaluationError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.MathEvaluationError">[docs]</a><span class="k">class</span> <span class="nc">MathEvaluationError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an error happens while evaluating math during</span>
+<span class="sd">    expansion</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RambleSyntaxError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.RambleSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RambleSyntaxError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a syntax error happens within variable definitions&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ApplicationNotDefinedError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ApplicationNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">ApplicationNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an application is not defined properly&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="WorkloadNotDefinedError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.WorkloadNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">WorkloadNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a workload is not defined properly&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ExperimentNotDefinedError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ExperimentNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">ExperimentNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an experiment is not defined properly&quot;&quot;&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">
+        Last updated on May 11, 2023.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
