@@ -60,7 +60,6 @@ properties = {
                     'additionalProperties': False,
                     'default': {}
                 },
-                'internals': ramble.schema.applications.internals_def,
                 'include': {
                     'type': 'array',
                     'default': [],

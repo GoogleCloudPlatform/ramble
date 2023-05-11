@@ -16,6 +16,7 @@ from llnl.util.lang import union_dicts
 from ramble.schema.success_criteria import success_list_def
 
 import ramble.schema.env_vars
+import ramble.schema.internals
 import ramble.schema.types
 import ramble.schema.variables
 import ramble.schema.success_criteria
@@ -44,38 +45,6 @@ matrices_def = {
     }
 }
 
-custom_executables_def = {
-    'type': 'object',
-    'properties': {},
-    'additionalProperties': {
-        'type': 'object',
-        'default': {
-            'template': [],
-            'use_mpi': False,
-            'redirect': '{log_file}',
-            'output_capture': ramble.schema.types.OUTPUT.DEFAULT
-        },
-        'properties': {
-            'template': ramble.schema.types.array_or_scalar_of_strings_or_nums,
-            'use_mpi': {'type': 'boolean'},
-            'redirect': ramble.schema.types.string_or_num,
-        }
-    },
-    'default': {},
-}
-
-executables_def = ramble.schema.types.array_of_strings_or_nums
-
-internals_def = {
-    'type': 'object',
-    'default': {},
-    'properties': {
-        'custom_executables': custom_executables_def,
-        'executables': executables_def,
-    },
-    'additionalProperties': False
-}
-
 chained_experiment_def = {
     'type': 'array',
     'default': [],
@@ -98,8 +67,8 @@ sub_props = union_dicts(
     ramble.schema.variables.properties,
     ramble.schema.success_criteria.properties,
     ramble.schema.env_vars.properties,
+    ramble.schema.internals.properties,
     {
-        'internals': internals_def,
         'env-vars': ramble.schema.licenses.env_var_actions,
         'chained_experiments': chained_experiment_def,
         'template': {'type': 'boolean'},
@@ -143,7 +112,6 @@ properties = {
                                                 {
                                                     'matrix': matrix_def,
                                                     'matrices': matrices_def,
-                                                    'internals': internals_def,
                                                     'success_criteria': success_list_def,
                                                 }
                                             )
