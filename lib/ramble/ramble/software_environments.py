@@ -436,15 +436,6 @@ class SoftwareEnvironments(object):
         if 'variants' in spec:
             spec_str.append(spec['variants'])
 
-        if 'compiler' in spec:
-            comp_spec = self.get_named_spec(spec['compiler'], 'compiler')
-
-            if comp_spec['base'] not in deps_used:
-                spec_str.append('%%%s' % self.spec_string(comp_spec,
-                                                          as_dep=True,
-                                                          use_custom_specifier=True,
-                                                          deps_used=deps_used))
-
         if not as_dep:
             if 'arch' in spec:
                 spec_str.append('arch=%s' % spec['arch'])
