@@ -10,7 +10,7 @@ import llnl.util.tty as tty
 
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
-from ramble.schema.applications import OUTPUT
+from ramble.schema.types import OUTPUT
 
 
 class ApplicationMeta(ramble.language.language_base.DirectiveMeta):

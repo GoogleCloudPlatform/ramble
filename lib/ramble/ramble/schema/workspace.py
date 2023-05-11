@@ -21,8 +21,7 @@ import ramble.schema.merged
 env_properties = spack.schema.env.schema['patternProperties']
 spec_properties = env_properties['^env|spack$']
 
-applications_schema = ramble.schema.applications.schema
-applications_properties = applications_schema['properties']['applications']
+applications_properties = ramble.schema.applications.properties['applications']
 app_addProps = applications_properties['additionalProperties']
 
 keys = ('ramble', 'workspace')
@@ -68,12 +67,6 @@ properties = {
                     'type': 'array',
                     'default': [],
                     'items': {'type': 'string'},
-                },
-                'applications': {
-                    'type': applications_properties['type'],
-                    'default': applications_properties['default'],
-                    'properties': applications_properties['properties'],
-                    'additionalProperties': app_addProps
                 },
                 'application_directories': {
                     'type': 'array',

@@ -20,12 +20,11 @@ import ramble.schema.spack
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
-    ramble.schema.applications.applications_schema,
+    ramble.schema.applications.properties,
     ramble.schema.config.properties,
     ramble.schema.repos.properties,
     ramble.schema.spack.properties,
 )
-
 
 #: Full schema with metadata
 schema = {

@@ -33,7 +33,7 @@ import ramble.expander
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
-from ramble.schema.applications import OUTPUT
+from ramble.schema.types import OUTPUT
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 

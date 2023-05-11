@@ -74,6 +74,7 @@ section_schemas = {
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
     'spack': ramble.schema.spack.schema,
+    'applications': ramble.schema.applications.schema,
 }
 
 # Same as above, but including keys for environments

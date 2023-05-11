@@ -13,45 +13,14 @@
 """  # noqa E501
 
 import ramble.schema.licenses
+import ramble.schema.types
 
-
-class OUTPUT:
-    STDERR = "2>"
-    STDOUT = ">>"
-    ALL = "&>"
-    DEFAULT = STDOUT
-
-
-# FIXME: should this use the vector notation which type natively supports?
-string_or_num = {
-    'anyOf': [
-        {'type': 'string'},
-        {'type': 'number'}
-    ]
-}
-
-array_of_strings_or_nums = {
-    'type': 'array',
-    'default': [],
-    'items': string_or_num
-}
-
-array_or_scalar_of_strings_or_nums = {
-    'anyOf': [
-        {
-            'type': 'array',
-            'default': [],
-            'items': string_or_num,
-        },
-        string_or_num
-    ]
-}
 
 variables_def = {
     'type': ['object', 'null'],
     'default': {},
     'properties': {},
-    'additionalProperties': array_or_scalar_of_strings_or_nums
+    'additionalProperties': ramble.schema.types.array_or_scalar_of_strings_or_nums
 }
 
 matrix_def = {
@@ -103,18 +72,18 @@ custom_executables_def = {
             'template': [],
             'use_mpi': False,
             'redirect': '{log_file}',
-            'output_capture': OUTPUT.DEFAULT
+            'output_capture': ramble.schema.types.OUTPUT.DEFAULT
         },
         'properties': {
-            'template': array_or_scalar_of_strings_or_nums,
+            'template': ramble.schema.types.array_or_scalar_of_strings_or_nums,
             'use_mpi': {'type': 'boolean'},
-            'redirect': string_or_num,
+            'redirect': ramble.schema.types.string_or_num,
         }
     },
     'default': {},
 }
 
-executables_def = array_of_strings_or_nums
+executables_def = ramble.schema.types.array_of_strings_or_nums
 
 internals_def = {
     'type': 'object',
@@ -143,7 +112,7 @@ chained_experiment_def = {
 }
 
 #: Properties for inclusion in other schemas
-applications_schema = {
+properties = {
     'applications': {
         'type': 'object',
         'default': {},
@@ -208,5 +177,5 @@ schema = {
     'title': 'Ramble application configuration file schema',
     'type': 'object',
     'additionalProperties': False,
-    'properties': applications_schema
+    'properties': properties
 }
