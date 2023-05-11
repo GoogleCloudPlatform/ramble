@@ -12,9 +12,7 @@ from ramble.expander import Expander
 
 
 class QuantumEspresso(SpackApplication):
-    '''Define Quantum-Espresso application.
-    https://www.quantum-espresso.org/
-    '''
+    '''Define Quantum-Espresso application.'''
     name = 'quantum-espresso'
 
     tags = ['electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials']
@@ -46,11 +44,6 @@ class QuantumEspresso(SpackApplication):
     input_file('PSIWAT', url='https://github.com/QEF/benchmarks/releases/download/bench0.0/PSIWAT.tgz',
                sha256='698fbdac9f307b9ebc77e70e52574d67adb0f21bfd6874559d633471664b77d6',
                description='Input file for PSIWAT benchmark')
-
-    # Set of small benchmarks to build a workload from.
-    # input_file('pwscf-small', url='https://github.com/QEF/benchmarks/releases/download/bench0.0/pwscf-small-benchmark.tar.gz',
-    #            sha256='4a17dc3f6df865ca8ab2d34eb9285f27af9b61d7532065353768a2e123610ac0',
-    #            description='Input file for pwscf-small benchmark')
 
     executable('copy_inputs', 'cp ' + os.path.join(Expander.expansion_str('input_path'), '*')
                + os.path.join(Expander.expansion_str('experiment_run_dir'), '.'),
