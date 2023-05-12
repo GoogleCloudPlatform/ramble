@@ -88,5 +88,5 @@ class QuantumEspresso(SpackApplication):
                     contexts=['Profile section'])
 
     success_criteria('job_done', mode='string',
-                     match=r'/s+JOB DONE.*',
+                     match=r'.*JOB DONE\..*',
                      file=log_str)
