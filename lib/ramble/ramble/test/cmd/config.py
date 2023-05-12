@@ -290,11 +290,13 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_r
 
         ws.write()
 
-        assert 'basic' not in config('get')
+        config_output = config('get')
 
-        ramble.test.cmd.workspace.add_basic(ws)
+        expected_keys = ['applications', 'variables', 'env-vars',
+                         'spack', 'mpi_command', 'batch_submit']
 
-        assert 'basic' in config('get')
+        for key in expected_keys:
+            assert key in config_output
 
 
 def test_config_edit_edits_ramble_yaml(mutable_mock_workspace_path):

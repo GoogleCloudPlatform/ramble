@@ -13,9 +13,11 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.workspace
-from ramble.namespace import namespace
 from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
+import ramble.config
+
+import spack.util.spack_yaml as syaml
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures('mutable_config',
@@ -34,19 +36,17 @@ def workspace_deactivate():
 
 
 def add_basic(ws):
-    app_dict = ws._get_workspace_dict()[namespace.ramble][namespace.application]
-    app_dict['basic'] = {}
-    app_dict['basic'][namespace.workload] = {}
-    wl_dict = app_dict['basic'][namespace.workload]
-    wl_dict['test_wl'] = {'experiments': {}}
-    wl_dict['test_wl2'] = {'experiments': {}}
+    ramble.config.add('applications:basic:workloads:test_wl:experiments:' + '{}',
+                      scope=ws.ws_file_config_scope_name())
+    ramble.config.add('applications:basic:workloads:test_wl2:experiments:' + '{}',
+                      scope=ws.ws_file_config_scope_name())
     ws.write()
     ws._re_read()
 
 
 def remove_basic(ws):
-    app_dict = ws._get_workspace_dict()[namespace.ramble][namespace.application]
-    del app_dict['basic']
+    ramble.config.set('applications', syaml.syaml_dict(), scope=ws.ws_file_config_scope_name())
+
     ws.write()
     ws._re_read()
 
