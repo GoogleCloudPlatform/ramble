@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.mirror &mdash; Ramble 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+              <div class="version">
+                0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.mirror</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.mirror</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file contains code for creating ramble mirror directories.  A</span>
+<span class="sd">mirror is an organized hierarchy containing specially named archive</span>
+<span class="sd">files.  This enabled ramble to know where to find files in a mirror if</span>
+<span class="sd">the main server for a particular input is down.  Or, if the computer</span>
+<span class="sd">where ramble is run is not connected to the internet, it allows ramble</span>
+<span class="sd">to download inputs directly from a mirror (e.g., on an intranet).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">import</span> <span class="nn">ruamel.yaml.error</span> <span class="k">as</span> <span class="nn">yaml_error</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+<span class="kn">from</span> <span class="nn">llnl.util.compat</span> <span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">llnl.util.filesystem</span> <span class="kn">import</span> <span class="n">mkdirp</span>
+
+<span class="kn">import</span> <span class="nn">ramble.config</span>
+<span class="kn">import</span> <span class="nn">ramble.error</span>
+<span class="kn">import</span> <span class="nn">ramble.fetch_strategy</span> <span class="k">as</span> <span class="nn">fs</span>
+
+<span class="kn">import</span> <span class="nn">spack.url</span>
+<span class="kn">import</span> <span class="nn">spack.util.spack_json</span>
+<span class="kn">import</span> <span class="nn">spack.util.spack_yaml</span>
+<span class="kn">import</span> <span class="nn">spack.util.url</span> <span class="k">as</span> <span class="nn">url_util</span>
+<span class="kn">from</span> <span class="nn">spack.util.spack_yaml</span> <span class="kn">import</span> <span class="n">syaml_dict</span>
+
+
+<span class="k">def</span> <span class="nf">_is_string</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_display_mirror_entry</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">type_</span><span class="p">:</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot; (&quot;</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="s2">&quot;)&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%-*s%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">type_</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Mirror"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror">[docs]</a><span class="k">class</span> <span class="nc">Mirror</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a named location for storing input tarballs.</span>
+
+<span class="sd">    Mirrors have a fetch_url that indicate where and how artifacts are fetched</span>
+<span class="sd">    from them, and a push_url that indicate where and how artifacts are pushed</span>
+<span class="sd">    to them.  These two URLs are usually the same.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_url</span><span class="p">,</span> <span class="n">push_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="o">=</span> <span class="n">fetch_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="o">=</span> <span class="n">push_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_push_url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Mirror.to_json"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mirror.to_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mirror.from_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_yaml">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Mirror</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">yaml_error</span><span class="o">.</span><span class="n">MarkedYAMLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">six</span><span class="o">.</span><span class="n">raise_from</span><span class="p">(</span>
+                <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">SpackYAMLError</span><span class="p">(</span><span class="s2">&quot;error parsing YAML mirror:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span>
+                <span class="n">e</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mirror.from_json"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Mirror</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">six</span><span class="o">.</span><span class="n">raise_from</span><span class="p">(</span>
+                <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">SpackJSONError</span><span class="p">(</span><span class="s2">&quot;error parsing JSON mirror:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span>
+                <span class="n">e</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mirror.to_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">syaml_dict</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;fetch&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;push&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="Mirror.from_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Mirror</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Mirror</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;fetch&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;push&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mirror.display"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_display_mirror_entry</span><span class="p">(</span><span class="n">max_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_display_mirror_entry</span><span class="p">(</span>
+                <span class="n">max_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">)</span>
+            <span class="n">_display_mirror_entry</span><span class="p">(</span>
+                <span class="n">max_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">push_url</span><span class="p">,</span> <span class="s2">&quot;push&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39; &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">name</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;[Mirror</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;[Mirror</span><span class="si">%s</span><span class="s2"> (fetch: </span><span class="si">%s</span><span class="s2">, push: </span><span class="si">%s</span><span class="s2">)]&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span>
+            <span class="s1">&#39;Mirror(&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="s1">&#39;fetch_url&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;push_url&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;fetch_url&#39;</span> <span class="ow">or</span> <span class="n">v</span><span class="p">),</span>
+            <span class="s1">&#39;)&#39;</span>
+        <span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">or</span> <span class="s2">&quot;&lt;unnamed&gt;&quot;</span>
+
+<div class="viewcode-block" id="Mirror.get_profile"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_profile">[docs]</a>    <span class="k">def</span> <span class="nf">get_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Mirror.set_profile"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_profile">[docs]</a>    <span class="k">def</span> <span class="nf">set_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span></div>
+
+<div class="viewcode-block" id="Mirror.get_access_pair"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_access_pair">[docs]</a>    <span class="k">def</span> <span class="nf">get_access_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_pair&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_pair&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Mirror.set_access_pair"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_access_pair">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">connection_tuple</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;access_pair&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_tuple</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;access_pair&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_tuple</span></div>
+
+<div class="viewcode-block" id="Mirror.get_endpoint_url"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_endpoint_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;endpoint_url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;endpoint_url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Mirror.set_endpoint_url"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_endpoint_url">[docs]</a>    <span class="k">def</span> <span class="nf">set_endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;endpoint_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;endpoint_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span></div>
+
+<div class="viewcode-block" id="Mirror.get_access_token"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">get_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_token&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_token&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Mirror.set_access_token"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">connection_token</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_token</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_token</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fetch_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="k">if</span> <span class="n">_is_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">)</span> \
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
+
+    <span class="nd">@fetch_url</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">fetch_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">push_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="k">if</span> <span class="n">_is_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">)</span> \
+                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="k">if</span> <span class="n">_is_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">)</span> \
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
+
+    <span class="nd">@push_url</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">push_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MirrorCollection"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection">[docs]</a><span class="k">class</span> <span class="nc">MirrorCollection</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A mapping of mirror names to mirrors.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirrors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Mirror</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">mirror</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">mirrors</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">mirrors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span>
+                <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_mirrors</span>
+
+<div class="viewcode-block" id="MirrorCollection.to_json"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MirrorCollection.to_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MirrorCollection.to_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">syaml_dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">recursive</span> <span class="k">else</span> <span class="n">v</span><span class="p">))</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">))</span></div>
+
+<div class="viewcode-block" id="MirrorCollection.from_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MirrorCollection</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+<div class="viewcode-block" id="MirrorCollection.display"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">mirror</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">max_len</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MirrorCollection.lookup"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.lookup">[docs]</a>    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_or_url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Looks up and returns a Mirror.</span>
+
+<span class="sd">        If this MirrorCollection contains a named Mirror under the name</span>
+<span class="sd">        [name_or_url], then that mirror is returned.  Otherwise, [name_or_url]</span>
+<span class="sd">        is assumed to be a mirror URL, and an anonymous mirror with the given</span>
+<span class="sd">        URL is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name_or_url</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Mirror</span><span class="p">(</span><span class="n">fetch_url</span><span class="o">=</span><span class="n">name_or_url</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_determine_extension</span><span class="p">(</span><span class="n">fetcher</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">URLFetchStrategy</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fetcher</span><span class="o">.</span><span class="n">expand_archive</span><span class="p">:</span>
+            <span class="c1"># If we fetch with a URLFetchStrategy, use URL&#39;s archive type</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">determine_url_file_extension</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
+                <span class="c1"># Remove any leading dots</span>
+                <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># TODO: Clean up this message...</span>
+                <span class="c1"># TODO: Add extension to input files...</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">Unable to parse extension from </span><span class="si">{0}</span><span class="s2">.</span>
+
+<span class="s2">If this URL is for a tarball but does not include the file extension</span>
+<span class="s2">in the name, you can explicitly declare it with the following syntax:</span>
+
+<span class="s2">    input_file(&#39;1.2.3&#39;, &#39;hash&#39;, extension=&#39;tar.gz&#39;)</span>
+
+<span class="s2">If this URL is for a download like a .jar or .whl that does not need</span>
+<span class="s2">to be expanded, or an uncompressed installation script, you can tell</span>
+<span class="s2">Ramble not to expand it with the following syntax:</span>
+
+<span class="s2">    input_file(&#39;1.2.3&#39;, &#39;hash&#39;, expand=False)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+                <span class="k">raise</span> <span class="n">MirrorError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">url</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If the archive shouldn&#39;t be expanded, don&#39;t check extension.</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Otherwise we&#39;ll make a .tar.gz ourselves</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;tar.gz&#39;</span>
+
+    <span class="k">return</span> <span class="n">ext</span>
+
+
+<div class="viewcode-block" id="MirrorReference"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorReference">[docs]</a><span class="k">class</span> <span class="nc">MirrorReference</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A ``MirrorReference`` stores the relative paths where you can store a</span>
+<span class="sd">    resource in a mirror directory.</span>
+
+<span class="sd">    The appropriate storage location is given by ``storage_path``. The</span>
+<span class="sd">    ``cosmetic_path`` property provides a reference that a human could generate</span>
+<span class="sd">    themselves based on reading the details of the input.</span>
+
+<span class="sd">    A user can iterate over a ``MirrorReference`` object to get all the</span>
+<span class="sd">    possible names that might be used to refer to the resource in a mirror;</span>
+<span class="sd">    this includes names generated by previous naming schemes that are no-longer</span>
+<span class="sd">    reported by ``storage_path`` or ``cosmetic_path``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cosmetic_path</span><span class="p">,</span> <span class="n">global_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_path</span> <span class="o">=</span> <span class="n">global_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cosmetic_path</span> <span class="o">=</span> <span class="n">cosmetic_path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">storage_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cosmetic_path</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_path</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_path</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">cosmetic_path</span></div>
+
+
+<div class="viewcode-block" id="mirror_archive_paths"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.mirror_archive_paths">[docs]</a><span class="k">def</span> <span class="nf">mirror_archive_paths</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">per_input_ref</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a ``MirrorReference`` object which keeps track of the relative</span>
+<span class="sd">    storage path of the resource associated with the specified ``fetcher``.&quot;&quot;&quot;</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_determine_extension</span><span class="p">(</span><span class="n">fetcher</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
+        <span class="n">per_input_ref</span> <span class="o">+=</span> <span class="s2">&quot;.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ext</span>
+
+    <span class="n">global_ref</span> <span class="o">=</span> <span class="n">fetcher</span><span class="o">.</span><span class="n">mirror_id</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">global_ref</span><span class="p">:</span>
+        <span class="n">global_ref</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;_input-cache&#39;</span><span class="p">,</span> <span class="n">global_ref</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">global_ref</span> <span class="ow">and</span> <span class="n">ext</span><span class="p">:</span>
+        <span class="n">global_ref</span> <span class="o">+=</span> <span class="s2">&quot;.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ext</span>
+
+    <span class="k">return</span> <span class="n">MirrorReference</span><span class="p">(</span><span class="n">per_input_ref</span><span class="p">,</span> <span class="n">global_ref</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a directory to be used as a ramble mirror, and fill it with</span>
+<span class="sd">    input archives.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        path: Path to create a mirror directory hierarchy in.</span>
+<span class="sd">        workspace: Workspace containing workloads to mirror inputs for.</span>
+
+<span class="sd">    Return Value:</span>
+<span class="sd">        Returns a tuple of lists: (present, mirrored, error)</span>
+
+<span class="sd">        * present:  Workload specs that were already present.</span>
+<span class="sd">        * mirrored: Workload specs that were successfully mirrored.</span>
+<span class="sd">        * error:    Workload specs that failed to mirror due to some error.</span>
+
+<span class="sd">    This routine iterates through all applications and workloads added to a</span>
+<span class="sd">    workspace, and it creates specs for them. If the workload has any input</span>
+<span class="sd">    files attached to it, it is downloaded and added to the mirror.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">mirror_root</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">local_file_path</span><span class="p">(</span><span class="n">parsed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mirror_root</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">(</span>
+            <span class="s1">&#39;MirrorCaches only work with file:// URLs&#39;</span><span class="p">)</span>
+
+    <span class="c1"># automatically spec-ify anything in the specs array.</span>
+    <span class="n">specs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">s</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">Spec</span><span class="p">)</span> <span class="k">else</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">Spec</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_specs</span><span class="p">()]</span>
+
+    <span class="c1"># Get the absolute path of the root before we start jumping around.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">mirror_root</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mkdirp</span><span class="p">(</span><span class="n">mirror_root</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MirrorError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot create directory &#39;</span><span class="si">%s</span><span class="s2">&#39;:&quot;</span> <span class="o">%</span> <span class="n">mirror_root</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="n">mirror_cache</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">MirrorCache</span><span class="p">(</span><span class="n">mirror_root</span><span class="p">)</span>
+    <span class="n">mirror_stats</span> <span class="o">=</span> <span class="n">MirrorStats</span><span class="p">()</span>
+
+    <span class="c1"># Iterate through application specs and download all safe tarballs for each</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+        <span class="n">mirror_stats</span><span class="o">.</span><span class="n">next_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">_add_single_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mirror_root</span><span class="p">,</span> <span class="n">mirror_cache</span><span class="p">,</span> <span class="n">mirror_stats</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mirror_stats</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a named mirror in the given scope&quot;&quot;&quot;</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mirrors</span><span class="p">:</span>
+        <span class="n">mirrors</span> <span class="o">=</span> <span class="n">syaml_dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Mirror with name </span><span class="si">%s</span><span class="s2"> already exists.&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+    <span class="n">mirror_data</span> <span class="o">=</span> <span class="n">url</span>
+    <span class="n">items</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mirror_data</span><span class="p">))</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">syaml_dict</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+    <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">mirrors</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.remove">[docs]</a><span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove the named mirror in the given scope&quot;&quot;&quot;</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mirrors</span><span class="p">:</span>
+        <span class="n">mirrors</span> <span class="o">=</span> <span class="n">syaml_dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;No mirror with name </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="n">old_value</span> <span class="o">=</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">mirrors</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+    <span class="n">debug_msg_url</span> <span class="o">=</span> <span class="s2">&quot;url </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">debug_msg</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Removed mirror </span><span class="si">%s</span><span class="s2"> with&quot;</span><span class="p">]</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fetch_value</span> <span class="o">=</span> <span class="n">old_value</span><span class="p">[</span><span class="s1">&#39;fetch&#39;</span><span class="p">]</span>
+        <span class="n">push_value</span> <span class="o">=</span> <span class="n">old_value</span><span class="p">[</span><span class="s1">&#39;push&#39;</span><span class="p">]</span>
+
+        <span class="n">debug_msg</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="s2">&quot;fetch&quot;</span><span class="p">,</span> <span class="n">debug_msg_url</span><span class="p">,</span> <span class="s2">&quot;and push&quot;</span><span class="p">,</span> <span class="n">debug_msg_url</span><span class="p">))</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">fetch_value</span><span class="p">,</span> <span class="n">push_value</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">debug_msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">debug_msg_url</span><span class="p">)</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">old_value</span><span class="p">)</span>
+
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">debug_msg</span><span class="p">)</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Removed mirror </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MirrorStats"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats">[docs]</a><span class="k">class</span> <span class="nc">MirrorStats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">present</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">added_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">existing_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MirrorStats.next_spec"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.next_spec">[docs]</a>    <span class="k">def</span> <span class="nf">next_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tally_current_spec</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span> <span class="o">=</span> <span class="n">spec</span></div>
+
+    <span class="k">def</span> <span class="nf">_tally_current_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">added_resources</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">added_resources</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">existing_resources</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">present</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">existing_resources</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">added_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">existing_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MirrorStats.stats"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.stats">[docs]</a>    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tally_current_spec</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">present</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MirrorStats.already_existed"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.already_existed">[docs]</a>    <span class="k">def</span> <span class="nf">already_existed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">present</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="MirrorStats.added"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.added">[docs]</a>    <span class="k">def</span> <span class="nf">added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="MirrorStats.error"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_add_single_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mirror_root</span><span class="p">,</span> <span class="n">mirror</span><span class="p">,</span> <span class="n">mirror_stats</span><span class="p">):</span>
+    <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Adding inputs for application </span><span class="si">{app}</span><span class="s2"> to mirror&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">app</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="p">))</span>
+    <span class="n">num_retries</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">while</span> <span class="n">num_retries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">app_inst</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">application_class</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">application_file_path</span><span class="p">)</span>
+            <span class="n">app_inst</span><span class="o">.</span><span class="n">mirror_inputs</span><span class="p">(</span><span class="n">mirror_root</span><span class="p">,</span> <span class="n">mirror</span><span class="p">,</span> <span class="n">mirror_stats</span><span class="p">)</span>
+
+            <span class="n">exception</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">exc_tuple</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+            <span class="n">exception</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="n">num_retries</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">exception</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:debug&#39;</span><span class="p">):</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exception</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_tuple</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Error while fetching </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">spec</span><span class="o">.</span><span class="n">cformat</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="n">exception</span><span class="p">))</span>
+        <span class="n">mirror_stats</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="push_url_from_directory"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_directory">[docs]</a><span class="k">def</span> <span class="nf">push_url_from_directory</span><span class="p">(</span><span class="n">output_directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a directory in the local filesystem, return the URL on</span>
+<span class="sd">    which to push resources.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scheme</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">output_directory</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;&lt;missing&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span>
+    <span class="k">if</span> <span class="n">scheme</span> <span class="o">!=</span> <span class="s1">&#39;&lt;missing&gt;&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;expected a local path, but got a URL instead&#39;</span><span class="p">)</span>
+    <span class="n">mirror_url</span> <span class="o">=</span> <span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="n">output_directory</span>
+    <span class="n">mirror</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">()</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">push_url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="push_url_from_mirror_name"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_mirror_name">[docs]</a><span class="k">def</span> <span class="nf">push_url_from_mirror_name</span><span class="p">(</span><span class="n">mirror_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a mirror name, return the URL on which to push resources.&quot;&quot;&quot;</span>
+    <span class="n">mirror</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">()</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">mirror_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mirror</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&lt;unnamed&gt;&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no mirror named &quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror_name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">push_url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="push_url_from_mirror_url"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_mirror_url">[docs]</a><span class="k">def</span> <span class="nf">push_url_from_mirror_url</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a mirror URL, return the URL on which to push resources.&quot;&quot;&quot;</span>
+    <span class="n">scheme</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;&lt;missing&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span>
+    <span class="k">if</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;&lt;missing&gt;&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{0}</span><span class="s1">&quot; is not a valid URL&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">))</span>
+    <span class="n">mirror</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">()</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">push_url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MirrorError"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorError">[docs]</a><span class="k">class</span> <span class="nc">MirrorError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass of all mirror-creation related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">long_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MirrorError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">long_msg</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 12, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

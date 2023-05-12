@@ -1,0 +1,74 @@
+ramble.schema package
+=====================
+
+.. automodule:: ramble.schema
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+ramble.schema.applications module
+---------------------------------
+
+.. automodule:: ramble.schema.applications
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.config module
+---------------------------
+
+.. automodule:: ramble.schema.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.licenses module
+-----------------------------
+
+.. automodule:: ramble.schema.licenses
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.merged module
+---------------------------
+
+.. automodule:: ramble.schema.merged
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.mirrors module
+----------------------------
+
+.. automodule:: ramble.schema.mirrors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.repos module
+--------------------------
+
+.. automodule:: ramble.schema.repos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.spack module
+--------------------------
+
+.. automodule:: ramble.schema.spack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.workspace module
+------------------------------
+
+.. automodule:: ramble.schema.workspace
+   :members:
+   :undoc-members:
+   :show-inheritance:

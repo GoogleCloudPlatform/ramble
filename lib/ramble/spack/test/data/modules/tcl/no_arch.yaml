@@ -1,8 +1,0 @@
-enable:
-  - tcl
-arch_folder: false
-tcl:
-  all:
-    autoload: none
-  projections:
-    all: ''

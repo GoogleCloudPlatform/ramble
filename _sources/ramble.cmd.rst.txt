@@ -1,0 +1,138 @@
+ramble.cmd package
+==================
+
+.. automodule:: ramble.cmd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ramble.cmd.common
+
+Submodules
+----------
+
+ramble.cmd.clean module
+-----------------------
+
+.. automodule:: ramble.cmd.clean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.commands module
+--------------------------
+
+.. automodule:: ramble.cmd.commands
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.config module
+------------------------
+
+.. automodule:: ramble.cmd.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.debug module
+-----------------------
+
+.. automodule:: ramble.cmd.debug
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.edit module
+----------------------
+
+.. automodule:: ramble.cmd.edit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.flake8 module
+------------------------
+
+.. automodule:: ramble.cmd.flake8
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.help module
+----------------------
+
+.. automodule:: ramble.cmd.help
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.info module
+----------------------
+
+.. automodule:: ramble.cmd.info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.license module
+-------------------------
+
+.. automodule:: ramble.cmd.license
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.list module
+----------------------
+
+.. automodule:: ramble.cmd.list
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.mirror module
+------------------------
+
+.. automodule:: ramble.cmd.mirror
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.on module
+--------------------
+
+.. automodule:: ramble.cmd.on
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.repo module
+----------------------
+
+.. automodule:: ramble.cmd.repo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.unit\_test module
+----------------------------
+
+.. automodule:: ramble.cmd.unit_test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.workspace module
+---------------------------
+
+.. automodule:: ramble.cmd.workspace
+   :members:
+   :undoc-members:
+   :show-inheritance:

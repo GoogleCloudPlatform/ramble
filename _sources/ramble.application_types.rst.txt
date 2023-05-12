@@ -1,0 +1,26 @@
+ramble.application\_types package
+=================================
+
+.. automodule:: ramble.application_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+ramble.application\_types.executable module
+-------------------------------------------
+
+.. automodule:: ramble.application_types.executable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.application\_types.spack module
+--------------------------------------
+
+.. automodule:: ramble.application_types.spack
+   :members:
+   :undoc-members:
+   :show-inheritance:

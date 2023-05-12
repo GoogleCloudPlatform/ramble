@@ -1,0 +1,18 @@
+ramble.cmd.common package
+=========================
+
+.. automodule:: ramble.cmd.common
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+ramble.cmd.common.arguments module
+----------------------------------
+
+.. automodule:: ramble.cmd.common.arguments
+   :members:
+   :undoc-members:
+   :show-inheritance:

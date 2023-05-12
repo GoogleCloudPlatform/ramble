@@ -1,7 +1,0 @@
-config:
-    test_stage: ~/.ramble/test
-    spack_flags:
-      install: --reuse
-      concretize: --reuse
-    include:
-      - test_include: include.yaml

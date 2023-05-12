@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.cmd.list &mdash; Ramble 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../cmd.html">ramble.cmd</a></li>
+      <li class="breadcrumb-item active">ramble.cmd.list</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.cmd.list</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+<span class="kn">from</span> <span class="nn">llnl.util.tty.colify</span> <span class="kn">import</span> <span class="n">colify</span>
+
+<span class="kn">import</span> <span class="nn">ramble.repository</span>
+<span class="kn">import</span> <span class="nn">ramble.cmd.common.arguments</span> <span class="k">as</span> <span class="nn">arguments</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">html</span> <span class="kn">import</span> <span class="n">escape</span>  <span class="c1"># novm</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">cgi</span> <span class="kn">import</span> <span class="n">escape</span>
+
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;list and search available applications&quot;</span>
+<span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;basic&quot;</span>
+<span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;short&quot;</span>
+
+
+<span class="n">formatters</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="formatter"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.formatter">[docs]</a><span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator used to register formatters&quot;&quot;&quot;</span>
+    <span class="n">formatters</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
+    <span class="k">return</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;optional case-insensitive glob patterns to filter results&#39;</span><span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--search-description&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;filtering will also search the description for a match&#39;</span><span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--format&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;name_only&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;format to be used to print the output [default: name_only]&#39;</span><span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--update&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;write output to the specified file, if any application is newer&#39;</span><span class="p">)</span>
+
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="filter_by_name"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.filter_by_name">[docs]</a><span class="k">def</span> <span class="nf">filter_by_name</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters the sequence of applications according to user prescriptions</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        apps: sequence of applications</span>
+<span class="sd">        args: parsed command line arguments</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        filtered and sorted list of applications</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filter</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">filter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">and</span> <span class="s1">&#39;?&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="n">rc</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">search_description</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+                <span class="n">app</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">apps</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">match</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">res</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="name_only"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.name_only">[docs]</a><span class="nd">@formatter</span>
+<span class="k">def</span> <span class="nf">name_only</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> applications.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">apps</span><span class="p">))</span>
+    <span class="n">colify</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="github_url"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.github_url">[docs]</a><span class="k">def</span> <span class="nf">github_url</span><span class="p">(</span><span class="n">apps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Link to an application file on github.&quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtin/appliactions/</span><span class="si">{0}</span><span class="s1">/application.py&#39;</span>
+    <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">apps</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rows_for_ncols"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.rows_for_ncols">[docs]</a><span class="k">def</span> <span class="nf">rows_for_ncols</span><span class="p">(</span><span class="n">elts</span><span class="p">,</span> <span class="n">ncols</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print out rows in a table with ncols of elts laid out vertically.&quot;&quot;&quot;</span>
+    <span class="n">clen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elts</span><span class="p">)</span> <span class="o">/</span> <span class="n">ncols</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">clen</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncols</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="n">clen</span> <span class="o">+</span> <span class="n">r</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">elts</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">row</span></div>
+
+
+<div class="viewcode-block" id="version_json"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.version_json">[docs]</a><span class="nd">@formatter</span>
+<span class="k">def</span> <span class="nf">version_json</span><span class="p">(</span><span class="n">app_names</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print all applications with their latest versions.&quot;&quot;&quot;</span>
+    <span class="n">apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">app_names</span><span class="p">]</span>
+
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># output name and latest version for each application</span>
+    <span class="n">app_latest</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+        <span class="s1">&#39;  {{&quot;name&quot;: &quot;</span><span class="si">{0}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s1">&#39;}}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">apps</span>
+    <span class="p">])</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">app_latest</span><span class="p">)</span>
+    <span class="c1"># important: no trailing comma in JSON arrays</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="html"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.html">[docs]</a><span class="nd">@formatter</span>
+<span class="k">def</span> <span class="nf">html</span><span class="p">(</span><span class="n">app_names</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print out information on all applications in Sphinx HTML.</span>
+
+<span class="sd">    This is intended to be inlined directly into Sphinx documentation.</span>
+<span class="sd">    We write HTML instead of RST for speed; generating RST from *all*</span>
+<span class="sd">    applications causes the Sphinx build to take forever. Including this as</span>
+<span class="sd">    raw HTML is much faster.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Read in all applications</span>
+    <span class="n">apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">app_names</span><span class="p">]</span>
+
+    <span class="c1"># Start at 2 because the title of the page from Sphinx is id1.</span>
+    <span class="n">span_id</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># HTML header with an increasing id span</span>
+    <span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">span_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">anchor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">anchor</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;&lt;span id=&quot;id</span><span class="si">%d</span><span class="s1">&quot;&gt;&lt;/span&gt;&#39;</span>
+                   <span class="s1">&#39;&lt;h1&gt;</span><span class="si">%s</span><span class="s1">&lt;a class=&quot;headerlink&quot; href=&quot;#</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
+                   <span class="s1">&#39;title=&quot;Permalink to this headline&quot;&gt;&amp;para;&lt;/a&gt;&#39;</span>
+                   <span class="s1">&#39;&lt;/h1&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">span_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">anchor</span><span class="p">))</span>
+
+    <span class="c1"># Start with the number of applications, skipping the title and intro</span>
+    <span class="c1"># blurb, which we maintain in the RST file.</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;p&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Ramble currently has </span><span class="si">%d</span><span class="s1"> mainline applications:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">apps</span><span class="p">))</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/p&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Table of links to all applications</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;table border=&quot;1&quot; class=&quot;docutils&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;tbody valign=&quot;top&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows_for_ncols</span><span class="p">(</span><span class="n">app_names</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;tr class=&quot;row-odd&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span>
+                  <span class="s1">&#39;&lt;tr class=&quot;row-even&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;a class=&quot;reference internal&quot; href=&quot;#</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/a&gt;&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                      <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/tr&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/tbody&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/table&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;hr class=&quot;docutils&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Output some text for each applications.</span>
+    <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;div class=&quot;section&quot; id=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">span_id</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">span_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dl class=&quot;docutils&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># out.write(&#39;&lt;dt&gt;Homepage:&lt;/dt&gt;\n&#39;)</span>
+        <span class="c1"># out.write(&#39;&lt;dd&gt;&lt;ul class=&quot;first last simple&quot;&gt;\n&#39;)</span>
+        <span class="c1"># out.write((&#39;&lt;li&gt;&#39;</span>
+        <span class="c1">#            &#39;&lt;a class=&quot;reference external&quot; href=&quot;%s&quot;&gt;%s&lt;/a&gt;&#39;</span>
+        <span class="c1">#            &#39;&lt;/li&gt;\n&#39;) % (app.homepage, escape(app.homepage, True)))</span>
+        <span class="c1"># out.write(&#39;&lt;/ul&gt;&lt;/dd&gt;\n&#39;)</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dt&gt;Ramble applications:&lt;/dt&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dd&gt;&lt;ul class=&quot;first last simple&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;&lt;li&gt;&#39;</span>
+                   <span class="s1">&#39;&lt;a class=&quot;reference external&quot; href=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">/application.py&lt;/a&gt;&#39;</span>  <span class="c1"># noqa: E501</span>
+                   <span class="s1">&#39;&lt;/li&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">github_url</span><span class="p">(</span><span class="n">app</span><span class="p">),</span> <span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/ul&gt;&lt;/dd&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># if app.versions:</span>
+        <span class="c1">#     out.write(&#39;&lt;dt&gt;Versions:&lt;/dt&gt;\n&#39;)</span>
+        <span class="c1">#     out.write(&#39;&lt;dd&gt;\n&#39;)</span>
+        <span class="c1">#     out.write(&#39;, &#39;.join(</span>
+        <span class="c1">#         str(v) for v in reversed(sorted(app.versions))))</span>
+        <span class="c1">#     out.write(&#39;\n&#39;)</span>
+        <span class="c1">#     out.write(&#39;&lt;/dd&gt;\n&#39;)</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dt&gt;Description:&lt;/dt&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dd&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="kc">True</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/dd&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/dl&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;hr class=&quot;docutils&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/div&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="list"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.list.list">[docs]</a><span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="c1"># retrieve the formatter to use from args</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">formatters</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">]</span>
+
+    <span class="c1"># Retrieve the names of all the applications</span>
+    <span class="n">apps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">())</span>
+    <span class="c1"># Filter the set appropriately</span>
+    <span class="n">sorted_applications</span> <span class="o">=</span> <span class="n">filter_by_name</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+    <span class="c1"># Filter by tags</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+        <span class="n">applications_with_tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">applications_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
+        <span class="n">sorted_applications</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sorted_applications</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">applications_with_tags</span>
+        <span class="n">sorted_applications</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sorted_applications</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">:</span>
+        <span class="c1"># change output stream if user asked for update</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span> <span class="o">&gt;</span> \
+                    <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">():</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;File is up to date: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Updating file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">formatter</span><span class="p">(</span><span class="n">sorted_applications</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Print to stdout</span>
+        <span class="n">formatter</span><span class="p">(</span><span class="n">sorted_applications</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 12, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.repository &mdash; Ramble 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+              <div class="version">
+                0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.repository</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.repository</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">stat</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>  <span class="c1"># novm</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Mapping</span>
+
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">import</span> <span class="nn">ruamel.yaml</span> <span class="k">as</span> <span class="nn">yaml</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.lang</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+<span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
+
+<span class="kn">import</span> <span class="nn">ramble.caches</span>
+<span class="kn">import</span> <span class="nn">ramble.config</span>
+<span class="kn">import</span> <span class="nn">ramble.spec</span>
+<span class="kn">import</span> <span class="nn">ramble.util.path</span>
+<span class="kn">import</span> <span class="nn">ramble.util.naming</span> <span class="k">as</span> <span class="nn">nm</span>
+
+<span class="kn">import</span> <span class="nn">spack.util.spack_json</span> <span class="k">as</span> <span class="nn">sjson</span>
+<span class="kn">import</span> <span class="nn">ramble.util.imp</span>
+
+<span class="n">repo_namespace</span> <span class="o">=</span> <span class="s1">&#39;ramble.app&#39;</span>
+
+
+<div class="viewcode-block" id="get_full_namespace"><a class="viewcode-back" href="../../ramble.html#ramble.repository.get_full_namespace">[docs]</a><span class="k">def</span> <span class="nf">get_full_namespace</span><span class="p">(</span><span class="n">namespace</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the full namespace of a repository, given its relative one.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">.</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_namespace</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span></div>
+
+
+<span class="c1"># Top-level filename for repo config.</span>
+<span class="n">REPO_CONFIG_NAME</span> <span class="o">=</span> <span class="s1">&#39;repo.yaml&#39;</span>
+<span class="c1"># Top-level repo directory containing applcations</span>
+<span class="n">APPLICATIONS_DIR_NAME</span> <span class="o">=</span> <span class="s1">&#39;applications&#39;</span>
+<span class="c1"># Filename for applications in a repo.</span>
+<span class="n">APPLICATION_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;application.py&#39;</span>
+
+<span class="c1">#: Guaranteed unused default value for some functions.</span>
+<span class="n">NOT_PROVIDED</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+
+<span class="c1"># TODO: DWJ - We can remove this, since we are making new applications. Then we</span>
+<span class="c1">#       can *only* import ramble.appkit</span>
+
+<span class="c1">#: Code in ``_application_prepend`` is prepended to imported applications.</span>
+<span class="c1">#:</span>
+<span class="c1">#: Ramble applications were originally expected to call `from ramble import *`</span>
+<span class="c1">#: themselves, but it became difficult to manage and imports in the Ramble</span>
+<span class="c1">#: core the top-level namespace polluted by application symbols this way.  To</span>
+<span class="c1">#: solve this, the top-level ``ramble`` application contains very few symbols</span>
+<span class="c1">#: of its own, and importing ``*`` is essentially a no-op.  The common</span>
+<span class="c1">#: routines and directives that applications need are now in ``ramble.appkit``,</span>
+<span class="c1">#: and the import system forces packages to automatically include</span>
+<span class="c1">#: this. This way, old packages that call ``from ramble import *`` will</span>
+<span class="c1">#: continue to work without modification, but it&#39;s no longer required.</span>
+<span class="n">_application_prepend</span> <span class="o">=</span> <span class="s1">&#39;from ramble.appkit import *&#39;</span>
+
+
+<div class="viewcode-block" id="is_application_file"><a class="viewcode-back" href="../../ramble.html#ramble.repository.is_application_file">[docs]</a><span class="k">def</span> <span class="nf">is_application_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine whether we are in an application file from a repo.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">ramble.application</span>
+    <span class="n">filename_noext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">applicationbase_filename_no_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span>
+        <span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">ApplicationBase</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">filename_noext</span> <span class="o">!=</span> <span class="n">applicationbase_filename_no_ext</span> <span class="ow">and</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename_noext</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;application&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="autospec"><a class="viewcode-back" href="../../ramble.html#ramble.repository.autospec">[docs]</a><span class="k">def</span> <span class="nf">autospec</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that automatically converts the first argument of a</span>
+<span class="sd">    function to a Spec.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_like</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_like</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">Spec</span><span class="p">):</span>
+            <span class="n">spec_like</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">Spec</span><span class="p">(</span><span class="n">spec_like</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_like</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">converter</span></div>
+
+
+<div class="viewcode-block" id="RambleNamespace"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RambleNamespace">[docs]</a><span class="k">class</span> <span class="nc">RambleNamespace</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Allow lazy loading of modules.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RambleNamespace</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__file__</span> <span class="o">=</span> <span class="s2">&quot;(ramble namespace)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path__</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">namespace</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__application__</span> <span class="o">=</span> <span class="n">namespace</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__modules</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getattr lazily loads modules if they&#39;re not already loaded.&quot;&quot;&quot;</span>
+        <span class="n">submodule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__application__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">name</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">submodule</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FastApplicationChecker"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FastApplicationChecker">[docs]</a><span class="k">class</span> <span class="nc">FastApplicationChecker</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache that maps package names to the stats obtained on the</span>
+<span class="sd">    &#39;application.py&#39; files associated with them.</span>
+
+<span class="sd">    For each repository a cache is maintained at class level, and shared among</span>
+<span class="sd">    all instances referring to it. Update of the global cache is done lazily</span>
+<span class="sd">    during instance initialization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: Global cache, reused by every instance</span>
+    <span class="n">_paths_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">applications_path</span><span class="p">):</span>
+        <span class="c1"># The path of the repository managed by this instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span> <span class="o">=</span> <span class="n">applications_path</span>
+
+        <span class="c1"># If the cache we need is not there yet, then build it appropriately</span>
+        <span class="k">if</span> <span class="n">applications_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="n">applications_path</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_new_cache</span><span class="p">()</span>
+
+        <span class="c1">#: Reference to the appropriate entry in the global cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_applications_to_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="n">applications_path</span><span class="p">]</span>
+
+<div class="viewcode-block" id="FastApplicationChecker.invalidate"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FastApplicationChecker.invalidate">[docs]</a>    <span class="k">def</span> <span class="nf">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Regenerate cache for this checker.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_new_cache</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_applications_to_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_new_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new cache for applications in a repo.</span>
+
+<span class="sd">        The implementation here should try to minimize filesystem</span>
+<span class="sd">        calls.  At the moment, it is O(number of applications) and makes</span>
+<span class="sd">        about one stat call per application.  This is reasonably fast, and</span>
+<span class="sd">        avoids actually importing applications in Ramble, which is slow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a dictionary that will store the mapping between a</span>
+        <span class="c1"># package name and its stat info</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">app_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">):</span>
+            <span class="c1"># Skip non-directories in the package root.</span>
+            <span class="n">app_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">,</span> <span class="n">app_name</span><span class="p">)</span>
+
+            <span class="c1"># Warn about invalid names that look like applications.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">nm</span><span class="o">.</span><span class="n">valid_module_name</span><span class="p">(</span><span class="n">app_name</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">app_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Skipping application at </span><span class="si">{0}</span><span class="s1">. &quot;</span><span class="si">{1}</span><span class="s1">&quot; is not &#39;</span>
+                             <span class="s1">&#39;a valid Ramble module name.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                 <span class="n">app_dir</span><span class="p">,</span> <span class="n">app_name</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Construct the file name from the directory</span>
+            <span class="n">app_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">,</span> <span class="n">app_name</span><span class="p">,</span> <span class="n">APPLICATION_FILE_NAME</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Use stat here to avoid lots of calls to the filesystem.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">app_file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
+                    <span class="c1"># No application.py file here.</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">:</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Can&#39;t read application file </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">app_file</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+            <span class="c1"># If it&#39;s not a file, skip it.</span>
+            <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISDIR</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">st_mode</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># If it is a file, then save the stats under the</span>
+            <span class="c1"># appropriate key</span>
+            <span class="n">cache</span><span class="p">[</span><span class="n">app_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sinfo</span>
+
+        <span class="k">return</span> <span class="n">cache</span>
+
+<div class="viewcode-block" id="FastApplicationChecker.last_mtime"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FastApplicationChecker.last_mtime">[docs]</a>    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">sinfo</span><span class="o">.</span><span class="n">st_mtime</span> <span class="k">for</span> <span class="n">sinfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_applications_to_stats</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_applications_to_stats</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_applications_to_stats</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_applications_to_stats</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TagIndex"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex">[docs]</a><span class="k">class</span> <span class="nc">TagIndex</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps tags to list of applications.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TagIndex.to_json"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="n">sjson</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">},</span> <span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TagIndex.from_json"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">sjson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">TagIndex</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="nb">list</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">r</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">r</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TagIndex.update_application"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.update_application">[docs]</a>    <span class="k">def</span> <span class="nf">update_application</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates an application in the tag index.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            app_name (str): name of the application to be removed from the</span>
+<span class="sd">            index</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">application</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+
+        <span class="c1"># Remove the application from the list of applications, if present</span>
+        <span class="k">for</span> <span class="n">app_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">app_name</span> <span class="ow">in</span> <span class="n">app_list</span><span class="p">:</span>
+                <span class="n">app_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+
+        <span class="c1"># Add it again under the appropriate tags</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Indexer"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Indexer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adaptor for indexes that need to be generated when repos are updated.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Indexer.create"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create</span><span class="p">()</span></div>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an empty index and return it.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Indexer.needs_update"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.needs_update">[docs]</a>    <span class="k">def</span> <span class="nf">needs_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether an update is needed when the application file hasn&#39;t changed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (bool): ``True`` if this application needs its index</span>
+<span class="sd">                updated, ``False`` otherwise.</span>
+
+<span class="sd">        We already automatically update indexes when application files</span>
+<span class="sd">        change, but other files (like patches) may change underneath the</span>
+<span class="sd">        application file. This method can be used to check additional</span>
+<span class="sd">        application-specific files whenever they&#39;re loaded, to tell the</span>
+<span class="sd">        RepoIndex to update the index *just* for that application.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Indexer.read"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.read">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read this index from a provided file object.&quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Indexer.update"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.update">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_fullname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the index in memory with information about an application.&quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Indexer.write"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.write">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the index to a file object.&quot;&quot;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="TagIndexer"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer">[docs]</a><span class="k">class</span> <span class="nc">TagIndexer</span><span class="p">(</span><span class="n">Indexer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lifecycle methods for a TagIndex on a Repo.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">TagIndex</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TagIndexer.read"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">TagIndex</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TagIndexer.update"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_fullname</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">update_application</span><span class="p">(</span><span class="n">app_fullname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TagIndexer.write"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RepoIndex"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoIndex">[docs]</a><span class="k">class</span> <span class="nc">RepoIndex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container class that manages a set of Indexers for a Repo.</span>
+
+<span class="sd">    This class is responsible for checking packages in a repository for</span>
+<span class="sd">    updates (using ``FastApplicationChecker``) and for regenerating indexes</span>
+<span class="sd">    when they&#39;re needed.</span>
+
+<span class="sd">    ``Indexers`` should be added to the ``RepoIndex`` using</span>
+<span class="sd">    ``add_index(name, indexer)``, and they should support the interface</span>
+<span class="sd">    defined by ``Indexer``, so that the ``RepoIndex`` can read, generate,</span>
+<span class="sd">    and update stored indices.</span>
+
+<span class="sd">    Generated indexes are accessed by name via ``__getitem__()``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_checker</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checker</span> <span class="o">=</span> <span class="n">application_checker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">applications_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="RepoIndex.add_indexer"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoIndex.add_indexer">[docs]</a>    <span class="k">def</span> <span class="nf">add_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexer</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an indexer to the repo index.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            name (str): name of this indexer</span>
+
+<span class="sd">            indexer (object): an object that supports create(), read(),</span>
+<span class="sd">                write(), and get_index() operations</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">indexer</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the index with the specified name, reindexing if needed.&quot;&quot;&quot;</span>
+        <span class="n">indexer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">indexer</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;no such index: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_all_indexes</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_build_all_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build all the indexes at once.</span>
+
+<span class="sd">        We regenerate *all* indexes whenever *any* index needs an update,</span>
+<span class="sd">        because the main bottleneck here is loading all the applications. It</span>
+<span class="sd">        can take tens of seconds to regenerate sequentially, and we&#39;d rather</span>
+<span class="sd">        only pay that cost once rather than on several invocations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_index</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">indexer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexer</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine which applications need an update, and update indexes.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Filename of the provider index cache (we assume they&#39;re all json)</span>
+        <span class="n">cache_filename</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">/</span><span class="si">{1}</span><span class="s1">-index.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+
+        <span class="c1"># Compute which applications needs to be updated in the cache</span>
+        <span class="n">misc_cache</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">misc_cache</span>
+        <span class="n">index_mtime</span> <span class="o">=</span> <span class="n">misc_cache</span><span class="o">.</span><span class="n">mtime</span><span class="p">(</span><span class="n">cache_filename</span><span class="p">)</span>
+
+        <span class="n">needs_update</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">sinfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">&gt;</span> <span class="n">index_mtime</span>
+        <span class="p">]</span>
+
+        <span class="n">index_existed</span> <span class="o">=</span> <span class="n">misc_cache</span><span class="o">.</span><span class="n">init_entry</span><span class="p">(</span><span class="n">cache_filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index_existed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">needs_update</span><span class="p">:</span>
+            <span class="c1"># If the index exists and doesn&#39;t need an update, read it</span>
+            <span class="k">with</span> <span class="n">misc_cache</span><span class="o">.</span><span class="n">read_transaction</span><span class="p">(</span><span class="n">cache_filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">indexer</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Otherwise update it and rewrite the cache file</span>
+            <span class="k">with</span> <span class="n">misc_cache</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span><span class="n">cache_filename</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+                <span class="n">indexer</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">old</span><span class="p">)</span> <span class="k">if</span> <span class="n">old</span> <span class="k">else</span> <span class="n">indexer</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+                <span class="k">for</span> <span class="n">app_name</span> <span class="ow">in</span> <span class="n">needs_update</span><span class="p">:</span>
+                    <span class="n">namespaced_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">app_name</span><span class="p">)</span>
+                    <span class="n">indexer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">namespaced_name</span><span class="p">)</span>
+
+                <span class="n">indexer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">indexer</span><span class="o">.</span><span class="n">index</span></div>
+
+
+<div class="viewcode-block" id="RepoPath"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath">[docs]</a><span class="k">class</span> <span class="nc">RepoPath</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A RepoPath is a list of repos that function as one.</span>
+
+<span class="sd">    It functions exactly like a Repo, but it operates on the combined</span>
+<span class="sd">    results of the Repos in its list instead of on a single application</span>
+<span class="sd">    repository.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repos (list): list Repo objects or paths to put in this RepoPath</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">repos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">NamespaceTrie</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_application_names</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Add each repo to this path.</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">repos</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+                    <span class="n">repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">put_last</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">RepoError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Failed to initialize repository: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">repo</span><span class="p">,</span>
+                         <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
+                         <span class="s2">&quot;To remove the bad repository, run this command:&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;    ramble repo rm </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">repo</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RepoPath.put_first"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.put_first">[docs]</a>    <span class="k">def</span> <span class="nf">put_first</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add repo first in the search path.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">RepoPath</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repos</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">put_first</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span></div>
+
+<div class="viewcode-block" id="RepoPath.put_last"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.put_last">[docs]</a>    <span class="k">def</span> <span class="nf">put_last</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add repo last in the search path.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">RepoPath</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">put_last</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+
+        <span class="c1"># don&#39;t mask any higher-precedence repos with same namespace</span>
+        <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span></div>
+
+<div class="viewcode-block" id="RepoPath.remove"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a repo from the search path.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.get_repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_repo">[docs]</a>    <span class="k">def</span> <span class="nf">get_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">NOT_PROVIDED</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a repository by namespace.</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">            namespace:</span>
+
+<span class="sd">                Look up this namespace in the RepoPath, and return it if found.</span>
+
+<span class="sd">        Optional Arguments:</span>
+
+<span class="sd">            default:</span>
+
+<span class="sd">                If default is provided, return it when the namespace</span>
+<span class="sd">                isn&#39;t found.  If not, raise an UnknownNamespaceError.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_namespace</span> <span class="o">=</span> <span class="n">get_full_namespace</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">full_namespace</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default</span> <span class="o">==</span> <span class="n">NOT_PROVIDED</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnknownNamespaceError</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">default</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">full_namespace</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RepoPath.first_repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.first_repo">[docs]</a>    <span class="k">def</span> <span class="nf">first_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the first repo in precedence order.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RepoPath.all_application_names"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_application_names">[docs]</a>    <span class="k">def</span> <span class="nf">all_application_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all unique application names in all repositories.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_application_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">all_apps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">():</span>
+                    <span class="n">all_apps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_application_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_apps</span><span class="p">,</span>
+                                                 <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_application_names</span></div>
+
+<div class="viewcode-block" id="RepoPath.applications_with_tags"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.applications_with_tags">[docs]</a>    <span class="k">def</span> <span class="nf">applications_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">applications_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">tags</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.all_applications"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_applications">[docs]</a>    <span class="k">def</span> <span class="nf">all_applications</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.all_application_classes"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_application_classes">[docs]</a>    <span class="k">def</span> <span class="nf">all_application_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_app_class</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.find_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.find_module">[docs]</a>    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements precedence for overlaid namespaces.</span>
+
+<span class="sd">        Loop checks each namespace in self.repos for applications, and</span>
+<span class="sd">        also handles loading empty containing namespaces.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># namespaces are added to repo, and application modules are leaves.</span>
+        <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">module_name</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If it&#39;s a module in some repo, or if it is the repo&#39;s</span>
+        <span class="c1"># namespace, let the repo handle it.</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">real_name</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">repo</span>
+            <span class="k">elif</span> <span class="n">fullname</span> <span class="o">==</span> <span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">repo</span>
+
+        <span class="c1"># No repo provides the namespace, but it is a valid prefix of</span>
+        <span class="c1"># something in the RepoPath.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="o">.</span><span class="n">is_prefix</span><span class="p">(</span><span class="n">fullname</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RepoPath.load_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.load_module">[docs]</a>    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles loading container namespaces when necessary.</span>
+
+<span class="sd">        See ``Repo`` for how actual application modules are loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fullname</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="o">.</span><span class="n">is_prefix</span><span class="p">(</span><span class="n">fullname</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;No such ramble repo: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fullname</span><span class="p">)</span>
+
+        <span class="n">module</span> <span class="o">=</span> <span class="n">RambleNamespace</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+        <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="k">return</span> <span class="n">module</span></div>
+
+<div class="viewcode-block" id="RepoPath.last_mtime"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.last_mtime">[docs]</a>    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time a application file in this repo was last updated.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">()</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.repo_for_app"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.repo_for_app">[docs]</a>    <span class="k">def</span> <span class="nf">repo_for_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Given a spec, get the repository for its application.&quot;&quot;&quot;</span>
+        <span class="c1"># We don&#39;t @_autospec this function b/c it&#39;s called very frequently</span>
+        <span class="c1"># and we want to avoid parsing str&#39;s into Specs unnecessarily.</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Getting repo for app </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">spec</span><span class="p">)</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">Spec</span><span class="p">):</span>
+            <span class="n">namespace</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">namespace</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># handle strings directly for speed instead of @_autospec&#39;ing</span>
+            <span class="n">namespace</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; Name and namespace = </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="c1"># If the spec already has a namespace, then return the</span>
+        <span class="c1"># corresponding repo if we know about it.</span>
+        <span class="k">if</span> <span class="n">namespace</span><span class="p">:</span>
+            <span class="n">fullspace</span> <span class="o">=</span> <span class="n">get_full_namespace</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fullspace</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnknownNamespaceError</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">fullspace</span><span class="p">]</span>
+
+        <span class="c1"># If there&#39;s no namespace, search in the RepoPath.</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found repo...&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">repo</span>
+
+        <span class="c1"># If the application isn&#39;t in any repo, return the one with</span>
+        <span class="c1"># highest precedence.  This is for commands like `ramble edit`</span>
+        <span class="c1"># that can operate on applications that don&#39;t exist yet.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_repo</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RepoPath.get"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get">[docs]</a>    <span class="nd">@autospec</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the application associated with the supplied spec.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_app</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.get_app_class"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_app_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_app_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find a class for the spec&#39;s application and return the class object.&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_app</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span><span class="o">.</span><span class="n">get_app_class</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.dump_provenance"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.dump_provenance">[docs]</a>    <span class="nd">@autospec</span>
+    <span class="k">def</span> <span class="nf">dump_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dump provenance information for a spec to a particular path.</span>
+
+<span class="sd">           This dumps the package file and any associated patch files.</span>
+<span class="sd">           Raises UnknownApplicationError if not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_app</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="n">dump_provenance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.dirname_for_application_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.dirname_for_application_name">[docs]</a>    <span class="k">def</span> <span class="nf">dirname_for_application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_app</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span><span class="o">.</span><span class="n">dirname_for_application_name</span><span class="p">(</span>
+            <span class="n">app_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.filename_for_application_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.filename_for_application_name">[docs]</a>    <span class="k">def</span> <span class="nf">filename_for_application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_app</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span><span class="o">.</span><span class="n">filename_for_application_name</span><span class="p">(</span>
+            <span class="n">app_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoPath.exists"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether application with the give name exists in the path&#39;s repos.</span>
+
+<span class="sd">        Note that virtual applications do not &quot;exist&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">)</span></div>
+
+    <span class="c1"># TODO: DWJ - Maybe we don&#39;t need this? Are we going to have virtual</span>
+    <span class="c1">#             applications</span>
+    <span class="c1"># def is_virtual(self, app_name, use_index=True):</span>
+    <span class="c1">#     &quot;&quot;&quot;True if the application with this name is virtual,</span>
+    <span class="c1">#        False otherwise.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Set `use_index` False when calling from a code block that could</span>
+    <span class="c1">#     be run during the computation of the provider index.&quot;&quot;&quot;</span>
+    <span class="c1">#     have_name = app_name is not None</span>
+    <span class="c1">#     if have_name and not isinstance(app_name, str):</span>
+    <span class="c1">#         raise ValueError(</span>
+    <span class="c1">#             &quot;is_virtual(): expected package name, got %s&quot; %</span>
+    <span class="c1">#             type(app_name))</span>
+    <span class="c1">#     if use_index:</span>
+    <span class="c1">#         return have_name and app_name in self.provider_index</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         return have_name and (not self.exists(app_name) or</span>
+    <span class="c1">#                               self.get_app_class(app_name).virtual)</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo">[docs]</a><span class="k">class</span> <span class="nc">Repo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a package repository in the filesystem.</span>
+
+<span class="sd">    Each application repository must have a top-level configuration file</span>
+<span class="sd">    called `repo.yaml`.</span>
+
+<span class="sd">    Currently, `repo.yaml` this must define:</span>
+
+<span class="sd">    `namespace`:</span>
+<span class="sd">        A Python namespace where the repository&#39;s applications should live.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate an application repository from a filesystem path.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root: the root directory of the repository</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Root directory, containing _repo.yaml and application dirs</span>
+        <span class="c1"># Allow roots to be ramble-relative by starting with &#39;$ramble&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="c1"># check and raise BadRepoError on fail.</span>
+        <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">condition</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadRepoError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Validate repository layout.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">REPO_CONFIG_NAME</span><span class="p">)</span>
+        <span class="n">check</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">),</span>
+              <span class="s2">&quot;No </span><span class="si">%s</span><span class="s2"> found in &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">REPO_CONFIG_NAME</span><span class="p">,</span> <span class="n">root</span><span class="p">))</span>
+
+        <span class="c1"># Read configuration and validate namespace</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_config</span><span class="p">()</span>
+        <span class="n">check</span><span class="p">(</span><span class="s1">&#39;namespace&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> must define a namespace.&#39;</span>
+              <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">REPO_CONFIG_NAME</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;namespace&#39;</span><span class="p">]</span>
+        <span class="n">check</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[a-zA-Z][a-zA-Z0-9_.]+&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">),</span>
+              <span class="p">(</span><span class="s2">&quot;Invalid namespace &#39;</span><span class="si">%s</span><span class="s2">&#39; in repo &#39;</span><span class="si">%s</span><span class="s2">&#39;. &quot;</span>
+               <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">))</span> <span class="o">+</span>
+              <span class="s2">&quot;Namespaces must be valid python identifiers separated by &#39;.&#39;&quot;</span><span class="p">)</span>
+
+        <span class="n">applications_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;subdirectory&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;subdirectory&quot;</span> <span class="ow">in</span> <span class="n">config</span> <span class="k">else</span> \
+            <span class="n">APPLICATIONS_DIR_NAME</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">applications_dir</span><span class="p">)</span>
+        <span class="n">check</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">),</span>
+              <span class="s2">&quot;No directory &#39;</span><span class="si">%s</span><span class="s2">&#39; found in &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">applications_dir</span><span class="p">,</span>
+                                                   <span class="n">root</span><span class="p">))</span>
+
+        <span class="c1"># Set up &#39;full_namespace&#39; to include the super-namespace</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">full_namespace</span> <span class="o">=</span> <span class="n">get_full_namespace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+
+        <span class="c1"># Keep name components around for checking prefixes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_namespace</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># These are internal cache variables.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_classes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instances</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Maps that goes from application name to corresponding file stat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fast_application_checker</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Indexes for this repository, computed lazily</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repo_index</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># make sure the namespace for applications in this repo exists.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_namespace</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_create_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create this repo&#39;s namespace module and insert it into sys.modules.</span>
+
+<span class="sd">        Ensures that modules loaded via the repo have a home, and that</span>
+<span class="sd">        we don&#39;t get runtime warnings from Python&#39;s module system.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">ns</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">ns</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">RambleNamespace</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+
+                <span class="c1"># TODO: DWJ - Do we need this?</span>
+                <span class="c1"># Ensure the namespace is an atrribute of its parent,</span>
+                <span class="c1"># if it has not been set by something else already.</span>
+                <span class="c1">#</span>
+                <span class="c1"># This ensures that we can do things like:</span>
+                <span class="c1">#    import ramble.app.builtin.mpich as mpich</span>
+                <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+                    <span class="n">modname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">modname</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># no need to set up a module</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span>
+
+            <span class="c1"># but keep track of the parent in this loop</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">module</span>
+
+<div class="viewcode-block" id="Repo.real_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.real_name">[docs]</a>    <span class="k">def</span> <span class="nf">real_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">import_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow users to import Ramble applications using Python identifiers.</span>
+
+<span class="sd">        A python identifier might map to many different Ramble application</span>
+<span class="sd">        names due to hyphen/underscore ambiguity.</span>
+
+<span class="sd">        Easy example:</span>
+<span class="sd">            num3proxy   -&gt; 3proxy</span>
+
+<span class="sd">        Ambiguous:</span>
+<span class="sd">            foo_bar -&gt; foo_bar, foo-bar</span>
+
+<span class="sd">        More ambiguous:</span>
+<span class="sd">            foo_bar_baz -&gt; foo_bar_baz, foo-bar-baz, foo_bar-baz, foo-bar_baz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">import_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">import_name</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">possible_ramble_module_names</span><span class="p">(</span><span class="n">import_name</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">import_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Repo.is_prefix"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.is_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">is_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True if fullname is a prefix of this Repo&#39;s namespace.&quot;&quot;&quot;</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)]</span> <span class="o">==</span> <span class="n">parts</span></div>
+
+<div class="viewcode-block" id="Repo.find_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.find_module">[docs]</a>    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Python find_module import hook.</span>
+
+<span class="sd">        Returns this Repo if it can load the module; None if not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_prefix</span><span class="p">(</span><span class="n">fullname</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">module_name</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_name</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Repo.load_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.load_module">[docs]</a>    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Python importer load hook.</span>
+
+<span class="sd">        Tries to load the module; raises an ImportError if it can&#39;t.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fullname</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span>
+
+        <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">module_name</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_prefix</span><span class="p">(</span><span class="n">fullname</span><span class="p">):</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">RambleNamespace</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">namespace</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">:</span>
+            <span class="n">real_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_name</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">real_name</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;No module </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_app_module</span><span class="p">(</span><span class="n">real_name</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;No module </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+        <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="o">!=</span> <span class="n">fullname</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">module_name</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">module</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check for a YAML config file in this db&#39;s root directory.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">reponame_file</span><span class="p">:</span>
+                <span class="n">yaml_data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">reponame_file</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">yaml_data</span> <span class="ow">or</span> <span class="s1">&#39;repo&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yaml_data</span> <span class="ow">or</span>
+                        <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yaml_data</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)):</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Invalid </span><span class="si">%s</span><span class="s2"> in repository </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">REPO_CONFIG_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">))</span>
+
+                <span class="k">return</span> <span class="n">yaml_data</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">]</span>
+
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Error reading </span><span class="si">%s</span><span class="s2"> when opening </span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Repo.get"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.get">[docs]</a>    <span class="nd">@autospec</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the application associated with the supplied spec.&quot;&quot;&quot;</span>
+        <span class="c1"># NOTE: we only check whether the application is None here, not whether</span>
+        <span class="c1"># it actually exists, because we have to load it anyway, and that ends</span>
+        <span class="c1"># up checking for existence. We avoid constructing</span>
+        <span class="c1"># FastApplicationChecker, which will stat all applications.</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Getting app </span><span class="si">%s</span><span class="s1"> from repo&#39;</span> <span class="o">%</span> <span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownApplicationError</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">namespace</span> <span class="ow">and</span> <span class="n">spec</span><span class="o">.</span><span class="n">namespace</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownApplicationError</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+
+        <span class="n">application_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_app_class</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">application_class</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">:</span>
+            <span class="c1"># pass these through as their error messages will be fine.</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+            <span class="c1"># Make sure other errors in constructors hit the error</span>
+            <span class="c1"># handler by wrapping them</span>
+            <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:debug&#39;</span><span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+            <span class="k">raise</span> <span class="n">FailedConstructorError</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fullname</span><span class="p">,</span> <span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Repo.dump_provenance"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.dump_provenance">[docs]</a>    <span class="nd">@autospec</span>
+    <span class="k">def</span> <span class="nf">dump_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dump provenance information for a spec to a particular path.</span>
+
+<span class="sd">           This dumps the application file.</span>
+<span class="sd">           Raises UnknownApplicationError if not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">namespace</span> <span class="ow">and</span> <span class="n">spec</span><span class="o">.</span><span class="n">namespace</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownApplicationError</span><span class="p">(</span>
+                <span class="s2">&quot;Repository </span><span class="si">%s</span><span class="s2"> does not contain package </span><span class="si">%s</span><span class="s2">.&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">fullname</span><span class="p">))</span>
+
+        <span class="c1"># Install the application.py file itself.</span>
+        <span class="n">fs</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_for_application_name</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repo.purge"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear entire application instance cache.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instances</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the index for this repo lazily.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repo_index</span> <span class="o">=</span> <span class="n">RepoIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_checker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repo_index</span><span class="o">.</span><span class="n">add_indexer</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="n">TagIndexer</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo_index</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tag_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Index of tags and which applications they&#39;re defined on.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Repo.dirname_for_application_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.dirname_for_application_name">[docs]</a>    <span class="k">def</span> <span class="nf">dirname_for_application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the directory name for a particular application.  This is the</span>
+<span class="sd">           directory that contains its application.py file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">,</span> <span class="n">app_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repo.filename_for_application_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.filename_for_application_name">[docs]</a>    <span class="k">def</span> <span class="nf">filename_for_application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the filename for the module we should load for a particular</span>
+<span class="sd">           application.  applications for a Repo live in</span>
+<span class="sd">           ``$root/&lt;application_name&gt;/application.py``</span>
+
+<span class="sd">           This will return a proper application.py path even if the</span>
+<span class="sd">           application doesn&#39;t exist yet, so callers will need to ensure</span>
+<span class="sd">           the application exists before importing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirname_for_application_name</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app_dir</span><span class="p">,</span> <span class="n">APPLICATION_FILE_NAME</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_app_checker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_application_checker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fast_application_checker</span> <span class="o">=</span> \
+                <span class="n">FastApplicationChecker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applications_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_application_checker</span>
+
+<div class="viewcode-block" id="Repo.all_application_names"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_application_names">[docs]</a>    <span class="k">def</span> <span class="nf">all_application_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sorted list of all application names in the Repo.&quot;&quot;&quot;</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_checker</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">names</span></div>
+
+<div class="viewcode-block" id="Repo.applications_with_tags"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.applications_with_tags">[docs]</a>    <span class="k">def</span> <span class="nf">applications_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">())</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_index</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">v</span> <span class="o">&amp;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repo.all_applications"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_applications">[docs]</a>    <span class="k">def</span> <span class="nf">all_applications</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all applications in the repository.</span>
+
+<span class="sd">        Use this with care, because loading applications is slow.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repo.all_application_classes"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_application_classes">[docs]</a>    <span class="k">def</span> <span class="nf">all_application_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all application *classes* in the repository.</span>
+
+<span class="sd">        Use this with care, because loading applications is slow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_app_class</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repo.exists"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether a application with the supplied name exists.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">app_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># if the FastApplicationChecker is already constructed, use it</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_application_checker</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">app_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_checker</span>
+
+        <span class="c1"># if not, check for the application.py file</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_for_application_name</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repo.last_mtime"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.last_mtime">[docs]</a>    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time a application file in this repo was last updated.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_checker</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_app_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a module for a particular application.</span>
+
+<span class="sd">        This caches the module within this Repo *instance*.  It does</span>
+<span class="sd">        *not* add it to ``sys.modules``.  So, you can construct</span>
+<span class="sd">        multiple Repos for testing and ensure that the module will be</span>
+<span class="sd">        loaded once per repo.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">app_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_for_application_name</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">UnknownApplicationError</span><span class="p">(</span><span class="n">app_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Something&#39;s wrong. &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a file!&quot;</span> <span class="o">%</span> <span class="n">file_path</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Cannot read &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="n">file_path</span><span class="p">)</span>
+
+            <span class="c1"># e.g., ramble.app.builtin.mpich</span>
+            <span class="n">fullname</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">,</span> <span class="n">app_name</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span>
+                                                     <span class="n">prepend</span><span class="o">=</span><span class="n">_application_prepend</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># SyntaxError strips the path from the filename so we need to</span>
+                <span class="c1"># manually construct the error message in order to give the</span>
+                <span class="c1"># user the correct application.py where the syntax error is</span>
+                <span class="c1"># located</span>
+                <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid syntax in </span><span class="si">{0:}</span><span class="s1">, line </span><span class="si">{1:}</span><span class="s1">&#39;</span>
+                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">lineno</span><span class="p">))</span>
+
+            <span class="n">module</span><span class="o">.</span><span class="n">__application__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_namespace</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">[</span><span class="n">app_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">[</span><span class="n">app_name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Repo.get_app_class"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.get_app_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_app_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the class for the application out of its module.</span>
+
+<span class="sd">        First loads (or fetches from cache) a module for the</span>
+<span class="sd">        application. Then extracts the application class from the module</span>
+<span class="sd">        according to Ramble&#39;s naming convention.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">namespace</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">app_name</span> <span class="o">=</span> <span class="n">app_name</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="ow">and</span> <span class="p">(</span><span class="n">namespace</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidNamespaceError</span><span class="p">(</span><span class="s1">&#39;Invalid namespace for </span><span class="si">%s</span><span class="s1"> repo: </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">namespace</span><span class="p">))</span>
+
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">mod_to_class</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; Class name = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">class_name</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_app_module</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2"> is not a class&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">app_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">cls</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;[Repo &#39;</span><span class="si">%s</span><span class="s2">&#39; at &#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.create_repo">[docs]</a><span class="k">def</span> <span class="nf">create_repo</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subdir</span><span class="o">=</span><span class="n">APPLICATIONS_DIR_NAME</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new repository in root with the specified namespace.</span>
+
+<span class="sd">       If the namespace is not provided, use basename of root.</span>
+<span class="sd">       Return the canonicalized path and namespace of the created repository.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\w[\.\w-]*&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">InvalidNamespaceError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a valid namespace.&quot;</span> <span class="o">%</span> <span class="n">namespace</span><span class="p">)</span>
+
+    <span class="n">existed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">BadRepoError</span><span class="p">(</span><span class="s1">&#39;File </span><span class="si">%s</span><span class="s1"> already exists and is not a directory&#39;</span>
+                               <span class="o">%</span> <span class="n">root</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BadRepoError</span><span class="p">(</span>
+                    <span class="s1">&#39;Cannot create new repo in </span><span class="si">%s</span><span class="s1">: cannot access directory.&#39;</span>
+                    <span class="o">%</span> <span class="n">root</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BadRepoError</span><span class="p">(</span>
+                    <span class="s1">&#39;Cannot create new repo in </span><span class="si">%s</span><span class="s1">: directory is not empty.&#39;</span>
+                    <span class="o">%</span> <span class="n">root</span><span class="p">)</span>
+        <span class="n">existed</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadRepoError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot create repository in </span><span class="si">%s</span><span class="s2">: can&#39;t access parent!&quot;</span> <span class="o">%</span> <span class="n">root</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">REPO_CONFIG_NAME</span><span class="p">)</span>
+        <span class="n">applications_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">subdir</span><span class="p">)</span>
+
+        <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="n">applications_path</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;repo:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  namespace: &#39;</span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">subdir</span> <span class="o">!=</span> <span class="n">APPLICATIONS_DIR_NAME</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  subdirectory: &#39;</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># try to clean up.</span>
+        <span class="k">if</span> <span class="n">existed</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">applications_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="n">BadRepoError</span><span class="p">(</span><span class="s1">&#39;Failed to create new repository in </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">root</span><span class="p">,</span>
+                           <span class="s2">&quot;Caused by </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">e</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">full_path</span><span class="p">,</span> <span class="n">namespace</span></div>
+
+
+<div class="viewcode-block" id="create_or_construct"><a class="viewcode-back" href="../../ramble.html#ramble.repository.create_or_construct">[docs]</a><span class="k">def</span> <span class="nf">create_or_construct</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a repository, or just return a Repo if it already exists.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">create_repo</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Repo</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_path</span><span class="p">(</span><span class="n">repo_dirs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the singleton RepoPath instance for Ramble.</span>
+
+<span class="sd">    Create a RepoPath, add it to sys.meta_path, and return it.</span>
+
+<span class="sd">    TODO: consider not making this a singleton.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">repo_dirs</span> <span class="o">=</span> <span class="n">repo_dirs</span> <span class="ow">or</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;repos&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">repo_dirs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NoRepoConfiguredError</span><span class="p">(</span>
+            <span class="s2">&quot;Ramble configuration contains no application repositories.&quot;</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">RepoPath</span><span class="p">(</span><span class="o">*</span><span class="n">repo_dirs</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span>
+
+
+<span class="c1">#: Singleton repo path instance</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">_path</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get"><a class="viewcode-back" href="../../ramble.html#ramble.repository.get">[docs]</a><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">spec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience wrapper around ``ramble.repository.get()``.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="all_application_names"><a class="viewcode-back" href="../../ramble.html#ramble.repository.all_application_names">[docs]</a><span class="k">def</span> <span class="nf">all_application_names</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience wrapper around ``ramble.repository.all_application_names()``.&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">all_application_names</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="set_path"><a class="viewcode-back" href="../../ramble.html#ramble.repository.set_path">[docs]</a><span class="k">def</span> <span class="nf">set_path</span><span class="p">(</span><span class="n">repo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the path singleton to a specific value.</span>
+
+<span class="sd">    Overwrite ``path`` and register it as an importer in</span>
+<span class="sd">    ``sys.meta_path`` if it is a ``Repo`` or ``RepoPath``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">path</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">repo</span>
+
+    <span class="c1"># make the new repo_path an importer if needed</span>
+    <span class="n">append</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="p">(</span><span class="n">Repo</span><span class="p">,</span> <span class="n">RepoPath</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">append</span></div>
+
+
+<div class="viewcode-block" id="additional_repository"><a class="viewcode-back" href="../../ramble.html#ramble.repository.additional_repository">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">additional_repository</span><span class="p">(</span><span class="n">repository</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds temporarily a repository to the default one.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repository: repository to be added</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">put_first</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
+    <span class="k">yield</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="use_repositories"><a class="viewcode-back" href="../../ramble.html#ramble.repository.use_repositories">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">use_repositories</span><span class="p">(</span><span class="o">*</span><span class="n">paths_and_repos</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the repositories passed as arguments within the context manager.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *paths_and_repos: paths to the repositories to be used, or</span>
+<span class="sd">            already constructed Repo objects</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Corresponding RepoPath object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">path</span>
+
+    <span class="c1"># Construct a temporary RepoPath object from</span>
+    <span class="n">temporary_repositories</span> <span class="o">=</span> <span class="n">RepoPath</span><span class="p">(</span><span class="o">*</span><span class="n">paths_and_repos</span><span class="p">)</span>
+
+    <span class="c1"># Swap the current repository out</span>
+    <span class="n">saved</span> <span class="o">=</span> <span class="n">path</span>
+    <span class="n">remove_from_meta</span> <span class="o">=</span> <span class="n">set_path</span><span class="p">(</span><span class="n">temporary_repositories</span><span class="p">)</span>
+
+    <span class="k">yield</span> <span class="n">temporary_repositories</span>
+
+    <span class="c1"># Restore _path and sys.meta_path</span>
+    <span class="k">if</span> <span class="n">remove_from_meta</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temporary_repositories</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">saved</span></div>
+
+
+<div class="viewcode-block" id="RepoError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoError">[docs]</a><span class="k">class</span> <span class="nc">RepoError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass for repository-related errors.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NoRepoConfiguredError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.NoRepoConfiguredError">[docs]</a><span class="k">class</span> <span class="nc">NoRepoConfiguredError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there are no repositories configured.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="InvalidNamespaceError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.InvalidNamespaceError">[docs]</a><span class="k">class</span> <span class="nc">InvalidNamespaceError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an invalid namespace is encountered.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="BadRepoError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.BadRepoError">[docs]</a><span class="k">class</span> <span class="nc">BadRepoError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when repo layout is invalid.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="UnknownEntityError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownEntityError">[docs]</a><span class="k">class</span> <span class="nc">UnknownEntityError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter a application ramble doesn&#39;t have.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="IndexError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.IndexError">[docs]</a><span class="k">class</span> <span class="nc">IndexError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there&#39;s an error with an index.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="UnknownApplicationError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownApplicationError">[docs]</a><span class="k">class</span> <span class="nc">UnknownApplicationError</span><span class="p">(</span><span class="n">UnknownEntityError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter a application ramble doesn&#39;t have.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">long_msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">repo</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Application &#39;</span><span class="si">{0}</span><span class="s2">&#39; not found in repository &#39;</span><span class="si">{1.root}</span><span class="s2">&#39;&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Application &#39;</span><span class="si">{0}</span><span class="s2">&#39; not found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Special handling for specs that may have been intended as</span>
+            <span class="c1"># filenames: prompt the user to ask whether they intended to write</span>
+            <span class="c1"># &#39;./&lt;name&gt;&#39;.</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.yaml&quot;</span><span class="p">):</span>
+                <span class="n">long_msg</span> <span class="o">=</span> <span class="s2">&quot;Did you mean to specify a filename with &#39;./</span><span class="si">{0}</span><span class="s2">&#39;?&quot;</span>
+                <span class="n">long_msg</span> <span class="o">=</span> <span class="n">long_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Attempting to retrieve anonymous Application.&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">UnknownApplicationError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">long_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="UnknownNamespaceError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownNamespaceError">[docs]</a><span class="k">class</span> <span class="nc">UnknownNamespaceError</span><span class="p">(</span><span class="n">UnknownEntityError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter an unknown namespace&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UnknownNamespaceError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="s2">&quot;Unknown namespace: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">namespace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FailedConstructorError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FailedConstructorError">[docs]</a><span class="k">class</span> <span class="nc">FailedConstructorError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an application&#39;s class constructor fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FailedConstructorError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="s2">&quot;Class constructor failed for application &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Caused by:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+            <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">))</span> <span class="o">+</span>
+            <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_tb</span><span class="p">(</span><span class="n">exc_tb</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 12, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.spec &mdash; Ramble 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+              <div class="version">
+                0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.spec</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.spec</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty.color</span> <span class="k">as</span> <span class="nn">clr</span>
+
+<span class="kn">import</span> <span class="nn">ramble.repository</span>
+<span class="kn">import</span> <span class="nn">ramble.error</span>
+
+<span class="kn">import</span> <span class="nn">spack.parse</span>
+
+<span class="c1">#: These are possible token types in the spec grammar.</span>
+<span class="n">HASH</span><span class="p">,</span> <span class="n">DEP</span><span class="p">,</span> <span class="n">AT</span><span class="p">,</span> <span class="n">COLON</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">,</span> <span class="n">ON</span><span class="p">,</span> <span class="n">OFF</span><span class="p">,</span> <span class="n">PCT</span><span class="p">,</span> <span class="n">EQ</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">VAL</span><span class="p">,</span> <span class="n">FILE</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c1">#: Regex for fully qualified spec names. (e.g., builtin.hdf5)</span>
+<span class="n">spec_id_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\w[\w.-]*&#39;</span>
+
+<span class="n">color_formats</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">default_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="SpecLexer"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecLexer">[docs]</a><span class="k">class</span> <span class="nc">SpecLexer</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">Lexer</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses tokens that make up spack specs.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SpecLexer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\^&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">DEP</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\@&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">AT</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\:&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">COLON</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\,&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">COMMA</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\+&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">ON</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\-&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">OFF</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\~&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">OFF</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\%&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">PCT</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\=&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">EQ</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
+
+            <span class="c1"># Filenames match before identifiers, so no initial filename</span>
+            <span class="c1"># component is parsed as a spec (e.g., in subdir/spec.yaml)</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[/\w.-]*/[/\w/-]+\.yaml[^\b]*&#39;</span><span class="p">,</span>
+             <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">FILE</span><span class="p">,</span> <span class="n">v</span><span class="p">)),</span>
+
+            <span class="c1"># Hash match after filename. No valid filename can be a hash</span>
+            <span class="c1"># (files end w/.yaml), but a hash can match a filename prefix.</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">HASH</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+
+            <span class="c1"># Identifiers match after filenames and hashes.</span>
+            <span class="p">(</span><span class="n">spec_id_re</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+
+            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="kc">None</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">EQ</span><span class="p">],</span>
+            <span class="p">[(</span><span class="sa">r</span><span class="s1">&#39;[\S].*&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">VAL</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
+             <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="kc">None</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">VAL</span><span class="p">])</span></div>
+
+
+<span class="c1"># Lexer is always the same for every parser</span>
+<span class="n">_lexer</span> <span class="o">=</span> <span class="n">SpecLexer</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="SpecParser"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParser">[docs]</a><span class="k">class</span> <span class="nc">SpecParser</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">Parser</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_spec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a new SpecParser.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            initial_spec (Spec, optional): provide a Spec that we&#39;ll parse</span>
+<span class="sd">                directly into. This is used to avoid construction of a</span>
+<span class="sd">                superfluous Spec object in the Spec constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Starting parser with spec </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">initial_spec</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SpecParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">_lexer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial</span> <span class="o">=</span> <span class="n">initial_spec</span>
+
+<div class="viewcode-block" id="SpecParser.do_parse"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParser.do_parse">[docs]</a>    <span class="k">def</span> <span class="nf">do_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">app_spec</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
+                <span class="n">app_spec</span> <span class="o">=</span> <span class="n">Spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workload</span><span class="p">()</span>
+                        <span class="n">app_spec</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_token_error</span><span class="p">(</span><span class="s2">&quot;Invalid token found&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">spack</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">ParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpecParseError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">app_spec</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SpecParser.workload"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParser.workload">[docs]</a>    <span class="k">def</span> <span class="nf">workload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name of the workload&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_identifier</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span></div>
+
+<div class="viewcode-block" id="SpecParser.check_identifier"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParser.check_identifier">[docs]</a>    <span class="k">def</span> <span class="nf">check_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The only identifiers that can contain &#39;.&#39; are versions, but version</span>
+<span class="sd">           ids are context-sensitive so we have to check on a case-by-case</span>
+<span class="sd">           basis. Call this if we detect a version id where it shouldn&#39;t be.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_token_error</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: Identifier cannot contain &#39;.&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="Spec"><a class="viewcode-back" href="../../ramble.html#ramble.spec.Spec">[docs]</a><span class="k">class</span> <span class="nc">Spec</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_like</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new Spec.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">          spec_like (optional string): If not provided we initialize an</span>
+<span class="sd">          anonymous Spec that matches any Spec object; if provided we parse</span>
+<span class="sd">          this as a Spec string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Copy if spec_like is a Spec.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_like</span><span class="p">,</span> <span class="n">Spec</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dup</span><span class="p">(</span><span class="n">spec_like</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># init an empty spec that matches anything.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_application</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_like</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">spec_name</span> <span class="o">=</span> <span class="n">spec_like</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>
+                <span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">spec_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+
+<div class="viewcode-block" id="Spec.copy"><a class="viewcode-back" href="../../ramble.html#ramble.spec.Spec.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_spec</span> <span class="o">=</span> <span class="n">Spec</span><span class="p">()</span>
+        <span class="n">new_spec</span><span class="o">.</span><span class="n">_dup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_spec</span></div>
+
+    <span class="k">def</span> <span class="nf">_dup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">namespace</span>
+
+<div class="viewcode-block" id="Spec.format"><a class="viewcode-back" href="../../ramble.html#ramble.spec.Spec.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_string</span><span class="o">=</span><span class="n">default_format</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prints out particular pieces of a spec, depending on what is</span>
+<span class="sd">        in the format string.</span>
+
+<span class="sd">        Using the ``{attribute}`` syntax, any field of the spec can be</span>
+<span class="sd">        selected.  Those attributes can be recursive.</span>
+
+<span class="sd">        Commonly used attributes of the Spec for format strings include::</span>
+
+<span class="sd">            name</span>
+<span class="sd">            workloads</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            format_string (str): string containing the format to be expanded</span>
+
+<span class="sd">        Keyword Args:</span>
+<span class="sd">            color (bool): True if returned string is colored</span>
+<span class="sd">            transform (dict): maps full-string formats to a callable \</span>
+<span class="sd">                that accepts a string and returns another one</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">clr</span><span class="o">.</span><span class="n">cescape</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">color_formats</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s2">&quot;@.&quot;</span>
+            <span class="n">clr</span><span class="o">.</span><span class="n">cwrite</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">write_attribute</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">spec</span>
+
+            <span class="k">if</span> <span class="n">attribute</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span><span class="s2">&quot;Format string attributes must be non-empty&quot;</span><span class="p">)</span>
+            <span class="n">attribute</span> <span class="o">=</span> <span class="n">attribute</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">attribute</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">parts</span>
+
+            <span class="c1"># find the morph function for our attribute</span>
+            <span class="n">morph</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
+
+            <span class="c1"># Iterate over components using getattr to get next element</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">part</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parts</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">part</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span><span class="s2">&quot;Format string attributes must be non-empty&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span><span class="s2">&quot;Attempted to format private attribute&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">current</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">part</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                        <span class="n">parent</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="n">idx</span><span class="p">])</span>
+                        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;Attempted to format attribute </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">attribute</span>
+                        <span class="n">m</span> <span class="o">+=</span> <span class="s2">&quot;Spec </span><span class="si">%s</span><span class="s2"> has no attribute </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">part</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">current</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span><span class="s2">&quot;Attempted to format callable object&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">current</span><span class="p">:</span>
+                        <span class="c1"># We&#39;re not printing anything</span>
+                        <span class="k">return</span>
+
+            <span class="c1"># Finally, write the output</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">write</span><span class="p">(</span><span class="n">morph</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">current</span><span class="p">)),</span> <span class="n">col</span><span class="p">)</span>
+
+        <span class="n">attribute</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">in_attribute</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">escape</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">format_string</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">escape</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="n">escape</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span>
+                <span class="n">escape</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">in_attribute</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;}&quot;</span><span class="p">:</span>
+                    <span class="n">write_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+                    <span class="n">attribute</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">in_attribute</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attribute</span> <span class="o">+=</span> <span class="n">c</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;}&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span><span class="s2">&quot;Encountered closing } before opening {&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;{&quot;</span><span class="p">:</span>
+                    <span class="n">in_attribute</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">in_attribute</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpecFormatStringError</span><span class="p">(</span>
+                <span class="s2">&quot;Format string terminated while reading attribute.&quot;</span> <span class="s2">&quot;Missing terminating }.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">formatted_spec</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">formatted_spec</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Spec.cformat"><a class="viewcode-back" href="../../ramble.html#ramble.spec.Spec.cformat">[docs]</a>    <span class="k">def</span> <span class="nf">cformat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Same as format, but color defaults to auto instead of False.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fullname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span>
+            <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">get_app_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">application_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">file_dir</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname_for_application_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullname</span><span class="p">)</span>
+        <span class="n">app_file</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">filename_for_application_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_dir</span><span class="p">,</span> <span class="n">app_file</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse"><a class="viewcode-back" href="../../ramble.html#ramble.spec.parse">[docs]</a><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a spec from an input string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SpecParser</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpecParseError"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParseError">[docs]</a><span class="k">class</span> <span class="nc">SpecParseError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">SpecError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for ParseError for when we&#39;re parsing specs.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parse_error</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SpecParseError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parse_error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">string</span> <span class="o">=</span> <span class="n">parse_error</span><span class="o">.</span><span class="n">string</span></div>
+
+
+<div class="viewcode-block" id="SpecFormatStringError"><a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecFormatStringError">[docs]</a><span class="k">class</span> <span class="nc">SpecFormatStringError</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">SpecError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Called for errors in Spec format strings.&quot;&quot;&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 12, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

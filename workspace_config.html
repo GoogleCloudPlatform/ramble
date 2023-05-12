@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workspace Configuration File &mdash; Ramble 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ramble" href="command_index.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Workspace Configuration File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ramble-dictionary">Ramble Dictionary:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#experiment-names">Experiment Names:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-dictionaries">Variable Dictionaries:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-variables">List Variables:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#custom-executables">Custom Executables:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#controlling-executable-order">Controlling Executable Order:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#reserved-variables">Reserved Variables:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#required-variables">Required Variables:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generated-variables">Generated Variables:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spack-specific-generated-variables">Spack Specific Generated Variables:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#spack-dictionary">Spack Dictionary:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#vector-and-matrix-packages-and-environments">Vector and Matrix Packages and Environments:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#external-spack-environment-support">External Spack Environment Support:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#controlling-mpi-libraries-and-batch-systems">Controlling MPI Libraries and Batch Systems:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mpi-command-control">MPI Command Control:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batch-system-control">Batch System Control:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#experiment-chains">Experiment Chains:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#defining-experiment-chains">Defining Experiment Chains:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#suppressing-experiments">Suppressing Experiments:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-chains-of-chains">Defining Chains of Chains:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Workspace Configuration File</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/workspace_config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="workspace-configuration-file">
+<h1>Workspace Configuration File<a class="headerlink" href="#workspace-configuration-file" title="Permalink to this heading"></a></h1>
+<p>Ramble workspaces are controlled through their configuration files. Each
+workspace has a configuration file stored at <code class="docutils literal notranslate"><span class="pre">$workspace/configs/ramble.yaml</span></code>.</p>
+<p>This document will describe the syntax for writing a workspace configuration file.</p>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, there are two top level dictionairies.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble:</span>
+<span class="go">  ...</span>
+<span class="go">spack:</span>
+<span class="go">  ...</span>
+</pre></div>
+</div>
+<p>Each of these dictionaires is used to control different aspects of the Ramble
+workspace.</p>
+<section id="ramble-dictionary">
+<h2>Ramble Dictionary:<a class="headerlink" href="#ramble-dictionary" title="Permalink to this heading"></a></h2>
+<p>The ramble dictionary is used to control the experiments a workspace is
+responsible for configuring, executing, analyzing, and archiving.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>Within a ramble configuration file, configuration scopes for an experiment
+include, <code class="docutils literal notranslate"><span class="pre">application</span></code>, <code class="docutils literal notranslate"><span class="pre">workload</span></code>, and <code class="docutils literal notranslate"><span class="pre">experiment</span></code>. They are denoted by
+these words in the configuration file. The name <code class="docutils literal notranslate"><span class="pre">hostname</span></code> name of the ramble
+application (as seen by <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">list</span></code>), while the name <code class="docutils literal notranslate"><span class="pre">serial</span></code> is the name of the
+workload (as seen by <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">info</span> <span class="pre">hostname</span></code>).</p>
+<p>The name <code class="docutils literal notranslate"><span class="pre">test_exp</span></code> is user defined, and will be explained in <a class="reference internal" href="#experiment-names"><span class="std std-ref">Experiment Names:</span></a>.</p>
+<p>The name <code class="docutils literal notranslate"><span class="pre">variables</span></code> defines arbitrary variables, and will be explained in
+<a class="reference internal" href="#variable-dictionaries"><span class="std std-ref">Variable Dictionaries:</span></a>.</p>
+<section id="experiment-names">
+<span id="id1"></span><h3>Experiment Names:<a class="headerlink" href="#experiment-names" title="Permalink to this heading"></a></h3>
+<p>While the names of applications and workloads are defined by the application
+definition file, experiment names are more arbitrary. Experiment names are
+string, and can take variables for expansion.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">test_{n_ranks}_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">                </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, the experiment name would be: <code class="docutils literal notranslate"><span class="pre">test_1_1</span></code> when it is created.</p>
+<p><strong>NOTE:</strong> Each experiment has a namespace that follows this pattern:
+<code class="docutils literal notranslate"><span class="pre">application.workload.experiment</span></code>. Every experiment needs a unique namespace,
+or ramble will throw an error.</p>
+</section>
+<section id="variable-dictionaries">
+<span id="id2"></span><h3>Variable Dictionaries:<a class="headerlink" href="#variable-dictionaries" title="Permalink to this heading"></a></h3>
+<p>Within a variable dictionary, arbitrary variables can be defined. Defined
+variables apply to all experiments within their scope.</p>
+<p>These variables can be referred to within the YAML file, or template files
+using python keyword ( <code class="docutils literal notranslate"><span class="pre">{var_name}</span></code> ) syntax to perform variable expansion.
+This syntax allows basic math operations ( <code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">**</span></code> ) to evaluate math expressions using variable definitions.</p>
+<p>If a variable is defined within multiple dictionaries, values defined closer to
+individual experiments take precendence.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>In this example, <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> will take a value of <code class="docutils literal notranslate"><span class="pre">1</span></code> within the <code class="docutils literal notranslate"><span class="pre">test_exp</span></code>
+experiment. This experiment will also include definitions for
+<code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, and <code class="docutils literal notranslate"><span class="pre">n_threads</span></code>.</p>
+</section>
+<section id="list-variables">
+<h3>List Variables:<a class="headerlink" href="#list-variables" title="Permalink to this heading"></a></h3>
+<p>Variables can be defined as a list of values as well (again, following the same
+math and variable expansion syntax as defined above).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>There are two noteable aspects of this config file are:
+1. <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> is a list of values
+2. The experiment name refernces variable values.</p>
+<p>All lists defined within any experiment namespace are required to be the same
+length. They are zipped together, and iterated over to generate unique experiments.</p>
+</section>
+<section id="variable-matrices">
+<h3>Variable Matrices:<a class="headerlink" href="#variable-matrices" title="Permalink to this heading"></a></h3>
+<p>In addition to allowing variables, Ramble’s config file has a special syntax for define variable matrices.</p>
+<p>Matrices consume list variables, and generate a matrix of variables with it.
+Each independent matrix performs the cross product of any list variables it
+consumes.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;32&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+</pre></div>
+</div>
+<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> variable is consumed as part
+of a matrix. The result is a matrix of shape 1x2. After this matrix is
+consumed, it will be crossed with the zipped vectors (creating 8 unique experiments).</p>
+<p>Mulitple matrices are allowed to be defined:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="w"> </span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">   </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">     </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="linenos"> 4</span><span class="w">     </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 5</span><span class="w">     </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="linenos"> 6</span><span class="w">   </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">     </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">       </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">         </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">10</span><span class="w">       </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">         </span><span class="nt">serial</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">           </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">             </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;32&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">14</span><span class="w">             </span><span class="nt">partition</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;part1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;part2&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">15</span><span class="w">             </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">16</span><span class="w">           </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="linenos">18</span><span class="w">               </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">                 </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">20</span><span class="w">               </span><span class="nt">matrices</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="linenos">22</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition</span>
+<span class="linenos">23</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+</pre></div>
+</div>
+<p>The result of this is that two matrices are created. The first is a 2x2 matrix,
+while the second is a 1x4 matrix. All matrices are required to have the same
+number of elements, as they are flattened and zipped together. In this case,
+there would be 4 experiments, each defined by a unique
+<code class="docutils literal notranslate"><span class="pre">(processes_per_node,</span> <span class="pre">partition,</span> <span class="pre">n_nodes)</span></code> tuple.</p>
+</section>
+<section id="cross-experiment-variable-references">
+<h3>Cross Experiment Variable References:<a class="headerlink" href="#cross-experiment-variable-references" title="Permalink to this heading"></a></h3>
+<p>Variables can be defined to pull the value of a variable out of a different
+experiment. This is particularly useful when an experiment needs the path to
+something ramble automatically generates in a different experiment.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp1</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">real_value</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;exp1_value&#39;</span>
+<span class="w">            </span><span class="nt">test_exp2</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">test_value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">real_value in hostname.serial.test_exp1</span>
+</pre></div>
+</div>
+<p>In the above example, <code class="docutils literal notranslate"><span class="pre">test_value</span></code> extracts the value of <code class="docutils literal notranslate"><span class="pre">real_value</span></code> as
+defined in the experiment <code class="docutils literal notranslate"><span class="pre">hostname.serial.test_exp1</span></code>. When evaluated, this
+will set <code class="docutils literal notranslate"><span class="pre">test_value</span></code> to <code class="docutils literal notranslate"><span class="pre">'exp1_value'</span></code>.</p>
+</section>
+<section id="controlling-internals">
+<h3>Controlling Internals:<a class="headerlink" href="#controlling-internals" title="Permalink to this heading"></a></h3>
+<p>Within a workspace config, an internals dictionary can be used to control
+several internal aspects of the application, workload, and experiment.</p>
+<p>An internals dictionary can be defined anywhere a variables dictionary can be
+defined (i.e. within a workspace, a specific application, a specific workload,
+or a specific experiment). This section will describe the features available
+within the internals dictionary.</p>
+<section id="custom-executables">
+<h4>Custom Executables:<a class="headerlink" href="#custom-executables" title="Permalink to this heading"></a></h4>
+<p>Custom executables can be created within the internals dictionary. Below is an
+example, showing how to create a <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> executable at the application level.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">internals</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">custom_executables</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">lscpu</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;lscpu&#39;</span>
+<span class="w">            </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">            </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{log_file}&#39;</span>
+<span class="w">    </span><span class="w w-Error"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</pre></div>
+</div>
+<p>The above example creates a custom executable, named <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> that will inject
+the command <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> into the command for an experiment when it is used. It is
+important to note that this only creates the executable, and does not use it.</p>
+</section>
+<section id="controlling-executable-order">
+<h4>Controlling Executable Order:<a class="headerlink" href="#controlling-executable-order" title="Permalink to this heading"></a></h4>
+<p>The internals dictionary allows the ability to control the order pre-defined
+executables (or custom executables) are pieced together to build an experiment.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">internals</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">custom_executables</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">lscpu</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;lscpu&#39;</span>
+<span class="w">            </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">            </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{log_file}&#39;</span>
+<span class="w">        </span><span class="nt">executables</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serial</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">builtin::env_vars</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lscpu</span>
+</pre></div>
+</div>
+<p>The above example builds off of the custom executable example, and shows how
+one can control the order of the executables in the <code class="docutils literal notranslate"><span class="pre">{command}</span></code> expansion.</p>
+<p>The default for the hostname application is <code class="docutils literal notranslate"><span class="pre">[builtin::env_vars,</span>
+<span class="pre">serial/parallel]</span></code> but this changes the order and injects <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> into the
+expansion.</p>
+</section>
+</section>
+<section id="reserved-variables">
+<h3>Reserved Variables:<a class="headerlink" href="#reserved-variables" title="Permalink to this heading"></a></h3>
+<p>There are several reserved, auto-generated, and required variables for Ramble
+to function properly. This section will describe them.</p>
+<section id="required-variables">
+<h4>Required Variables:<a class="headerlink" href="#required-variables" title="Permalink to this heading"></a></h4>
+<p>Ramble requires the following variables to be defined:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> - Defines the number of MPI ranks to use. If not explicitly set,
+is defined as: <code class="docutils literal notranslate"><span class="pre">{processes_per_node}*{n_nodes}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> - Defines the number of machines needed for the experiment. If
+not explicitly set, is defined as:
+<code class="docutils literal notranslate"><span class="pre">ceiling({n_ranks}/{processes_per_node})</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> - Defines how many ranks should be on each node. If
+not explicitly set, is defined as: <code class="docutils literal notranslate"><span class="pre">ceiling({n_ranks}/{n_nodes})</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> - Template for generating an MPI command</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> - Template for generating a batch system submit command</p></li>
+</ul>
+</section>
+<section id="generated-variables">
+<h4>Generated Variables:<a class="headerlink" href="#generated-variables" title="Permalink to this heading"></a></h4>
+<p>Ramble automatically generates definitions for the following varialbes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">application_name</span></code> - Set to the name of the application</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workload_name</span></code> - Set to the name of the workload within the application</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> - Set to the name of the experiment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">env_name</span></code> - By default defined as <code class="docutils literal notranslate"><span class="pre">{application_name}</span></code>. Can be
+overriden to control the spack definition to use.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">application_run_dir</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/experiments/{application_name}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workload_run_dir</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/experiments/{application_name}/{workload_name}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">experiment_run_dir</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/experiments/{application_name}/{workload_name}/{experiment_name}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">application_input_dir</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/inputs/{application_name}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workload_input_dir</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/inputs/{application_name}/{workload_name}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spack_env</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/software/{env_name}.{workload_name}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_dir</span></code> - Absolute path to <code class="docutils literal notranslate"><span class="pre">$workspace_root/logs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_file</span></code> - Absolute path to
+<code class="docutils literal notranslate"><span class="pre">{experiment_run_dir}/{experiment_name}.out</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;input_name&gt;</span></code> - Applications that have input files have variables defined
+that contain the absolute path to:
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/inputs/{application_name}/{workload_name}/&lt;input_name&gt;</span></code>
+where <code class="docutils literal notranslate"><span class="pre">&lt;input_name&gt;</span></code> is the name as defined in the <code class="docutils literal notranslate"><span class="pre">input_file</span></code>
+directive.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;template_name&gt;</span></code> - Any files with the <code class="docutils literal notranslate"><span class="pre">.tpl</span></code> extension in
+<code class="docutils literal notranslate"><span class="pre">$workspace_root/configs</span></code> have a variable generated that resolves to the
+absolute path to: <code class="docutils literal notranslate"><span class="pre">{experiment_run_dir}/&lt;template_name&gt;</span></code> where
+<code class="docutils literal notranslate"><span class="pre">&lt;template_name&gt;</span></code> is the filename of the template, without the extension.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">command</span></code> - Set to all of the commands needed to perform an experiment.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spack_setup</span></code> - Set to the commands needed to load a spack environment for
+an experiment. Set to an empty string for non-spack applications</p></li>
+</ul>
+</section>
+<section id="spack-specific-generated-variables">
+<h4>Spack Specific Generated Variables:<a class="headerlink" href="#spack-specific-generated-variables" title="Permalink to this heading"></a></h4>
+<p>When using spack applications, Ramble also geneates the following variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> - Set to the equivalent of <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">location</span> <span class="pre">-i</span>
+<span class="pre">&lt;spec&gt;</span></code> for packages defined in a ramble <code class="docutils literal notranslate"><span class="pre">spec_name</span></code> package set.
+<code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> is set to the name of the package as defined in the
+<code class="docutils literal notranslate"><span class="pre">spack:packages</span></code> dictionary.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="spack-dictionary">
+<h2>Spack Dictionary:<a class="headerlink" href="#spack-dictionary" title="Permalink to this heading"></a></h2>
+<p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">spack:</span></code> dictionary controlls the software
+stack installation that ramble performs. This is accomplished by defining
+a packages dictionary, and an environments dictionary.</p>
+<p>The packages dictionary houses ramble descriptions of spack packages that can
+be used to construct environments with. A package is defined as software that
+spack should install for the user. These have one required attribute, and two
+optional attributes. The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute is required to be defined,
+and should be the spec passed to <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">install</span></code> on the command line for the
+package. Optionally, a package can defined a <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which
+will be the spec used when this package is used as a compiler for another
+package. Packages can also optionally defined a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which
+is the name of another package that should be used as it’s compiler.</p>
+<p>The environments dictionary contains descriptions of spack environments that
+Ramble might generate based on the requested experiments. Environments are
+defined as a list of packages (in the aforementioned packages dictionary) that
+should be bundled into a spack environment.</p>
+<p>Below is an annotated example of the spack dictionary.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span><span class="w"> </span><span class="c1"># Abstract name to refer to this package</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span><span class="w"> </span><span class="c1"># Spack spec for this package</span>
+<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span><span class="w"> </span><span class="c1"># Spack compiler spec for this package</span>
+<span class="w">    </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span><span class="w"> </span><span class="c1"># Other package name to use as compiler for this package</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">packages</span><span class="p">:</span><span class="w"> </span><span class="c1"># List of packages to include in this environment</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">concretize</span></code> command can help construct a functional
+spack dictionary based on the experiments listed.</p>
+<p>It is important to note that packages and environments that are not used by an
+experiment are not installed.</p>
+<p>Application definition files can define one or more <code class="docutils literal notranslate"><span class="pre">software_spec</span></code>
+directives, which are packages the application might need to run properly.
+Additionally, spack packages can be marked as required through the
+<code class="docutils literal notranslate"><span class="pre">required_package</span></code> directive.</p>
+<section id="vector-and-matrix-packages-and-environments">
+<h3>Vector and Matrix Packages and Environments:<a class="headerlink" href="#vector-and-matrix-packages-and-environments" title="Permalink to this heading"></a></h3>
+<p>As with experiments, package and environment definitions can generate many
+packages and environments following the same previously mentioned vector and
+matrix syntax.</p>
+<p>Below is an example of using this logic within the spack dictionary:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver} target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver}</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi-{comp}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">openmpi-{comp}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}-{mpi}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">mpi</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">intel-mpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">},</span><span class="w"> </span><span class="nv">openmpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span><span class="s">&#39;]</span>
+<span class="w">      </span><span class="s">matrix:</span>
+<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">mpi</span>
+<span class="w">      </span><span class="s">packages:</span>
+<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">{mpi}</span>
+<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">wrf-{comp}</span>
+</pre></div>
+</div>
+<p>The above file will generate 3 versions of <code class="docutils literal notranslate"><span class="pre">gcc</span></code>, 3 versions each of <code class="docutils literal notranslate"><span class="pre">wrf</span></code>,
+<code class="docutils literal notranslate"><span class="pre">intel-mpi</span></code> and <code class="docutils literal notranslate"><span class="pre">openmpi</span></code> built with each <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version, and 6 spack
+environments, with each combination of the 2 <code class="docutils literal notranslate"><span class="pre">mpi</span></code> libraries and 3 compilers.</p>
+</section>
+<section id="external-spack-environment-support">
+<h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Permalink to this heading"></a></h3>
+<p><strong>NOTE</strong>: Using external Spack environments is an advanced feature.</p>
+<p>Some experiments will want to use an externally defined Spack environment
+instead of having Ramble generate its own Spack environment file. This can be
+useful when the Spack environment a user wants to experiment with is
+complicated.</p>
+<p>This section shows how this feature can be used.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">external_spack_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name_or_path_to_spack_env</span>
+</pre></div>
+</div>
+<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">external_spack_env</span></code> keyword refers an external
+Spack environment. This can be the name of a named Spack environment, or the
+path to a directory which contains a Spack environment. Ramble will copy the
+<code class="docutils literal notranslate"><span class="pre">spack.yaml</span></code> file from this environment, instead of generating its own.</p>
+<p>This allows users to describe custom Spack environments and allow them to be
+used with Ramble generated experiments.</p>
+<p>It is important to note that Ramble copies in the external environment files
+every time <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">setup</span></code> is called. The new files will clobber the
+old files, changing the configuration of the environment that Ramble will use
+for the experiments it generates.</p>
+</section>
+</section>
+<section id="controlling-mpi-libraries-and-batch-systems">
+<h2>Controlling MPI Libraries and Batch Systems:<a class="headerlink" href="#controlling-mpi-libraries-and-batch-systems" title="Permalink to this heading"></a></h2>
+<p>Some workspaces might be configured with the goal of exploring the performance
+of different MPI libraries (e.g. MPICH vs. Open MPI), or of performing the same
+experiment in multiple batch schedulers (e.g. SLURM, PBS Pro, and Flux).</p>
+<p>This section will show how to perform these experiments within a workspace
+configuration file.</p>
+<section id="mpi-command-control">
+<h3>MPI Command Control:<a class="headerlink" href="#mpi-command-control" title="Permalink to this heading"></a></h3>
+<p>When writing a ramble configuration file to perform the same experiment with
+different MPI libraries, the MPI section within the Ramble dictionary is
+insufficient for changing the flags used based on the MPI library used.</p>
+<p>However, Ramble’s variable definitions can be used to control this on a
+per-experiment basis.</p>
+<p>Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}</span><span class="nv"> </span><span class="s">&#39;</span><span class="w"> </span><span class="c1"># MPICH</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-nperhost</span><span class="nv"> </span><span class="s">{processes_per_node}</span><span class="nv"> </span><span class="s">&#39;</span><span class="w"> </span><span class="c1"># OpenMPI</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="s">&#39;{env_name}&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">env_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;gromacs-mpich&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;gromacs-ompi&#39;</span><span class="p p-Indicator">]</span>
+<span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="w">    </span><span class="nt">mpich</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpich@4.0.2 target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">ompi</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4 target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{mpi}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">mpi</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;mpich&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;ompi&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{mpi}&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, you can see how <code class="docutils literal notranslate"><span class="pre">env_name</span></code> is used to test both an
+OpenMPI and MPICH version of Gromacs. Additionally, the <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code>
+variable is used to define how <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> should look for each of the MPI
+libraries.</p>
+<p>Using the previously described Ramble vector syntax, this configuration file
+will generate 2 experiments. Both <code class="docutils literal notranslate"><span class="pre">env_name</span></code> and <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> will be
+zipped together, giving each experiment a tuple of: <code class="docutils literal notranslate"><span class="pre">(mpi_command,</span>
+<span class="pre">env_name)</span></code> which allows us to pair a specific MPI command to the
+corresponding Gromacs spec.</p>
+</section>
+<section id="batch-system-control">
+<h3>Batch System Control:<a class="headerlink" href="#batch-system-control" title="Permalink to this heading"></a></h3>
+<p>Similar to the previously describe MPI command control, experiments can use
+different batch systems by overriding the <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> variable.</p>
+<p>Below is an example configuration file showing how the <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code>
+variable can be used to submit the same experiment to multiple batch systems.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="w">    </span><span class="nt">batch_system</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slurm</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pbs</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;sbatch</span><span class="nv"> </span><span class="s">{execute_slurm}&#39;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;qsub</span><span class="nv"> </span><span class="s">{execute_pbs}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="s">&#39;{batch_system}&#39;</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="w">    </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+</pre></div>
+</div>
+<p>The above example overrides the generated <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> variable to change
+how different experiments are submitted. In this example, we submit the same
+experiment to both SLURM and PBS.</p>
+<p>Note that each of the two <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> commands submits a different
+template. This means the workspace’s configs directory should have two files:
+<code class="docutils literal notranslate"><span class="pre">execute_slurm.tpl</span></code> and <code class="docutils literal notranslate"><span class="pre">execute_pbs.tpl</span></code> which will be template submission
+scripts to each of the batch systems.</p>
+</section>
+</section>
+<section id="experiment-chains">
+<h2>Experiment Chains:<a class="headerlink" href="#experiment-chains" title="Permalink to this heading"></a></h2>
+<p>Multiple experiments can be executed within the same context by a process known
+as chaining, this allows multiple experiments (potentially from multiple
+applications) to be executed in the same context and is useful for many
+potential use cases such as running multiple experiments on the same physical
+hardware</p>
+<p>There are two important parts for defining an experiment chain. The first of
+these is simply defining the experiment chain, and the second is defining
+experiments which are only intended to be used when chained into another
+experiment, known as template experiments.</p>
+<section id="defining-experiment-chains">
+<h3>Defining Experiment Chains:<a class="headerlink" href="#defining-experiment-chains" title="Permalink to this heading"></a></h3>
+<p>The following example shows how to specify a chain of experiments:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp1</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">            </span><span class="nt">test_exp2</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.test_exp1</span>
+<span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;append&#39;</span>
+<span class="w">                </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;2&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">hostname.serial.test_exp2</span></code> experiment defines an
+experiment chain. The chain is defined by mergining the <code class="docutils literal notranslate"><span class="pre">chained_experiments</span></code>
+dictionaries and inserting itself at the appropriate location.</p>
+<p>Experiments can be defined with in the <code class="docutils literal notranslate"><span class="pre">chained_experiments</span></code> dictionary using
+the following format:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">chained_experiments</span><span class="p">:</span><span class="w"> </span><span class="c1"># List of experiments to chain</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Fully qualified experiment namespace</span>
+<span class="w">  </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Command that executes the sub experiment</span>
+<span class="w">  </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Order to chain this experiment. Defaults to &#39;after_root&#39;</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Variables dictionary to override the variables from the</span>
+<span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">original experiment</span>
+</pre></div>
+</div>
+<p>Each chained experiment receives its own unique namespace. These take the form of:
+<code class="docutils literal notranslate"><span class="pre">&lt;parent_experiment_namespace&gt;.chain.&lt;chain_index&gt;.&lt;chained_experiment_namespace&gt;</span></code></p>
+<p>In the above example, the chained experiment would have a namespace of:
+<code class="docutils literal notranslate"><span class="pre">hostname.serial.test_exp2.chain.0.hostname.serial.test_exp1</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute can use <cite>globbing
+syntax&lt;https://docs.python.org/3/library/fnmatch.html#module-fnmatch&gt;</cite> to chain
+multiple experiments at once.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">order</span></code> keyword is optional. Valid options include:
+* <code class="docutils literal notranslate"><span class="pre">before_chain</span></code> Chained experiment is injected at the beginning of the chain
+* <code class="docutils literal notranslate"><span class="pre">before_root</span></code> Chained experiment is injected right before the root experiment in the chain
+* <code class="docutils literal notranslate"><span class="pre">after_root</span></code> Chained experiment is injected right after the root experiment in the chain
+* <code class="docutils literal notranslate"><span class="pre">after_chain</span></code> Chained experiment is injected at the end of the chain</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">root</span></code> experiment is defined as the initial experiment that started the
+chain. When examining the entire chain, the root experiment is the only one
+that does not have <code class="docutils literal notranslate"><span class="pre">chain.{idx}</span></code> in its name.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">variables</span></code> keyword is optional. It can be used to override the
+definition of variables from the chained experiment if needed.</p>
+</section>
+<section id="suppressing-experiments">
+<h3>Suppressing Experiments:<a class="headerlink" href="#suppressing-experiments" title="Permalink to this heading"></a></h3>
+<p>The below example shows how to suppress generation of an experiment, by marking
+it as a template.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp1</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">            </span><span class="nt">test_exp2</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.test_exp1</span>
+<span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;append&#39;</span>
+<span class="w">                </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;2&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">template</span></code> keyword is used to mark
+<code class="docutils literal notranslate"><span class="pre">hostname.serial.test_exp1</span></code> as a template experiment. This prevents it from
+being used as a stand-alone experiment, but it will still be generated and used
+when it’s chained into other experiments.</p>
+</section>
+<section id="defining-chains-of-chains">
+<h3>Defining Chains of Chains:<a class="headerlink" href="#defining-chains-of-chains" title="Permalink to this heading"></a></h3>
+<p>Ramble supports the ability to define chains of experiment chains. This allows
+an experiment to automatically implicity include all of the experiments chained
+into the explicitly chained experiment.</p>
+<p>Below is an example showing how chains of chains can be defined:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">child_level2_experiment</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">            </span><span class="nt">child_level1_experiment</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.child_level2_experiment</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;prepend&#39;</span>
+<span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">            </span><span class="nt">parent_experiment</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.child_level1_experiment</span>
+<span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, the resulting experiment chain would be:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.parent_experiment.chain.0.hostname.serial.child_level2_experiment</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.parent_experiment</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.parent_experiment.chain.1.hostname.serial.child_level1_experiment</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="command_index.html" class="btn btn-neutral float-right" title="ramble" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 12, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

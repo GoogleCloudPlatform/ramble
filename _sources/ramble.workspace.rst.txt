@@ -1,0 +1,26 @@
+ramble.workspace package
+========================
+
+.. automodule:: ramble.workspace
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+ramble.workspace.shell module
+-----------------------------
+
+.. automodule:: ramble.workspace.shell
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.workspace.workspace module
+---------------------------------
+
+.. automodule:: ramble.workspace.workspace
+   :members:
+   :undoc-members:
+   :show-inheritance:
