@@ -13,6 +13,7 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.workspace
+from ramble.namespace import namespace
 from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
 
@@ -23,8 +24,6 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 
 config = RambleCommand('config')
 workspace = RambleCommand('workspace')
-add = RambleCommand('add')
-remove = RambleCommand('remove')
 
 
 @pytest.fixture()
@@ -32,6 +31,24 @@ def workspace_deactivate():
     yield
     ramble.workspace._active_workspace = None
     os.environ.pop('RAMBLE_WORKSPACE', None)
+
+
+def add_basic(ws):
+    app_dict = ws._get_workspace_dict()[namespace.ramble][namespace.application]
+    app_dict['basic'] = {}
+    app_dict['basic'][namespace.workload] = {}
+    wl_dict = app_dict['basic'][namespace.workload]
+    wl_dict['test_wl'] = {'experiments': {}}
+    wl_dict['test_wl2'] = {'experiments': {}}
+    ws.write()
+    ws._re_read()
+
+
+def remove_basic(ws):
+    app_dict = ws._get_workspace_dict()[namespace.ramble][namespace.application]
+    del app_dict['basic']
+    ws.write()
+    ws._re_read()
 
 
 def check_basic(ws):
@@ -92,50 +109,10 @@ def check_results(ws):
     assert os.path.exists(os.path.join(ws.root, fn + '.yaml'))
 
 
-def test_workspace_add():
-    ws = ramble.workspace.create('test')
-    ws.add('basic')
-    check_basic(ws)
-
-
-def test_workspace_remove():
-    ws = ramble.workspace.create('test')
-    ws.add('basic')
-    check_basic(ws)
-
-    ws.remove('basic')
-    check_no_basic(ws)
-
-
 def test_workspace_activate_fails(mutable_mock_workspace_path):
     workspace('create', 'foo')
     out = workspace('activate', 'foo')
     assert "To set up shell support" in out
-
-
-def test_add_command():
-    workspace('create', 'test')
-    assert 'test' in workspace('list')
-
-    with ramble.workspace.read('test') as ws:
-        add('basic')
-
-        check_basic(ws)
-
-
-def test_remove_command():
-    workspace('create', 'test')
-    assert 'test' in workspace('list')
-
-    with ramble.workspace.read('test') as ws:
-        add('basic')
-
-        check_basic(ws)
-
-    with ramble.workspace.read('test') as ws:
-        remove('basic')
-
-        check_no_basic(ws)
 
 
 def test_workspace_list(mutable_mock_workspace_path):
@@ -447,7 +424,7 @@ def test_concretize_command():
     workspace('create', ws_name)
 
     with ramble.workspace.read('test') as ws:
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
         workspace('concretize')
         assert ws.is_concretized()
@@ -459,7 +436,7 @@ def test_concretize_nothing():
     assert ws_name in workspace('list')
 
     with ramble.workspace.read(ws_name) as ws:
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
 
         ws.concretize()
@@ -471,7 +448,7 @@ def test_setup_command():
     workspace('create', ws_name)
 
     with ramble.workspace.read('test') as ws:
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
 
         workspace('concretize')
@@ -487,7 +464,7 @@ def test_setup_nothing():
     assert ws_name in workspace('list')
 
     with ramble.workspace.read(ws_name) as ws:
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
 
         ws.concretize()
@@ -502,7 +479,7 @@ def test_anlyze_command():
     workspace('create', ws_name)
 
     with ramble.workspace.read('test') as ws:
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
 
         workspace('concretize')
@@ -521,7 +498,7 @@ def test_analyze_nothing():
     assert ws_name in workspace('list')
 
     with ramble.workspace.read(ws_name) as ws:
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
 
         ws.concretize()
@@ -540,9 +517,9 @@ def test_workspace_flag_named():
     assert ws_name in workspace('list')
 
     flag_args = ['-w', ws_name]
-    add('basic', global_args=flag_args)
 
     with ramble.workspace.read(ws_name) as ws:
+        add_basic(ws)
         check_basic(ws)
 
     workspace('concretize', global_args=flag_args)
@@ -557,8 +534,8 @@ def test_workspace_flag_named():
     with ramble.workspace.read(ws_name) as ws:
         check_results(ws)
 
-    remove('basic', global_args=flag_args)
     with ramble.workspace.read(ws_name) as ws:
+        remove_basic(ws)
         check_no_basic(ws)
 
 
@@ -568,9 +545,9 @@ def test_workspace_flag_anon(tmpdir):
     assert ramble.workspace.is_workspace_dir(ws_path)
 
     flag_args = ['-D', ws_path]
-    add('basic', global_args=flag_args)
 
     with ramble.workspace.Workspace(ws_path) as ws:
+        add_basic(ws)
         check_basic(ws)
 
     workspace('concretize', global_args=flag_args)
@@ -585,8 +562,8 @@ def test_workspace_flag_anon(tmpdir):
     with ramble.workspace.Workspace(ws_path) as ws:
         check_results(ws)
 
-    remove('basic', global_args=flag_args)
     with ramble.workspace.Workspace(ws_path) as ws:
+        remove_basic(ws)
         check_no_basic(ws)
 
 
@@ -597,10 +574,8 @@ def test_no_workspace_flag():
 
     flag_args = ['-W']
     with ramble.workspace.read(ws_name) as ws:
-        with pytest.raises(RambleCommandError):
-            add('basic', global_args=flag_args)
         ramble.workspace.activate(ws)
-        add('basic')
+        add_basic(ws)
         check_basic(ws)
 
         with pytest.raises(RambleCommandError):
@@ -621,10 +596,8 @@ def test_no_workspace_flag():
         workspace('analyze')
         check_results(ws)
 
-        with pytest.raises(RambleCommandError):
-            remove('basic', global_args=flag_args)
         ramble.workspace.activate(ws)
-        remove('basic')
+        remove_basic(ws)
         check_no_basic(ws)
 
 

@@ -20,7 +20,6 @@ import spack.util.url
 
 mirror = RambleCommand('mirror')
 workspace = RambleCommand('workspace')
-add = RambleCommand('add')
 
 pytestmark = pytest.mark.skipif(sys.platform == "win32",
                                 reason="does not run on windows")
