@@ -486,7 +486,8 @@ def setup_main_options(args):
         ramble.config.set('config:locks', args.locks, scope='command_line')
 
     if args.mock:
-        ramble.repository.path = ramble.repository.RepoPath(ramble.paths.mock_applications_path)
+        ramble.repository.apps_path = \
+            ramble.repository.RepoPath(ramble.paths.mock_applications_path)
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:

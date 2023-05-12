@@ -25,7 +25,9 @@ repo:
 """)
         if request.param != "applications":
             f.write(f"  subdirectory: '{request.param}'")
-    return (ramble.repository.Repo(str(repo_dir)), request.param)
+    return (ramble.repository.Repo(str(repo_dir),
+            object_type=ramble.repository.ObjectTypes.applications),
+            request.param)
 
 
 def test_repo_getapp(mutable_mock_repo):
@@ -41,8 +43,8 @@ def test_repo_multi_getapp(mutable_mock_repo, extra_repo):
 
 def test_repo_multi_getappclass(mutable_mock_repo, extra_repo):
     mutable_mock_repo.put_first(extra_repo[0])
-    mutable_mock_repo.get_app_class('basic')
-    mutable_mock_repo.get_app_class('builtin.mock.basic')
+    mutable_mock_repo.get_obj_class('basic')
+    mutable_mock_repo.get_obj_class('builtin.mock.basic')
 
 
 def test_repo_app_with_unknown_namespace(mutable_mock_repo):
@@ -51,12 +53,12 @@ def test_repo_app_with_unknown_namespace(mutable_mock_repo):
 
 
 def test_repo_unknown_app(mutable_mock_repo):
-    with pytest.raises(ramble.repository.UnknownApplicationError):
+    with pytest.raises(ramble.repository.UnknownObjectError):
         mutable_mock_repo.get('builtin.mock.nonexistentapplication')
 #
 #
 # def test_repo_anonymous_app(mutable_mock_repo):
-#     with pytest.raises(ramble.repository.UnknownApplicationError):
+#     with pytest.raises(ramble.repository.UnknownObjectError):
 #         mutable_mock_repo.get('+variant')
 #
 #

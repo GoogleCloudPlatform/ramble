@@ -283,19 +283,19 @@ class Spec(object):
     @property
     def application(self):
         if not self._application:
-            self._application = ramble.repository.path.get(self)
+            self._application = ramble.repository.apps_path.get(self)
         return self._application
 
     @property
     def application_class(self):
         if not self._application_class:
-            self._application_class = ramble.repository.path.get_app_class(self.fullname)
+            self._application_class = ramble.repository.apps_path.get_obj_class(self.fullname)
         return self._application_class
 
     @property
     def application_file_path(self):
-        file_dir = ramble.repository.path.dirname_for_application_name(self.fullname)
-        app_file = ramble.repository.path.filename_for_application_name(self.fullname)
+        file_dir = ramble.repository.apps_path.dirname_for_object_name(self.fullname)
+        app_file = ramble.repository.apps_path.filename_for_object_name(self.fullname)
         return os.path.join(file_dir, app_file)
 
 

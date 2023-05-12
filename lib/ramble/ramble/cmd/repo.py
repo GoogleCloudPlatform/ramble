@@ -43,7 +43,7 @@ def setup_parser(subparser):
     create_parser.add_argument(
         '-d', '--subdirectory',
         action='store',
-        default=ramble.repository.APPLICATIONS_DIR_NAME,
+        default='applications',
         help=(
             "subdirectory to store applications in the repository."
             "Default 'applications'. Use an empty string for no subdirectory."
