@@ -129,6 +129,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinxcontrib.programoutput",
+    "sphinxcontrib.jquery",
 ]
 
 # Set default graphviz options
