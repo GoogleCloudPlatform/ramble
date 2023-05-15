@@ -9,7 +9,7 @@
 """Schema for configuration merged into one file.
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/merged.py
-   :lines: 39-
+   :lines: 14-
 """
 from llnl.util.lang import union_dicts
 

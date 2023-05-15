@@ -24,7 +24,7 @@ custom_executables_def = {
             'template': [],
             'use_mpi': False,
             'redirect': '{log_file}',
-            'output_capture': ramble.schema.types.OUTPUT.DEFAULT
+            'output_capture': ramble.schema.types.OUTPUT_CAPTURE.DEFAULT
         },
         'properties': {
             'template': ramble.schema.types.array_or_scalar_of_strings_or_nums,

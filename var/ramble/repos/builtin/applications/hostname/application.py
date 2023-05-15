@@ -18,9 +18,9 @@ class Hostname(ExecutableApplication):
 
     input_file('test', url="https://no.domain/file/test_dir.tgz", description="Example input file...")
 
-    executable('local', 'time hostname', use_mpi=False, output_capture=OUTPUT.ALL)
-    executable('serial', '/usr/bin/time hostname', use_mpi=False, output_capture=OUTPUT.ALL)
-    executable('parallel', '/usr/bin/time hostname', use_mpi=True, output_capture=OUTPUT.ALL)
+    executable('local', 'time hostname', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
+    executable('serial', '/usr/bin/time hostname', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
+    executable('parallel', '/usr/bin/time hostname', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
 
     workload('local', executable='local')
     workload('serial', executable='serial')

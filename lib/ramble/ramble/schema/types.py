@@ -9,7 +9,7 @@
 """Base types for building schema files from"""
 
 
-class OUTPUT:
+class OUTPUT_CAPTURE:
     STDERR = "2>"
     STDOUT = ">>"
     ALL = "&>"

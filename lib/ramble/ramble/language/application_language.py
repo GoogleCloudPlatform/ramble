@@ -10,7 +10,7 @@ import llnl.util.tty as tty
 
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
-from ramble.schema.types import OUTPUT
+from ramble.schema.types import OUTPUT_CAPTURE
 
 
 class ApplicationMeta(ramble.language.language_base.DirectiveMeta):
@@ -77,7 +77,7 @@ def workload(name, executables=None, executable=None, input=None,
 
 @application_directive('executables')
 def executable(name, template, use_mpi=False, redirect='{log_file}',
-               output_capture=OUTPUT.DEFAULT, **kwargs):
+               output_capture=OUTPUT_CAPTURE.DEFAULT, **kwargs):
     """Adds an executable to this application
 
     Defines a new executable that can be used to configure workloads and
