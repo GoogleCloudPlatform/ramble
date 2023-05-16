@@ -993,7 +993,7 @@ namespace
   show this help message and exit
 
 ``-d SUBDIRECTORY, --subdirectory SUBDIRECTORY``
-  subdirectory to store applications in the repository.Default 'applications'. Use an empty string for no subdirectory.
+  subdirectory to store applications in the repository. Default 'applications'. Use an empty string for no subdirectory.
 
 
 ----

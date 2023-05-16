@@ -346,7 +346,7 @@
     <span class="c1"># Filter by tags</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
         <span class="n">applications_with_tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">applications_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
+            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">apps_path</span><span class="o">.</span><span class="n">objects_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
         <span class="n">sorted_applications</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sorted_applications</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">applications_with_tags</span>
         <span class="n">sorted_applications</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sorted_applications</span><span class="p">)</span>
 
@@ -354,7 +354,7 @@
         <span class="c1"># change output stream if user asked for update</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span> <span class="o">&gt;</span> \
-                    <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">():</span>
+                    <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">apps_path</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">():</span>
                 <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;File is up to date: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
                 <span class="k">return</span>
 
@@ -375,7 +375,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 15, 2023.
+      <span class="lastupdated">Last updated on May 16, 2023.
       </span></p>
   </div>
 

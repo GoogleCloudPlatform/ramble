@@ -590,7 +590,8 @@
         <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;config:locks&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">locks</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;command_line&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
-        <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">RepoPath</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">mock_applications_path</span><span class="p">)</span>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">apps_path</span> <span class="o">=</span> \
+            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">RepoPath</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">mock_applications_path</span><span class="p">)</span>
 
     <span class="c1"># If the user asked for it, don&#39;t check ssl certs.</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">insecure</span><span class="p">:</span>
@@ -988,7 +989,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 15, 2023.
+      <span class="lastupdated">Last updated on May 16, 2023.
       </span></p>
   </div>
 

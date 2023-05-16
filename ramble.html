@@ -537,9 +537,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.repository">ramble.repository module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.BadRepoError"><code class="docutils literal notranslate"><span class="pre">BadRepoError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.FailedConstructorError"><code class="docutils literal notranslate"><span class="pre">FailedConstructorError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.FastApplicationChecker"><code class="docutils literal notranslate"><span class="pre">FastApplicationChecker</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.FastApplicationChecker.invalidate"><code class="docutils literal notranslate"><span class="pre">FastApplicationChecker.invalidate()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.FastApplicationChecker.last_mtime"><code class="docutils literal notranslate"><span class="pre">FastApplicationChecker.last_mtime()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.FastObjectChecker"><code class="docutils literal notranslate"><span class="pre">FastObjectChecker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.FastObjectChecker.invalidate"><code class="docutils literal notranslate"><span class="pre">FastObjectChecker.invalidate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.FastObjectChecker.last_mtime"><code class="docutils literal notranslate"><span class="pre">FastObjectChecker.last_mtime()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.IndexError"><code class="docutils literal notranslate"><span class="pre">IndexError</span></code></a></li>
@@ -554,23 +554,28 @@
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.InvalidNamespaceError"><code class="docutils literal notranslate"><span class="pre">InvalidNamespaceError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.NOT_PROVIDED"><code class="docutils literal notranslate"><span class="pre">NOT_PROVIDED</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.NoRepoConfiguredError"><code class="docutils literal notranslate"><span class="pre">NoRepoConfiguredError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.RambleNamespace"><code class="docutils literal notranslate"><span class="pre">RambleNamespace</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.ObjectNamespace"><code class="docutils literal notranslate"><span class="pre">ObjectNamespace</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.ObjectTypes"><code class="docutils literal notranslate"><span class="pre">ObjectTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.ObjectTypes.applications"><code class="docutils literal notranslate"><span class="pre">ObjectTypes.applications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.ObjectTypes.objects"><code class="docutils literal notranslate"><span class="pre">ObjectTypes.objects</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.Repo"><code class="docutils literal notranslate"><span class="pre">Repo</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.all_application_classes"><code class="docutils literal notranslate"><span class="pre">Repo.all_application_classes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.all_application_names"><code class="docutils literal notranslate"><span class="pre">Repo.all_application_names()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.all_applications"><code class="docutils literal notranslate"><span class="pre">Repo.all_applications()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.applications_with_tags"><code class="docutils literal notranslate"><span class="pre">Repo.applications_with_tags()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.dirname_for_application_name"><code class="docutils literal notranslate"><span class="pre">Repo.dirname_for_application_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.all_object_classes"><code class="docutils literal notranslate"><span class="pre">Repo.all_object_classes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.all_object_names"><code class="docutils literal notranslate"><span class="pre">Repo.all_object_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.all_objects"><code class="docutils literal notranslate"><span class="pre">Repo.all_objects()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.dirname_for_object_name"><code class="docutils literal notranslate"><span class="pre">Repo.dirname_for_object_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.dump_provenance"><code class="docutils literal notranslate"><span class="pre">Repo.dump_provenance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.exists"><code class="docutils literal notranslate"><span class="pre">Repo.exists()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.filename_for_application_name"><code class="docutils literal notranslate"><span class="pre">Repo.filename_for_application_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.filename_for_object_name"><code class="docutils literal notranslate"><span class="pre">Repo.filename_for_object_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.find_module"><code class="docutils literal notranslate"><span class="pre">Repo.find_module()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.get"><code class="docutils literal notranslate"><span class="pre">Repo.get()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.get_app_class"><code class="docutils literal notranslate"><span class="pre">Repo.get_app_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.get_obj_class"><code class="docutils literal notranslate"><span class="pre">Repo.get_obj_class()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.index"><code class="docutils literal notranslate"><span class="pre">Repo.index</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.is_prefix"><code class="docutils literal notranslate"><span class="pre">Repo.is_prefix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.last_mtime"><code class="docutils literal notranslate"><span class="pre">Repo.last_mtime()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.load_module"><code class="docutils literal notranslate"><span class="pre">Repo.load_module()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.objects_with_tags"><code class="docutils literal notranslate"><span class="pre">Repo.objects_with_tags()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.purge"><code class="docutils literal notranslate"><span class="pre">Repo.purge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.real_name"><code class="docutils literal notranslate"><span class="pre">Repo.real_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.Repo.tag_index"><code class="docutils literal notranslate"><span class="pre">Repo.tag_index</span></code></a></li>
@@ -582,31 +587,32 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.RepoPath"><code class="docutils literal notranslate"><span class="pre">RepoPath</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.all_application_classes"><code class="docutils literal notranslate"><span class="pre">RepoPath.all_application_classes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.all_application_names"><code class="docutils literal notranslate"><span class="pre">RepoPath.all_application_names()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.all_applications"><code class="docutils literal notranslate"><span class="pre">RepoPath.all_applications()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.applications_with_tags"><code class="docutils literal notranslate"><span class="pre">RepoPath.applications_with_tags()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.dirname_for_application_name"><code class="docutils literal notranslate"><span class="pre">RepoPath.dirname_for_application_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.all_object_classes"><code class="docutils literal notranslate"><span class="pre">RepoPath.all_object_classes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.all_object_names"><code class="docutils literal notranslate"><span class="pre">RepoPath.all_object_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.all_objects"><code class="docutils literal notranslate"><span class="pre">RepoPath.all_objects()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.dirname_for_object_name"><code class="docutils literal notranslate"><span class="pre">RepoPath.dirname_for_object_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.dump_provenance"><code class="docutils literal notranslate"><span class="pre">RepoPath.dump_provenance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.exists"><code class="docutils literal notranslate"><span class="pre">RepoPath.exists()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.filename_for_application_name"><code class="docutils literal notranslate"><span class="pre">RepoPath.filename_for_application_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.filename_for_object_name"><code class="docutils literal notranslate"><span class="pre">RepoPath.filename_for_object_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.find_module"><code class="docutils literal notranslate"><span class="pre">RepoPath.find_module()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.first_repo"><code class="docutils literal notranslate"><span class="pre">RepoPath.first_repo()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.get"><code class="docutils literal notranslate"><span class="pre">RepoPath.get()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.get_app_class"><code class="docutils literal notranslate"><span class="pre">RepoPath.get_app_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.get_full_namespace"><code class="docutils literal notranslate"><span class="pre">RepoPath.get_full_namespace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.get_obj_class"><code class="docutils literal notranslate"><span class="pre">RepoPath.get_obj_class()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.get_repo"><code class="docutils literal notranslate"><span class="pre">RepoPath.get_repo()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.last_mtime"><code class="docutils literal notranslate"><span class="pre">RepoPath.last_mtime()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.load_module"><code class="docutils literal notranslate"><span class="pre">RepoPath.load_module()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.objects_with_tags"><code class="docutils literal notranslate"><span class="pre">RepoPath.objects_with_tags()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.put_first"><code class="docutils literal notranslate"><span class="pre">RepoPath.put_first()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.put_last"><code class="docutils literal notranslate"><span class="pre">RepoPath.put_last()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.remove"><code class="docutils literal notranslate"><span class="pre">RepoPath.remove()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.repo_for_app"><code class="docutils literal notranslate"><span class="pre">RepoPath.repo_for_app()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.RepoPath.repo_for_obj"><code class="docutils literal notranslate"><span class="pre">RepoPath.repo_for_obj()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.TagIndex"><code class="docutils literal notranslate"><span class="pre">TagIndex</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.TagIndex.from_json"><code class="docutils literal notranslate"><span class="pre">TagIndex.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.TagIndex.to_json"><code class="docutils literal notranslate"><span class="pre">TagIndex.to_json()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.TagIndex.update_application"><code class="docutils literal notranslate"><span class="pre">TagIndex.update_application()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.repository.TagIndex.update_object"><code class="docutils literal notranslate"><span class="pre">TagIndex.update_object()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.TagIndexer"><code class="docutils literal notranslate"><span class="pre">TagIndexer</span></code></a><ul>
@@ -615,18 +621,16 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.repository.TagIndexer.write"><code class="docutils literal notranslate"><span class="pre">TagIndexer.write()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.UnknownApplicationError"><code class="docutils literal notranslate"><span class="pre">UnknownApplicationError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.UnknownEntityError"><code class="docutils literal notranslate"><span class="pre">UnknownEntityError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.UnknownNamespaceError"><code class="docutils literal notranslate"><span class="pre">UnknownNamespaceError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.UnknownObjectError"><code class="docutils literal notranslate"><span class="pre">UnknownObjectError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.additional_repository"><code class="docutils literal notranslate"><span class="pre">additional_repository()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.all_application_names"><code class="docutils literal notranslate"><span class="pre">all_application_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.apps_path"><code class="docutils literal notranslate"><span class="pre">apps_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.autospec"><code class="docutils literal notranslate"><span class="pre">autospec()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.create_or_construct"><code class="docutils literal notranslate"><span class="pre">create_or_construct()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.create_repo"><code class="docutils literal notranslate"><span class="pre">create_repo()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.get_full_namespace"><code class="docutils literal notranslate"><span class="pre">get_full_namespace()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.is_application_file"><code class="docutils literal notranslate"><span class="pre">is_application_file()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ramble.repository.path"><code class="docutils literal notranslate"><span class="pre">path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.set_path"><code class="docutils literal notranslate"><span class="pre">set_path()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.repository.use_repositories"><code class="docutils literal notranslate"><span class="pre">use_repositories()</span></code></a></li>
 </ul>
@@ -4459,29 +4463,29 @@ objects and injects them into the self.objects dictionary.</p>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="ramble.repository.FailedConstructorError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">FailedConstructorError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_tb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FailedConstructorError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FailedConstructorError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">FailedConstructorError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_tb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FailedConstructorError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FailedConstructorError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.repository.RepoError" title="ramble.repository.RepoError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RepoError</span></code></a></p>
-<p>Raised when an application’s class constructor fails.</p>
+<p>Raised when an object’s class constructor fails.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="ramble.repository.FastApplicationChecker">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">FastApplicationChecker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">applications_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FastApplicationChecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FastApplicationChecker" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.FastObjectChecker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">FastObjectChecker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objects_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FastObjectChecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FastObjectChecker" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></p>
-<p>Cache that maps package names to the stats obtained on the
-‘application.py’ files associated with them.</p>
+<p>Cache that maps object names to the stats obtained on the
+‘.py’ files associated with them.</p>
 <p>For each repository a cache is maintained at class level, and shared among
 all instances referring to it. Update of the global cache is done lazily
 during instance initialization.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.FastApplicationChecker.invalidate">
-<span class="sig-name descname"><span class="pre">invalidate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FastApplicationChecker.invalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FastApplicationChecker.invalidate" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.FastObjectChecker.invalidate">
+<span class="sig-name descname"><span class="pre">invalidate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FastObjectChecker.invalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FastObjectChecker.invalidate" title="Permalink to this definition"></a></dt>
 <dd><p>Regenerate cache for this checker.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.FastApplicationChecker.last_mtime">
-<span class="sig-name descname"><span class="pre">last_mtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FastApplicationChecker.last_mtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FastApplicationChecker.last_mtime" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.FastObjectChecker.last_mtime">
+<span class="sig-name descname"><span class="pre">last_mtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#FastObjectChecker.last_mtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.FastObjectChecker.last_mtime" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -4519,11 +4523,11 @@ during instance initialization.</p>
 <dd class="field-even"><p>(bool)</p>
 </dd>
 </dl>
-<p>We already automatically update indexes when application files
+<p>We already automatically update indexes when object files
 change, but other files (like patches) may change underneath the
-application file. This method can be used to check additional
-application-specific files whenever they’re loaded, to tell the
-RepoIndex to update the index <em>just</em> for that application.</p>
+object file. This method can be used to check additional
+object-specific files whenever they’re loaded, to tell the
+RepoIndex to update the index <em>just</em> for that object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4534,8 +4538,8 @@ RepoIndex to update the index <em>just</em> for that application.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Indexer.update">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_fullname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Indexer.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Indexer.update" title="Permalink to this definition"></a></dt>
-<dd><p>Update the index in memory with information about an application.</p>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_fullname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Indexer.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Indexer.update" title="Permalink to this definition"></a></dt>
+<dd><p>Update the index in memory with information about an object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4567,79 +4571,91 @@ RepoIndex to update the index <em>just</em> for that application.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="ramble.repository.RambleNamespace">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">RambleNamespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RambleNamespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RambleNamespace" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.ObjectNamespace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">ObjectNamespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#ObjectNamespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.ObjectNamespace" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">module</span></code></p>
 <p>Allow lazy loading of modules.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="ramble.repository.ObjectTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">ObjectTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ramble.repository.ObjectTypes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.repository.ObjectTypes.applications">
+<span class="sig-name descname"><span class="pre">applications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ramble.repository.ObjectTypes.applications" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.repository.ObjectTypes.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ramble.repository.ObjectTypes.objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="ramble.repository.Repo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">Repo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">Repo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class representing a package repository in the filesystem.</p>
-<p>Each application repository must have a top-level configuration file
+<p>Each object repository must have a top-level configuration file
 called <cite>repo.yaml</cite>.</p>
 <p>Currently, <cite>repo.yaml</cite> this must define:</p>
 <dl class="simple">
-<dt><cite>namespace</cite>:</dt><dd><p>A Python namespace where the repository’s applications should live.</p>
+<dt><cite>namespace</cite>:</dt><dd><p>A Python namespace where the repository’s objects should live.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.all_application_classes">
-<span class="sig-name descname"><span class="pre">all_application_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.all_application_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.all_application_classes" title="Permalink to this definition"></a></dt>
-<dd><p>Iterator over all application <em>classes</em> in the repository.</p>
-<p>Use this with care, because loading applications is slow.</p>
+<dt class="sig sig-object py" id="ramble.repository.Repo.all_object_classes">
+<span class="sig-name descname"><span class="pre">all_object_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.all_object_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.all_object_classes" title="Permalink to this definition"></a></dt>
+<dd><p>Iterator over all object <em>classes</em> in the repository.</p>
+<p>Use this with care, because loading objects is slow.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.all_application_names">
-<span class="sig-name descname"><span class="pre">all_application_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.all_application_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.all_application_names" title="Permalink to this definition"></a></dt>
-<dd><p>Returns a sorted list of all application names in the Repo.</p>
+<dt class="sig sig-object py" id="ramble.repository.Repo.all_object_names">
+<span class="sig-name descname"><span class="pre">all_object_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.all_object_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.all_object_names" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a sorted list of all object names in the Repo.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.all_applications">
-<span class="sig-name descname"><span class="pre">all_applications</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.all_applications"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.all_applications" title="Permalink to this definition"></a></dt>
-<dd><p>Iterator over all applications in the repository.</p>
-<p>Use this with care, because loading applications is slow.</p>
+<dt class="sig sig-object py" id="ramble.repository.Repo.all_objects">
+<span class="sig-name descname"><span class="pre">all_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.all_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.all_objects" title="Permalink to this definition"></a></dt>
+<dd><p>Iterator over all objects in the repository.</p>
+<p>Use this with care, because loading objects is slow.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.applications_with_tags">
-<span class="sig-name descname"><span class="pre">applications_with_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.applications_with_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.applications_with_tags" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.dirname_for_application_name">
-<span class="sig-name descname"><span class="pre">dirname_for_application_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.dirname_for_application_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.dirname_for_application_name" title="Permalink to this definition"></a></dt>
-<dd><p>Get the directory name for a particular application.  This is the
-directory that contains its application.py file.</p>
+<dt class="sig sig-object py" id="ramble.repository.Repo.dirname_for_object_name">
+<span class="sig-name descname"><span class="pre">dirname_for_object_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.dirname_for_object_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.dirname_for_object_name" title="Permalink to this definition"></a></dt>
+<dd><p>Get the directory name for a particular object.  This is the
+directory that contains its object.py file.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Repo.dump_provenance">
 <span class="sig-name descname"><span class="pre">dump_provenance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.dump_provenance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.dump_provenance" title="Permalink to this definition"></a></dt>
 <dd><p>Dump provenance information for a spec to a particular path.</p>
-<p>This dumps the application file.
-Raises UnknownApplicationError if not found.</p>
+<p>This dumps the object file.
+Raises UnknownObjectError if not found.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Repo.exists">
-<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.exists" title="Permalink to this definition"></a></dt>
-<dd><p>Whether a application with the supplied name exists.</p>
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.exists" title="Permalink to this definition"></a></dt>
+<dd><p>Whether a object with the supplied name exists.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.filename_for_application_name">
-<span class="sig-name descname"><span class="pre">filename_for_application_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.filename_for_application_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.filename_for_application_name" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.Repo.filename_for_object_name">
+<span class="sig-name descname"><span class="pre">filename_for_object_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.filename_for_object_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.filename_for_object_name" title="Permalink to this definition"></a></dt>
 <dd><p>Get the filename for the module we should load for a particular
-application.  applications for a Repo live in
-<code class="docutils literal notranslate"><span class="pre">$root/&lt;application_name&gt;/application.py</span></code></p>
-<p>This will return a proper application.py path even if the
-application doesn’t exist yet, so callers will need to ensure
-the application exists before importing.</p>
+object.  objects for a Repo live in
+<code class="docutils literal notranslate"><span class="pre">$root/&lt;object_name&gt;/&lt;object_type&gt;.py</span></code></p>
+<p>This will return a proper &lt;object_type&gt;.py path even if the
+object doesn’t exist yet, so callers will need to ensure
+the object exists before importing.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4652,15 +4668,15 @@ the application exists before importing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Repo.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.get" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the application associated with the supplied spec.</p>
+<dd><p>Returns the object associated with the supplied spec.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.Repo.get_app_class">
-<span class="sig-name descname"><span class="pre">get_app_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.get_app_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.get_app_class" title="Permalink to this definition"></a></dt>
-<dd><p>Get the class for the application out of its module.</p>
+<dt class="sig sig-object py" id="ramble.repository.Repo.get_obj_class">
+<span class="sig-name descname"><span class="pre">get_obj_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.get_obj_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.get_obj_class" title="Permalink to this definition"></a></dt>
+<dd><p>Get the class for the object out of its module.</p>
 <p>First loads (or fetches from cache) a module for the
-application. Then extracts the application class from the module
+object. Then extracts the object class from the module
 according to Ramble’s naming convention.</p>
 </dd></dl>
 
@@ -4679,7 +4695,7 @@ according to Ramble’s naming convention.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Repo.last_mtime">
 <span class="sig-name descname"><span class="pre">last_mtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.last_mtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.last_mtime" title="Permalink to this definition"></a></dt>
-<dd><p>Time a application file in this repo was last updated.</p>
+<dd><p>Time a object file in this repo was last updated.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4690,16 +4706,21 @@ according to Ramble’s naming convention.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ramble.repository.Repo.objects_with_tags">
+<span class="sig-name descname"><span class="pre">objects_with_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.objects_with_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.objects_with_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Repo.purge">
 <span class="sig-name descname"><span class="pre">purge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.purge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.purge" title="Permalink to this definition"></a></dt>
-<dd><p>Clear entire application instance cache.</p>
+<dd><p>Clear entire object instance cache.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.Repo.real_name">
 <span class="sig-name descname"><span class="pre">real_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">import_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#Repo.real_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.Repo.real_name" title="Permalink to this definition"></a></dt>
-<dd><p>Allow users to import Ramble applications using Python identifiers.</p>
-<p>A python identifier might map to many different Ramble application
+<dd><p>Allow users to import Ramble objects using Python identifiers.</p>
+<p>A python identifier might map to many different Ramble object
 names due to hyphen/underscore ambiguity.</p>
 <dl class="simple">
 <dt>Easy example:</dt><dd><p>num3proxy   -&gt; 3proxy</p>
@@ -4714,7 +4735,7 @@ names due to hyphen/underscore ambiguity.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ramble.repository.Repo.tag_index">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tag_index</span></span><a class="headerlink" href="#ramble.repository.Repo.tag_index" title="Permalink to this definition"></a></dt>
-<dd><p>Index of tags and which applications they’re defined on.</p>
+<dd><p>Index of tags and which objects they’re defined on.</p>
 </dd></dl>
 
 </dd></dl>
@@ -4728,11 +4749,11 @@ names due to hyphen/underscore ambiguity.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.repository.RepoIndex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">RepoIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_checker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoIndex" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">RepoIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_checker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoIndex" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Container class that manages a set of Indexers for a Repo.</p>
 <p>This class is responsible for checking packages in a repository for
-updates (using <code class="docutils literal notranslate"><span class="pre">FastApplicationChecker</span></code>) and for regenerating indexes
+updates (using <code class="docutils literal notranslate"><span class="pre">FastObjectChecker</span></code>) and for regenerating indexes
 when they’re needed.</p>
 <p><code class="docutils literal notranslate"><span class="pre">Indexers</span></code> should be added to the <code class="docutils literal notranslate"><span class="pre">RepoIndex</span></code> using
 <code class="docutils literal notranslate"><span class="pre">add_index(name,</span> <span class="pre">indexer)</span></code>, and they should support the interface
@@ -4758,11 +4779,11 @@ write(), and get_index() operations</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">RepoPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">repos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">RepoPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">repos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A RepoPath is a list of repos that function as one.</p>
 <p>It functions exactly like a Repo, but it operates on the combined
-results of the Repos in its list instead of on a single application
+results of the Repos in its list instead of on a single object
 repository.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -4770,29 +4791,24 @@ repository.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.all_application_classes">
-<span class="sig-name descname"><span class="pre">all_application_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.all_application_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.all_application_classes" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.all_object_classes">
+<span class="sig-name descname"><span class="pre">all_object_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.all_object_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.all_object_classes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.all_application_names">
-<span class="sig-name descname"><span class="pre">all_application_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.all_application_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.all_application_names" title="Permalink to this definition"></a></dt>
-<dd><p>Return all unique application names in all repositories.</p>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.all_object_names">
+<span class="sig-name descname"><span class="pre">all_object_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.all_object_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.all_object_names" title="Permalink to this definition"></a></dt>
+<dd><p>Return all unique object names in all repositories.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.all_applications">
-<span class="sig-name descname"><span class="pre">all_applications</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.all_applications"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.all_applications" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.all_objects">
+<span class="sig-name descname"><span class="pre">all_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.all_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.all_objects" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.applications_with_tags">
-<span class="sig-name descname"><span class="pre">applications_with_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.applications_with_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.applications_with_tags" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.dirname_for_application_name">
-<span class="sig-name descname"><span class="pre">dirname_for_application_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.dirname_for_application_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.dirname_for_application_name" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.dirname_for_object_name">
+<span class="sig-name descname"><span class="pre">dirname_for_object_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.dirname_for_object_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.dirname_for_object_name" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -4800,26 +4816,26 @@ repository.</p>
 <span class="sig-name descname"><span class="pre">dump_provenance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.dump_provenance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.dump_provenance" title="Permalink to this definition"></a></dt>
 <dd><p>Dump provenance information for a spec to a particular path.</p>
 <p>This dumps the package file and any associated patch files.
-Raises UnknownApplicationError if not found.</p>
+Raises UnknownObjectError if not found.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath.exists">
-<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.exists" title="Permalink to this definition"></a></dt>
-<dd><p>Whether application with the give name exists in the path’s repos.</p>
-<p>Note that virtual applications do not “exist”.</p>
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.exists" title="Permalink to this definition"></a></dt>
+<dd><p>Whether object with the give name exists in the path’s repos.</p>
+<p>Note that virtual objects do not “exist”.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.filename_for_application_name">
-<span class="sig-name descname"><span class="pre">filename_for_application_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.filename_for_application_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.filename_for_application_name" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.filename_for_object_name">
+<span class="sig-name descname"><span class="pre">filename_for_object_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.filename_for_object_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.filename_for_object_name" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath.find_module">
 <span class="sig-name descname"><span class="pre">find_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fullname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.find_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.find_module" title="Permalink to this definition"></a></dt>
 <dd><p>Implements precedence for overlaid namespaces.</p>
-<p>Loop checks each namespace in self.repos for applications, and
+<p>Loop checks each namespace in self.repos for objects, and
 also handles loading empty containing namespaces.</p>
 </dd></dl>
 
@@ -4832,13 +4848,19 @@ also handles loading empty containing namespaces.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.get" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the application associated with the supplied spec.</p>
+<dd><p>Returns the object associated with the supplied spec.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.get_app_class">
-<span class="sig-name descname"><span class="pre">get_app_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.get_app_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.get_app_class" title="Permalink to this definition"></a></dt>
-<dd><p>Find a class for the spec’s application and return the class object.</p>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.get_full_namespace">
+<span class="sig-name descname"><span class="pre">get_full_namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.get_full_namespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.get_full_namespace" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the full namespace of a repository, given its relative one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.get_obj_class">
+<span class="sig-name descname"><span class="pre">get_obj_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.get_obj_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.get_obj_class" title="Permalink to this definition"></a></dt>
+<dd><p>Find a class for the spec’s object and return the class object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4863,15 +4885,20 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath.last_mtime">
 <span class="sig-name descname"><span class="pre">last_mtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.last_mtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.last_mtime" title="Permalink to this definition"></a></dt>
-<dd><p>Time a application file in this repo was last updated.</p>
+<dd><p>Time a object file in this repo was last updated.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath.load_module">
 <span class="sig-name descname"><span class="pre">load_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fullname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.load_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.load_module" title="Permalink to this definition"></a></dt>
 <dd><p>Handles loading container namespaces when necessary.</p>
-<p>See <code class="docutils literal notranslate"><span class="pre">Repo</span></code> for how actual application modules are loaded.</p>
+<p>See <code class="docutils literal notranslate"><span class="pre">Repo</span></code> for how actual object modules are loaded.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.objects_with_tags">
+<span class="sig-name descname"><span class="pre">objects_with_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.objects_with_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.objects_with_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.RepoPath.put_first">
@@ -4892,16 +4919,16 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.RepoPath.repo_for_app">
-<span class="sig-name descname"><span class="pre">repo_for_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.repo_for_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.repo_for_app" title="Permalink to this definition"></a></dt>
-<dd><p>Given a spec, get the repository for its application.</p>
+<dt class="sig sig-object py" id="ramble.repository.RepoPath.repo_for_obj">
+<span class="sig-name descname"><span class="pre">repo_for_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepoPath.repo_for_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepoPath.repo_for_obj" title="Permalink to this definition"></a></dt>
+<dd><p>Given a spec, get the repository for its object.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.repository.TagIndex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">TagIndex</span></span><a class="reference internal" href="_modules/ramble/repository.html#TagIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.TagIndex" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">TagIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#TagIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.TagIndex" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></p>
 <p>Maps tags to list of applications.</p>
 <dl class="py method">
@@ -4915,13 +4942,13 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.repository.TagIndex.update_application">
-<span class="sig-name descname"><span class="pre">update_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#TagIndex.update_application"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.TagIndex.update_application" title="Permalink to this definition"></a></dt>
-<dd><p>Updates an application in the tag index.</p>
+<dt class="sig sig-object py" id="ramble.repository.TagIndex.update_object">
+<span class="sig-name descname"><span class="pre">update_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#TagIndex.update_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.TagIndex.update_object" title="Permalink to this definition"></a></dt>
+<dd><p>Updates an object in the tag index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>app_name</strong> (<em>str</em>) – name of the application to be removed from the</p></li>
+<li><p><strong>obj_name</strong> (<em>str</em>) – name of the object to be removed from the</p></li>
 <li><p><strong>index</strong> – </p></li>
 </ul>
 </dd>
@@ -4943,8 +4970,8 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.repository.TagIndexer.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_fullname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#TagIndexer.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.TagIndexer.update" title="Permalink to this definition"></a></dt>
-<dd><p>Update the index in memory with information about an application.</p>
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_fullname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#TagIndexer.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.TagIndexer.update" title="Permalink to this definition"></a></dt>
+<dd><p>Update the index in memory with information about an object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4956,17 +4983,10 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="ramble.repository.UnknownApplicationError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">UnknownApplicationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#UnknownApplicationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.UnknownApplicationError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#ramble.repository.UnknownEntityError" title="ramble.repository.UnknownEntityError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnknownEntityError</span></code></a></p>
-<p>Raised when we encounter a application ramble doesn’t have.</p>
-</dd></dl>
-
-<dl class="py exception">
 <dt class="sig sig-object py" id="ramble.repository.UnknownEntityError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">UnknownEntityError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#UnknownEntityError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.UnknownEntityError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.repository.RepoError" title="ramble.repository.RepoError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RepoError</span></code></a></p>
-<p>Raised when we encounter a application ramble doesn’t have.</p>
+<p>Raised when we encounter a object ramble doesn’t have.</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -4974,6 +4994,13 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">UnknownNamespaceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#UnknownNamespaceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.UnknownNamespaceError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.repository.UnknownEntityError" title="ramble.repository.UnknownEntityError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnknownEntityError</span></code></a></p>
 <p>Raised when we encounter an unknown namespace</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.repository.UnknownObjectError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">UnknownObjectError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Object'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#UnknownObjectError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.UnknownObjectError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.repository.UnknownEntityError" title="ramble.repository.UnknownEntityError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnknownEntityError</span></code></a></p>
+<p>Raised when we encounter an object ramble doesn’t have.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -4993,6 +5020,12 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 <dd><p>Convenience wrapper around <code class="docutils literal notranslate"><span class="pre">ramble.repository.all_application_names()</span></code>.</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="ramble.repository.apps_path">
+<span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">apps_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ramble.repository.RepoPath</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#ramble.repository.apps_path" title="Permalink to this definition"></a></dt>
+<dd><p>Singleton repo path instance</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.repository.autospec">
 <span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">autospec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#autospec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.autospec" title="Permalink to this definition"></a></dt>
@@ -5008,7 +5041,7 @@ function to a Spec.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.repository.create_repo">
-<span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">create_repo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'applications'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#create_repo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.create_repo" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">create_repo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'applications'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#create_repo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.create_repo" title="Permalink to this definition"></a></dt>
 <dd><p>Create a new repository in root with the specified namespace.</p>
 <p>If the namespace is not provided, use basename of root.
 Return the canonicalized path and namespace of the created repository.</p>
@@ -5018,24 +5051,6 @@ Return the canonicalized path and namespace of the created repository.</p>
 <dt class="sig sig-object py" id="ramble.repository.get">
 <span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.get" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience wrapper around <code class="docutils literal notranslate"><span class="pre">ramble.repository.get()</span></code>.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.repository.get_full_namespace">
-<span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">get_full_namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#get_full_namespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.get_full_namespace" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the full namespace of a repository, given its relative one.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.repository.is_application_file">
-<span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">is_application_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#is_application_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.is_application_file" title="Permalink to this definition"></a></dt>
-<dd><p>Determine whether we are in an application file from a repo.</p>
-</dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="ramble.repository.path">
-<span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ramble.repository.RepoPath</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#ramble.repository.path" title="Permalink to this definition"></a></dt>
-<dd><p>Singleton repo path instance</p>
 </dd></dl>
 
 <dl class="py function">
@@ -6022,7 +6037,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 15, 2023.
+      <span class="lastupdated">Last updated on May 16, 2023.
       </span></p>
   </div>
 

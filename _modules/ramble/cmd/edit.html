@@ -139,9 +139,9 @@
     <span class="k">if</span> <span class="n">repo_path</span><span class="p">:</span>
         <span class="n">repo</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">Repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">namespace</span><span class="p">:</span>
-        <span class="n">repo</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">get_repo</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">apps_path</span><span class="o">.</span><span class="n">get_repo</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">repo</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">apps_path</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">filename_for_application_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -241,7 +241,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 15, 2023.
+      <span class="lastupdated">Last updated on May 16, 2023.
       </span></p>
   </div>
 
