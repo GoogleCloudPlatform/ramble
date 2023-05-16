@@ -213,7 +213,7 @@
 </li>
       <li><a href="ramble.html#ramble.main.aliases">aliases (in module ramble.main)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.applications.OUTPUT.ALL">ALL (ramble.schema.applications.OUTPUT attribute)</a>
+      <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE.ALL">ALL (ramble.schema.types.OUTPUT_CAPTURE attribute)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.all_application_names">all_application_names() (in module ramble.repository)</a>
 </li>
@@ -367,12 +367,8 @@
 </li>
       <li><a href="ramble.html#ramble.repository.ObjectTypes.applications">applications (ramble.repository.ObjectTypes attribute)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.applications.applications_schema">applications_schema (in module ramble.schema.applications)</a>
-
-      <ul>
-        <li><a href="ramble.workspace.html#ramble.workspace.workspace.applications_schema">(in module ramble.workspace.workspace)</a>
+      <li><a href="ramble.workspace.html#ramble.workspace.workspace.applications_schema">applications_schema (in module ramble.workspace.workspace)</a>
 </li>
-      </ul></li>
       <li><a href="ramble.html#ramble.repository.apps_path">apps_path (in module ramble.repository)</a>
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.CvsFetchStrategy.archive">archive() (ramble.fetch_strategy.CvsFetchStrategy method)</a>
@@ -745,7 +741,7 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.debug.debug">debug() (in module ramble.cmd.debug)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.applications.OUTPUT.DEFAULT">DEFAULT (ramble.schema.applications.OUTPUT attribute)</a>
+      <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE.DEFAULT">DEFAULT (ramble.schema.types.OUTPUT_CAPTURE attribute)</a>
 </li>
       <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.default_compilers">default_compilers (ramble.application_types.executable.ExecutableApplication attribute)</a>
 
@@ -1731,6 +1727,10 @@
 </li>
         <li><a href="ramble.schema.html#module-ramble.schema.config">ramble.schema.config</a>
 </li>
+        <li><a href="ramble.schema.html#module-ramble.schema.env_vars">ramble.schema.env_vars</a>
+</li>
+        <li><a href="ramble.schema.html#module-ramble.schema.internals">ramble.schema.internals</a>
+</li>
         <li><a href="ramble.schema.html#module-ramble.schema.licenses">ramble.schema.licenses</a>
 </li>
         <li><a href="ramble.schema.html#module-ramble.schema.merged">ramble.schema.merged</a>
@@ -1740,6 +1740,12 @@
         <li><a href="ramble.schema.html#module-ramble.schema.repos">ramble.schema.repos</a>
 </li>
         <li><a href="ramble.schema.html#module-ramble.schema.spack">ramble.schema.spack</a>
+</li>
+        <li><a href="ramble.schema.html#module-ramble.schema.success_criteria">ramble.schema.success_criteria</a>
+</li>
+        <li><a href="ramble.schema.html#module-ramble.schema.types">ramble.schema.types</a>
+</li>
+        <li><a href="ramble.schema.html#module-ramble.schema.variables">ramble.schema.variables</a>
 </li>
         <li><a href="ramble.schema.html#module-ramble.schema.workspace">ramble.schema.workspace</a>
 </li>
@@ -1910,7 +1916,7 @@
 </li>
       <li><a href="ramble.html#ramble.main.options_by_level">options_by_level (in module ramble.main)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.applications.OUTPUT">OUTPUT (class in ramble.schema.applications)</a>
+      <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE">OUTPUT_CAPTURE (class in ramble.schema.types)</a>
 </li>
       <li><a href="ramble.html#ramble.config.override">override() (in module ramble.config)</a>
 </li>
@@ -1968,19 +1974,25 @@
 </li>
       <li><a href="ramble.html#ramble.config.Configuration.print_section">print_section() (ramble.config.Configuration method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.main.print_setup_info">print_setup_info() (in module ramble.main)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.info.print_text_info">print_text_info() (in module ramble.cmd.info)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.config.process_config_path">process_config_path() (in module ramble.config)</a>
 </li>
       <li><a href="ramble.html#ramble.keywords.Keywords.processes_per_node">processes_per_node (ramble.keywords.Keywords attribute)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.config.properties">properties (in module ramble.schema.config)</a>
+      <li><a href="ramble.schema.html#ramble.schema.applications.properties">properties (in module ramble.schema.applications)</a>
 
       <ul>
+        <li><a href="ramble.schema.html#ramble.schema.config.properties">(in module ramble.schema.config)</a>
+</li>
+        <li><a href="ramble.schema.html#ramble.schema.env_vars.properties">(in module ramble.schema.env_vars)</a>
+</li>
+        <li><a href="ramble.schema.html#ramble.schema.internals.properties">(in module ramble.schema.internals)</a>
+</li>
         <li><a href="ramble.schema.html#ramble.schema.merged.properties">(in module ramble.schema.merged)</a>
 </li>
         <li><a href="ramble.schema.html#ramble.schema.mirrors.properties">(in module ramble.schema.mirrors)</a>
@@ -1988,6 +2000,8 @@
         <li><a href="ramble.schema.html#ramble.schema.repos.properties">(in module ramble.schema.repos)</a>
 </li>
         <li><a href="ramble.schema.html#ramble.schema.spack.properties">(in module ramble.schema.spack)</a>
+</li>
+        <li><a href="ramble.schema.html#ramble.schema.success_criteria.properties">(in module ramble.schema.success_criteria)</a>
 </li>
         <li><a href="ramble.schema.html#ramble.schema.workspace.properties">(in module ramble.schema.workspace)</a>
 </li>
@@ -2295,6 +2309,20 @@
 </li>
       </ul></li>
       <li>
+    ramble.schema.env_vars
+
+      <ul>
+        <li><a href="ramble.schema.html#module-ramble.schema.env_vars">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.schema.internals
+
+      <ul>
+        <li><a href="ramble.schema.html#module-ramble.schema.internals">module</a>
+</li>
+      </ul></li>
+      <li>
     ramble.schema.licenses
 
       <ul>
@@ -2327,6 +2355,27 @@
 
       <ul>
         <li><a href="ramble.schema.html#module-ramble.schema.spack">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.schema.success_criteria
+
+      <ul>
+        <li><a href="ramble.schema.html#module-ramble.schema.success_criteria">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.schema.types
+
+      <ul>
+        <li><a href="ramble.schema.html#module-ramble.schema.types">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.schema.variables
+
+      <ul>
+        <li><a href="ramble.schema.html#module-ramble.schema.variables">module</a>
 </li>
       </ul></li>
       <li>
@@ -2378,6 +2427,8 @@
         <li><a href="ramble.util.html#module-ramble.util">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.util.editor
 
@@ -2399,8 +2450,6 @@
         <li><a href="ramble.util.imp.html#module-ramble.util.imp">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.util.imp.imp_importer
 
@@ -2678,6 +2727,10 @@
       <ul>
         <li><a href="ramble.schema.html#ramble.schema.config.schema">(in module ramble.schema.config)</a>
 </li>
+        <li><a href="ramble.schema.html#ramble.schema.env_vars.schema">(in module ramble.schema.env_vars)</a>
+</li>
+        <li><a href="ramble.schema.html#ramble.schema.internals.schema">(in module ramble.schema.internals)</a>
+</li>
         <li><a href="ramble.schema.html#ramble.schema.licenses.schema">(in module ramble.schema.licenses)</a>
 </li>
         <li><a href="ramble.schema.html#ramble.schema.merged.schema">(in module ramble.schema.merged)</a>
@@ -2687,6 +2740,10 @@
         <li><a href="ramble.schema.html#ramble.schema.repos.schema">(in module ramble.schema.repos)</a>
 </li>
         <li><a href="ramble.schema.html#ramble.schema.spack.schema">(in module ramble.schema.spack)</a>
+</li>
+        <li><a href="ramble.schema.html#ramble.schema.success_criteria.schema">(in module ramble.schema.success_criteria)</a>
+</li>
+        <li><a href="ramble.schema.html#ramble.schema.variables.schema">(in module ramble.schema.variables)</a>
 </li>
         <li><a href="ramble.schema.html#ramble.schema.workspace.schema">(in module ramble.schema.workspace)</a>
 </li>
@@ -2803,14 +2860,14 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.software_dir">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.software_specs">software_specs (ramble.application_types.executable.ExecutableApplication attribute)</a>
 
       <ul>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.software_specs">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments">SoftwareEnvironments (class in ramble.software_environments)</a>
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.BundleFetchStrategy.source_id">source_id() (ramble.fetch_strategy.BundleFetchStrategy method)</a>
@@ -2901,9 +2958,9 @@
 </li>
       <li><a href="ramble.html#ramble.mirror.MirrorStats.stats">stats() (ramble.mirror.MirrorStats method)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.applications.OUTPUT.STDERR">STDERR (ramble.schema.applications.OUTPUT attribute)</a>
+      <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE.STDERR">STDERR (ramble.schema.types.OUTPUT_CAPTURE attribute)</a>
 </li>
-      <li><a href="ramble.schema.html#ramble.schema.applications.OUTPUT.STDOUT">STDOUT (ramble.schema.applications.OUTPUT attribute)</a>
+      <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE.STDOUT">STDOUT (ramble.schema.types.OUTPUT_CAPTURE attribute)</a>
 </li>
       <li><a href="ramble.html#ramble.stage.InputStage.steal_source">steal_source() (ramble.stage.InputStage method)</a>
 </li>

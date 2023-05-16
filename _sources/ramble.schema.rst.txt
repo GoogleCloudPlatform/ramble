@@ -25,6 +25,22 @@ ramble.schema.config module
    :undoc-members:
    :show-inheritance:
 
+ramble.schema.env\_vars module
+------------------------------
+
+.. automodule:: ramble.schema.env_vars
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.internals module
+------------------------------
+
+.. automodule:: ramble.schema.internals
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.schema.licenses module
 -----------------------------
 
@@ -61,6 +77,30 @@ ramble.schema.spack module
 --------------------------
 
 .. automodule:: ramble.schema.spack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.success\_criteria module
+--------------------------------------
+
+.. automodule:: ramble.schema.success_criteria
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.types module
+--------------------------
+
+.. automodule:: ramble.schema.types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.variables module
+------------------------------
+
+.. automodule:: ramble.schema.variables
    :members:
    :undoc-members:
    :show-inheritance:

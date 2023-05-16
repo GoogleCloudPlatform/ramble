@@ -158,12 +158,15 @@
 
 <span class="kn">import</span> <span class="nn">ramble.schema</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.config</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.env_vars</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.repos</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.workspace</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.applications</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.licenses</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.mirrors</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.spack</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.success_criteria</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.variables</span>
 
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
@@ -174,10 +177,14 @@
 <span class="c1">#: Dict from section names -&gt; schema for that section</span>
 <span class="n">section_schemas</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s1">&#39;env_vars&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">env_vars</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;repos&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;licenses&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">licenses</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;mirrors&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;spack&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s1">&#39;success_criteria&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s1">&#39;applications&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s1">&#39;variables&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1"># Same as above, but including keys for environments</span>

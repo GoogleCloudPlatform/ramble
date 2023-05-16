@@ -258,7 +258,7 @@ ramble config get
 **Positional arguments**
 
 section
-  configuration section to print. options: config, repos, licenses, mirrors, spack
+  configuration section to print. options: config, env_vars, repos, licenses, mirrors, spack, success_criteria, applications, variables
 
 
 **Optional arguments**
@@ -282,7 +282,7 @@ ramble config blame
 **Positional arguments**
 
 section
-  configuration section to print. options: config, repos, licenses, mirrors, spack
+  configuration section to print. options: config, env_vars, repos, licenses, mirrors, spack, success_criteria, applications, variables
 
 
 **Optional arguments**
@@ -306,7 +306,7 @@ ramble config edit
 **Positional arguments**
 
 section
-  configuration section to edit. options: config, repos, licenses, mirrors, spack
+  configuration section to edit. options: config, env_vars, repos, licenses, mirrors, spack, success_criteria, applications, variables
 
 
 **Optional arguments**
