@@ -128,7 +128,8 @@ def working_env():
 #
 @pytest.fixture(scope='session')
 def mock_repo_path():
-    yield ramble.repository.Repo(ramble.paths.mock_applications_path)
+    yield ramble.repository.Repo(ramble.paths.mock_applications_path,
+                                 object_type=ramble.repository.ObjectTypes.applications)
 
 
 @pytest.fixture(scope='function')
@@ -141,7 +142,8 @@ def mock_applications(mock_repo_path):
 @pytest.fixture(scope='function')
 def mutable_mock_repo(mock_repo_path):
     """Function-scoped mock packages, for tests that need to modify them."""
-    mock_repo = ramble.repository.Repo(ramble.paths.mock_applications_path)
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_applications_path,
+                                       object_type=ramble.repository.ObjectTypes.applications)
     with ramble.repository.use_repositories(mock_repo) as mock_repo_path:
         yield mock_repo_path
 

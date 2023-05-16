@@ -118,7 +118,7 @@ spack:
     mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
 
     with archive_dir.as_cwd():
-        app_class = ramble.repository.path.get_app_class(app_name)('test')
+        app_class = ramble.repository.apps_path.get_obj_class(app_name)('test')
         create_archive(archive_dir, app_class)
 
         # Create workspace
