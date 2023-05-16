@@ -73,6 +73,197 @@ repos:
 - repo3'''
 
 
+def test_merged_variables_section(mock_low_high_config):
+    low_path = mock_low_high_config.scopes['low'].path
+    high_path = mock_low_high_config.scopes['high'].path
+
+    fs.mkdirp(low_path)
+    fs.mkdirp(high_path)
+
+    with open(os.path.join(low_path, 'variables.yaml'), 'w') as f:
+        f.write('''\
+variables:
+  foo: 'bar'
+''')
+
+    with open(os.path.join(high_path, 'variables.yaml'), 'w') as f:
+        f.write('''\
+variables:
+  bar: 'baz'
+''')
+
+    assert config('get', 'variables').strip() == '''variables:
+  bar: baz
+  foo: bar'''
+
+
+def test_merged_env_vars_section(mock_low_high_config):
+    low_path = mock_low_high_config.scopes['low'].path
+    high_path = mock_low_high_config.scopes['high'].path
+
+    fs.mkdirp(low_path)
+    fs.mkdirp(high_path)
+
+    with open(os.path.join(low_path, 'env_vars.yaml'), 'w') as f:
+        f.write('''\
+env_vars:
+  set:
+    FOO: bar
+''')
+
+    with open(os.path.join(high_path, 'env_vars.yaml'), 'w') as f:
+        f.write('''\
+env_vars:
+  append:
+    vars:
+      FOO: baz
+''')
+
+    assert config('get', 'env_vars').strip() == '''env_vars:
+  append:
+    vars:
+      FOO: baz
+  set:
+    FOO: bar'''
+
+
+def test_merged_spack_section(mock_low_high_config):
+    low_path = mock_low_high_config.scopes['low'].path
+    high_path = mock_low_high_config.scopes['high'].path
+
+    fs.mkdirp(low_path)
+    fs.mkdirp(high_path)
+
+    with open(os.path.join(low_path, 'spack.yaml'), 'w') as f:
+        f.write('''\
+spack:
+  packages:
+    gcc:
+      spack_spec: gcc@4.8.5
+''')
+
+    with open(os.path.join(high_path, 'spack.yaml'), 'w') as f:
+        f.write('''\
+spack:
+  packages:
+    zlib:
+      spack_spec: zlib
+      compiler: gcc
+''')
+
+    assert config('get', 'spack').strip() == '''spack:
+  packages:
+    zlib:
+      spack_spec: zlib
+      compiler: gcc
+    gcc:
+      spack_spec: gcc@4.8.5'''
+
+
+def test_merged_success_criteria_section(mock_low_high_config):
+    low_path = mock_low_high_config.scopes['low'].path
+    high_path = mock_low_high_config.scopes['high'].path
+
+    fs.mkdirp(low_path)
+    fs.mkdirp(high_path)
+
+    with open(os.path.join(low_path, 'success_criteria.yaml'), 'w') as f:
+        f.write('''\
+success_criteria:
+  - name: done
+    mode: string
+    match: "DONE"
+    file: "{log_file}"
+''')
+
+    with open(os.path.join(high_path, 'success_criteria.yaml'), 'w') as f:
+        f.write('''\
+success_criteria:
+  - name: complete
+    mode: string
+    match: "COMPLETE"
+    file: "{log_file}"
+''')
+
+    assert config('get', 'success_criteria').strip() == """success_criteria:
+- name: complete
+  mode: string
+  match: COMPLETE
+  file: '{log_file}'
+- name: done
+  mode: string
+  match: DONE
+  file: '{log_file}'"""
+
+
+def test_merged_appliactions_section(mock_low_high_config):
+    low_path = mock_low_high_config.scopes['low'].path
+    high_path = mock_low_high_config.scopes['high'].path
+
+    fs.mkdirp(low_path)
+    fs.mkdirp(high_path)
+
+    with open(os.path.join(low_path, 'applications.yaml'), 'w') as f:
+        f.write('''\
+applications:
+  foo:
+    workloads:
+      bar:
+        experiments:
+          test:
+            variables:
+              my_var: value
+''')
+
+    with open(os.path.join(high_path, 'applications.yaml'), 'w') as f:
+        f.write('''\
+applications:
+  foo:
+    workloads:
+      bar:
+        experiments:
+          test2:
+            variables:
+              my_var: value
+      baz:
+        experiments:
+          test:
+            variables:
+              my_var: value
+  hostname:
+    workloads:
+      serial:
+        experiments:
+          single:
+            variables:
+              n_ranks: 1
+''')
+
+    assert config('get', 'applications').strip() == """applications:
+  foo:
+    workloads:
+      bar:
+        experiments:
+          test2:
+            variables:
+              my_var: value
+          test:
+            variables:
+              my_var: value
+      baz:
+        experiments:
+          test:
+            variables:
+              my_var: value
+  hostname:
+    workloads:
+      serial:
+        experiments:
+          single:
+            variables:
+              n_ranks: 1"""
+
+
 def test_config_edit():
     """Ensure `ramble config edit` edits the right paths."""
 
@@ -99,11 +290,13 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_r
 
         ws.write()
 
-        assert 'basic' not in config('get')
+        config_output = config('get')
 
-        ramble.test.cmd.workspace.add_basic(ws)
+        expected_keys = ['applications', 'variables', 'env-vars',
+                         'spack', 'mpi_command', 'batch_submit']
 
-        assert 'basic' in config('get')
+        for key in expected_keys:
+            assert key in config_output
 
 
 def test_config_edit_edits_ramble_yaml(mutable_mock_workspace_path):

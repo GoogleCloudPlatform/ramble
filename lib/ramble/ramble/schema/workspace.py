@@ -17,12 +17,12 @@ from llnl.util.lang import union_dicts
 import spack.schema.env
 import ramble.schema.applications
 import ramble.schema.merged
+import ramble.schema.licenses
 
 env_properties = spack.schema.env.schema['patternProperties']
 spec_properties = env_properties['^env|spack$']
 
-applications_schema = ramble.schema.applications.schema
-applications_properties = applications_schema['properties']['applications']
+applications_properties = ramble.schema.applications.properties['applications']
 app_addProps = applications_properties['additionalProperties']
 
 keys = ('ramble', 'workspace')
@@ -60,21 +60,12 @@ properties = {
                     'additionalProperties': False,
                     'default': {}
                 },
-                'variables': ramble.schema.applications.variables_def,
-                'internals': ramble.schema.applications.internals_def,
-                'success_criteria': ramble.schema.applications.success_list_def,
-                'env-vars': ramble.schema.licenses.env_var_actions,
                 'include': {
                     'type': 'array',
                     'default': [],
                     'items': {'type': 'string'},
                 },
-                'applications': {
-                    'type': applications_properties['type'],
-                    'default': applications_properties['default'],
-                    'properties': applications_properties['properties'],
-                    'additionalProperties': app_addProps
-                },
+                'env-vars': ramble.schema.licenses.env_var_actions,
                 'application_directories': {
                     'type': 'array',
                     'default': [],

@@ -16,6 +16,7 @@ import datetime
 
 import six
 
+from llnl.util.lang import union_dicts
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 
@@ -703,36 +704,35 @@ class Workspace(object):
         tty.debug(' With ws dict: %s' % (ws_dict))
 
         # Iterate over applications in ramble.yaml first
-        if namespace.application in ws_dict[namespace.ramble]:
-            app_dict = ws_dict[namespace.ramble][namespace.application]
+        app_dict = ramble.config.config.get_config('applications')
 
-            for application, contents in app_dict.items():
-                application_vars = None
-                application_env_vars = None
-                application_internals = None
-                application_template = False
-                application_chained_experiments = None
+        for application, contents in app_dict.items():
+            application_vars = None
+            application_env_vars = None
+            application_internals = None
+            application_template = False
+            application_chained_experiments = None
 
-                if namespace.variables in contents:
-                    application_vars = contents[namespace.variables]
+            if namespace.variables in contents:
+                application_vars = contents[namespace.variables]
 
-                if namespace.env_var in contents:
-                    application_env_vars = contents[namespace.env_var]
+            if namespace.env_var in contents:
+                application_env_vars = contents[namespace.env_var]
 
-                if namespace.internals in contents:
-                    application_internals = contents[namespace.internals]
+            if namespace.internals in contents:
+                application_internals = contents[namespace.internals]
 
-                if namespace.template in contents:
-                    application_template = contents[namespace.template]
+            if namespace.template in contents:
+                application_template = contents[namespace.template]
 
-                if namespace.chained_experiments in contents:
-                    application_chained_experiments = contents[namespace.chained_experiments]
+            if namespace.chained_experiments in contents:
+                application_chained_experiments = contents[namespace.chained_experiments]
 
-                self.extract_success_criteria('application', contents)
+            self.extract_success_criteria('application', contents)
 
-                yield application, contents, application_vars, \
-                    application_env_vars, application_internals, \
-                    application_template, application_chained_experiments
+            yield application, contents, application_vars, \
+                application_env_vars, application_internals, \
+                application_template, application_chained_experiments
 
         tty.debug('  Iterating over configs in directories...')
         # Iterate over applications defined in application directories
@@ -1120,7 +1120,8 @@ class Workspace(object):
                             'properly configured.'
             tty.die(error_message)
 
-        self.extract_success_criteria('workspace', self._get_workspace_dict()[namespace.ramble])
+        self.extract_success_criteria('workspace',
+                                      ramble.config.config.get_config('success_criteria'))
 
         if pipeline == 'setup':
             all_experiments_path = os.path.join(self.root,
@@ -1478,11 +1479,12 @@ class Workspace(object):
 
     def get_workspace_vars(self):
         """Return a dict of workspace variables"""
-        return self._get_workspace_section(namespace.variables)
+        return ramble.config.config.get_config('variables')
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        return self._get_workspace_section(namespace.env_var)
+        return union_dicts(ramble.config.config.get_config('env_vars'),
+                           self._get_workspace_section(namespace.env_var))
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""

@@ -33,7 +33,7 @@ import ramble.expander
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
-from ramble.schema.applications import OUTPUT
+from ramble.schema.types import OUTPUT_CAPTURE
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
@@ -493,7 +493,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if namespace.custom_executables in self.internals.keys():
             for name, conf in self.internals[namespace.custom_executables].items():
 
-                output_capture = OUTPUT.DEFAULT
+                output_capture = OUTPUT_CAPTURE.DEFAULT
                 if 'output_capture' in conf:
                     output_capture = conf['output_capture']
 
