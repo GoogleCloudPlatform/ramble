@@ -233,15 +233,17 @@ def list(parser, args):
     # retrieve the formatter to use from args
     formatter = formatters[args.format]
 
+    app_type = ramble.repository.ObjectTypes.applications
+
     # Retrieve the names of all the applications
-    apps = set(ramble.repository.all_application_names())
+    apps = set(ramble.repository.all_object_names(app_type))
     # Filter the set appropriately
     sorted_applications = filter_by_name(apps, args)
 
     # Filter by tags
     if args.tags:
         applications_with_tags = set(
-            ramble.repository.apps_path.objects_with_tags(*args.tags))
+            ramble.repository.paths[app_type].objects_with_tags(*args.tags))
         sorted_applications = set(sorted_applications) & applications_with_tags
         sorted_applications = sorted(sorted_applications)
 
@@ -249,7 +251,7 @@ def list(parser, args):
         # change output stream if user asked for update
         if os.path.exists(args.update):
             if os.path.getmtime(args.update) > \
-                    ramble.repository.apps_path.last_mtime():
+                    ramble.repository.paths[app_type].last_mtime():
                 tty.msg('File is up to date: %s' % args.update)
                 return
 

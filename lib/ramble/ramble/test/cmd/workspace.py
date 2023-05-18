@@ -22,7 +22,7 @@ import spack.util.spack_yaml as syaml
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_workspace_path',
-                                     'mutable_mock_repo')
+                                     'mutable_mock_apps_repo')
 
 config = RambleCommand('config')
 workspace = RambleCommand('workspace')

@@ -7,8 +7,8 @@
 # except according to those terms.
 
 
-def test_basic_inheritance(mutable_mock_repo):
-    app_inst = mutable_mock_repo.get('basic-inherited')
+def test_basic_inheritance(mutable_mock_apps_repo):
+    app_inst = mutable_mock_apps_repo.get('basic-inherited')
 
     assert 'foo' in app_inst.executables
     assert app_inst.executables['foo']['template'] == 'bar'

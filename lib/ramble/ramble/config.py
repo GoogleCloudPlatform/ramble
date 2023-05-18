@@ -56,6 +56,7 @@ import ramble.schema
 import ramble.schema.config
 import ramble.schema.env_vars
 import ramble.schema.repos
+import ramble.schema.modifier_repos
 import ramble.schema.workspace
 import ramble.schema.applications
 import ramble.schema.internals
@@ -79,6 +80,7 @@ section_schemas = {
     'internals': ramble.schema.internals.schema,
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
+    'modifier_repos': ramble.schema.modifier_repos.schema,
     'spack': ramble.schema.spack.schema,
     'success_criteria': ramble.schema.success_criteria.schema,
     'applications': ramble.schema.applications.schema,

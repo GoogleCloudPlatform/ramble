@@ -493,8 +493,19 @@ def setup_main_options(args):
         ramble.config.set('config:locks', args.locks, scope='command_line')
 
     if args.mock:
-        ramble.repository.apps_path = \
-            ramble.repository.RepoPath(ramble.paths.mock_applications_path)
+        import spack.util.spack_yaml as syaml
+
+        for obj in ramble.repository.ObjectTypes:
+            obj_section = ramble.repository.type_definitions[obj]['config_section']
+            key = syaml.syaml_str(obj_section)
+            key.override = True
+
+            ramble.config.config.scopes["command_line"].sections[obj_section] = syaml.syaml_dict(
+                [(key, [ramble.paths.mock_builtin_path])]
+            )
+
+            ramble.repository.paths[obj] = \
+                ramble.repository.create(ramble.config.config, object_type=obj)
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:

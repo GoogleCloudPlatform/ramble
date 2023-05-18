@@ -127,24 +127,50 @@ def working_env():
 # Test-specific fixtures
 #
 @pytest.fixture(scope='session')
-def mock_repo_path():
-    yield ramble.repository.Repo(ramble.paths.mock_applications_path,
-                                 object_type=ramble.repository.ObjectTypes.applications)
+def mock_apps_repo_path():
+    obj_type = ramble.repository.ObjectTypes.applications
+    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture(scope='session')
+def mock_mods_repo_path():
+    obj_type = ramble.repository.ObjectTypes.modifiers
+    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
 
 
 @pytest.fixture(scope='function')
-def mock_applications(mock_repo_path):
-    """Use the 'builtin.mock' repository instead of 'builtin'"""
-    with ramble.repository.use_repositories(mock_repo_path) as mock_repo:
-        yield mock_repo
+def mock_applications(mock_apps_repo_path):
+    """Use the 'builtin.mock' repository for applications instead of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.applications
+    with ramble.repository.use_repositories(mock_apps_repo_path, object_type=obj_type) \
+            as mock_apps_repo:
+        yield mock_apps_repo
 
 
 @pytest.fixture(scope='function')
-def mutable_mock_repo(mock_repo_path):
-    """Function-scoped mock packages, for tests that need to modify them."""
-    mock_repo = ramble.repository.Repo(ramble.paths.mock_applications_path,
-                                       object_type=ramble.repository.ObjectTypes.applications)
-    with ramble.repository.use_repositories(mock_repo) as mock_repo_path:
+def mock_modifiers(mock_mods_repo_path):
+    """Use the 'builtin.mock' repository for modifiersinstead of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.modifiers
+    with ramble.repository.use_repositories(mock_mods_repo_path, object_type=obj_type) \
+            as mock_mods_repo:
+        yield mock_mods_repo
+
+
+@pytest.fixture(scope='function')
+def mutable_mock_apps_repo(mock_apps_repo_path):
+    """Function-scoped mock applications, for tests that need to modify them."""
+    obj_type = ramble.repository.ObjectTypes.applications
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
+        yield mock_repo_path
+
+
+@pytest.fixture(scope='function')
+def mutable_mock_mods_repo(mock_mods_repo_path):
+    """Function-scoped mock modifiers, for tests that need to modify them."""
+    obj_type = ramble.repository.ObjectTypes.modifiers
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
         yield mock_repo_path
 
 

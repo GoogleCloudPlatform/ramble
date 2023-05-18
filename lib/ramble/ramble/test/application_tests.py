@@ -20,8 +20,8 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
     'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
     'register-builtin'
 ])
-def test_app_features(mutable_mock_repo, app):
-    app_inst = mutable_mock_repo.get(app)
+def test_app_features(mutable_mock_apps_repo, app):
+    app_inst = mutable_mock_apps_repo.get(app)
     assert hasattr(app_inst, 'workloads')
     assert hasattr(app_inst, 'executables')
     assert hasattr(app_inst, 'figures_of_merit')
@@ -33,8 +33,8 @@ def test_app_features(mutable_mock_repo, app):
     assert hasattr(app_inst, 'builtins')
 
 
-def test_basic_app(mutable_mock_repo):
-    basic_inst = mutable_mock_repo.get('basic')
+def test_basic_app(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
     assert 'foo' in basic_inst.executables
     assert basic_inst.executables['foo']['template'] == 'bar'
     assert not basic_inst.executables['foo']['mpi']
@@ -72,8 +72,8 @@ def test_basic_app(mutable_mock_repo):
         == 'Example var'
 
 
-def test_env_var_set_command_gen(mutable_mock_repo):
-    basic_inst = mutable_mock_repo.get('basic')
+def test_env_var_set_command_gen(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
 
     tests = {
         'var1': 'val1',
@@ -90,8 +90,8 @@ def test_env_var_set_command_gen(mutable_mock_repo):
         assert cmd in out_cmds
 
 
-def test_env_var_append_command_gen(mutable_mock_repo):
-    basic_inst = mutable_mock_repo.get('basic')
+def test_env_var_append_command_gen(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
 
     tests = [
         {
@@ -126,8 +126,8 @@ def test_env_var_append_command_gen(mutable_mock_repo):
         assert cmd in out_cmds
 
 
-def test_env_var_prepend_command_gen(mutable_mock_repo):
-    basic_inst = mutable_mock_repo.get('basic')
+def test_env_var_prepend_command_gen(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
 
     tests = [
         {
@@ -154,8 +154,8 @@ def test_env_var_prepend_command_gen(mutable_mock_repo):
         assert cmd in out_cmds
 
 
-def test_env_var_unset_command_gen(mutable_mock_repo):
-    basic_inst = mutable_mock_repo.get('basic')
+def test_env_var_unset_command_gen(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
 
     tests = [
         'var1',
@@ -173,8 +173,8 @@ def test_env_var_unset_command_gen(mutable_mock_repo):
 
 
 @pytest.mark.parametrize('app_name', ['basic', 'zlib'])
-def test_application_copy_is_deep(mutable_mock_repo, app_name):
-    src_inst = mutable_mock_repo.get(app_name)
+def test_application_copy_is_deep(mutable_mock_apps_repo, app_name):
+    src_inst = mutable_mock_apps_repo.get(app_name)
 
     defined_variables = {
         'test_var1': 'test_val1',
@@ -274,8 +274,8 @@ def test_application_copy_is_deep(mutable_mock_repo, app_name):
     'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
     'register-builtin'
 ])
-def test_required_builtins(mutable_mock_repo, app):
-    app_inst = mutable_mock_repo.get(app)
+def test_required_builtins(mutable_mock_apps_repo, app):
+    app_inst = mutable_mock_apps_repo.get(app)
 
     required_builtins = []
     for builtin, conf in app_inst.builtins.items():
@@ -288,8 +288,8 @@ def test_required_builtins(mutable_mock_repo, app):
                 assert builtin in wl_conf[app_inst._workload_exec_key]
 
 
-def test_register_builtin_app(mutable_mock_repo):
-    app_inst = mutable_mock_repo.get('register-builtin')
+def test_register_builtin_app(mutable_mock_apps_repo):
+    app_inst = mutable_mock_apps_repo.get('register-builtin')
 
     required_builtins = []
     excluded_builtins = []

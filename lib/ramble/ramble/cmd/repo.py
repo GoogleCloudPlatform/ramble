@@ -15,8 +15,9 @@ import llnl.util.tty as tty
 
 import ramble.config
 import ramble.repository
+import ramble.cmd.common.arguments
 
-description = "manage application repositories"
+description = "manage Ramble repositories"
 section = "config"
 level = "long"
 
@@ -24,33 +25,33 @@ level = "long"
 def setup_parser(subparser):
     """Setup the repo command parser.
 
-    The repo command helps manage application repositories, which are
-    the locations ramble reads application definition files from.
+    The repo command helps manage Ramble repositories, which are
+    the locations ramble reads object definition files from.
 
     This command has subcommands for create, add, remove, and list.
     """
+
     sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='repo_command')
     scopes = ramble.config.scopes()
     scopes_metavar = ramble.config.scopes_metavar
-
-    default_type_def = ramble.repository.type_definitions[ramble.repository.default_type]
 
     # Create
     create_parser = sp.add_parser('create', help=repo_create.__doc__)
     create_parser.add_argument(
         'directory', help="directory to create the repo in")
     create_parser.add_argument(
-        'namespace', help=f"namespace to identify {ramble.repository.default_type.name} "
+        'namespace', help="namespace to identify objects "
         "in the repository. defaults to the directory name", nargs='?')
     create_parser.add_argument(
         '-d', '--subdirectory',
         action='store',
-        default=default_type_def['dir_name'],
         help=(
-            "subdirectory to store applications in the repository. "
-            f"Default '{default_type_def['dir_name']}'. Use an empty string for no subdirectory."
+            "subdirectory to store objects in the repository. "
+            "Default is determined by the type of repository. "
+            "Use an empty string for no subdirectory."
         ),
     )
+    ramble.cmd.common.arguments.add_common_arguments(create_parser, ['repo_type'])
 
     # List
     list_parser = sp.add_parser('list', help=repo_list.__doc__)
@@ -58,41 +59,51 @@ def setup_parser(subparser):
         '--scope', choices=scopes, metavar=scopes_metavar,
         default=ramble.config.default_list_scope(),
         help="configuration scope to read from")
+    ramble.cmd.common.arguments.add_common_arguments(list_parser, ['repo_type'])
 
     # Add
     add_parser = sp.add_parser('add', help=repo_add.__doc__)
     add_parser.add_argument(
-        'path', help="path to a Ramble application repository directory")
+        'path', help="path to a Ramble repository directory")
     add_parser.add_argument(
         '--scope', choices=scopes, metavar=scopes_metavar,
         default=ramble.config.default_modify_scope(),
         help="configuration scope to modify")
+    ramble.cmd.common.arguments.add_common_arguments(add_parser, ['repo_type'])
 
     # Remove
     remove_parser = sp.add_parser(
         'remove', help=repo_remove.__doc__, aliases=['rm'])
     remove_parser.add_argument(
         'namespace_or_path',
-        help="namespace or path of a Ramble application repository")
+        help="namespace or path of a Ramble repository")
     remove_parser.add_argument(
         '--scope', choices=scopes, metavar=scopes_metavar,
         default=ramble.config.default_modify_scope(),
         help="configuration scope to modify")
+    ramble.cmd.common.arguments.add_common_arguments(remove_parser, ['repo_type'])
 
 
 def repo_create(args):
-    """Create a new application repository."""
+    """Create a new repository."""
+    obj_type = ramble.repository.ObjectTypes[args.type]
+    subdir = args.subdirectory
+    if subdir is None:
+        subdir = ramble.repository.type_definitions[obj_type]['dir_name']
+
     full_path, namespace = ramble.repository.create_repo(
-        args.directory, args.namespace, args.subdirectory
+        args.directory, args.namespace, subdir, object_type=obj_type
     )
-    tty.msg("Created repo with namespace '%s'." % namespace)
+    tty.msg(f"Created {obj_type.name} repo with namespace '{namespace}'.")
     tty.msg("To register it with ramble, run this command:",
-            'ramble repo add %s' % full_path)
+            f'ramble repo -t {obj_type.name} add {full_path}')
 
 
 def repo_add(args):
-    """Add an application repository to Ramble's configuration."""
+    """Add a repository to Ramble's configuration."""
     path = args.path
+    obj_type = ramble.repository.ObjectTypes[args.type]
+    type_def = ramble.repository.type_definitions[obj_type]
 
     # real_path is absolute and handles substitution.
     canon_path = ramble.util.path.canonicalize_path(path)
@@ -106,10 +117,10 @@ def repo_add(args):
         tty.die("Not a Ramble repository: %s" % path)
 
     # Make sure it's actually a ramble repository by constructing it.
-    repo = ramble.repository.Repo(canon_path)
+    repo = ramble.repository.Repo(canon_path, obj_type)
 
     # If that succeeds, finally add it to the configuration.
-    repos = ramble.config.get('repos', scope=args.scope)
+    repos = ramble.config.get(type_def['config_section'], scope=args.scope)
     if not repos:
         repos = []
 
@@ -117,13 +128,16 @@ def repo_add(args):
         tty.die("Repository is already registered with Ramble: %s" % path)
 
     repos.insert(0, canon_path)
-    ramble.config.set('repos', repos, args.scope)
-    tty.msg("Added repo with namespace '%s'." % repo.namespace)
+    ramble.config.set(type_def['config_section'], repos, args.scope)
+    tty.msg(f"Added {obj_type.name} repo with namespace '{repo.namespace}'.")
 
 
 def repo_remove(args):
     """Remove a repository from Ramble's configuration."""
-    repos = ramble.config.get('repos', scope=args.scope)
+    obj_type = ramble.repository.ObjectTypes[args.type]
+    type_def = ramble.repository.type_definitions[obj_type]
+
+    repos = ramble.config.get(type_def['config_section'], scope=args.scope)
     namespace_or_path = args.namespace_or_path
 
     # If the argument is a path, remove that repository from config.
@@ -132,39 +146,41 @@ def repo_remove(args):
         repo_canon_path = ramble.util.path.canonicalize_path(repo_path)
         if canon_path == repo_canon_path:
             repos.remove(repo_path)
-            ramble.config.set('repos', repos, args.scope)
-            tty.msg("Removed repository %s" % repo_path)
+            ramble.config.set(type_def['config_section'], repos, args.scope)
+            tty.msg(f"Removed {obj_type.name} repository {repo_path}")
             return
 
     # If it is a namespace, remove corresponding repo
     for path in repos:
         try:
-            repo = ramble.repository.Repo(path)
+            repo = ramble.repository.Repo(path, obj_type)
             if repo.namespace == namespace_or_path:
                 repos.remove(path)
-                ramble.config.set('repos', repos, args.scope)
-                tty.msg("Removed repository %s with namespace '%s'."
-                        % (repo.root, repo.namespace))
+                ramble.config.set(type_def['config_section'], repos, args.scope)
+                tty.msg(f"Removed {obj_type.name} repository {repo.root} "
+                        f"with namespace '{repo.namespace}'.")
                 return
         except ramble.repository.RepoError:
             continue
 
-    tty.die("No repository with path or namespace: %s"
-            % namespace_or_path)
+    tty.die(f"No {obj_type.name} repository with path or namespace: {namespace_or_path}")
 
 
 def repo_list(args):
     """Show registered repositories and their namespaces."""
-    roots = ramble.config.get('repos', scope=args.scope)
+    obj_type = ramble.repository.ObjectTypes[args.type]
+    type_def = ramble.repository.type_definitions[obj_type]
+
+    roots = ramble.config.get(type_def['config_section'], scope=args.scope)
     repos = []
     for r in roots:
         try:
-            repos.append(ramble.repository.Repo(r))
+            repos.append(ramble.repository.Repo(r, obj_type))
         except ramble.repository.RepoError:
             continue
 
     if sys.stdout.isatty():
-        msg = "%d application repositor" % len(repos)
+        msg = f"{len(repos)} {obj_type.name} repositor"
         msg += "y." if len(repos) == 1 else "ies."
         tty.msg(msg)
 
@@ -183,4 +199,8 @@ def repo(parser, args):
               'add': repo_add,
               'remove': repo_remove,
               'rm': repo_remove}
+
+    if args.type not in ramble.repository.OBJECT_NAMES:
+        tty.die(f"Repository type '{args.type}' is not valid.")
+
     action[args.repo_command](args)

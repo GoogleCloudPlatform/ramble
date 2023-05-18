@@ -14,7 +14,7 @@ import ramble.workspace
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+    'mutable_mock_workspace_path', 'config', 'mutable_mock_apps_repo')
 
 
 @pytest.fixture()
