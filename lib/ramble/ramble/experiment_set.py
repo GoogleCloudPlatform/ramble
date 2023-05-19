@@ -53,6 +53,7 @@ class ExperimentSet(object):
         self._internals = {}
         self._templates = {}
         self._chained_experiments = {}
+        self._modifiers = {}
         self._context_names = {}
 
         for context in self._contexts:
@@ -62,6 +63,7 @@ class ExperimentSet(object):
             self._internals[context] = None
             self._templates[context] = None
             self._chained_experiments[context] = None
+            self._modifiers[context] = None
 
         self._variables[self._contexts.base] = {}
         self._variables[self._contexts.required] = {}
@@ -76,6 +78,7 @@ class ExperimentSet(object):
         workspace_vars = workspace.get_workspace_vars()
         workspace_env_vars = workspace.get_workspace_env_vars()
         workspace_internals = workspace.get_workspace_internals()
+        workspace_modifiers = workspace.get_workspace_modifiers()
 
         try:
             self.keywords.check_reserved_keys(workspace_vars)
@@ -88,7 +91,8 @@ class ExperimentSet(object):
                           workspace.name,
                           workspace_vars,
                           workspace_env_vars,
-                          workspace_internals)
+                          workspace_internals,
+                          modifiers=workspace_modifiers)
 
         # Set some base variables from the workspace definition.
         self.set_base_var(self.keywords.log_dir, workspace.log_dir)
@@ -105,6 +109,7 @@ class ExperimentSet(object):
                           site_env_vars,
                           None,
                           False,
+                          None,
                           None)
 
     def get_config_vars(self, workspace):
@@ -130,7 +135,7 @@ class ExperimentSet(object):
         self._variables[self._contexts.required][var] = val
 
     def _set_context(self, context, name, variables, env_variables, internals,
-                     template=None, chained_experiments=None):
+                     template=None, chained_experiments=None, modifiers=None):
         """Abstraction method to set context attributes"""
         if context not in self._contexts:
             raise RambleVariableDefinitionError(
@@ -143,13 +148,15 @@ class ExperimentSet(object):
         self._internals[context] = internals
         self._templates[context] = template
         self._chained_experiments[context] = chained_experiments
+        self._modifiers[context] = modifiers
 
     def set_application_context(self, application_name,
                                 application_variables,
                                 application_env_variables,
                                 application_internals,
                                 application_template,
-                                application_chained_experiments):
+                                application_chained_experiments,
+                                application_modifiers=None):
         """Set up current application context"""
 
         try:
@@ -162,14 +169,16 @@ class ExperimentSet(object):
         self._set_context(self._contexts.application, application_name,
                           application_variables, application_env_variables,
                           application_internals, application_template,
-                          application_chained_experiments)
+                          application_chained_experiments,
+                          application_modifiers)
 
     def set_workload_context(self, workload_name,
                              workload_variables,
                              workload_env_variables,
                              workload_internals,
                              workload_template,
-                             workload_chained_experiments):
+                             workload_chained_experiments,
+                             workload_modifiers=None):
         """Set up current workload context"""
 
         try:
@@ -183,7 +192,8 @@ class ExperimentSet(object):
         self._set_context(self._contexts.workload, workload_name,
                           workload_variables, workload_env_variables,
                           workload_internals, workload_template,
-                          workload_chained_experiments)
+                          workload_chained_experiments,
+                          workload_modifiers)
 
     def set_experiment_context(self, experiment_name_template,
                                experiment_variables,
@@ -191,7 +201,8 @@ class ExperimentSet(object):
                                experiment_matrices,
                                experiment_internals,
                                experiment_template,
-                               experiment_chained_experiments):
+                               experiment_chained_experiments,
+                               experiment_modifiers=None):
         """Set up current experiment context"""
 
         try:
@@ -205,7 +216,8 @@ class ExperimentSet(object):
         self._set_context(self._contexts.experiment, experiment_name_template,
                           experiment_variables, experiment_env_variables,
                           experiment_internals, experiment_template,
-                          experiment_chained_experiments)
+                          experiment_chained_experiments,
+                          experiment_modifiers)
 
         self._matrices[self._contexts.experiment] = experiment_matrices
         self._ingest_experiments()
@@ -334,6 +346,7 @@ class ExperimentSet(object):
         ordered_env_variables = []
         merged_internals = {}
         merged_chained_experiments = []
+        merged_mods = []
         is_template = False
 
         internal_sections = [ramble.workspace.namespace.custom_executables,
@@ -364,6 +377,9 @@ class ExperimentSet(object):
             if self._chained_experiments[context]:
                 for chained_exp in self._chained_experiments[context]:
                     merged_chained_experiments.append(chained_exp.copy())
+            if self._modifiers[context]:
+                for modifier in self._modifiers[context]:
+                    merged_mods.append(modifier.copy())
             if self._templates[context] is not None:
                 is_template = self._templates[context]
 
@@ -445,6 +461,7 @@ class ExperimentSet(object):
             app_inst.set_internals(merged_internals)
             app_inst.set_template(is_template)
             app_inst.set_chained_experiments(merged_chained_experiments)
+            app_inst.set_modifiers(merged_mods)
             self.experiments[experiment_namespace] = app_inst
             self.experiment_order.append(experiment_namespace)
 

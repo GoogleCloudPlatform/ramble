@@ -10,5 +10,5 @@
 # Per-user settings (overrides default and site settings):
 #   ~/.ramble/repos.yaml
 # -------------------------------------------------------------------------
-repos:
+modifier_repos:
   - $ramble/var/ramble/repos/builtin

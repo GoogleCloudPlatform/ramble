@@ -82,6 +82,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.chain_append = []
         self.chain_commands = {}
         self._env_variable_sets = None
+        self.modifiers = None
 
         self._file_path = file_path
 
@@ -199,6 +200,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.chained_experiments = None
         if chained_experiments:
             self.chained_experiments = chained_experiments.copy()
+
+    def set_modifiers(self, modifiers):
+        """Set modifiers for this instance"""
+        if modifiers:
+            self.modifiers = modifiers.copy()
 
     def get_pipeline_phases(self, pipeline):
         phases = []
