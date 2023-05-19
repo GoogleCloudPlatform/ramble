@@ -331,8 +331,8 @@
             <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> \
                     <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_env_packages</span><span class="p">(</span><span class="n">app_context</span><span class="p">):</span>
                 <span class="n">spec_str</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_spec_string</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
-                <span class="n">package_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">get_package_path</span><span class="p">(</span><span class="n">spec_str</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">package_path</span>
+                <span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">package_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">get_package_path</span><span class="p">(</span><span class="n">spec_str</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">package_path</span>
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
@@ -421,7 +421,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 17, 2023.
+      <span class="lastupdated">Last updated on May 19, 2023.
       </span></p>
   </div>
 
