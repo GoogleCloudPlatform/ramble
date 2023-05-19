@@ -909,6 +909,7 @@ class Workspace(object):
 
         for app_name, *_ in self.all_applications():
             app_inst = ramble.repository.get(app_name)
+            app_inst.build_modifier_instances()
 
             for comp, info in app_inst.default_compilers.items():
                 if comp not in packages_dict:
@@ -938,33 +939,40 @@ class Workspace(object):
                                   scope=self.ws_file_config_scope_name())
 
             app_packages = environments_dict[app_name][namespace.packages]
-            for spec_name, info in app_inst.software_specs.items():
-                if spec_name not in packages_dict:
-                    packages_dict[spec_name] = syaml.syaml_dict()
-                    packages_dict[spec_name]['spack_spec'] = info['spack_spec']
-                    ramble.config.add(f'spack:packages:{spec_name}:' +
-                                      f'spack_spec:{info["spack_spec"]}',
+
+            software_dicts = [app_inst.software_specs]
+            for mod in app_inst.modifiers:
+                mod_inst = app_inst._modifier_map[mod]
+                software_dicts.append(mod_inst.software_specs)
+
+            for software_dict in software_dicts:
+                for spec_name, info in software_dict.items():
+                    if spec_name not in packages_dict:
+                        packages_dict[spec_name] = syaml.syaml_dict()
+                        packages_dict[spec_name]['spack_spec'] = info['spack_spec']
+                        ramble.config.add(f'spack:packages:{spec_name}:' +
+                                          f'spack_spec:{info["spack_spec"]}',
+                                          scope=self.ws_file_config_scope_name())
+                        if 'compiler_spec' in info and info['compiler_spec']:
+                            packages_dict[spec_name]['compiler_spec'] = info['compiler_spec']
+                            config_path = f'spack:packages:{spec_name}:' + \
+                                f'compiler_spec:{info["compiler_spec"]}'
+                            ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                        if 'compiler' in info and info['compiler']:
+                            packages_dict[spec_name]['compiler'] = info['compiler']
+                            config_path = f'spack:packages:{spec_name}:' + \
+                                f'compiler:{info["compiler"]}'
+                            ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+
+                    elif not specs_equiv(info, packages_dict[spec_name]):
+                        raise RambleConflictingDefinitionError(
+                            f'Package {spec_name} defined in multiple conflicting ways'
+                        )
+
+                    ramble.config.add(f'spack:environments:{app_name}:packages:[{spec_name}]',
                                       scope=self.ws_file_config_scope_name())
-                    if 'compiler_spec' in info and info['compiler_spec']:
-                        packages_dict[spec_name]['compiler_spec'] = info['compiler_spec']
-                        config_path = f'spack:packages:{spec_name}:' + \
-                            f'compiler_spec:{info["compiler_spec"]}'
-                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
-                    if 'compiler' in info and info['compiler']:
-                        packages_dict[spec_name]['compiler'] = info['compiler']
-                        config_path = f'spack:packages:{spec_name}:' + \
-                            f'compiler:{info["compiler"]}'
-                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
 
-                elif not specs_equiv(info, packages_dict[spec_name]):
-                    raise RambleConflictingDefinitionError(
-                        f'Package {spec_name} defined in multiple conflicting ways'
-                    )
-
-                ramble.config.add(f'spack:environments:{app_name}:packages:[{spec_name}]',
-                                  scope=self.ws_file_config_scope_name())
-
-                app_packages.append(spec_name)
+                    app_packages.append(spec_name)
 
         ramble.config.add('spack:concretized:true', scope=self.ws_file_config_scope_name())
 

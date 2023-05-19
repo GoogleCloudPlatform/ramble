@@ -29,11 +29,13 @@ import ramble.stage
 import ramble.mirror
 import ramble.fetch_strategy
 import ramble.expander
+import ramble.repository
+import ramble.modifier
+import ramble.util.executable
 
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
-from ramble.schema.types import OUTPUT_CAPTURE
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
@@ -59,6 +61,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
     uses_spack = False
     _exec_prefix_builtin = 'builtin::'
+    _mod_prefix_builtin = 'modifier_builtin::'
     _builtin_required_key = 'required'
     _workload_exec_key = 'executables'
 
@@ -82,7 +85,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.chain_append = []
         self.chain_commands = {}
         self._env_variable_sets = None
-        self.modifiers = None
+        self.modifiers = []
+        self._modifier_instances = []
+        self._modifier_builtins = {}
 
         self._file_path = file_path
 
@@ -115,6 +120,54 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 for builtin in reversed(required_builtins):
                     if builtin not in wl_conf[self._workload_exec_key]:
                         wl_conf[self._workload_exec_key].insert(0, builtin)
+
+    def _inject_required_modifier_builtins(self):
+        """Inject builtins defined as required from each modifier into this
+        application instance."""
+        if not self.modifiers or len(self._modifier_instances) == 0:
+            return
+
+        required_prepend_builtins = []
+        required_append_builtins = []
+
+        mod_regex = re.compile(ramble.modifier.ModifierBase._mod_builtin_regex +
+                               r'(?P<func>.*)')
+        for mod_inst in self._modifier_instances:
+            for builtin, blt_conf in mod_inst.builtins.items():
+                if blt_conf[self._builtin_required_key]:
+                    blt_match = mod_regex.match(builtin)
+
+                    # Each builtin should only be added once.
+                    added = False
+
+                    if blt_conf['injection_method'] == 'prepend':
+                        if builtin not in required_prepend_builtins:
+                            required_prepend_builtins.append(builtin)
+                            added = True
+                    else:  # Append
+                        if builtin not in required_append_builtins:
+                            required_append_builtins.append(builtin)
+                            added = True
+
+                    # Only update if the builtin was added to a list.
+                    if added:
+                        self._modifier_builtins[builtin] = {
+                            'func': getattr(mod_inst,
+                                            blt_match.group("func"))
+                        }
+
+        for workload, wl_conf in self.workloads.items():
+            if self._workload_exec_key in wl_conf:
+                # Insert prepend builtins in reverse order, to make sure they
+                # are correctly ordered.
+                for builtin in reversed(required_prepend_builtins):
+                    if builtin not in wl_conf[self._workload_exec_key]:
+                        wl_conf[self._workload_exec_key].insert(0, builtin)
+
+                # Append builtins can be inserted in their correct order.
+                for builtin in required_append_builtins:
+                    if builtin not in wl_conf[self._workload_exec_key]:
+                        wl_conf[self._workload_exec_key].append(builtin)
 
     def _long_print(self):
         out_str = []
@@ -239,6 +292,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     # Phase execution helpers
     def run_phase(self, phase, workspace):
         """Run a phase, by getting its function pointer"""
+        self.build_modifier_instances()
+        self._inject_required_modifier_builtins()
         self.add_expand_vars(workspace)
         if self.is_template:
             tty.debug(f'{self.name} is a template. Skipping phases')
@@ -476,6 +531,31 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if exp_inst:
                 exp_inst.chain_order = self.chain_order.copy()
 
+    def build_modifier_instances(self):
+        """Built a map of modifier names to modifier instances needed for this
+           application instance
+        """
+
+        if not self.modifiers:
+            return
+
+        mod_type = ramble.repository.ObjectTypes.modifiers
+
+        for mod in self.modifiers:
+            mod_inst = ramble.repository.get(mod['name'], mod_type).copy()
+
+            if 'on_executable' in mod:
+                mod_inst.set_on_executables(mod['on_executable'])
+            else:
+                mod_inst.set_on_executables(None)
+
+            if 'mode' in mod:
+                mod_inst.set_usage_mode(mod['mode'])
+            else:
+                mod_inst.set_usage_mode(None)
+
+            self._modifier_instances.append(mod_inst)
+
     def _get_executables_and_inputs(self):
         """Return executables and inputs for add_expand_vars"""
 
@@ -489,17 +569,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Define custom executables
         if namespace.custom_executables in self.internals.keys():
             for name, conf in self.internals[namespace.custom_executables].items():
-
-                output_capture = OUTPUT_CAPTURE.DEFAULT
-                if 'output_capture' in conf:
-                    output_capture = conf['output_capture']
-
-                self.executables[name] = {
-                    'template': conf['template'],
-                    'mpi': conf['mpi'] if 'mpi' in conf else False,
-                    'redirect': conf['redirect'] if 'redirect' in conf else '{log_file}',
-                    'output_capture': output_capture
-                }
+                self.executables[name] = ramble.util.executable.CommandExecutable(
+                    name=name,
+                    **conf
+                )
 
         return executables, inputs
 
@@ -533,11 +606,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # ensure all log files are purged and set up
         logs = set()
         builtin_regex = re.compile(r'%s(?P<func>.*)' % self._exec_prefix_builtin)
+        modifier_regex = re.compile(ramble.modifier.ModifierBase._mod_prefix_builtin +
+                                    r'(?P<func>.*)')
         for executable in executables:
-            if not builtin_regex.match(executable):
+            if not builtin_regex.search(executable) and \
+                    not modifier_regex.search(executable):
                 command_config = self.executables[executable]
-                if command_config['redirect']:
-                    logs.add(command_config['redirect'])
+                if command_config.redirect:
+                    logs.add(command_config.redirect)
 
         for log in logs:
             command.append('rm -f "%s"' % log)
@@ -545,50 +621,59 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for executable in executables:
             builtin_match = builtin_regex.match(executable)
+
+            exec_vars = {'executable_name': executable}
+
+            for mod in self._modifier_instances:
+                if mod.applies_to_executable(executable):
+                    exec_vars.update(mod.modded_variables(self))
+
             if builtin_match:
                 # Process builtin executables
 
                 # Get internal method:
                 func_name = f'{builtin_match.group("func")}'
                 func = getattr(self, func_name)
-                command.extend(func())
+                func_cmds = func()
+                for cmd in func_cmds:
+                    command.append(self.expander.expand_var(cmd, exec_vars))
+            elif executable in self._modifier_builtins.keys():
+                builtin_def = self._modifier_builtins[executable]
+                func = builtin_def['func']
+                func_cmds = func()
+                for cmd in func_cmds:
+                    command.append(self.expander.expand_var(cmd, exec_vars))
             else:
                 # Process directive defined executables
-                self.variables['executable_name'] = executable
-                exec_vars = {}
-                command_config = self.executables[executable]
+                base_command = self.executables[executable].copy()
+                pre_commands = []
+                post_commands = []
 
-                if command_config['mpi']:
-                    exec_vars['mpi_command'] = \
-                        self.expander.expand_var('{mpi_command}') + ' '
-                else:
-                    exec_vars['mpi_command'] = ''
+                for mod in self._modifier_instances:
+                    if mod.applies_to_executable(executable):
+                        pre_cmd, post_cmd = mod.apply_executable_modifiers(executable,
+                                                                           base_command)
+                        pre_commands.extend(pre_cmd)
+                        post_commands.extend(post_cmd)
 
-                if command_config['redirect']:
-                    out_log = self.expander.expand_var(command_config['redirect'])
-                    output_operator = command_config['output_capture']
-                    exec_vars['redirect'] = f' {output_operator} "{out_log}"'
-                else:
-                    exec_vars['redirect'] = ''
+                command_configs = pre_commands.copy()
+                command_configs.append(base_command)
+                command_configs.extend(post_commands)
 
-                mpi_cmd = exec_vars['mpi_command']
-                redirect = exec_vars['redirect']
-                if isinstance(command_config['template'], list):
-                    for part in command_config['template']:
+                for cmd_conf in command_configs:
+                    mpi_cmd = ''
+                    if cmd_conf.mpi:
+                        mpi_cmd = ' ' + self.expander.expand_var('{mpi_command}', exec_vars) + ' '
+
+                    redirect = ''
+                    if cmd_conf.redirect:
+                        out_log = self.expander.expand_var(cmd_conf.redirect, exec_vars)
+                        output_operator = cmd_conf.output_capture
+                        redirect = f' {output_operator} "{out_log}"'
+
+                    for part in cmd_conf.template:
                         command_part = f'{mpi_cmd}{part}{redirect}'
-                        command.append(self.expander.expand_var(command_part,
-                                                                exec_vars))
-                elif isinstance(command_config['template'],
-                                six.string_types):
-                    command_part = f'{mpi_cmd}{command_config["template"]}{redirect}'
-                    command.append(self.expander.expand_var(command_part,
-                                                            exec_vars))
-                else:
-                    app_err = 'Unsupported template type in executable '
-                    app_err += f'{executable}'
-                    raise ApplicationError(app_err)
-
-                del self.variables['executable_name']
+                        command.append(self.expander.expand_var(command_part, exec_vars))
 
         # Inject all appended chained experiments
         for chained_exp in self.chain_append:
@@ -761,7 +846,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 shutil.copy(file, archive_experiment_dir)
 
         # Copy all archive patterns
-        for pattern in self.archive_patterns.keys():
+        archive_patterns = set(self.archive_patterns.keys())
+        for mod in self._modifier_instances:
+            for pattern in mod.archive_patterns.keys():
+                archive_patterns.add(pattern)
+
+        for pattern in archive_patterns:
             exp_pattern = self.expander.expand_var(pattern)
             for file in glob.glob(exp_pattern):
                 shutil.copy(file, archive_experiment_dir)
@@ -939,7 +1029,23 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # Remap fom / context / file data
         # Could push this into the language features in the future
-        for fom, conf in self.figures_of_merit.items():
+        fom_definitions = self.figures_of_merit.copy()
+        fom_contexts = self.figure_of_merit_contexts.copy()
+        for mod in self._modifier_instances:
+            fom_contexts.update(mod.figure_of_merit_contexts)
+
+            mod_vars = mod.modded_variables(self)
+
+            for fom, fom_def in mod.figures_of_merit.items():
+                fom_definitions[fom] = {}
+                for attr in fom_def.keys():
+                    if isinstance(fom_def[attr], list):
+                        fom_definitions[fom][attr] = fom_def[attr].copy()
+                    else:
+                        fom_definitions[fom][attr] = self.expander.expand_var(fom_def[attr],
+                                                                              mod_vars)
+
+        for fom, conf in fom_definitions.items():
             log_path = self.expander.expand_var(conf['log_file'])
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()
@@ -963,9 +1069,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if conf['contexts']:
                 for context in conf['contexts']:
                     regex_str = \
-                        self.figure_of_merit_contexts[context]['regex']
+                        fom_contexts[context]['regex']
                     format_str = \
-                        self.figure_of_merit_contexts[context]['output_format']
+                        fom_contexts[context]['output_format']
                     contexts[context] = {
                         'regex': re.compile(r'%s' % regex_str),
                         'format': format_str
@@ -1009,6 +1115,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Process environment variable actions
         for env_var_set in self._env_variable_sets:
             for action, conf in env_var_set.items():
+                (env_cmds, _) = action_funcs[action](conf,
+                                                     set(),
+                                                     shell=shell)
+
+                for cmd in env_cmds:
+                    if cmd:
+                        command.append(cmd)
+
+        for mod_inst in self._modifier_instances:
+            for action, conf in mod_inst.all_env_var_modifications():
                 (env_cmds, _) = action_funcs[action](conf,
                                                      set(),
                                                      shell=shell)
