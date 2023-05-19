@@ -227,8 +227,8 @@ class SpackApplication(ApplicationBase):
             for pkg_name in \
                     workspace.software_environments.get_env_packages(app_context):
                 spec_str = workspace.software_environments.get_spec_string(pkg_name)
-                package_path = self.spack_runner.get_package_path(spec_str)
-                self.variables[pkg_name] = package_path
+                spack_pkg_name, package_path = self.spack_runner.get_package_path(spec_str)
+                self.variables[spack_pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)

@@ -468,14 +468,23 @@ class SpackRunner(object):
 
     def get_package_path(self, package_spec):
         """Return the installation directory for a package"""
-        args = ['location', '-i']
-        args.extend(package_spec.split())
+        loc_args = ['location', '-i']
+        loc_args.extend(package_spec.split())
+
+        name_args = ['find', '--format={name}']
+        name_args.extend(package_spec.split())
 
         if not self.dry_run:
-            return self.exe(*args, output=str).strip()
+            name = self.exe(*name_args, output=str).strip()
+            location = self.exe(*loc_args, output=str).strip()
+            return (name, location)
         else:
-            self._dry_run_print(args)
-            return os.path.join('dry-run', 'path', 'to', package_spec.split()[0])
+            self._dry_run_print(name_args)
+            self._dry_run_print(loc_args)
+
+            name = os.path.join(package_spec.split()[0])
+            location = os.path.join('dry-run', 'path', 'to', package_spec.split()[0])
+            return (name, location)
 
     def mirror_environment(self, mirror_path):
         """Create a spack mirror from the activated environment"""
