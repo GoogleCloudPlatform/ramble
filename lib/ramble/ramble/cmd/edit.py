@@ -37,7 +37,7 @@ def edit_application(name, repo_path, namespace):
         repo = ramble.repository.apps_path.get_repo(namespace)
     else:
         repo = ramble.repository.apps_path
-    path = repo.filename_for_application_name(name)
+    path = repo.filename_for_object_name(name)
 
     if os.path.exists(path):
         if not os.path.isfile(path):
