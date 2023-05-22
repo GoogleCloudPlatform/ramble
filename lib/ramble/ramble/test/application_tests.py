@@ -36,11 +36,11 @@ def test_app_features(mutable_mock_apps_repo, app):
 def test_basic_app(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get('basic')
     assert 'foo' in basic_inst.executables
-    assert basic_inst.executables['foo']['template'] == 'bar'
-    assert not basic_inst.executables['foo']['mpi']
+    assert basic_inst.executables['foo'].template == ['bar']
+    assert not basic_inst.executables['foo'].mpi
     assert 'bar' in basic_inst.executables
-    assert basic_inst.executables['bar']['template'] == 'baz'
-    assert basic_inst.executables['bar']['mpi']
+    assert basic_inst.executables['bar'].template == ['baz']
+    assert basic_inst.executables['bar'].mpi
 
     assert 'test_wl' in basic_inst.workloads
     assert basic_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']

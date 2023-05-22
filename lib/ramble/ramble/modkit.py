@@ -21,3 +21,4 @@ from ramble.spec import Spec
 
 import ramble.language.modifier_language
 from ramble.language.modifier_language import *
+from ramble.schema.types import OUTPUT_CAPTURE

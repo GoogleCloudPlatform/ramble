@@ -40,7 +40,7 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, 'default_compilers')
     assert hasattr(test_mod, 'required_packages')
     assert hasattr(test_mod, 'builtins')
-    assert hasattr(test_mod, 'executable_modifier')
+    assert hasattr(test_mod, 'executable_modifiers')
 
 
 def add_mode(mod_inst, mode_num=1):

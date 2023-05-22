@@ -159,23 +159,18 @@ class SpackApplication(ApplicationBase):
             added_packages = set(self.spack_runner.added_packages())
             for pkg in self.required_packages.keys():
                 if pkg not in added_packages:
-                    tty.die(('Software spec {} is not defined '
-                             'in environment {}, but is required '
-                             'to by the {} application '
-                             'definition').format(pkg,
-                                                  env_context,
-                                                  self.name))
+                    tty.die(f'Software spec {pkg} is not defined '
+                            f'in environment {env_context}, but is required '
+                            f'to by the {self.name} application '
+                            'definition')
 
-            for mod in self.modifiers:
-                mod_inst = self._modifier_map[mod]
+            for mod_inst in self._modifier_instances:
                 for pkg in mod_inst.required_packages.keys():
                     if pkg not in added_packages:
-                        tty.die(('Software spec {} is not defined '
-                                 'in environment {}, but is required '
-                                 'to by the {} modifier '
-                                 'definition').format(pkg,
-                                                      env_context,
-                                                      mod['name']))
+                        tty.die(f'Software spec {pkg} is not defined '
+                                f'in environment {env_context}, but is required '
+                                f'to by the {mod_inst.name} modifier '
+                                'definition')
 
             if not env_concretized:
                 self.spack_runner.concretize()

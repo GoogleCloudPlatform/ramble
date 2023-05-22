@@ -1076,6 +1076,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         'regex': re.compile(r'%s' % regex_str),
                         'format': format_str
                     }
+
+            if conf['contexts']:
+                for context in conf['contexts']:
+                    regex_str = \
+                        fom_contexts[context]['regex']
+                    format_str = \
+                        fom_contexts[context]['output_format']
+                    contexts[context] = {
+                        'regex': re.compile(r'%s' % regex_str),
+                        'format': format_str
+                    }
         return files, contexts, foms
 
     register_builtin('env_vars', required=True)

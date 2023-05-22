@@ -11,11 +11,11 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get('basic-inherited')
 
     assert 'foo' in app_inst.executables
-    assert app_inst.executables['foo']['template'] == 'bar'
-    assert not app_inst.executables['foo']['mpi']
+    assert app_inst.executables['foo'].template == ['bar']
+    assert not app_inst.executables['foo'].mpi
     assert 'bar' in app_inst.executables
-    assert app_inst.executables['bar']['template'] == 'baz'
-    assert app_inst.executables['bar']['mpi']
+    assert app_inst.executables['bar'].template == ['baz']
+    assert app_inst.executables['bar'].mpi
 
     assert 'test_wl' in app_inst.workloads
     assert app_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']

@@ -10,8 +10,10 @@
 import re
 import six
 import textwrap
+import fnmatch
 
 from llnl.util.tty.colify import colified
+import llnl.util.tty as tty
 
 from ramble.language.modifier_language import ModifierMeta, register_builtin  # noqa: F401
 from ramble.error import RambleError
@@ -38,8 +40,10 @@ def nested_2_color(s):
 class ModifierBase(object, metaclass=ModifierMeta):
     name = None
     uses_spack = False
-    _exec_prefix_builtin = 'builtin::'
+    _mod_prefix_builtin = r'modifier_builtin::'
+    _mod_builtin_regex = r'modifier_builtin::(?P<modifier>[\w-]+)::'
     _builtin_required_key = 'required'
+    builtin_group = 'modifier'
 
     modifier_class = 'ModifierBase'
 
@@ -47,14 +51,52 @@ class ModifierBase(object, metaclass=ModifierMeta):
         super().__init__()
 
         self._file_path = file_path
+        self._on_executables = ['*']
+        self._usage_mode = None
 
         self._verbosity = 'short'
 
     def copy(self):
         """Deep copy a modifier instance"""
         new_copy = type(self)(self._file_path)
+        new_copy._on_executables = self._on_executables.copy()
+        new_copy._usage_mode = self._usage_mode
+        new_copy._verbosity = self._verbosity
 
         return new_copy
+
+    def set_usage_mode(self, mode):
+        """Set the usage mode for this modifier.
+
+        If not set, or given an empty string the modifier tries to auto-detect a mode.
+
+        If it cannot auto detect the usage mode, an error is raised.
+        """
+        if mode:
+            self._usage_mode = mode
+        else:
+            if len(self.modes) > 1 or len(self.modes) == 0:
+                raise InvalidModeError('Cannot auto determine usage '
+                                       f'mode for modifier {self.name}')
+
+            self._usage_mode = list(self.modes.keys())[0]
+            tty.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+
+    def set_on_executables(self, on_executables):
+        """Set the executables this modifier applies to.
+
+        If given an empty list or a value of None, the default of: '*' is usage.
+        """
+        if on_executables:
+            if not isinstance(on_executables, list):
+                raise ModifierError(f'Modifier {self.name} given an unsupported on_executables '
+                                    f'type of {type(on_executables)}')
+
+            self._on_executables = []
+            for exec_name in on_executables:
+                self._on_executables.append(exec_name)
+        else:
+            self._on_executables = ['*']
 
     def _long_print(self):
         out_str = []

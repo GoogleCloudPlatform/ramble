@@ -67,7 +67,6 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - env_name
   spack:
     concretized: false
     packages: {}

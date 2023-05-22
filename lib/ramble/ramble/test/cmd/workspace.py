@@ -989,6 +989,8 @@ ramble:
   variables:
     mpi_command: 'mpirun'
     batch_submit: '{execute_experiment}'
+    n_ranks: '1'
+    n_nodes: '1'
   applications:
     basic:
       workloads:
@@ -1010,8 +1012,9 @@ ramble:
             config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
             with open(config_path, 'w+') as f:
                 f.write(config)
+            ws._re_read()
 
-    ws_path = str(tmpdir.join('test_concretize_in_configs_dir'))
+    ws_path = str(tmpdir.join('test_reconcretize_in_configs_dir'))
     workspace('create', '-d', ws_path)
     assert ramble.workspace.is_workspace_dir(ws_path)
 
