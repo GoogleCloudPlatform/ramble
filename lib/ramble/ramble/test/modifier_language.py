@@ -10,6 +10,7 @@
 import pytest
 
 from ramble.modkit import *  # noqa
+from ramble.language.language_base import DirectiveError
 
 
 mod_types = [
@@ -20,9 +21,12 @@ mod_types = [
 
 
 def generate_mod_class(base_class):
+
     class GeneratedClass(base_class):
+
         def __init__(self, file_path):
             super().__init__(file_path)
+
     return GeneratedClass
 
 
@@ -41,6 +45,7 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, 'required_packages')
     assert hasattr(test_mod, 'builtins')
     assert hasattr(test_mod, 'executable_modifiers')
+    assert hasattr(test_mod, 'env_var_modifications')
 
 
 def add_mode(mod_inst, mode_num=1):
@@ -77,15 +82,18 @@ def add_variable_modification(mod_inst, var_mod_num=1):
     var_mod_mod = 'test_append'
     var_mod_method = 'append'
     var_mod_mode = 'test_mode'
+    var_mod_modes = ['another_mode1', 'another_mode2']
 
     var_mod_def = {
         'name': var_mod_name,
         'modification': var_mod_mod,
         'method': var_mod_method,
-        'mode': var_mod_mode
+        'mode': var_mod_mode,
+        'modes': var_mod_modes.copy(),
     }
 
-    variable_modification(var_mod_name, var_mod_mod, var_mod_method, mode=var_mod_mode)(mod_inst)
+    variable_modification(var_mod_name, var_mod_mod, var_mod_method,
+                          mode=var_mod_mode, modes=var_mod_modes)(mod_inst)
 
     return var_mod_def
 
@@ -110,6 +118,42 @@ def test_variable_modification_directive(mod_class):
         for attr in expected_attrs:
             assert attr in mod_inst.variable_modifications[mode_name][var_name]
             assert test_def[attr] == mod_inst.variable_modifications[mode_name][var_name][attr]
+
+        for mode_name in test_def['modes']:
+            assert mode_name in mod_inst.variable_modifications
+            assert var_name in mod_inst.variable_modifications[mode_name]
+            for attr in expected_attrs:
+                assert attr in mod_inst.variable_modifications[mode_name][var_name]
+                assert test_def[attr] == mod_inst.variable_modifications[mode_name][var_name][attr]
+
+
+@pytest.mark.parametrize('mod_class', mod_types)
+def test_variable_modification_invalid_method(mod_class):
+    var_mod_name = 'invalid_method_variable'
+    var_mod_mod = 'invalid_method_mod'
+    var_mod_method = 'invalid'
+    var_mod_mode = 'invalid_method_mode'
+    test_class = generate_mod_class(mod_class)
+    mod_inst = test_class('/not/a/path')
+
+    with pytest.raises(DirectiveError) as err:
+        variable_modification(var_mod_name, var_mod_mod,
+                              var_mod_method, mode=var_mod_mode)(mod_inst)
+        assert 'variable_modification directive given an invalid method' in err
+
+
+@pytest.mark.parametrize('mod_class', mod_types)
+def test_variable_modification_missing_mode(mod_class):
+    var_mod_name = 'missing_mode_variable'
+    var_mod_mod = 'missing_mode_mod'
+    var_mod_method = 'set'
+    test_class = generate_mod_class(mod_class)
+    mod_inst = test_class('/not/a/path')
+
+    with pytest.raises(DirectiveError) as err:
+        variable_modification(var_mod_name, var_mod_mod, var_mod_method)(mod_inst)
+        assert 'variable_modification directive requires:' in err
+        assert 'mode or modes to be defined.' in err
 
 
 def add_software_spec(mod_inst, spec_num=1):
@@ -271,7 +315,8 @@ def add_figure_of_merit(mod_inst, context_num=1):
         'contexts': contexts.copy(),
     }
 
-    figure_of_merit(name, log_file, fom_regex, group_name, units, contexts)(mod_inst)
+    figure_of_merit(name, fom_regex=fom_regex, group_name=group_name,
+                    units=units, log_file=log_file, contexts=contexts)(mod_inst)
 
     return fom_def
 
@@ -342,3 +387,41 @@ def test_executable_modifier_directive(mod_class):
 
         assert mod_name in mod_inst.executable_modifiers
         assert mod_name == mod_inst.executable_modifiers[mod_name]
+
+
+def add_env_var_modification(mod_inst, env_var_mod_num=1):
+    mod_name = f'env_var_mod_{env_var_mod_num}'
+    mod_val = f'value_{env_var_mod_num}'
+    mod_method = 'set'
+    mod_mode = 'env_var_mod_mode'
+
+    test_defs = {
+        'name': mod_name,
+        'modification': mod_val,
+        'method': mod_method,
+        'mode': mod_mode
+    }
+
+    env_var_modification(mod_name, mod_val, mode=mod_mode)(mod_inst)
+
+    return test_defs
+
+
+@pytest.mark.parametrize('mod_class', mod_types)
+def test_env_var_modification_directive(mod_class):
+    test_class = generate_mod_class(mod_class)
+    mod_inst = test_class('/not/a/path')
+    test_defs = []
+    test_defs.append(add_env_var_modification(mod_inst))
+
+    assert hasattr(mod_inst, 'env_var_modifications')
+
+    for test_def in test_defs:
+        method = test_def['method']
+        mode = test_def['mode']
+
+        assert method in mod_inst.env_var_modifications[mode]
+        if method == 'set':
+            assert test_def['name'] in mod_inst.env_var_modifications[mode][method]
+            assert test_def['modification'] == \
+                mod_inst.env_var_modifications[mode][method][test_def['name']]

@@ -126,16 +126,28 @@ def working_env():
 #
 # Test-specific fixtures
 #
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def mock_apps_repo_path():
     obj_type = ramble.repository.ObjectTypes.applications
     yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def mock_mods_repo_path():
     obj_type = ramble.repository.ObjectTypes.modifiers
     yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture(scope='function')
+def mutable_apps_repo_path():
+    obj_type = ramble.repository.ObjectTypes.applications
+    yield ramble.repository.Repo(ramble.paths.builtin_path, obj_type)
+
+
+@pytest.fixture(scope='function')
+def mutable_mods_repo_path():
+    obj_type = ramble.repository.ObjectTypes.modifiers
+    yield ramble.repository.Repo(ramble.paths.builtin_path, obj_type)
 
 
 @pytest.fixture(scope='function')
@@ -154,6 +166,24 @@ def mock_modifiers(mock_mods_repo_path):
     with ramble.repository.use_repositories(mock_mods_repo_path, object_type=obj_type) \
             as mock_mods_repo:
         yield mock_mods_repo
+
+
+@pytest.fixture(scope='function')
+def mutable_applications(mutable_apps_repo_path):
+    """Use the 'builtin.mock' repository for modifiers instead of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.applications
+    with ramble.repository.use_repositories(mutable_apps_repo_path, object_type=obj_type) \
+            as apps_repo:
+        yield apps_repo
+
+
+@pytest.fixture(scope='function')
+def mutable_modifiers(mutable_mods_repo_path):
+    """Use the 'builtin.mock' repository for modifiers instead of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.modifiers
+    with ramble.repository.use_repositories(mutable_mods_repo_path, object_type=obj_type) \
+            as mods_repo:
+        yield mods_repo
 
 
 @pytest.fixture(scope='function')
@@ -539,3 +569,26 @@ def pytest_generate_tests(metafunc):
                 all_applications.append(app_str.strip())
 
         metafunc.parametrize("application", all_applications)
+
+    if "modifier" in metafunc.fixturenames:
+        from ramble.main import RambleCommand
+        mods_cmd = RambleCommand('mods')
+
+        all_modifiers = []
+        repo_mods = mods_cmd('list').split('\n')
+
+        for mod_str in repo_mods:
+            if mod_str != '':
+                all_modifiers.append(mod_str.strip())
+
+        metafunc.parametrize("modifier", all_modifiers)
+
+    if "mock_modifier" in metafunc.fixturenames:
+        obj_type = ramble.repository.ObjectTypes.modifiers
+        repo_path = ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+        all_modifiers = []
+        for mod_name in repo_path.all_object_names():
+            all_modifiers.append(mod_name)
+
+        metafunc.parametrize("mock_modifier", all_modifiers)

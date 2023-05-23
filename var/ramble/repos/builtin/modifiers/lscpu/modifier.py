@@ -10,7 +10,15 @@ from ramble.modkit import *  # noqa: F403
 
 
 class Lscpu(BasicModifier):
+    """Define a modifier for lspcu
+
+    lscpu gives useful information about the underlying compute platform. This
+    modifier allows experiments to easily extract system information while the
+    experiment is being performed.
+    """
     name = "lscpu"
+
+    tags = ['system-info', 'sysinfo', 'platform-info']
 
     mode('standard', description='Standard execution mode for lscpu')
 

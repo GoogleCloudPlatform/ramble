@@ -10,7 +10,13 @@ from ramble.modkit import *  # noqa: F403
 
 
 class TestMod(BasicModifier):
+    """Define a test modifier
+
+    This modifier is just a test of various aspects of the modifier language.
+    """
     name = "test-mod"
+
+    tags = ['test']
 
     mode('test', description='This is a test mode')
 

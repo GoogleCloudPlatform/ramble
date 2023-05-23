@@ -10,7 +10,15 @@ from ramble.modkit import *  # noqa: F403
 
 
 class IntelAps(SpackModifier):
+    """Define a modifier for Intel's Application Performance Snapshot
+
+    Intel's Application Performance Snapshot (APS) is a high level profiler. It
+    gives a quick view into the high level performance characteristics of an
+    experiment. This modifier allows for easy application of APS to experiments.
+    """
     name = "intel-aps"
+
+    tags = ['profiler', 'performance-analysis']
 
     mode('mpi', description='Mode for collecting mpi statistics')
 

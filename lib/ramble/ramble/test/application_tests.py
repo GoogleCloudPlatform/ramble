@@ -13,7 +13,7 @@ import ramble.workspace
 
 pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_workspace_path',
-                                     'mutable_mock_repo')
+                                     'mutable_mock_apps_repo')
 
 
 @pytest.mark.parametrize('app', [
@@ -344,10 +344,10 @@ def basic_exp_dict():
     }
 
 
-def test_get_executables_and_inputs_initial(mutable_mock_repo):
+def test_get_executables_and_inputs_initial(mutable_mock_apps_repo):
     """_get_executables_and_inputs, test1, workload executables and inputs"""
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 
@@ -365,10 +365,10 @@ def test_get_executables_and_inputs_initial(mutable_mock_repo):
     assert 'input' in inputs
 
 
-def test_get_executables_and_inputs_yaml_defined(mutable_mock_repo):
+def test_get_executables_and_inputs_yaml_defined(mutable_mock_apps_repo):
     """_get_executables_and_inputs, test2, yaml-defined order"""
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 
@@ -399,10 +399,10 @@ def test_get_executables_and_inputs_yaml_defined(mutable_mock_repo):
     assert 'test_exec' in executables
 
 
-def test_get_executables_and_inputs_custom_executables(mutable_mock_repo):
+def test_get_executables_and_inputs_custom_executables(mutable_mock_apps_repo):
     """_get_executables_and_inputs, test3, custom executables"""
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 
@@ -433,10 +433,10 @@ def test_get_executables_and_inputs_custom_executables(mutable_mock_repo):
     assert 'test_exec2' in executable_application_instance.executables
 
 
-def test_set_input_path(mutable_mock_repo):
+def test_set_input_path(mutable_mock_apps_repo):
     """_set_input_path"""
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 
@@ -461,10 +461,10 @@ def test_set_input_path(mutable_mock_repo):
     assert executable_application_instance.variables['input'] == default_answer
 
 
-def test_set_default_experiment_variables(mutable_mock_repo):
+def test_set_default_experiment_variables(mutable_mock_apps_repo):
     """_set_default_experiment_variables"""
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 
@@ -493,10 +493,10 @@ def test_set_default_experiment_variables(mutable_mock_repo):
     assert executable_application_instance.variables['n_ranks'] == '1'
 
 
-def test_inject_commands(mutable_mock_repo):
+def test_inject_commands(mutable_mock_apps_repo):
     """ test _inject_commands """
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 
@@ -527,7 +527,7 @@ def test_inject_commands(mutable_mock_repo):
     assert 'mpirun' in executable_application_instance.variables['command']
 
 
-def test_derive_variables_for_template_path(mutable_mock_repo):
+def test_derive_variables_for_template_path(mutable_mock_apps_repo):
     """_set_default_variables_for_template_path"""
     test_config = """
 ramble:
@@ -568,7 +568,7 @@ ramble:
 
     ws1._re_read()
 
-    executable_application_instance = mutable_mock_repo.get('basic')
+    executable_application_instance = mutable_mock_apps_repo.get('basic')
 
     expansion_vars = basic_exp_dict()
 

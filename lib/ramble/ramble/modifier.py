@@ -51,6 +51,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
     builtin_group = 'modifier'
 
     modifier_class = 'ModifierBase'
+    tags = []
 
     def __init__(self, file_path):
         super().__init__()
@@ -149,13 +150,13 @@ class ModifierBase(object, metaclass=ModifierMeta):
             for comp_name, comp_def in self.default_compilers.items():
                 out_str.append('\t' + nested_2_color(f'{comp_name}:\n'))
                 out_str.append('\t\t' + nested_3_color('Spack Spec:') +
-                               f'{comp_def["spack_spec"]}\n')
+                               f'{comp_def["spack_spec"].replace("@", "@@")}\n')
 
-                if 'compiler_spec' in comp_def:
+                if 'compiler_spec' in comp_def and comp_def['compiler_spec']:
                     out_str.append('\t\t' + nested_3_color('Compiler Spec:\n') +
-                                   f'{comp_def["compiler_spec"]}\n')
+                                   f'{comp_def["compiler_spec"].replace("@", "@@")}\n')
 
-                if 'compiler' in comp_def:
+                if 'compiler' in comp_def and comp_def['compiler']:
                     out_str.append('\t\t' + nested_3_color('Compiler:\n') +
                                    f'{comp_def["compiler"]}\n')
             out_str.append('\n')
@@ -165,13 +166,13 @@ class ModifierBase(object, metaclass=ModifierMeta):
             for spec_name, spec_def in self.software_specs.items():
                 out_str.append('\t' + nested_2_color(f'{spec_name}:\n'))
                 out_str.append('\t\t' + nested_3_color('Spack Spec:') +
-                               f'{spec_def["spack_spec"]}\n')
+                               f'{spec_def["spack_spec"].replace("@", "@@")}\n')
 
-                if 'compiler_spec' in spec_def:
+                if 'compiler_spec' in spec_def and spec_def['compiler_spec']:
                     out_str.append('\t\t' + nested_3_color('Compiler Spec:') +
-                                   f'{spec_def["compiler_spec"]}\n')
+                                   f'{spec_def["compiler_spec"].replace("@", "@@")}\n')
 
-                if 'compiler' in spec_def:
+                if 'compiler' in spec_def and spec_def['compiler']:
                     out_str.append('\t\t' + nested_3_color('Compiler:') +
                                    f'{spec_def["compiler"]}\n')
             out_str.append('\n')
