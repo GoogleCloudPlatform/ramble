@@ -22,6 +22,7 @@ from ramble.error import RambleError
 header_color = '@*b'
 level1_color = '@*g'
 level2_color = '@*r'
+level3_color = '@*c'
 plain_format = '@.'
 
 
@@ -35,6 +36,10 @@ def subsection_title(s):
 
 def nested_2_color(s):
     return level2_color + s + plain_format
+
+
+def nested_3_color(s):
+    return level3_color + s + plain_format
 
 
 class ModifierBase(object, metaclass=ModifierMeta):
@@ -134,6 +139,43 @@ class ModifierBase(object, metaclass=ModifierMeta):
         if hasattr(self, 'builtins'):
             out_str.append(section_title('Builtin Executables:\n'))
             out_str.append('\t' + colified(self.builtins.keys(), tty=True) + '\n')
+
+        if hasattr(self, 'executable_modifiers'):
+            out_str.append(section_title('Executable Modifiers:\n'))
+            out_str.append('\t' + colified(self.executable_modifiers.keys(), tty=True) + '\n')
+
+        if hasattr(self, 'default_compilers'):
+            out_str.append(section_title('Default Compilers:\n'))
+            for comp_name, comp_def in self.default_compilers.items():
+                out_str.append('\t' + nested_2_color(f'{comp_name}:\n'))
+                out_str.append('\t\t' + nested_3_color('Spack Spec:') +
+                               f'{comp_def["spack_spec"]}\n')
+
+                if 'compiler_spec' in comp_def:
+                    out_str.append('\t\t' + nested_3_color('Compiler Spec:\n') +
+                                   f'{comp_def["compiler_spec"]}\n')
+
+                if 'compiler' in comp_def:
+                    out_str.append('\t\t' + nested_3_color('Compiler:\n') +
+                                   f'{comp_def["compiler"]}\n')
+            out_str.append('\n')
+
+        if hasattr(self, 'software_specs'):
+            out_str.append(section_title('Software Specs:\n'))
+            for spec_name, spec_def in self.software_specs.items():
+                out_str.append('\t' + nested_2_color(f'{spec_name}:\n'))
+                out_str.append('\t\t' + nested_3_color('Spack Spec:') +
+                               f'{spec_def["spack_spec"]}\n')
+
+                if 'compiler_spec' in spec_def:
+                    out_str.append('\t\t' + nested_3_color('Compiler Spec:') +
+                                   f'{spec_def["compiler_spec"]}\n')
+
+                if 'compiler' in spec_def:
+                    out_str.append('\t\t' + nested_3_color('Compiler:') +
+                                   f'{spec_def["compiler"]}\n')
+            out_str.append('\n')
+
         return out_str
 
     def _short_print(self):

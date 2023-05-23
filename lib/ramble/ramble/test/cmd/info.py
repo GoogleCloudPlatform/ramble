@@ -9,7 +9,7 @@
 import argparse
 
 import pytest
-import ramble.cmd.info
+import ramble.cmd.common.info
 
 from ramble.main import RambleCommand
 
@@ -36,7 +36,7 @@ def mock_print(monkeypatch, info_lines):
     def _print(*args):
         info_lines.extend(args)
 
-    monkeypatch.setattr(ramble.cmd.info.color, 'cprint', _print, raising=False)
+    monkeypatch.setattr(ramble.cmd.common.info.color, 'cprint', _print, raising=False)
 
 
 @pytest.mark.parametrize('app', [
