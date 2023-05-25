@@ -292,7 +292,7 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_r
 
         config_output = config('get')
 
-        expected_keys = ['applications', 'variables', 'env-vars',
+        expected_keys = ['applications', 'variables', 'env_vars',
                          'spack', 'mpi_command', 'batch_submit']
 
         for key in expected_keys:
