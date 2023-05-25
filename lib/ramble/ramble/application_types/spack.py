@@ -40,9 +40,7 @@ class SpackApplication(ApplicationBase):
     _spec_groups = [('default_compilers', 'Default Compilers'),
                     ('mpi_libraries', 'MPI Libraries'),
                     ('software_specs', 'Software Specs')]
-    _spec_keys = ['base', 'version', 'variants',
-                  'dependenices', 'target', 'arch'
-                  'compiler', 'mpi']
+    _spec_keys = ['spack_spec', 'compiler_spec', 'compiler']
 
     def __init__(self, file_path):
         super().__init__(file_path)
@@ -78,7 +76,7 @@ class SpackApplication(ApplicationBase):
                     for key in self._spec_keys:
                         if key in info and info[key]:
                             out_str.append('    %s = %s\n' % (key,
-                                                              info[key]))
+                                                              info[key].replace('@', '@@')))
 
         return ''.join(out_str)
 
