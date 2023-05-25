@@ -17,7 +17,7 @@ class QuantumEspresso(SpackApplication):
 
     tags = ['electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials']
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0', compiler_spec='gcc@12.2.0')
+    default_compiler('gcc12', spack_spec='gcc@12.2.0')
 
     software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0', compiler='gcc12')
 
