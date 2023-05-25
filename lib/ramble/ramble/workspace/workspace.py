@@ -49,6 +49,7 @@ import ramble.schema.merged
 
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
+from ramble.util.spec_utils import specs_equiv
 from ramble.namespace import namespace
 
 
@@ -914,7 +915,7 @@ class Workspace(object):
                         config_path = f'spack:packages:{comp}:' + \
                             f'compiler:{info["compiler"]}'
                         ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
-                elif not self.software_environments.specs_equiv(info, packages_dict[comp]):
+                elif not specs_equiv(info, packages_dict[comp]):
                     raise RambleConflictingDefinitionError(
                         f'Compiler {comp} defined in multiple conflicting ways'
                     )
@@ -944,7 +945,7 @@ class Workspace(object):
                             f'compiler:{info["compiler"]}'
                         ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
 
-                elif not self.software_environments.specs_equiv(info, packages_dict[spec_name]):
+                elif not specs_equiv(info, packages_dict[spec_name]):
                     raise RambleConflictingDefinitionError(
                         f'Package {spec_name} defined in multiple conflicting ways'
                     )
