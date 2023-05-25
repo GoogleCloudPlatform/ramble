@@ -241,6 +241,70 @@ number of elements, as they are flattened and zipped together. In this case,
 there would be 4 experiments, each defined by a unique
 ``(processes_per_node, partition, n_nodes)`` tuple.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Environment Variable Control:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Environment variables can be controlled within the workspace configuration
+file. These are defined within the ``env_vars`` configuration section. Below is
+an example of the format of this configuration section.
+
+.. code-block:: yaml
+
+    env_vars:
+      set:
+        var_name: var_value
+      append:
+      - var-separator: ','
+        vars:
+          var_to_append: val_to_append
+        paths:
+          path_to_append: val_to_append
+      prepend:
+      - paths:
+          path_to_prepend: val_to_prepend
+      unset:
+      - var_to_unset
+
+
+The above example is general, and intended to show the available functionality
+of configuring environment variables. Below the ``env_vars`` level, one of four
+actions is available. These actions are:
+* ``set`` - Define a variable equal to a given value. Overwrites previously configured values
+* ``append`` - Append the given value to the end of a previous variable definition. Delimited for vars is defined by ``var_separator``, ``paths`` uses ``:``
+* ``prepend`` - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is ``:``
+* ``unset`` - Remove a variable definition, if it is set.
+
+This config section is allowed to be defined anywhere a variables configuration
+can be defined.
+
+As a more concrete example:
+
+.. code-block:: yaml
+
+    env_vars:
+      set:
+        SET_VAR: set_val
+      append:
+      - var-separator: ','
+        vars:
+          APPEND_VAR: app_val
+        paths:
+          PATH: app_path
+      prepend:
+      - paths:
+          PATH: prepend_path
+      unset:
+      - LD_LIBRARY_PATH
+
+Would result in roughly the following bash commands:
+
+.. code-block:: console
+
+    export SET_VAR=set_val
+    export APPEND_VAR=$APPEND_VAR,app_val
+    export PATH=prepend_path:$PATH:app_path
+    unset LD_LIBRARY_PATH
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Cross Experiment Variable References:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
