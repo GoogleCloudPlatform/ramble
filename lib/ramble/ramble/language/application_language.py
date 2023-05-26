@@ -9,8 +9,8 @@
 import llnl.util.tty as tty
 
 import ramble.language.language_base
-from ramble.language.language_base import DirectiveError
 from ramble.schema.types import OUTPUT_CAPTURE
+import ramble.language.language_helpers
 
 
 class ApplicationMeta(ramble.language.language_base.DirectiveMeta):
@@ -44,33 +44,17 @@ def workload(name, executables=None, executable=None, input=None,
             'inputs': []
         }
 
-        found_exec = False
-        if executables:
-            found_exec = True
-            if isinstance(executables, list):
-                app.workloads[name]['executables'].extend(
-                    executables)
-            else:
-                app.workloads[name]['executables'].append(
-                    executables.copy())
+        all_execs = ramble.language.language_helpers.require_definition(executable,
+                                                                        executables,
+                                                                        'executable',
+                                                                        'executables',
+                                                                        'workload')
 
-        if executable:
-            found_exec = True
-            app.workloads[name]['executables'].append(executable)
+        app.workloads[name]['executables'] = all_execs.copy()
 
-        if not found_exec:
-            raise DirectiveError('workload directive requires one of:\n' +
-                                 '  executable\n' +
-                                 '  executables\n')
+        all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs)
 
-        if inputs:
-            if isinstance(inputs, list):
-                app.workloads[name]['inputs'].extend(inputs)
-            else:
-                app.workloads[name]['inputs'].append(inputs)
-
-        if input:
-            app.workloads[name]['inputs'].append(input)
+        app.workloads[name]['inputs'] = all_inputs.copy()
 
     return _execute_workload
 
@@ -151,7 +135,7 @@ def archive_pattern(pattern):
 
 
 @application_directive('figures_of_merit')
-def figure_of_merit(name, log_file, fom_regex, group_name, units='',
+def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units='',
                     contexts=[]):
     """Adds a figure of merit to track for this application
 
@@ -224,18 +208,11 @@ def workload_variable(name, default, description, values=None, workload=None,
     """
 
     def _execute_workload_variable(app):
-        if not (workload or workloads):
-            raise DirectiveError('workload_variable directive requires:\n' +
-                                 '  workload or workloads to be defined.')
-
-        all_workloads = []
-        if workload:
-            all_workloads.append(workload)
-        if workloads:
-            if isinstance(workloads, list):
-                all_workloads.extend(workloads)
-            else:
-                all_workloads.extend(workloads)
+        all_workloads = ramble.language.language_helpers.require_definition(workload,
+                                                                            workloads,
+                                                                            'workload',
+                                                                            'workloads',
+                                                                            'workload_variable')
 
         for wl_name in all_workloads:
             if wl_name not in app.workload_variables:
@@ -310,7 +287,7 @@ def required_package(name):
 
 
 @application_directive('success_criteria')
-def success_criteria(name, mode, match, file):
+def success_criteria(name, mode, match, file='{log_file}'):
     """Defines a success criteria used by experiments of this application
 
     Adds a new success criteria to this application definition.

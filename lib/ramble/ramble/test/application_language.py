@@ -115,8 +115,8 @@ def add_figure_of_merit(app_inst, fom_num=1):
     fom_group = 'fom%s_val' % fom_num
     fom_units = '(s)'
 
-    figure_of_merit(fom_name, fom_log, fom_regex,  # noqa: F405
-                    fom_group, fom_units)(app_inst)
+    figure_of_merit(fom_name, log_file=fom_log, fom_regex=fom_regex,  # noqa: F405
+                    group_name=fom_group, units=fom_units)(app_inst)
 
     fom_def = {
         fom_name: {

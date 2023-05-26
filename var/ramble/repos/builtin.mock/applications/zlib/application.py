@@ -20,7 +20,7 @@ class Zlib(SpackApplication):
 
     figure_of_merit('zlib_installed',
                     fom_regex=r'(?P<lib_name>libz.so.*)', group_name='lib_name',
-                    units='', log_file='{log_file}')
+                    units='')
 
     success_criteria('zlib_installed', mode='string',
                      match=r'libz.so', file='{log_file}')

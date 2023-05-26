@@ -45,7 +45,7 @@ def test_basic_app(mutable_mock_repo):
 
     assert 'test_fom' in basic_inst.figures_of_merit
     fom_conf = basic_inst.figures_of_merit['test_fom']
-    assert fom_conf['log_file'] == 'log_file'
+    assert fom_conf['log_file'] == '{log_file}'
     assert fom_conf['regex'] == \
         r'(?P<test>[0-9]+\.[0-9]+).*seconds.*'  # noqa: W605
     assert fom_conf['group_name'] == 'test'
