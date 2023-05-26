@@ -188,6 +188,9 @@ def filter_file(source, dest, output=False):
     # https://gitlab.com/pycqa/flake8/issues/583
     ignore_f811_on_previous_line = False
 
+    if not os.path.isfile(source):
+        return
+
     with open(source) as infile:
         parent = os.path.dirname(dest)
         mkdirp(parent)
