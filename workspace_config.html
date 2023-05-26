@@ -56,6 +56,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#variable-dictionaries">Variable Dictionaries:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#list-variables">List Variables:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#custom-executables">Custom Executables:</a></li>
@@ -332,6 +333,61 @@ while the second is a 1x4 matrix. All matrices are required to have the same
 number of elements, as they are flattened and zipped together. In this case,
 there would be 4 experiments, each defined by a unique
 <code class="docutils literal notranslate"><span class="pre">(processes_per_node,</span> <span class="pre">partition,</span> <span class="pre">n_nodes)</span></code> tuple.</p>
+</section>
+<section id="environment-variable-control">
+<h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Permalink to this heading"></a></h3>
+<p>Environment variables can be controlled within the workspace configuration
+file. These are defined within the <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> configuration section. Below is
+an example of the format of this configuration section.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">var_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_value</span>
+<span class="w">  </span><span class="nt">append</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">var-separator</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;,&#39;</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">var_to_append</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_append</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path_to_append</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_append</span>
+<span class="w">  </span><span class="nt">prepend</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path_to_prepend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_prepend</span>
+<span class="w">  </span><span class="nt">unset</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_to_unset</span>
+</pre></div>
+</div>
+<p>The above example is general, and intended to show the available functionality
+of configuring environment variables. Below the <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> level, one of four
+actions is available. These actions are:
+* <code class="docutils literal notranslate"><span class="pre">set</span></code> - Define a variable equal to a given value. Overwrites previously configured values
+* <code class="docutils literal notranslate"><span class="pre">append</span></code> - Append the given value to the end of a previous variable definition. Delimited for vars is defined by <code class="docutils literal notranslate"><span class="pre">var_separator</span></code>, <code class="docutils literal notranslate"><span class="pre">paths</span></code> uses <code class="docutils literal notranslate"><span class="pre">:</span></code>
+* <code class="docutils literal notranslate"><span class="pre">prepend</span></code> - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is <code class="docutils literal notranslate"><span class="pre">:</span></code>
+* <code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p>
+<p>This config section is allowed to be defined anywhere a variables configuration
+can be defined.</p>
+<p>As a more concrete example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">SET_VAR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_val</span>
+<span class="w">  </span><span class="nt">append</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">var-separator</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;,&#39;</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">APPEND_VAR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app_val</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app_path</span>
+<span class="w">  </span><span class="nt">prepend</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prepend_path</span>
+<span class="w">  </span><span class="nt">unset</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LD_LIBRARY_PATH</span>
+</pre></div>
+</div>
+<p>Would result in roughly the following bash commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export SET_VAR=set_val</span>
+<span class="go">export APPEND_VAR=$APPEND_VAR,app_val</span>
+<span class="go">export PATH=prepend_path:$PATH:app_path</span>
+<span class="go">unset LD_LIBRARY_PATH</span>
+</pre></div>
+</div>
 </section>
 <section id="cross-experiment-variable-references">
 <h3>Cross Experiment Variable References:<a class="headerlink" href="#cross-experiment-variable-references" title="Permalink to this heading"></a></h3>
@@ -899,7 +955,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 25, 2023.
+      <span class="lastupdated">Last updated on May 26, 2023.
       </span></p>
   </div>
 
