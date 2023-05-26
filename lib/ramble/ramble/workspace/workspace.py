@@ -583,14 +583,6 @@ class Workspace(object):
 
         error_sections = []
         deprecated_sections = []
-        # Trap and warn on deprecated config options.
-        if namespace.ramble in config:
-            # TODO: (dwj) Remove the following deprecation check
-            # DEPRECATED
-            if 'mpi' in config[namespace.ramble]:
-                deprecated_sections.append('ramble:mpi')
-            if 'batch' in config[namespace.ramble]:
-                deprecated_sections.append('ramble:batch')
 
         if len(deprecated_sections) > 0:
             tty.warn('Your workspace configuration contains deprecated sections:')
