@@ -27,6 +27,7 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 workspace = RambleCommand('workspace')
 
 
+@pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
 def test_dryrun_chained_experiments(mutable_config,
                                     mutable_mock_workspace_path):
     test_config = r"""
