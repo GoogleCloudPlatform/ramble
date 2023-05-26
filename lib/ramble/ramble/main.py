@@ -43,7 +43,6 @@ import ramble.paths
 import ramble.repository
 import spack.util.debug
 import spack.util.environment
-import spack.util.executable as exe
 import spack.util.path
 from ramble.error import RambleError
 
@@ -111,20 +110,28 @@ def add_all_commands(parser):
 
 
 def get_version():
-    """Get a descriptive version of this instance of Ramble.
+    """Get a descriptive version of this instance of Spack.
 
     Outputs '<PEP440 version> (<git commit sha>)'.
 
     The commit sha is only added when available.
     """
+    import spack.util.git
     version = ramble.ramble_version
     git_path = os.path.join(ramble.paths.prefix, ".git")
     if os.path.exists(git_path):
-        git = exe.which("git")
+        git = spack.util.git.git()
         if not git:
             return version
-        rev = git('-C', ramble.paths.prefix, 'rev-parse', 'HEAD',
-                  output=str, error=os.devnull, fail_on_error=False)
+        rev = git(
+            "-C",
+            ramble.paths.prefix,
+            "rev-parse",
+            "HEAD",
+            output=str,
+            error=os.devnull,
+            fail_on_error=False,
+        )
         if git.returncode != 0:
             return version
         match = re.match(r"[a-f\d]{7,}$", rev)

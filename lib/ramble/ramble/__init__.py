@@ -8,7 +8,7 @@
 
 
 #: major, minor, patch version for Ramble, in a tuple
-ramble_version_info = (0, 0, 1)
+ramble_version_info = (0, 3, 0)
 
 #: String containing Ramble version joined with .'s
 ramble_version = '.'.join(str(v) for v in ramble_version_info)
