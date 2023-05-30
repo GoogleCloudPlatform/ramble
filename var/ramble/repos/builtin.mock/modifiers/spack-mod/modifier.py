@@ -13,7 +13,7 @@ class SpackMod(SpackModifier):
     """Define spack modifier with various software aspects"""
     name = "spack-mod"
 
-    tags = ['test']
+    tags('test')
 
     mode('default', description='This is the default mode for the spack-mod')
 

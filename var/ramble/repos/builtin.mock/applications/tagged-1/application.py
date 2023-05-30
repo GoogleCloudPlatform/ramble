@@ -6,13 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.appkit import *
 
 
-class NoVariableMods(BasicModifier):
-    """Define modifier with no variable modifications"""
-    name = "no-variable-mods"
+class Tagged1(ExecutableApplication):
+    name = "tagged-1"
 
-    tags('test')
+    tags('tag-1')
 
-    mode('test', description='This is a test mode')
+    executable('foo', 'bar', use_mpi=False)
+
+    workload('test_wl', executable='foo')

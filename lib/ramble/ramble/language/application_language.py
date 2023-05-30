@@ -350,3 +350,35 @@ def register_builtin(name, required=False):
         app.builtins[builtin_name] = {'name': name,
                                       'required': required}
     return _store_builtin
+
+
+@application_directive(dicts=())
+def maintainers(*names: str):
+    """Add a new maintainer directive, to specify maintainers in a declarative way.
+
+    Args:
+        names: GitHub username for the maintainer
+    """
+
+    def _execute_maintainer(app):
+        maintainers_from_base = getattr(app, "maintainers", [])
+        # Here it is essential to copy, otherwise we might add to an empty list in the parent
+        app.maintainers = list(sorted(set(maintainers_from_base + list(names))))
+
+    return _execute_maintainer
+
+
+@application_directive(dicts=())
+def tags(*values: str):
+    """Add a new tag directive, to specify tags in a declarative way.
+
+    Args:
+        values: Value to mark as a tag
+    """
+
+    def _execute_tag(app):
+        tags_from_base = getattr(app, "tags", [])
+        # Here it is essential to copy, otherwise we might add to an empty list in the parent
+        app.tags = list(sorted(set(tags_from_base + list(values))))
+
+    return _execute_tag

@@ -31,6 +31,7 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, 'default_compilers')
     assert hasattr(test_app, 'software_specs')
     assert hasattr(test_app, 'required_packages')
+    assert hasattr(test_app, 'maintainers')
 
 
 def add_workload(app_inst, wl_num=1):

@@ -14,7 +14,7 @@ class UnsetEnvVarMod(BasicModifier):
     the unset method"""
     name = "unset-env-var-mod"
 
-    tags = ['test']
+    tags('test')
 
     mode('test', description='This is a test mode')
 

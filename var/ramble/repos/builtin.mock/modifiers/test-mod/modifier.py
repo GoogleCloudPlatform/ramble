@@ -16,7 +16,7 @@ class TestMod(BasicModifier):
     """
     name = "test-mod"
 
-    tags = ['test']
+    tags('test')
 
     mode('test', description='This is a test mode')
 

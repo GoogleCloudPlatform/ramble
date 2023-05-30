@@ -9,14 +9,10 @@
 from ramble.modkit import *  # noqa: F403
 
 
-class AppendEnvVarModPaths(BasicModifier):
-    """Define a modifier with only an environment variable modification using
-    the append method and a colon separator"""
-    name = "append-env-var-mod-paths"
+class Unmaintained1(BasicModifier):
+    """Define an unmaintained modifier"""
+    name = "test-mod"
 
     tags('test')
 
     mode('test', description='This is a test mode')
-
-    env_var_modification('test_var', modification='test_val', method='append',
-                         mode='test')
