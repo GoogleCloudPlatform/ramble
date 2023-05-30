@@ -13,7 +13,9 @@ class Ior(SpackApplication):
     '''Define the IOR parallel IO benchmark. Also includes'''
     name = 'ior'
 
-    tags = ['synthetic-benchmarks', 'IO']
+    maintainers('rfbgo')
+
+    tags('synthetic-benchmarks', 'IO')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')

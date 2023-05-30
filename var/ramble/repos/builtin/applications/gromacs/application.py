@@ -14,7 +14,9 @@ class Gromacs(SpackApplication):
     '''Define a Gromacs application'''
     name = 'gromacs'
 
-    tags = ['molecular-dynamics']
+    maintainers('douglasjacobsen')
+
+    tags('molecular-dynamics')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274', compiler='gcc9')

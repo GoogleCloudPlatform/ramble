@@ -18,7 +18,9 @@ class IntelAps(SpackModifier):
     """
     name = "intel-aps"
 
-    tags = ['profiler', 'performance-analysis']
+    tags('profiler', 'performance-analysis')
+
+    maintainers('douglasjacobsen')
 
     mode('mpi', description='Mode for collecting mpi statistics')
 

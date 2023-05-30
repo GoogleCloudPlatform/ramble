@@ -13,7 +13,9 @@ class OsuMicroBenchmarks(SpackApplication):
     '''Define an OSU micro benchmarks application'''
     name = 'osu-micro-benchmarks'
 
-    tags = ['synthetic-benchmarks']
+    maintainers('rfbgo')
+
+    tags('synthetic-benchmarks')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')

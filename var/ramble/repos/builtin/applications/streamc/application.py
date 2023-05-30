@@ -13,7 +13,9 @@ class Streamc(SpackApplication):
     '''Define STREAMC application'''
     name = 'streamc'
 
-    tags = ['memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark']
+    maintainers('dodecatheon')
+
+    tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 

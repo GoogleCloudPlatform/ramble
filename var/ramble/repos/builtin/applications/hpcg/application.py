@@ -13,7 +13,9 @@ class Hpcg(SpackApplication):
     '''Define HPCG application'''
     name = 'hpcg'
 
-    tags = ['benchmark-app', 'mini-app', 'benchmark']
+    maintainers('douglasjacobsen')
+
+    tags('benchmark-app', 'mini-app', 'benchmark')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
