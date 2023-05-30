@@ -267,7 +267,16 @@ _ramble() {
     then
         RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
-        RAMBLE_COMPREPLY="clean commands config debug edit flake8 help info license list mirror mods on repo software-definitions unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config debug edit flake8 help info license list mirror mods on repo software-definitions unit-test workspace"
+    fi
+}
+
+_ramble_attributes() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --maintainers --tags"
+    else
+        RAMBLE=""
     fi
 }
 
