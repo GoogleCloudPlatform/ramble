@@ -9,6 +9,12 @@
 
 import pytest
 
+import ramble.workspace
+
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path',
+                                     'mutable_mock_repo')
+
 
 @pytest.mark.parametrize('app', [
     'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
@@ -299,3 +305,288 @@ def test_register_builtin_app(mutable_mock_repo):
                 assert builtin in wl_conf[app_inst._workload_exec_key]
             for builtin in excluded_builtins:
                 assert builtin not in wl_conf[app_inst._workload_exec_key]
+
+
+def basic_exp_dict():
+    """To set expander consistently with test_wl2 of builtin.mock/applications/basic"""
+    return {
+        'application_name': 'bar',
+        'inputs': {'test_wl': 'input', 'test_wl2': 'input'},
+        'workload_name': 'test_wl2',
+        'experiment_name': 'baz',
+        'application_input_dir': '/workspace/inputs/bar',
+        'workload_input_dir': '/workspace/inputs/bar/test_wl2',
+        'application_run_dir': '/workspace/experiments/bar',
+        'workload_run_dir': '/workspace/experiments/bar/test_wl2',
+        'experiment_run_dir': '/workspace/experiments/bar/test_wl2/baz',
+        'env_name': 'spack_bar.test_wl2',
+        'n_ranks': '4',
+        'processes_per_node': '2',
+        'n_nodes': '2',
+        'var1': '{var2}',
+        'var2': '{var3}',
+        'var3': '3',
+        'mpi_command': 'mpirun -n {n_ranks}',
+        'batch_command': 'sbatch -p {partition} {execute_experiment}'
+    }
+
+
+def test_get_executables_and_inputs_initial(mutable_mock_repo):
+    """_get_executables_and_inputs, test1, workload executables and inputs"""
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to test just the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input']}}
+    executable_application_instance.internals = {}
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    assert 'bar' in executables
+    assert 'input' in inputs
+
+
+def test_get_executables_and_inputs_yaml_defined(mutable_mock_repo):
+    """_get_executables_and_inputs, test2, yaml-defined order"""
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input']}}
+
+    # Insert namespace.executables into the instance's internals to pass the
+    # second part of the function
+    defined_internals = {
+        'executables': {
+            'test_exec': {
+                'template': [
+                    'test_exec'
+                ],
+                'use_mpi': False,
+                'redirect': '{log_file}'
+            }
+        }
+    }
+    executable_application_instance.set_internals(defined_internals)
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    assert 'test_exec' in executables
+
+
+def test_get_executables_and_inputs_custom_executables(mutable_mock_repo):
+    """_get_executables_and_inputs, test3, custom executables"""
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input']}}
+
+    # Insert namespace.executables into the instance's internals to pass the
+    # second part of the function
+    defined_internals = {
+        'custom_executables': {
+            'test_exec2': {
+                'template': [
+                    'test_exec2'
+                ],
+                'use_mpi': False,
+                'redirect': '{log_file}',
+            }
+        }
+    }
+    executable_application_instance.set_internals(defined_internals)
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    assert 'test_exec2' in executable_application_instance.executables
+
+
+def test_set_input_path(mutable_mock_repo):
+    """_set_input_path"""
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input']}}
+
+    executable_application_instance.internals = {}
+
+    executable_application_instance.inputs = {'input': {'target_dir': '.'}}
+    executable_application_instance.variables = {}
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    executable_application_instance._set_input_path(inputs)
+
+    default_answer = '/workspace/inputs/bar/.'
+
+    assert executable_application_instance.variables['input'] == default_answer
+
+
+def test_set_default_experiment_variables(mutable_mock_repo):
+    """_set_default_experiment_variables"""
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input']}}
+
+    executable_application_instance.internals = {}
+
+    executable_application_instance.inputs = {'input': {'target_dir': '.'}}
+    executable_application_instance.variables = {}
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    executable_application_instance._set_input_path(inputs)
+
+    executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
+                                                                       {'default': '1'}}}
+
+    executable_application_instance._set_default_experiment_variables()
+
+    assert executable_application_instance.variables['n_ranks'] == '1'
+
+
+def test_inject_commands(mutable_mock_repo):
+    """ test _inject_commands """
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input']}}
+
+    executable_application_instance.internals = {}
+
+    executable_application_instance.inputs = {'input': {'target_dir': '.'}}
+    executable_application_instance.variables = {}
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    executable_application_instance._set_input_path(inputs)
+
+    executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
+                                                                       {'default': '1'}}}
+
+    executable_application_instance._set_default_experiment_variables()
+
+    executable_application_instance.chain_prepend = []
+    executable_application_instance._inject_commands(executables)
+    assert 'mpirun' in executable_application_instance.variables['command']
+
+
+def test_derive_variables_for_template_path(mutable_mock_repo):
+    """_set_default_variables_for_template_path"""
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              template: true
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
+"""
+    import os.path
+    workspace_name = 'test_derive_variables_for_template_path'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    executable_application_instance = mutable_mock_repo.get('basic')
+
+    expansion_vars = basic_exp_dict()
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+
+    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
+                                                             'inputs': ['input']},
+                                                 'test_wl2': {'executables': ['bar'],
+                                                              'inputs': ['input'],
+                                                              'template': ['input'],
+                                                              },
+                                                 }
+
+    executable_application_instance.internals = {}
+
+    executable_application_instance.inputs = {'input': {'target_dir': '.'}}
+    executable_application_instance.variables = {}
+
+    executables, inputs = executable_application_instance._get_executables_and_inputs()
+
+    executable_application_instance._set_input_path(inputs)
+
+    executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
+                                                                       {'default': '1'}}}
+
+    executable_application_instance._set_default_experiment_variables()
+
+    executable_application_instance.chain_prepend = []
+    executable_application_instance._inject_commands(executables)
+
+    test_answer = "/workspace/experiments/bar/test_wl2/baz/execute_experiment"
+    executable_application_instance._derive_variables_for_template_path(ws1)
+    assert executable_application_instance.variables['execute_experiment'] == test_answer
