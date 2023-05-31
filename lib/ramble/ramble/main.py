@@ -110,7 +110,7 @@ def add_all_commands(parser):
 
 
 def get_version():
-    """Get a descriptive version of this instance of Spack.
+    """Get a descriptive version of this instance of Ramble.
 
     Outputs '<PEP440 version> (<git commit sha>)'.
 
