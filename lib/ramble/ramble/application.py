@@ -37,11 +37,6 @@ from ramble.schema.types import OUTPUT_CAPTURE
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
-# # For checking whether an object is iterable before iterating over it.
-# from collections.abc import Iterable
-# def iterable(obj):
-#     return isinstance(obj, Iterable)
-
 header_color = '@*b'
 level1_color = '@*g'
 level2_color = '@*r'
@@ -603,8 +598,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 template_name)
             self.variables[template_name] = expand_path
 
-        self._vars_are_expanded = True
-
     def add_expand_vars(self, workspace):
         """Add application specific expansion variables
 
@@ -613,22 +606,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         - command: set to the commands needed to execute the experiment
         - spack_setup: set to an empty string, so spack applications can override this
         """
-        if self._vars_are_expanded:
-            return
-
-        executables, inputs = self._get_executables_and_inputs()
-
-        self._set_input_path(inputs)
-
-        self._set_default_experiment_variables()
-
-        self._inject_commands(executables)
-
-        # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
-        #             this is no longer needed, as spack was converted to builtins.
-        self.variables['spack_setup'] = ''
-
-        self._derive_variables_for_template_path(workspace)
+        if not self._vars_are_expanded:
+            executables, inputs = self._get_executables_and_inputs()
+            self._set_input_path(inputs)
+            self._set_default_experiment_variables()
+            self._inject_commands(executables)
+            # ---------------------------------------------------------------------------------
+            # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
+            #             this is no longer needed, as spack was converted to builtins.
+            self.variables['spack_setup'] = ''
+            # ---------------------------------------------------------------------------------
+            self._derive_variables_for_template_path(workspace)
+            self._vars_are_expanded = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload

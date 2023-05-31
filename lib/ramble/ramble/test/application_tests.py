@@ -509,11 +509,8 @@ def test_inject_commands(mutable_mock_repo):
 
     executable_application_instance._set_default_experiment_variables()
 
-    # print("\n\nexecutables:", executables, "\n\n")
-    # print("\n\ninstance.nexecutables:", executable_application_instance.executables, "\n\n")
     executable_application_instance.chain_prepend = []
     executable_application_instance._inject_commands(executables)
-    # print("\n\ncommand:", executable_application_instance.variables['command'], "\n\n")
     assert 'mpirun' in executable_application_instance.variables['command']
 
 
