@@ -17,13 +17,15 @@ class Hpl(SpackApplication):
 
     tags = ['benchmark-app', 'mini-app', 'benchmark']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274', compiler='gcc9')
 
-    software_spec('hpl', base='hpl', version='2.3',
-                  variants='+openmp',
-                  compiler='gcc9', mpi='impi2018', required=True)
+    software_spec('hpl',
+                  spack_spec='hpl@2.3 +openmp',
+                  compiler='gcc9')
+
+    required_package('hpl')
 
     executable('execute', 'xhpl', use_mpi=True)
 
@@ -83,7 +85,7 @@ class Hpl(SpackApplication):
     workload_variable('N-RFACTs', default='3            # of recursive panel fact.',
                       description='Number of RFACTs',
                       workloads=['standard'])
-    workload_variable('RACFTs', default='0 1 2        RFACTs (0=left, 1=Crout, 2=Right)',
+    workload_variable('RFACTs', default='0 1 2        RFACTs (0=left, 1=Crout, 2=Right)',
                       description='RFACT values',
                       workloads=['standard'])
     workload_variable('N-BCASTs', default='1            # of broadcast',
@@ -168,36 +170,36 @@ class Hpl(SpackApplication):
             bestQ = int(totalCores / bestP)
 
             for var, config in self.workload_variables['standard'].items():
-                expander.set_var(var, config['default'])
+                self.variables[var] = config['default']
 
-            expander.set_var('N-Ns', '1')
-            expander.set_var('Ns', int(problemSize))
-            expander.set_var('N-NBs', '1')
-            expander.set_var('NBs', blockSize)
-            expander.set_var('N-Grids', '1')
-            expander.set_var('Ps', int(bestP))
-            expander.set_var('Qs', int(bestQ))
-            expander.set_var('NPFACTS', '1')
-            expander.set_var('PFACTS', '2')
-            expander.set_var('N-NBMINs', '1')
-            expander.set_var('NBMINs', '4')
-            expander.set_var('N-RFACTs', '1')
-            expander.set_var('RFACTs', '1')
-            expander.set_var('N-BCASTs', '1')
-            expander.set_var('BCASTs', '1')
-            expander.set_var('N-DEPTHs', '1')
-            expander.set_var('DEPTHs', '1')
+            self.variables['N-Ns'] = '1'
+            self.variables['Ns'] = int(problemSize)
+            self.variables['N-NBs'] = '1'
+            self.variables['NBs'] = blockSize
+            self.variables['N-Grids'] = '1'
+            self.variables['Ps'] = int(bestP)
+            self.variables['Qs'] = int(bestQ)
+            self.variables['NPFACTS'] = '1'
+            self.variables['PFACTS'] = '2'
+            self.variables['N-NBMINs'] = '1'
+            self.variables['NBMINs'] = '4'
+            self.variables['N-RFACTs'] = '1'
+            self.variables['RFACTs'] = '1'
+            self.variables['N-BCASTs'] = '1'
+            self.variables['BCASTs'] = '1'
+            self.variables['N-DEPTHs'] = '1'
+            self.variables['DEPTHs'] = '1'
 
-    def _make_experiments(self, workspace, expander):
-        super()._make_experiments(workspace, expander)
-        self._calculate_values(workspace, expander)
+    def _make_experiments(self, workspace):
+        super()._make_experiments(workspace)
+        self._calculate_values(workspace, self.expander)
 
-        input_path = expander.expand_var('{experiment_run_dir}/HPL.dat')
+        input_path = self.expander.expand_var('{experiment_run_dir}/HPL.dat')
 
         settings = ['output_file', 'device_out', 'N-Ns', 'Ns', 'N-NBs', 'NBs',
                     'PMAP', 'N-Grids', 'Ps', 'Qs', 'threshold', 'NPFACTS',
                     'PFACTS', 'N-NBMINs', 'NBMINs', 'N-NDIVs', 'NDIVs', 'N-RFACTs',
-                    'RACFTs', 'N-BCASTs', 'BCASTs', 'N-DEPTHs', 'DEPTHs', 'SWAP',
+                    'RFACTs', 'N-BCASTs', 'BCASTs', 'N-DEPTHs', 'DEPTHs', 'SWAP',
                     'swapping_threshold', 'L1', 'U', 'Equilibration',
                     'mem_alignment']
 
@@ -206,4 +208,4 @@ class Hpl(SpackApplication):
             f.write('Innovative Computing Laboratory, University of Tennessee\n')
 
             for setting in settings:
-                f.write(expander.expand_var('{' + setting + '}') + '\n')
+                f.write(self.expander.expand_var('{' + setting + '}') + '\n')

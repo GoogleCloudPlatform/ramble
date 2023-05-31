@@ -76,3 +76,5 @@ def test_gcsfetchstrategy_download(tmpdir, _fetch_method):
         pytest.skip('%s' % e)
     except google_auth_exceptions.RefreshError as e:
         pytest.skip('%s' % e)
+    except google_auth_exceptions.DefaultCredentialsError as e:
+        pytest.skip('%s' % e)

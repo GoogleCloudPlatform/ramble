@@ -15,13 +15,17 @@ class Hpcg(SpackApplication):
 
     tags = ['benchmark-app', 'mini-app', 'benchmark']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018',
+                  spack_spec='intel-mpi@2018.4.274',
+                  compiler='gcc9')
 
-    software_spec('hpcg', base='hpcg', version='3.1',
-                  variants='+openmp',
-                  compiler='gcc9', mpi='impi2018', required=True)
+    software_spec('hpcg',
+                  spack_spec='hpcg@3.1 +openmp',
+                  compiler='gcc9')
+
+    required_package('hpcg')
 
     executable('execute', 'xhpcg', use_mpi=True)
 
@@ -74,13 +78,13 @@ class Hpcg(SpackApplication):
                     fom_regex=r'Final Summary::HPCG 2\.4 rating.*=(?P<rating>[0-9]+\.*[0-9]*)',
                     group_name='rating', units='')
 
-    def _make_experiments(self, workspace, expander):
-        super()._make_experiments(workspace, expander)
+    def _make_experiments(self, workspace):
+        super()._make_experiments(workspace)
 
-        input_path = expander.expand_var('{experiment_run_dir}/hpcg.dat')
+        input_path = self.expander.expand_var('{experiment_run_dir}/hpcg.dat')
 
         with open(input_path, 'w+') as f:
             f.write('HPCG benchmark input file\n')
             f.write('Sandia National Laboratories; University of Tennessee, Knoxville\n')
-            f.write(expander.expand_var('{matrix_size}\n'))
-            f.write(expander.expand_var('{iterations}\n'))
+            f.write(self.expander.expand_var('{matrix_size}\n'))
+            f.write(self.expander.expand_var('{iterations}\n'))

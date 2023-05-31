@@ -3,3 +3,5 @@ config:
     spack_flags:
       install: --reuse
       concretize: --reuse
+    include:
+      - test_include: include.yaml

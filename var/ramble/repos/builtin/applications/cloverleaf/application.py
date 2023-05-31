@@ -16,18 +16,15 @@ class Cloverleaf(SpackApplication):
 
     tags = ['cfd', 'fluid', 'dynamics', 'euler', 'miniapp', 'minibenchmark', 'mini-benchmark']
 
-    default_compiler('gcc12', base='gcc', version='12.2.0', target='x86_64')
+    default_compiler('gcc12', spack_spec='gcc@12.2.0 target=x86_64')
 
-    mpi_library('ompi414', base='openmpi', version='4.1.4',
-                variants='+legacylaunchers +pmi +cxx')
-
+    software_spec('ompi414', spack_spec='openmpi@4.1.4 +legacylaunchers +pmi +cxx',
+                  compiler='gcc12')
     software_spec('cloverleaf',
-                  base='cloverleaf',
-                  version='1.1',
-                  compiler='gcc12',
-                  variants='build=ref',
-                  mpi='ompi414',
-                  required=True)
+                  spack_spec='cloverleaf@1.1 build=ref',
+                  compiler='gcc12')
+
+    required_package('cloverleaf')
 
     executable('execute', 'clover_leaf', use_mpi=True)
 

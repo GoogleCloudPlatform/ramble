@@ -8,20 +8,19 @@
 """This module implements Ramble's configuration file handling.
 
 This implements Ramble's configuration system, which handles merging
-multiple scopes with different levels of precedence.  See the
-documentation on :ref:`configuration-scopes` for details on how Ramble's
-configuration system behaves.  The scopes are:
+multiple scopes with different levels of precedence.
+
+The scopes are:
 
   #. ``default``
   #. ``system``
   #. ``site``
   #. ``user``
 
-And corresponding :ref:`per-platform scopes <platform-scopes>`. Important
-functions in this module are:
+Important functions in this module are:
 
-* :py:func:`get_config`
-* :py:func:`update_config`
+* :py:func:`Configuration.get_config`
+* :py:func:`Configuration.update_config`
 
 ``get_config`` reads in YAML data for a particular scope and returns
 it. Callers can then modify the data and write it back with
@@ -55,11 +54,15 @@ import spack.platforms
 
 import ramble.schema
 import ramble.schema.config
+import ramble.schema.env_vars
 import ramble.schema.repos
 import ramble.schema.workspace
 import ramble.schema.applications
 import ramble.schema.licenses
 import ramble.schema.mirrors
+import ramble.schema.spack
+import ramble.schema.success_criteria
+import ramble.schema.variables
 
 from ramble.error import RambleError
 
@@ -70,9 +73,14 @@ from spack.util.cpus import cpus_available
 #: Dict from section names -> schema for that section
 section_schemas = {
     'config': ramble.schema.config.schema,
+    'env_vars': ramble.schema.env_vars.schema,
     'repos': ramble.schema.repos.schema,
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
+    'spack': ramble.schema.spack.schema,
+    'success_criteria': ramble.schema.success_criteria.schema,
+    'applications': ramble.schema.applications.schema,
+    'variables': ramble.schema.variables.schema,
 }
 
 # Same as above, but including keys for environments
@@ -1192,7 +1200,7 @@ def default_modify_scope(section='config'):
     priority scope.
 
     Arguments:
-        section (boolean): Section for which to get the default scope.
+        section (bool): Section for which to get the default scope.
             If this is not 'experiments', a general (non-workspace) scope is
             used.
     """

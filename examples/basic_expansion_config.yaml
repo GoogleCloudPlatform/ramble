@@ -1,16 +1,7 @@
 ramble:
-  mpi:
-    command: mpirun
-    args:
-      - -n
-      - '{n_ranks}'
-      - -ppn
-      - '{processes_per_node}'
-      - -hostfile
-      - hostfile
-  batch:
-    submit: '{execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node} -hosfile hostfile'
+    batch_submit: '{execute_experiment}'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
     openfoam:
@@ -23,6 +14,7 @@ ramble:
                 processes_per_node: ['16', '32']
                 #^-- (partition, processes_per_node) -> (part1, 16), (part2, 32)
                 n_nodes: ['2', '4']
+                wrf_path: execute_experiment in wrfv4.CONUS_2p5km.new_test
               matrices:
                 - - n_nodes
                 #^-- (partiton, processes_per_node, n_nodes) ->
@@ -38,38 +30,31 @@ ramble:
                 n_nodes: '1'
 spack:
   concretized: true
-  compilers:
+  packages:
     gcc9:
-      base: gcc
-      version: 9.3.0
-      target: x86_64
-  mpi_libraries:
+      spack_spec: gcc@9.3.0 target=x86_64
     ompi412:
-      base: openmpi
-      version: 4.1.2
-      variants: +legacylaunchers +pmi +thread_multiple +cxx
-      target: x86_64
+      spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
+      compiler: gcc9
     impi2018:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
+      spack_spec: intel-mpi@2018.4.274
+      compiler: gcc9
     openfoam:
-      flex:
-        base: flex
-        version: 2.6.4
-        compiler: gcc9
-      openfoam:
-        base: openfoam-org
-        version: '7'
-        compiler: gcc9
-        mpi: ompi412
-        dependencies:
-        - flex
+      spack_spec: openfoam-org@7
+      compiler: gcc9
+    flex:
+      spack_spec: flex@2.6.4
+      compiler: gcc9
     wrfv4:
-      wrf:
-        base: wrf
-        version: '4.2'
-        variants: build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
-        compiler: gcc9
-        mpi: impi2018
-        required: true
+      spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+      compiler: gcc9
+  environments:
+    openfoam:
+      packages:
+      - ompi412
+      - flex
+      - openfoam
+    wrfv4:
+      packages:
+      - impi2018
+      - wrfv4

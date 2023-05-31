@@ -1,64 +1,52 @@
 ramble:
-    variables:
-        processes_per_node: 16
-    mpi:
-        command: mpirun
-        args:
-        - '-n'
-        - '{n_ranks}'
-        - -ppn
-        - '{processes_per_node}'
-        - -hostfile
-        - hostfile
-    batch:
-        submit: '{execute_experiment}'
-    applications:
-        gromacs: # Application name
-            workloads:
-                water_gmx50: # Workload name from application
-                    experiments:
-                        pme_single_rank: # Arbitrary experiment name
-                            variables:
-                                n_ranks: '1'
-                                n_threads: '1'
-                                size: '0003'
-                                type: 'pme'
-                        rf_single_rank:
-                            variables:
-                                n_ranks: '1'
-                                n_threads: '1'
-                                size: '0003'
-                                type: 'rf'
-                water_bare:
-                    experiments:
-                        pme_single_rank:
-                            variables:
-                                n_ranks: '1'
-                                n_threads: '1'
-                                size: '0003'
-                                type: 'pme'
-                        rf_single_rank:
-                            variables:
-                                n_ranks: '1'
-                                n_threads: '1'
-                                size: '0003'
-                                type: 'rf'
+  variables:
+    processes_per_node: 16
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node} -hostfile hostfile'
+    batch_submit: '{execute_experiment}'
+  applications:
+    gromacs: # Application name
+      workloads:
+        water_gmx50: # Workload name from application
+          experiments:
+            pme_single_rank: # Arbitrary experiment name
+              variables:
+                n_ranks: '1'
+                n_threads: '1'
+                size: '0003'
+                type: 'pme'
+            rf_single_rank:
+              variables:
+                n_ranks: '1'
+                n_threads: '1'
+                size: '0003'
+                type: 'rf'
+        water_bare:
+          experiments:
+            pme_single_rank:
+              variables:
+                n_ranks: '1'
+                n_threads: '1'
+                size: '0003'
+                type: 'pme'
+              rf_single_rank:
+                variables:
+                  n_ranks: '1'
+                  n_threads: '1'
+                  size: '0003'
+                  type: 'rf'
 spack:
     concretized: true
-    compilers:
-        gcc9:
-            base: gcc
-            version: 9.3.0
-            target: x86_64
-    mpi_libraries:
-        impi2018:
-            base: intel-mpi
-            version: 2018.4.274
-            target: x86_64
-    applications:
-        gromacs: # Application name
-            gromacs: # Spec name. Semi-abstract, but could be required
-                base: gromacs
-                version: '2021.6'
-                compiler: gcc9
-                mpi: impi2018
+    packages:
+      gcc9:
+        spack_spec: gcc@9.3.0 target=x86_64
+      impi2018:
+        spack_spec: intel-mpi@2018.4.274 target=x86_64
+        compiler: gcc9
+      gromacs:
+        spack_spec: gromacs@2021.6
+        compiler: gcc9
+    environments:
+      gromacs:
+        packages:
+        - gromacs
+        - impi2018

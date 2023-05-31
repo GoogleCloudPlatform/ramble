@@ -15,13 +15,20 @@ class Openfoam(SpackApplication):
 
     tags = ['cfd', 'fluid', 'dynamics']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
-    mpi_library('ompi412', base='openmpi', version='4.1.2',
-                variants='+legacylaunchers +pmi +thread_multiple +cxx')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    software_spec('flex', base='flex', version='2.6.4', compiler='gcc9')
-    software_spec('openfoam', base='openfoam-org', version='7', compiler='gcc9',
-                  mpi='ompi412', dependencies=['flex'])
+    software_spec('ompi412',
+                  spack_spec='openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx',
+                  compiler='gcc9')
+
+    software_spec('flex',
+                  spack_spec='flex@2.6.4',
+                  compiler='gcc9')
+    software_spec('openfoam',
+                  spack_spec='openfoam-org@7',
+                  compiler='gcc9')
+
+    required_package('openfoam-org')
 
     workload('motorbike', executables=['get_inputs', 'configure', 'serial_decompose',
                                        'snappyHexMesh', 'patchSummary', 'potentialFoam',
@@ -68,6 +75,20 @@ class Openfoam(SpackApplication):
                       description='Max global cells for simulation',
                       workload='hpc_motorbike')
 
+    workload_variable('x_decomp', default='{n_ranks}',
+                      description='Workload X decomposition',
+                      workload='motorbike')
+    workload_variable('y_decomp', default='1',
+                      description='Workload Y decomposition',
+                      workload='motorbike')
+    workload_variable('z_decomp', default='1',
+                      description='Workload Z decomposition',
+                      workload='motorbike')
+
+    workload_variable('decomp', default='({x_decomp} {y_decomp} {z_decomp})',
+                      description='Workload decomposition',
+                      workload='motorbike')
+
     workload_variable('hex_flags', default='-overwrite -parallel',
                       description='Flags for snappyHexMesh',
                       workloads=['hpc_motorbike', 'motorbike'])
@@ -102,16 +123,17 @@ class Openfoam(SpackApplication):
                use_mpi=False)
 
     executable('build_mesh', template=['cp -R {input_path}/* {experiment_run_dir}/.',
-                                       'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
+                                       r'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
                                        'chmod a+x All*',
                                        'mv Allmesh* Allmesh',
                                        './Allmesh'],
                use_mpi=False)
 
-    executable('configure', template=['sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
-                                      'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
-                                      'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
-                                      'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
+    executable('configure', template=[r'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
+                                      r'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
+                                      'sed "s/(3 2 1)/{decomp}/" -i {decomposition_path}',
+                                      r'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
+                                      r'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
                                       'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
                                       'sed "s/maxLocalCells 100000/maxLocalCells {max_local_cells}/" -i {hex_mesh_path}',
                                       'sed "s/maxGlobalCells 2000000/maxGlobalCells {max_global_cells}/" -i {hex_mesh_path}',

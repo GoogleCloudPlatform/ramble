@@ -94,13 +94,9 @@ def test_mirror_create(tmpdir, mutable_mock_repo,
 
     test_config = f"""
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{{n_ranks}}'
-  batch:
-    submit: '{{execute_experiment}}'
+  variables:
+    mpi_command: 'mpirun -n {{n_ranks}}'
+    batch_submit: '{{execute_experiment}}'
   applications:
     {app_name}:
       workloads:
@@ -122,7 +118,7 @@ spack:
     mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
 
     with archive_dir.as_cwd():
-        app_class = ramble.repository.path.get_app_class(app_name)('test')
+        app_class = ramble.repository.apps_path.get_obj_class(app_name)('test')
         create_archive(archive_dir, app_class)
 
         # Create workspace

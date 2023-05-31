@@ -22,9 +22,12 @@ import ramble.cmd
 import ramble.cmd.common.arguments
 import ramble.cmd.common.arguments as arguments
 
+import ramble.config
 import ramble.workspace
 import ramble.workspace.shell
-import ramble.expander
+import ramble.experiment_set
+import ramble.software_environments
+from ramble.namespace import namespace
 
 if sys.version_info >= (3, 3):
     from collections.abc import Sequence  # novm noqa: F401
@@ -334,6 +337,13 @@ def workspace_analyze_setup_parser(subparser):
              'Supported formats are json, yaml, or text',
         required=False)
 
+    subparser.add_argument(
+        '-u', '--upload',
+        dest='upload',
+        action='store_true',
+        help='Push experiment data to remote store (as defined in config)',
+        required=False)
+
 
 def workspace_analyze(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
@@ -343,13 +353,22 @@ def workspace_analyze(args):
         ws.run_pipeline('analyze')
         ws.dump_results(output_formats=args.output_formats)
 
+    # FIXME: this will fire the analyze logic of twice currently
+    if args.upload:
+        ws.upload_results()
 
+
+config_color = '@*Y'
 header_color = '@*b'
 level1_color = '@*g'
 level2_color = '@*r'
 level3_color = '@*c'
 level4_color = '@*m'
 plain_format = '@.'
+
+
+def config_title(s):
+    return config_color + s + plain_format
 
 
 def section_title(s):
@@ -374,7 +393,9 @@ def nested_4(s):
 
 def workspace_info_setup_parser(subparser):
     """Information about a workspace"""
-    pass
+    subparser.add_argument('-v', '--verbose', action='count', default=0,
+                           help='level of verbosity. Add flags to ' +
+                                'increase description of workspace')
 
 
 def workspace_info(args):
@@ -392,96 +413,201 @@ def workspace_info(args):
 
     # Print workspace variables information
     workspace_vars = ws.get_workspace_vars()
-    if workspace_vars:
-        color.cprint('')
-        color.cprint(section_title('Workspace Variables:'))
-        for arg, val in workspace_vars.items():
-            color.cprint('  - %s = %s' % (arg, val))
+
+    # Build experiment set
+    experiment_set = ramble.experiment_set.ExperimentSet(ws)
+    for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps \
+            in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
+                workload_template, workload_chained_exps in ws.all_workloads(workloads):
+            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals, exp_template, \
+                    exp_chained_exps in ws.all_experiments(experiments):
+                experiment_set.set_application_context(app, app_vars, app_env_vars, app_internals,
+                                                       app_template, app_chained_exps)
+                experiment_set.set_workload_context(workload, workload_vars,
+                                                    workload_env_vars, workload_internals,
+                                                    workload_template, workload_chained_exps)
+                experiment_set.set_experiment_context(exp,
+                                                      exp_vars,
+                                                      exp_env_vars,
+                                                      exp_matrices,
+                                                      exp_internals,
+                                                      exp_template,
+                                                      exp_chained_exps)
+    experiment_set.build_experiment_chains()
 
     # Print experiment information
-    expander = ramble.expander.Expander(ws)
     color.cprint('')
     color.cprint(section_title('Experiments:'))
-    for app, workloads, app_vars, app_env_vars in ws.all_applications():
-        color.cprint(nested_1('  Application: ') + app)
-        expander.set_application(app)
-        expander.set_application_vars(app_vars)
-        if app_vars:
-            color.cprint(nested_4('    Application Parameters:'))
-            for name, value in app_vars.items():
-                color.cprint('      %s = %s --> %s'
-                             % (name, value, expander.expand_var(value)))
+    for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps \
+            in ws.all_applications():
+        for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
+                workload_template, workload_chained_exps in ws.all_workloads(workloads):
+            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals, exp_template, \
+                    exp_chained_exps in ws.all_experiments(experiments):
+                print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
+                print_experiment_set.set_application_context(app, app_vars,
+                                                             app_env_vars, app_internals,
+                                                             app_template, app_chained_exps)
+                print_experiment_set.set_workload_context(workload, workload_vars,
+                                                          workload_env_vars, workload_internals,
+                                                          workload_template, workload_chained_exps)
+                print_experiment_set.set_experiment_context(exp,
+                                                            exp_vars,
+                                                            exp_env_vars,
+                                                            exp_matrices,
+                                                            exp_internals,
+                                                            exp_template,
+                                                            exp_chained_exps)
 
-        for workload, experiments, workload_vars, workload_env_vars in \
-                ws.all_workloads(workloads):
-            color.cprint(nested_2('    Workload: ') + workload)
-            expander.set_workload(workload)
-            expander.set_workload_vars(workload_vars)
-            if workload_vars:
-                color.cprint(nested_4('      Workload Parameters:'))
-                for name, value in workload_vars.items():
-                    color.cprint('        %s = %s --> %s'
-                                 % (name, value, expander.expand_var(value)))
+                print_experiment_set.build_experiment_chains()
 
-            for exp, _, exp_vars, exp_env_vars, exp_matrices in ws.all_experiments(experiments):
-                expander.set_experiment(exp)
-                expander.set_experiment_vars(exp_vars)
-                expander.set_experiment_matrices(exp_matrices)
+                color.cprint(nested_1('  Application: ') + app)
+                color.cprint(nested_2('    Workload: ') + workload)
 
-                for _ in expander.rendered_experiments():
-                    color.cprint(nested_3('      Experiment: ') +
-                                 expander.experiment_name)
+                for exp_name, _ in print_experiment_set.all_experiments():
+                    app_inst = experiment_set.get_experiment(exp_name)
+                    if app_inst.is_template:
+                        color.cprint(nested_3('      Template Experiment: ') + exp_name)
+                    else:
+                        color.cprint(nested_3('      Experiment: ') + exp_name)
 
-                    color.cprint(nested_4('        Experiment Parameters:'))
-                    rendered_vars = expander.get_level_vars(level='experiment')
-                    if 'experiment_name' in rendered_vars:
-                        del rendered_vars['experiment_name']
+                    if args.verbose >= 1:
+                        config_vars = ramble.config.config.get('config:variables')
+                        if config_vars:
+                            color.cprint(nested_4('        Variables from ') +
+                                         config_title('Config') + ':')
+                            for var, val in config_vars.items():
+                                expanded = app_inst.expander.expand_var('{' + var + '}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
-                    for name, value in rendered_vars.items():
-                        color.cprint('          %s = %s --> %s'
-                                     % (name, value, expander.expand_var(value)))
+                        if workspace_vars:
+                            color.cprint(nested_4('        Variables from ') +
+                                         section_title('Workspace') + ':')
+                            for var, val in workspace_vars.items():
+                                expanded = app_inst.expander.expand_var('{' + var + '}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
 
-    # Print MPI command
-    color.cprint('')
-    color.cprint(section_title('MPI Command:'))
-    color.cprint('    %s' % ws.mpi_command)
+                        if app_vars:
+                            color.cprint(nested_4('        Variables from ') +
+                                         nested_1('Application') + ':')
+                            for var, val in app_vars.items():
+                                expanded = app_inst.expander.expand_var('{' + var + '}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
+
+                        if workload_vars:
+                            color.cprint(nested_4('        Variables from ') +
+                                         nested_2('Workload') + ':')
+                            for var, val in workload_vars.items():
+                                expanded = app_inst.expander.expand_var('{' + var + '}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
+
+                        if exp_vars:
+                            color.cprint(nested_4('        Variables from ') +
+                                         nested_3('Experiment') + ':')
+                            for var, val in exp_vars.items():
+                                expanded = app_inst.expander.expand_var('{' + var + '}')
+                                color.cprint(
+                                    f'          {var} = {val} ==> {expanded}'.replace('@',
+                                                                                      '@@'))
+
+                        if app_inst.internals:
+                            if ramble.workspace.namespace.custom_executables in app_inst.internals:
+                                color.cprint(nested_4('        Custom Executables') + ':')
+                                for name in app_inst.internals[
+                                        ramble.workspace.namespace.custom_executables]:
+
+                                    color.cprint(f'          {name}')
+                            if ramble.workspace.namespace.executables in app_inst.internals:
+                                color.cprint(nested_4('        Executable Order') + ': ' +
+                                             str(app_inst.internals['executables']))
+
+                        if app_inst.chain_order:
+                            color.cprint(nested_4('        Experiment Chain') + ':')
+                            for exp in app_inst.chain_order:
+                                color.cprint(nested_4('         - ') + exp)
 
     # Print software stack information
     color.cprint('')
     color.cprint(section_title('Software Stack:'))
-    comp_str = 'compilers'
-    mpi_str = 'mpi_libraries'
-    app_str = 'applications'
 
-    spack_dict = ws.get_spack_dict()
-    if comp_str in spack_dict:
-        color.cprint(nested_1('  Compilers:'))
-        for name, info in spack_dict[comp_str].items():
-            spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec).replace('@', '@@')
-            color.cprint('    %s = %s' % (name, spec_str))
-    if mpi_str in spack_dict:
-        color.cprint(nested_1('  MPI Libraries:'))
-        for name, info in spack_dict[mpi_str].items():
-            spec = ws._build_spec_dict(info)
-            spec_str = ws.spec_string(spec).replace('@', '@@')
-            color.cprint('    %s = %s' % (name, spec_str))
-    if app_str in spack_dict:
-        color.cprint(nested_1('  Application Specs:'))
-        for app, specs in spack_dict[app_str].items():
-            color.cprint(nested_2('    %s:' % app))
-            for name, info in specs.items():
-                spec = ws._build_spec_dict(info, app)
-                spec['application_name'] = app
-                spec_str = ws.spec_string(spec).replace('@', '@@')
-                color.cprint('      %s = %s' % (name, spec_str))
-                ws_name = ' ' * (len(name) + 2)
-                if 'compiler' in info:
-                    color.cprint('      %s compiler = %s' %
-                                 (ws_name, info['compiler']))
-                if 'mpi' in info:
-                    color.cprint('      %s mpi = %s' %
-                                 (ws_name, info['mpi']))
+    software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+    color.cprint(nested_1('  Packages:'))
+    for raw_pkg in software_environments.all_raw_packages():
+        color.cprint(nested_2(f'    {raw_pkg}:'))
+
+        pkg_info = software_environments.raw_package_info(raw_pkg)
+
+        if args.verbose >= 1:
+            if namespace.variables in pkg_info and pkg_info[namespace.variables]:
+                color.cprint(nested_3('      Variables:'))
+                for var, val in pkg_info[namespace.variables].items():
+                    color.cprint(f'        {var} = {val}')
+
+            if namespace.matrices in pkg_info and pkg_info[namespace.matrices]:
+                color.cprint(nested_3('      Matrices:'))
+                for matrix in pkg_info[namespace.matrices]:
+                    base_str = '        - '
+                    for var in matrix:
+                        color.cprint(f'{base_str}- {var}')
+                        base_str = '          '
+
+            if namespace.matrix in pkg_info and pkg_info[namespace.matrix]:
+                color.cprint(nested_3('      Matrix:'))
+                for var in pkg_info[namespace.matrix]:
+                    color.cprint(f'        - {var}')
+
+        color.cprint(nested_3('      Rendered Packages:'))
+        for pkg in software_environments.mapped_packages(raw_pkg):
+            color.cprint(nested_4(f'        {pkg}:'))
+            pkg_spec = software_environments.get_spec(pkg)
+            spec_str = pkg_spec[namespace.spack_spec].replace('@', '@@')
+            color.cprint(f'          Spack spec: {spec_str}')
+            if namespace.compiler_spec in pkg_spec and pkg_spec[namespace.compiler_spec]:
+                spec_str = pkg_spec[namespace.compiler_spec].replace('@', '@@')
+                color.cprint(f'          Compiler spec: {spec_str}')
+            if namespace.compiler in pkg_spec and pkg_spec[namespace.compiler]:
+                color.cprint(f'          Compiler: {pkg_spec[namespace.compiler]}')
+
+    color.cprint(nested_1('  Environments:'))
+    for raw_env in software_environments.all_raw_environments():
+        color.cprint(nested_2(f'    {raw_env}:'))
+
+        env_info = software_environments.raw_environment_info(raw_env)
+
+        if args.verbose >= 1:
+            if namespace.variables in env_info and env_info[namespace.variables]:
+                color.cprint(nested_3('      Variables:'))
+                for var, val in env_info[namespace.variables].items():
+                    color.cprint(f'        {var} = {val}')
+
+            if namespace.matrices in env_info and env_info[namespace.matrices]:
+                color.cprint(nested_3('      Matrices:'))
+                for matrix in env_info[namespace.matrices]:
+                    base_str = '        - '
+                    for var in matrix:
+                        color.cprint(f'{base_str}- {var}')
+                        base_str = '          '
+
+            if namespace.matrix in env_info and env_info[namespace.matrix]:
+                color.cprint(nested_3('      Matrix:'))
+                for var in env_info[namespace.matrix]:
+                    color.cprint(f'        - {var}')
+
+        color.cprint(nested_3('      Rendered Environments:'))
+        for env in software_environments.mapped_environments(raw_env):
+            color.cprint(nested_4(f'        {env} Packages:'))
+            for pkg in software_environments.get_env_packages(env):
+                color.cprint(f'          - {pkg}')
 
 
 #
@@ -516,17 +642,20 @@ def workspace_list(args):
 def workspace_edit_setup_parser(subparser):
     """edit workspace config or template"""
     subparser.add_argument(
-        '-t', '--template', dest='edit_template',
-        default='',
-        help='template name to edit. If not set, defaults to editing ramble.yaml. '
-             + 'Errors if template does not exist and `--create` is not used',
+        '-c', '--config_only', dest='config_only',
+        action='store_true',
+        help='Only open config files',
         required=False)
+
     subparser.add_argument(
-        '--print-file', action='store_true',
+        '-t', '--template_only', dest='template_only',
+        action='store_true',
+        help='Only open template files',
+        required=False)
+
+    subparser.add_argument(
+        '-p', '--print-file', action='store_true',
         help='print the file name that would be edited')
-    subparser.add_argument(
-        '--create', '-c', action='store_true',
-        help='create template if it does not exist.')
 
 
 def workspace_edit(args):
@@ -536,23 +665,21 @@ def workspace_edit(args):
         tty.die('ramble workspace edit requires either a command '
                 'line workspace or an active workspace')
 
-    if not args.edit_template:
-        edit_file = ramble.workspace.config_file(ramble_ws)
-    else:
-        edit_file = ramble.workspace.template_path(ramble_ws,
-                                                   args.edit_template)
+    config_file = ramble.workspace.config_file(ramble_ws)
+    template_files = ramble.workspace.all_template_paths(ramble_ws)
 
-        if args.create and not os.path.exists(edit_file):
-            f = open(edit_file, 'w+')
-            f.close()
+    edit_files = [config_file] + template_files
 
-        if not os.path.exists(edit_file):
-            tty.die('File for template %s does not exist.' % (args.edit_template))
+    if args.config_only:
+        edit_files = [config_file]
+    elif args.template_only:
+        edit_files = template_files
 
     if args.print_file:
-        print(edit_file)
+        for f in edit_files:
+            print(f)
     else:
-        editor(edit_file)
+        editor(*edit_files)
 
 
 def workspace_archive_setup_parser(subparser):

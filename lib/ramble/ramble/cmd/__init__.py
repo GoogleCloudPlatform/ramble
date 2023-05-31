@@ -13,8 +13,6 @@ import re
 import argparse
 import ruamel.yaml as yaml
 
-import six
-
 import llnl.util.tty as tty
 from llnl.util.lang import attr_setdefault
 from llnl.util.filesystem import join_path
@@ -22,7 +20,6 @@ from llnl.util.filesystem import join_path
 import ramble.config
 import ramble.error
 import ramble.paths
-import ramble.spec
 import ramble.workspace
 
 import spack.extensions
@@ -186,31 +183,6 @@ def is_git_repo(path):
         except MarkedYAMLError:
             pass
     return False
-
-
-def parse_specs(args, **kwargs):
-    """Convenience function for parsing arguments from specs.  Handles common
-       exceptions and dies if there are errors.
-    """
-    try:
-        sargs = args
-        if not isinstance(args, six.string_types):
-            sargs = ' '.join(spack.util.string.quote(args))
-        specs = ramble.spec.parse(sargs)
-        return specs
-
-    except ramble.spec.SpecParseError as e:
-        msg = e.message + "\n" + str(e.string) + "\n"
-        msg += (e.pos + 2) * " " + "^"
-        raise ramble.error.RambleError(msg)
-
-    except ramble.error.SpecError as e:
-
-        msg = e.message
-        if e.long_message:
-            msg += e.long_message
-
-        raise ramble.error.RambleError(msg)
 
 
 class PythonNameError(ramble.error.RambleError):

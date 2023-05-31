@@ -17,6 +17,7 @@ from .workspace import (
     RambleMissingWorkloadError,
     RambleMissingExperimentError,
     RambleMissingApplicationDirError,
+    RambleInvalidTemplateNameError,
     activate,
     active,
     active_workspace,
@@ -34,10 +35,12 @@ from .workspace import (
     workspace_software_path,
     auxiliary_software_dir_name,
     template_path,
+    all_template_paths,
     no_active_workspace,
     read,
     root,
     ramble_workspace_var,
+    namespace,
 )
 
 __all__ = [
@@ -48,6 +51,7 @@ __all__ = [
     'RambleMissingWorkloadError',
     'RambleMissingExperimentError',
     'RambleMissingApplicationDirError',
+    'RambleInvalidTemplateNameError',
     'activate',
     'active',
     'active_workspace',
@@ -65,8 +69,10 @@ __all__ = [
     'workspace_software_path',
     'auxiliary_software_dir_name',
     'template_path',
+    'all_template_paths',
     'no_active_workspace',
     'read',
     'root',
     'ramble_workspace_var',
+    'namespace',
 ]

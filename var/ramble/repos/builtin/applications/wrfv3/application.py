@@ -15,13 +15,15 @@ class Wrfv3(SpackApplication):
 
     tags = ['nwp', 'weather']
 
-    default_compiler('gcc8', base='gcc', version='8.2.0')
+    default_compiler('gcc8', spack_spec='gcc@8.2.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274', compiler='gcc8')
 
-    software_spec('wrf', base='wrf', version='3.9.1.1',
-                  variants='build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf',
-                  compiler='gcc8', mpi='impi2018', required=True)
+    software_spec('wrf',
+                  spack_spec='wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf',
+                  compiler='gcc8')
+
+    required_package('wrf')
 
     input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/bench/conus2.5km_v3911/bench_2.5km.tar.bz2',
                description='2.5 km resolution mesh of the continental United States.')
@@ -74,12 +76,12 @@ class Wrfv3(SpackApplication):
                     fom_regex=r'Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*',
                     group_name='avg_max_ratio', units='')
 
-    def _analyze_experiments(self, workspace, expander):
+    def _analyze_experiments(self, workspace):
         import glob
         import re
         # Generate stats file
 
-        file_list = glob.glob(expander.expand_var('{experiment_run_dir}/rsl.out.*'))
+        file_list = glob.glob(self.expander.expand_var('{experiment_run_dir}/rsl.out.*'))
 
         if file_list:
             timing_regex = re.compile(r'Timing for main.*(?P<main_time>[0-9]+\.[0-9]*).*')
@@ -101,7 +103,7 @@ class Wrfv3(SpackApplication):
 
             avg_time = sum_time / max(count, 1)
 
-            stats_path = expander.expand_var('{experiment_run_dir}/stats.out')
+            stats_path = self.expander.expand_var('{experiment_run_dir}/stats.out')
             with open(stats_path, 'w+') as f:
                 f.write('Average time: %s s\n' % (avg_time))
                 f.write('Cumulative time: %s s\n' % (sum_time))
@@ -110,4 +112,4 @@ class Wrfv3(SpackApplication):
                 f.write('Avg time / Max time: %s s\n' % (avg_time / max(max_time, float(1.0))))
                 f.write('Number of times: %s\n' % (count))
 
-        super()._analyze_experiments(workspace, expander)
+        super()._analyze_experiments(workspace)

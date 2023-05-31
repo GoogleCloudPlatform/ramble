@@ -16,6 +16,7 @@ import datetime
 
 import six
 
+from llnl.util.lang import union_dicts
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 
@@ -25,12 +26,16 @@ import ramble.util.path
 import ramble.error
 import ramble.repository
 import ramble.spack_runner
-import ramble.expander
+import ramble.experiment_set
 import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
 import ramble.success_criteria
+import ramble.keywords
+import ramble.software_environments
 from ramble.mirror import MirrorStats
+from ramble.config import ConfigError
+import ramble.experimental.uploader
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
@@ -40,23 +45,12 @@ import spack.util.web as web_util
 
 import ramble.schema.workspace
 import ramble.schema.applications
+import ramble.schema.merged
 
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
+from ramble.namespace import namespace
 
-ramble_namespace = 'ramble'
-spack_namespace = 'spack'
-application_dir_namespace = 'application_directories'
-application_namespace = 'applications'
-workload_namespace = 'workloads'
-experiment_namespace = 'experiments'
-variables_namespace = 'variables'
-success_namespace = 'success_criteria'
-env_var_namespace = 'env-vars'
-mpi_namespace = 'mpi'
-batch_namespace = 'batch'
-compiler_namespace = 'compilers'
-mpi_lib_namespace = 'mpi_libraries'
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = 'RAMBLE_WORKSPACE'
@@ -127,26 +121,18 @@ def default_config_yaml():
 #               n_ranks: '{processes_per_node}'
 
 ramble:
-  mpi:
-    command: mpirun
-    args: []
-  batch:
-    submit: '{execute_experiment}'
-  env-vars:
+  env_vars:
     set:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: '{execute_experiment}'
     processes_per_node: -1
   applications: {}
-spack:
-  concretized: false
-  compilers: {}
-  mpi_libraries: {}
-  applications: {}
-    # app_name
-    #   spec_name:
-    #     base: ''
-    #     version: ''
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
 """
 
 
@@ -164,8 +150,6 @@ template_execute_script = """\
 # Some example variables are:
 #   - experiment_run_dir (Will be replaced with the experiment directory)
 #   - command (Will be replaced with the command to run the experiment)
-#   - spack_setup (Will be replaced with the commands needed to setup
-#                  and load a spack environment for a given experiment)
 #   - log_dir (Will be replaced with the logs directory)
 #   - experiment_name (Will be replaced with the name of the experiment)
 #   - workload_run_dir (Will be replaced with the directory of the workload
@@ -174,8 +158,6 @@ template_execute_script = """\
 #   Any experiment parameters will be available as variables as well.
 
 cd "{experiment_run_dir}"
-
-{spack_setup}
 
 {command}
 """
@@ -332,6 +314,18 @@ def template_path(ws_path, requested_template_name):
     return template_path
 
 
+def all_template_paths(path):
+    """Returns (abs) path to available template files in the workspace"""
+    templates = []
+
+    config_path = os.path.join(path, workspace_config_path)
+    for f in os.listdir(config_path):
+        if f.endswith(workspace_template_extension):
+            templates.append(os.path.join(config_path, f))
+
+    return templates
+
+
 def is_workspace_dir(path):
     """Whether a directory contains a ramble workspace."""
     ret_val = os.path.isdir(path)
@@ -412,8 +406,9 @@ class Workspace(object):
 
     Each workspace must have a config directory, that contains 2
     files by default.
-       - ramble.yaml
-       - execute_experiment.tpl
+
+    - ramble.yaml
+    - execute_experiment.tpl
 
     The ramble.yaml file is the overall configuration file for
     this workspace. It defines all experiments, variables, and
@@ -449,6 +444,7 @@ class Workspace(object):
         self._input_mirror_stats = None
         self._input_mirror_cache = None
         self._software_mirror_cache = None
+        self._software_environments = None
 
         self.specs = []
 
@@ -469,6 +465,8 @@ class Workspace(object):
         #     'yaml': <yaml>
         #  }
         self.application_configs = {}
+
+        self._experiment_script = None
 
         self._read()
 
@@ -494,6 +492,8 @@ class Workspace(object):
             'yaml': None
         }
 
+        keywords = ramble.keywords.keywords
+
         read_default = not os.path.exists(self.config_file_path)
         if read_default:
             self._read_config(config_section, default_config_yaml())
@@ -509,6 +509,13 @@ class Workspace(object):
                     read_default_script = False
                     template_name = filename[0:-ext_len]
                     template_path = os.path.join(self.config_dir, filename)
+                    if keywords.is_reserved(template_name):
+                        raise RambleInvalidTemplateNameError(
+                            f'Template file {filename} results in a '
+                            f'template name of {template_name}'
+                            + ' which is reserved by ramble.'
+                        )
+
                     with open(template_path, 'r') as f:
                         self._read_template(template_name, f.read())
 
@@ -529,9 +536,9 @@ class Workspace(object):
             'workspace': self.root,
             'workspace_config': self.config_dir
         }
-        ramble_dict = self._get_workspace_dict()[ramble_namespace]
-        if application_dir_namespace in ramble_dict:
-            app_dirs = ramble_dict[application_dir_namespace]
+        ramble_dict = self._get_workspace_dict()[namespace.ramble]
+        if namespace.application_dir in ramble_dict:
+            app_dirs = ramble_dict[namespace.application_dir]
             for raw_dir in app_dirs:
                 app_dir = substitute_path_variables(raw_dir,
                                                     path_replacements)
@@ -566,6 +573,37 @@ class Workspace(object):
         """Read configuration file"""
         config = self.config_sections[section]
         self._read_yaml(config, f, raw_yaml)
+        self._check_deprecated(config['yaml'])
+
+    def _check_deprecated(self, config):
+        """
+        Trap and warn (or error) on deprecated configuration settings
+        in the workspace config.
+        """
+
+        error_sections = []
+        deprecated_sections = []
+        # Trap and warn on deprecated config options.
+        if namespace.ramble in config:
+            # TODO: (dwj) Remove the following deprecation check
+            # DEPRECATED
+            if 'mpi' in config[namespace.ramble]:
+                deprecated_sections.append('ramble:mpi')
+            if 'batch' in config[namespace.ramble]:
+                deprecated_sections.append('ramble:batch')
+
+        if len(deprecated_sections) > 0:
+            tty.warn('Your workspace configuration contains deprecated sections:')
+            for section in deprecated_sections:
+                tty.warn(f'     {section}')
+            tty.warn('Please see the current workspace documentation and update')
+            tty.warn('to ensure your workspace continues to function properly')
+
+        if len(error_sections) > 0:
+            tty.warn('Your workspace configuration contains invalid sections:')
+            for section in deprecated_sections:
+                tty.warn(f'     {section}')
+            tty.die('Please update to the latest format.')
 
     def _read_yaml(self, config, f, raw_yaml=None):
         if raw_yaml:
@@ -576,122 +614,12 @@ class Workspace(object):
                                                             config['schema'])
 
     def _read_template(self, name, f):
-        """Read a tempalte file"""
+        """Read a template file"""
         self._templates[name] = f
 
     def _read_auxiliary_software_file(self, name, f):
         """Read an auxiliary software file for generated software directories"""
         self._auxiliary_software_files[name] = f
-
-    def add(self, user_spec):
-        """Add a single workload spec to the workspace
-
-        Returns:
-            (bool): True if the spec was added, False if it was
-            already present and did not need to be added
-        """
-
-        spec = ramble.spec.Spec(user_spec)
-
-        changed = False
-        all_apps = self.get_applications()
-
-        # Check that the application exists
-        if not ramble.repository.path.exists(spec.name):
-            msg = 'no such application: %s' % spec.name
-            raise RambleWorkspaceError(msg)
-
-        # Check if application is in the list of workloads already
-        if spec.name not in all_apps:
-            all_apps[spec.name] = syaml.syaml_dict()
-            all_apps[spec.name][workload_namespace] = syaml.syaml_dict()
-            changed = True
-
-        app_file = ramble.repository.path.filename_for_application_name(
-            spec.name)
-        app_dir = ramble.repository.path.dirname_for_application_name(
-            spec.name)
-        app_filepath = '%s/%s' % (app_dir, app_file)
-        app_inst = ramble.repository.path.get_app_class(spec.name)(
-            app_filepath)
-
-        app_workloads = all_apps[spec.name][workload_namespace]
-
-        workload_dict = syaml.syaml_dict()
-        workload_dict.update(app_workloads.keys())
-
-        if hasattr(spec, 'workloads') and spec.workloads:
-            # Try to add each workload name into the list within
-            # the application
-            for wlname in spec.workloads.keys():
-                if wlname not in workload_dict.keys():
-                    workload_dict[wlname] = syaml.syaml_dict()
-                    workload_dict[wlname]['experiments'] = syaml.syaml_dict()
-                    changed = True
-
-        elif not workload_dict:
-            # Add all of the workloads from the application
-            # to the dict
-            for wlname in app_inst.workloads.keys():
-                workload_dict[wlname] = syaml.syaml_dict()
-                workload_dict[wlname]['experiments'] = syaml.syaml_dict()
-                changed = True
-
-        if workload_dict:
-            app_workloads.clear()
-            app_workloads.update(workload_dict)
-        else:
-            del all_apps[spec.name]
-
-        return changed
-
-    def remove(self, user_spec):
-        """Remove a single workload spec from the workspace
-
-        Returns:
-            (bool): True if the spec was removed, False if it was
-            absent, and nothing was done
-        """
-
-        spec = ramble.spec.Spec(user_spec)
-
-        changed = False
-        all_apps = self.get_applications()
-
-        # Check that the application exists
-        if not ramble.repository.path.exists(spec.name):
-            msg = 'no such application: %s' % spec.name
-            raise RambleWorkspaceError(msg)
-
-        # Check if application is missing from the list of workloads
-        if spec.name not in all_apps:
-            msg = 'application %s is not present in the workspace' % spec.name
-            raise RambleWorkspaceError(msg)
-
-        app_workloads = all_apps[spec.name][workload_namespace]
-
-        workload_dict = syaml.syaml_dict()
-        workload_dict.update(app_workloads)
-
-        if hasattr(spec, 'workloads') and spec.workloads:
-            # Try to remove each workload name from the list within
-            # the application
-            for wlname in spec.workloads.keys():
-                if wlname in workload_dict.keys():
-                    del workload_dict[wlname]
-                    changed = True
-
-        elif workload_dict:
-            workload_dict.clear()
-            changed = True
-
-        if workload_dict:
-            app_workloads.clear()
-            app_workloads.update(workload_dict)
-        else:
-            del all_apps[spec.name]
-
-        return changed
 
     def write(self):
         """Write an in-memory workspace to its location on disk."""
@@ -743,9 +671,9 @@ class Workspace(object):
         """
         self.success_list.flush_scope(scope)
 
-        if success_namespace in contents:
+        if namespace.success in contents:
             tty.debug(' ---- Found success in %s' % scope)
-            for conf in contents[success_namespace]:
+            for conf in contents[namespace.success]:
                 tty.debug(' ---- Adding criteria %s' % conf['name'])
                 self.success_list.add_criteria(scope, conf['name'],
                                                conf['mode'],
@@ -756,8 +684,8 @@ class Workspace(object):
         import ramble.spec
 
         specs = []
-        for app, workloads, _, _ in self.all_applications():
-            for workload, _, _, _ in self.all_workloads(workloads):
+        for app, workloads, *_ in self.all_applications():
+            for workload, *_ in self.all_workloads(workloads):
                 app_spec = ramble.spec.Spec(app)
                 app_spec.workloads[workload] = True
                 specs.append(app_spec)
@@ -776,42 +704,72 @@ class Workspace(object):
         tty.debug(' With ws dict: %s' % (ws_dict))
 
         # Iterate over applications in ramble.yaml first
-        if application_namespace in ws_dict[ramble_namespace]:
-            app_dict = ws_dict[ramble_namespace][application_namespace]
+        app_dict = ramble.config.config.get_config('applications')
 
-            for application, contents in app_dict.items():
-                application_vars = None
-                application_env_vars = None
+        for application, contents in app_dict.items():
+            application_vars = None
+            application_env_vars = None
+            application_internals = None
+            application_template = False
+            application_chained_experiments = None
 
-                if variables_namespace in contents:
-                    application_vars = contents[variables_namespace]
+            if namespace.variables in contents:
+                application_vars = contents[namespace.variables]
 
-                if env_var_namespace in contents:
-                    application_env_vars = contents[env_var_namespace]
-                self.extract_success_criteria('application', contents)
+            if namespace.env_var in contents:
+                application_env_vars = contents[namespace.env_var]
 
-                yield application, contents, application_vars, \
-                    application_env_vars
+            if namespace.internals in contents:
+                application_internals = contents[namespace.internals]
+
+            if namespace.template in contents:
+                application_template = contents[namespace.template]
+
+            if namespace.chained_experiments in contents:
+                application_chained_experiments = contents[namespace.chained_experiments]
+
+            self.extract_success_criteria('application', contents)
+
+            yield application, contents, application_vars, \
+                application_env_vars, application_internals, \
+                application_template, application_chained_experiments
 
         tty.debug('  Iterating over configs in directories...')
         # Iterate over applications defined in application directories
         # files after the ramble.yaml file is complete
         for app_conf in self.application_configs:
             config = self._get_application_dict_config(app_conf)
-            if application_namespace not in config:
+            if namespace.application not in config:
                 tty.msg('No applications in config file %s'
                         % app_conf)
-            app_dict = config[application_namespace]
+            app_dict = config[namespace.application]
             for application, contents in app_dict.items():
                 application_vars = None
                 application_env_vars = None
-                if variables_namespace in contents:
+                application_internals = None
+                application_template = False
+                application_chained_experiments = None
+
+                if namespace.variables in contents:
                     application_vars = \
-                        contents[variables_namespace]
-                if env_var_namespace in contents:
-                    application_env_vars = contents[env_var_namespace]
+                        contents[namespace.variables]
+
+                if namespace.env_var in contents:
+                    application_env_vars = contents[namespace.env_var]
+
+                if namespace.internals in contents:
+                    application_internals = contents[namespace.internals]
+
+                if namespace.template in contents:
+                    application_template = contents[namespace.template]
+
+                if namespace.chained_experiments in contents:
+                    application_chained_experiments = contents[namespace.chained_experiments]
+
                 self.extract_success_criteria('application', contents)
-                yield application, contents, application_vars, application_env_vars
+                yield application, contents, application_vars, \
+                    application_env_vars, application_internals, \
+                    application_template, application_chained_experiments
 
     def all_workloads(self, application):
         """Iterator over workloads in an application dict
@@ -821,22 +779,33 @@ class Workspace(object):
         should be applied.
         """
 
-        if workload_namespace not in application:
+        if namespace.workload not in application:
             tty.msg('No workloads in application')
             return
 
-        workloads = application[workload_namespace]
+        workloads = application[namespace.workload]
 
         for workload, contents in workloads.items():
             workload_variables = None
             workload_env_vars = None
-            if variables_namespace in contents:
-                workload_variables = contents[variables_namespace]
-            if env_var_namespace in contents:
-                workload_env_vars = contents[env_var_namespace]
+            workload_internals = None
+            workload_template = False
+            workload_chained_experiments = None
+            if namespace.variables in contents:
+                workload_variables = contents[namespace.variables]
+            if namespace.env_var in contents:
+                workload_env_vars = contents[namespace.env_var]
+            if namespace.internals in contents:
+                workload_internals = contents[namespace.internals]
+            if namespace.template in contents:
+                workload_template = contents[namespace.template]
+            if namespace.chained_experiments in contents:
+                workload_chained_experiments = contents[namespace.chained_experiments]
             self.extract_success_criteria('workload', contents)
 
-            yield workload, contents, workload_variables, workload_env_vars
+            yield workload, contents, workload_variables, \
+                workload_env_vars, workload_internals, \
+                workload_template, workload_chained_experiments
 
     def all_experiments(self, workload):
         """Iterator over experiments in a workload dict
@@ -846,21 +815,33 @@ class Workspace(object):
         should be applied.
         """
 
-        if experiment_namespace not in workload:
+        if namespace.experiment not in workload:
             tty.msg('No experiments in workload')
             return
 
-        experiments = workload[experiment_namespace]
+        experiments = workload[namespace.experiment]
         for experiment, contents in experiments.items():
 
             experiment_vars = syaml.syaml_dict()
             experiment_env_vars = None
+            experiment_internals = None
+            experiment_template = False
+            experiment_chained_experiments = None
 
-            if variables_namespace in contents:
-                experiment_vars = contents[variables_namespace]
+            if namespace.variables in contents:
+                experiment_vars = contents[namespace.variables]
 
-            if env_var_namespace in contents:
-                experiment_env_vars = contents[env_var_namespace]
+            if namespace.env_var in contents:
+                experiment_env_vars = contents[namespace.env_var]
+
+            if namespace.internals in contents:
+                experiment_internals = contents[namespace.internals]
+
+            if namespace.template in contents:
+                experiment_template = contents[namespace.template]
+
+            if namespace.chained_experiments in contents:
+                experiment_chained_experiments = contents[namespace.chained_experiments]
 
             self.extract_success_criteria('experiment', contents)
 
@@ -883,147 +864,15 @@ class Workspace(object):
                         matrices.append(matrix)
 
             yield experiment, contents, experiment_vars, \
-                experiment_env_vars, matrices
+                experiment_env_vars, matrices, experiment_internals, \
+                experiment_template, experiment_chained_experiments
 
-    def _build_spec_dict(self, info_dict, app_name=None, for_config=False):
-        spec = {}
+    def external_spack_env(self, env_name):
+        env_context = self.software_environments.get_env(env_name)
 
-        for name, val in info_dict.items():
-            if val:
-                spec[name] = val
-
-        if app_name:
-            spec['application_name'] = app_name
-
-        if for_config:
-            if 'application_name' in spec:
-                del spec['application_name']
-            if 'spec_type' in spec:
-                del spec['spec_type']
-
-        return spec
-
-    def specs_equiv(self, spec1, spec2):
-        all_keys = set(spec1.keys())
-        all_keys.update(set(spec2.keys()))
-
-        if len(all_keys) != len(spec1.keys()):
-            return False
-
-        if 'application_name' in all_keys:
-            all_keys.remove('application_name')
-
-        if 'spec_type' in all_keys:
-            all_keys.remove('spec_type')
-
-        for key in all_keys:
-            if key not in spec1:
-                return False
-            if key not in spec2:
-                return False
-            if spec1[key] != spec2[key]:
-                return False
-
-        return True
-
-    def get_named_spec(self, spec_name, spec_context='compiler'):
-        spack_dict = self.get_spack_dict()
-
-        if spec_context == 'compiler':
-            if compiler_namespace not in spack_dict:
-                raise RambleWorkspaceError('No compilers ' +
-                                           'defined in workspace')
-            spec_dict = spack_dict[compiler_namespace]
-        elif spec_context == 'mpi_library':
-            if mpi_lib_namespace not in spack_dict:
-                raise RambleWorkspaceError('No MPI libraries ' +
-                                           'defined in workspace')
-            spec_dict = spack_dict[mpi_lib_namespace]
-        else:
-            if application_namespace not in spack_dict:
-                raise RambleWorkspaceError('No applications ' +
-                                           'defined in workspace')
-            if spec_context not in spack_dict['applications']:
-                raise RambleWorkspaceError('Invalid context ' +
-                                           '%s' % spec_context)
-            spec_dict = spack_dict[application_namespace][spec_context]
-            return self._build_spec_dict(spec_dict[spec_name], app_name=spec_context)
-
-        return self._build_spec_dict(spec_dict[spec_name])
-
-    def spec_string(self, spec, as_dep=False, use_custom_specifier=False, deps_used=None):
-        """Create a string for a spec
-
-        Extract portions of the spec into a usable string.
-        """
-
-        if not deps_used:
-            deps_used = set()
-
-        spec_str = []
-
-        if spec['base'] in deps_used:
-            return ''
-        else:
-            deps_used.add(spec['base'])
-
-        if use_custom_specifier and 'custom_specifier' in spec:
-            return spec['custom_specifier']
-
-        if 'base' in spec:
-            spec_str.append(spec['base'])
-
-        if 'version' in spec:
-            spec_str.append('@%s' % spec['version'])
-
-        if 'variants' in spec:
-            spec_str.append(spec['variants'])
-
-        if 'compiler' in spec:
-            comp_spec = self.get_named_spec(spec['compiler'], 'compiler')
-
-            if comp_spec['base'] not in deps_used:
-                spec_str.append('%%%s' % self.spec_string(comp_spec,
-                                                          as_dep=True,
-                                                          use_custom_specifier=True,
-                                                          deps_used=deps_used))
-
-        if not as_dep:
-            if 'arch' in spec:
-                spec_str.append('arch=%s' % spec['arch'])
-
-            if 'target' in spec:
-                spec_str.append('target=%s' % spec['target'])
-
-        if 'dependencies' in spec:
-            for dep in spec['dependencies']:
-                dep_spec = self.get_named_spec(dep, spec['application_name'])
-
-                dep_str = self.spec_string(dep_spec, as_dep=True,
-                                           use_custom_specifier=False,
-                                           deps_used=deps_used)
-
-                if dep_str:
-                    spec_str.append(f'^{dep_str}')
-
-        return ' '.join(spec_str)
-
-    def all_application_specs(self, app_name):
-        spack_dict = self.get_spack_dict()
-
-        if application_namespace not in spack_dict:
-            raise RambleWorkspaceError('No applications defined ' +
-                                       'in spack config section')
-
-        if app_name not in spack_dict[application_namespace]:
-            raise RambleWorkspaceError('Application %s ' % app_name +
-                                       'not defined in spack ' +
-                                       'config section')
-
-        app_specs = spack_dict[application_namespace][app_name]
-        for name, info in app_specs.items():
-            spec = self._build_spec_dict(info)
-            yield name, spec
+        if namespace.external_env not in env_context:
+            return None
+        return env_context[namespace.external_env]
 
     def concretize(self):
         spack_dict = self.get_spack_dict()
@@ -1033,70 +882,114 @@ class Workspace(object):
                                        'already concretized ' +
                                        'workspace')
 
-        if compiler_namespace not in spack_dict or \
-                not spack_dict[compiler_namespace]:
-            spack_dict[compiler_namespace] = syaml.syaml_dict()
-        if mpi_lib_namespace not in spack_dict or \
-                not spack_dict[mpi_lib_namespace]:
-            spack_dict[mpi_lib_namespace] = syaml.syaml_dict()
-        if application_namespace not in spack_dict or \
-                not spack_dict[application_namespace]:
-            spack_dict[application_namespace] = syaml.syaml_dict()
+        if namespace.packages not in spack_dict or \
+                not spack_dict[namespace.packages]:
+            spack_dict[namespace.packages] = syaml.syaml_dict()
+        if namespace.environments not in spack_dict or \
+                not spack_dict[namespace.environments]:
+            spack_dict[namespace.environments] = syaml.syaml_dict()
 
-        compilers_dict = spack_dict[compiler_namespace]
-        mpi_dict = spack_dict[mpi_lib_namespace]
-        applications_dict = spack_dict[application_namespace]
+        packages_dict = spack_dict[namespace.packages]
+        environments_dict = spack_dict[namespace.environments]
 
-        for app_name, _, _, _ in self.all_applications():
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
+
+        for app_name, *_ in self.all_applications():
             app_inst = ramble.repository.get(app_name)
 
             for comp, info in app_inst.default_compilers.items():
-                spec = self._build_spec_dict(info, for_config=True)
-                if comp not in compilers_dict:
-                    compilers_dict[comp] = spec
-                else:
-                    comp_spec = self.get_named_spec(comp, 'compiler')
-                    if not self.specs_equiv(comp_spec, spec):
-                        err = 'Compiler %s defined multiple ' % comp + \
-                              'conflicting ways'
-                        raise RambleConflictingDefinitionError(err)
+                if comp not in packages_dict:
+                    packages_dict[comp] = syaml.syaml_dict()
+                    packages_dict[comp]['spack_spec'] = info['spack_spec']
+                    ramble.config.add(f'spack:packages:{comp}:spack_spec:{info["spack_spec"]}',
+                                      scope=self.ws_file_config_scope_name())
+                    if 'compiler_spec' in info and info['compiler_spec']:
+                        packages_dict[comp]['compiler_spec'] = info['compiler_spec']
+                        config_path = f'spack:packages:{comp}:' + \
+                            f'compiler_spec:{info["compiler_spec"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                    if 'compiler' in info and info['compiler']:
+                        packages_dict[comp]['compiler'] = info['compiler']
+                        config_path = f'spack:packages:{comp}:' + \
+                            f'compiler:{info["compiler"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                elif not self.software_environments.specs_equiv(info, packages_dict[comp]):
+                    raise RambleConflictingDefinitionError(
+                        f'Compiler {comp} defined in multiple conflicting ways'
+                    )
 
-            for mpi, info in app_inst.mpi_libraries.items():
-                spec = self._build_spec_dict(info, for_config=True)
-                if mpi not in mpi_dict:
-                    mpi_dict[mpi] = spec
-                else:
-                    mpi_spec = self.get_named_spec(mpi, 'mpi_library')
-                    if not self.specs_equiv(mpi_spec, spec):
-                        err = 'MPI Library %s defined multiple ' % mpi + \
-                              'conflicting ways'
-                        raise RambleConflictingDefinitionError(err)
+            if app_name not in environments_dict:
+                environments_dict[app_name] = syaml.syaml_dict()
+                environments_dict[app_name][namespace.packages] = []
+                ramble.config.add(f'spack:environments:{app_name}:packages:[]',
+                                  scope=self.ws_file_config_scope_name())
 
-            if app_name not in applications_dict:
-                applications_dict[app_name] = syaml.syaml_dict()
-
-            app_specs = applications_dict[app_name]
+            app_packages = environments_dict[app_name][namespace.packages]
             for spec_name, info in app_inst.software_specs.items():
-                spec = self._build_spec_dict(info, for_config=True)
-                if spec_name not in app_specs:
-                    app_specs[spec_name] = spec
-                else:
-                    app_spec = self.get_named_spec(spec_name, app_name)
-                    if not self.specs_equiv(app_spec, spec):
-                        err = 'Spec %s defined multiple ' % spec_name + \
-                              'times in application %s' % app_name
-                        raise RambleConflictingDefinitionError(err)
+                if spec_name not in packages_dict:
+                    packages_dict[spec_name] = syaml.syaml_dict()
+                    packages_dict[spec_name]['spack_spec'] = info['spack_spec']
+                    ramble.config.add(f'spack:packages:{spec_name}:' +
+                                      f'spack_spec:{info["spack_spec"]}',
+                                      scope=self.ws_file_config_scope_name())
+                    if 'compiler_spec' in info and info['compiler_spec']:
+                        packages_dict[spec_name]['compiler_spec'] = info['compiler_spec']
+                        config_path = f'spack:packages:{spec_name}:' + \
+                            f'compiler_spec:{info["compiler_spec"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
+                    if 'compiler' in info and info['compiler']:
+                        packages_dict[spec_name]['compiler'] = info['compiler']
+                        config_path = f'spack:packages:{spec_name}:' + \
+                            f'compiler:{info["compiler"]}'
+                        ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
 
-        workspace_dict = self._get_workspace_dict()
-        workspace_dict[spack_namespace]['concretized'] = True
-        self.write()
+                elif not self.software_environments.specs_equiv(info, packages_dict[spec_name]):
+                    raise RambleConflictingDefinitionError(
+                        f'Package {spec_name} defined in multiple conflicting ways'
+                    )
+
+                ramble.config.add(f'spack:environments:{app_name}:packages:[{spec_name}]',
+                                  scope=self.ws_file_config_scope_name())
+
+                app_packages.append(spec_name)
+
+        ramble.config.add('spack:concretized:true', scope=self.ws_file_config_scope_name())
+
         return
+
+    def write_json_results(self):
+        out_file = os.path.join(self.root, 'results.json')
+        with open(out_file, 'w+') as f:
+            sjson.dump(self.results, f)
+        return out_file
+
+    def upload_results(self):
+        if ramble.config.get('config:upload'):
+            # Read upload type and push it there
+            if ramble.config.get('config:upload:type') == 'BigQuery':  # TODO: enum?
+                formatted_data = ramble.experimental.uploader.format_data(self.results)
+
+                # TODO: strategy object?
+                uploader = ramble.experimental.uploader.BigQueryUploader()
+
+                uri = ramble.config.get('config:upload:uri')
+                if not uri:
+                    tty.die('No upload URI (config:upload:uri) in config.')
+
+                tty.msg('Uploading Results to ' + uri)
+                uploader.perform_upload(uri, self.name, formatted_data)
+            else:
+                raise ConfigError("Unknown config:upload:type value")
+
+        else:
+            raise ConfigError("Missing correct conifg:upload parameters")
 
     def append_result(self, result):
         if not self.results:
-            self.results = {}
+            self.results = {'experiments': []}
 
-        self.results.update(result)
+        self.results['experiments'].append(result)
 
     def simlink_result(self, filename_base, latest_base, file_extension):
         """
@@ -1138,21 +1031,24 @@ class Workspace(object):
             results_written.append(out_file)
 
             with open(out_file, 'w+') as f:
-                for exp, results in self.results.items():
-                    f.write('Experiment %s figures of merit:\n' %
-                            exp)
-                    f.write('  Status = %s\n' %
-                            results['RAMBLE_STATUS'])
-                    if results['RAMBLE_STATUS'] == 'SUCCESS':
-                        for context, foms in \
-                                results['CONTEXTS'].items():
-                            f.write('  %s figures of merit:\n' %
-                                    context)
-                            for name, fom in foms.items():
-                                output = '%s = %s %s' % (name,
-                                                         fom['value'],
-                                                         fom['units'])
-                                f.write('    %s\n' % (output.strip()))
+                if 'experiments' in self.results:
+                    for exp in self.results['experiments']:
+                        f.write('Experiment %s figures of merit:\n' %
+                                exp['name'])
+                        f.write('  Status = %s\n' %
+                                exp['RAMBLE_STATUS'])
+                        if exp['RAMBLE_STATUS'] == 'SUCCESS':
+                            for context in exp['CONTEXTS']:
+                                f.write('  %s figures of merit:\n' %
+                                        context['name'])
+                                for fom in context['foms']:
+                                    output = '%s = %s %s' % (fom['name'],
+                                                             fom['value'],
+                                                             fom['units'])
+                                    f.write('    %s\n' % (output.strip()))
+                else:
+                    tty.msg('No results to write')
+
             self.simlink_result(filename_base, latest_base, file_extension)
 
         if 'json' in output_formats:
@@ -1211,67 +1107,58 @@ class Workspace(object):
 
     def run_pipeline(self, pipeline):
         all_experiments_file = None
-        expander = ramble.expander.Expander(self)
+        experiment_set = ramble.experiment_set.ExperimentSet(self)
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
 
         if not self.is_concretized():
             error_message = 'Cannot run %s in a ' % pipeline + \
                             'non-conretized workspace\n' + \
                             'Run `ramble workspace concretize` on this ' + \
                             'workspace first.\n' + \
-                            'Then ensure its software_stack.yaml file is ' + \
+                            'Then ensure its spack configuration is ' + \
                             'properly configured.'
             tty.die(error_message)
 
-        self.extract_success_criteria('workspace', self._get_workspace_dict()[ramble_namespace])
+        self.extract_success_criteria('workspace',
+                                      ramble.config.config.get_config('success_criteria'))
 
         if pipeline == 'setup':
             all_experiments_path = os.path.join(self.root,
                                                 workspace_all_experiments_file)
             all_experiments_file = open(all_experiments_path, 'w+')
             all_experiments_file.write('#!/bin/sh\n')
+            self._experiment_script = all_experiments_file
 
-            expander.set_var('experiments_file', all_experiments_file)
+            experiment_set.set_base_var('experiments_file', all_experiments_file)
 
-            runner = ramble.spack_runner.SpackRunner(dry_run=self.dry_run)
-            spack_dict = self.get_spack_dict()
-            if compiler_namespace in spack_dict:
-                for comp_name, comp_spec in \
-                        spack_dict[compiler_namespace].items():
-                    comp_str = self.spec_string(comp_spec,
-                                                as_dep=False,
-                                                use_custom_specifier=False)
-                    runner.install_compiler(comp_str)
+        for app, workloads, app_vars, app_env_vars, app_ints, app_template, \
+                app_chained_exps in self.all_applications():
+            experiment_set.set_application_context(app, app_vars, app_env_vars, app_ints,
+                                                   app_template, app_chained_exps)
 
-        for app, workloads, app_vars, app_env_vars in self.all_applications():
-            expander.set_application(app)
-            expander.set_application_vars(app_vars)
-            expander.set_application_env_vars(app_env_vars)
-            tty.debug('Getting application: %s' % app)
-            tty.debug('Getting application: %s' % expander.application_name)
-            app_inst = ramble.repository.get(expander.application_name)
+            for workload, experiments, workload_vars, workload_env_vars, workload_ints, \
+                    workload_template, workload_chained_exps in self.all_workloads(workloads):
+                experiment_set.set_workload_context(workload, workload_vars,
+                                                    workload_env_vars, workload_ints,
+                                                    workload_template, workload_chained_exps)
 
-            tty.msg('  Working on ' + app_inst.application_class +
-                    ' ' + app_inst.name)
+                for experiment, _, exp_vars, exp_env_vars, exp_matrices, exp_ints, \
+                        exp_template, exp_chained_exps in self.all_experiments(experiments):
+                    experiment_set.set_experiment_context(experiment,
+                                                          exp_vars,
+                                                          exp_env_vars,
+                                                          exp_matrices,
+                                                          exp_ints,
+                                                          exp_template,
+                                                          exp_chained_exps)
 
-            for workload, experiments, workload_vars, workload_env_vars in \
-                    self.all_workloads(workloads):
-                expander.set_workload(workload)
-                expander.set_workload_vars(workload_vars)
-                expander.set_workload_env_vars(workload_env_vars)
+        experiment_set.build_experiment_chains()
 
-                for experiment, _, exp_vars, exp_env_vars, exp_matrices in \
-                        self.all_experiments(experiments):
-                    expander.set_experiment(experiment)
-                    expander.set_experiment_vars(exp_vars)
-                    expander.set_experiment_env_vars(exp_env_vars)
-                    expander.set_experiment_matrices(exp_matrices)
-
-                    for _ in expander.rendered_experiments():
-                        app_inst = ramble.repository.get(expander.application_name)
-                        for phase in app_inst.get_pipeline_phases(pipeline):
-                            app_inst.run_phase(phase, self, expander)
-                        # Tidy up deduced variable values
-                        expander.unset_mpi_vars()
+        for exp, app_inst in experiment_set.all_experiments():
+            tty.debug('On experiment: %s' % exp)
+            for phase in app_inst.get_pipeline_phases(pipeline):
+                app_inst.run_phase(phase, self)
 
         if pipeline == 'setup':
             all_experiments_file.close()
@@ -1300,6 +1187,10 @@ class Workspace(object):
                 tty.error("Failed downloads:")
                 tty.colify(s.cformat("{name}") for s in list(self._input_mirror_stats.errors))
                 tty.die('Mirroring has errors.')
+
+    @property
+    def experiments_script(self):
+        return self._experiment_script
 
     @property
     def latest_archive_path(self):
@@ -1336,8 +1227,9 @@ class Workspace(object):
 
         None of the input, or output files aside from these are archived.
         However, the archive should useful to perform the following actions:
-         - Re-extract figures of merit based on previous experiments
-         - Regenerate experiments, using the archived configuration.
+
+        - Re-extract figures of merit based on previous experiments
+        - Regenerate experiments, using the archived configuration.
 
         If an archive url is configured for ramble at config:archive_url this
         will automatically upload tar archives to that location.
@@ -1402,46 +1294,6 @@ class Workspace(object):
         return now.strftime("%Y-%m-%d_%H.%M.%S")
 
     @property
-    def mpi_command(self):
-        if not hasattr(self, 'mpi_template') or not self.mpi_template:
-            mpi_config = \
-                self._get_workspace_dict()[ramble_namespace][mpi_namespace]
-
-            self.mpi_template = ''
-            if 'pre_command' in mpi_config:
-                self.mpi_template += " %s" % mpi_config['pre_command']
-            if 'pre_command_args' in mpi_config:
-                self.mpi_template += " %s" % \
-                    ' '.join(mpi_config['pre_command_args'])
-            if 'command' in mpi_config:
-                self.mpi_template += " %s" % mpi_config['command']
-            if 'args' in mpi_config:
-                self.mpi_template += " %s" % ' '.join(mpi_config['args'])
-            if 'post_command' in mpi_config:
-                self.mpi_template += " %s" % mpi_config['post_command']
-            if 'post_command_args' in mpi_config:
-                self.mpi_template += " %s" % \
-                    ' '.join(mpi_config['post_command_args'])
-
-        return self.mpi_template
-
-    @property
-    def batch_submit(self):
-        if not hasattr(self, 'batch_submit_command') or not \
-                self.batch_submit_command:
-
-            workspace_dict = self._get_workspace_dict()
-            if batch_namespace in workspace_dict[ramble_namespace]:
-                batch_section = \
-                    workspace_dict[ramble_namespace][batch_namespace]
-                batch_submit = batch_section['submit']
-            else:
-                batch_submit = ''
-
-            self.batch_submit_command = batch_submit
-        return self.batch_submit_command
-
-    @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
         wspath = get_workspace_path()
@@ -1451,13 +1303,9 @@ class Workspace(object):
     def name(self):
         """Human-readable representation of the workspace.
 
-        This is the path for directory workspaces and just the name
-        for named workspaces.
+        The name of the workspace is the basename of its path
         """
-        if self.internal:
-            return os.path.basename(self.path)
-        else:
-            return self.path
+        return os.path.basename(self.path)
 
     @property
     def path(self):
@@ -1615,33 +1463,52 @@ class Workspace(object):
             in self.application_configs else None
 
     def is_concretized(self):
-        ws_dict = self._get_workspace_dict()
-        if 'concretized' in ws_dict[spack_namespace]:
-            return (True if ws_dict[spack_namespace]['concretized']
+        spack_dict = self.get_spack_dict()
+        if 'concretized' in spack_dict:
+            return (True if spack_dict['concretized']
                     else False)
         return False
 
-    def get_workspace_vars(self):
-        """Return a dict of workspace variables"""
+    def _get_workspace_section(self, section):
+        """Return a dict of a workspace section"""
         workspace_dict = self._get_workspace_dict()
 
-        return workspace_dict[ramble_namespace][variables_namespace] \
-            if variables_namespace in \
-            workspace_dict[ramble_namespace] else syaml.syaml_dict()
+        return workspace_dict[namespace.ramble][section] \
+            if section in \
+            workspace_dict[namespace.ramble] else syaml.syaml_dict()
+
+    def get_workspace_vars(self):
+        """Return a dict of workspace variables"""
+        return ramble.config.config.get_config('variables')
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        workspace_dict = self._get_workspace_dict()
+        deprecated_env_vars = self._get_workspace_section(namespace.env_var)
+        if deprecated_env_vars:
+            tty.warn('The env-vars workspace section is deprecated. Environment variables\n'
+                     'should be defined in the env_vars config section using the same\n'
+                     'syntax. Support for env-vars will be removed in a future. See\n'
+                     'the documentation for examples of the new syntax.')
 
-        return workspace_dict[ramble_namespace][env_var_namespace] \
-            if env_var_namespace in \
-            workspace_dict[ramble_namespace] else None
+        return union_dicts(ramble.config.config.get_config('env_vars'),
+                           deprecated_env_vars)
+
+    def get_workspace_internals(self):
+        """Return a dict of workspace internals"""
+        return self._get_workspace_section(namespace.internals)
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
         ws_dict = self._get_workspace_dict()
-        if spack_namespace in ws_dict:
-            return ws_dict[spack_namespace]
+        # TODO (dwj): Remove after deprecation period
+        # DEPRECATED
+        if namespace.spack in ws_dict:
+            tty.warn('The spack dictionary is moving to its own config section.')
+            tty.warn('Please update to ensure your config continues to function properly.')
+            tty.warn('See the documentation for the new format.')
+            return ws_dict[namespace.spack]
+        else:
+            return ramble.config.config.get_config('spack')
         return syaml.syaml_dict()
 
     def get_applications(self):
@@ -1649,10 +1516,10 @@ class Workspace(object):
         tty.debug('Getting app dict.')
         tty.debug(' %s ' % self._get_workspace_dict())
         workspace_dict = self._get_workspace_dict()
-        if application_namespace not in workspace_dict[ramble_namespace]:
-            workspace_dict[ramble_namespace][application_namespace] = \
+        if namespace.application not in workspace_dict[namespace.ramble]:
+            workspace_dict[namespace.ramble][namespace.application] = \
                 syaml.syaml_dict()
-        return workspace_dict[ramble_namespace][application_namespace]
+        return workspace_dict[namespace.ramble][namespace.application]
 
     def write_transaction(self):
         """Get a write lock context manager for use in a `with` block."""
@@ -1737,16 +1604,26 @@ def no_active_workspace():
     """Deactivate the active workspace for the duration of the context. Has no
        effect when there is no active workspace."""
     ws = active_workspace()
+    env_var = None
+    if ramble_workspace_var in os.environ.keys():
+        env_var = os.environ[ramble_workspace_var]
+        del os.environ[ramble_workspace_var]
+
     try:
         deactivate()
         yield
     finally:
         if ws:
+            os.environ[ramble_workspace_var] = env_var
             activate(ws)
 
 
 class RambleWorkspaceError(ramble.error.RambleError):
     """Superclass for all errors to do with Ramble Workspaces"""
+
+
+class RambleInvalidTemplateNameError(ramble.error.RambleError):
+    """Error when an invalid template name is provided"""
 
 
 class RambleConflictingDefinitionError(RambleWorkspaceError):

@@ -12,7 +12,6 @@ import llnl.util.tty.color as color
 
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
-import ramble.spec
 
 
 description = 'get detailed information on a particular application'

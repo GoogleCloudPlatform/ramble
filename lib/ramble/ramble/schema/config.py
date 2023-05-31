@@ -40,6 +40,10 @@ properties['config']['spack_flags'] = {
         'concretize': {
             'type': 'string',
             'default': '--reuse'
+        },
+        'global_args': {
+            'type': 'string',
+            'default': ''
         }
     },
     'additionalProperties': False,
@@ -53,6 +57,20 @@ properties['config']['input_cache'] = {
 properties['config']['workspace_dirs'] = {
     'type': 'string',
     'default': '$ramble/var/ramble/workspaces'
+}
+
+properties['config']['upload'] = {
+    'type': 'object',
+    'properties': {
+        'uri': {
+            'type': 'string',
+            'default': ''
+        },
+        'type': {
+            'type': 'string',
+            'default': 'BigQuery'
+        },
+    }
 }
 
 #: Full schema with metadata

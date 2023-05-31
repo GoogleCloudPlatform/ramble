@@ -43,7 +43,6 @@ import ramble.paths
 import ramble.repository
 import spack.util.debug
 import spack.util.environment
-import spack.util.executable as exe
 import spack.util.path
 from ramble.error import RambleError
 
@@ -117,14 +116,22 @@ def get_version():
 
     The commit sha is only added when available.
     """
+    import spack.util.git
     version = ramble.ramble_version
     git_path = os.path.join(ramble.paths.prefix, ".git")
     if os.path.exists(git_path):
-        git = exe.which("git")
+        git = spack.util.git.git()
         if not git:
             return version
-        rev = git('-C', ramble.paths.prefix, 'rev-parse', 'HEAD',
-                  output=str, error=os.devnull, fail_on_error=False)
+        rev = git(
+            "-C",
+            ramble.paths.prefix,
+            "rev-parse",
+            "HEAD",
+            output=str,
+            error=os.devnull,
+            fail_on_error=False,
+        )
         if git.returncode != 0:
             return version
         match = re.match(r"[a-f\d]{7,}$", rev)
@@ -486,7 +493,8 @@ def setup_main_options(args):
         ramble.config.set('config:locks', args.locks, scope='command_line')
 
     if args.mock:
-        ramble.repository.path = ramble.repository.RepoPath(ramble.paths.mock_applications_path)
+        ramble.repository.apps_path = \
+            ramble.repository.RepoPath(ramble.paths.mock_applications_path)
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:

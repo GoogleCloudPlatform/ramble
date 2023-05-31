@@ -241,7 +241,7 @@ def list(parser, args):
     # Filter by tags
     if args.tags:
         applications_with_tags = set(
-            ramble.repository.path.applications_with_tags(*args.tags))
+            ramble.repository.apps_path.objects_with_tags(*args.tags))
         sorted_applications = set(sorted_applications) & applications_with_tags
         sorted_applications = sorted(sorted_applications)
 
@@ -249,7 +249,7 @@ def list(parser, args):
         # change output stream if user asked for update
         if os.path.exists(args.update):
             if os.path.getmtime(args.update) > \
-                    ramble.repository.path.last_mtime():
+                    ramble.repository.apps_path.last_mtime():
                 tty.msg('File is up to date: %s' % args.update)
                 return
 

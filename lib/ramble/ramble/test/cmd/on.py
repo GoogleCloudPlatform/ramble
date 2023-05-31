@@ -20,8 +20,6 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_repo')
 
 workspace = RambleCommand('workspace')
-add = RambleCommand('add')
-remove = RambleCommand('remove')
 on = RambleCommand('on')
 
 
@@ -30,7 +28,7 @@ def test_on_command(mutable_mock_workspace_path):
     workspace('create', ws_name)
 
     with ramble.workspace.read('test') as ws:
-        add('basic')
+        ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
 
         workspace('concretize')
@@ -48,7 +46,7 @@ def test_execute_nothing(mutable_mock_workspace_path):
     assert ws_name in workspace('list')
 
     with ramble.workspace.read(ws_name) as ws:
-        add('basic')
+        ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
 
         ws.concretize()

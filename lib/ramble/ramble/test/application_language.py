@@ -29,8 +29,8 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, 'inputs')
     assert hasattr(test_app, 'workload_variables')
     assert hasattr(test_app, 'default_compilers')
-    assert hasattr(test_app, 'mpi_libraries')
     assert hasattr(test_app, 'software_specs')
+    assert hasattr(test_app, 'required_packages')
 
 
 def add_workload(app_inst, wl_num=1):
@@ -62,9 +62,13 @@ def add_executable(app_inst, exe_num=1):
     mpi_list_exec_name = 'MultiLineMpiExe%s' % exe_num
     template = 'application%s.x -i {input_path}' % exe_num
     redirect_test = '{output_file}'
+    output_capture = '>>'
 
-    executable(nompi_exec_name, template,  # noqa: F405
-               use_mpi=False, redirect=redirect_test)(app_inst)
+    executable(nompi_exec_name,
+               template,  # noqa: F405
+               use_mpi=False,
+               redirect=redirect_test,
+               output_capture=output_capture)(app_inst)
 
     executable(mpi_exec_name, template,  # noqa: F405
                use_mpi=True)(app_inst)
@@ -80,7 +84,8 @@ def add_executable(app_inst, exe_num=1):
         nompi_exec_name: {
             'template': template,
             'mpi': False,
-            'redirect': redirect_test
+            'redirect': redirect_test,
+            'output_capture': output_capture
         },
         mpi_exec_name: {
             'template': template,
@@ -160,137 +165,60 @@ def add_input_file(app_inst, input_num=1):
 
 def add_default_compiler(app_inst, spec_num=1):
     spec_name = 'Compiler%spec_num'
-    spec_base = 'compiler_base'
-    spec_ver = '%s.0' % spec_num
-    spec_variants = '+var1 ~var2'
-    spec_deps = 'dep1 dep2 dep3'
-    spec_target = 'x86_64'
+    spec_spack_spec = f'compiler_base@{spec_num}.0 +var1 ~var2'
+    spec_compiler_spec = 'compiler1_base@{spec_num}'
 
     spec_defs = {}
     spec_defs[spec_name] = {
-        'base': spec_base,
-        'version': spec_ver,
-        'variants': spec_variants,
-        'dependencies': spec_deps,
-        'target': spec_target
+        'spack_spec': spec_spack_spec,
+        'compiler_spec': spec_compiler_spec
     }
 
-    default_compiler(spec_name, base=spec_base, version=spec_ver,  # noqa: F405
-                     variants=spec_variants, dependencies=spec_deps,
-                     target=spec_target)(app_inst)
+    default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                     compiler_spec=spec_compiler_spec)(app_inst)
 
     spec_name = 'OtherCompiler%spec_num'
-    spec_base = 'compiler_base'
-    spec_ver = '%s.1' % spec_num
-    spec_variants = '+var1 ~var2'
-    spec_deps = 'dep1 dep2 dep3'
-    spec_target = 'x86_64'
+    spec_spack_spec = f'compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64'
+    spec_compiler_spec = 'compiler2_base@{spec_num}'
 
     spec_defs[spec_name] = {
-        'base': spec_base,
-        'version': spec_ver,
-        'variants': spec_variants,
-        'dependencies': spec_deps,
-        'target': spec_target
+        'spack_spec': spec_spack_spec,
+        'compiler_spec': spec_compiler_spec
     }
 
-    default_compiler(spec_name, base=spec_base, version=spec_ver,  # noqa: F405
-                     variants=spec_variants, dependencies=spec_deps,
-                     target=spec_target)(app_inst)
-
-    return spec_defs
-
-
-def add_mpi_library(app_inst, spec_num=1):
-    spec_name = 'MpiLibrary%spec_num'
-    spec_base = 'mpi_base'
-    spec_ver = '%s.0' % spec_num
-    spec_variants = '+var1 ~var2'
-    spec_deps = 'dep1 dep2 dep3'
-    spec_target = 'x86_64'
-
-    spec_defs = {}
-    spec_defs[spec_name] = {
-        'base': spec_base,
-        'version': spec_ver,
-        'variants': spec_variants,
-        'dependencies': spec_deps,
-        'target': spec_target
-    }
-
-    mpi_library(spec_name, base=spec_base, version=spec_ver,  # noqa: F405
-                variants=spec_variants, dependencies=spec_deps,
-                target=spec_target)(app_inst)
-
-    spec_name = 'MpiLibrary%spec_num'
-    spec_base = 'mpi_base'
-    spec_ver = '%s.1' % spec_num
-    spec_variants = '+var1 ~var2'
-    spec_deps = 'dep1 dep2 dep3'
-    spec_target = 'x86_64'
-
-    spec_defs[spec_name] = {
-        'base': spec_base,
-        'version': spec_ver,
-        'variants': spec_variants,
-        'dependencies': spec_deps,
-        'target': spec_target
-    }
-
-    mpi_library(spec_name, base=spec_base, version=spec_ver,  # noqa: F405
-                variants=spec_variants, dependencies=spec_deps,
-                target=spec_target)(app_inst)
+    default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                     compiler_spec=spec_compiler_spec)(app_inst)
 
     return spec_defs
 
 
 def add_software_spec(app_inst, spec_num=1):
     spec_name = 'NoMPISpec%s' % spec_num
-    spec_base = 'NoMPISpec'
-    spec_ver = spec_num
-    spec_variants = '+var1 ~var2'
-    spec_compiler = 'SpecComp'
-    spec_deps = 'dep1 dep2 dep3'
-    spec_target = 'x86_64'
+    spec_spack_spec = f'NoMPISpec@{spec_num} +var1 ~var2 target=x86_64'
+    spec_compiler = 'spec_compiler1@1.1'
 
     spec_defs = {}
     spec_defs[spec_name] = {
-        'base': spec_base,
-        'version': spec_ver,
-        'variants': spec_variants,
-        'compiler': spec_compiler,
-        'dependencies': spec_deps,
-        'target': spec_target
+        'spack_spec': spec_spack_spec,
+        'compiler': spec_compiler
     }
 
-    software_spec(spec_name, base=spec_base, version=spec_ver,  # noqa: F405
-                  variants=spec_variants,
-                  compiler=spec_compiler, dependencies=spec_deps,
-                  target=spec_target)(app_inst)
+    software_spec(spec_name,  # noqa: F405
+                  spack_spec=spec_spack_spec,
+                  compiler=spec_compiler)(app_inst)
 
     spec_name = 'MPISpec%s' % spec_num
-    spec_base = 'MPISpec'
-    spec_ver = spec_num
-    spec_variants = '+var1 ~var2'
-    spec_compiler = 'SpecComp'
-    spec_mpi = 'SpecMPI'
-    spec_deps = 'dep1 dep2 dep3'
-    spec_target = 'x86_64'
+    spec_spack_spec = f'MPISpec@{spec_num} +var1 ~var2 target=x86_64'
+    spec_compiler = 'spec_compiler1@1.1'
 
     spec_defs[spec_name] = {
-        'base': spec_base,
-        'version': spec_ver,
-        'variants': spec_variants,
-        'compiler': spec_compiler,
-        'mpi': spec_mpi,
-        'dependencies': spec_deps,
-        'target': spec_target
+        'spack_spec': spec_spack_spec,
+        'compiler': spec_compiler
     }
 
-    software_spec(spec_name, base=spec_base, version=spec_ver,  # noqa: F405
-                  variants=spec_variants,
-                  compiler=spec_compiler, dependencies=spec_deps,
-                  mpi=spec_mpi, target=spec_target)(app_inst)
+    software_spec(spec_name,  # noqa: F405
+                  spack_spec=spec_spack_spec,
+                  compiler=spec_compiler)(app_inst)
 
     return spec_defs
 
@@ -382,26 +310,6 @@ def test_default_compiler_directive(app_class):
 
         assert hasattr(app_inst, 'default_compilers')
         assert not app_inst.default_compilers
-
-
-@pytest.mark.parametrize('app_class', app_types)
-def test_mpi_library_directive(app_class):
-    app_inst = app_class('/not/a/path')
-    test_defs = {}
-    if app_inst.uses_spack:
-        test_defs.update(add_mpi_library(app_inst, 1))
-        test_defs.update(add_mpi_library(app_inst, 2))
-
-        assert hasattr(app_inst, 'mpi_libraries')
-        for name, info in test_defs.items():
-            assert name in app_inst.mpi_libraries
-            for key, value in info.items():
-                assert app_inst.mpi_libraries[name][key] == value
-    else:
-        test_defs.update(add_mpi_library(app_inst, 1))
-
-        assert hasattr(app_inst, 'mpi_libraries')
-        assert not app_inst.mpi_libraries
 
 
 @pytest.mark.parametrize('app_class', app_types)

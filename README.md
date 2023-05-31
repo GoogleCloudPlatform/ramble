@@ -9,7 +9,9 @@ These can include anything from:
  - Performance focused scalaing studies
  - Compiler flag sweeps
 
-To install ramble and configure your experiment workspace, make sure you have Python.
+To install ramble and configure your experiment workspace, make sure you have
+Python, and Ramble’s dependencies are installed as per the dependency section
+below.
 Then:
 
     $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
@@ -35,7 +37,7 @@ Documentation
 For help with Ramble’s commands, run `ramble help` or `ramble help --all`.
 
 For more information on concepts in Ramble, see Ramble’s
-[Getting Started](./docs/Getting_Started.md) guide.
+[Getting Started](./lib/ramble/docs/getting_started.rst) guide.
 
 Example configuration files are also contained in the
 [examples](./examples) directory.
@@ -60,10 +62,12 @@ When you send your request, make ``develop`` the destination branch on the
 
 Your PR must pass Ramble's unit tests and documentation tests, and must be
 [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant.  We enforce
-these guidelines with our CI process. To run these tests locally,
-please use the test runners:
- - share/ramble/qa/run-unit-tests
- - share/ramble/qa/run-flake8-tests
+these guidelines with our CI process.
+
+These tests can be run locally through test runners in the share/ramble/qa/
+directory. Alternatively, [pre-commit](https://pre-commit.com/#install) can be
+used to manage our git hooks. To install the hooks, simply run:
+- pre-commit install
 
  For additional requirements about contributing, including Google’s CLA, see our
  [Contribution Guide](.github/CONTRIBUTING.md).

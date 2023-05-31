@@ -6,12 +6,14 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 
+.. getting_started:
+
 ===============
 Getting Started
 ===============
 
 --------------------
-System Requirements:
+System Requirements
 --------------------
 
 Ramble's dependencies are listed within the top level
@@ -20,30 +22,31 @@ requirements.txt file.
 In addition to the listed python dependencies, Ramble depends on
 spack for some application definition files.
 
-Please see [Spack's documentation](https://spack.readthedocs.io/en/latest/getting_started.html)
-for getting spack installed.
+Please see Spack's `documentation <https://spack.readthedocs.io/en/latest/getting_started.html>`_ for getting spack installed.
 
 
 -------------
-Installation:
+Installation
 -------------
 
 Installing ramble is easy. You can clone it from the
-[github repository](https://github.com/GoogleCloudPlatform/ramble) using this command:
+`github repository <https://github.com/GoogleCloudPlatform/ramble>`_ using this command:
 
 .. code-block:: console
+
    $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
 
 
 This will create a directory called ``ramble``.
 
 ^^^^^^^^^^^^^^
-Shell Support:
+Shell Support
 ^^^^^^^^^^^^^^
 
 Once you have cloned Ramble, we recommend sourcing the appropriate script for your shell:
 
 .. code-block:: console
+
    # For bash/zsh/sh
    $ . ramble/share/ramble/setup-env.sh
 
@@ -70,40 +73,44 @@ environment.
 
 
 -------------
-Command Help:
+Command Help
 -------------
 To get information on the available commands, you can execute:
 
 .. code-block:: console
+
     $ ramble help --all
 
 
 For help with sub-commands, the ``-h`` flag can be used:
 
 .. code-block:: console
+  
    $ ramble <subcommand> -h
 
 
 ---------------------
-Defined Applications:
+Defined Applications
 ---------------------
 
 In order to get information about the available applications defined within
 ``ramble``, you can use the command:
 
 .. code-block:: console
+
    $ ramble list
 
 
 This command uses filtering to search the defined applications, e.g.:
 
 .. code-block:: console
+
    $ ramble list wrf
 
 will list both ``wrfv3`` and ``wrfv4``.
 
 ------------------
-Ramble Workspaces:
+Ramble Workspaces
 ------------------
 
 To configure experiments, you need to use a Ramble workspace. A workspace is a
@@ -125,12 +132,13 @@ A workspace can be selected when executing ``ramble`` through the use of the
 ``-w`` and ``-D`` flags.
 
 ^^^^^^^^^^^^^^^^^^^^
-Creating Workspaces:
+Creating Workspaces
 ^^^^^^^^^^^^^^^^^^^^
 
 To create a new Ramble workspace, you can use:
 
 .. code-block:: console
+
     $ ramble workspace create [<name>] [-d <path>]
 
 Once a workspace is created, you can activate the workspace. This allows some
@@ -138,15 +146,17 @@ subsequent commands to work without explicitly passing in a workspace. This
 is done through:
 
 .. code-block:: console
+
     $ ramble workspace activate [<name>/<path>]
 
 With an activated workspace, you can get information about the workspace with:
 
 .. code-block:: console
+
     $ ramble workspace info
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Configuring A Workspace:
+Configuring A Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Within the created workspace, a ``configs`` directory is created to house the
@@ -155,6 +165,7 @@ configuration files.
 A newly created workspace will contain:
 
 .. code-block:: console
+
    - configs
      | - ramble.yaml
      | - execute_experiment.tpl
@@ -166,8 +177,8 @@ a "rendered" version within every experiment directory.
 These files can be edited with your favorite editor, or though the command:
 
 .. code-block:: console
+
     $ ramble workspace edit
-```
 
 Flags exist to control whether you want to edit a template file, or the
 configuration file.
@@ -176,6 +187,7 @@ Variables are defined of the format ``{file_prefix}``, that contain the path to
 the rendered version within every experiment. As an example:
 
 .. code-block:: console
+
     configs/execute_experiment.tpl
 
 Will define ``{execute_experiment}`` with a value set to the path of hte
@@ -183,7 +195,7 @@ generated file.
 (More explicitly, ``execute_experiment={experiment_run_dir}/{template_name_sans_extension}``)
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-Concretizing A Workspace:
+Concretizing A Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 After configuring a workspace with applications, workloads, and experiments,
@@ -191,6 +203,7 @@ Ramble can be used to inject default software configurations for the requested
 experiments. To do this, you can use the:
 
 .. code-block:: console
+
     $ ramble workspace concretize
 
 This will fill out the ``spack`` dictionary within the ``ramble.yaml`` file
@@ -198,12 +211,13 @@ with defaults. The defaults can be configured however you want before
 installing the actual software.
 
 ^^^^^^^^^^^^^^^^^^^^^^^
-Setting Up A Workspace:
+Setting Up A Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Once a workspace is concretized, it can be set up. This process is executed through:
 
 .. code-block:: console
+
     $ ramble workspace setup
 
 The setup action will:
@@ -213,25 +227,27 @@ The setup action will:
  - Create the ``all_experiments`` script
 
 ^^^^^^^^^^^^^^^^^^^^^^
-Executing Experiments:
+Executing Experiments
 ^^^^^^^^^^^^^^^^^^^^^^
 
 After the workspace is set up, its experiments can be executed. The two methods
 to run the experiments are:
 
 .. code-block:: console
+   
     $ ramble on
    or;
     $ ./all_experiments
 
 ^^^^^^^^^^^^^^^^^^^^^^
-Analyzing Experiments:
+Analyzing Experiments
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Once the experiments within a workspace are complete, the experiments can be
 analyzed. This is done through:
 
 .. code-block:: console
+
     $ ramble workspace analyze
 
 This creates a ``results`` file in the root of the workspace that contains
@@ -239,7 +255,7 @@ extracted figures of merit.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^
-Archiving A Workspace:
+Archiving A Workspace
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Ramble can create an archive of a workspace. This is a self contained copy of various important aspects of the workspace, including:
@@ -252,9 +268,11 @@ Ramble can create an archive of a workspace. This is a self contained copy of va
 You can archive a workspace with:
 
 .. code-block:: console
+
     $ ramble workspace archive
 
 And you can create a tar-ball with:
 
 .. code-block:: console
+
     $ ramble workspace archive -t

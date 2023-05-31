@@ -15,18 +15,21 @@ class Wrfv4(SpackApplication):
 
     tags = ['nwp', 'weather']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('intel-mpi', spack_spec="intel-mpi@2018.4.274",
+                  compiler='gcc9')
 
-    software_spec('wrf', base='wrf', version='4.2',
-                  variants='build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf',
-                  compiler='gcc9', mpi='impi2018', required=True)
+    software_spec('wrf',
+                  spack_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
+                  compiler='gcc9')
 
-    input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus2.5km.tar.gz',
+    required_package('wrf')
+
+    input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus2.5km.tar.gz',
                description='2.5 km resolution mesh of the continental United States.')
 
-    input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus12km.tar.gz',
+    input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz',
                description='12 km resolution mesh of the continental United States.')
 
     executable('cleanup', 'rm -f rsl.* wrfout*', use_mpi=False)
@@ -81,12 +84,12 @@ class Wrfv4(SpackApplication):
     archive_pattern('{experiment_run_dir}/rsl.out.*')
     archive_pattern('{experiment_run_dir}/rsl.error.*')
 
-    def _analyze_experiments(self, workspace, expander):
+    def _analyze_experiments(self, workspace):
         import glob
         import re
         # Generate stats file
 
-        file_list = glob.glob(expander.expand_var('{experiment_run_dir}/rsl.out.*'))
+        file_list = glob.glob(self.expander.expand_var('{experiment_run_dir}/rsl.out.*'))
 
         if file_list:
             timing_regex = re.compile(r'Timing for main.*(?P<main_time>[0-9]+\.[0-9]*).*')
@@ -108,7 +111,7 @@ class Wrfv4(SpackApplication):
 
             avg_time = sum_time / max(count, 1)
 
-            stats_path = expander.expand_var('{experiment_run_dir}/stats.out')
+            stats_path = self.expander.expand_var('{experiment_run_dir}/stats.out')
             with open(stats_path, 'w+') as f:
                 f.write('Average time: %s s\n' % (avg_time))
                 f.write('Cumulative time: %s s\n' % (sum_time))
@@ -117,4 +120,4 @@ class Wrfv4(SpackApplication):
                 f.write('Avg time / Max time: %s s\n' % (avg_time / max(max_time, float(1.0))))
                 f.write('Number of times: %s\n' % (count))
 
-        super()._analyze_experiments(workspace, expander)
+        super()._analyze_experiments(workspace)

@@ -1,0 +1,101 @@
+# Copyright 2022-2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+
+steps:
+  - name: gcr.io/cloud-builders/git
+    args:
+      - fetch
+      - '--unshallow'
+    id: ramble-clone
+  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-centos7:latest
+    args:
+      - '-c'
+      - |
+        cd /workspace
+
+        git branch develop origin/develop
+
+        export PATH=$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}
+
+        . /opt/spack/share/spack/setup-env.sh
+        . /workspace/share/ramble/setup-env.sh
+
+        ramble flake8 -U
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        flake_err=$$?
+
+        ramble commands --update-completion
+        git diff --exit-code &> /dev/null
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        commands_err=$$?
+
+        ramble license verify
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        license_err=$$?
+
+        # Test removing a dependency
+        conda uninstall -qy pytest
+
+        ramble help
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        missing_req_err=$$?
+
+        if [ $$missing_req_err -gt 0 ]; then
+          echo " ***** Ramble failed to work when requirements.txt were not installed"
+          error=1
+        fi
+
+        error=0
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$flake_err -gt 0 ]; then
+          echo "Flake error = $$flake_err"
+          echo " ***** Flake8 tests failed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$commands_err -gt 0 ]; then
+          echo "Commands error = $$commands_err"
+          echo " ***** Commands changed and bash completion is not updated."
+          echo "       Please use the following to fix this:"
+          echo "         ramble commands --update-completion"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$license_err -gt 0 ]; then
+          echo "License check error = $$license_err"
+          echo " ***** License check failed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        if [ $$unit_err -gt 0 ]; then
+          echo "Unit error = $$unit_err"
+          echo " ***** Unit tests failed"
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        exit $$error
+    id: ramble-style-tests
+    entrypoint: /bin/bash
+
+timeout: 600s
+options:
+  machineType: N1_HIGHCPU_8

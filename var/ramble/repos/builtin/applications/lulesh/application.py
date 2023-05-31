@@ -15,14 +15,19 @@ class Lulesh(SpackApplication):
 
     tags = ['proxy-app', 'mini-app']
 
-    default_compiler('intel202160', base='intel-oneapi-compilers', version='2022.1.0',
-                     custom_specifier='intel@2021.6.0')
+    default_compiler('intel202160',
+                     spack_spec='intel-oneapi-compilers@2022.1.0',
+                     compiler_spec='intel@2021.6.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018',
+                  spack_spec='intel-mpi@2018.4.274',
+                  compiler='intel202160')
 
-    software_spec('lulesh', base='lulesh', version='2.0.3',
-                  variants='+openmp',
-                  compiler='intel202160', mpi='impi2018', required=True)
+    software_spec('lulesh',
+                  spack_spec='lulesh@2.0.3 +openmp',
+                  compiler='intel202160')
+
+    required_package('lulesh')
 
     executable('execute', 'lulesh2.0 {flags}', use_mpi=True)
 
@@ -64,7 +69,7 @@ class Lulesh(SpackApplication):
                     fom_regex=r'\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
                     group_name='iterations', units='')
 
-    def _make_experiments(self, workspace, expander):
+    def _make_experiments(self, workspace):
         """
         LULESH requires the number of ranks to be a cube root of an integer.
 
@@ -74,12 +79,10 @@ class Lulesh(SpackApplication):
         We also need to recompute the number of nodes, or the value of
         processes per node here too.
         """
-        num_ranks = int(expander.expand_var('{n_ranks}'))
+        num_ranks = int(self.expander.expand_var('{n_ranks}'))
 
         cube_root = int(num_ranks ** (1. / 3.))
 
-        expander.set_var('n_ranks', cube_root**3, 'experiment')
-        expander._compute_mpi_vars()
+        self.variables['n_ranks'] = cube_root**3
 
-        super()._add_expand_vars(expander)
-        super()._make_experiments(workspace, expander)
+        super()._make_experiments(workspace)

@@ -12,7 +12,7 @@ from ramble.app.builtin.mock.basic import Basic as BaseBasic
 
 
 class BasicInherited(BaseBasic):
-    name = "Basic Inheritance Test Application"
+    name = "basic-inherited"
 
     input_file('inherited_input', url='file:///tmp/inherited_file.log',
                description='Again, not a file', extension='.log')

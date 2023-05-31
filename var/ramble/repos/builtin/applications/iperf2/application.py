@@ -15,10 +15,13 @@ class Iperf2(SpackApplication):
 
     tags = []
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    # software_spec('iperf2', base='iperf2', version='2.0.12',
-    #               compiler='gcc9', required=True)
+    software_spec('iperf2',
+                  spack_spec='iperf2@2.0.12',
+                  compiler='gcc9')
+
+    required_package('iperf2')
 
     # Need to support these use cases:
     # iperf -s // set up server

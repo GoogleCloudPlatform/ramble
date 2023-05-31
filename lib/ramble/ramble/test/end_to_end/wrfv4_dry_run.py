@@ -12,7 +12,10 @@ import glob
 import pytest
 
 import ramble.workspace
+import ramble.config
+import ramble.software_environments
 from ramble.main import RambleCommand
+
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures('mutable_config',
@@ -24,18 +27,9 @@ workspace = RambleCommand('workspace')
 def test_wrfv4_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-    - '-ppn'
-    - '{processes_per_node}'
-    - '-hostfile'
-    - 'hostfile'
-  batch:
-    submit: 'batch_submit {execute_experiment}'
   variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
     partition: ['part1', 'part2']
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'
@@ -43,11 +37,11 @@ ramble:
   applications:
     wrfv4:
       variables:
-        spec_name: ['wrfv4', 'wrfv4-portable']
+        env_name: ['wrfv4', 'wrfv4-portable']
       workloads:
         CONUS_12km:
           experiments:
-            scaling_{n_nodes}_{partition}_{spec_name}:
+            scaling_{n_nodes}_{partition}_{env_name}:
               success_criteria:
               - name: 'timing'
                 mode: 'string'
@@ -72,33 +66,31 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - spec_name
-spack:
-  concretized: true
-  compilers:
-    gcc:
-      base: gcc
-      version: 8.5.0
-  mpi_libraries:
-    intel:
-      base: intel-mpi
-      version: 2018.4.274
-  applications:
-    wrfv4:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+              - env_name
+  spack:
+    concretized: true
+    packages:
+      gcc:
+        spack_spec: gcc@8.5.0
+      intel-mpi:
+        spack_spec: intel-mpi@2018.4.274
         compiler: gcc
-        mpi: intel
-    wrfv4-portable:
-      wrf:
-        base: wrf
-        version: 4.2
-        variants: 'build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf'
+      wrfv4:
+        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
         compiler: gcc
-        mpi: intel
-        target: 'x86_64'
+      wrfv4-portable:
+        spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
+          nesting=basic ~chem ~pnetcdf target=x86_64'
+        compiler: gcc
+    environments:
+      wrfv4:
+        packages:
+        - wrfv4
+        - intel-mpi
+      wrfv4-portable:
+        packages:
+        - wrfv4-portable
+        - intel-mpi
 """
 
     test_licenses = """
@@ -137,7 +129,7 @@ licenses:
         ws1._re_read()
 
         output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v42/v42_bench_conus12km.tar.gz" in output
+        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz" in output
 
         # Test software directories
         software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
@@ -189,7 +181,7 @@ licenses:
                 assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
-                assert "export OMP_NUM_THREADS='1'" in data
+                assert 'export OMP_NUM_THREADS="1"' in data
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
@@ -208,7 +200,7 @@ licenses:
                 assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
-                assert "export OMP_NUM_THREADS='1'" in data
+                assert 'export OMP_NUM_THREADS="1"' in data
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 

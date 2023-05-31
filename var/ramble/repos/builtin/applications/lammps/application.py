@@ -15,24 +15,26 @@ class Lammps(SpackApplication):
 
     tags = ['molecular-dynamics']
 
-    default_compiler('gcc9', base='gcc', version='9.3.0')
+    default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    mpi_library('impi2018', base='intel-mpi', version='2018.4.274')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274',
+                  compiler='gcc9')
 
-    software_spec('lammps', base='lammps', version='20220623',
-                  compiler='gcc9', mpi='impi2018',
-                  variants='+opt+manybody+molecule+kspace+rigid',
-                  required=True)
+    software_spec('lammps',
+                  spack_spec='lammps@20220623 +opt+manybody+molecule+kspace+rigid',
+                  compiler='gcc9')
 
-    input_file('leonard-jones', url='https://www.lammps.org/inputs/in.lj.txt',
+    required_package('lammps')
+
+    input_file('leonard-jones', url='https://www.lammps.org/inputs/in.lj.txt', expand=False,
                description='Atomic fluid. 32k atoms. 100 timesteps. https://www.lammps.org/bench.html#lj')
-    input_file('eam', url='https://www.lammps.org/inputs/in.eam.txt',
+    input_file('eam', url='https://www.lammps.org/inputs/in.eam.txt', expand=False,
                description='Cu metallic solid with embedded atom method potential. 32k atoms. https://www.lammps.org/bench.html#eam')
-    input_file('polymer-chain-melt', url='https://www.lammps.org/inputs/in.chain.txt',
+    input_file('polymer-chain-melt', url='https://www.lammps.org/inputs/in.chain.txt', expand=False,
                description='Bead-spring polymer melt with 100-mer chains and FENE bonds. 32k atoms. 100 timesteps. https://www.lammps.org/bench.html#chain')
-    input_file('chute', url='https://www.lammps.org/inputs/in.chute.txt',
+    input_file('chute', url='https://www.lammps.org/inputs/in.chute.txt', expand=False,
                description='Chute flow of packed granular particles with frictional history potential. 32k atoms. 100 timeteps. https://www.lammps.org/bench.html#chute')
-    input_file('rhodo', url='https://www.lammps.org/inputs/in.rhodo.txt',
+    input_file('rhodo', url='https://www.lammps.org/inputs/in.rhodo.txt', expand=False,
                description='All-atom rhodopsin protein in solvated lipid bilayer with CHARMM force field, long-range Coulombics via PPPM (particle-particle particle mesh), SHAKE constraints. This model contains counter-ions and a reduced amount of water to make a 32K atom system. 32k atoms. 100 timesteps. https://www.lammps.org/bench.html#rhodo')
 
     executable('copy', template=['cp {input_path} {experiment_run_dir}/input.txt'],

@@ -18,13 +18,13 @@ def test_basic_inheritance(mutable_mock_repo):
     assert app_inst.executables['bar']['mpi']
 
     assert 'test_wl' in app_inst.workloads
-    assert app_inst.workloads['test_wl']['executables'] == ['foo']
+    assert app_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']
     assert app_inst.workloads['test_wl']['inputs'] == ['input']
     assert 'test_wl2' in app_inst.workloads
-    assert app_inst.workloads['test_wl2']['executables'] == ['bar']
+    assert app_inst.workloads['test_wl2']['executables'] == ['builtin::env_vars', 'bar']
     assert app_inst.workloads['test_wl2']['inputs'] == ['input']
     assert 'test_wl3' in app_inst.workloads
-    assert app_inst.workloads['test_wl3']['executables'] == ['foo']
+    assert app_inst.workloads['test_wl3']['executables'] == ['builtin::env_vars', 'foo']
     assert app_inst.workloads['test_wl3']['inputs'] == ['inherited_input']
 
     assert 'test_fom' in app_inst.figures_of_merit

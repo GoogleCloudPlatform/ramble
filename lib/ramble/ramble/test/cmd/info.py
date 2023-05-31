@@ -65,3 +65,23 @@ def test_info_fields(app_query, parser, info_lines):
     for text in expected_fields:
         match = [x for x in info_lines if text in x]
         assert match
+
+
+@pytest.mark.parametrize('app_query', [
+    'gromacs', 'wrfv3', 'wrfv4'
+])
+def test_spack_info_software(app_query):
+    expected_fields = (
+        'Description:',
+        'Setup Pipeline Phases:',
+        'Analyze Pipeline Phases:',
+        'Tags:',
+        'spack_spec =',
+        'compiler =',
+
+    )
+
+    out = info(app_query)
+
+    for field in expected_fields:
+        assert field in out
