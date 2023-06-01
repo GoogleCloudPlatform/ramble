@@ -86,6 +86,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mirror">ramble.cmd.mirror module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.on">ramble.cmd.on module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.repo">ramble.cmd.repo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.unit_test">ramble.cmd.unit_test module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.workspace">ramble.cmd.workspace module</a></li>
 </ul>
@@ -137,6 +138,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
 </ul>
@@ -1061,6 +1063,64 @@ the locations ramble reads application definition files from.</p>
 </dd></dl>
 
 </section>
+<section id="module-ramble.cmd.software_definitions">
+<span id="ramble-cmd-software-definitions-module"></span><h2>ramble.cmd.software_definitions module<a class="headerlink" href="#module-ramble.cmd.software_definitions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.collect_definitions">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">collect_definitions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#collect_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.collect_definitions" title="Permalink to this definition"></a></dt>
+<dd><p>Build software definition data structures</p>
+<p>Iterate over all defined objects and extract their software definitions.
+Built maps representing which objects use a given software definition, and
+where detected conflicts have occured.</p>
+<p>The maps are global to this module, and reused in other internal methods.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.count_conflicts">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">count_conflicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#count_conflicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.count_conflicts" title="Permalink to this definition"></a></dt>
+<dd><p>Iterate over conflicts and count how many were detected</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.nested_1">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">nested_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#nested_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.nested_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.nested_2">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">nested_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#nested_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.nested_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.print_conflicts">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">print_conflicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#print_conflicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.print_conflicts" title="Permalink to this definition"></a></dt>
+<dd><p>Print conflict information, if any exist</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.print_summary">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">print_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#print_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.print_summary" title="Permalink to this definition"></a></dt>
+<dd><p>Print a summary of all software definitions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.section_title">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">section_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#section_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.section_title" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.setup_parser" title="Permalink to this definition"></a></dt>
+<dd><p>Setup the parser for software-definitions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.software_definitions.software_definitions">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.software_definitions.</span></span><span class="sig-name descname"><span class="pre">software_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unknown_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/software_definitions.html#software_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.software_definitions.software_definitions" title="Permalink to this definition"></a></dt>
+<dd><p>Perform software-definitions actions</p>
+</dd></dl>
+
+</section>
 <section id="module-ramble.cmd.unit_test">
 <span id="ramble-cmd-unit-test-module"></span><h2>ramble.cmd.unit_test module<a class="headerlink" href="#module-ramble.cmd.unit_test" title="Permalink to this heading"></a></h2>
 <dl class="py function">
@@ -1294,7 +1354,7 @@ should be removed manually.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 31, 2023.
+      <span class="lastupdated">Last updated on Jun 01, 2023.
       </span></p>
   </div>
 

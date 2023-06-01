@@ -65,6 +65,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
 </ul>
@@ -445,29 +446,6 @@
         <span class="k">for</span> <span class="n">env</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_map</span><span class="p">[</span><span class="n">raw_env</span><span class="p">]:</span>
             <span class="k">yield</span> <span class="n">env</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.specs_equiv"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.specs_equiv">[docs]</a>    <span class="k">def</span> <span class="nf">specs_equiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec1</span><span class="p">,</span> <span class="n">spec2</span><span class="p">):</span>
-        <span class="n">all_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">spec1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="n">all_keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">spec2</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec1</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="s1">&#39;application_name&#39;</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
-            <span class="n">all_keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;application_name&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="s1">&#39;spec_type&#39;</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
-            <span class="n">all_keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;spec_type&#39;</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spec1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spec2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">spec1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">spec2</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="kc">True</span></div>
-
 <div class="viewcode-block" id="SoftwareEnvironments.get_named_spec"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_named_spec">[docs]</a>    <span class="k">def</span> <span class="nf">get_named_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_name</span><span class="p">,</span> <span class="n">spec_context</span><span class="o">=</span><span class="s1">&#39;compiler&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract a named spec from a v1 spack dictionary&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">spec_context</span> <span class="o">==</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span>
@@ -573,7 +551,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 31, 2023.
+      <span class="lastupdated">Last updated on Jun 01, 2023.
       </span></p>
   </div>
 

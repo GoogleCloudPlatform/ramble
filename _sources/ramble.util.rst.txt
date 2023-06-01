@@ -65,6 +65,14 @@ ramble.util.path module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.spec\_utils module
+------------------------------
+
+.. automodule:: ramble.util.spec_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.web module
 ----------------------
 

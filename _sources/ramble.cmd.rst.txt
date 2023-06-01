@@ -121,6 +121,14 @@ ramble.cmd.repo module
    :undoc-members:
    :show-inheritance:
 
+ramble.cmd.software\_definitions module
+---------------------------------------
+
+.. automodule:: ramble.cmd.software_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.cmd.unit\_test module
 ----------------------------
 

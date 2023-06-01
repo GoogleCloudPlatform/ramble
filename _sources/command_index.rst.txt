@@ -1,7 +1,7 @@
 
-====================  =================================================================
+====================  ==================================================================
  Category              Commands 
-====================  =================================================================
+====================  ==================================================================
 Application dev       | :ref:`edit <ramble-edit>`
 Query applications    | :ref:`info <ramble-info>`,
                         :ref:`list <ramble-list>`
@@ -13,11 +13,12 @@ Developer             | :ref:`commands <ramble-commands>`,
                         :ref:`debug <ramble-debug>`,
                         :ref:`flake8 <ramble-flake8>`,
                         :ref:`license <ramble-license>`,
+                        :ref:`software-definitions <ramble-software-definitions>`,
                         :ref:`unit-test <ramble-unit-test>`
 More help             | :ref:`help <ramble-help>`
 Secret                | :ref:`on <ramble-on>`
 Workspaces            | :ref:`workspace <ramble-workspace>`
-====================  =================================================================
+====================  ==================================================================
 
 
 ----
@@ -127,6 +128,7 @@ A fleixble benchmark experiment manager.
    * :ref:`mirror <ramble-mirror>`
    * :ref:`on <ramble-on>`
    * :ref:`repo <ramble-repo>`
+   * :ref:`software-definitions <ramble-software-definitions>`
    * :ref:`unit-test <ramble-unit-test>`
    * :ref:`workspace <ramble-workspace>`
 
@@ -1069,6 +1071,35 @@ namespace_or_path
 
 ``--scope {defaults,system,site,user}``
   configuration scope to modify
+
+
+----
+
+.. _ramble-software-definitions:
+
+ramble software-definitions
+---------------------------
+
+inspect software definitions in object definitions
+
+.. code-block:: console
+
+    ramble software-definitions [-hsce]
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+``-s, --summary``
+  print summary of software definitions
+
+``-c, --conflicts``
+  print summary of conflicting definitions
+
+``-e, --error-on-conflict``
+  if conflicts are found, exit code is number of conflicts
 
 
 ----

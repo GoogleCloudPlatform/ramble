@@ -65,6 +65,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
 </ul>
@@ -555,6 +556,8 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.cmd_name">cmd_name() (in module ramble.cmd)</a>
 </li>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.collect_definitions">collect_definitions() (in module ramble.cmd.software_definitions)</a>
+</li>
       <li><a href="ramble.html#ramble.spec.COLON">COLON (in module ramble.spec)</a>
 </li>
       <li><a href="ramble.html#ramble.spec.COMMA">COMMA (in module ramble.spec)</a>
@@ -674,6 +677,8 @@
       <li><a href="ramble.html#ramble.spec.Spec.copy">copy() (ramble.spec.Spec method)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.copy_from_external_env">copy_from_external_env() (ramble.spack_runner.SpackRunner method)</a>
+</li>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.count_conflicts">count_conflicts() (in module ramble.cmd.software_definitions)</a>
 </li>
       <li><a href="ramble.html#ramble.mirror.create">create() (in module ramble.mirror)</a>
 
@@ -1693,6 +1698,8 @@
 </li>
         <li><a href="ramble.cmd.html#module-ramble.cmd.repo">ramble.cmd.repo</a>
 </li>
+        <li><a href="ramble.cmd.html#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions</a>
+</li>
         <li><a href="ramble.cmd.html#module-ramble.cmd.unit_test">ramble.cmd.unit_test</a>
 </li>
         <li><a href="ramble.cmd.html#module-ramble.cmd.workspace">ramble.cmd.workspace</a>
@@ -1779,6 +1786,8 @@
 </li>
         <li><a href="ramble.util.html#module-ramble.util.path">ramble.util.path</a>
 </li>
+        <li><a href="ramble.util.html#module-ramble.util.spec_utils">ramble.util.spec_utils</a>
+</li>
         <li><a href="ramble.util.html#module-ramble.util.web">ramble.util.web</a>
 </li>
         <li><a href="ramble.workspace.html#module-ramble.workspace">ramble.workspace</a>
@@ -1836,12 +1845,20 @@
 </li>
       <li><a href="ramble.html#ramble.repository.Indexer.needs_update">needs_update() (ramble.repository.Indexer method)</a>
 </li>
-      <li><a href="ramble.cmd.html#ramble.cmd.workspace.nested_1">nested_1() (in module ramble.cmd.workspace)</a>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.nested_1">nested_1() (in module ramble.cmd.software_definitions)</a>
+
+      <ul>
+        <li><a href="ramble.cmd.html#ramble.cmd.workspace.nested_1">(in module ramble.cmd.workspace)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ramble.cmd.html#ramble.cmd.workspace.nested_2">nested_2() (in module ramble.cmd.workspace)</a>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.nested_2">nested_2() (in module ramble.cmd.software_definitions)</a>
+
+      <ul>
+        <li><a href="ramble.cmd.html#ramble.cmd.workspace.nested_2">(in module ramble.cmd.workspace)</a>
 </li>
+      </ul></li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.nested_3">nested_3() (in module ramble.cmd.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.nested_4">nested_4() (in module ramble.cmd.workspace)</a>
@@ -1970,16 +1987,20 @@
 </li>
       <li><a href="ramble.util.imp.html#ramble.util.imp.importlib_importer.PrependFileLoader">PrependFileLoader (class in ramble.util.imp.importlib_importer)</a>
 </li>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.print_conflicts">print_conflicts() (in module ramble.cmd.software_definitions)</a>
+</li>
       <li><a href="ramble.html#ramble.error.RambleError.print_context">print_context() (ramble.error.RambleError method)</a>
 </li>
       <li><a href="ramble.html#ramble.config.Configuration.print_section">print_section() (ramble.config.Configuration method)</a>
 </li>
       <li><a href="ramble.html#ramble.main.print_setup_info">print_setup_info() (in module ramble.main)</a>
 </li>
-      <li><a href="ramble.cmd.html#ramble.cmd.info.print_text_info">print_text_info() (in module ramble.cmd.info)</a>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.print_summary">print_summary() (in module ramble.cmd.software_definitions)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.cmd.html#ramble.cmd.info.print_text_info">print_text_info() (in module ramble.cmd.info)</a>
+</li>
       <li><a href="ramble.html#ramble.config.process_config_path">process_config_path() (in module ramble.config)</a>
 </li>
       <li><a href="ramble.html#ramble.keywords.Keywords.processes_per_node">processes_per_node (ramble.keywords.Keywords attribute)</a>
@@ -2187,6 +2208,13 @@
 
       <ul>
         <li><a href="ramble.cmd.html#module-ramble.cmd.repo">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.cmd.software_definitions
+
+      <ul>
+        <li><a href="ramble.cmd.html#module-ramble.cmd.software_definitions">module</a>
 </li>
       </ul></li>
       <li>
@@ -2493,6 +2521,13 @@
 </li>
       </ul></li>
       <li>
+    ramble.util.spec_utils
+
+      <ul>
+        <li><a href="ramble.util.html#module-ramble.util.spec_utils">module</a>
+</li>
+      </ul></li>
+      <li>
     ramble.util.web
 
       <ul>
@@ -2767,6 +2802,8 @@
       <ul>
         <li><a href="ramble.cmd.html#ramble.cmd.info.section_title">(in module ramble.cmd.info)</a>
 </li>
+        <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.section_title">(in module ramble.cmd.software_definitions)</a>
+</li>
         <li><a href="ramble.cmd.html#ramble.cmd.workspace.section_title">(in module ramble.cmd.workspace)</a>
 </li>
       </ul></li>
@@ -2837,6 +2874,8 @@
 </li>
         <li><a href="ramble.cmd.html#ramble.cmd.repo.setup_parser">(in module ramble.cmd.repo)</a>
 </li>
+        <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.setup_parser">(in module ramble.cmd.software_definitions)</a>
+</li>
         <li><a href="ramble.cmd.html#ramble.cmd.unit_test.setup_parser">(in module ramble.cmd.unit_test)</a>
 </li>
         <li><a href="ramble.cmd.html#ramble.cmd.workspace.setup_parser">(in module ramble.cmd.workspace)</a>
@@ -2854,14 +2893,16 @@
 </li>
       <li><a href="ramble.html#ramble.config.SingleFileScope">SingleFileScope (class in ramble.config)</a>
 </li>
+      <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.software_definitions">software_definitions() (in module ramble.cmd.software_definitions)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.software_dir">software_dir (ramble.workspace.Workspace property)</a>
 
       <ul>
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.software_dir">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.software_specs">software_specs (ramble.application_types.executable.ExecutableApplication attribute)</a>
 
       <ul>
@@ -2940,7 +2981,7 @@
 </li>
       <li><a href="ramble.html#ramble.spec.SpecParser">SpecParser (class in ramble.spec)</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.specs_equiv">specs_equiv() (ramble.software_environments.SoftwareEnvironments method)</a>
+      <li><a href="ramble.util.html#ramble.util.spec_utils.specs_equiv">specs_equiv() (in module ramble.util.spec_utils)</a>
 </li>
       <li><a href="ramble.util.html#ramble.util.web.spider">spider() (in module ramble.util.web)</a>
 </li>
@@ -3365,7 +3406,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 31, 2023.
+      <span class="lastupdated">Last updated on Jun 01, 2023.
       </span></p>
   </div>
 
