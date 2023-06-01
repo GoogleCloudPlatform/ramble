@@ -502,11 +502,6 @@
 
         <span class="n">experiment_template_name</span> <span class="o">=</span> <span class="n">context_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">]</span>
 
-        <span class="c1"># Check deprecated variable definitions</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">spec_name</span> <span class="ow">in</span> <span class="n">context_variables</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Workspace config uses the &quot;spec_name&quot; variable&#39;</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;Please update to using the &quot;env_name&quot; variable instead&#39;</span><span class="p">)</span>
-
         <span class="n">renderer</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">Renderer</span><span class="p">(</span><span class="s1">&#39;experiment&#39;</span><span class="p">)</span>
 
         <span class="n">rendered_experiments</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>

@@ -1597,17 +1597,7 @@
 
 <div class="viewcode-block" id="Workspace.get_spack_dict"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_spack_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_spack_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the spack dictionary for this workspace&quot;&quot;&quot;</span>
-        <span class="n">ws_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_workspace_dict</span><span class="p">()</span>
-        <span class="c1"># TODO (dwj): Remove after deprecation period</span>
-        <span class="c1"># DEPRECATED</span>
-        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">spack</span> <span class="ow">in</span> <span class="n">ws_dict</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The spack dictionary is moving to its own config section.&#39;</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Please update to ensure your config continues to function properly.&#39;</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;See the documentation for the new format.&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">ws_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">spack</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;spack&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;spack&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Workspace.get_applications"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_applications">[docs]</a>    <span class="k">def</span> <span class="nf">get_applications</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the dictionary of applications&quot;&quot;&quot;</span>
