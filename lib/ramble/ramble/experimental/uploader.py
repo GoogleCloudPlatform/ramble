@@ -82,7 +82,6 @@ class Experiment():
         return j
 
 
-@staticmethod
 def format_data(data_in):
     '''
     Goal: convert results to a more searchable and decomposed format for insertion
