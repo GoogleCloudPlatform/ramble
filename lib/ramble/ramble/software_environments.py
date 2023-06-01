@@ -341,29 +341,6 @@ class SoftwareEnvironments(object):
         for env in self._environment_map[raw_env]:
             yield env
 
-    def specs_equiv(self, spec1, spec2):
-        all_keys = set(spec1.keys())
-        all_keys.update(set(spec2.keys()))
-
-        if len(all_keys) != len(spec1.keys()):
-            return False
-
-        if 'application_name' in all_keys:
-            all_keys.remove('application_name')
-
-        if 'spec_type' in all_keys:
-            all_keys.remove('spec_type')
-
-        for key in all_keys:
-            if key not in spec1:
-                return False
-            if key not in spec2:
-                return False
-            if spec1[key] != spec2[key]:
-                return False
-
-        return True
-
     def get_named_spec(self, spec_name, spec_context='compiler'):
         """Extract a named spec from a v1 spack dictionary"""
         if spec_context == 'compiler':
