@@ -1,5 +1,5 @@
 ramble:
-  env-vars:
+  env_vars:
     set:
       I_MPI_DEBUG: '5'
   variables:
@@ -13,7 +13,7 @@ ramble:
         motorbike:
           experiments:
             test_{partition}_{processes_per_node}_{n_nodes}_{env_name}:
-              env-vars:
+              env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
               variables:

@@ -69,7 +69,6 @@ sub_props = union_dicts(
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
     {
-        'env-vars': ramble.schema.licenses.env_var_actions,
         'chained_experiments': chained_experiment_def,
         'template': {'type': 'boolean'},
     }

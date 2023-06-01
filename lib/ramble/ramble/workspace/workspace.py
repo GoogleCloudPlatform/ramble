@@ -16,7 +16,6 @@ import datetime
 
 import six
 
-from llnl.util.lang import union_dicts
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 
@@ -1476,15 +1475,7 @@ class Workspace(object):
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        deprecated_env_vars = self._get_workspace_section(namespace.env_var)
-        if deprecated_env_vars:
-            tty.warn('The env-vars workspace section is deprecated. Environment variables\n'
-                     'should be defined in the env_vars config section using the same\n'
-                     'syntax. Support for env-vars will be removed in a future. See\n'
-                     'the documentation for examples of the new syntax.')
-
-        return union_dicts(ramble.config.config.get_config('env_vars'),
-                           deprecated_env_vars)
+        return ramble.config.config.get_config('env_vars')
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""

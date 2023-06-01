@@ -40,7 +40,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
         test_wl2:
@@ -48,7 +48,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
         test_wl3:
@@ -56,7 +56,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
   spack:
