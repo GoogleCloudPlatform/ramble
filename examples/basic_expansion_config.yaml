@@ -33,6 +33,7 @@ spack:
   packages:
     gcc9:
       spack_spec: gcc@9.3.0 target=x86_64
+      compiler_spec: gcc@9.3.0
     ompi412:
       spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
       compiler: gcc9

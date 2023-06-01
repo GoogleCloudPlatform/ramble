@@ -1492,17 +1492,7 @@ class Workspace(object):
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
-        ws_dict = self._get_workspace_dict()
-        # TODO (dwj): Remove after deprecation period
-        # DEPRECATED
-        if namespace.spack in ws_dict:
-            tty.warn('The spack dictionary is moving to its own config section.')
-            tty.warn('Please update to ensure your config continues to function properly.')
-            tty.warn('See the documentation for the new format.')
-            return ws_dict[namespace.spack]
-        else:
-            return ramble.config.config.get_config('spack')
-        return syaml.syaml_dict()
+        return ramble.config.config.get_config('spack')
 
     def get_applications(self):
         """Get the dictionary of applications"""

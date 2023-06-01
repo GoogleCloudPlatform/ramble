@@ -19,8 +19,6 @@
 
 cd {experiment_run_dir}
 
-{spack_setup}
-
 export OMP_NUM_THREADS={n_threads}
 
 scontrol show hostnames ${SLURM_JOB_NODELIST} > hostfile

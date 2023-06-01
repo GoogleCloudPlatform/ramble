@@ -397,11 +397,6 @@ class ExperimentSet(object):
 
         experiment_template_name = context_variables[self.keywords.experiment_name]
 
-        # Check deprecated variable definitions
-        if self.keywords.spec_name in context_variables:
-            tty.warn('Workspace config uses the "spec_name" variable')
-            tty.die('Please update to using the "env_name" variable instead')
-
         renderer = ramble.renderer.Renderer('experiment')
 
         rendered_experiments = set()
