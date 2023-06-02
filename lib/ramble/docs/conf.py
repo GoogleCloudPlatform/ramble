@@ -71,13 +71,12 @@ apidoc_args = [
     "--no-toc",  # Don't create a table of contents file
     "--output-dir=.",  # Directory to place all output
     "--module-first",  # emit module docs before submodule docs
+    "--implicit-namespaces"
 ]
 sphinx_apidoc(
     apidoc_args
     + [
         "_ramble_root/lib/ramble/ramble",
-        "_ramble_root/lib/ramble/ramble/test/*.py",
-        "_ramble_root/lib/ramble/ramble/test/cmd/*.py",
     ]
 )
 
