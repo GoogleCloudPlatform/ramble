@@ -17,6 +17,7 @@ import shutil
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
+import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified
 
 import spack.util.executable
@@ -32,29 +33,13 @@ import ramble.expander
 import ramble.repository
 import ramble.modifier
 import ramble.util.executable
+import ramble.util.colors as rucolor
 
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
-
-header_color = '@*b'
-level1_color = '@*g'
-level2_color = '@*r'
-plain_format = '@.'
-
-
-def section_title(s):
-    return header_color + s + plain_format
-
-
-def subsection_title(s):
-    return level1_color + s + plain_format
-
-
-def nested_2_color(s):
-    return level2_color + s + plain_format
 
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
@@ -171,46 +156,46 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def _long_print(self):
         out_str = []
-        out_str.append(section_title('Application: ') + f'{self.name}\n')
+        out_str.append(rucolor.section_title('Application: ') + f'{self.name}\n')
         out_str.append('\n')
 
-        out_str.append('%s\n' % section_title('Description:'))
+        out_str.append(rucolor.section_title('Description:\n'))
         if self.__doc__:
-            out_str.append('\t%s\n' % self.__doc__)
+            out_str.append(f'\t{self.__doc__}\n')
         else:
             out_str.append('\tNone\n')
 
         if hasattr(self, 'tags'):
             out_str.append('\n')
-            out_str.append('%s\n' % section_title('Tags:'))
+            out_str.append(rucolor.section_title('Tags:\n'))
             out_str.append(colified(self.tags, tty=True))
             out_str.append('\n')
 
         if hasattr(self, '_setup_phases'):
             out_str.append('\n')
-            out_str.append('%s\n' % section_title('Setup Pipeline Phases:'))
+            out_str.append(rucolor.section_title('Setup Pipeline Phases:\n'))
             out_str.append(colified(self._setup_phases, tty=True))
 
         if hasattr(self, '_analyze_phases'):
             out_str.append('\n')
-            out_str.append('%s\n' % section_title('Analyze Pipeline Phases:'))
+            out_str.append(rucolor.section_title('Analyze Pipeline Phases:\n'))
             out_str.append(colified(self._analyze_phases, tty=True))
 
         if hasattr(self, 'workloads'):
             out_str.append('\n')
             for wl_name, wl_conf in self.workloads.items():
-                out_str.append(section_title('Workload:') + f' {wl_name}\n')
-                out_str.append('\t' + subsection_title('Executables: ') +
+                out_str.append(rucolor.section_title('Workload:') + f' {wl_name}\n')
+                out_str.append('\t' + rucolor.nested_1('Executables: ') +
                                f'{wl_conf["executables"]}\n')
-                out_str.append('\t' + subsection_title('Inputs: ') +
+                out_str.append('\t' + rucolor.nested_1('Inputs: ') +
                                f'{wl_conf["inputs"]}\n')
 
                 if wl_name in self.workload_variables:
-                    out_str.append('\t' + subsection_title('Variables:') + '\n')
+                    out_str.append(rucolor.nested_1('\tVariables:\n'))
                     for var, conf in self.workload_variables[wl_name].items():
                         indent = '\t\t'
 
-                        out_str.append(nested_2_color(f'{indent}{var}:\n'))
+                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
                         out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
                         out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
                         if 'values' in conf:
@@ -219,7 +204,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             out_str.append('\n')
 
         if hasattr(self, 'builtins'):
-            out_str.append(section_title('Builtin Executables:\n'))
+            out_str.append(rucolor.section_title('Builtin Executables:\n'))
             out_str.append('\t' + colified(self.builtins.keys(), tty=True) + '\n')
         return out_str
 
@@ -274,6 +259,41 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         elif self._verbosity == 'short':
             return ''.join(self._short_print())
         return self.name
+
+    def print_vars(self, header='', vars_to_print=None, indent=''):
+        print_vars = vars_to_print
+        if not print_vars:
+            print_vars = self.variables
+
+        color.cprint(f'{indent}{header}:')
+        for var, val in print_vars.items():
+            expansion_var = self.expander.expansion_str(var)
+            expanded = self.expander.expand_var(expansion_var)
+            color.cprint(f'{indent}  {var} = {val} ==> {expanded}'.replace('@', '@@'))
+
+    def print_internals(self, indent=''):
+        if not self.internals:
+            return
+
+        if namespace.custom_executables in self.internals:
+            header = rucolor.nested_4('Custom Executables')
+            color.cprint(f'{indent}{header}:')
+
+            for name in self.internals[namespace.custom_executables]:
+                color.cprint(f'{indent}  {name}')
+
+        if namespace.executables in self.internals:
+            header = rucolor.nested_4('Executable Order')
+            color.cprint(f'{indent}{header}: {str(self.internals[namespace.executables])}')
+
+    def print_chain_order(self, indent=''):
+        if not self.chain_order:
+            return
+
+        header = rucolor.nested_4('Experiment Chain')
+        color.cprint(f'{indent}{header}:')
+        for exp in self.chain_order:
+            color.cprint(f'{indent}- {exp}')
 
     def format_doc(self, **kwargs):
         """Wrap doc string at 72 characters and format nicely"""
