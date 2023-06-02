@@ -50,12 +50,12 @@ class Ior(SpackApplication):
 
     iter_regex = ''
     for metric in metrics[0:3]:  # iter is non-float
-        iter_regex += f'\s+(?P<{metric}>[0-9]+\.[0-9]+)'  # xfer => total
-    iter_regex += f'\s+(?P<{metrics[3]}>[0-9]+)'  # handle block
+        iter_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'  # xfer => total
+    iter_regex += r'\s+(?P<' + metrics[3] + r'>[0-9]+)'  # handle block
 
     for metric in metrics[4:-1]:  # iter is non-float
-        iter_regex += f'\s+(?P<{metric}>[0-9]+\.[0-9]+)'  # xfer => total
-    iter_regex += f'\s+(?P<{metrics[-1]}>[0-9]+)\s*$'  # handle iter
+        iter_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'  # xfer => total
+    iter_regex += r'\s+(?P<' + metrics[-1] + r'>[0-9]+)\s*$'  # handle iter
 
     access_regex = '(?P<access>(read|write))' + iter_regex
     figure_of_merit_context('iter', regex=access_regex,
@@ -63,7 +63,7 @@ class Ior(SpackApplication):
 
     # Capture Per Iteration Data
     for metric, unit in zip(metrics, units):
-        fom_regex = '\w+' + iter_regex
+        fom_regex = r'\w+' + iter_regex
         figure_of_merit(metric,
                         log_file='{log_file}',
                         fom_regex=fom_regex,
@@ -108,11 +108,11 @@ class Ior(SpackApplication):
     summary_regex = '(?P<Operation>(read|write))'
     for name, unit, variant in metrics:
         if 'str' in variant:
-            summary_regex += f'\s+(?P<{name}>\w+)'
+            summary_regex += r'\s+(?P<' + name + r'>\w+)'
         elif 'int' in variant:
-            summary_regex += f'\s+(?P<{name}>[0-9]+)'
+            summary_regex += r'\s+(?P<' + name + r'>[0-9]+)'
         elif 'float' in variant:
-            summary_regex += f'\s+(?P<{name}>[0-9]+\.[0-9]+)'
+            summary_regex += r'\s+(?P<' + name + r'>[0-9]+\.[0-9]+)'
         else:
             tty.error("Incorrect metric for FOMs")
 
