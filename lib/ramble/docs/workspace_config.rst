@@ -348,8 +348,8 @@ Experiment Modifiers:
 
 In addition to containing application definitions, Ramble also provides
 experiment modifiers. Experiment modifiers encapsulate several aspects of a
-standard modification to an experiment, and can be applied to experiments to
-modify their behavior.
+standard modification to an experiment, such as prepending a binary with a tool
+or profiler, and can be applied to experiments to modify their behavior.
 
 Available experiment modifiers can be seen using ``ramble mods list``, and more
 information about a particular modifier can be see with
@@ -385,9 +385,12 @@ their own config section).
 When defining a modifier, the ``name`` attribute is the name of the modifier
 that will be applied. The ``mode`` attribute is a modifier specific setting
 allowing the user to select the modifier behavior. Modes can be seen by looking
-at the modifier informaiton. The ``on_executable`` attribute is a list of
-experiment executables that the modifier should be applied to. These executable
-names are matched using python's ``fnmatch.fnmatch`` functionality.
+at the modifier information, and represent modes of use for the modifier. Modes
+group several general aspects of a modifier into one usage mode, and can allow
+a general modifier to present many operational entry points. The
+``on_executable`` attribute is a list of experiment executables that the
+modifier should be applied to. These executable names are matched using
+python's ``fnmatch.fnmatch`` functionality.
 
 If it is not set, modifiers will attempt to determine their own ``mode``
 attribute. This will succeed if the modifier has a single mode of operation. If
