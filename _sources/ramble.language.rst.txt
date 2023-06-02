@@ -1,0 +1,23 @@
+ramble.language namespace
+=========================
+
+.. py:module:: ramble.language
+
+Submodules
+----------
+
+ramble.language.application\_language module
+--------------------------------------------
+
+.. automodule:: ramble.language.application_language
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.language.language\_base module
+-------------------------------------
+
+.. automodule:: ramble.language.language_base
+   :members:
+   :undoc-members:
+   :show-inheritance:

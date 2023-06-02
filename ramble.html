@@ -54,14 +54,54 @@
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.application_types.html">ramble.application_types package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html">ramble.cmd package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html">ramble.util package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html">ramble.workspace package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ramble-appkit-module">ramble.appkit module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ramble-application-module">ramble.application module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ramble.application">ramble.application module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.ApplicationBase"><code class="docutils literal notranslate"><span class="pre">ApplicationBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.add_expand_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.add_expand_vars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.archive_patterns"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.archive_patterns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.builtins"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.builtins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.copy"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.create_experiment_chain"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.create_experiment_chain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.default_compilers"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.default_compilers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.env_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.env_vars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.executables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.executables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.figure_of_merit_contexts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.figures_of_merit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.format_doc"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.format_doc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.get_pipeline_phases"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.get_pipeline_phases()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.inputs"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.inputs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.name"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.required_packages"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.required_packages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.run_phase"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.run_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.set_chained_experiments"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.set_chained_experiments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.set_env_variable_sets"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.set_env_variable_sets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.set_internals"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.set_internals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.set_template"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.set_template()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.set_variables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.set_variables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.software_specs"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.software_specs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.success_criteria"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.success_criteria</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.uses_spack"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.uses_spack</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.workload_variables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.workload_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.workloads"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.workloads</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.ApplicationError"><code class="docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.ChainCycleDetectedError"><code class="docutils literal notranslate"><span class="pre">ChainCycleDetectedError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.InvalidChainError"><code class="docutils literal notranslate"><span class="pre">InvalidChainError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.nested_2_color"><code class="docutils literal notranslate"><span class="pre">nested_2_color()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.section_title"><code class="docutils literal notranslate"><span class="pre">section_title()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.subsection_title"><code class="docutils literal notranslate"><span class="pre">subsection_title()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.caches">ramble.caches module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.caches.MirrorCache"><code class="docutils literal notranslate"><span class="pre">MirrorCache</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.caches.MirrorCache.store"><code class="docutils literal notranslate"><span class="pre">MirrorCache.store()</span></code></a></li>
@@ -1145,6 +1185,58 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ramble.experimental.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.experimental.html#module-ramble.experimental.uploader">ramble.experimental.uploader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader"><code class="docutils literal notranslate"><span class="pre">BigQueryUploader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.get_expierment_id"><code class="docutils literal notranslate"><span class="pre">BigQueryUploader.get_expierment_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.insert_data"><code class="docutils literal notranslate"><span class="pre">BigQueryUploader.insert_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.perform_upload"><code class="docutils literal notranslate"><span class="pre">BigQueryUploader.perform_upload()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.Experiment"><code class="docutils literal notranslate"><span class="pre">Experiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.Experiment.generate_hash"><code class="docutils literal notranslate"><span class="pre">Experiment.generate_hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.Experiment.get_hash"><code class="docutils literal notranslate"><span class="pre">Experiment.get_hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.Experiment.to_json"><code class="docutils literal notranslate"><span class="pre">Experiment.to_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.Uploader"><code class="docutils literal notranslate"><span class="pre">Uploader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.Uploader.perform_upload"><code class="docutils literal notranslate"><span class="pre">Uploader.perform_upload()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html#ramble.experimental.uploader.format_data"><code class="docutils literal notranslate"><span class="pre">format_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ramble.language.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.language.html#module-ramble.language.application_language">ramble.language.application_language module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.ApplicationMeta"><code class="docutils literal notranslate"><span class="pre">ApplicationMeta</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.archive_pattern"><code class="docutils literal notranslate"><span class="pre">archive_pattern()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.default_compiler"><code class="docutils literal notranslate"><span class="pre">default_compiler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.executable"><code class="docutils literal notranslate"><span class="pre">executable()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.figure_of_merit"><code class="docutils literal notranslate"><span class="pre">figure_of_merit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.figure_of_merit_context"><code class="docutils literal notranslate"><span class="pre">figure_of_merit_context()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.input_file"><code class="docutils literal notranslate"><span class="pre">input_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.register_builtin"><code class="docutils literal notranslate"><span class="pre">register_builtin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.required_package"><code class="docutils literal notranslate"><span class="pre">required_package()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.software_spec"><code class="docutils literal notranslate"><span class="pre">software_spec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.success_criteria"><code class="docutils literal notranslate"><span class="pre">success_criteria()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload"><code class="docutils literal notranslate"><span class="pre">workload()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload_variable"><code class="docutils literal notranslate"><span class="pre">workload_variable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.language.html#module-ramble.language.language_base">ramble.language.language_base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.language_base.DirectiveError"><code class="docutils literal notranslate"><span class="pre">DirectiveError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.language_base.DirectiveMeta"><code class="docutils literal notranslate"><span class="pre">DirectiveMeta</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.language.html#ramble.language.language_base.DirectiveMeta.directive"><code class="docutils literal notranslate"><span class="pre">DirectiveMeta.directive()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ramble.schema.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.schema.html#module-ramble.schema.applications">ramble.schema.applications module</a><ul>
@@ -1216,6 +1308,82 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html#ramble.schema.workspace.schema"><code class="docutils literal notranslate"><span class="pre">schema</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.cmd.html">ramble.test.cmd namespace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-clean-module">ramble.test.cmd.clean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-config-module">ramble.test.cmd.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#module-ramble.test.cmd.debug">ramble.test.cmd.debug module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-info-module">ramble.test.cmd.info module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-list-module">ramble.test.cmd.list module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-mirror-module">ramble.test.cmd.mirror module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-on-module">ramble.test.cmd.on module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-repo-module">ramble.test.cmd.repo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#module-ramble.test.cmd.software_definitions">ramble.test.cmd.software_definitions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-workspace-module">ramble.test.cmd.workspace module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.end_to_end.html">ramble.test.end_to_end namespace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-config-section-env-vars-module">ramble.test.end_to_end.config_section_env_vars module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-custom-executables-module">ramble.test.end_to_end.custom_executables module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-deprecated-env-vars-module">ramble.test.end_to_end.deprecated_env_vars module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-dryrun-chained-experiments-module">ramble.test.end_to_end.dryrun_chained_experiments module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-dryrun-copies-external-env-module">ramble.test.end_to_end.dryrun_copies_external_env module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-dryrun-series-contains-package-paths-module">ramble.test.end_to_end.dryrun_series_contains_package_paths module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-env-var-builtin-module">ramble.test.end_to_end.env_var_builtin module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-known-applications-module">ramble.test.end_to_end.known_applications module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-missing-required-dry-run-module">ramble.test.end_to_end.missing_required_dry_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-test-configvar-dry-run-module">ramble.test.end_to_end.test_configvar_dry_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-unused-compilers-are-skipped-module">ramble.test.end_to_end.unused_compilers_are_skipped module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-wrfv4-dry-run-module">ramble.test.end_to_end.wrfv4_dry_run module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#module-ramble.test.application_inheritance">ramble.test.application_inheritance module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.application_inheritance.test_basic_inheritance"><code class="docutils literal notranslate"><span class="pre">test_basic_inheritance()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-application-language-module">ramble.test.application_language module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-application-tests-module">ramble.test.application_tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-cache-fetch-module">ramble.test.cache_fetch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-commands-module">ramble.test.commands module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-concretize-builtin-module">ramble.test.concretize_builtin module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-conftest-module">ramble.test.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#module-ramble.test.expander">ramble.test.expander module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.expander.exp_dict"><code class="docutils literal notranslate"><span class="pre">exp_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.expander.test_expansion_namespaces"><code class="docutils literal notranslate"><span class="pre">test_expansion_namespaces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.expander.test_expansions"><code class="docutils literal notranslate"><span class="pre">test_expansions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-experiment-set-module">ramble.test.experiment_set module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-gcs-fetch-module">ramble.test.gcs_fetch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-mirror-tests-module">ramble.test.mirror_tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-namespace-trie-module">ramble.test.namespace_trie module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-repository-module">ramble.test.repository module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-software-environment-module">ramble.test.software_environment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-spack-runner-module">ramble.test.spack_runner module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#module-ramble.test.spec_basic">ramble.test.spec_basic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.spec_basic.TestSpec"><code class="docutils literal notranslate"><span class="pre">TestSpec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble.test.spec_basic.TestSpec.test_spec_copy"><code class="docutils literal notranslate"><span class="pre">TestSpec.test_spec_copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble.test.spec_basic.TestSpec.test_spec_examples"><code class="docutils literal notranslate"><span class="pre">TestSpec.test_spec_examples()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-stage-module">ramble.test.stage module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#module-ramble.test.success_criteria">ramble.test.success_criteria module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.success_criteria.generate_file"><code class="docutils literal notranslate"><span class="pre">generate_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.success_criteria.test_criteria_list"><code class="docutils literal notranslate"><span class="pre">test_criteria_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.html#ramble.test.success_criteria.test_single_criteria"><code class="docutils literal notranslate"><span class="pre">test_single_criteria()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-workspace-tests-module">ramble.test.workspace_tests module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ramble.util.html">ramble.util package</a><ul>
@@ -1534,11 +1702,205 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
-<section id="ramble-appkit-module">
-<h2>ramble.appkit module<a class="headerlink" href="#ramble-appkit-module" title="Permalink to this heading"></a></h2>
+<section id="module-ramble.appkit">
+<span id="ramble-appkit-module"></span><h2>ramble.appkit module<a class="headerlink" href="#module-ramble.appkit" title="Permalink to this heading"></a></h2>
+<p>appkit is a set of useful build tools and directives for applications.</p>
+<p>Everything in this module is automatically imported into Ramble application files.</p>
 </section>
-<section id="ramble-application-module">
-<h2>ramble.application module<a class="headerlink" href="#ramble-application-module" title="Permalink to this heading"></a></h2>
+<section id="module-ramble.application">
+<span id="ramble-application-module"></span><h2>ramble.application module<a class="headerlink" href="#module-ramble.application" title="Permalink to this heading"></a></h2>
+<p>Define base classes for application definitions</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">ApplicationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.add_expand_vars">
+<span class="sig-name descname"><span class="pre">add_expand_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.add_expand_vars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.add_expand_vars" title="Permalink to this definition"></a></dt>
+<dd><p>Add application specific expansion variables</p>
+<p>Applications require several variables to be defined to function properly.
+This method defines these variables, including:
+- command: set to the commands needed to execute the experiment
+- spack_setup: set to an empty string, so spack applications can override this</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.archive_patterns">
+<span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.archive_patterns" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.builtins">
+<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'builtin::env_vars':</span> <span class="pre">{'name':</span> <span class="pre">'env_vars',</span> <span class="pre">'required':</span> <span class="pre">True}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.builtins" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.copy" title="Permalink to this definition"></a></dt>
+<dd><p>Deep copy an application instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.create_experiment_chain">
+<span class="sig-name descname"><span class="pre">create_experiment_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.create_experiment_chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.create_experiment_chain" title="Permalink to this definition"></a></dt>
+<dd><p>Create the necessary chained experiments for this instance</p>
+<p>This method determines which experiments need to be chained, grabs the
+base instance from the experiment set, creates a copy of it (with a
+unique name), injects the copy back into the experiment set,
+and builds an internal mapping from unique name to the chaining definition.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.default_compilers">
+<span class="sig-name descname"><span class="pre">default_compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.default_compilers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.env_vars">
+<span class="sig-name descname"><span class="pre">env_vars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.env_vars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.env_vars" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.executables">
+<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.executables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.figure_of_merit_contexts">
+<span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.figure_of_merit_contexts" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.figures_of_merit">
+<span class="sig-name descname"><span class="pre">figures_of_merit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.figures_of_merit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.format_doc">
+<span class="sig-name descname"><span class="pre">format_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.format_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.format_doc" title="Permalink to this definition"></a></dt>
+<dd><p>Wrap doc string at 72 characters and format nicely</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.get_pipeline_phases">
+<span class="sig-name descname"><span class="pre">get_pipeline_phases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.get_pipeline_phases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.get_pipeline_phases" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.inputs">
+<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.inputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.required_packages">
+<span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.required_packages" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.run_phase">
+<span class="sig-name descname"><span class="pre">run_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.run_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.run_phase" title="Permalink to this definition"></a></dt>
+<dd><p>Run a phase, by getting its function pointer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.set_chained_experiments">
+<span class="sig-name descname"><span class="pre">set_chained_experiments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chained_experiments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.set_chained_experiments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.set_chained_experiments" title="Permalink to this definition"></a></dt>
+<dd><p>Set chained experiments for this instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.set_env_variable_sets">
+<span class="sig-name descname"><span class="pre">set_env_variable_sets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_variable_sets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.set_env_variable_sets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.set_env_variable_sets" title="Permalink to this definition"></a></dt>
+<dd><p>Set internal reference to environment variable sets</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.set_internals">
+<span class="sig-name descname"><span class="pre">set_internals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">internals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.set_internals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.set_internals" title="Permalink to this definition"></a></dt>
+<dd><p>Set internal refernece to application internals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.set_template">
+<span class="sig-name descname"><span class="pre">set_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_template</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.set_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.set_template" title="Permalink to this definition"></a></dt>
+<dd><p>Set if this instance is a template or not</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.set_variables">
+<span class="sig-name descname"><span class="pre">set_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_set</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.set_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.set_variables" title="Permalink to this definition"></a></dt>
+<dd><p>Set internal reference to variables</p>
+<p>Also, create an application specific expander class.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.software_specs">
+<span class="sig-name descname"><span class="pre">software_specs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.software_specs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.success_criteria">
+<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.success_criteria" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.uses_spack">
+<span class="sig-name descname"><span class="pre">uses_spack</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.uses_spack" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.workload_variables">
+<span class="sig-name descname"><span class="pre">workload_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.workload_variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.workloads">
+<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.workloads" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.application.ApplicationError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">ApplicationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.error.RambleError" title="ramble.error.RambleError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RambleError</span></code></a></p>
+<p>Exception that is raised by applications</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.application.ChainCycleDetectedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">ChainCycleDetectedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ChainCycleDetectedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ChainCycleDetectedError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.application.ApplicationError" title="ramble.application.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></p>
+<p>Exception raised when a cycle is detected in a defined experiment chain</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.application.InvalidChainError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">InvalidChainError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#InvalidChainError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.InvalidChainError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.application.ApplicationError" title="ramble.application.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></p>
+<p>Exception raised when a invalid chained experiment is defined</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.application.nested_2_color">
+<span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">nested_2_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#nested_2_color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.nested_2_color" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.application.section_title">
+<span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">section_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#section_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.section_title" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.application.subsection_title">
+<span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">subsection_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#subsection_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.subsection_title" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-ramble.caches">
 <span id="ramble-caches-module"></span><h2>ramble.caches module<a class="headerlink" href="#module-ramble.caches" title="Permalink to this heading"></a></h2>
@@ -1564,7 +1926,7 @@ storage location.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="ramble.caches.fetch_cache">
-<span class="sig-prename descclassname"><span class="pre">ramble.caches.</span></span><span class="sig-name descname"><span class="pre">fetch_cache</span></span><a class="headerlink" href="#ramble.caches.fetch_cache" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.caches.</span></span><span class="sig-name descname"><span class="pre">fetch_cache</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ramble.fetch_strategy.FsCache</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#ramble.caches.fetch_cache" title="Permalink to this definition"></a></dt>
 <dd><p>Ramble’s local cache for downloaded source archives</p>
 </dd></dl>
 
@@ -6041,7 +6403,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 01, 2023.
+      <span class="lastupdated">Last updated on Jun 02, 2023.
       </span></p>
   </div>
 

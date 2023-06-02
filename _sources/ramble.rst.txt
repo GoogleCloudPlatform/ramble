@@ -14,7 +14,10 @@ Subpackages
 
    ramble.application_types
    ramble.cmd
+   ramble.experimental
+   ramble.language
    ramble.schema
+   ramble.test
    ramble.util
    ramble.workspace
 

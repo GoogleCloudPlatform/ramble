@@ -1,0 +1,87 @@
+ramble.test.cmd namespace
+=========================
+
+.. py:module:: ramble.test.cmd
+
+Submodules
+----------
+
+ramble.test.cmd.clean module
+----------------------------
+
+.. automodule:: ramble.test.cmd.clean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.config module
+-----------------------------
+
+.. automodule:: ramble.test.cmd.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.debug module
+----------------------------
+
+.. automodule:: ramble.test.cmd.debug
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.info module
+---------------------------
+
+.. automodule:: ramble.test.cmd.info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.list module
+---------------------------
+
+.. automodule:: ramble.test.cmd.list
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.mirror module
+-----------------------------
+
+.. automodule:: ramble.test.cmd.mirror
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.on module
+-------------------------
+
+.. automodule:: ramble.test.cmd.on
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.repo module
+---------------------------
+
+.. automodule:: ramble.test.cmd.repo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.software\_definitions module
+--------------------------------------------
+
+.. automodule:: ramble.test.cmd.software_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.cmd.workspace module
+--------------------------------
+
+.. automodule:: ramble.test.cmd.workspace
+   :members:
+   :undoc-members:
+   :show-inheritance:
