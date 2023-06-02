@@ -73,7 +73,7 @@ class Lammps(SpackApplication):
                       description='Number of timesteps',
                       workloads=['lj', 'eam', 'polymer-chain-melt', 'chute', 'rhodo'])
 
-    workload_variable('input_path', default='{application_input_dir}/in.{workload_name}.txt',
+    workload_variable('input_path', default='{workload_input_dir}/in.{workload_name}.txt',
                       description='Path for the workload input file.',
                       workloads=['lj', 'eam', 'chain', 'chute', 'rhodo'])
 
