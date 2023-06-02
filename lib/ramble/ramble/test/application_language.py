@@ -157,7 +157,7 @@ def add_input_file(app_inst, input_num=1):
     input_defs[input_name] = {
         'url': input_url,
         'description': input_desc,
-        'target_dir': '{workload_name}'
+        'target_dir': '{input_name}'
     }
 
     return input_defs

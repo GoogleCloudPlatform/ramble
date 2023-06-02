@@ -47,6 +47,7 @@ class Keywords(object):
         'err_file': key_type.reserved,
         'command': key_type.reserved,
         'spack_env': key_type.reserved,
+        'input_name': key_type.reserved,
 
         'spec_name': key_type.optional,
         'env_name': key_type.optional,
