@@ -1488,7 +1488,7 @@ class Workspace(object):
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""
-        return self._get_workspace_section(namespace.internals)
+        return ramble.config.config.get_config(namespace.internals)
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
