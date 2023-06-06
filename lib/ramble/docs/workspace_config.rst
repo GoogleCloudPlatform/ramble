@@ -24,7 +24,7 @@ Within the ``ramble.yaml`` file, there are two top level dictionairies.
    spack:
      ...
 
-Each of these dictionaires is used to control different aspects of the Ramble
+Each of these dictionaries is used to control different aspects of the Ramble
 workspace.
 
 ------------------
@@ -107,7 +107,7 @@ This syntax allows basic math operations ( ``+``, ``-``, ``/``, ``*``, and
 ``**`` ) to evaluate math expressions using variable definitions.
 
 If a variable is defined within multiple dictionaries, values defined closer to
-individual experiments take precendence.
+individual experiments take precedence.
 
 .. code-block:: yaml
 
@@ -162,9 +162,9 @@ math and variable expansion syntax as defined above).
                   variables:
                     n_ranks: '1'
 
-There are two noteable aspects of this config file are:
+There are two notable aspects of this config file are:
 1. ``n_nodes`` is a list of values
-2. The experiment name refernces variable values.
+2. The experiment name references variable values.
 
 All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.
@@ -206,7 +206,7 @@ In the above example, the ``processes_per_node`` variable is consumed as part
 of a matrix. The result is a matrix of shape 1x2. After this matrix is
 consumed, it will be crossed with the zipped vectors (creating 8 unique experiments).
 
-Mulitple matrices are allowed to be defined:
+Multiple matrices are allowed to be defined:
 
 .. code-block:: yaml
    :linenos:
@@ -444,7 +444,7 @@ Ramble automatically generates definitions for the following varialbes:
 * ``workload_name`` - Set to the name of the workload within the application
 * ``experiment_name`` - Set to the name of the experiment
 * ``env_name`` - By default defined as ``{application_name}``. Can be
-  overriden to control the spack definition to use.
+  overridden to control the spack definition to use.
 * ``application_run_dir`` - Absolute path to
   ``$workspace_root/experiments/{application_name}``
 * ``workload_run_dir`` - Absolute path to
@@ -476,7 +476,7 @@ Ramble automatically generates definitions for the following varialbes:
 """""""""""""""""""""""""""""""""""
 Spack Specific Generated Variables:
 """""""""""""""""""""""""""""""""""
-When using spack applications, Ramble also geneates the following variables:
+When using spack applications, Ramble also generates the following variables:
 
 * ``<software_spec_name>`` - Set to the equivalent of ``spack location -i
   <spec>`` for packages defined in a ramble ``spec_name`` package set.
@@ -487,7 +487,7 @@ When using spack applications, Ramble also geneates the following variables:
 Spack Dictionary:
 -----------------
 
-Within a ramble.yaml file, the ``spack:`` dictionary controlls the software
+Within a ramble.yaml file, the ``spack:`` dictionary controls the software
 stack installation that ramble performs. This is accomplished by defining
 a packages dictionary, and an environments dictionary.
 
@@ -894,7 +894,7 @@ Defining Chains of Chains:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ramble supports the ability to define chains of experiment chains. This allows
-an experiment to automatically implicity include all of the experiments chained
+an experiment to automatically implicitly include all of the experiments chained
 into the explicitly chained experiment.
 
 Below is an example showing how chains of chains can be defined:

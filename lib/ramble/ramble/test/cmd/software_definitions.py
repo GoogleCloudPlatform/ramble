@@ -11,7 +11,7 @@ from ramble.main import RambleCommand, RambleCommandError
 software_defs = RambleCommand('software-definitions')
 
 
-def test_software_defintions_runs():
+def test_software_definitions_runs():
     software_defs()
 
 

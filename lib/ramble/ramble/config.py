@@ -582,7 +582,7 @@ class Configuration(object):
 
         If ``scope`` is ``None`` or not provided, return the merged contents
         of all of ramble's configuration scopes.  If ``scope`` is provided,
-        return only the confiugration as specified in that scope.
+        return only the configuration as specified in that scope.
 
         This off the top-level name from the YAML section.  That is, for a
         YAML config file that looks like this::
@@ -825,7 +825,7 @@ def _config():
     for name, path in configuration_paths:
         cfg.push_scope(ConfigScope(name, path))
 
-        # Each scope can have per-platfom overrides in subdirectories
+        # Each scope can have per-platform overrides in subdirectories
         _add_platform_scope(cfg, ConfigScope, name, path)
 
     # add command-line scopes
@@ -1138,7 +1138,7 @@ def merge_yaml(dest, source):
     # Source dict is merged into dest.
     elif they_are(dict):
         # save dest keys to reinsert later -- this ensures that  source items
-        # come *before* dest in OrderdDicts
+        # come *before* dest in OrderedDicts
         dest_keys = [dk for dk in dest.keys() if dk not in source]
 
         for sk, sv in iteritems(source):
@@ -1342,7 +1342,7 @@ class ConfigFormatError(ConfigError):
         super(ConfigError, self).__init__(message)
 
     def _get_mark(self, validation_error, data):
-        """Get the file/line mark fo a validation error from a Ramble YAML file.
+        """Get the file/line mark for a validation error from a Ramble YAML file.
         """
         def _get_mark_or_first_member_mark(obj):
             # mark of object itelf

@@ -91,7 +91,7 @@ _bash_completion_ramble() {
         list_options=true
     fi
 
-    # In general, when envoking tab completion, the user is not expecting to
+    # In general, when evoking tab completion, the user is not expecting to
     # see optional flags mixed in with subcommands or package names. Tab
     # completion is used by those who are either lazy or just bad at spelling.
     # If someone doesn't remember what flag to use, seeing single letter flags

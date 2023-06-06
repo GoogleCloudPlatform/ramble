@@ -836,7 +836,7 @@ class Repo(object):
                 sys.modules[ns] = module
 
                 # TODO: DWJ - Do we need this?
-                # Ensure the namespace is an atrribute of its parent,
+                # Ensure the namespace is an attribute of its parent,
                 # if it has not been set by something else already.
                 #
                 # This ensures that we can do things like:

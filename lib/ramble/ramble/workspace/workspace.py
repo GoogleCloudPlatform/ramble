@@ -368,7 +368,7 @@ def get_workspace(args, cmd_name, required=False):
     workspace.
 
     Arguments:
-        args (Namespace): argparse namespace wtih command arguments
+        args (Namespace): argparse namespace with command arguments
         cmd_name (str): name of calling command
         required (bool): if ``True``, raise an exception when no workspace
             is found; if ``False``, just return ``None``
@@ -416,7 +416,7 @@ class Workspace(object):
     the entire software stack.
 
     The execute_experiment.tpl file is a template script that
-    contants the blueprints for running each experiment.
+    constants the blueprints for running each experiment.
     There are several ramble language features that can be used
     within the script, to help it render properly for all
     experiments.

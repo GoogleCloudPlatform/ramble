@@ -360,10 +360,10 @@ def mock_directive_bundle():
 
 @pytest.fixture
 def clear_directive_functions():
-    """Clear all overidden directive functions for subsequent tests."""
+    """Clear all overridden directive functions for subsequent tests."""
     yield
 
-    # Make sure any directive functions overidden by tests are cleared before
+    # Make sure any directive functions overridden by tests are cleared before
     # proceeding with subsequent tests that may depend on the original
     # functions.
     ramble.directives.DirectiveMeta._directives_to_be_executed = []

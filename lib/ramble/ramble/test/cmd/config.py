@@ -630,7 +630,7 @@ def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspa
 #     config_yaml_v015()
 #     config('update', '-y', 'config')
 #
-#     # Check the entires have been transformed
+#     # Check the entries have been transformed
 #     data = ramble.config.get('config')
 #     check_config_updated(data)
 

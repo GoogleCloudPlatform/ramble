@@ -114,7 +114,7 @@ class DirectiveMeta(type):
 
         Ramble directives allow you to modify a package while it is being
         defined, e.g. to add version or dependency information.  Directives are
-        one of the key pieces of Ramble's appliaction "language", which is
+        one of the key pieces of Ramble's application "language", which is
         embedded in python.
 
         Here's an example directive:
@@ -143,7 +143,7 @@ class DirectiveMeta(type):
         and that if no directive actually modified it, it will just be an empty
         dict.
 
-        This is just a modular way to add storage attributes to the Appliaction
+        This is just a modular way to add storage attributes to the Application
         class, and it's how Ramble gets information from the applications to
         the core.
 

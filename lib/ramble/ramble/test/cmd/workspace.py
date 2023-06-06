@@ -982,7 +982,7 @@ ramble:
 def test_reconcretize_in_configs_dir(tmpdir):
     """
     Test multiple concretizations while the configs dir is the cwd do not fail.
-    This catchs a bug that existed when lock files were written incorrectly.
+    This catches a bug that existed when lock files were written incorrectly.
     """
     test_config = """
 ramble:
@@ -1063,7 +1063,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1137,7 +1137,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more temlates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1213,7 +1213,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1294,7 +1294,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1327,7 +1327,7 @@ ramble:
     fs.mkdirp(remote_archive_path)
 
     config('add', 'config:archive_url:%s/' % remote_archive_path,
-           gloabl_args=['-w', workspace_name])
+           global_args=['-w', workspace_name])
 
     output = workspace('archive', '-t', global_args=['-w', workspace_name])
 

@@ -61,7 +61,7 @@ class Experiment():
         # Avoid regenerating a hash when possible
         # (The hash of an object must never change during its lifetime..)
         if self.id is None:
-            #  TODO: this might be better as a hash of something we intuatively
+            #  TODO: this might be better as a hash of something we intuitively
             # expect to be uniqie, like:
             # "{RAMBLE_STATUS}-{application_name}-{experiment_name}-{time}-etc"
             # If we don't want this, we can go back to this class just being a dict
@@ -193,5 +193,5 @@ class BigQueryUploader(Uploader):
         # get_max_current_id(...) # Warning: dangerous..
 
         # This should be stable per machine/python version, but is not
-        # guarnteed to be globally stable
+        # guaranteed to be globally stable
         return hash(json.dumps(experiment, sort_keys=True))

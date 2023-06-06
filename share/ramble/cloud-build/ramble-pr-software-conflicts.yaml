@@ -34,7 +34,7 @@ steps:
         conflict_err=$$?
 
         if [ $$conflict_err -gt 0 ]; then
-          echo " ***** Conflicts in software defintions detected."
+          echo " ***** Conflicts in software definitions detected."
           error=1
         fi
 

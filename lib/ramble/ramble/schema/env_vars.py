@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Schema for environment varaibles configuration file.
+"""Schema for environment variables configuration file.
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/env_vars.py
    :lines: 12-
