@@ -592,3 +592,16 @@ def pytest_generate_tests(metafunc):
             all_modifiers.append(mod_name)
 
         metafunc.parametrize("mock_modifier", all_modifiers)
+
+    if 'config_section' in metafunc.fixturenames:
+        from ramble.main import RambleCommand
+        config_cmd = RambleCommand('config')
+
+        all_sections = []
+        config_sections = config_cmd('list').split(' ')
+
+        for section_str in config_sections:
+            if section_str != '':
+                all_sections.append(section_str.strip())
+
+        metafunc.parametrize('config_section', all_sections)

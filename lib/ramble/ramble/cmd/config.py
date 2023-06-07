@@ -18,7 +18,7 @@ import ramble.config
 import ramble.workspace
 
 import spack.util.spack_yaml as syaml
-from spack.util.editor import editor
+import ramble.util.editor
 
 description = "get and set configuration options"
 section = "config"
@@ -102,6 +102,7 @@ def setup_parser(subparser):
 
 def _get_scope_and_section(args):
     """Extract config scope and section from arguments."""
+    tty.debug(f' Args = {str(args)}')
     scope = args.scope
     section = getattr(args, 'section', None)
     path = getattr(args, 'path', None)
@@ -179,7 +180,7 @@ def config_edit(args):
         if not os.path.isdir(os.path.dirname(config_file)):
             fs.mkdirp(os.path.dirname(config_file))
 
-        editor(config_file)
+        return ramble.util.editor.editor(config_file)
 
 
 def config_list(args):

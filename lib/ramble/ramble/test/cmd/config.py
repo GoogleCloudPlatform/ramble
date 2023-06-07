@@ -721,3 +721,30 @@ def check_config_updated(data):
     assert isinstance(data['install_tree'], dict)
     assert data['install_tree']['root'] == '/fake/path'
     assert data['install_tree']['projections'] == {'all': '{name}-{version}'}
+
+
+@pytest.fixture(scope='function')
+def mock_editor(monkeypatch):
+    def _editor(*args, **kwargs):
+        return True
+
+    monkeypatch.setattr('ramble.util.editor.editor', _editor)
+
+
+def section_args(section_name):
+    class TestArgs(object):
+        scope = None
+        section = section_name
+        config_command = 'edit'
+        print_file = False
+
+    return TestArgs()
+
+
+def test_config_edit_file(mutable_config, config_section, mock_editor):
+    import ramble.cmd.config
+    import ramble.util.editor
+
+    args = section_args(config_section)
+
+    assert ramble.cmd.config.config_edit(args)
