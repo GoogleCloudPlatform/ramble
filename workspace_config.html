@@ -155,7 +155,7 @@ workspace has a configuration file stored at <code class="docutils literal notra
 <span class="go">  ...</span>
 </pre></div>
 </div>
-<p>Each of these dictionaires is used to control different aspects of the Ramble
+<p>Each of these dictionaries is used to control different aspects of the Ramble
 workspace.</p>
 <section id="ramble-dictionary">
 <h2>Ramble Dictionary:<a class="headerlink" href="#ramble-dictionary" title="Permalink to this heading"></a></h2>
@@ -217,7 +217,7 @@ using python keyword ( <code class="docutils literal notranslate"><span class="p
 This syntax allows basic math operations ( <code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">**</span></code> ) to evaluate math expressions using variable definitions.</p>
 <p>If a variable is defined within multiple dictionaries, values defined closer to
-individual experiments take precendence.</p>
+individual experiments take precedence.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
@@ -266,9 +266,9 @@ math and variable expansion syntax as defined above).</p>
 <span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 </pre></div>
 </div>
-<p>There are two noteable aspects of this config file are:
+<p>There are two notable aspects of this config file are:
 1. <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> is a list of values
-2. The experiment name refernces variable values.</p>
+2. The experiment name references variable values.</p>
 <p>All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.</p>
 </section>
@@ -303,7 +303,7 @@ consumes.</p>
 <p>In the above example, the <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> variable is consumed as part
 of a matrix. The result is a matrix of shape 1x2. After this matrix is
 consumed, it will be crossed with the zipped vectors (creating 8 unique experiments).</p>
-<p>Mulitple matrices are allowed to be defined:</p>
+<p>Multiple matrices are allowed to be defined:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="w"> </span><span class="nt">ramble</span><span class="p">:</span>
 <span class="linenos"> 2</span><span class="w">   </span><span class="nt">variables</span><span class="p">:</span>
 <span class="linenos"> 3</span><span class="w">     </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
@@ -507,7 +507,7 @@ not explicitly set, is defined as: <code class="docutils literal notranslate"><s
 <li><p><code class="docutils literal notranslate"><span class="pre">workload_name</span></code> - Set to the name of the workload within the application</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> - Set to the name of the experiment</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">env_name</span></code> - By default defined as <code class="docutils literal notranslate"><span class="pre">{application_name}</span></code>. Can be
-overriden to control the spack definition to use.</p></li>
+overridden to control the spack definition to use.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">application_run_dir</span></code> - Absolute path to
 <code class="docutils literal notranslate"><span class="pre">$workspace_root/experiments/{application_name}</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">workload_run_dir</span></code> - Absolute path to
@@ -539,7 +539,7 @@ an experiment. Set to an empty string for non-spack applications</p></li>
 </section>
 <section id="spack-specific-generated-variables">
 <h4>Spack Specific Generated Variables:<a class="headerlink" href="#spack-specific-generated-variables" title="Permalink to this heading"></a></h4>
-<p>When using spack applications, Ramble also geneates the following variables:</p>
+<p>When using spack applications, Ramble also generates the following variables:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> - Set to the equivalent of <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">location</span> <span class="pre">-i</span>
 <span class="pre">&lt;spec&gt;</span></code> for packages defined in a ramble <code class="docutils literal notranslate"><span class="pre">spec_name</span></code> package set.
@@ -551,7 +551,7 @@ an experiment. Set to an empty string for non-spack applications</p></li>
 </section>
 <section id="spack-dictionary">
 <h2>Spack Dictionary:<a class="headerlink" href="#spack-dictionary" title="Permalink to this heading"></a></h2>
-<p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">spack:</span></code> dictionary controlls the software
+<p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">spack:</span></code> dictionary controls the software
 stack installation that ramble performs. This is accomplished by defining
 a packages dictionary, and an environments dictionary.</p>
 <p>The packages dictionary houses ramble descriptions of spack packages that can
@@ -897,7 +897,7 @@ when it’s chained into other experiments.</p>
 <section id="defining-chains-of-chains">
 <h3>Defining Chains of Chains:<a class="headerlink" href="#defining-chains-of-chains" title="Permalink to this heading"></a></h3>
 <p>Ramble supports the ability to define chains of experiment chains. This allows
-an experiment to automatically implicity include all of the experiments chained
+an experiment to automatically implicitly include all of the experiments chained
 into the explicitly chained experiment.</p>
 <p>Below is an example showing how chains of chains can be defined:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -956,7 +956,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 02, 2023.
+      <span class="lastupdated">Last updated on Jun 07, 2023.
       </span></p>
   </div>
 

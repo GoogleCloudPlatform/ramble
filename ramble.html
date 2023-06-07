@@ -1822,7 +1822,7 @@ and builds an internal mapping from unique name to the chaining definition.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.set_internals">
 <span class="sig-name descname"><span class="pre">set_internals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">internals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.set_internals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.set_internals" title="Permalink to this definition"></a></dt>
-<dd><p>Set internal refernece to application internals</p>
+<dd><p>Set internal reference to application internals</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1918,7 +1918,7 @@ and builds an internal mapping from unique name to the chaining definition.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.caches.MirrorCache.symlink">
 <span class="sig-name descname"><span class="pre">symlink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mirror_ref</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/caches.html#MirrorCache.symlink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.caches.MirrorCache.symlink" title="Permalink to this definition"></a></dt>
-<dd><p>Symlink a human readible path in our mirror to the actual
+<dd><p>Symlink a human readable path in our mirror to the actual
 storage location.</p>
 </dd></dl>
 
@@ -2068,7 +2068,7 @@ entries.  Getting the ‘config’ section would look like:</p>
 <dd><p>Get configuration settings for a section.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">scope</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or not provided, return the merged contents
 of all of ramble’s configuration scopes.  If <code class="docutils literal notranslate"><span class="pre">scope</span></code> is provided,
-return only the confiugration as specified in that scope.</p>
+return only the configuration as specified in that scope.</p>
 <p>This off the top-level name from the YAML section.  That is, for a
 YAML config file that looks like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>config:
@@ -2653,7 +2653,7 @@ instances.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.experiment_set.ExperimentSet.all_experiments">
 <span class="sig-name descname"><span class="pre">all_experiments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/experiment_set.html#ExperimentSet.all_experiments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.experiment_set.ExperimentSet.all_experiments" title="Permalink to this definition"></a></dt>
-<dd><p>Iteartor over all experiments in this set</p>
+<dd><p>Iterator over all experiments in this set</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2699,7 +2699,7 @@ pass through to rendered content.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>experiment</strong> – A fully qualified experiment name (application.workload.experiment)</p></li>
-<li><p><strong>varialbe</strong> – Name of variable to look up</p></li>
+<li><p><strong>variable</strong> – Name of variable to look up</p></li>
 </ul>
 </dd>
 </dl>
@@ -4223,7 +4223,7 @@ their output.</p>
 <span class="sig-prename descclassname"><span class="pre">ramble.main.</span></span><span class="sig-name descname"><span class="pre">allows_unknown_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/main.html#allows_unknown_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.main.allows_unknown_args" title="Permalink to this definition"></a></dt>
 <dd><p>Implements really simple argument injection for unknown arguments.</p>
 <p>Commands may add an optional argument called “unknown args” to
-indicate they can handle unknonwn args, and we’ll pass the unknown
+indicate they can handle unknown args, and we’ll pass the unknown
 args in.</p>
 </dd></dl>
 
@@ -4804,7 +4804,7 @@ dependencies.</p>
 <dt class="sig sig-object py" id="ramble.renderer.Renderer.render_objects">
 <span class="sig-name descname"><span class="pre">render_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/renderer.html#Renderer.render_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.renderer.Renderer.render_objects" title="Permalink to this definition"></a></dt>
 <dd><p>Render objects based on the input variabls and matrices</p>
-<p>Interally collects all matrix and vector variables.</p>
+<p>Internally collects all matrix and vector variables.</p>
 <p>Matrices are processed first.</p>
 <p>Vectors in the same matrix are crossed, sibling matrices are zipped.
 All matrices are required to result in the same number of elements, but
@@ -5603,7 +5603,7 @@ environment.</p>
 <p>Runner for executing several spack commands</p>
 <p>The SpackRunner class is primarily used to manage spack environments
 for executing experiments under.</p>
-<p>This calss provides methods for creating and manaving spack environments,
+<p>This class provides methods for creating and manaving spack environments,
 and for ensuring required compilers are installed. It also provides a
 method for generating variables that can be used to ensure a spack env
 is loaded within an execution script.</p>
@@ -6329,7 +6329,7 @@ based on which portion of a workspace they are defined in.</p>
 </ul>
 </dd>
 </dl>
-<p>To see if success was met, all criteria will be checked and are ANDed together.</p>
+<p>To see if success was met, all criteria will be checked and are AND-ed together.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.success_criteria.ScopedCriteriaList.add_criteria">
 <span class="sig-name descname"><span class="pre">add_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/success_criteria.html#ScopedCriteriaList.add_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.success_criteria.ScopedCriteriaList.add_criteria" title="Permalink to this definition"></a></dt>
@@ -6403,7 +6403,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 02, 2023.
+      <span class="lastupdated">Last updated on Jun 07, 2023.
       </span></p>
   </div>
 

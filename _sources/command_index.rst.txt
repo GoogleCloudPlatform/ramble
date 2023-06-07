@@ -28,7 +28,7 @@ Workspaces            | :ref:`workspace <ramble-workspace>`
 ramble
 ------
 
-A fleixble benchmark experiment manager.
+A flexible benchmark experiment manager.
 
 .. code-block:: console
 

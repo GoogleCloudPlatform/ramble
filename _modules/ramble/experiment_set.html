@@ -409,7 +409,7 @@
     <span class="k">def</span> <span class="nf">_ingest_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ingest experiments based on the current context.</span>
 
-<span class="sd">        Interally collects all matrix and vector variables.</span>
+<span class="sd">        Internally collects all matrix and vector variables.</span>
 
 <span class="sd">        Matrices are processed first.</span>
 
@@ -561,7 +561,7 @@
             <span class="n">instance</span><span class="o">.</span><span class="n">create_experiment_chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_workspace</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ExperimentSet.all_experiments"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.all_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">all_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iteartor over all experiments in this set&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all experiments in this set&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span>
 
@@ -597,7 +597,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">          experiment: A fully qualified experiment name (application.workload.experiment)</span>
-<span class="sd">          varialbe: Name of variable to look up</span>
+<span class="sd">          variable: Name of variable to look up</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">experiment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -624,7 +624,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 02, 2023.
+      <span class="lastupdated">Last updated on Jun 07, 2023.
       </span></p>
   </div>
 

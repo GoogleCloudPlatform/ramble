@@ -254,7 +254,7 @@ expression.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.input_file">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">input_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{workload_name}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sha256</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#input_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.input_file" title="Permalink to this definition"></a></dt>
-<dd><p>Adds an input file defintion to this appliaction</p>
+<dd><p>Adds an input file definition to this application</p>
 <p>Defines a new input file.
 An input file must define it’s name, and a url where the input can be
 fetched from.</p>
@@ -412,7 +412,7 @@ area into the package.</p>
 <dd><p>Decorator for Ramble directives.</p>
 <p>Ramble directives allow you to modify a package while it is being
 defined, e.g. to add version or dependency information.  Directives are
-one of the key pieces of Ramble’s appliaction “language”, which is
+one of the key pieces of Ramble’s application “language”, which is
 embedded in python.</p>
 <p>Here’s an example directive:</p>
 <blockquote>
@@ -444,7 +444,7 @@ package so that you can refer to app.workloads.</p></li>
 Ramble will have a <code class="docutils literal notranslate"><span class="pre">workloads</span></code> attribute after they’re constructed,
 and that if no directive actually modified it, it will just be an empty
 dict.</p>
-<p>This is just a modular way to add storage attributes to the Appliaction
+<p>This is just a modular way to add storage attributes to the Application
 class, and it’s how Ramble gets information from the applications to
 the core.</p>
 </dd></dl>
@@ -466,7 +466,7 @@ the core.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 02, 2023.
+      <span class="lastupdated">Last updated on Jun 07, 2023.
       </span></p>
   </div>
 

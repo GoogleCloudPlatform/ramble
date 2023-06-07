@@ -166,7 +166,7 @@
         <span class="c1"># Avoid regenerating a hash when possible</span>
         <span class="c1"># (The hash of an object must never change during its lifetime..)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1">#  TODO: this might be better as a hash of something we intuatively</span>
+            <span class="c1">#  TODO: this might be better as a hash of something we intuitively</span>
             <span class="c1"># expect to be uniqie, like:</span>
             <span class="c1"># &quot;{RAMBLE_STATUS}-{application_name}-{experiment_name}-{time}-etc&quot;</span>
             <span class="c1"># If we don&#39;t want this, we can go back to this class just being a dict</span>
@@ -298,7 +298,7 @@
         <span class="c1"># get_max_current_id(...) # Warning: dangerous..</span>
 
         <span class="c1"># This should be stable per machine/python version, but is not</span>
-        <span class="c1"># guarnteed to be globally stable</span>
+        <span class="c1"># guaranteed to be globally stable</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div></div>
 </pre></div>
 
@@ -310,7 +310,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 02, 2023.
+      <span class="lastupdated">Last updated on Jun 07, 2023.
       </span></p>
   </div>
 
