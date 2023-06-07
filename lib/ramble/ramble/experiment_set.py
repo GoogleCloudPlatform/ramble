@@ -304,7 +304,7 @@ class ExperimentSet(object):
     def _ingest_experiments(self):
         """Ingest experiments based on the current context.
 
-        Interally collects all matrix and vector variables.
+        Internally collects all matrix and vector variables.
 
         Matrices are processed first.
 
@@ -456,7 +456,7 @@ class ExperimentSet(object):
             instance.create_experiment_chain(self._workspace)
 
     def all_experiments(self):
-        """Iteartor over all experiments in this set"""
+        """Iterator over all experiments in this set"""
         for exp, inst in self.experiments.items():
             yield exp, inst
 
@@ -492,7 +492,7 @@ class ExperimentSet(object):
 
         Args:
           experiment: A fully qualified experiment name (application.workload.experiment)
-          varialbe: Name of variable to look up
+          variable: Name of variable to look up
         """
 
         if experiment not in self.experiments.keys():

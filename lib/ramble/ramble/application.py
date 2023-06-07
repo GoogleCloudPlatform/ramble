@@ -185,7 +185,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
 
     def set_internals(self, internals):
-        """Set internal refernece to application internals
+        """Set internal reference to application internals
         """
 
         self.internals = internals
@@ -889,7 +889,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         workspace.append_result(results)
 
     def _new_file_dict(self):
-        """Create a dictonary to represent a new log file"""
+        """Create a dictionary to represent a new log file"""
         return {
             'success_criteria': [],
             'contexts': [],
@@ -972,7 +972,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         command = []
         # ensure license variables are set / modified
         # Process one scope at a time, to ensure
-        # highest-precendence scopes are processed last
+        # highest-precedence scopes are processed last
         config_scopes = ramble.config.scopes()
         shell = ramble.config.get('config:shell')
         var_set = set()

@@ -56,11 +56,11 @@ def collect_definitions():
 
     Iterate over all defined objects and extract their software definitions.
     Built maps representing which objects use a given software definition, and
-    where detected conflicts have occured.
+    where detected conflicts have occurred.
 
     The maps are global to this module, and reused in other internal methods.
     """
-    top_level_attrs = ['default_compilers', 'softwre_specs']
+    top_level_attrs = ['default_compilers', 'software_specs']
 
     types_to_print = [
         ramble.repository.ObjectTypes.applications

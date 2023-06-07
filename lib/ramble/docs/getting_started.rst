@@ -64,7 +64,7 @@ If you do not want to use Ramble's shell support, you can always just run the
 ``ramble`` command directly from ``ramble/bin/ramble``.
 
 When the ``ramble`` command is executed, it searches for an appropriate Python
-interpreter to use, which can be explicitly overriden by setting the
+interpreter to use, which can be explicitly overridden by setting the
 ``RAMBLE_PYTHON`` environment variable. When sourcing the appropriate shell
 setup script, ``RAMBLE_PYTHON`` will be set to the interpreter found at
 sourcing time, ensuring future invocations of the ``ramble`` command will
@@ -190,7 +190,7 @@ the rendered version within every experiment. As an example:
 
     configs/execute_experiment.tpl
 
-Will define ``{execute_experiment}`` with a value set to the path of hte
+Will define ``{execute_experiment}`` with a value set to the path of the
 generated file.
 (More explicitly, ``execute_experiment={experiment_run_dir}/{template_name_sans_extension}``)
 
@@ -263,7 +263,7 @@ Ramble can create an archive of a workspace. This is a self contained copy of va
  - Rendered templates in the experiments directories
  - Files that would have figures of merit extracted
  - Auxiliary files that an application lists for archival
- - All genreated spack.yaml files
+ - All generated spack.yaml files
 
 You can archive a workspace with:
 

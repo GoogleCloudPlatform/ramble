@@ -35,7 +35,7 @@ class SpackRunner(object):
     The SpackRunner class is primarily used to manage spack environments
     for executing experiments under.
 
-    This calss provides methods for creating and manaving spack environments,
+    This class provides methods for creating and manaving spack environments,
     and for ensuring required compilers are installed. It also provides a
     method for generating variables that can be used to ensure a spack env
     is loaded within an execution script.

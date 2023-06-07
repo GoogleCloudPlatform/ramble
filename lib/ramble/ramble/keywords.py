@@ -122,7 +122,7 @@ class Keywords(object):
             for key in required_set:
                 tty.warn(f'Required key "{key}" is not defined')
             raise RambleKeywordError('One or more required keys ' +
-                                     'are not definied within an experiment.')
+                                     'are not defined within an experiment.')
 
 
 keywords = llnl.util.lang.Singleton(Keywords)

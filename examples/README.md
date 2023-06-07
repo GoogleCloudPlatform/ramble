@@ -33,7 +33,7 @@ or
 ```bash
 ./all_experiments
 ```
-excuted from the root of the workspace.
+executed from the root of the workspace.
 
 ## Variable syntax:
 
