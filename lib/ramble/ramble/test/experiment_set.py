@@ -123,7 +123,7 @@ def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
             'wl_var2': '2',
             'processes_per_node': '2'
         }
-        exp_name = 'series1_{preocesses_per_node}'
+        exp_name = 'series1_{processes_per_node}'
         exp_vars = {
             'exp_var1': '1',
             'exp_var2': '2',
