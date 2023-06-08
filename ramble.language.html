@@ -59,6 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.application_language">ramble.language.application_language module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_base">ramble.language.language_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_helpers">ramble.language.language_helpers module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
@@ -207,7 +208,7 @@ capture. Defaults to stdout</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.figure_of_merit">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.figure_of_merit" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.figure_of_merit" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a figure of merit to track for this application</p>
 <p>Defines a new figure of merit.
 Inputs:</p>
@@ -330,7 +331,7 @@ environment.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.success_criteria">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.success_criteria" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.success_criteria" title="Permalink to this definition"></a></dt>
 <dd><p>Defines a success criteria used by experiments of this application</p>
 <p>Adds a new success criteria to this application definition.</p>
 <p>These will be checked during the analyze step to see if a job exited properly.</p>
@@ -449,6 +450,39 @@ class, and it’s how Ramble gets information from the applications to
 the core.</p>
 </dd></dl>
 
+</dd></dl>
+
+</section>
+<section id="module-ramble.language.language_helpers">
+<span id="ramble-language-language-helpers-module"></span><h2>ramble.language.language_helpers module<a class="headerlink" href="#module-ramble.language.language_helpers" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.language_helpers.merge_definitions">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">merge_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#merge_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.merge_definitions" title="Permalink to this definition"></a></dt>
+<dd><p>Merge definitions of a type</p>
+<p>This method will merge two optional definitions of single_type and
+multiple_type.</p>
+<p>Args:
+- single_type: Single string for type name
+- multiple_type: List of strings for type names</p>
+<p>Returns:
+- List of all type names (Merged if both single_type and multiple_type defintions are valid)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.language_helpers.require_definition">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">require_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directive_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#require_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.require_definition" title="Permalink to this definition"></a></dt>
+<dd><p>Require at least one definition for a type in a directive</p>
+<p>This method will validate that single_type / multiple_type are properly defined.</p>
+<p>It will raise an error if at least one type is not defined, or if
+either are the incorrect type.</p>
+<p>Args:
+- single_type: Single string for type name
+- multiple_type: List of strings for type names
+- single_arg_name: String name of the single_type argument in the directive
+- multiple_arg_name: String name of the multiple_type argument in the directive
+- directive_name: Name of the directive requiring a type</p>
+<p>Returns:
+- List of all type names (Merged if both single_type and multiple_type defintions are valid)</p>
 </dd></dl>
 
 </section>

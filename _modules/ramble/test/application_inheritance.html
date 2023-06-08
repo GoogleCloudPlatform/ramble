@@ -134,7 +134,7 @@
 
     <span class="k">assert</span> <span class="s1">&#39;test_fom&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">figures_of_merit</span>
     <span class="n">fom_conf</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">figures_of_merit</span><span class="p">[</span><span class="s1">&#39;test_fom&#39;</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;log_file&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;log_file&#39;</span>
+    <span class="k">assert</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;log_file&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span>
     <span class="k">assert</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;regex&#39;</span><span class="p">]</span> <span class="o">==</span> \
         <span class="sa">r</span><span class="s1">&#39;(?P&lt;test&gt;[0-9]+\.[0-9]+).*seconds.*&#39;</span>  <span class="c1"># noqa: W605</span>
     <span class="k">assert</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;group_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span>

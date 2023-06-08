@@ -21,3 +21,11 @@ ramble.language.language\_base module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.language.language\_helpers module
+----------------------------------------
+
+.. automodule:: ramble.language.language_helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
