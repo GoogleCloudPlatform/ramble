@@ -58,6 +58,7 @@ import ramble.schema.env_vars
 import ramble.schema.repos
 import ramble.schema.workspace
 import ramble.schema.applications
+import ramble.schema.internals
 import ramble.schema.licenses
 import ramble.schema.mirrors
 import ramble.schema.spack
@@ -75,6 +76,7 @@ section_schemas = {
     'config': ramble.schema.config.schema,
     'env_vars': ramble.schema.env_vars.schema,
     'repos': ramble.schema.repos.schema,
+    'internals': ramble.schema.internals.schema,
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
     'spack': ramble.schema.spack.schema,
