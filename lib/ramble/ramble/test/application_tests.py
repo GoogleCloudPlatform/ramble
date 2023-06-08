@@ -307,6 +307,19 @@ def test_register_builtin_app(mutable_mock_repo):
                 assert builtin not in wl_conf[app_inst._workload_exec_key]
 
 
+@pytest.mark.parametrize('app', [
+    'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
+    'register-builtin'
+])
+def test_short_print(mutable_mock_repo, app):
+    app_inst = mutable_mock_repo.get(app)
+    app_inst._verbosity = 'short'
+
+    str_val = str(app_inst)
+
+    assert str_val == app
+
+
 def basic_exp_dict():
     """To set expander consistently with test_wl2 of builtin.mock/applications/basic"""
     return {
