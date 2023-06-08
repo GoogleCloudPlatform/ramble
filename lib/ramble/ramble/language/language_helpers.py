@@ -22,7 +22,7 @@ def merge_definitions(single_type, multiple_type):
     - multiple_type: List of strings for type names
 
     Returns:
-    - List of all type names (Merged if both single_type and multiple_type defintions are valid)
+    - List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
 
     all_types = []
@@ -54,7 +54,7 @@ def require_definition(single_type, multiple_type,
     - directive_name: Name of the directive requiring a type
 
     Returns:
-    - List of all type names (Merged if both single_type and multiple_type defintions are valid)
+    - List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
 
     if not (single_type or multiple_type):
