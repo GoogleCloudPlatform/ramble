@@ -37,7 +37,6 @@ from ramble.schema.types import OUTPUT_CAPTURE
 from ramble.language.application_language import ApplicationMeta, register_builtin
 from ramble.error import RambleError
 
-
 header_color = '@*b'
 level1_color = '@*g'
 level2_color = '@*r'
@@ -186,7 +185,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
 
     def set_internals(self, internals):
-        """Set internal refernece to application internals
+        """Set internal reference to application internals
         """
 
         self.internals = internals
@@ -471,16 +470,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if exp_inst:
                 exp_inst.chain_order = self.chain_order.copy()
 
-    def add_expand_vars(self, workspace):
-        """Add application specific expansion variables
-
-        Applications require several variables to be defined to function properly.
-        This method defines these variables, including:
-        - command: set to the commands needed to execute the experiment
-        - spack_setup: set to an empty string, so spack applications can override this
-        """
-        if self._vars_are_expanded:
-            return
+    def _get_executables_and_inputs(self):
+        """Return executables and inputs for add_expand_vars"""
 
         executables = self.workloads[self.expander.workload_name]['executables']
         inputs = self.workloads[self.expander.workload_name]['inputs']
@@ -504,13 +495,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     'output_capture': output_capture
                 }
 
+        return executables, inputs
+
+    def _set_input_path(self, inputs):
+        """Put input_path into self.variables[input_file] for add_expand_vars"""
         for input_file in inputs:
             input_conf = self.inputs[input_file]
-            input_path = \
-                os.path.join(self.expander.application_input_dir,
-                             input_conf['target_dir'])
+            input_path = os.path.join(self.expander.application_input_dir,
+                                      input_conf['target_dir'])
             self.variables[input_file] = input_path
 
+    def _set_default_experiment_variables(self):
+        """Set default experiment variables (for add_expand_vars),
+        if they haven't been set already"""
         # Set default experiment variables, if they haven't been set already
         if self.expander.workload_name in self.workload_variables:
             wl_vars = self.workload_variables[self.expander.workload_name]
@@ -519,6 +516,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 if var not in self.variables.keys():
                     self.variables[var] = conf['default']
 
+    def _inject_commands(self, executables):
+        """For add_expand_vars, inject all commands"""
         command = []
 
         # Inject all prepended chained experiments
@@ -591,18 +590,34 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.variables['command'] = '\n'.join(command)
 
-        # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
-        #             this is no longer needed, as spack was converted to builtins.
-        self.variables['spack_setup'] = ''
-
-        # Define variables for template paths
+    def _derive_variables_for_template_path(self, workspace):
+        """Define variables for template paths (for add_expand_vars)"""
         for template_name, template_val in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var(f'{{experiment_run_dir}}'),  # noqa: F541
                 template_name)
             self.variables[template_name] = expand_path
 
-        self._vars_are_expanded = True
+    def add_expand_vars(self, workspace):
+        """Add application specific expansion variables
+
+        Applications require several variables to be defined to function properly.
+        This method defines these variables, including:
+        - command: set to the commands needed to execute the experiment
+        - spack_setup: set to an empty string, so spack applications can override this
+        """
+        if not self._vars_are_expanded:
+            executables, inputs = self._get_executables_and_inputs()
+            self._set_input_path(inputs)
+            self._set_default_experiment_variables()
+            self._inject_commands(executables)
+            # ---------------------------------------------------------------------------------
+            # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
+            #             this is no longer needed, as spack was converted to builtins.
+            self.variables['spack_setup'] = ''
+            # ---------------------------------------------------------------------------------
+            self._derive_variables_for_template_path(workspace)
+            self._vars_are_expanded = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
@@ -874,7 +889,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         workspace.append_result(results)
 
     def _new_file_dict(self):
-        """Create a dictonary to represent a new log file"""
+        """Create a dictionary to represent a new log file"""
         return {
             'success_criteria': [],
             'contexts': [],
@@ -957,7 +972,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         command = []
         # ensure license variables are set / modified
         # Process one scope at a time, to ensure
-        # highest-precendence scopes are processed last
+        # highest-precedence scopes are processed last
         config_scopes = ramble.config.scopes()
         shell = ramble.config.get('config:shell')
         var_set = set()

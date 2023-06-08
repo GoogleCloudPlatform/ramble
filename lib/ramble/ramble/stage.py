@@ -50,7 +50,7 @@ def create_stage_root(path):
 
     err_msg = 'Cannot create stage root {0}: Access to {1} is denied'
 
-    # TODO: (dwjacobsen) Reomve when owner_uid is removed below
+    # TODO: (dwjacobsen) Remove when owner_uid is removed below
     # user_uid = os.getuid()
 
     # Obtain lists of ancestor and descendant paths of the $user node, if any.

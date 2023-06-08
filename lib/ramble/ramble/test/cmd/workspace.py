@@ -982,7 +982,7 @@ ramble:
 def test_reconcretize_in_configs_dir(tmpdir):
     """
     Test multiple concretizations while the configs dir is the cwd do not fail.
-    This catchs a bug that existed when lock files were written incorrectly.
+    This catches a bug that existed when lock files were written incorrectly.
     """
     test_config = """
 ramble:
@@ -1063,7 +1063,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1137,7 +1137,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more temlates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1213,7 +1213,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1294,7 +1294,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1327,7 +1327,7 @@ ramble:
     fs.mkdirp(remote_archive_path)
 
     config('add', 'config:archive_url:%s/' % remote_archive_path,
-           gloabl_args=['-w', workspace_name])
+           global_args=['-w', workspace_name])
 
     output = workspace('archive', '-t', global_args=['-w', workspace_name])
 
@@ -1608,116 +1608,6 @@ ramble:
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
 
 
-def test_old_config_warns(capsys):
-    test_config = """
-ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-  batch:
-    submit: '{execute_experiment}'
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}'
-  applications:
-    basic:
-      internals:
-        custom_executables:
-          app_level_cmd:
-            template:
-            - 'app_level_cmd'
-            use_mpi: false
-            redirect: '{log_file}'
-      workloads:
-        test_wl:
-          internals:
-            custom_executables:
-              wl_level_cmd:
-                template:
-                - 'wl_level_cmd'
-                use_mpi: false
-                redirect: '{log_file}'
-          experiments:
-            test_experiment:
-              internals:
-                custom_executables:
-                  exp_level_cmd:
-                    template:
-                    - 'exp_level_cmd'
-                    use_mpi: false
-                    redirect: '{log_file}'
-                executables:
-                - exp_level_cmd
-                - wl_level_cmd
-                - app_level_cmd
-spack:
-  concretized: true
-  packages: {}
-  environments: {}
-"""
-
-    workspace_name = 'test_custom_executables_info'
-    ws1 = ramble.workspace.create(workspace_name)
-    ws1.write()
-
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
-
-    ws1._re_read()
-    captured = capsys.readouterr()
-    assert 'Your workspace configuration contains deprecated sections' in captured.err
-    assert 'ramble:mpi' in captured.err
-    assert 'ramble:batch' in captured.err
-
-
-def test_v1_spack_config_warns(capsys):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}'
-  applications:
-    zlib:
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_ranks: '1'
-spack:
-  concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications:
-    zlib:
-      zlib:
-        base: zlib
-"""
-
-    workspace_name = 'test_v1_spack_config_warns'
-    ws1 = ramble.workspace.create(workspace_name)
-    ws1.write()
-
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
-
-    ws1._re_read()
-    ramble.software_environments.SoftwareEnvironments(ws1)
-    captured = capsys.readouterr()
-    assert 'Your workspace configuration uses the v1 format for the spack section' in captured.err
-    assert 'v1 support will be removed in the future.' in captured.err
-
-
 def test_invalid_spack_config_errors(capsys):
     test_config = """
 ramble:
@@ -1749,4 +1639,4 @@ ramble:
     with pytest.raises(RambleSoftwareEnvironmentError):
         ramble.software_environments.SoftwareEnvironments(ws1)
         captured = capsys.readouterr()
-        assert "Software configuration type invalid is not one of ['v1', 'v2']" in captured.err
+        assert "Software configuration type invalid is not one of ['v2']" in captured.err

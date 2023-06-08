@@ -176,6 +176,9 @@ def config_edit(args):
     if args.print_file:
         print(config_file)
     else:
+        if not os.path.isdir(os.path.dirname(config_file)):
+            fs.mkdirp(os.path.dirname(config_file))
+
         editor(config_file)
 
 

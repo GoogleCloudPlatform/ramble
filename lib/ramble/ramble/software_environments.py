@@ -26,7 +26,7 @@ class SoftwareEnvironments(object):
 
     keywords = ramble.keywords.keywords
 
-    supported_confs = ['v1', 'v2']
+    supported_confs = ['v2']
 
     def __init__(self, workspace):
 
@@ -53,15 +53,7 @@ class SoftwareEnvironments(object):
     def _detect_conf_type(self):
         """Auto-detect the type of configuration provided.
 
-        Default configuration type is v2.
-
-        v1 configurations follow the format:
-
-        spack:
-          concretized: [true/false]
-          applications: {}
-          compilers: {}
-          mpi_libraries: {}
+        Default configuration type is 'invalid'.
 
         v2 configurations follow the format:
 
@@ -73,10 +65,6 @@ class SoftwareEnvironments(object):
 
         conf_type = 'invalid'
 
-        if namespace.application in self.spack_dict or \
-                namespace.compilers in self.spack_dict or \
-                namespace.mpi_lib in self.spack_dict:
-            conf_type = 'v1'
         if namespace.packages in self.spack_dict and \
                 namespace.environments in self.spack_dict:
             conf_type = 'v2'
@@ -84,64 +72,6 @@ class SoftwareEnvironments(object):
         tty.debug(f'Detected config type of: {conf_type}')
 
         return conf_type
-
-    def _v1_setup(self):
-        """Process a v1 `spack:` dictionary in the workspace configuration."""
-        tty.debug('Performing v1 software setup.')
-        tty.warn('Your workspace configuration uses the v1 format for the spack section')
-        tty.warn('Please update to the latest format to ensure it keeps functioning properly.')
-        tty.warn('v1 support will be removed in the future.')
-
-        if namespace.compilers in self.spack_dict:
-            for compiler, conf in self.spack_dict[namespace.compilers].items():
-                self._packages[compiler] = {}
-                self._package_map[compiler] = [compiler]
-
-                spec_dict = self.get_named_spec(compiler)
-                self._packages[compiler][namespace.spack_spec] = self.spec_string(spec_dict)
-                self._packages[compiler][namespace.compiler_spec] = \
-                    self.spec_string(spec_dict, use_custom_specifier=True)
-
-        if namespace.mpi_lib in self.spack_dict:
-            for mpi, conf in self.spack_dict[namespace.mpi_lib].items():
-                self._packages[mpi] = {}
-                self._package_map[mpi] = [mpi]
-
-                spec_dict = self.get_named_spec(mpi, 'mpi_library')
-                self._packages[mpi][namespace.spack_spec] = self.spec_string(spec_dict)
-
-        if namespace.application in self.spack_dict:
-            for env, pkgs in self.spack_dict[namespace.application].items():
-                self._environment_map[env] = [env]
-                self._environments[env] = {}
-                self._environments[env][namespace.packages] = []
-                self._environments[env][namespace.compilers] = []
-                self._environments[env][namespace.external_env] = None
-
-                if namespace.external_env in pkgs:
-                    self._environments[env][namespace.external_env] = \
-                        pkgs[namespace.external_env]
-
-                for pkg, conf in pkgs.items():
-                    if pkg != namespace.external_env:
-                        self._packages[pkg] = {}
-                        self._package_map[pkg] = [pkg]
-                        spec_dict = self.get_named_spec(pkg, spec_context=env)
-                        self._packages[pkg][namespace.spack_spec] = self.spec_string(spec_dict)
-                        self._environments[env][namespace.packages].append(pkg)
-
-                        if 'compiler' in conf:
-                            self._environments[env][namespace.compilers].append(
-                                conf['compiler']
-                            )
-                            self._packages[pkg]['compiler'] = conf['compiler']
-
-                        if 'mpi' in conf:
-                            self._environments[env][namespace.packages].append(
-                                conf['mpi']
-                            )
-        self._raw_packages = self._packages
-        self._raw_environments = self._environments
 
     def _v2_setup(self):
         """Process a v2 `spack:` dictionary in the workspace configuration."""
@@ -340,121 +270,6 @@ class SoftwareEnvironments(object):
 
         for env in self._environment_map[raw_env]:
             yield env
-
-    def specs_equiv(self, spec1, spec2):
-        all_keys = set(spec1.keys())
-        all_keys.update(set(spec2.keys()))
-
-        if len(all_keys) != len(spec1.keys()):
-            return False
-
-        if 'application_name' in all_keys:
-            all_keys.remove('application_name')
-
-        if 'spec_type' in all_keys:
-            all_keys.remove('spec_type')
-
-        for key in all_keys:
-            if key not in spec1:
-                return False
-            if key not in spec2:
-                return False
-            if spec1[key] != spec2[key]:
-                return False
-
-        return True
-
-    def get_named_spec(self, spec_name, spec_context='compiler'):
-        """Extract a named spec from a v1 spack dictionary"""
-        if spec_context == 'compiler':
-            if namespace.compilers not in self.spack_dict:
-                raise RambleSoftwareEnvironmentError('No compilers ' +
-                                                     'defined in workspace')
-            spec_dict = self.spack_dict[namespace.compilers]
-        elif spec_context == 'mpi_library':
-            if namespace.mpi_lib not in self.spack_dict:
-                raise RambleSoftwareEnvironmentError('No MPI libraries ' +
-                                                     'defined in workspace')
-            spec_dict = self.spack_dict[namespace.mpi_lib]
-        else:
-            if namespace.application not in self.spack_dict:
-                raise RambleSoftwareEnvironmentError('No applications ' +
-                                                     'defined in workspace')
-            if spec_context not in self.spack_dict['applications']:
-                raise RambleSoftwareEnvironmentError('Invalid context ' +
-                                                     '%s' % spec_context)
-            spec_dict = self.spack_dict[namespace.application][spec_context]
-            return self._build_spec_dict(spec_dict[spec_name], app_name=spec_context)
-
-        return self._build_spec_dict(spec_dict[spec_name])
-
-    def _build_spec_dict(self, info_dict, app_name=None, for_config=False):
-        """Build a spec dict from a v1 spack dictionary"""
-        spec = {}
-
-        for name, val in info_dict.items():
-            if val:
-                if name != 'required':
-                    spec[name] = val
-
-        if app_name:
-            spec['application_name'] = app_name
-
-        if for_config:
-            if 'application_name' in spec:
-                del spec['application_name']
-            if 'spec_type' in spec:
-                del spec['spec_type']
-
-        return spec
-
-    def spec_string(self, spec, as_dep=False, use_custom_specifier=False, deps_used=None):
-        """Create a string for a v1 package spec
-
-        Extract portions of the spec into a usable string.
-        """
-
-        if not deps_used:
-            deps_used = set()
-
-        spec_str = []
-
-        if spec['base'] in deps_used:
-            return ''
-        else:
-            deps_used.add(spec['base'])
-
-        if use_custom_specifier and 'custom_specifier' in spec:
-            return spec['custom_specifier']
-
-        if 'base' in spec:
-            spec_str.append(spec['base'])
-
-        if 'version' in spec:
-            spec_str.append('@%s' % spec['version'])
-
-        if 'variants' in spec:
-            spec_str.append(spec['variants'])
-
-        if not as_dep:
-            if 'arch' in spec:
-                spec_str.append('arch=%s' % spec['arch'])
-
-            if 'target' in spec:
-                spec_str.append('target=%s' % spec['target'])
-
-        if 'dependencies' in spec:
-            for dep in spec['dependencies']:
-                dep_spec = self.get_named_spec(dep, spec['application_name'])
-
-                dep_str = self.spec_string(dep_spec, as_dep=True,
-                                           use_custom_specifier=False,
-                                           deps_used=deps_used)
-
-                if dep_str:
-                    spec_str.append(f'^{dep_str}')
-
-        return ' '.join(spec_str)
 
 
 class RambleSoftwareEnvironmentError(ramble.error.RambleError):

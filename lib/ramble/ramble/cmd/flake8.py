@@ -312,7 +312,7 @@ def flake8(parser, args):
 
         # TODO: make these repeated blocks a function?
         if primary_file_list:
-            # Copy flake8 file so the paths will be reltive to the new location
+            # Copy flake8 file so the paths will be relative to the new location
             f = '.flake8'
             shutil.copy(f, primary_dest_dir)
             qa_dir = os.path.join(primary_dest_dir, 'share', 'ramble', 'qa')

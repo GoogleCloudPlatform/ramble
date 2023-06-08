@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Provide data structures to assist with cacheing operations"""
+"""Provide data structures to assist with caching operations"""
 
 
 class SetCache:

@@ -43,7 +43,6 @@ import ramble.paths
 import ramble.repository
 import spack.util.debug
 import spack.util.environment
-import spack.util.executable as exe
 import spack.util.path
 from ramble.error import RambleError
 
@@ -117,14 +116,22 @@ def get_version():
 
     The commit sha is only added when available.
     """
+    import spack.util.git
     version = ramble.ramble_version
     git_path = os.path.join(ramble.paths.prefix, ".git")
     if os.path.exists(git_path):
-        git = exe.which("git")
+        git = spack.util.git.git()
         if not git:
             return version
-        rev = git('-C', ramble.paths.prefix, 'rev-parse', 'HEAD',
-                  output=str, error=os.devnull, fail_on_error=False)
+        rev = git(
+            "-C",
+            ramble.paths.prefix,
+            "rev-parse",
+            "HEAD",
+            output=str,
+            error=os.devnull,
+            fail_on_error=False,
+        )
         if git.returncode != 0:
             return version
         match = re.match(r"[a-f\d]{7,}$", rev)
@@ -359,7 +366,7 @@ def make_argument_parser(**kwargs):
     parser = RambleArgumentParser(
         formatter_class=RambleHelpFormatter, add_help=False,
         description=(
-            "A fleixble benchmark experiment manager."),
+            "A flexible benchmark experiment manager."),
         **kwargs)
 
     # stat names in groups of 7, for nice wrapping.
@@ -506,7 +513,7 @@ def allows_unknown_args(command):
     """Implements really simple argument injection for unknown arguments.
 
     Commands may add an optional argument called "unknown args" to
-    indicate they can handle unknonwn args, and we'll pass the unknown
+    indicate they can handle unknown args, and we'll pass the unknown
     args in.
     """
     info = dict(inspect.getmembers(command))

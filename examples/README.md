@@ -33,7 +33,7 @@ or
 ```bash
 ./all_experiments
 ```
-excuted from the root of the workspace.
+executed from the root of the workspace.
 
 ## Variable syntax:
 
@@ -85,7 +85,7 @@ The full expansion configuration file shows a more complete example of
 experiment generation. It extends the basic expansion config file by showing two main aspects:
 
 1) How to define environment variables (`env-vars`)
-2) How to generate experiments using different binaries for the same application name (`spec_name`)
+2) How to generate experiments using different binaries for the same application name (`env_name`)
 
 ## Available Template Files:
 

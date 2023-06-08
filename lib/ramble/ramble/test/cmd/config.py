@@ -292,7 +292,7 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_r
 
         config_output = config('get')
 
-        expected_keys = ['applications', 'variables', 'env-vars',
+        expected_keys = ['applications', 'variables', 'env_vars',
                          'spack', 'mpi_command', 'batch_submit']
 
         for key in expected_keys:
@@ -630,7 +630,7 @@ def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspa
 #     config_yaml_v015()
 #     config('update', '-y', 'config')
 #
-#     # Check the entires have been transformed
+#     # Check the entries have been transformed
 #     data = ramble.config.get('config')
 #     check_config_updated(data)
 

@@ -17,7 +17,7 @@ ramble:
                 wrf_path: execute_experiment in wrfv4.CONUS_2p5km.new_test
               matrices:
                 - - n_nodes
-                #^-- (partiton, processes_per_node, n_nodes) ->
+                #^-- (partition, processes_per_node, n_nodes) ->
                                 #(part1, 16, 2), (part1, 16, 4)
                                 #(part2, 32, 2), (part2, 32, 4)
     wrfv4:
@@ -33,6 +33,7 @@ spack:
   packages:
     gcc9:
       spack_spec: gcc@9.3.0 target=x86_64
+      compiler_spec: gcc@9.3.0
     ompi412:
       spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
       compiler: gcc9

@@ -1,0 +1,49 @@
+# Copyright 2022-2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+
+steps:
+  - name: gcr.io/cloud-builders/git
+    args:
+      - fetch
+      - '--unshallow'
+    id: ramble-clone
+  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-centos7:latest
+    args:
+      - '-c'
+      - |
+        cd /workspace
+
+        git branch develop origin/develop
+
+        export PATH=$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}
+
+        . /opt/spack/share/spack/setup-env.sh
+        . /workspace/share/ramble/setup-env.sh
+
+        ramble software-definitions -s
+
+        ramble software-definitions -c -e
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        conflict_err=$$?
+
+        if [ $$conflict_err -gt 0 ]; then
+          echo " ***** Conflicts in software definitions detected."
+          error=1
+        fi
+
+        # $$ characters are required for cloud-build:
+        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+        exit $$error
+    id: ramble-style-tests
+    entrypoint: /bin/bash
+
+timeout: 600s
+options:
+  machineType: N1_HIGHCPU_8

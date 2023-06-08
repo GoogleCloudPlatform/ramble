@@ -70,7 +70,7 @@ class MirrorCache(object):
         fetcher.archive(dst)
 
     def symlink(self, mirror_ref):
-        """Symlink a human readible path in our mirror to the actual
+        """Symlink a human readable path in our mirror to the actual
         storage location."""
 
         cosmetic_path = os.path.join(self.root, mirror_ref.cosmetic_path)

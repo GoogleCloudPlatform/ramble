@@ -105,7 +105,7 @@ _ramble_shell_wrapper() {
                 case $_rmb_arg in
                     activate)
                         # Get --sh, --csh, or -h/--help arguments.
-                        # Space needed here becauses regexes start with a space
+                        # Space needed here because regexes start with a space
                         # and `-h` may be the only argument.
                         _a=" $@"
                         # Space needed here to differentiate between `-h`
@@ -126,7 +126,7 @@ _ramble_shell_wrapper() {
                         ;;
                     deactivate)
                         # Get --sh, --csh, or -h/--help arguments.
-                        # Space needed here becauses regexes start with a space
+                        # Space needed here because regexes start with a space
                         # and `-h` may be the only argument.
                         _a=" $@"
                         # Space needed here to differentiate between `--sh`

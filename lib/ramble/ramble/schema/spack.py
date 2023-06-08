@@ -72,9 +72,7 @@ properties = {
             }
         },
         'default': {},
-        # TODO (dwj): Remove when v1 spack support is dropped
-        # DEPRECATED
-        'additionalProperties': True,  # to support v1 formats
+        'additionalProperties': False,
     }
 }
 

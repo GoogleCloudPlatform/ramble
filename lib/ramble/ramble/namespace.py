@@ -34,10 +34,6 @@ class namespace:
     spack = 'spack'
     external_env = 'external_spack_env'
 
-    # v1 configs
-    mpi_lib = 'mpi_libraries'
-    compilers = 'compilers'
-
     # v2 configs
     packages = 'packages'
     environments = 'environments'

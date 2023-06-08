@@ -23,7 +23,7 @@ class ScopedCriteriaList(object):
      - workload
      - experiment
 
-    To see if success was met, all criteria will be checked and are ANDed together.
+    To see if success was met, all criteria will be checked and are AND-ed together.
     """
 
     _valid_scopes = [

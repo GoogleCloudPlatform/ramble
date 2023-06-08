@@ -160,7 +160,7 @@ class Openfoam(SpackApplication):
                redirect='{experiment_run_dir}/log.reconstructPar')
 
     executable('allRun', template=[r'sed "s/writephi/writePhi/g" -i Allrun',
-                                   r'sed "s/rm.*log\./#/g" -i Allclean',
+                                   r'sed "s/rm.*log./#/g" -i Allclean',
                                    r'chmod a+x Allrun',
                                    './Allrun'],
                use_mpi=False)

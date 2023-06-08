@@ -34,7 +34,7 @@ class Renderer(object):
     def render_objects(self, variables, matrices=None):
         """Render objects based on the input variabls and matrices
 
-        Interally collects all matrix and vector variables.
+        Internally collects all matrix and vector variables.
 
         Matrices are processed first.
 
@@ -110,7 +110,7 @@ class Renderer(object):
                     vectors.append(object_variables[var])
                     variable_names.append(var)
 
-                    # Remove the variable, so it's not proccessed as a vector anymore.
+                    # Remove the variable, so it's not processed as a vector anymore.
                     del object_variables[var]
 
                 if last_size == -1:

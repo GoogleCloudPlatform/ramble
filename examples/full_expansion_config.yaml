@@ -25,7 +25,7 @@ ramble:
               matrices:
                 - matrix_a:
                   - n_nodes
-                #^-- (partiton, processes_per_node, n_nodes) ->
+                #^-- (partition, processes_per_node, n_nodes) ->
                                 #(part1, 16, openfoam-skx, 2), (part1, 16, openfoam-skx, 4)
                                 #(part2, 32, openfoam-zen2, 2), (part2, 32, openfoam-zen2, 4)
 spack:
@@ -33,6 +33,7 @@ spack:
   packages:
     gcc9:
       spack_spec: gcc@9.3.0 target=x86_64
+      compiler_spec: gcc@9.3.0
     ompi412:
       spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
       compiler: gcc9

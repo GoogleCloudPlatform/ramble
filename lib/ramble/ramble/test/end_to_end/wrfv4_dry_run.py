@@ -185,7 +185,7 @@ licenses:
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
-                # Test the expected portions of the exection command exist
+                # Test the expected portions of the execution command exist
                 assert "sed -i -e 's/ start_hour.*/ start_hour" in data
                 assert "sed -i -e 's/ restart .*/ restart" in data
                 assert "mpirun" in data
@@ -204,7 +204,7 @@ licenses:
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
-                # Test the expected portions of the exection command exist
+                # Test the expected portions of the execution command exist
                 assert "sed -i -e 's/ start_hour.*/ start_hour" in data
                 assert "sed -i -e 's/ restart .*/ restart" in data
                 assert "mpirun" in data

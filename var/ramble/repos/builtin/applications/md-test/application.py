@@ -45,10 +45,10 @@ class MdTest(SpackApplication):
     metrics = ['max', 'min', 'mean', 'stddev']
     base_regex = ':'
     for metric in metrics:
-        base_regex += f'\s+(?P<{metric}>[0-9]+\.[0-9]+)'
+        base_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'
 
     for op in operations:
-        fom_regex = '\s*' + op + '\s+' + base_regex
+        fom_regex = r'\s*' + op + r'\s+' + base_regex
         for metric in metrics:
             figure_of_merit(f'{op}-{metric}',
                             log_file='{log_file}',

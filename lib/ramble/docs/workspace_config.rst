@@ -24,7 +24,7 @@ Within the ``ramble.yaml`` file, there are two top level dictionairies.
    spack:
      ...
 
-Each of these dictionaires is used to control different aspects of the Ramble
+Each of these dictionaries is used to control different aspects of the Ramble
 workspace.
 
 ------------------
@@ -107,7 +107,7 @@ This syntax allows basic math operations ( ``+``, ``-``, ``/``, ``*``, and
 ``**`` ) to evaluate math expressions using variable definitions.
 
 If a variable is defined within multiple dictionaries, values defined closer to
-individual experiments take precendence.
+individual experiments take precedence.
 
 .. code-block:: yaml
 
@@ -162,9 +162,9 @@ math and variable expansion syntax as defined above).
                   variables:
                     n_ranks: '1'
 
-There are two noteable aspects of this config file are:
+There are two notable aspects of this config file are:
 1. ``n_nodes`` is a list of values
-2. The experiment name refernces variable values.
+2. The experiment name references variable values.
 
 All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.
@@ -206,7 +206,7 @@ In the above example, the ``processes_per_node`` variable is consumed as part
 of a matrix. The result is a matrix of shape 1x2. After this matrix is
 consumed, it will be crossed with the zipped vectors (creating 8 unique experiments).
 
-Mulitple matrices are allowed to be defined:
+Multiple matrices are allowed to be defined:
 
 .. code-block:: yaml
    :linenos:
@@ -240,6 +240,70 @@ while the second is a 1x4 matrix. All matrices are required to have the same
 number of elements, as they are flattened and zipped together. In this case,
 there would be 4 experiments, each defined by a unique
 ``(processes_per_node, partition, n_nodes)`` tuple.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Environment Variable Control:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Environment variables can be controlled within the workspace configuration
+file. These are defined within the ``env_vars`` configuration section. Below is
+an example of the format of this configuration section.
+
+.. code-block:: yaml
+
+    env_vars:
+      set:
+        var_name: var_value
+      append:
+      - var-separator: ','
+        vars:
+          var_to_append: val_to_append
+        paths:
+          path_to_append: val_to_append
+      prepend:
+      - paths:
+          path_to_prepend: val_to_prepend
+      unset:
+      - var_to_unset
+
+
+The above example is general, and intended to show the available functionality
+of configuring environment variables. Below the ``env_vars`` level, one of four
+actions is available. These actions are:
+* ``set`` - Define a variable equal to a given value. Overwrites previously configured values
+* ``append`` - Append the given value to the end of a previous variable definition. Delimited for vars is defined by ``var_separator``, ``paths`` uses ``:``
+* ``prepend`` - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is ``:``
+* ``unset`` - Remove a variable definition, if it is set.
+
+This config section is allowed to be defined anywhere a variables configuration
+can be defined.
+
+As a more concrete example:
+
+.. code-block:: yaml
+
+    env_vars:
+      set:
+        SET_VAR: set_val
+      append:
+      - var-separator: ','
+        vars:
+          APPEND_VAR: app_val
+        paths:
+          PATH: app_path
+      prepend:
+      - paths:
+          PATH: prepend_path
+      unset:
+      - LD_LIBRARY_PATH
+
+Would result in roughly the following bash commands:
+
+.. code-block:: console
+
+    export SET_VAR=set_val
+    export APPEND_VAR=$APPEND_VAR,app_val
+    export PATH=prepend_path:$PATH:app_path
+    unset LD_LIBRARY_PATH
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Cross Experiment Variable References:
@@ -380,7 +444,7 @@ Ramble automatically generates definitions for the following varialbes:
 * ``workload_name`` - Set to the name of the workload within the application
 * ``experiment_name`` - Set to the name of the experiment
 * ``env_name`` - By default defined as ``{application_name}``. Can be
-  overriden to control the spack definition to use.
+  overridden to control the spack definition to use.
 * ``application_run_dir`` - Absolute path to
   ``$workspace_root/experiments/{application_name}``
 * ``workload_run_dir`` - Absolute path to
@@ -412,7 +476,7 @@ Ramble automatically generates definitions for the following varialbes:
 """""""""""""""""""""""""""""""""""
 Spack Specific Generated Variables:
 """""""""""""""""""""""""""""""""""
-When using spack applications, Ramble also geneates the following variables:
+When using spack applications, Ramble also generates the following variables:
 
 * ``<software_spec_name>`` - Set to the equivalent of ``spack location -i
   <spec>`` for packages defined in a ramble ``spec_name`` package set.
@@ -423,7 +487,7 @@ When using spack applications, Ramble also geneates the following variables:
 Spack Dictionary:
 -----------------
 
-Within a ramble.yaml file, the ``spack:`` dictionary controlls the software
+Within a ramble.yaml file, the ``spack:`` dictionary controls the software
 stack installation that ramble performs. This is accomplished by defining
 a packages dictionary, and an environments dictionary.
 
@@ -830,7 +894,7 @@ Defining Chains of Chains:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ramble supports the ability to define chains of experiment chains. This allows
-an experiment to automatically implicity include all of the experiments chained
+an experiment to automatically implicitly include all of the experiments chained
 into the explicitly chained experiment.
 
 Below is an example showing how chains of chains can be defined:

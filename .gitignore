@@ -2,3 +2,4 @@ __pycache__/
 *.x
 *.txt
 var/ramble/cache
+var/ramble/workspaces

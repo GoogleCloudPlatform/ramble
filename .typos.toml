@@ -1,0 +1,11 @@
+# do not check external or spack
+[files]
+extend-exclude = [
+  "lib/ramble/llnl/*",
+  "lib/ramble/spack/*",
+  "lib/ramble/external/*",
+]
+
+[default.extend-words]
+cachable = "cachable"
+FO = "FO"

@@ -49,6 +49,7 @@ import ramble.schema.merged
 
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
+from ramble.util.spec_utils import specs_equiv
 from ramble.namespace import namespace
 
 
@@ -121,7 +122,7 @@ def default_config_yaml():
 #               n_ranks: '{processes_per_node}'
 
 ramble:
-  env-vars:
+  env_vars:
     set:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
@@ -367,7 +368,7 @@ def get_workspace(args, cmd_name, required=False):
     workspace.
 
     Arguments:
-        args (Namespace): argparse namespace wtih command arguments
+        args (Namespace): argparse namespace with command arguments
         cmd_name (str): name of calling command
         required (bool): if ``True``, raise an exception when no workspace
             is found; if ``False``, just return ``None``
@@ -415,7 +416,7 @@ class Workspace(object):
     the entire software stack.
 
     The execute_experiment.tpl file is a template script that
-    contants the blueprints for running each experiment.
+    constants the blueprints for running each experiment.
     There are several ramble language features that can be used
     within the script, to help it render properly for all
     experiments.
@@ -583,14 +584,6 @@ class Workspace(object):
 
         error_sections = []
         deprecated_sections = []
-        # Trap and warn on deprecated config options.
-        if namespace.ramble in config:
-            # TODO: (dwj) Remove the following deprecation check
-            # DEPRECATED
-            if 'mpi' in config[namespace.ramble]:
-                deprecated_sections.append('ramble:mpi')
-            if 'batch' in config[namespace.ramble]:
-                deprecated_sections.append('ramble:batch')
 
         if len(deprecated_sections) > 0:
             tty.warn('Your workspace configuration contains deprecated sections:')
@@ -914,7 +907,7 @@ class Workspace(object):
                         config_path = f'spack:packages:{comp}:' + \
                             f'compiler:{info["compiler"]}'
                         ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
-                elif not self.software_environments.specs_equiv(info, packages_dict[comp]):
+                elif not specs_equiv(info, packages_dict[comp]):
                     raise RambleConflictingDefinitionError(
                         f'Compiler {comp} defined in multiple conflicting ways'
                     )
@@ -944,7 +937,7 @@ class Workspace(object):
                             f'compiler:{info["compiler"]}'
                         ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
 
-                elif not self.software_environments.specs_equiv(info, packages_dict[spec_name]):
+                elif not specs_equiv(info, packages_dict[spec_name]):
                     raise RambleConflictingDefinitionError(
                         f'Package {spec_name} defined in multiple conflicting ways'
                     )
@@ -1483,8 +1476,15 @@ class Workspace(object):
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
+        deprecated_env_vars = self._get_workspace_section(namespace.env_var)
+        if deprecated_env_vars:
+            tty.warn('The env-vars workspace section is deprecated. Environment variables\n'
+                     'should be defined in the env_vars config section using the same\n'
+                     'syntax. Support for env-vars will be removed in a future. See\n'
+                     'the documentation for examples of the new syntax.')
+
         return union_dicts(ramble.config.config.get_config('env_vars'),
-                           self._get_workspace_section(namespace.env_var))
+                           deprecated_env_vars)
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""
@@ -1492,17 +1492,7 @@ class Workspace(object):
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
-        ws_dict = self._get_workspace_dict()
-        # TODO (dwj): Remove after deprecation period
-        # DEPRECATED
-        if namespace.spack in ws_dict:
-            tty.warn('The spack dictionary is moving to its own config section.')
-            tty.warn('Please update to ensure your config continues to function properly.')
-            tty.warn('See the documentation for the new format.')
-            return ws_dict[namespace.spack]
-        else:
-            return ramble.config.config.get_config('spack')
-        return syaml.syaml_dict()
+        return ramble.config.config.get_config('spack')
 
     def get_applications(self):
         """Get the dictionary of applications"""

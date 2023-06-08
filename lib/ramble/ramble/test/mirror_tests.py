@@ -107,11 +107,10 @@ ramble:
                 n_ranks: '1'
                 n_nodes: '1'
                 processes_per_node: '1'
-spack:
-  concretized: true
-  compilers: {{}}
-  mpi_libraries: {{}}
-  applications: {{}}
+  spack:
+    concretized: true
+    packages: {{}}
+    environments: {{}}
 """
 
     archive_dir = tmpdir_factory.mktemp('mock-archives-dir')
