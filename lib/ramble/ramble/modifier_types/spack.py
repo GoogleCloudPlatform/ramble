@@ -13,7 +13,7 @@ from ramble.modifier import ModifierBase
 class SpackModifier(ModifierBase):
     """Specialized class for modifiers that use spack.
 
-    This class can be used to set up a modifer that uses spack to install
+    This class can be used to set up a modifier that uses spack to install
     software for the modifier to work.
     """
 

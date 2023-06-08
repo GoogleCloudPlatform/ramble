@@ -321,8 +321,8 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
     - modes: List of mode names this env_var_modification should apply in
 
     Supported values for method are:
-    - set: Defines the varible to equal the modification value
-    - unset: Removes any defintion of the variable from the environment
+    - set: Defines the variable to equal the modification value
+    - unset: Removes any definition of the variable from the environment
     - prepend: Prepends the modification to the beginning of the variable.
                Always uses the separator ':'
     - append: Appends the modification value to the end of the value. Allows a
