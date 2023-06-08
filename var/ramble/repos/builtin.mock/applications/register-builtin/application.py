@@ -29,9 +29,9 @@ class RegisterBuiltin(ExecutableApplication):
 
     archive_pattern('{experiment_run_dir}/archive_test.*')
 
-    figure_of_merit('test_fom', 'log_file',
-                    r'(?P<test>[0-9]+\.[0-9]+).*seconds.*',
-                    'test', 's')
+    figure_of_merit('test_fom',
+                    fom_regex=r'(?P<test>[0-9]+\.[0-9]+).*seconds.*',
+                    group_name='test', units='s')
 
     # Test disabling the typically included env_vars builtin.
     register_builtin('env_vars', required=False)
