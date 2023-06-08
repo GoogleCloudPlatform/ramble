@@ -979,6 +979,8 @@ class Workspace(object):
                                 f'compiler:{info["compiler"]}'
                             ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
                     elif not specs_equiv(info, packages_dict[comp]):
+                        tty.debug(f'  Spec 1: {str(info)}')
+                        tty.debug(f'  Spec 2: {str(packages_dict[comp])}')
                         raise RambleConflictingDefinitionError(
                             f'Compiler {comp} defined in multiple conflicting ways'
                         )

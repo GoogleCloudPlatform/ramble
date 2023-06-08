@@ -311,8 +311,8 @@ def test_register_builtin_app(mutable_mock_apps_repo):
     'basic', 'basic-inherited', 'input-test', 'interleved-env-vars',
     'register-builtin'
 ])
-def test_short_print(mutable_mock_repo, app):
-    app_inst = mutable_mock_repo.get(app)
+def test_short_print(mutable_mock_apps_repo, app):
+    app_inst = mutable_mock_apps_repo.get(app)
     app_inst._verbosity = 'short'
 
     str_val = str(app_inst)
