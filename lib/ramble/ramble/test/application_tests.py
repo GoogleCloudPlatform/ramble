@@ -319,6 +319,7 @@ def test_short_print(mutable_mock_repo, app):
 
     assert str_val == app
 
+    
 def basic_exp_dict():
     """To set expander consistently with test_wl2 of builtin.mock/applications/basic"""
     return {
