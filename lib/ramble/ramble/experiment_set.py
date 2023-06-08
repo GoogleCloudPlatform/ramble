@@ -385,7 +385,8 @@ class ExperimentSet(object):
 
         for context in self._contexts:
             var_name = f'{context.name}_name'
-            context_variables[var_name] = self._context_names[context]
+            if self._context_names[context] not in context_variables:
+                context_variables[var_name] = self._context_names[context]
 
         # Set namespaces
         context_variables['application_namespace'] = self.application_namespace
@@ -444,9 +445,9 @@ class ExperimentSet(object):
 
             tty.debug('   Final name: %s' % final_exp_name)
 
-            if final_exp_name in rendered_experiments:
-                tty.die('Experiment %s is not unique.' % final_exp_name)
-            rendered_experiments.add(final_exp_name)
+            if experiment_namespace in rendered_experiments:
+                tty.die('Experiment %s is not unique.' % experiment_namespace)
+            rendered_experiments.add(experiment_namespace)
 
             try:
                 self.keywords.check_required_keys(experiment_vars)

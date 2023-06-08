@@ -714,6 +714,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 template_name)
             self.variables[template_name] = expand_path
 
+    def _validate_experiment(self):
+        """Perform validation of an experiment before performing actions with it
+
+        This function is an entry point to validate various aspects of an
+        experiment definition before it is used. It is expected to raise errors
+        when validation fails.
+        """
+        if self.expander.workload_name not in self.workloads:
+            raise ApplicationError(f'Workload {self.expander.workload_name} is not defined '
+                                   f'as a workload of application {self.name}.')
+
     def add_expand_vars(self, workspace):
         """Add application specific expansion variables
 
@@ -723,6 +734,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         - spack_setup: set to an empty string, so spack applications can override this
         """
         if not self._vars_are_expanded:
+            self._validate_experiment()
             executables = self._get_executables()
             self._set_input_path()
             self._set_default_experiment_variables()
