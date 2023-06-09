@@ -14,7 +14,7 @@ class AppendEnvVarModVars(BasicModifier):
     the append method and a non-colon separator"""
     name = "append-env-var-mod-vars"
 
-    tags = ['test']
+    tags('test')
 
     mode('test', description='This is a test mode')
 

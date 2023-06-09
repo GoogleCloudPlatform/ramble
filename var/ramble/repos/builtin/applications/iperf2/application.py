@@ -13,7 +13,7 @@ class Iperf2(SpackApplication):
     '''Define the iperf2 application'''
     name = 'iperf2'
 
-    tags = []
+    maintainers('rfbgo')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

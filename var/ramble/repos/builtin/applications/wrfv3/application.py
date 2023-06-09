@@ -13,7 +13,9 @@ class Wrfv3(SpackApplication):
     '''Define Wrf version 3 application'''
     name = 'wrfv3'
 
-    tags = ['nwp', 'weather']
+    maintainers('douglasjacobsen')
+
+    tags('nwp', 'weather')
 
     default_compiler('gcc8', spack_spec='gcc@8.2.0')
 

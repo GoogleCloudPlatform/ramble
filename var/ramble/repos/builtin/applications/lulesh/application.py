@@ -13,7 +13,9 @@ class Lulesh(SpackApplication):
     '''Define LULESH application'''
     name = 'LULESH'
 
-    tags = ['proxy-app', 'mini-app']
+    maintainers('douglasjacobsen')
+
+    tags('proxy-app', 'mini-app')
 
     default_compiler('intel202160',
                      spack_spec='intel-oneapi-compilers@2022.1.0',

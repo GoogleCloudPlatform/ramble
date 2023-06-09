@@ -14,6 +14,7 @@ import six
 import textwrap
 import string
 import shutil
+from typing import List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -49,6 +50,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _mod_prefix_builtin = 'modifier_builtin::'
     _builtin_required_key = 'required'
     _workload_exec_key = 'executables'
+
+    #: Lists of strings which contains GitHub usernames of attributes.
+    #: Do not include @ here in order not to unnecessarily ping the users.
+    maintainers: List[str] = []
+    tags: List[str] = []
 
     def __init__(self, file_path):
         super().__init__()
@@ -165,6 +171,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             out_str.append(f'\t{self.__doc__}\n')
         else:
             out_str.append('\tNone\n')
+
+        if hasattr(self, 'maintainers'):
+            out_str.append('\n')
+            out_str.append(section_title("Maintainers:\n"))
+            out_str.append(colified(self.maintainers, tty=True))
+            out_str.append('\n')
 
         if hasattr(self, 'tags'):
             out_str.append('\n')

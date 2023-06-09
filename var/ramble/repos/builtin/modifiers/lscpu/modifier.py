@@ -18,7 +18,9 @@ class Lscpu(BasicModifier):
     """
     name = "lscpu"
 
-    tags = ['system-info', 'sysinfo', 'platform-info']
+    tags('system-info', 'sysinfo', 'platform-info')
+
+    maintainers('douglasjacobsen')
 
     mode('standard', description='Standard execution mode for lscpu')
 

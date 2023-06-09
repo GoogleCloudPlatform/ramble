@@ -14,7 +14,9 @@ class Hostname(ExecutableApplication):
     """This is an example application that will simply run the hostname command"""  # noqa: E501
     name = "hostname"
 
-    tags = ["test-app"]
+    tags("test-app")
+
+    maintainers('douglasjacobsen')
 
     input_file('test', url="https://no.domain/file/test_dir.tgz", description="Example input file...")
 

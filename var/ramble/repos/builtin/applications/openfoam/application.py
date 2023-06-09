@@ -13,7 +13,9 @@ class Openfoam(SpackApplication):
     '''Define the Openfoam application'''
     name = 'openfoam'
 
-    tags = ['cfd', 'fluid', 'dynamics']
+    maintainers('douglasjacobsen')
+
+    tags('cfd', 'fluid', 'dynamics')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

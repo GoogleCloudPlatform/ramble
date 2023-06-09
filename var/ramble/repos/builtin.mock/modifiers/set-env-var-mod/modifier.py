@@ -14,7 +14,7 @@ class SetEnvVarMod(BasicModifier):
     the set method"""
     name = "set-env-var-mod"
 
-    tags = ['test']
+    tags('test')
 
     mode('test', description='This is a test mode')
 

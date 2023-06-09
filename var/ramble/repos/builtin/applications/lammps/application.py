@@ -13,7 +13,9 @@ class Lammps(SpackApplication):
     '''Define LAMMPS application'''
     name = 'lammps'
 
-    tags = ['molecular-dynamics']
+    maintainers('douglasjacobsen')
+
+    tags('molecular-dynamics')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

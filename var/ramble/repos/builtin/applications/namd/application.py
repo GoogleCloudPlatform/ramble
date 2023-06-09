@@ -17,7 +17,9 @@ class Namd(SpackApplication):
     '''Define NAMD application'''
     name = 'namd'
 
-    tags = ['molecular-dynamics', 'charm++', 'task-parallelism']
+    maintainers('douglasjacobsen')
+
+    tags('molecular-dynamics', 'charm++', 'task-parallelism')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 

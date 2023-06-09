@@ -14,7 +14,9 @@ class Minixyce(SpackApplication):
     '''Define miniXyce application'''
     name = 'minixyce'
 
-    tags = ['circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark']
+    maintainers('dodecatheon')
+
+    tags('circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark')
 
     default_compiler('gcc12', spack_spec="gcc@12.2.0")
 

@@ -391,3 +391,35 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
             mod.env_var_modifications[mode][method].append(append_dict.copy())
 
     return _env_var_modification
+
+
+@modifier_directive(dicts=())
+def maintainers(*names: str):
+    """Add a new maintainer directive, to specify maintainers in a declarative way.
+
+    Args:
+        names: GitHub username for the maintainer
+    """
+
+    def _execute_maintainer(mod):
+        maintainers_from_base = getattr(mod, "maintainers", [])
+        # Here it is essential to copy, otherwise we might add to an empty list in the parent
+        mod.maintainers = list(sorted(set(maintainers_from_base + list(names))))
+
+    return _execute_maintainer
+
+
+@modifier_directive(dicts=())
+def tags(*values: str):
+    """Add a new tag directive, to specify tags in a declarative way.
+
+    Args:
+        values: Value to mark as a tag
+    """
+
+    def _execute_tag(mod):
+        tags_from_base = getattr(mod, "tags", [])
+        # Here it is essential to copy, otherwise we might add to an empty list in the parent
+        mod.tags = list(sorted(set(tags_from_base + list(values))))
+
+    return _execute_tag

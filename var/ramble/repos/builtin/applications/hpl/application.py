@@ -15,7 +15,9 @@ class Hpl(SpackApplication):
     '''Define HPL application'''
     name = 'hpl'
 
-    tags = ['benchmark-app', 'mini-app', 'benchmark']
+    maintainers('douglasjacobsen', 'dodecatheon')
+
+    tags('benchmark-app', 'mini-app', 'benchmark')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

@@ -13,7 +13,9 @@ class MdTest(SpackApplication):
     '''Define the MDTest parallel IO benchmark'''
     name = 'md-test'
 
-    tags = ['synthetic-benchmarks', 'IO']
+    maintainers('rfbgo')
+
+    tags('synthetic-benchmarks', 'IO')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')

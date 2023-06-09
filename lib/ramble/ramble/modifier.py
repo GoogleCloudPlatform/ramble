@@ -11,6 +11,7 @@ import re
 import six
 import textwrap
 import fnmatch
+from typing import List
 
 from llnl.util.tty.colify import colified
 import llnl.util.tty as tty
@@ -29,7 +30,11 @@ class ModifierBase(object, metaclass=ModifierMeta):
     builtin_group = 'modifier'
 
     modifier_class = 'ModifierBase'
-    tags = []
+
+    #: Lists of strings which contains GitHub usernames of attributes.
+    #: Do not include @ here in order not to unnecessarily ping the users.
+    maintainers: List[str] = []
+    tags: List[str] = []
 
     def __init__(self, file_path):
         super().__init__()

@@ -14,7 +14,7 @@ class PrependEnvVarModPaths(BasicModifier):
     the prepend method and a colon separator"""
     name = "prepend-env-var-mod-paths"
 
-    tags = ['test']
+    tags('test')
 
     mode('test', description='This is a test mode')
 

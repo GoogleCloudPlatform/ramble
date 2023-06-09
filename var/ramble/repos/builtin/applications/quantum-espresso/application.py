@@ -15,7 +15,9 @@ class QuantumEspresso(SpackApplication):
     '''Define Quantum-Espresso application.'''
     name = 'quantum-espresso'
 
-    tags = ['electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials']
+    maintainers('douglasjacobsen')
+
+    tags('electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 

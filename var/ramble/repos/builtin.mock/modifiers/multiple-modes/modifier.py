@@ -13,7 +13,7 @@ class MultipleModes(BasicModifier):
     """Define modifier with no variable modifications"""
     name = "multiple-modes"
 
-    tags = ['test']
+    tags('test')
 
     mode('test_mode1', description='This is the first test mode')
 
