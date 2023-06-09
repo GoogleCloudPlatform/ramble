@@ -1,7 +1,7 @@
 
-====================  ==================================================================
+====================  ===================================================================
  Category              Commands 
-====================  ==================================================================
+====================  ===================================================================
 Application dev       | :ref:`edit <ramble-edit>`
 Query applications    | :ref:`info <ramble-info>`,
                         :ref:`list <ramble-list>`,
@@ -10,7 +10,8 @@ Cleanup               | :ref:`clean <ramble-clean>`
 Configuration         | :ref:`config <ramble-config>`,
                         :ref:`mirror <ramble-mirror>`,
                         :ref:`repo <ramble-repo>`
-Developer             | :ref:`commands <ramble-commands>`,
+Developer             | :ref:`attributes <ramble-attributes>`,
+                        :ref:`commands <ramble-commands>`,
                         :ref:`debug <ramble-debug>`,
                         :ref:`flake8 <ramble-flake8>`,
                         :ref:`license <ramble-license>`,
@@ -19,7 +20,7 @@ Developer             | :ref:`commands <ramble-commands>`,
 More help             | :ref:`help <ramble-help>`
 Secret                | :ref:`on <ramble-on>`
 Workspaces            | :ref:`workspace <ramble-workspace>`
-====================  ==================================================================
+====================  ===================================================================
 
 
 ----
@@ -116,6 +117,7 @@ A flexible benchmark experiment manager.
 .. hlist::
    :columns: 4
 
+   * :ref:`attributes <ramble-attributes>`
    * :ref:`clean <ramble-clean>`
    * :ref:`commands <ramble-commands>`
    * :ref:`config <ramble-config>`
@@ -133,6 +135,58 @@ A flexible benchmark experiment manager.
    * :ref:`software-definitions <ramble-software-definitions>`
    * :ref:`unit-test <ramble-unit-test>`
    * :ref:`workspace <ramble-workspace>`
+
+
+----
+
+.. _ramble-attributes:
+
+ramble attributes
+-----------------
+
+get information about object attributes
+
+.. code-block:: console
+
+    ramble attributes [-ha] [--defined | --undefined] [--by-attribute] [--applications | --modifiers]
+                  [--maintainers | --tags]
+                  ...
+
+
+**Positional arguments**
+
+object_or_attr
+  names of objects or attributes to get info for
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+``--defined``
+  show names of objects with attributes
+
+``--undefined``
+  show names of objects without attributes
+
+``-a, --all``
+  show attributes for all objects
+
+``--by-attribute``
+  show objects for attributes instead of attributes for objects
+
+``--applications``
+  show attributes for applications (default)
+
+``--modifiers``
+  show attributes for modifiers
+
+``--maintainers``
+  use maintainers as the attribute. (default)
+
+``--tags``
+  use tags as the attribute.
 
 
 ----

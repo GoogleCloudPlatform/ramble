@@ -17,6 +17,14 @@ Subpackages
 Submodules
 ----------
 
+ramble.cmd.attributes module
+----------------------------
+
+.. automodule:: ramble.cmd.attributes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.cmd.clean module
 -----------------------
 

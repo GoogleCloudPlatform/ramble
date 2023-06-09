@@ -6,6 +6,14 @@ ramble.test.cmd namespace
 Submodules
 ----------
 
+ramble.test.cmd.attributes module
+---------------------------------
+
+.. automodule:: ramble.test.cmd.attributes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.cmd.clean module
 ----------------------------
 

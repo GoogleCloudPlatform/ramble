@@ -52,6 +52,7 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-attributes">ramble attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
@@ -120,6 +121,7 @@
 <span class="kn">import</span> <span class="nn">textwrap</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
@@ -155,6 +157,11 @@
     <span class="n">_mod_prefix_builtin</span> <span class="o">=</span> <span class="s1">&#39;modifier_builtin::&#39;</span>
     <span class="n">_builtin_required_key</span> <span class="o">=</span> <span class="s1">&#39;required&#39;</span>
     <span class="n">_workload_exec_key</span> <span class="o">=</span> <span class="s1">&#39;executables&#39;</span>
+
+    <span class="c1">#: Lists of strings which contains GitHub usernames of attributes.</span>
+    <span class="c1">#: Do not include @ here in order not to unnecessarily ping the users.</span>
+    <span class="n">maintainers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -271,6 +278,12 @@
             <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">None</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;maintainers&#39;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Maintainers:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maintainers</span><span class="p">,</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">):</span>
             <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>

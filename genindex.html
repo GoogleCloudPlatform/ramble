@@ -52,6 +52,7 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
@@ -293,14 +294,14 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.all_template_paths">(in module ramble.workspace.workspace)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.all_templates">all_templates() (ramble.workspace.Workspace method)</a>
 
       <ul>
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.all_templates">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.all_workloads">all_workloads() (ramble.workspace.Workspace method)</a>
 
       <ul>
@@ -450,6 +451,10 @@
 </li>
       </ul></li>
       <li><a href="ramble.html#ramble.spec.AT">AT (in module ramble.spec)</a>
+</li>
+      <li><a href="ramble.cmd.html#ramble.cmd.attributes.attributes">attributes() (in module ramble.cmd.attributes)</a>
+</li>
+      <li><a href="ramble.cmd.html#ramble.cmd.attributes.attributes_to_objects">attributes_to_objects() (in module ramble.cmd.attributes)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.autospec">autospec() (in module ramble.repository)</a>
 </li>
@@ -855,10 +860,12 @@
 </li>
       <li><a href="ramble.html#ramble.config.default_modify_scope">default_modify_scope() (in module ramble.config)</a>
 </li>
-      <li><a href="ramble.html#ramble.spec.DEP">DEP (in module ramble.spec)</a>
+      <li><a href="ramble.cmd.html#ramble.cmd.attributes.defined_objects">defined_objects() (in module ramble.cmd.attributes)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.spec.DEP">DEP (in module ramble.spec)</a>
+</li>
       <li><a href="ramble.html#ramble.fetch_strategy.FsCache.destroy">destroy() (ramble.fetch_strategy.FsCache method)</a>
 
       <ul>
@@ -1807,6 +1814,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.main.main">main() (in module ramble.main)</a>
 </li>
+      <li><a href="ramble.html#ramble.application.ApplicationBase.maintainers">maintainers (ramble.application.ApplicationBase attribute)</a>
+
+      <ul>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.maintainers">(ramble.modifier.ModifierBase attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="ramble.language.html#ramble.language.application_language.maintainers">maintainers() (in module ramble.language.application_language)</a>
+
+      <ul>
+        <li><a href="ramble.language.html#ramble.language.modifier_language.maintainers">(in module ramble.language.modifier_language)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.html#ramble.main.make_argument_parser">make_argument_parser() (in module ramble.main)</a>
 </li>
       <li><a href="ramble.html#ramble.stage.DIYStage.managed_by_ramble">managed_by_ramble (ramble.stage.DIYStage attribute)</a>
@@ -1968,6 +1987,8 @@
         <li><a href="ramble.html#module-ramble.caches">ramble.caches</a>
 </li>
         <li><a href="ramble.cmd.html#module-ramble.cmd">ramble.cmd</a>
+</li>
+        <li><a href="ramble.cmd.html#module-ramble.cmd.attributes">ramble.cmd.attributes</a>
 </li>
         <li><a href="ramble.cmd.html#module-ramble.cmd.clean">ramble.cmd.clean</a>
 </li>
@@ -2258,6 +2279,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.repository.ObjectNamespace">ObjectNamespace (class in ramble.repository)</a>
 </li>
+      <li><a href="ramble.cmd.html#ramble.cmd.attributes.objects_to_attributes">objects_to_attributes() (in module ramble.cmd.attributes)</a>
+</li>
       <li><a href="ramble.html#ramble.repository.Repo.objects_with_tags">objects_with_tags() (ramble.repository.Repo method)</a>
 
       <ul>
@@ -2496,6 +2519,13 @@
 
       <ul>
         <li><a href="ramble.cmd.html#module-ramble.cmd">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.cmd.attributes
+
+      <ul>
+        <li><a href="ramble.cmd.html#module-ramble.cmd.attributes">module</a>
 </li>
       </ul></li>
       <li>
@@ -2967,6 +2997,8 @@
         <li><a href="ramble.test.html#module-ramble.test">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.application_inheritance
 
@@ -2974,8 +3006,6 @@
         <li><a href="ramble.test.html#module-ramble.test.application_inheritance">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.cmd
 
@@ -3510,9 +3540,11 @@
 </li>
       <li><a href="ramble.html#ramble.main.setup_main_options">setup_main_options() (in module ramble.main)</a>
 </li>
-      <li><a href="ramble.cmd.html#ramble.cmd.clean.setup_parser">setup_parser() (in module ramble.cmd.clean)</a>
+      <li><a href="ramble.cmd.html#ramble.cmd.attributes.setup_parser">setup_parser() (in module ramble.cmd.attributes)</a>
 
       <ul>
+        <li><a href="ramble.cmd.html#ramble.cmd.clean.setup_parser">(in module ramble.cmd.clean)</a>
+</li>
         <li><a href="ramble.cmd.html#ramble.cmd.commands.setup_parser">(in module ramble.cmd.commands)</a>
 </li>
         <li><a href="ramble.cmd.html#ramble.cmd.config.setup_parser">(in module ramble.cmd.config)</a>
@@ -3554,10 +3586,10 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.simlink_result">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
-      <li><a href="ramble.util.html#ramble.util.naming.simplify_name">simplify_name() (in module ramble.util.naming)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.util.html#ramble.util.naming.simplify_name">simplify_name() (in module ramble.util.naming)</a>
+</li>
       <li><a href="ramble.html#ramble.config.SingleFileScope">SingleFileScope (class in ramble.config)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.software_definitions">software_definitions() (in module ramble.cmd.software_definitions)</a>
@@ -3754,8 +3786,18 @@
 </li>
       <li><a href="ramble.html#ramble.repository.TagIndexer">TagIndexer (class in ramble.repository)</a>
 </li>
-      <li><a href="ramble.html#ramble.modifier.ModifierBase.tags">tags (ramble.modifier.ModifierBase attribute)</a>
+      <li><a href="ramble.html#ramble.application.ApplicationBase.tags">tags (ramble.application.ApplicationBase attribute)</a>
+
+      <ul>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.tags">(ramble.modifier.ModifierBase attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="ramble.language.html#ramble.language.application_language.tags">tags() (in module ramble.language.application_language)</a>
+
+      <ul>
+        <li><a href="ramble.language.html#ramble.language.modifier_language.tags">(in module ramble.language.modifier_language)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.html#ramble.namespace.namespace.template">template (ramble.namespace.namespace attribute)</a>
 
       <ul>
@@ -3780,10 +3822,10 @@
 </li>
       <li><a href="ramble.test.html#ramble.test.expander.test_expansion_namespaces">test_expansion_namespaces() (in module ramble.test.expander)</a>
 </li>
-      <li><a href="ramble.test.html#ramble.test.expander.test_expansions">test_expansions() (in module ramble.test.expander)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.test.html#ramble.test.expander.test_expansions">test_expansions() (in module ramble.test.expander)</a>
+</li>
       <li><a href="ramble.test.html#ramble.test.success_criteria.test_single_criteria">test_single_criteria() (in module ramble.test.success_criteria)</a>
 </li>
       <li><a href="ramble.test.cmd.html#ramble.test.cmd.software_definitions.test_software_definitions_conflicts">test_software_definitions_conflicts() (in module ramble.test.cmd.software_definitions)</a>
@@ -3828,6 +3870,8 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.cmd.html#ramble.cmd.attributes.union_values">union_values() (in module ramble.cmd.attributes)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.unit_test.unit_test">unit_test() (in module ramble.cmd.unit_test)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.UnknownEntityError">UnknownEntityError</a>

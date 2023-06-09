@@ -52,6 +52,7 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-attributes">ramble attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
@@ -117,6 +118,7 @@
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">textwrap</span>
 <span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">llnl.util.tty.colify</span> <span class="kn">import</span> <span class="n">colified</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
@@ -135,7 +137,11 @@
     <span class="n">builtin_group</span> <span class="o">=</span> <span class="s1">&#39;modifier&#39;</span>
 
     <span class="n">modifier_class</span> <span class="o">=</span> <span class="s1">&#39;ModifierBase&#39;</span>
-    <span class="n">tags</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1">#: Lists of strings which contains GitHub usernames of attributes.</span>
+    <span class="c1">#: Do not include @ here in order not to unnecessarily ping the users.</span>
+    <span class="n">maintainers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>

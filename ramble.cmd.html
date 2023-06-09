@@ -73,6 +73,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.cmd.require_python_name"><code class="docutils literal notranslate"><span class="pre">require_python_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.attributes">ramble.cmd.attributes module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.clean">ramble.cmd.clean module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.commands">ramble.cmd.commands module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.config">ramble.cmd.config module</a></li>
@@ -132,6 +133,7 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
@@ -404,6 +406,51 @@ prerequisites.</p>
 </section>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-ramble.cmd.attributes">
+<span id="ramble-cmd-attributes-module"></span><h2>ramble.cmd.attributes module<a class="headerlink" href="#module-ramble.cmd.attributes" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.attributes.attributes">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.attributes.</span></span><span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/attributes.html#attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.attributes.attributes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.attributes.attributes_to_objects">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.attributes.</span></span><span class="sig-name descname"><span class="pre">attributes_to_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">users</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'maintainers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/attributes.html#attributes_to_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.attributes.attributes_to_objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.attributes.defined_objects">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.attributes.</span></span><span class="sig-name descname"><span class="pre">defined_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'maintainers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/attributes.html#defined_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.attributes.defined_objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.attributes.objects_to_attributes">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.attributes.</span></span><span class="sig-name descname"><span class="pre">objects_to_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'maintainers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ObjectTypes.applications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/attributes.html#objects_to_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.attributes.objects_to_attributes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.attributes.setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.attributes.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/attributes.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.attributes.setup_parser" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.attributes.union_values">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.attributes.</span></span><span class="sig-name descname"><span class="pre">union_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/attributes.html#union_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.attributes.union_values" title="Permalink to this definition"></a></dt>
+<dd><p>Given a dictionary with values that are Collections, return their union.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dictionary</strong> (<em>dict</em>) – dictionary whose values are all collections.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the union of all collections in the dictionary’s values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(set)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-ramble.cmd.clean">
 <span id="ramble-cmd-clean-module"></span><h2>ramble.cmd.clean module<a class="headerlink" href="#module-ramble.cmd.clean" title="Permalink to this heading"></a></h2>
