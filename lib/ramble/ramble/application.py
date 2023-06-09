@@ -88,6 +88,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.modifiers = []
         self._modifier_instances = []
         self._modifier_builtins = {}
+        self._input_fetchers = None
 
         self._file_path = file_path
 
@@ -556,11 +557,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             self._modifier_instances.append(mod_inst)
 
-    def _get_executables_and_inputs(self):
-        """Return executables and inputs for add_expand_vars"""
+    def _get_executables(self):
+        """Return executables for add_expand_vars"""
 
         executables = self.workloads[self.expander.workload_name]['executables']
-        inputs = self.workloads[self.expander.workload_name]['inputs']
 
         # Use yaml defined executable order, if defined
         if namespace.executables in self.internals:
@@ -574,15 +574,20 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     **conf
                 )
 
-        return executables, inputs
+        return executables
 
-    def _set_input_path(self, inputs):
+    def _set_input_path(self):
         """Put input_path into self.variables[input_file] for add_expand_vars"""
-        for input_file in inputs:
-            input_conf = self.inputs[input_file]
-            input_path = os.path.join(self.expander.application_input_dir,
-                                      input_conf['target_dir'])
-            self.variables[input_file] = input_path
+        self._inputs_and_fetchers(self.expander.workload_name)
+
+        for input_file, input_conf in self._input_fetchers.items():
+            input_vars = {keywords.input_name: input_conf['input_name']}
+            if not input_conf['expand']:
+                input_vars[keywords.input_name] = input_file
+            input_path = os.path.join(self.expander.workload_input_dir,
+                                      self.expander.expand_var(input_conf['target_dir'],
+                                                               extra_vars=input_vars))
+            self.variables[input_conf['input_name']] = input_path
 
     def _set_default_experiment_variables(self):
         """Set default experiment variables (for add_expand_vars),
@@ -698,8 +703,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         - spack_setup: set to an empty string, so spack applications can override this
         """
         if not self._vars_are_expanded:
-            executables, inputs = self._get_executables_and_inputs()
-            self._set_input_path(inputs)
+            executables = self._get_executables()
+            self._set_input_path()
             self._set_default_experiment_variables()
             self._inject_commands(executables)
             # ---------------------------------------------------------------------------------
@@ -716,6 +721,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         Take a workload name and extract all inputs for the workload.
         If the workload is set to None, extract all inputs for all workloads.
         """
+
+        if self._input_fetchers is not None:
+            return
 
         workload_names = [workload] if workload else self.workloads.keys()
 
@@ -743,15 +751,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                      'input_name': input_file,
                                      'expand': input_conf['expand']
                                      }
-        return inputs
+        self._input_fetchers = inputs
 
     def _mirror_inputs(self, workspace):
         """Mirror application inputs
 
         Perform mirroring of inputs within this application class.
         """
-        for input_file, input_conf in \
-                self._inputs_and_fetchers(self.expander.workload_name).items():
+        self._inputs_and_fetchers(self.expander.workload_name)
+
+        for input_file, input_conf in self._input_fetchers.items():
             mirror_paths = ramble.mirror.mirror_archive_paths(
                 input_conf['fetcher'], os.path.join(self.name, input_file))
             fetch_dir = os.path.join(workspace._input_mirror_path, self.name)
@@ -768,17 +777,22 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """
         workload_namespace = self.expander.workload_namespace
 
-        for input_file, input_conf in \
-                self._inputs_and_fetchers(self.expander.workload_name).items():
+        self._inputs_and_fetchers(self.expander.workload_name)
+
+        for input_file, input_conf in self._input_fetchers.items():
             if not workspace.dry_run:
                 mirror_paths = ramble.mirror.mirror_archive_paths(
                     input_conf['fetcher'], os.path.join(self.name, input_file))
 
-                with ramble.stage.InputStage(input_conf['fetcher'], name=workload_namespace,
-                                             path=self.expander.application_input_dir,
+                input_namespace = workload_namespace + '.' + input_file
+                input_vars = {keywords.input_name: input_conf['input_name']}
+
+                with ramble.stage.InputStage(input_conf['fetcher'], name=input_namespace,
+                                             path=self.expander.workload_input_dir,
                                              mirror_paths=mirror_paths) \
                         as stage:
-                    stage.set_subdir(self.expander.expand_var(input_conf['target_dir']))
+                    stage.set_subdir(self.expander.expand_var(input_conf['target_dir'],
+                                                              extra_vars=input_vars))
                     stage.fetch()
                     if input_conf['fetcher'].digest:
                         stage.check()

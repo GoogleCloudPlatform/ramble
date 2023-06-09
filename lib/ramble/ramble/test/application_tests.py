@@ -344,8 +344,8 @@ def basic_exp_dict():
     }
 
 
-def test_get_executables_and_inputs_initial(mutable_mock_apps_repo):
-    """_get_executables_and_inputs, test1, workload executables and inputs"""
+def test_get_executables_initial(mutable_mock_apps_repo):
+    """_get_executables, test1, workload executables"""
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -359,14 +359,13 @@ def test_get_executables_and_inputs_initial(mutable_mock_apps_repo):
                                                               'inputs': ['input']}}
     executable_application_instance.internals = {}
 
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
+    executables = executable_application_instance._get_executables()
 
     assert 'bar' in executables
-    assert 'input' in inputs
 
 
-def test_get_executables_and_inputs_yaml_defined(mutable_mock_apps_repo):
-    """_get_executables_and_inputs, test2, yaml-defined order"""
+def test_get_executables_yaml_defined(mutable_mock_apps_repo):
+    """_get_executables, test2, yaml-defined order"""
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -394,13 +393,13 @@ def test_get_executables_and_inputs_yaml_defined(mutable_mock_apps_repo):
     }
     executable_application_instance.set_internals(defined_internals)
 
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
+    executables = executable_application_instance._get_executables()
 
     assert 'test_exec' in executables
 
 
-def test_get_executables_and_inputs_custom_executables(mutable_mock_apps_repo):
-    """_get_executables_and_inputs, test3, custom executables"""
+def test_get_executables_custom_executables(mutable_mock_apps_repo):
+    """_get_executables, test3, custom executables"""
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -428,7 +427,7 @@ def test_get_executables_and_inputs_custom_executables(mutable_mock_apps_repo):
     }
     executable_application_instance.set_internals(defined_internals)
 
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
+    executable_application_instance._get_executables()
 
     assert 'test_exec2' in executable_application_instance.executables
 
@@ -442,23 +441,44 @@ def test_set_input_path(mutable_mock_apps_repo):
 
     # Set up the instance to pass the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input']}}
 
     executable_application_instance.internals = {}
 
-    executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
 
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
+    executable_application_instance._set_input_path()
 
-    executable_application_instance._set_input_path(inputs)
-
-    default_answer = '/workspace/inputs/bar/.'
+    default_answer = '/workspace/inputs/bar/test_wl2/input'
 
     assert executable_application_instance.variables['input'] == default_answer
+
+
+def test_set_input_path_multi_input(mutable_mock_apps_repo):
+    """Tests set_input_path with multiple inputs in a given workload"""
+
+    executable_application_instance = mutable_mock_apps_repo.get('input-test')
+
+    expansion_vars = basic_exp_dict()
+    del expansion_vars['inputs']
+    expansion_vars['application_name'] = 'input-test'
+    expansion_vars['workload_name'] = 'test'
+
+    # Set up the instance to pass the initial part of the function
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+
+    executable_application_instance.internals = {}
+
+    executable_application_instance.variables = {}
+
+    executable_application_instance._set_input_path()
+
+    input1_path = '/workspace/inputs/bar/test_wl2/test-input1'
+    input2_path = '/workspace/inputs/bar/test_wl2/test-input2'
+    input3_path = '/workspace/inputs/bar/test_wl2/input3.txt'
+
+    assert executable_application_instance.variables['test-input1'] == input1_path
+    assert executable_application_instance.variables['test-input2'] == input2_path
+    assert executable_application_instance.variables['test-input3'] == input3_path
 
 
 def test_set_default_experiment_variables(mutable_mock_apps_repo):
@@ -480,10 +500,6 @@ def test_set_default_experiment_variables(mutable_mock_apps_repo):
 
     executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
-
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
-
-    executable_application_instance._set_input_path(inputs)
 
     executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
                                                                        {'default': '1'}}}
@@ -513,9 +529,7 @@ def test_inject_commands(mutable_mock_apps_repo):
     executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
 
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
-
-    executable_application_instance._set_input_path(inputs)
+    executables = executable_application_instance._get_executables()
 
     executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
                                                                        {'default': '1'}}}
@@ -588,9 +602,7 @@ ramble:
     executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
 
-    executables, inputs = executable_application_instance._get_executables_and_inputs()
-
-    executable_application_instance._set_input_path(inputs)
+    executables = executable_application_instance._get_executables()
 
     executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
                                                                        {'default': '1'}}}

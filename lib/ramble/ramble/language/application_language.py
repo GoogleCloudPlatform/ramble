@@ -160,7 +160,7 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
 
 
 @application_directive('inputs')
-def input_file(name, url, description, target_dir='{workload_name}', sha256=None, extension=None,
+def input_file(name, url, description, target_dir='{input_name}', sha256=None, extension=None,
                expand=True, **kwargs):
     """Adds an input file definition to this application
 
