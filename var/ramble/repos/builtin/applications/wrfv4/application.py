@@ -20,7 +20,7 @@ class Wrfv4(SpackApplication):
     software_spec('intel-mpi', spack_spec="intel-mpi@2018.4.274",
                   compiler='gcc9')
 
-    software_spec('wrf',
+    software_spec('wrfv4',
                   spack_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
                   compiler='gcc9')
 
