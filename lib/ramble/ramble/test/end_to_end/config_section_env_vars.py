@@ -58,9 +58,7 @@ ramble:
             f.write(test_config)
         ws._re_read()
 
-        out = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-
-        assert 'The env-vars workspace section is deprecated' not in out
+        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
         experiment_root = ws.experiment_dir
         exp1_dir = os.path.join(experiment_root, 'basic', 'test_wl', 'simple_test')

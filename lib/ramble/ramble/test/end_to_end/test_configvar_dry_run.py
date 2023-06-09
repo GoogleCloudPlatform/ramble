@@ -74,11 +74,11 @@ ramble:
 
     expected_experiments = []
     for scope in test_scopes:
-        config('--scope', scope, 'add', f'config:variables:{var_name1}:{var_val}')
+        config('--scope', scope, 'add', f'variables:{var_name1}:{var_val}')
         expected_experiments.append(f'{scope}_test_{var_val}')
 
     for i, scope in enumerate(test_scopes):
-        config('--scope', scope, 'add', f'config:env-vars:set:{var_name2}{i}:{var_val}')
+        config('--scope', scope, 'add', f'env_vars:set:{var_name2}{i}:{var_val}')
 
     workspace_name = 'test_sitevar'
     with ramble.workspace.create(workspace_name) as ws:

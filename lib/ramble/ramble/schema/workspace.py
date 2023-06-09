@@ -65,7 +65,6 @@ properties = {
                     'default': [],
                     'items': {'type': 'string'},
                 },
-                'env-vars': ramble.schema.licenses.env_var_actions,
                 'application_directories': {
                     'type': 'array',
                     'default': [],

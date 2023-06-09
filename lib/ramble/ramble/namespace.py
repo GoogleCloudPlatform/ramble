@@ -19,7 +19,7 @@ class namespace:
     internals = 'internals'
     custom_executables = 'custom_executables'
     executables = 'executables'
-    env_var = 'env-vars'
+    env_var = 'env_vars'
     packages = 'packages'
     environments = 'environments'
     template = 'template'

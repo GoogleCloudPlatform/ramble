@@ -52,7 +52,7 @@ ramble:
                 - baz
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
   spack:

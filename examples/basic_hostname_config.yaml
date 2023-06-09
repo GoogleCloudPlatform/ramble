@@ -20,7 +20,7 @@
 #               n_ranks: '{processes_per_node}'
 
 ramble:
-  env-vars:
+  env_vars:
     set:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
