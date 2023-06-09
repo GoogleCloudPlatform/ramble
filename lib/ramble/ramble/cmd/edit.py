@@ -30,13 +30,14 @@ def edit_application(name, repo_path, namespace):
         repo_path (str): The path to the repository containing this application
         namespace (str): A valid namespace registered with Ramble
     """
+    app_type = ramble.repository.ObjectTypes.applications
     # Find the location of the package
     if repo_path:
         repo = ramble.repository.Repo(repo_path)
     elif namespace:
-        repo = ramble.repository.apps_path.get_repo(namespace)
+        repo = ramble.repository.paths[app_type].get_repo(namespace)
     else:
-        repo = ramble.repository.apps_path
+        repo = ramble.repository.paths[app_type]
     path = repo.filename_for_object_name(name)
 
     if os.path.exists(path):
@@ -93,7 +94,7 @@ def edit(parser, args):
     name = args.application
 
     # By default, edit application files
-    path = ramble.paths.applications_path
+    path = ramble.paths.builtin_path
 
     # If `--command`, `--test`, or `--module` is chosen, edit those instead
     if args.path:

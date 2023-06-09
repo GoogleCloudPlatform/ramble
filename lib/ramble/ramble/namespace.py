@@ -24,6 +24,7 @@ class namespace:
     environments = 'environments'
     template = 'template'
     chained_experiments = 'chained_experiments'
+    modifiers = 'modifiers'
 
     # For rendering objects
     variables = 'variables'

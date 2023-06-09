@@ -82,13 +82,13 @@ def add_executable(app_inst, exe_num=1):
 
     exec_def = {
         nompi_exec_name: {
-            'template': template,
+            'template': [template],
             'mpi': False,
             'redirect': redirect_test,
             'output_capture': output_capture
         },
         mpi_exec_name: {
-            'template': template,
+            'template': [template],
             'mpi': True,
             'redirect': '{log_file}'  # Default value
         },
@@ -252,10 +252,9 @@ def test_executable_directive(app_class):
     for exe_name, conf in test_defs.items():
         assert exe_name in app_inst.executables
         for conf_name, conf_val in conf.items():
-            assert conf_name in app_inst.executables[exe_name]
-            assert app_inst.executables[exe_name][conf_name] == conf_val
-            assert isinstance(conf_val,
-                   type(app_inst.executables[exe_name][conf_name]))
+            assert hasattr(app_inst.executables[exe_name], conf_name)
+            assert conf_val == getattr(app_inst.executables[exe_name],
+                                       conf_name)
 
 
 @pytest.mark.parametrize('app_class', app_types)

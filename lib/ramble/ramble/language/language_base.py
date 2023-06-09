@@ -47,6 +47,8 @@ __all__ = ['DirectiveMeta', 'DirectiveError']
 #: them
 reserved_names = []
 
+namespaces = ['ramble.app', 'ramble.mod']
+
 
 class DirectiveMeta(type):
     """Flushes the directives that were temporarily stored in the staging
@@ -92,7 +94,12 @@ class DirectiveMeta(type):
         # The instance is being initialized: if it is a package we must ensure
         # that the directives are called to set it up.
 
-        if "ramble.app" in cls.__module__:
+        valid_module = False
+        for namespace in namespaces:
+            if namespace in cls.__module__:
+                valid_module = True
+
+        if valid_module:
             # Ensure the presence of the dictionaries associated
             # with the directives
             for d in DirectiveMeta._directive_names:

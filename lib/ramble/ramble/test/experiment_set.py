@@ -17,7 +17,7 @@ from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_workspace_path',
-                                     'mutable_mock_repo',
+                                     'mutable_mock_apps_repo',
                                      )
 
 workspace  = RambleCommand('workspace')
@@ -1059,3 +1059,77 @@ def test_chained_invalid_order_errors(mutable_mock_workspace_path, capsys):
             exp_set.build_experiment_chains()
             captured = capsys.readouterr
             assert "Invalid experiment chain defined:" in captured
+
+
+def test_modifiers_set_correctly(mutable_mock_workspace_path, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        app_mods = [
+            {
+                'name': 'test_app_mod',
+                'mode': 'test_app',
+                'on_executable': [
+                    'builtin::env_vars'
+                ]
+            }
+        ]
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+
+        wl_mods = [
+            {
+                'name': 'test_wl_mod',
+                'mode': 'test_wl',
+                'on_executable': [
+                    'builtin::env_vars'
+                ]
+            }
+        ]
+
+        exp1_name = 'test1'
+        exp1_vars = {
+            'n_ranks': '2'
+        }
+
+        exp1_mods = [
+            {
+                'name': 'test_exp1_mod',
+                'mode': 'test_exp1',
+                'on_executable': [
+                    'builtin::env_vars'
+                ]
+            }
+        ]
+
+        exp_set.set_application_context(app_name, app_vars, None, None, None, None, app_mods)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None, wl_mods)
+        exp_set.set_experiment_context(exp1_name, exp1_vars, None, None, None,
+                                       None, None, exp1_mods)
+
+        assert 'basic.test_wl.test1' in exp_set.experiments
+        app_inst = exp_set.experiments['basic.test_wl.test1']
+        assert app_inst.modifiers is not None
+
+        expected_modifiers = set(['test_app_mod', 'test_wl_mod', 'test_exp1_mod'])
+        for mod_def in app_inst.modifiers:
+            assert mod_def['name'] in expected_modifiers
+            expected_modifiers.remove(mod_def['name'])
+        assert len(expected_modifiers) == 0

@@ -27,7 +27,7 @@ pytestmark = [pytest.mark.skipif(sys.platform == "win32",
                                       'tmpdir_factory',
                                       'mutable_config',
                                       'mutable_mock_workspace_path',
-                                      'mutable_mock_repo')]
+                                      'mutable_mock_apps_repo')]
 
 
 class MockFetcher(object):
@@ -88,7 +88,7 @@ def check_mirror(mirror_path, app_name, app_class):
 @pytest.mark.parametrize('app_name', [
     'input-test'
 ])
-def test_mirror_create(tmpdir, mutable_mock_repo,
+def test_mirror_create(tmpdir,
                        mutable_mock_workspace_path,
                        app_name, tmpdir_factory):
 
@@ -117,7 +117,8 @@ ramble:
     mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
 
     with archive_dir.as_cwd():
-        app_class = ramble.repository.apps_path.get_obj_class(app_name)('test')
+        app_type = ramble.repository.ObjectTypes.applications
+        app_class = ramble.repository.paths[app_type].get_obj_class(app_name)('test')
         create_archive(archive_dir, app_class)
 
         # Create workspace

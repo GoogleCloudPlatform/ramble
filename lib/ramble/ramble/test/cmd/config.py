@@ -278,7 +278,7 @@ def test_config_edit():
     assert config('edit', '--print-file', 'repos').strip() == repos_path
 
 
-def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_repo):
+def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_apps_repo):
     ws = ramble.workspace.create('test')
 
     config('get', fail_on_error=False)

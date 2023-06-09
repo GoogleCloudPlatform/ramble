@@ -21,6 +21,7 @@ import ramble.schema.types
 import ramble.schema.variables
 import ramble.schema.success_criteria
 import ramble.schema.licenses
+import ramble.schema.modifiers
 
 
 matrix_def = {
@@ -68,6 +69,7 @@ sub_props = union_dicts(
     ramble.schema.success_criteria.properties,
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
+    ramble.schema.modifiers.properties,
     {
         'env-vars': ramble.schema.licenses.env_var_actions,
         'chained_experiments': chained_experiment_def,

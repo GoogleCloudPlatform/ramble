@@ -8,11 +8,13 @@
 
 
 def specs_equiv(spec1, spec2):
-    all_keys = set(spec1.keys())
-    all_keys.update(set(spec2.keys()))
-
-    if len(all_keys) != len(spec1.keys()):
-        return False
+    all_keys = set()
+    for key in spec1.keys():
+        if spec1[key] is not None:
+            all_keys.add(key)
+    for key in spec2.keys():
+        if spec2[key] is not None:
+            all_keys.add(key)
 
     if 'application_name' in all_keys:
         all_keys.remove('application_name')

@@ -76,6 +76,16 @@ def specs():
 
 
 @arg
+def repo_type():
+    from ramble.repository import default_type, OBJECT_NAMES
+    return Args(
+        '-t', '--type', default=default_type.name,
+        help=f"type of repositories to manage. Defaults to '{default_type.name}'. "
+        f"Allowed types are {str(OBJECT_NAMES)}",
+    )
+
+
+@arg
 def no_checksum():
     return Args(
         '-n', '--no-checksum', action='store_true', default=False,

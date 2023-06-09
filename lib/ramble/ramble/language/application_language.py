@@ -81,13 +81,10 @@ def executable(name, template, use_mpi=False, redirect='{log_file}',
     """
 
     def _execute_executable(app):
-        app.executables[name] = \
-            {
-                'template': template,
-                'mpi': use_mpi,
-                'redirect': redirect,
-                'output_capture': output_capture
-            }  # noqa: E123
+        from ramble.util.executable import CommandExecutable
+        app.executables[name] = CommandExecutable(
+            name=name, template=template, use_mpi=use_mpi, redirect=redirect,
+            output_capture=output_capture)
 
     return _execute_executable
 

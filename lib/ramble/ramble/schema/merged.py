@@ -21,6 +21,7 @@ import ramble.schema.success_criteria
 import ramble.schema.variables
 import ramble.schema.env_vars
 import ramble.schema.internals
+import ramble.schema.modifiers
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
@@ -32,6 +33,7 @@ properties = union_dicts(
     ramble.schema.variables.properties,
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
+    ramble.schema.modifiers.properties,
 )
 
 #: Full schema with metadata

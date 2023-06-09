@@ -342,6 +342,64 @@ In the above example, ``test_value`` extracts the value of ``real_value`` as
 defined in the experiment ``hostname.serial.test_exp1``. When evaluated, this
 will set ``test_value`` to ``'exp1_value'``.
 
+^^^^^^^^^^^^^^^^^^^^^
+Experiment Modifiers:
+^^^^^^^^^^^^^^^^^^^^^
+
+In addition to containing application definitions, Ramble also provides
+experiment modifiers. Experiment modifiers encapsulate several aspects of a
+standard modification to an experiment, such as prepending a binary with a tool
+or profiler, and can be applied to experiments to modify their behavior.
+
+Available experiment modifiers can be seen using ``ramble mods list``, and more
+information about a particular modifier can be see with
+``ramble mods info <mod_name>``.
+
+Modifiers can be applied to experiments using the following YAML syntax:
+
+.. code-block:: yaml
+
+    ramble:
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        processes_per_node: '16'
+      applications:
+        gromacs:
+          workloads:
+            water_bare:
+              experiments:
+                test_exp1:
+                  modifiers:
+                  - name: intel-aps
+                    mode: mpi
+                    on_executable:
+                    - '*'
+                  variables:
+                    n_ranks: '1'
+
+
+Modifiers can be defined at any level variables can be defined at (and are even
+their own config section).
+
+When defining a modifier, the ``name`` attribute is the name of the modifier
+that will be applied. The ``mode`` attribute is a modifier specific setting
+allowing the user to select the modifier behavior. Modes can be seen by looking
+at the modifier information, and represent modes of use for the modifier. Modes
+group several general aspects of a modifier into one usage mode, and can allow
+a general modifier to present many operational entry points. The
+``on_executable`` attribute is a list of experiment executables that the
+modifier should be applied to. These executable names are matched using
+python's ``fnmatch.fnmatch`` functionality.
+
+If it is not set, modifiers will attempt to determine their own ``mode``
+attribute. This will succeed if the modifier has a single mode of operation. If
+there are multiple modes, this will raise an exception.
+
+If the ``on_executable`` attribute is not set, it will default to ``'*'`` which
+will match all executables. Modifier classes can (and should) be implemented to
+only act on the correct executable types (i.e. executables with ``use_mpi=true``).
+
 ^^^^^^^^^^^^^^^^^^^^^^
 Controlling Internals:
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -378,7 +436,6 @@ example, showing how to create a ``lscpu`` executable at the application level.
 The above example creates a custom executable, named ``lscpu`` that will inject
 the command ``lscpu`` into the command for an experiment when it is used. It is
 important to note that this only creates the executable, and does not use it.
-
 
 """""""""""""""""""""""""""""
 Controlling Executable Order:
