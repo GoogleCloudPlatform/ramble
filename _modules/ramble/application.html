@@ -194,6 +194,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">modifiers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_builtins</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span> <span class="o">=</span> <span class="n">file_path</span>
 
@@ -662,11 +663,10 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_executables_and_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return executables and inputs for add_expand_vars&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_get_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return executables for add_expand_vars&quot;&quot;&quot;</span>
 
         <span class="n">executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span>
 
         <span class="c1"># Use yaml defined executable order, if defined</span>
         <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">executables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
@@ -680,15 +680,20 @@
                     <span class="o">**</span><span class="n">conf</span>
                 <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">executables</span><span class="p">,</span> <span class="n">inputs</span>
+        <span class="k">return</span> <span class="n">executables</span>
 
-    <span class="k">def</span> <span class="nf">_set_input_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_input_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Put input_path into self.variables[input_file] for add_expand_vars&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
-            <span class="n">input_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="n">input_file</span><span class="p">]</span>
-            <span class="n">input_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">application_input_dir</span><span class="p">,</span>
-                                      <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;target_dir&#39;</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">input_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">input_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">keywords</span><span class="o">.</span><span class="n">input_name</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;input_name&#39;</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;expand&#39;</span><span class="p">]:</span>
+                <span class="n">input_vars</span><span class="p">[</span><span class="n">keywords</span><span class="o">.</span><span class="n">input_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_file</span>
+            <span class="n">input_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_input_dir</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;target_dir&#39;</span><span class="p">],</span>
+                                                               <span class="n">extra_vars</span><span class="o">=</span><span class="n">input_vars</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;input_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">input_path</span>
 
     <span class="k">def</span> <span class="nf">_set_default_experiment_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set default experiment variables (for add_expand_vars),</span>
@@ -804,8 +809,8 @@
 <span class="sd">        - spack_setup: set to an empty string, so spack applications can override this</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span><span class="p">:</span>
-            <span class="n">executables</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_executables_and_inputs</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_set_input_path</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_executables</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_input_path</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_experiment_variables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inject_commands</span><span class="p">(</span><span class="n">executables</span><span class="p">)</span>
             <span class="c1"># ---------------------------------------------------------------------------------</span>
@@ -822,6 +827,9 @@
 <span class="sd">        Take a workload name and extract all inputs for the workload.</span>
 <span class="sd">        If the workload is set to None, extract all inputs for all workloads.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
 
         <span class="n">workload_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">workload</span><span class="p">]</span> <span class="k">if</span> <span class="n">workload</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
@@ -849,15 +857,16 @@
                                      <span class="s1">&#39;input_name&#39;</span><span class="p">:</span> <span class="n">input_file</span><span class="p">,</span>
                                      <span class="s1">&#39;expand&#39;</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;expand&#39;</span><span class="p">]</span>
                                      <span class="p">}</span>
-        <span class="k">return</span> <span class="n">inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="n">inputs</span>
 
     <span class="k">def</span> <span class="nf">_mirror_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mirror application inputs</span>
 
 <span class="sd">        Perform mirroring of inputs within this application class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">mirror_paths</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">mirror_archive_paths</span><span class="p">(</span>
                 <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">input_file</span><span class="p">))</span>
             <span class="n">fetch_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">_input_mirror_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -874,17 +883,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">workload_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_namespace</span>
 
-        <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
                 <span class="n">mirror_paths</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">mirror_archive_paths</span><span class="p">(</span>
                     <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">input_file</span><span class="p">))</span>
 
-                <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">InputStage</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">workload_namespace</span><span class="p">,</span>
-                                             <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">application_input_dir</span><span class="p">,</span>
+                <span class="n">input_namespace</span> <span class="o">=</span> <span class="n">workload_namespace</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">input_file</span>
+                <span class="n">input_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">keywords</span><span class="o">.</span><span class="n">input_name</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;input_name&#39;</span><span class="p">]}</span>
+
+                <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">InputStage</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">input_namespace</span><span class="p">,</span>
+                                             <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_input_dir</span><span class="p">,</span>
                                              <span class="n">mirror_paths</span><span class="o">=</span><span class="n">mirror_paths</span><span class="p">)</span> \
                         <span class="k">as</span> <span class="n">stage</span><span class="p">:</span>
-                    <span class="n">stage</span><span class="o">.</span><span class="n">set_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;target_dir&#39;</span><span class="p">]))</span>
+                    <span class="n">stage</span><span class="o">.</span><span class="n">set_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;target_dir&#39;</span><span class="p">],</span>
+                                                              <span class="n">extra_vars</span><span class="o">=</span><span class="n">input_vars</span><span class="p">))</span>
                     <span class="n">stage</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">:</span>
                         <span class="n">stage</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
