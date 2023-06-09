@@ -27,7 +27,7 @@ import ramble.workspace
 import ramble.workspace.shell
 import ramble.experiment_set
 import ramble.software_environments
-from ramble.namespace import namespace
+import ramble.util.colors as rucolor
 
 if sys.version_info >= (3, 3):
     from collections.abc import Sequence  # novm noqa: F401
@@ -358,39 +358,6 @@ def workspace_analyze(args):
         ws.upload_results()
 
 
-config_color = '@*Y'
-header_color = '@*b'
-level1_color = '@*g'
-level2_color = '@*r'
-level3_color = '@*c'
-level4_color = '@*m'
-plain_format = '@.'
-
-
-def config_title(s):
-    return config_color + s + plain_format
-
-
-def section_title(s):
-    return header_color + s + plain_format
-
-
-def nested_1(s):
-    return level1_color + s + plain_format
-
-
-def nested_2(s):
-    return level2_color + s + plain_format
-
-
-def nested_3(s):
-    return level3_color + s + plain_format
-
-
-def nested_4(s):
-    return level4_color + s + plain_format
-
-
 def workspace_info_setup_parser(subparser):
     """Information about a workspace"""
     subparser.add_argument('-v', '--verbose', action='count', default=0,
@@ -401,13 +368,13 @@ def workspace_info_setup_parser(subparser):
 def workspace_info(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace info')
 
-    color.cprint(section_title('Workspace: ') + ws.name)
+    color.cprint(rucolor.section_title('Workspace: ') + ws.name)
     color.cprint('')
-    color.cprint(section_title('Location: ') + ws.path)
+    color.cprint(rucolor.section_title('Location: ') + ws.path)
     color.cprint('')
 
     # Print workspace templates that currently exist
-    color.cprint(section_title('Workspace Templates:'))
+    color.cprint(rucolor.section_title('Workspace Templates:'))
     for template, _ in ws.all_templates():
         color.cprint('    %s' % template)
 
@@ -415,33 +382,14 @@ def workspace_info(args):
     workspace_vars = ws.get_workspace_vars()
 
     # Build experiment set
-    experiment_set = ramble.experiment_set.ExperimentSet(ws)
-    for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps, \
-            app_mods in ws.all_applications():
-        for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
-                workload_template, workload_chained_exps, workload_mods \
-                in ws.all_workloads(workloads):
-            for exp, _, exp_vars, exp_env_vars, exp_matrices, exp_internals, exp_template, \
-                    exp_chained_exps, exp_mods in ws.all_experiments(experiments):
-                experiment_set.set_application_context(app, app_vars, app_env_vars, app_internals,
-                                                       app_template, app_chained_exps, app_mods)
-                experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars, workload_internals,
-                                                    workload_template, workload_chained_exps,
-                                                    workload_mods)
-                experiment_set.set_experiment_context(exp,
-                                                      exp_vars,
-                                                      exp_env_vars,
-                                                      exp_matrices,
-                                                      exp_internals,
-                                                      exp_template,
-                                                      exp_chained_exps,
-                                                      exp_mods)
-    experiment_set.build_experiment_chains()
+    experiment_set = ws.build_experiment_set()
 
     # Print experiment information
+    # We built a "print_experiment_set" to access the scopes of variables for each
+    # experiment, rather than having merged scopes as we do in the base experiment_set.
+    # The base experiment_set is used to list *all* experiments.
     color.cprint('')
-    color.cprint(section_title('Experiments:'))
+    color.cprint(rucolor.section_title('Experiments:'))
     for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps, \
             app_mods in ws.all_applications():
         for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
@@ -469,153 +417,47 @@ def workspace_info(args):
 
                 print_experiment_set.build_experiment_chains()
 
-                color.cprint(nested_1('  Application: ') + app)
-                color.cprint(nested_2('    Workload: ') + workload)
+                color.cprint(rucolor.nested_1('  Application: ') + app)
+                color.cprint(rucolor.nested_2('    Workload: ') + workload)
+
+                # Define variable printing groups.
+                var_indent = '        '
+                var_group_names = [
+                    rucolor.config_title('Config'),
+                    rucolor.section_title('Workspace'),
+                    rucolor.nested_1('Application'),
+                    rucolor.nested_2('Workload'),
+                    rucolor.nested_3('Experiment'),
+                ]
+                header_base = rucolor.nested_4('Variables from')
+                config_vars = ramble.config.config.get('config:variables')
 
                 for exp_name, _ in print_experiment_set.all_experiments():
                     app_inst = experiment_set.get_experiment(exp_name)
                     if app_inst.is_template:
-                        color.cprint(nested_3('      Template Experiment: ') + exp_name)
+                        color.cprint(rucolor.nested_3('      Template Experiment: ') + exp_name)
                     else:
-                        color.cprint(nested_3('      Experiment: ') + exp_name)
+                        color.cprint(rucolor.nested_3('      Experiment: ') + exp_name)
 
                     if args.verbose >= 1:
-                        config_vars = ramble.config.config.get('config:variables')
-                        if config_vars:
-                            color.cprint(nested_4('        Variables from ') +
-                                         config_title('Config') + ':')
-                            for var, val in config_vars.items():
-                                expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(
-                                    f'          {var} = {val} ==> {expanded}'.replace('@',
-                                                                                      '@@'))
+                        var_groups = [config_vars, workspace_vars,
+                                      app_vars, workload_vars, exp_vars]
 
-                        if workspace_vars:
-                            color.cprint(nested_4('        Variables from ') +
-                                         section_title('Workspace') + ':')
-                            for var, val in workspace_vars.items():
-                                expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(
-                                    f'          {var} = {val} ==> {expanded}'.replace('@',
-                                                                                      '@@'))
+                        # Print each group that has variables in it
+                        for group, name in zip(var_groups, var_group_names):
+                            if group:
+                                header = f'{header_base} {name}'
+                                app_inst.print_vars(header=header,
+                                                    vars_to_print=group,
+                                                    indent=var_indent)
 
-                        if app_vars:
-                            color.cprint(nested_4('        Variables from ') +
-                                         nested_1('Application') + ':')
-                            for var, val in app_vars.items():
-                                expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(
-                                    f'          {var} = {val} ==> {expanded}'.replace('@',
-                                                                                      '@@'))
-
-                        if workload_vars:
-                            color.cprint(nested_4('        Variables from ') +
-                                         nested_2('Workload') + ':')
-                            for var, val in workload_vars.items():
-                                expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(
-                                    f'          {var} = {val} ==> {expanded}'.replace('@',
-                                                                                      '@@'))
-
-                        if exp_vars:
-                            color.cprint(nested_4('        Variables from ') +
-                                         nested_3('Experiment') + ':')
-                            for var, val in exp_vars.items():
-                                expanded = app_inst.expander.expand_var('{' + var + '}')
-                                color.cprint(
-                                    f'          {var} = {val} ==> {expanded}'.replace('@',
-                                                                                      '@@'))
-
-                        if app_inst.internals:
-                            if ramble.workspace.namespace.custom_executables in app_inst.internals:
-                                color.cprint(nested_4('        Custom Executables') + ':')
-                                for name in app_inst.internals[
-                                        ramble.workspace.namespace.custom_executables]:
-
-                                    color.cprint(f'          {name}')
-                            if ramble.workspace.namespace.executables in app_inst.internals:
-                                color.cprint(nested_4('        Executable Order') + ': ' +
-                                             str(app_inst.internals['executables']))
-
-                        if app_inst.chain_order:
-                            color.cprint(nested_4('        Experiment Chain') + ':')
-                            for exp in app_inst.chain_order:
-                                color.cprint(nested_4('         - ') + exp)
+                        app_inst.print_internals(indent=var_indent)
+                        app_inst.print_chain_order(indent=var_indent)
 
     # Print software stack information
     color.cprint('')
-    color.cprint(section_title('Software Stack:'))
-
     software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-    color.cprint(nested_1('  Packages:'))
-    for raw_pkg in software_environments.all_raw_packages():
-        color.cprint(nested_2(f'    {raw_pkg}:'))
-
-        pkg_info = software_environments.raw_package_info(raw_pkg)
-
-        if args.verbose >= 1:
-            if namespace.variables in pkg_info and pkg_info[namespace.variables]:
-                color.cprint(nested_3('      Variables:'))
-                for var, val in pkg_info[namespace.variables].items():
-                    color.cprint(f'        {var} = {val}')
-
-            if namespace.matrices in pkg_info and pkg_info[namespace.matrices]:
-                color.cprint(nested_3('      Matrices:'))
-                for matrix in pkg_info[namespace.matrices]:
-                    base_str = '        - '
-                    for var in matrix:
-                        color.cprint(f'{base_str}- {var}')
-                        base_str = '          '
-
-            if namespace.matrix in pkg_info and pkg_info[namespace.matrix]:
-                color.cprint(nested_3('      Matrix:'))
-                for var in pkg_info[namespace.matrix]:
-                    color.cprint(f'        - {var}')
-
-        color.cprint(nested_3('      Rendered Packages:'))
-        for pkg in software_environments.mapped_packages(raw_pkg):
-            color.cprint(nested_4(f'        {pkg}:'))
-            pkg_spec = software_environments.get_spec(pkg)
-            spec_str = pkg_spec[namespace.spack_spec].replace('@', '@@')
-            color.cprint(f'          Spack spec: {spec_str}')
-            if namespace.compiler_spec in pkg_spec and pkg_spec[namespace.compiler_spec]:
-                spec_str = pkg_spec[namespace.compiler_spec].replace('@', '@@')
-                color.cprint(f'          Compiler spec: {spec_str}')
-            if namespace.compiler in pkg_spec and pkg_spec[namespace.compiler]:
-                color.cprint(f'          Compiler: {pkg_spec[namespace.compiler]}')
-
-    color.cprint(nested_1('  Environments:'))
-    for raw_env in software_environments.all_raw_environments():
-        color.cprint(nested_2(f'    {raw_env}:'))
-
-        env_info = software_environments.raw_environment_info(raw_env)
-
-        if args.verbose >= 1:
-            if namespace.variables in env_info and env_info[namespace.variables]:
-                color.cprint(nested_3('      Variables:'))
-                for var, val in env_info[namespace.variables].items():
-                    color.cprint(f'        {var} = {val}')
-
-            if namespace.matrices in env_info and env_info[namespace.matrices]:
-                color.cprint(nested_3('      Matrices:'))
-                for matrix in env_info[namespace.matrices]:
-                    base_str = '        - '
-                    for var in matrix:
-                        color.cprint(f'{base_str}- {var}')
-                        base_str = '          '
-
-            if namespace.matrix in env_info and env_info[namespace.matrix]:
-                color.cprint(nested_3('      Matrix:'))
-                for var in env_info[namespace.matrix]:
-                    color.cprint(f'        - {var}')
-
-        color.cprint(nested_3('      Rendered Environments:'))
-        for env in software_environments.mapped_environments(raw_env):
-            color.cprint(nested_4(f'        {env} Packages:'))
-            for pkg in software_environments.get_env_packages(env):
-                color.cprint(f'          - {pkg}')
-
+    software_environments.print_environments(verbosity=args.verbose)
 
 #
 # workspace list

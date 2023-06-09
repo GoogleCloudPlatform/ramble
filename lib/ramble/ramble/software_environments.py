@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import llnl.util.tty as tty
+import llnl.util.tty.color as color
 
 import ramble.repository
 import ramble.workspace
@@ -15,6 +16,8 @@ import ramble.error
 import ramble.renderer
 import ramble.expander
 from ramble.namespace import namespace
+
+import ramble.util.colors as rucolor
 
 
 class SoftwareEnvironments(object):
@@ -161,6 +164,76 @@ class SoftwareEnvironments(object):
                             expanded_pkg = expander.expand_var(pkg_name,
                                                                extra_vars=rendered_vars)
                             env_packages.append(expanded_pkg)
+
+    def print_environments(self, verbosity=0):
+        color.cprint(rucolor.section_title('Software Stack:'))
+        color.cprint(rucolor.nested_1('  Packages:'))
+        for raw_pkg in self.all_raw_packages():
+            color.cprint(rucolor.nested_2(f'    {raw_pkg}:'))
+
+            pkg_info = self.raw_package_info(raw_pkg)
+
+            if verbosity >= 1:
+                if namespace.variables in pkg_info and pkg_info[namespace.variables]:
+                    color.cprint(rucolor.nested_3('      Variables:'))
+                    for var, val in pkg_info[namespace.variables].items():
+                        color.cprint(f'        {var} = {val}')
+
+                if namespace.matrices in pkg_info and pkg_info[namespace.matrices]:
+                    color.cprint(rucolor.nested_3('      Matrices:'))
+                    for matrix in pkg_info[namespace.matrices]:
+                        base_str = '        - '
+                        for var in matrix:
+                            color.cprint(f'{base_str}- {var}')
+                            base_str = '          '
+
+                if namespace.matrix in pkg_info and pkg_info[namespace.matrix]:
+                    color.cprint(rucolor.nested_3('      Matrix:'))
+                    for var in pkg_info[namespace.matrix]:
+                        color.cprint(f'        - {var}')
+
+            color.cprint(rucolor.nested_3('      Rendered Packages:'))
+            for pkg in self.mapped_packages(raw_pkg):
+                color.cprint(rucolor.nested_4(f'        {pkg}:'))
+                pkg_spec = self.get_spec(pkg)
+                spec_str = pkg_spec[namespace.spack_spec].replace('@', '@@')
+                color.cprint(f'          Spack spec: {spec_str}')
+                if namespace.compiler_spec in pkg_spec and pkg_spec[namespace.compiler_spec]:
+                    spec_str = pkg_spec[namespace.compiler_spec].replace('@', '@@')
+                    color.cprint(f'          Compiler spec: {spec_str}')
+                if namespace.compiler in pkg_spec and pkg_spec[namespace.compiler]:
+                    color.cprint(f'          Compiler: {pkg_spec[namespace.compiler]}')
+
+        color.cprint(rucolor.nested_1('  Environments:'))
+        for raw_env in self.all_raw_environments():
+            color.cprint(rucolor.nested_2(f'    {raw_env}:'))
+
+            env_info = self.raw_environment_info(raw_env)
+
+            if verbosity >= 1:
+                if namespace.variables in env_info and env_info[namespace.variables]:
+                    color.cprint(rucolor.nested_3('      Variables:'))
+                    for var, val in env_info[namespace.variables].items():
+                        color.cprint(f'        {var} = {val}')
+
+                if namespace.matrices in env_info and env_info[namespace.matrices]:
+                    color.cprint(rucolor.nested_3('      Matrices:'))
+                    for matrix in env_info[namespace.matrices]:
+                        base_str = '        - '
+                        for var in matrix:
+                            color.cprint(f'{base_str}- {var}')
+                            base_str = '          '
+
+                if namespace.matrix in env_info and env_info[namespace.matrix]:
+                    color.cprint(rucolor.nested_3('      Matrix:'))
+                    for var in env_info[namespace.matrix]:
+                        color.cprint(f'        - {var}')
+
+            color.cprint(rucolor.nested_3('      Rendered Environments:'))
+            for env in self.mapped_environments(raw_env):
+                color.cprint(rucolor.nested_4(f'        {env} Packages:'))
+                for pkg in self.get_env_packages(env):
+                    color.cprint(f'          - {pkg}')
 
     def get_env(self, environment_name):
         """Return a reference to the environment definition"""
