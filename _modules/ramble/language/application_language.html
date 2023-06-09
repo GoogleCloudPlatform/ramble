@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -186,13 +187,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_executable</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="p">{</span>
-                <span class="s1">&#39;template&#39;</span><span class="p">:</span> <span class="n">template</span><span class="p">,</span>
-                <span class="s1">&#39;mpi&#39;</span><span class="p">:</span> <span class="n">use_mpi</span><span class="p">,</span>
-                <span class="s1">&#39;redirect&#39;</span><span class="p">:</span> <span class="n">redirect</span><span class="p">,</span>
-                <span class="s1">&#39;output_capture&#39;</span><span class="p">:</span> <span class="n">output_capture</span>
-            <span class="p">}</span>  <span class="c1"># noqa: E123</span>
+        <span class="kn">from</span> <span class="nn">ramble.util.executable</span> <span class="kn">import</span> <span class="n">CommandExecutable</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">CommandExecutable</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="n">use_mpi</span><span class="p">,</span> <span class="n">redirect</span><span class="o">=</span><span class="n">redirect</span><span class="p">,</span>
+            <span class="n">output_capture</span><span class="o">=</span><span class="n">output_capture</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_execute_executable</span></div>
 

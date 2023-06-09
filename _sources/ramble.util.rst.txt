@@ -25,6 +25,14 @@ ramble.util.editor module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.executable module
+-----------------------------
+
+.. automodule:: ramble.util.executable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.file\_cache module
 ------------------------------
 

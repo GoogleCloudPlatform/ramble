@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -522,49 +523,56 @@
 
     <span class="c1"># Build experiment set</span>
     <span class="n">experiment_set</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">ExperimentSet</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span> \
-            <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">,</span> \
+            <span class="n">app_mods</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workload</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span> <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_internals</span><span class="p">,</span> \
-                <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
+                <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span> <span class="n">workload_mods</span> \
+                <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">exp_vars</span><span class="p">,</span> <span class="n">exp_env_vars</span><span class="p">,</span> <span class="n">exp_matrices</span><span class="p">,</span> <span class="n">exp_internals</span><span class="p">,</span> <span class="n">exp_template</span><span class="p">,</span> \
-                    <span class="n">exp_chained_exps</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
+                    <span class="n">exp_chained_exps</span><span class="p">,</span> <span class="n">exp_mods</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
                 <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_application_context</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span>
-                                                       <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">)</span>
+                                                       <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">,</span> <span class="n">app_mods</span><span class="p">)</span>
                 <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_workload_context</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span>
                                                     <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_internals</span><span class="p">,</span>
-                                                    <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">)</span>
+                                                    <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span>
+                                                    <span class="n">workload_mods</span><span class="p">)</span>
                 <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_experiment_context</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span>
                                                       <span class="n">exp_vars</span><span class="p">,</span>
                                                       <span class="n">exp_env_vars</span><span class="p">,</span>
                                                       <span class="n">exp_matrices</span><span class="p">,</span>
                                                       <span class="n">exp_internals</span><span class="p">,</span>
                                                       <span class="n">exp_template</span><span class="p">,</span>
-                                                      <span class="n">exp_chained_exps</span><span class="p">)</span>
+                                                      <span class="n">exp_chained_exps</span><span class="p">,</span>
+                                                      <span class="n">exp_mods</span><span class="p">)</span>
     <span class="n">experiment_set</span><span class="o">.</span><span class="n">build_experiment_chains</span><span class="p">()</span>
 
     <span class="c1"># Print experiment information</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Experiments:&#39;</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span> \
-            <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">,</span> \
+            <span class="n">app_mods</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workload</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span> <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_internals</span><span class="p">,</span> \
-                <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
+                <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span> <span class="n">workload_mods</span> \
+                <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">exp_vars</span><span class="p">,</span> <span class="n">exp_env_vars</span><span class="p">,</span> <span class="n">exp_matrices</span><span class="p">,</span> <span class="n">exp_internals</span><span class="p">,</span> <span class="n">exp_template</span><span class="p">,</span> \
-                    <span class="n">exp_chained_exps</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
+                    <span class="n">exp_chained_exps</span><span class="p">,</span> <span class="n">exp_mods</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
                 <span class="n">print_experiment_set</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">ExperimentSet</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
                 <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">set_application_context</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span>
                                                              <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span>
-                                                             <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">)</span>
+                                                             <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">,</span>
+                                                             <span class="n">app_mods</span><span class="p">)</span>
                 <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">set_workload_context</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span>
                                                           <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_internals</span><span class="p">,</span>
-                                                          <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">)</span>
+                                                          <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span>
+                                                          <span class="n">workload_mods</span><span class="p">)</span>
                 <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">set_experiment_context</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span>
                                                             <span class="n">exp_vars</span><span class="p">,</span>
                                                             <span class="n">exp_env_vars</span><span class="p">,</span>
                                                             <span class="n">exp_matrices</span><span class="p">,</span>
                                                             <span class="n">exp_internals</span><span class="p">,</span>
                                                             <span class="n">exp_template</span><span class="p">,</span>
-                                                            <span class="n">exp_chained_exps</span><span class="p">)</span>
+                                                            <span class="n">exp_chained_exps</span><span class="p">,</span>
+                                                            <span class="n">exp_mods</span><span class="p">)</span>
 
                 <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">build_experiment_chains</span><span class="p">()</span>
 

@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -161,11 +162,13 @@
 <span class="kn">import</span> <span class="nn">ramble.schema.config</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.env_vars</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.repos</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.modifier_repos</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.workspace</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.applications</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.internals</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.licenses</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.mirrors</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.modifiers</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.spack</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.success_criteria</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.variables</span>
@@ -184,6 +187,8 @@
     <span class="s1">&#39;internals&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;licenses&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">licenses</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;mirrors&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s1">&#39;modifier_repos&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifier_repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s1">&#39;modifiers&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifiers</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;spack&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;success_criteria&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s1">&#39;applications&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>

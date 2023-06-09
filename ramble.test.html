@@ -56,6 +56,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html">ramble.cmd package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ramble.test namespace</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
@@ -71,6 +72,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble-test-experiment-set-module">ramble.test.experiment_set module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-test-gcs-fetch-module">ramble.test.gcs_fetch module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-test-mirror-tests-module">ramble.test.mirror_tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-test-modifier-application-module">ramble.test.modifier_application module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-test-modifier-language-module">ramble.test.modifier_language module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-test-namespace-trie-module">ramble.test.namespace_trie module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-test-repository-module">ramble.test.repository module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-test-software-environment-module">ramble.test.software_environment module</a></li>
@@ -97,6 +100,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
@@ -125,6 +130,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -182,6 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-info-module">ramble.test.cmd.info module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-list-module">ramble.test.cmd.list module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-mirror-module">ramble.test.cmd.mirror module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-mods-module">ramble.test.cmd.mods module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-on-module">ramble.test.cmd.on module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#ramble-test-cmd-repo-module">ramble.test.cmd.repo module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.cmd.html#module-ramble.test.cmd.software_definitions">ramble.test.cmd.software_definitions module</a><ul>
@@ -210,6 +217,43 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-wrfv4-dry-run-module">ramble.test.end_to_end.wrfv4_dry_run module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="ramble.test.modifier_functionality.html">ramble.test.modifier_functionality namespace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-env-var-modifiers-module">ramble.test.modifier_functionality.mock_env_var_modifiers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-modifier-dry-run-module">ramble.test.modifier_functionality.mock_modifier_dry_run module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-spack-modifier-module">ramble.test.modifier_functionality.mock_spack_modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#module-ramble.test.modifier_functionality.modifier_helpers">ramble.test.modifier_functionality.modifier_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES"><code class="docutils literal notranslate"><span class="pre">SCOPES</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.application"><code class="docutils literal notranslate"><span class="pre">SCOPES.application</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.experiment"><code class="docutils literal notranslate"><span class="pre">SCOPES.experiment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.workload"><code class="docutils literal notranslate"><span class="pre">SCOPES.workload</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.workspace"><code class="docutils literal notranslate"><span class="pre">SCOPES.workspace</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.check_execute_script"><code class="docutils literal notranslate"><span class="pre">check_execute_script()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.check_software_env"><code class="docutils literal notranslate"><span class="pre">check_software_env()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.dry_run_config"><code class="docutils literal notranslate"><span class="pre">dry_run_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier"><code class="docutils literal notranslate"><span class="pre">env_var_append_paths_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier_answer"><code class="docutils literal notranslate"><span class="pre">env_var_append_paths_modifier_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier"><code class="docutils literal notranslate"><span class="pre">env_var_append_vars_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier_answer"><code class="docutils literal notranslate"><span class="pre">env_var_append_vars_modifier_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier"><code class="docutils literal notranslate"><span class="pre">env_var_prepend_paths_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier_answer"><code class="docutils literal notranslate"><span class="pre">env_var_prepend_paths_modifier_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier"><code class="docutils literal notranslate"><span class="pre">env_var_set_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier_answer"><code class="docutils literal notranslate"><span class="pre">env_var_set_modifier_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier"><code class="docutils literal notranslate"><span class="pre">env_var_unset_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier_answer"><code class="docutils literal notranslate"><span class="pre">env_var_unset_modifier_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_answer"><code class="docutils literal notranslate"><span class="pre">intel_aps_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_modifier"><code class="docutils literal notranslate"><span class="pre">intel_aps_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_answer"><code class="docutils literal notranslate"><span class="pre">lscpu_answer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_modifier"><code class="docutils literal notranslate"><span class="pre">lscpu_modifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.named_modifier"><code class="docutils literal notranslate"><span class="pre">named_modifier()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-multi-modifier-dry-run-module">ramble.test.modifier_functionality.multi_modifier_dry_run module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-single-modifier-dry-run-module">ramble.test.modifier_functionality.single_modifier_dry_run module</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -220,7 +264,7 @@
 <span id="ramble-test-application-inheritance-module"></span><h2>ramble.test.application_inheritance module<a class="headerlink" href="#module-ramble.test.application_inheritance" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.test.application_inheritance.test_basic_inheritance">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.application_inheritance.</span></span><span class="sig-name descname"><span class="pre">test_basic_inheritance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutable_mock_repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/application_inheritance.html#test_basic_inheritance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.application_inheritance.test_basic_inheritance" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.test.application_inheritance.</span></span><span class="sig-name descname"><span class="pre">test_basic_inheritance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutable_mock_apps_repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/application_inheritance.html#test_basic_inheritance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.application_inheritance.test_basic_inheritance" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -268,6 +312,12 @@
 </section>
 <section id="ramble-test-mirror-tests-module">
 <h2>ramble.test.mirror_tests module<a class="headerlink" href="#ramble-test-mirror-tests-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="ramble-test-modifier-application-module">
+<h2>ramble.test.modifier_application module<a class="headerlink" href="#ramble-test-modifier-application-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="ramble-test-modifier-language-module">
+<h2>ramble.test.modifier_language module<a class="headerlink" href="#ramble-test-modifier-language-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="ramble-test-namespace-trie-module">
 <h2>ramble.test.namespace_trie module<a class="headerlink" href="#ramble-test-namespace-trie-module" title="Permalink to this heading"></a></h2>

@@ -58,6 +58,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#experiment-modifiers">Experiment Modifiers:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#custom-executables">Custom Executables:</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#controlling-executable-order">Controlling Executable Order:</a></li>
@@ -104,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -423,6 +425,54 @@ something ramble automatically generates in a different experiment.</p>
 <p>In the above example, <code class="docutils literal notranslate"><span class="pre">test_value</span></code> extracts the value of <code class="docutils literal notranslate"><span class="pre">real_value</span></code> as
 defined in the experiment <code class="docutils literal notranslate"><span class="pre">hostname.serial.test_exp1</span></code>. When evaluated, this
 will set <code class="docutils literal notranslate"><span class="pre">test_value</span></code> to <code class="docutils literal notranslate"><span class="pre">'exp1_value'</span></code>.</p>
+</section>
+<section id="experiment-modifiers">
+<h3>Experiment Modifiers:<a class="headerlink" href="#experiment-modifiers" title="Permalink to this heading"></a></h3>
+<p>In addition to containing application definitions, Ramble also provides
+experiment modifiers. Experiment modifiers encapsulate several aspects of a
+standard modification to an experiment, such as prepending a binary with a tool
+or profiler, and can be applied to experiments to modify their behavior.</p>
+<p>Available experiment modifiers can be seen using <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">mods</span> <span class="pre">list</span></code>, and more
+information about a particular modifier can be see with
+<code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">mods</span> <span class="pre">info</span> <span class="pre">&lt;mod_name&gt;</span></code>.</p>
+<p>Modifiers can be applied to experiments using the following YAML syntax:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp1</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">modifiers</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-aps</span>
+<span class="w">                </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi</span>
+<span class="w">                </span><span class="nt">on_executable</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;*&#39;</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>Modifiers can be defined at any level variables can be defined at (and are even
+their own config section).</p>
+<p>When defining a modifier, the <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute is the name of the modifier
+that will be applied. The <code class="docutils literal notranslate"><span class="pre">mode</span></code> attribute is a modifier specific setting
+allowing the user to select the modifier behavior. Modes can be seen by looking
+at the modifier information, and represent modes of use for the modifier. Modes
+group several general aspects of a modifier into one usage mode, and can allow
+a general modifier to present many operational entry points. The
+<code class="docutils literal notranslate"><span class="pre">on_executable</span></code> attribute is a list of experiment executables that the
+modifier should be applied to. These executable names are matched using
+python’s <code class="docutils literal notranslate"><span class="pre">fnmatch.fnmatch</span></code> functionality.</p>
+<p>If it is not set, modifiers will attempt to determine their own <code class="docutils literal notranslate"><span class="pre">mode</span></code>
+attribute. This will succeed if the modifier has a single mode of operation. If
+there are multiple modes, this will raise an exception.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">on_executable</span></code> attribute is not set, it will default to <code class="docutils literal notranslate"><span class="pre">'*'</span></code> which
+will match all executables. Modifier classes can (and should) be implemented to
+only act on the correct executable types (i.e. executables with <code class="docutils literal notranslate"><span class="pre">use_mpi=true</span></code>).</p>
 </section>
 <section id="controlling-internals">
 <h3>Controlling Internals:<a class="headerlink" href="#controlling-internals" title="Permalink to this heading"></a></h3>

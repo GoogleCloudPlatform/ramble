@@ -89,6 +89,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#ramble-mirror-list">ramble mirror list</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#ramble-mods">ramble mods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ramble-mods-list">ramble mods list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ramble-mods-info">ramble mods info</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#ramble-repo">ramble repo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-repo-create">ramble repo create</a></li>
@@ -164,7 +169,8 @@
 <tr class="row-odd"><td><p>Query applications</p></td>
 <td><div class="line-block">
 <div class="line"><a class="reference internal" href="#ramble-info"><span class="std std-ref">info</span></a>,
-<a class="reference internal" href="#ramble-list"><span class="std std-ref">list</span></a></div>
+<a class="reference internal" href="#ramble-list"><span class="std std-ref">list</span></a>,
+<a class="reference internal" href="#ramble-mods"><span class="std std-ref">mods</span></a></div>
 </div>
 </td>
 </tr>
@@ -278,17 +284,18 @@
 <li><p><a class="reference internal" href="#ramble-commands"><span class="std std-ref">commands</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-config"><span class="std std-ref">config</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-debug"><span class="std std-ref">debug</span></a></p></li>
+<li><p><a class="reference internal" href="#ramble-edit"><span class="std std-ref">edit</span></a></p></li>
 </ul>
 </td><td><ul class="simple">
-<li><p><a class="reference internal" href="#ramble-edit"><span class="std std-ref">edit</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-flake8"><span class="std std-ref">flake8</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-help"><span class="std std-ref">help</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-info"><span class="std std-ref">info</span></a></p></li>
+<li><p><a class="reference internal" href="#ramble-license"><span class="std std-ref">license</span></a></p></li>
 </ul>
 </td><td><ul class="simple">
-<li><p><a class="reference internal" href="#ramble-license"><span class="std std-ref">license</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-list"><span class="std std-ref">list</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-mirror"><span class="std std-ref">mirror</span></a></p></li>
+<li><p><a class="reference internal" href="#ramble-mods"><span class="std std-ref">mods</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-on"><span class="std std-ref">on</span></a></p></li>
 </ul>
 </td><td><ul class="simple">
@@ -389,7 +396,7 @@
 </div>
 <p><strong>Positional arguments</strong></p>
 <dl class="simple">
-<dt>section</dt><dd><p>configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, spack, success_criteria, applications, variables</p>
+<dt>section</dt><dd><p>configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, modifier_repos, modifiers, spack, success_criteria, applications, variables</p>
 </dd>
 </dl>
 <p><strong>Optional arguments</strong></p>
@@ -406,7 +413,7 @@
 </div>
 <p><strong>Positional arguments</strong></p>
 <dl class="simple">
-<dt>section</dt><dd><p>configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, spack, success_criteria, applications, variables</p>
+<dt>section</dt><dd><p>configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, modifier_repos, modifiers, spack, success_criteria, applications, variables</p>
 </dd>
 </dl>
 <p><strong>Optional arguments</strong></p>
@@ -423,7 +430,7 @@
 </div>
 <p><strong>Positional arguments</strong></p>
 <dl class="simple">
-<dt>section</dt><dd><p>configuration section to edit. options: config, env_vars, repos, internals, licenses, mirrors, spack, success_criteria, applications, variables</p>
+<dt>section</dt><dd><p>configuration section to edit. options: config, env_vars, repos, internals, licenses, mirrors, modifier_repos, modifiers, spack, success_criteria, applications, variables</p>
 </dd>
 </dl>
 <p><strong>Optional arguments</strong></p>
@@ -860,8 +867,75 @@
 <hr class="docutils" />
 </section>
 </section>
+<section id="ramble-mods">
+<span id="id29"></span><h1>ramble mods<a class="headerlink" href="#ramble-mods" title="Permalink to this heading"></a></h1>
+<p>list and get information on available modifiers</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble mods [-h] SUBCOMMAND ...</span>
+</pre></div>
+</div>
+<p><strong>Optional arguments</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
+</dd>
+</dl>
+<p><strong>Subcommands</strong></p>
+<table class="hlist"><tr><td><ul class="simple">
+<li><p><a class="reference internal" href="#ramble-mods-list"><span class="std std-ref">mods list</span></a></p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p><a class="reference internal" href="#ramble-mods-info"><span class="std std-ref">mods info</span></a></p></li>
+</ul>
+</td><td><ul class="simple">
+</ul>
+</td><td><ul class="simple">
+</ul>
+</td></tr></table>
+<hr class="docutils" />
+<section id="ramble-mods-list">
+<span id="id30"></span><h2>ramble mods list<a class="headerlink" href="#ramble-mods-list" title="Permalink to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble mods list [-hd] [--format {name_only,version_json,html}] [--update FILE] [-t TAGS] ...</span>
+</pre></div>
+</div>
+<p><strong>Positional arguments</strong></p>
+<dl class="simple">
+<dt>filter</dt><dd><p>optional case-insensitive glob patterns to filter results</p>
+</dd>
+</dl>
+<p><strong>Optional arguments</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-d,</span> <span class="pre">--search-description</span></code></dt><dd><p>filtering will also search the description for a match</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">{name_only,version_json,html}</span></code></dt><dd><p>format to be used to print the output [default: name_only]</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--update</span> <span class="pre">FILE</span></code></dt><dd><p>write output to the specified file, if any modifier is newer</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TAGS,</span> <span class="pre">--tags</span> <span class="pre">TAGS</span></code></dt><dd><p>filter a package query by tags</p>
+</dd>
+</dl>
+<hr class="docutils" />
+</section>
+<section id="ramble-mods-info">
+<span id="id31"></span><h2>ramble mods info<a class="headerlink" href="#ramble-mods-info" title="Permalink to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble mods info [-h] modifier</span>
+</pre></div>
+</div>
+<p><strong>Positional arguments</strong></p>
+<dl class="simple">
+<dt>modifier</dt><dd><p>modifier name</p>
+</dd>
+</dl>
+<p><strong>Optional arguments</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
+</dd>
+</dl>
+<hr class="docutils" />
+</section>
+</section>
 <section id="ramble-on">
-<span id="id29"></span><h1>ramble on<a class="headerlink" href="#ramble-on" title="Permalink to this heading"></a></h1>
+<span id="id32"></span><h1>ramble on<a class="headerlink" href="#ramble-on" title="Permalink to this heading"></a></h1>
 <p>And now’s the time, the time is now</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble on [-h] [-w workspace]</span>
 </pre></div>
@@ -876,8 +950,8 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-repo">
-<span id="id30"></span><h1>ramble repo<a class="headerlink" href="#ramble-repo" title="Permalink to this heading"></a></h1>
-<p>manage application repositories</p>
+<span id="id33"></span><h1>ramble repo<a class="headerlink" href="#ramble-repo" title="Permalink to this heading"></a></h1>
+<p>manage Ramble repositories</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo [-h] SUBCOMMAND ...</span>
 </pre></div>
 </div>
@@ -902,29 +976,31 @@
 </td></tr></table>
 <hr class="docutils" />
 <section id="ramble-repo-create">
-<span id="id31"></span><h2>ramble repo create<a class="headerlink" href="#ramble-repo-create" title="Permalink to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo create [-h] [-d SUBDIRECTORY] directory [namespace]</span>
+<span id="id34"></span><h2>ramble repo create<a class="headerlink" href="#ramble-repo-create" title="Permalink to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo create [-h] [-d SUBDIRECTORY] [-t TYPE] directory [namespace]</span>
 </pre></div>
 </div>
 <p><strong>Positional arguments</strong></p>
 <dl class="simple">
 <dt>directory</dt><dd><p>directory to create the repo in</p>
 </dd>
-<dt>namespace</dt><dd><p>namespace to identify applications in the repository. defaults to the directory name</p>
+<dt>namespace</dt><dd><p>namespace to identify objects in the repository. defaults to the directory name</p>
 </dd>
 </dl>
 <p><strong>Optional arguments</strong></p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">-d</span> <span class="pre">SUBDIRECTORY,</span> <span class="pre">--subdirectory</span> <span class="pre">SUBDIRECTORY</span></code></dt><dd><p>subdirectory to store applications in the repository. Default ‘applications’. Use an empty string for no subdirectory.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">-d</span> <span class="pre">SUBDIRECTORY,</span> <span class="pre">--subdirectory</span> <span class="pre">SUBDIRECTORY</span></code></dt><dd><p>subdirectory to store objects in the repository. Default is determined by the type of repository. Use an empty string for no subdirectory.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TYPE,</span> <span class="pre">--type</span> <span class="pre">TYPE</span></code></dt><dd><p>type of repositories to manage. Defaults to ‘applications’. Allowed types are [‘applications’, ‘modifiers’]</p>
 </dd>
 </dl>
 <hr class="docutils" />
 </section>
 <section id="ramble-repo-list">
-<span id="id32"></span><h2>ramble repo list<a class="headerlink" href="#ramble-repo-list" title="Permalink to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo list [-h] [--scope {defaults,system,site,user}]</span>
+<span id="id35"></span><h2>ramble repo list<a class="headerlink" href="#ramble-repo-list" title="Permalink to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo list [-h] [--scope {defaults,system,site,user}] [-t TYPE]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -933,17 +1009,19 @@
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--scope</span> <span class="pre">{defaults,system,site,user}</span></code></dt><dd><p>configuration scope to read from</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TYPE,</span> <span class="pre">--type</span> <span class="pre">TYPE</span></code></dt><dd><p>type of repositories to manage. Defaults to ‘applications’. Allowed types are [‘applications’, ‘modifiers’]</p>
+</dd>
 </dl>
 <hr class="docutils" />
 </section>
 <section id="ramble-repo-add">
-<span id="id33"></span><h2>ramble repo add<a class="headerlink" href="#ramble-repo-add" title="Permalink to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo add [-h] [--scope {defaults,system,site,user}] path</span>
+<span id="id36"></span><h2>ramble repo add<a class="headerlink" href="#ramble-repo-add" title="Permalink to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo add [-h] [--scope {defaults,system,site,user}] [-t TYPE] path</span>
 </pre></div>
 </div>
 <p><strong>Positional arguments</strong></p>
 <dl class="simple">
-<dt>path</dt><dd><p>path to a Ramble application repository directory</p>
+<dt>path</dt><dd><p>path to a Ramble repository directory</p>
 </dd>
 </dl>
 <p><strong>Optional arguments</strong></p>
@@ -951,18 +1029,20 @@
 <dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--scope</span> <span class="pre">{defaults,system,site,user}</span></code></dt><dd><p>configuration scope to modify</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TYPE,</span> <span class="pre">--type</span> <span class="pre">TYPE</span></code></dt><dd><p>type of repositories to manage. Defaults to ‘applications’. Allowed types are [‘applications’, ‘modifiers’]</p>
 </dd>
 </dl>
 <hr class="docutils" />
 </section>
 <section id="ramble-repo-remove">
-<span id="id34"></span><h2>ramble repo remove<a class="headerlink" href="#ramble-repo-remove" title="Permalink to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo remove [-h] [--scope {defaults,system,site,user}] namespace_or_path</span>
+<span id="id37"></span><h2>ramble repo remove<a class="headerlink" href="#ramble-repo-remove" title="Permalink to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble repo remove [-h] [--scope {defaults,system,site,user}] [-t TYPE] namespace_or_path</span>
 </pre></div>
 </div>
 <p><strong>Positional arguments</strong></p>
 <dl class="simple">
-<dt>namespace_or_path</dt><dd><p>namespace or path of a Ramble application repository</p>
+<dt>namespace_or_path</dt><dd><p>namespace or path of a Ramble repository</p>
 </dd>
 </dl>
 <p><strong>Optional arguments</strong></p>
@@ -970,13 +1050,15 @@
 <dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--scope</span> <span class="pre">{defaults,system,site,user}</span></code></dt><dd><p>configuration scope to modify</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">TYPE,</span> <span class="pre">--type</span> <span class="pre">TYPE</span></code></dt><dd><p>type of repositories to manage. Defaults to ‘applications’. Allowed types are [‘applications’, ‘modifiers’]</p>
 </dd>
 </dl>
 <hr class="docutils" />
 </section>
 </section>
 <section id="ramble-software-definitions">
-<span id="id35"></span><h1>ramble software-definitions<a class="headerlink" href="#ramble-software-definitions" title="Permalink to this heading"></a></h1>
+<span id="id38"></span><h1>ramble software-definitions<a class="headerlink" href="#ramble-software-definitions" title="Permalink to this heading"></a></h1>
 <p>inspect software definitions in object definitions</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble software-definitions [-hsce]</span>
 </pre></div>
@@ -995,7 +1077,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-unit-test">
-<span id="id36"></span><h1>ramble unit-test<a class="headerlink" href="#ramble-unit-test" title="Permalink to this heading"></a></h1>
+<span id="id39"></span><h1>ramble unit-test<a class="headerlink" href="#ramble-unit-test" title="Permalink to this heading"></a></h1>
 <p>run ramble’s unit tests (wrapper around pytest)</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble unit-test [-hHs] [-l | -L | -N] [--extension EXTENSION] [-k EXPRESSION] [--showlocals] ...</span>
 </pre></div>
@@ -1029,7 +1111,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace">
-<span id="id37"></span><h1>ramble workspace<a class="headerlink" href="#ramble-workspace" title="Permalink to this heading"></a></h1>
+<span id="id40"></span><h1>ramble workspace<a class="headerlink" href="#ramble-workspace" title="Permalink to this heading"></a></h1>
 <p>manage experiment workspaces</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace [-h] SUBCOMMAND ...</span>
 </pre></div>
@@ -1063,7 +1145,7 @@
 </td></tr></table>
 <hr class="docutils" />
 <section id="ramble-workspace-activate">
-<span id="id38"></span><h2>ramble workspace activate<a class="headerlink" href="#ramble-workspace-activate" title="Permalink to this heading"></a></h2>
+<span id="id41"></span><h2>ramble workspace activate<a class="headerlink" href="#ramble-workspace-activate" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace activate [-hp] [--sh | --csh | --fish | --bat] [--temp | -d DIR | workspace]</span>
 </pre></div>
 </div>
@@ -1094,7 +1176,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-archive">
-<span id="id39"></span><h2>ramble workspace archive<a class="headerlink" href="#ramble-workspace-archive" title="Permalink to this heading"></a></h2>
+<span id="id42"></span><h2>ramble workspace archive<a class="headerlink" href="#ramble-workspace-archive" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL]</span>
 </pre></div>
 </div>
@@ -1110,7 +1192,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-deactivate">
-<span id="id40"></span><h2>ramble workspace deactivate<a class="headerlink" href="#ramble-workspace-deactivate" title="Permalink to this heading"></a></h2>
+<span id="id43"></span><h2>ramble workspace deactivate<a class="headerlink" href="#ramble-workspace-deactivate" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace deactivate [-h] [--sh | --csh | --fish | --bat]</span>
 </pre></div>
 </div>
@@ -1130,7 +1212,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-create">
-<span id="id41"></span><h2>ramble workspace create<a class="headerlink" href="#ramble-workspace-create" title="Permalink to this heading"></a></h2>
+<span id="id44"></span><h2>ramble workspace create<a class="headerlink" href="#ramble-workspace-create" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace create [-hd] [-c CONFIG] [-t TEMPLATE_EXECUTE] wrkspc</span>
 </pre></div>
 </div>
@@ -1153,7 +1235,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-concretize">
-<span id="id42"></span><h2>ramble workspace concretize<a class="headerlink" href="#ramble-workspace-concretize" title="Permalink to this heading"></a></h2>
+<span id="id45"></span><h2>ramble workspace concretize<a class="headerlink" href="#ramble-workspace-concretize" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace concretize [-h]</span>
 </pre></div>
 </div>
@@ -1165,7 +1247,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-setup">
-<span id="id43"></span><h2>ramble workspace setup<a class="headerlink" href="#ramble-workspace-setup" title="Permalink to this heading"></a></h2>
+<span id="id46"></span><h2>ramble workspace setup<a class="headerlink" href="#ramble-workspace-setup" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace setup [-h] [--dry-run]</span>
 </pre></div>
 </div>
@@ -1179,7 +1261,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-analyze">
-<span id="id44"></span><h2>ramble workspace analyze<a class="headerlink" href="#ramble-workspace-analyze" title="Permalink to this heading"></a></h2>
+<span id="id47"></span><h2>ramble workspace analyze<a class="headerlink" href="#ramble-workspace-analyze" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]]</span>
 </pre></div>
 </div>
@@ -1195,7 +1277,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-info">
-<span id="id45"></span><h2>ramble workspace info<a class="headerlink" href="#ramble-workspace-info" title="Permalink to this heading"></a></h2>
+<span id="id48"></span><h2>ramble workspace info<a class="headerlink" href="#ramble-workspace-info" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace info [-hv]</span>
 </pre></div>
 </div>
@@ -1209,7 +1291,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-edit">
-<span id="id46"></span><h2>ramble workspace edit<a class="headerlink" href="#ramble-workspace-edit" title="Permalink to this heading"></a></h2>
+<span id="id49"></span><h2>ramble workspace edit<a class="headerlink" href="#ramble-workspace-edit" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace edit [-hctp]</span>
 </pre></div>
 </div>
@@ -1227,7 +1309,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-mirror">
-<span id="id47"></span><h2>ramble workspace mirror<a class="headerlink" href="#ramble-workspace-mirror" title="Permalink to this heading"></a></h2>
+<span id="id50"></span><h2>ramble workspace mirror<a class="headerlink" href="#ramble-workspace-mirror" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace mirror [-h] [-d MIRROR_PATH] [--dry-run]</span>
 </pre></div>
 </div>
@@ -1243,7 +1325,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-list">
-<span id="id48"></span><h2>ramble workspace list<a class="headerlink" href="#ramble-workspace-list" title="Permalink to this heading"></a></h2>
+<span id="id51"></span><h2>ramble workspace list<a class="headerlink" href="#ramble-workspace-list" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace list [-h]</span>
 </pre></div>
 </div>
@@ -1255,7 +1337,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-remove">
-<span id="id49"></span><h2>ramble workspace remove<a class="headerlink" href="#ramble-workspace-remove" title="Permalink to this heading"></a></h2>
+<span id="id52"></span><h2>ramble workspace remove<a class="headerlink" href="#ramble-workspace-remove" title="Permalink to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace remove [-hy] wrkspc [wrkspc ...]</span>
 </pre></div>
 </div>

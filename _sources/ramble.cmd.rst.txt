@@ -105,6 +105,14 @@ ramble.cmd.mirror module
    :undoc-members:
    :show-inheritance:
 
+ramble.cmd.mods module
+----------------------
+
+.. automodule:: ramble.cmd.mods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.cmd.on module
 --------------------
 

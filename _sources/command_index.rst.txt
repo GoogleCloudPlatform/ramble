@@ -4,7 +4,8 @@
 ====================  ==================================================================
 Application dev       | :ref:`edit <ramble-edit>`
 Query applications    | :ref:`info <ramble-info>`,
-                        :ref:`list <ramble-list>`
+                        :ref:`list <ramble-list>`,
+                        :ref:`mods <ramble-mods>`
 Cleanup               | :ref:`clean <ramble-clean>`
 Configuration         | :ref:`config <ramble-config>`,
                         :ref:`mirror <ramble-mirror>`,
@@ -126,6 +127,7 @@ A flexible benchmark experiment manager.
    * :ref:`license <ramble-license>`
    * :ref:`list <ramble-list>`
    * :ref:`mirror <ramble-mirror>`
+   * :ref:`mods <ramble-mods>`
    * :ref:`on <ramble-on>`
    * :ref:`repo <ramble-repo>`
    * :ref:`software-definitions <ramble-software-definitions>`
@@ -260,7 +262,7 @@ ramble config get
 **Positional arguments**
 
 section
-  configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, spack, success_criteria, applications, variables
+  configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, modifier_repos, modifiers, spack, success_criteria, applications, variables
 
 
 **Optional arguments**
@@ -284,7 +286,7 @@ ramble config blame
 **Positional arguments**
 
 section
-  configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, spack, success_criteria, applications, variables
+  configuration section to print. options: config, env_vars, repos, internals, licenses, mirrors, modifier_repos, modifiers, spack, success_criteria, applications, variables
 
 
 **Optional arguments**
@@ -308,7 +310,7 @@ ramble config edit
 **Positional arguments**
 
 section
-  configuration section to edit. options: config, env_vars, repos, internals, licenses, mirrors, spack, success_criteria, applications, variables
+  configuration section to edit. options: config, env_vars, repos, internals, licenses, mirrors, modifier_repos, modifiers, spack, success_criteria, applications, variables
 
 
 **Optional arguments**
@@ -916,6 +918,95 @@ ramble mirror list
 
 ----
 
+.. _ramble-mods:
+
+ramble mods
+-----------
+
+list and get information on available modifiers
+
+.. code-block:: console
+
+    ramble mods [-h] SUBCOMMAND ...
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+
+**Subcommands**
+
+.. hlist::
+   :columns: 4
+
+   * :ref:`mods list <ramble-mods-list>`
+   * :ref:`mods info <ramble-mods-info>`
+
+
+----
+
+.. _ramble-mods-list:
+
+ramble mods list
+^^^^^^^^^^^^^^^^
+
+.. code-block:: console
+
+    ramble mods list [-hd] [--format {name_only,version_json,html}] [--update FILE] [-t TAGS] ...
+
+
+**Positional arguments**
+
+filter
+  optional case-insensitive glob patterns to filter results
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+``-d, --search-description``
+  filtering will also search the description for a match
+
+``--format {name_only,version_json,html}``
+  format to be used to print the output [default: name_only]
+
+``--update FILE``
+  write output to the specified file, if any modifier is newer
+
+``-t TAGS, --tags TAGS``
+  filter a package query by tags
+
+
+----
+
+.. _ramble-mods-info:
+
+ramble mods info
+^^^^^^^^^^^^^^^^
+
+.. code-block:: console
+
+    ramble mods info [-h] modifier
+
+
+**Positional arguments**
+
+modifier
+  modifier name
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+
+----
+
 .. _ramble-on:
 
 ramble on
@@ -944,7 +1035,7 @@ And now's the time, the time is now
 ramble repo
 -----------
 
-manage application repositories
+manage Ramble repositories
 
 .. code-block:: console
 
@@ -977,7 +1068,7 @@ ramble repo create
 
 .. code-block:: console
 
-    ramble repo create [-h] [-d SUBDIRECTORY] directory [namespace]
+    ramble repo create [-h] [-d SUBDIRECTORY] [-t TYPE] directory [namespace]
 
 
 **Positional arguments**
@@ -986,7 +1077,7 @@ directory
   directory to create the repo in
 
 namespace
-  namespace to identify applications in the repository. defaults to the directory name
+  namespace to identify objects in the repository. defaults to the directory name
 
 
 **Optional arguments**
@@ -995,7 +1086,10 @@ namespace
   show this help message and exit
 
 ``-d SUBDIRECTORY, --subdirectory SUBDIRECTORY``
-  subdirectory to store applications in the repository. Default 'applications'. Use an empty string for no subdirectory.
+  subdirectory to store objects in the repository. Default is determined by the type of repository. Use an empty string for no subdirectory.
+
+``-t TYPE, --type TYPE``
+  type of repositories to manage. Defaults to 'applications'. Allowed types are ['applications', 'modifiers']
 
 
 ----
@@ -1007,7 +1101,7 @@ ramble repo list
 
 .. code-block:: console
 
-    ramble repo list [-h] [--scope {defaults,system,site,user}]
+    ramble repo list [-h] [--scope {defaults,system,site,user}] [-t TYPE]
 
 
 **Optional arguments**
@@ -1017,6 +1111,9 @@ ramble repo list
 
 ``--scope {defaults,system,site,user}``
   configuration scope to read from
+
+``-t TYPE, --type TYPE``
+  type of repositories to manage. Defaults to 'applications'. Allowed types are ['applications', 'modifiers']
 
 
 ----
@@ -1028,13 +1125,13 @@ ramble repo add
 
 .. code-block:: console
 
-    ramble repo add [-h] [--scope {defaults,system,site,user}] path
+    ramble repo add [-h] [--scope {defaults,system,site,user}] [-t TYPE] path
 
 
 **Positional arguments**
 
 path
-  path to a Ramble application repository directory
+  path to a Ramble repository directory
 
 
 **Optional arguments**
@@ -1044,6 +1141,9 @@ path
 
 ``--scope {defaults,system,site,user}``
   configuration scope to modify
+
+``-t TYPE, --type TYPE``
+  type of repositories to manage. Defaults to 'applications'. Allowed types are ['applications', 'modifiers']
 
 
 ----
@@ -1055,13 +1155,13 @@ ramble repo remove
 
 .. code-block:: console
 
-    ramble repo remove [-h] [--scope {defaults,system,site,user}] namespace_or_path
+    ramble repo remove [-h] [--scope {defaults,system,site,user}] [-t TYPE] namespace_or_path
 
 
 **Positional arguments**
 
 namespace_or_path
-  namespace or path of a Ramble application repository
+  namespace or path of a Ramble repository
 
 
 **Optional arguments**
@@ -1071,6 +1171,9 @@ namespace_or_path
 
 ``--scope {defaults,system,site,user}``
   configuration scope to modify
+
+``-t TYPE, --type TYPE``
+  type of repositories to manage. Defaults to 'applications'. Allowed types are ['applications', 'modifiers']
 
 
 ----

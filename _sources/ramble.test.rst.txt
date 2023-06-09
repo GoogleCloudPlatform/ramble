@@ -11,6 +11,7 @@ Subpackages
 
    ramble.test.cmd
    ramble.test.end_to_end
+   ramble.test.modifier_functionality
 
 Submodules
 ----------
@@ -99,6 +100,22 @@ ramble.test.mirror\_tests module
 --------------------------------
 
 .. automodule:: ramble.test.mirror_tests
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.modifier\_application module
+----------------------------------------
+
+.. automodule:: ramble.test.modifier_application
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.modifier\_language module
+-------------------------------------
+
+.. automodule:: ramble.test.modifier_language
    :members:
    :undoc-members:
    :show-inheritance:

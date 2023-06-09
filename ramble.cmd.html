@@ -84,6 +84,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.license">ramble.cmd.license module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.list">ramble.cmd.list module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mirror">ramble.cmd.mirror module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mods">ramble.cmd.mods module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.on">ramble.cmd.on module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.repo">ramble.cmd.repo module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions module</a></li>
@@ -93,6 +94,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html">ramble.util package</a></li>
@@ -111,6 +113,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
@@ -139,6 +143,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -371,6 +376,25 @@ prerequisites.</p>
 <li class="toctree-l2"><a class="reference internal" href="ramble.cmd.common.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.cmd.common.html#module-ramble.cmd.common.arguments">ramble.cmd.common.arguments module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.arguments.add_common_arguments"><code class="docutils literal notranslate"><span class="pre">add_common_arguments()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.cmd.common.html#module-ramble.cmd.common.info">ramble.cmd.common.info module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.info.print_info"><code class="docutils literal notranslate"><span class="pre">print_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.info.print_text_info"><code class="docutils literal notranslate"><span class="pre">print_text_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.info.section_title"><code class="docutils literal notranslate"><span class="pre">section_title()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.info.setup_info_parser"><code class="docutils literal notranslate"><span class="pre">setup_info_parser()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.cmd.common.html#module-ramble.cmd.common.list">ramble.cmd.common.list module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.filter_by_name"><code class="docutils literal notranslate"><span class="pre">filter_by_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.formatter"><code class="docutils literal notranslate"><span class="pre">formatter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.github_url"><code class="docutils literal notranslate"><span class="pre">github_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.html"><code class="docutils literal notranslate"><span class="pre">html()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.name_only"><code class="docutils literal notranslate"><span class="pre">name_only()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.perform_list"><code class="docutils literal notranslate"><span class="pre">perform_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.rows_for_ncols"><code class="docutils literal notranslate"><span class="pre">rows_for_ncols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.setup_list_parser"><code class="docutils literal notranslate"><span class="pre">setup_list_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.common.html#ramble.cmd.common.list.version_json"><code class="docutils literal notranslate"><span class="pre">version_json()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -795,23 +819,6 @@ exemptions if any patterns in the sub-dict match.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.info.padder">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.info.</span></span><span class="sig-name descname"><span class="pre">padder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/info.html#padder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.info.padder" title="Permalink to this definition"></a></dt>
-<dd><p>Return a function to pad elements of a list.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.info.print_text_info">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.info.</span></span><span class="sig-name descname"><span class="pre">print_text_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/info.html#print_text_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.info.print_text_info" title="Permalink to this definition"></a></dt>
-<dd><p>Print out a plain text description of a application.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.info.section_title">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.info.</span></span><span class="sig-name descname"><span class="pre">section_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/info.html#section_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.info.section_title" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="ramble.cmd.info.setup_parser">
 <span class="sig-prename descclassname"><span class="pre">ramble.cmd.info.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/info.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.info.setup_parser" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -897,70 +904,14 @@ so far, just this command – so it can find LGPL things elsewhere</p>
 <section id="module-ramble.cmd.list">
 <span id="ramble-cmd-list-module"></span><h2>ramble.cmd.list module<a class="headerlink" href="#module-ramble.cmd.list" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.filter_by_name">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">filter_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#filter_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.filter_by_name" title="Permalink to this definition"></a></dt>
-<dd><p>Filters the sequence of applications according to user prescriptions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>apps</strong> – sequence of applications</p></li>
-<li><p><strong>args</strong> – parsed command line arguments</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>filtered and sorted list of applications</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.formatter">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#formatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.formatter" title="Permalink to this definition"></a></dt>
-<dd><p>Decorator used to register formatters</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.github_url">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">github_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#github_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.github_url" title="Permalink to this definition"></a></dt>
-<dd><p>Link to an application file on github.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.html">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.html" title="Permalink to this definition"></a></dt>
-<dd><p>Print out information on all applications in Sphinx HTML.</p>
-<p>This is intended to be inlined directly into Sphinx documentation.
-We write HTML instead of RST for speed; generating RST from <em>all</em>
-applications causes the Sphinx build to take forever. Including this as
-raw HTML is much faster.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="ramble.cmd.list.list">
 <span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.name_only">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">name_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#name_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.name_only" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.rows_for_ncols">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">rows_for_ncols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#rows_for_ncols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.rows_for_ncols" title="Permalink to this definition"></a></dt>
-<dd><p>Print out rows in a table with ncols of elts laid out vertically.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="ramble.cmd.list.setup_parser">
 <span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.setup_parser" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.list.version_json">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.list.</span></span><span class="sig-name descname"><span class="pre">version_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/list.html#version_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.list.version_json" title="Permalink to this definition"></a></dt>
-<dd><p>Print all applications with their latest versions.</p>
-</dd></dl>
 
 </section>
 <section id="module-ramble.cmd.mirror">
@@ -1006,6 +957,48 @@ raw HTML is much faster.</p>
 <dd></dd></dl>
 
 </section>
+<section id="module-ramble.cmd.mods">
+<span id="ramble-cmd-mods-module"></span><h2>ramble.cmd.mods module<a class="headerlink" href="#module-ramble.cmd.mods" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.mods.mods">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods" title="Permalink to this definition"></a></dt>
+<dd><p>Look for a function called mods_&lt;name&gt; and call it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.mods.mods_info">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.mods.mods_info_setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_info_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_info_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_info_setup_parser" title="Permalink to this definition"></a></dt>
+<dd><p>Information about a modifier</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.mods.mods_list">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.mods.mods_list_setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_list_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_list_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_list_setup_parser" title="Permalink to this definition"></a></dt>
+<dd><p>List available modifiers</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.mods.setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.setup_parser" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="ramble.cmd.mods.subcommand_functions">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">subcommand_functions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.cmd.mods.subcommand_functions" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary mapping subcommand names and aliases to functions</p>
+</dd></dl>
+
+</section>
 <section id="module-ramble.cmd.on">
 <span id="ramble-cmd-on-module"></span><h2>ramble.cmd.on module<a class="headerlink" href="#module-ramble.cmd.on" title="Permalink to this heading"></a></h2>
 <dl class="py function">
@@ -1035,13 +1028,13 @@ raw HTML is much faster.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.cmd.repo.repo_add">
 <span class="sig-prename descclassname"><span class="pre">ramble.cmd.repo.</span></span><span class="sig-name descname"><span class="pre">repo_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/repo.html#repo_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.repo.repo_add" title="Permalink to this definition"></a></dt>
-<dd><p>Add an application repository to Ramble’s configuration.</p>
+<dd><p>Add a repository to Ramble’s configuration.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.cmd.repo.repo_create">
 <span class="sig-prename descclassname"><span class="pre">ramble.cmd.repo.</span></span><span class="sig-name descname"><span class="pre">repo_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/repo.html#repo_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.repo.repo_create" title="Permalink to this definition"></a></dt>
-<dd><p>Create a new application repository.</p>
+<dd><p>Create a new repository.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1060,8 +1053,8 @@ raw HTML is much faster.</p>
 <dt class="sig sig-object py" id="ramble.cmd.repo.setup_parser">
 <span class="sig-prename descclassname"><span class="pre">ramble.cmd.repo.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/repo.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.repo.setup_parser" title="Permalink to this definition"></a></dt>
 <dd><p>Setup the repo command parser.</p>
-<p>The repo command helps manage application repositories, which are
-the locations ramble reads application definition files from.</p>
+<p>The repo command helps manage Ramble repositories, which are
+the locations ramble reads object definition files from.</p>
 <p>This command has subcommands for create, add, remove, and list.</p>
 </dd></dl>
 

@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -180,6 +181,16 @@
 <span class="k">def</span> <span class="nf">specs</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
         <span class="s1">&#39;specs&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;one or more workload specs&#39;</span><span class="p">)</span>
+
+
+<span class="nd">@arg</span>
+<span class="k">def</span> <span class="nf">repo_type</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">ramble.repository</span> <span class="kn">import</span> <span class="n">default_type</span><span class="p">,</span> <span class="n">OBJECT_NAMES</span>
+    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
+        <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;type of repositories to manage. Defaults to &#39;</span><span class="si">{</span><span class="n">default_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Allowed types are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">OBJECT_NAMES</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="nd">@arg</span>

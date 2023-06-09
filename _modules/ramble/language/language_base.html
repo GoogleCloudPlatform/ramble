@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -152,6 +153,8 @@
 <span class="c1">#: them</span>
 <span class="n">reserved_names</span> <span class="o">=</span> <span class="p">[]</span>
 
+<span class="n">namespaces</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ramble.app&#39;</span><span class="p">,</span> <span class="s1">&#39;ramble.mod&#39;</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="DirectiveMeta"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_base.DirectiveMeta">[docs]</a><span class="k">class</span> <span class="nc">DirectiveMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Flushes the directives that were temporarily stored in the staging</span>
@@ -197,7 +200,12 @@
         <span class="c1"># The instance is being initialized: if it is a package we must ensure</span>
         <span class="c1"># that the directives are called to set it up.</span>
 
-        <span class="k">if</span> <span class="s2">&quot;ramble.app&quot;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="p">:</span>
+        <span class="n">valid_module</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="p">:</span>
+                <span class="n">valid_module</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">valid_module</span><span class="p">:</span>
             <span class="c1"># Ensure the presence of the dictionaries associated</span>
             <span class="c1"># with the directives</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directive_names</span><span class="p">:</span>

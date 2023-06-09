@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -113,11 +114,13 @@
 
 
 <div class="viewcode-block" id="specs_equiv"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.spec_utils.specs_equiv">[docs]</a><span class="k">def</span> <span class="nf">specs_equiv</span><span class="p">(</span><span class="n">spec1</span><span class="p">,</span> <span class="n">spec2</span><span class="p">):</span>
-    <span class="n">all_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">spec1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="n">all_keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">spec2</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec1</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">all_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">spec1</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">spec1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">all_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">spec2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">spec2</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">all_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s1">&#39;application_name&#39;</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
         <span class="n">all_keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;application_name&#39;</span><span class="p">)</span>

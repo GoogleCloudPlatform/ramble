@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -112,15 +113,15 @@
 <span class="c1"># except according to those terms.</span>
 
 
-<div class="viewcode-block" id="test_basic_inheritance"><a class="viewcode-back" href="../../../ramble.test.html#ramble.test.application_inheritance.test_basic_inheritance">[docs]</a><span class="k">def</span> <span class="nf">test_basic_inheritance</span><span class="p">(</span><span class="n">mutable_mock_repo</span><span class="p">):</span>
-    <span class="n">app_inst</span> <span class="o">=</span> <span class="n">mutable_mock_repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;basic-inherited&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_basic_inheritance"><a class="viewcode-back" href="../../../ramble.test.html#ramble.test.application_inheritance.test_basic_inheritance">[docs]</a><span class="k">def</span> <span class="nf">test_basic_inheritance</span><span class="p">(</span><span class="n">mutable_mock_apps_repo</span><span class="p">):</span>
+    <span class="n">app_inst</span> <span class="o">=</span> <span class="n">mutable_mock_apps_repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;basic-inherited&#39;</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="s1">&#39;foo&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span>
-    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">][</span><span class="s1">&#39;template&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bar&#39;</span>
-    <span class="k">assert</span> <span class="ow">not</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">][</span><span class="s1">&#39;mpi&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">template</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mpi</span>
     <span class="k">assert</span> <span class="s1">&#39;bar&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span>
-    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">][</span><span class="s1">&#39;template&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span>
-    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">][</span><span class="s1">&#39;mpi&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">template</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mpi</span>
 
     <span class="k">assert</span> <span class="s1">&#39;test_wl&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span>
     <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">]</span>

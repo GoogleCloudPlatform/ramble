@@ -54,6 +54,14 @@ ramble.test.cmd.mirror module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.cmd.mods module
+---------------------------
+
+.. automodule:: ramble.test.cmd.mods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.cmd.on module
 -------------------------
 

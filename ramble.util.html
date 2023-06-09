@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ramble.util.imp package" href="ramble.util.imp.html" />
-    <link rel="prev" title="ramble.test.end_to_end namespace" href="ramble.test.end_to_end.html" /> 
+    <link rel="prev" title="ramble.test.modifier_functionality namespace" href="ramble.test.modifier_functionality.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -56,12 +56,14 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html">ramble.cmd package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ramble.util package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.editor">ramble.util.editor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.executable">ramble.util.executable module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.file_cache">ramble.util.file_cache module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.install_cache">ramble.util.install_cache module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.lock">ramble.util.lock module</a></li>
@@ -86,6 +88,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
@@ -114,6 +118,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -219,6 +224,33 @@ searching the full list above, we’ll raise an error.</p>
 <dt>Optional Arguments:</dt><dd><p>_exec_func (function): invoke this function instead of <code class="docutils literal notranslate"><span class="pre">os.execv()</span></code></p>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+<section id="module-ramble.util.executable">
+<span id="ramble-util-executable-module"></span><h2>ramble.util.executable module<a class="headerlink" href="#module-ramble.util.executable" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.executable.CommandExecutable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.executable.</span></span><span class="sig-name descname"><span class="pre">CommandExecutable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redirect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_capture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&gt;&gt;'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#CommandExecutable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.CommandExecutable" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>CommandExecutable class
+This class is used to represent internal executables in Ramble.</p>
+<p>These executables are portions of an experiment definition. They are
+generally used to group one or more commands together into an executable
+name.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.executable.CommandExecutable.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#CommandExecutable.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.CommandExecutable.copy" title="Permalink to this definition"></a></dt>
+<dd><p>Replicate a CommandExecutable instance</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.util.executable.CommandExecutableError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.executable.</span></span><span class="sig-name descname"><span class="pre">CommandExecutableError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#CommandExecutableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.CommandExecutableError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="ramble.html#ramble.error.RambleError" title="ramble.error.RambleError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RambleError</span></code></a></p>
+<p>Class for errors when using command executable classes</p>
 </dd></dl>
 
 </section>
@@ -657,7 +689,7 @@ set of visited links.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ramble.test.end_to_end.html" class="btn btn-neutral float-left" title="ramble.test.end_to_end namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ramble.test.modifier_functionality.html" class="btn btn-neutral float-left" title="ramble.test.modifier_functionality namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="ramble.util.imp.html" class="btn btn-neutral float-right" title="ramble.util.imp package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

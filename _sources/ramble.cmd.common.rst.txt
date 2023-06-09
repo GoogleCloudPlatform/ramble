@@ -16,3 +16,19 @@ ramble.cmd.common.arguments module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.cmd.common.info module
+-----------------------------
+
+.. automodule:: ramble.cmd.common.info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.cmd.common.list module
+-----------------------------
+
+.. automodule:: ramble.cmd.common.list
+   :members:
+   :undoc-members:
+   :show-inheritance:

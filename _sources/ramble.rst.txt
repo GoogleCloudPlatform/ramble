@@ -16,6 +16,7 @@ Subpackages
    ramble.cmd
    ramble.experimental
    ramble.language
+   ramble.modifier_types
    ramble.schema
    ramble.test
    ramble.util
@@ -108,6 +109,22 @@ ramble.mirror module
 --------------------
 
 .. automodule:: ramble.mirror
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.modifier module
+----------------------
+
+.. automodule:: ramble.modifier
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.modkit module
+--------------------
+
+.. automodule:: ramble.modkit
    :members:
    :undoc-members:
    :show-inheritance:

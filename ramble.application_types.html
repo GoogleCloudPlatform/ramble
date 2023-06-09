@@ -61,6 +61,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html">ramble.cmd package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html">ramble.util package</a></li>
@@ -79,6 +80,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
@@ -107,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -178,6 +182,16 @@ which should already be on the platform.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.env_var_modifications">
+<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.env_var_modifications" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.executable_modifiers">
+<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.executable_modifiers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.executables">
 <span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.executables" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -198,6 +212,11 @@ which should already be on the platform.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.modes">
+<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.modes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.required_packages">
 <span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.required_packages" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -210,6 +229,11 @@ which should already be on the platform.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.success_criteria">
 <span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.success_criteria" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.variable_modifications">
+<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.variable_modifications" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -251,6 +275,16 @@ via spack.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.env_var_modifications">
+<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.env_var_modifications" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.executable_modifiers">
+<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.executable_modifiers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.executables">
 <span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.executables" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -268,6 +302,11 @@ via spack.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.inputs">
 <span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.inputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.modes">
+<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.modes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -303,6 +342,11 @@ via spack.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.uses_spack">
 <span class="sig-name descname"><span class="pre">uses_spack</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.uses_spack" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.variable_modifications">
+<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.variable_modifications" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

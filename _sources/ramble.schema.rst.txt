@@ -65,6 +65,22 @@ ramble.schema.mirrors module
    :undoc-members:
    :show-inheritance:
 
+ramble.schema.modifier\_repos module
+------------------------------------
+
+.. automodule:: ramble.schema.modifier_repos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.modifiers module
+------------------------------
+
+.. automodule:: ramble.schema.modifiers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.schema.repos module
 --------------------------
 

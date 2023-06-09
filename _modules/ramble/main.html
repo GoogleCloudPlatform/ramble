@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -598,8 +599,19 @@
         <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;config:locks&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">locks</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;command_line&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
-        <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">apps_path</span> <span class="o">=</span> \
-            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">RepoPath</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">mock_applications_path</span><span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">spack.util.spack_yaml</span> <span class="k">as</span> <span class="nn">syaml</span>
+
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="p">:</span>
+            <span class="n">obj_section</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">obj</span><span class="p">][</span><span class="s1">&#39;config_section&#39;</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_str</span><span class="p">(</span><span class="n">obj_section</span><span class="p">)</span>
+            <span class="n">key</span><span class="o">.</span><span class="n">override</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="s2">&quot;command_line&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">obj_section</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">mock_builtin_path</span><span class="p">])]</span>
+            <span class="p">)</span>
+
+            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="c1"># If the user asked for it, don&#39;t check ssl certs.</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">insecure</span><span class="p">:</span>

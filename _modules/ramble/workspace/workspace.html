@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
@@ -790,6 +791,46 @@
 
         <span class="k">return</span> <span class="n">specs</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_experiments_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">workspace_all_experiments_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Workspace.build_experiment_set"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.build_experiment_set">[docs]</a>    <span class="k">def</span> <span class="nf">build_experiment_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an experiment set representing this workspace&quot;&quot;&quot;</span>
+
+        <span class="n">experiment_set</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">ExperimentSet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_base_var</span><span class="p">(</span><span class="s1">&#39;experiments_file&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_experiments_path</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_ints</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> \
+                <span class="n">app_chained_exps</span><span class="p">,</span> <span class="n">app_mods</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
+            <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_application_context</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_ints</span><span class="p">,</span>
+                                                   <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">,</span> <span class="n">app_mods</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">workload</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span> <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_ints</span><span class="p">,</span> \
+                    <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span> <span class="n">workload_mods</span> \
+                    <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
+                <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_workload_context</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span>
+                                                    <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_ints</span><span class="p">,</span>
+                                                    <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span>
+                                                    <span class="n">workload_mods</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">exp_vars</span><span class="p">,</span> <span class="n">exp_env_vars</span><span class="p">,</span> <span class="n">exp_matrices</span><span class="p">,</span> <span class="n">exp_ints</span><span class="p">,</span> \
+                        <span class="n">exp_template</span><span class="p">,</span> <span class="n">exp_chained_exps</span><span class="p">,</span> <span class="n">exp_mods</span> \
+                        <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
+                    <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_experiment_context</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span>
+                                                          <span class="n">exp_vars</span><span class="p">,</span>
+                                                          <span class="n">exp_env_vars</span><span class="p">,</span>
+                                                          <span class="n">exp_matrices</span><span class="p">,</span>
+                                                          <span class="n">exp_ints</span><span class="p">,</span>
+                                                          <span class="n">exp_template</span><span class="p">,</span>
+                                                          <span class="n">exp_chained_exps</span><span class="p">,</span>
+                                                          <span class="n">exp_mods</span><span class="p">)</span>
+
+        <span class="n">experiment_set</span><span class="o">.</span><span class="n">build_experiment_chains</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">experiment_set</span></div>
+
 <div class="viewcode-block" id="Workspace.all_applications"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.all_applications">[docs]</a>    <span class="k">def</span> <span class="nf">all_applications</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over applications</span>
 
@@ -810,6 +851,7 @@
             <span class="n">application_internals</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">application_template</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">application_chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">application_modifiers</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                 <span class="n">application_vars</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span>
@@ -826,11 +868,15 @@
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                 <span class="n">application_chained_experiments</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">]</span>
 
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                <span class="n">application_modifiers</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span><span class="p">]</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">extract_success_criteria</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
 
             <span class="k">yield</span> <span class="n">application</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">application_vars</span><span class="p">,</span> \
                 <span class="n">application_env_vars</span><span class="p">,</span> <span class="n">application_internals</span><span class="p">,</span> \
-                <span class="n">application_template</span><span class="p">,</span> <span class="n">application_chained_experiments</span>
+                <span class="n">application_template</span><span class="p">,</span> <span class="n">application_chained_experiments</span><span class="p">,</span> \
+                <span class="n">application_modifiers</span>
 
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;  Iterating over configs in directories...&#39;</span><span class="p">)</span>
         <span class="c1"># Iterate over applications defined in application directories</span>
@@ -847,6 +893,7 @@
                 <span class="n">application_internals</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">application_template</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">application_chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">application_modifiers</span> <span class="o">=</span> <span class="kc">None</span>
 
                 <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                     <span class="n">application_vars</span> <span class="o">=</span> \
@@ -864,10 +911,14 @@
                 <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                     <span class="n">application_chained_experiments</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">]</span>
 
+                <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                    <span class="n">application_modifiers</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span><span class="p">]</span>
+
                 <span class="bp">self</span><span class="o">.</span><span class="n">extract_success_criteria</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
                 <span class="k">yield</span> <span class="n">application</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">application_vars</span><span class="p">,</span> \
                     <span class="n">application_env_vars</span><span class="p">,</span> <span class="n">application_internals</span><span class="p">,</span> \
-                    <span class="n">application_template</span><span class="p">,</span> <span class="n">application_chained_experiments</span></div>
+                    <span class="n">application_template</span><span class="p">,</span> <span class="n">application_chained_experiments</span><span class="p">,</span> \
+                    <span class="n">application_modifiers</span></div>
 
 <div class="viewcode-block" id="Workspace.all_workloads"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.all_workloads">[docs]</a>    <span class="k">def</span> <span class="nf">all_workloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over workloads in an application dict</span>
@@ -889,6 +940,7 @@
             <span class="n">workload_internals</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">workload_template</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">workload_chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">workload_modifiers</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                 <span class="n">workload_variables</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">env_var</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
@@ -899,11 +951,14 @@
                 <span class="n">workload_template</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">template</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                 <span class="n">workload_chained_experiments</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                <span class="n">workload_modifiers</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extract_success_criteria</span><span class="p">(</span><span class="s1">&#39;workload&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
 
             <span class="k">yield</span> <span class="n">workload</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">workload_variables</span><span class="p">,</span> \
                 <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_internals</span><span class="p">,</span> \
-                <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_experiments</span></div>
+                <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_experiments</span><span class="p">,</span> \
+                <span class="n">workload_modifiers</span></div>
 
 <div class="viewcode-block" id="Workspace.all_experiments"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.all_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">all_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workload</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over experiments in a workload dict</span>
@@ -925,6 +980,7 @@
             <span class="n">experiment_internals</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">experiment_template</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">experiment_chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">experiment_modifiers</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                 <span class="n">experiment_vars</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span>
@@ -940,6 +996,9 @@
 
             <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
                 <span class="n">experiment_chained_experiments</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                <span class="n">experiment_modifiers</span> <span class="o">=</span> <span class="n">contents</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">modifiers</span><span class="p">]</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">extract_success_criteria</span><span class="p">(</span><span class="s1">&#39;experiment&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
 
@@ -963,7 +1022,8 @@
 
             <span class="k">yield</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">experiment_vars</span><span class="p">,</span> \
                 <span class="n">experiment_env_vars</span><span class="p">,</span> <span class="n">matrices</span><span class="p">,</span> <span class="n">experiment_internals</span><span class="p">,</span> \
-                <span class="n">experiment_template</span><span class="p">,</span> <span class="n">experiment_chained_experiments</span></div>
+                <span class="n">experiment_template</span><span class="p">,</span> <span class="n">experiment_chained_experiments</span><span class="p">,</span> \
+                <span class="n">experiment_modifiers</span></div>
 
 <div class="viewcode-block" id="Workspace.external_spack_env"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.external_spack_env">[docs]</a>    <span class="k">def</span> <span class="nf">external_spack_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_name</span><span class="p">):</span>
         <span class="n">env_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_env</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
@@ -980,6 +1040,9 @@
                                        <span class="s1">&#39;already concretized &#39;</span> <span class="o">+</span>
                                        <span class="s1">&#39;workspace&#39;</span><span class="p">)</span>
 
+        <span class="n">spack_dict</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+        <span class="n">spack_dict</span><span class="p">[</span><span class="s1">&#39;concretized&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spack_dict</span> <span class="ow">or</span> \
                 <span class="ow">not</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]:</span>
             <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
@@ -993,66 +1056,76 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span> <span class="o">=</span> \
             <span class="n">ramble</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">SoftwareEnvironments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">app_name</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
-            <span class="n">app_inst</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
+        <span class="n">experiment_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_experiment_set</span><span class="p">()</span>
 
-            <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">default_compilers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
-                    <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-                    <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span>
-                    <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:spack_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                                      <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="s1">&#39;compiler_spec&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]:</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span>
-                        <span class="n">config_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span> \
-                            <span class="sa">f</span><span class="s1">&#39;compiler_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
-                        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="s1">&#39;compiler&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]:</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span>
-                        <span class="n">config_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span> \
-                            <span class="sa">f</span><span class="s1">&#39;compiler:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
-                        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]):</span>
-                    <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Compiler </span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1"> defined in multiple conflicting ways&#39;</span>
-                    <span class="p">)</span>
+        <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">app_inst</span> <span class="ow">in</span> <span class="n">experiment_set</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">():</span>
+            <span class="n">app_inst</span><span class="o">.</span><span class="n">build_modifier_instances</span><span class="p">()</span>
+            <span class="n">env_name_str</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+            <span class="n">env_name</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">env_name_str</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">app_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">environments_dict</span><span class="p">:</span>
-                <span class="n">environments_dict</span><span class="p">[</span><span class="n">app_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-                <span class="n">environments_dict</span><span class="p">[</span><span class="n">app_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spack:environments:</span><span class="si">{</span><span class="n">app_name</span><span class="si">}</span><span class="s1">:packages:[]&#39;</span><span class="p">,</span>
-                                  <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+            <span class="n">compiler_dicts</span> <span class="o">=</span> <span class="p">[</span><span class="n">app_inst</span><span class="o">.</span><span class="n">default_compilers</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+                <span class="n">compiler_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">default_compilers</span><span class="p">)</span>
 
-            <span class="n">app_packages</span> <span class="o">=</span> <span class="n">environments_dict</span><span class="p">[</span><span class="n">app_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">spec_name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">software_specs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
-                    <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-                    <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span>
-                    <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span>
-                                      <span class="sa">f</span><span class="s1">&#39;spack_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                                      <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="s1">&#39;compiler_spec&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]:</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span>
-                        <span class="n">config_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span> \
-                            <span class="sa">f</span><span class="s1">&#39;compiler_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
-                        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="s1">&#39;compiler&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]:</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span>
-                        <span class="n">config_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span> \
-                            <span class="sa">f</span><span class="s1">&#39;compiler:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
-                        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">compiler_dict</span> <span class="ow">in</span> <span class="n">compiler_dicts</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">compiler_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
+                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span>
+                        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:spack_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                          <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+                        <span class="k">if</span> <span class="s1">&#39;compiler_spec&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]:</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span>
+                            <span class="n">config_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span> \
+                                <span class="sa">f</span><span class="s1">&#39;compiler_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+                        <span class="k">if</span> <span class="s1">&#39;compiler&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]:</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span>
+                            <span class="n">config_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="o">+</span> \
+                                <span class="sa">f</span><span class="s1">&#39;compiler:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]):</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Spec 1: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Spec 2: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;Compiler </span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1"> defined in multiple conflicting ways&#39;</span>
+                        <span class="p">)</span>
 
-                <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]):</span>
-                    <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Package </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1"> defined in multiple conflicting ways&#39;</span>
-                    <span class="p">)</span>
+            <span class="k">if</span> <span class="n">env_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">environments_dict</span><span class="p">:</span>
+                <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+                <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-                <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spack:environments:</span><span class="si">{</span><span class="n">app_name</span><span class="si">}</span><span class="s1">:packages:[</span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">,</span>
-                                  <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trying to define packages for </span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">app_packages</span> <span class="o">=</span> <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
 
-                <span class="n">app_packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+            <span class="n">software_dicts</span> <span class="o">=</span> <span class="p">[</span><span class="n">app_inst</span><span class="o">.</span><span class="n">software_specs</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+                <span class="n">software_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">software_specs</span><span class="p">)</span>
 
-        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;spack:concretized:true&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">software_dict</span> <span class="ow">in</span> <span class="n">software_dicts</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">spec_name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">software_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Found spec: </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
+                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;compiler_spec&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]:</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler_spec&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;compiler&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]:</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span>
+
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]):</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Spec 1: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Spec 2: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;Package </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s1"> defined in multiple conflicting ways&#39;</span>
+                        <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app_packages</span><span class="p">:</span>
+                        <span class="n">app_packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+
+        <span class="n">spack_dict</span><span class="p">[</span><span class="s1">&#39;concretized&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span><span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="n">spack_dict</span><span class="p">,</span>
+                                           <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
 
         <span class="k">return</span></div>
 
@@ -1222,36 +1295,11 @@
                                       <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;success_criteria&#39;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">pipeline</span> <span class="o">==</span> <span class="s1">&#39;setup&#39;</span><span class="p">:</span>
-            <span class="n">all_experiments_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
-                                                <span class="n">workspace_all_experiments_file</span><span class="p">)</span>
-            <span class="n">all_experiments_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">all_experiments_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
+            <span class="n">all_experiments_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_experiments_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
             <span class="n">all_experiments_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;#!/bin/sh</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_script</span> <span class="o">=</span> <span class="n">all_experiments_file</span>
 
-            <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_base_var</span><span class="p">(</span><span class="s1">&#39;experiments_file&#39;</span><span class="p">,</span> <span class="n">all_experiments_file</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_ints</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> \
-                <span class="n">app_chained_exps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_applications</span><span class="p">():</span>
-            <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_application_context</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_ints</span><span class="p">,</span>
-                                                   <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">workload</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span> <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_ints</span><span class="p">,</span> \
-                    <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
-                <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_workload_context</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span> <span class="n">workload_vars</span><span class="p">,</span>
-                                                    <span class="n">workload_env_vars</span><span class="p">,</span> <span class="n">workload_ints</span><span class="p">,</span>
-                                                    <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">)</span>
-
-                <span class="k">for</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">exp_vars</span><span class="p">,</span> <span class="n">exp_env_vars</span><span class="p">,</span> <span class="n">exp_matrices</span><span class="p">,</span> <span class="n">exp_ints</span><span class="p">,</span> \
-                        <span class="n">exp_template</span><span class="p">,</span> <span class="n">exp_chained_exps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
-                    <span class="n">experiment_set</span><span class="o">.</span><span class="n">set_experiment_context</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span>
-                                                          <span class="n">exp_vars</span><span class="p">,</span>
-                                                          <span class="n">exp_env_vars</span><span class="p">,</span>
-                                                          <span class="n">exp_matrices</span><span class="p">,</span>
-                                                          <span class="n">exp_ints</span><span class="p">,</span>
-                                                          <span class="n">exp_template</span><span class="p">,</span>
-                                                          <span class="n">exp_chained_exps</span><span class="p">)</span>
-
-        <span class="n">experiment_set</span><span class="o">.</span><span class="n">build_experiment_chains</span><span class="p">()</span>
+        <span class="n">experiment_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_experiment_set</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">app_inst</span> <span class="ow">in</span> <span class="n">experiment_set</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">():</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;On experiment: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp</span><span class="p">)</span>
@@ -1594,6 +1642,10 @@
 <div class="viewcode-block" id="Workspace.get_workspace_internals"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_workspace_internals">[docs]</a>    <span class="k">def</span> <span class="nf">get_workspace_internals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict of workspace internals&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">namespace</span><span class="o">.</span><span class="n">internals</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Workspace.get_workspace_modifiers"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_workspace_modifiers">[docs]</a>    <span class="k">def</span> <span class="nf">get_workspace_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict of workspace modifiers&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;modifiers&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Workspace.get_spack_dict"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_spack_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_spack_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the spack dictionary for this workspace&quot;&quot;&quot;</span>
