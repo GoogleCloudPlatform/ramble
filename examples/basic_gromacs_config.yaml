@@ -28,12 +28,12 @@ ramble:
                 n_threads: '1'
                 size: '0003'
                 type: 'pme'
-              rf_single_rank:
-                variables:
-                  n_ranks: '1'
-                  n_threads: '1'
-                  size: '0003'
-                  type: 'rf'
+            rf_single_rank:
+              variables:
+                n_ranks: '1'
+                n_threads: '1'
+                size: '0003'
+                type: 'rf'
 spack:
     concretized: true
     packages:
