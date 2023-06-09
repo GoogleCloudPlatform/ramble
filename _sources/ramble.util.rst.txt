@@ -17,6 +17,14 @@ Subpackages
 Submodules
 ----------
 
+ramble.util.colors module
+-------------------------
+
+.. automodule:: ramble.util.colors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.editor module
 -------------------------
 
