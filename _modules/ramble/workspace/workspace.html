@@ -122,7 +122,6 @@
 
 <span class="kn">import</span> <span class="nn">six</span>
 
-<span class="kn">from</span> <span class="nn">llnl.util.lang</span> <span class="kn">import</span> <span class="n">union_dicts</span>
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 
@@ -1629,15 +1628,7 @@
 
 <div class="viewcode-block" id="Workspace.get_workspace_env_vars"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_workspace_env_vars">[docs]</a>    <span class="k">def</span> <span class="nf">get_workspace_env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict of workspace environment variables&quot;&quot;&quot;</span>
-        <span class="n">deprecated_env_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_workspace_section</span><span class="p">(</span><span class="n">namespace</span><span class="o">.</span><span class="n">env_var</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">deprecated_env_vars</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The env-vars workspace section is deprecated. Environment variables</span><span class="se">\n</span><span class="s1">&#39;</span>
-                     <span class="s1">&#39;should be defined in the env_vars config section using the same</span><span class="se">\n</span><span class="s1">&#39;</span>
-                     <span class="s1">&#39;syntax. Support for env-vars will be removed in a future. See</span><span class="se">\n</span><span class="s1">&#39;</span>
-                     <span class="s1">&#39;the documentation for examples of the new syntax.&#39;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">union_dicts</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">),</span>
-                           <span class="n">deprecated_env_vars</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Workspace.get_workspace_internals"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_workspace_internals">[docs]</a>    <span class="k">def</span> <span class="nf">get_workspace_internals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict of workspace internals&quot;&quot;&quot;</span>

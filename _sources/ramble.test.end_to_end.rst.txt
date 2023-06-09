@@ -22,14 +22,6 @@ ramble.test.end\_to\_end.custom\_executables module
    :undoc-members:
    :show-inheritance:
 
-ramble.test.end\_to\_end.deprecated\_env\_vars module
------------------------------------------------------
-
-.. automodule:: ramble.test.end_to_end.deprecated_env_vars
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ramble.test.end\_to\_end.dryrun\_chained\_experiments module
 ------------------------------------------------------------
 
