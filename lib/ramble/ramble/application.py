@@ -554,7 +554,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                 if command_config['mpi']:
                     exec_vars['mpi_command'] = \
-                        self.expander.expand_var('{mpi_command} ')
+                        self.expander.expand_var('{mpi_command}') + ' '
                 else:
                     exec_vars['mpi_command'] = ''
 
@@ -565,21 +565,21 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 else:
                     exec_vars['redirect'] = ''
 
+                mpi_cmd = exec_vars['mpi_command']
+                redirect = exec_vars['redirect']
                 if isinstance(command_config['template'], list):
                     for part in command_config['template']:
-                        command_part = '{mpi_command}%s{redirect}' % \
-                            part
+                        command_part = f'{mpi_cmd}{part}{redirect}'
                         command.append(self.expander.expand_var(command_part,
                                                                 exec_vars))
                 elif isinstance(command_config['template'],
                                 six.string_types):
-                    command_part = '{mpi_command}%s{redirect}' % \
-                        command_config['template']
+                    command_part = f'{mpi_cmd}{command_config["template"]}{redirect}'
                     command.append(self.expander.expand_var(command_part,
                                                             exec_vars))
                 else:
                     app_err = 'Unsupported template type in executable '
-                    app_err += '%s' % executable
+                    app_err += f'{executable}'
                     raise ApplicationError(app_err)
 
                 del self.variables['executable_name']
