@@ -267,11 +267,17 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span>
 
-<div class="viewcode-block" id="Expander.expand_var"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Expander.expand_var"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform expansion of a string</span>
 
 <span class="sd">        Expand a string by building up a dict of all</span>
 <span class="sd">        expansion variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        - var: String variable to expand</span>
+<span class="sd">        - extra_vars: Variable definitions to use with highest precedence</span>
+<span class="sd">        - allow_passthrough: Whether the string is allowed to have</span>
+<span class="sd">                             keywords after expansion</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
@@ -279,7 +285,7 @@
             <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">expansions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_vars</span><span class="p">)</span>
 
-        <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansions</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+        <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansions</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">),</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_expanded</span><span class="p">(</span><span class="n">expanded</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -290,6 +296,11 @@
                 <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
                 <span class="k">pass</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Passthrough expansion not allowed.&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;    Variable definitions are: {str(self._variables)}&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ExpanderError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expander was unable to fully expand &quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&quot;, &#39;</span>
+                                <span class="s1">&#39;and is not allowed to passthrough undefined variables.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span></div>
 
@@ -300,22 +311,40 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">l_delimiter</span><span class="si">}{</span><span class="n">in_str</span><span class="si">}{</span><span class="n">r_delimiter</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
     <span class="k">def</span> <span class="nf">_all_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator for all keyword arguments in a string</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        - in_str (string): Input string to detect keywords from</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">        - Each keyword argument in in_str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">keyword</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                     <span class="k">yield</span> <span class="n">keyword</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_fully_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if a string is fully expanded</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        - in_str (string): Input string to test as expanded</span>
+
+<span class="sd">        Returns boolean. True if `in_str` contains no keywords, false if a</span>
+<span class="sd">        keyword is detected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_partial_expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expansion_vars</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_partial_expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expansion_vars</span><span class="p">,</span> <span class="n">in_str</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform expansion of a string with some variables</span>
 
 <span class="sd">        args:</span>
 <span class="sd">          expansion_vars (dict): Variables to perform expansion with</span>
 <span class="sd">          in_str (str): Input template string to expand</span>
+<span class="sd">          allow_passthrough (bool): Define if variables are allowed to passthrough</span>
+<span class="sd">                                    without being expanded.</span>
 
 <span class="sd">        returns:</span>
 <span class="sd">          in_str (str): Expanded version of input string</span>
@@ -329,6 +358,7 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansion_vars</span><span class="p">,</span>
                                              <span class="n">expansion_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">])</span>
 
+            <span class="n">passthrough_vars</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">kw</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">exp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_expanded</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
                     <span class="k">try</span><span class="p">:</span>
@@ -339,6 +369,12 @@
                         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
                         <span class="k">pass</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">deubg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion stack errors: attempted to expand &quot;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s1">&quot; = &quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                        <span class="n">passthrough_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">kw</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
+            <span class="n">exp_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">passthrough_vars</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">in_str</span><span class="o">.</span><span class="n">format_map</span><span class="p">(</span><span class="n">exp_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">in_str</span>

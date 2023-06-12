@@ -70,6 +70,14 @@ ramble.test.end\_to\_end.missing\_required\_dry\_run module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.passthrough\_variables module
+------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.passthrough_variables
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.test\_configvar\_dry\_run module
 ---------------------------------------------------------
 
