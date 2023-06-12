@@ -174,7 +174,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, 'maintainers'):
             out_str.append('\n')
-            out_str.append(section_title("Maintainers:\n"))
+            out_str.append(rucolor.section_title("Maintainers:\n"))
             out_str.append(colified(self.maintainers, tty=True))
             out_str.append('\n')
 
