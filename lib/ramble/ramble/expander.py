@@ -160,11 +160,17 @@ class Expander(object):
 
         return self._experiment_run_dir
 
-    def expand_var(self, var, extra_vars=None):
+    def expand_var(self, var, extra_vars=None, allow_passthrough=True):
         """Perform expansion of a string
 
         Expand a string by building up a dict of all
         expansion variables.
+
+        Args:
+        - var: String variable to expand
+        - extra_vars: Variable definitions to use with highest precedence
+        - allow_passthrough: Whether the string is allowed to have
+                             keywords after expansion
         """
 
         expansions = self._variables
@@ -172,7 +178,7 @@ class Expander(object):
             expansions = self._variables.copy()
             expansions.update(extra_vars)
 
-        expanded = self._partial_expand(expansions, str(var))
+        expanded = self._partial_expand(expansions, str(var), allow_passthrough=allow_passthrough)
 
         if self._fully_expanded(expanded):
             try:
@@ -183,6 +189,11 @@ class Expander(object):
                 tty.debug(e)
             except SyntaxError:
                 pass
+        elif not allow_passthrough:
+            tty.debug('Passthrough expansion not allowed.')
+            tty.debug('    Variable definitions are: {str(self._variables)}')
+            raise ExpanderError(f'Expander was unable to fully expand "{var}", '
+                                'and is not allowed to passthrough undefined variables.')
 
         return str(expanded).lstrip()
 
@@ -193,22 +204,40 @@ class Expander(object):
         return f'{l_delimiter}{in_str}{r_delimiter}'
 
     def _all_keywords(self, in_str):
+        """Iterator for all keyword arguments in a string
+
+        Args:
+        - in_str (string): Input string to detect keywords from
+
+        Yields:
+        - Each keyword argument in in_str
+        """
         if isinstance(in_str, six.string_types):
             for keyword in string.Formatter().parse(in_str):
                 if keyword[1]:
                     yield keyword[1]
 
     def _fully_expanded(self, in_str):
+        """Test if a string is fully expanded
+
+        Args:
+        - in_str (string): Input string to test as expanded
+
+        Returns boolean. True if `in_str` contains no keywords, false if a
+        keyword is detected.
+        """
         for kw in self._all_keywords(in_str):
             return False
         return True
 
-    def _partial_expand(self, expansion_vars, in_str):
+    def _partial_expand(self, expansion_vars, in_str, allow_passthrough=True):
         """Perform expansion of a string with some variables
 
         args:
           expansion_vars (dict): Variables to perform expansion with
           in_str (str): Input template string to expand
+          allow_passthrough (bool): Define if variables are allowed to passthrough
+                                    without being expanded.
 
         returns:
           in_str (str): Expanded version of input string
@@ -222,6 +251,7 @@ class Expander(object):
                         self._partial_expand(expansion_vars,
                                              expansion_vars[kw])
 
+            passthrough_vars = {}
             for kw, val in exp_dict.items():
                 if self._fully_expanded(val):
                     try:
@@ -232,6 +262,12 @@ class Expander(object):
                         tty.debug(e)
                     except SyntaxError:
                         pass
+                elif not allow_passthrough:
+                    tty.deubg(f'Expansion stack errors: attempted to expand "{kw}" = "{val}"')
+                else:
+                    for kw in self._all_keywords(val):
+                        passthrough_vars[kw] = '{' + kw + '}'
+            exp_dict.update(passthrough_vars)
 
             return in_str.format_map(exp_dict)
         return in_str
