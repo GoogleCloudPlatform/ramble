@@ -833,6 +833,17 @@
                 <span class="n">template_name</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">template_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">expand_path</span>
 
+    <span class="k">def</span> <span class="nf">_validate_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform validation of an experiment before performing actions with it</span>
+
+<span class="sd">        This function is an entry point to validate various aspects of an</span>
+<span class="sd">        experiment definition before it is used. It is expected to raise errors</span>
+<span class="sd">        when validation fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Workload </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="si">}</span><span class="s1"> is not defined &#39;</span>
+                                   <span class="sa">f</span><span class="s1">&#39;as a workload of application </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
 <div class="viewcode-block" id="ApplicationBase.add_expand_vars"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.add_expand_vars">[docs]</a>    <span class="k">def</span> <span class="nf">add_expand_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add application specific expansion variables</span>
 
@@ -842,6 +853,7 @@
 <span class="sd">        - spack_setup: set to an empty string, so spack applications can override this</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_experiment</span><span class="p">()</span>
             <span class="n">executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_executables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_input_path</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_experiment_variables</span><span class="p">()</span>

@@ -94,6 +94,14 @@ ramble.test.end\_to\_end.unused\_compilers\_are\_skipped module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.vector\_workloads module
+-------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.vector_workloads
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.wrfv4\_dry\_run module
 -----------------------------------------------
 

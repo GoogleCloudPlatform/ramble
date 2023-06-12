@@ -492,7 +492,8 @@
 
         <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="p">:</span>
             <span class="n">var_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_name&#39;</span>
-            <span class="n">context_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context_names</span><span class="p">[</span><span class="n">context</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context_names</span><span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context_variables</span><span class="p">:</span>
+                <span class="n">context_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context_names</span><span class="p">[</span><span class="n">context</span><span class="p">]</span>
 
         <span class="c1"># Set namespaces</span>
         <span class="n">context_variables</span><span class="p">[</span><span class="s1">&#39;application_namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_namespace</span>
@@ -551,9 +552,9 @@
 
             <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   Final name: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">final_exp_name</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">final_exp_name</span> <span class="ow">in</span> <span class="n">rendered_experiments</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;Experiment </span><span class="si">%s</span><span class="s1"> is not unique.&#39;</span> <span class="o">%</span> <span class="n">final_exp_name</span><span class="p">)</span>
-            <span class="n">rendered_experiments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">final_exp_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">experiment_namespace</span> <span class="ow">in</span> <span class="n">rendered_experiments</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;Experiment </span><span class="si">%s</span><span class="s1"> is not unique.&#39;</span> <span class="o">%</span> <span class="n">experiment_namespace</span><span class="p">)</span>
+            <span class="n">rendered_experiments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">experiment_namespace</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">check_required_keys</span><span class="p">(</span><span class="n">experiment_vars</span><span class="p">)</span>

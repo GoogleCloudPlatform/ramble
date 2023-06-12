@@ -57,6 +57,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#list-variables">List Variables:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#templatized-workloads">Templatized Workloads:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-modifiers">Experiment Modifiers:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a><ul>
@@ -392,6 +393,29 @@ can be defined.</p>
 <span class="go">unset LD_LIBRARY_PATH</span>
 </pre></div>
 </div>
+</section>
+<section id="templatized-workloads">
+<h3>Templatized Workloads:<a class="headerlink" href="#templatized-workloads" title="Permalink to this heading"></a></h3>
+<p>As previously shown, variables can be defined using lists or matrices. In addition to
+controlling several aspects of experiments, list and matrix variables can be used to
+replicate an experiment across workloads.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">application_workloads</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;parallel&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;serial&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;local&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;{application_workloads}&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, we use the <code class="docutils literal notranslate"><span class="pre">application_workloads</span></code> variable to define
+the names of the workloads we’d like to generate experiments for. Any variable
+can be used to define the name of the workloads, except those reserved by
+Ramble. These can be seen in the reserved variables section below.</p>
 </section>
 <section id="cross-experiment-variable-references">
 <h3>Cross Experiment Variable References:<a class="headerlink" href="#cross-experiment-variable-references" title="Permalink to this heading"></a></h3>
