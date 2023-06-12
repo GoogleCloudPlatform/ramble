@@ -174,7 +174,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, 'maintainers'):
             out_str.append('\n')
-            out_str.append(section_title("Maintainers:\n"))
+            out_str.append(rucolor.section_title("Maintainers:\n"))
             out_str.append(colified(self.maintainers, tty=True))
             out_str.append('\n')
 
@@ -975,28 +975,32 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         fom_conf = foms[fom]
                         fom_match = fom_conf['regex'].match(line)
 
-                        if fom_match and \
-                                (fom_conf['group'] in
-                                 fom_conf['regex'].groupindex):
-                            tty.debug(' --- Matched fom %s' % fom)
-                            fom_contexts = []
-                            if fom_conf['contexts']:
-                                for context in fom_conf['contexts']:
-                                    context_name = active_contexts[context] \
-                                        if context in active_contexts \
-                                        else 'null'
-                                    fom_contexts.append(context_name)
-                            else:
-                                fom_contexts.append('null')
+                        if fom_match:
+                            fom_vars = {}
+                            for k, v in fom_match.groupdict().items():
+                                fom_vars[k] = v
+                            fom_name = self.expander.expand_var(fom, extra_vars=fom_vars)
 
-                            for context in fom_contexts:
-                                if context not in fom_values:
-                                    fom_values[context] = {}
-                                fom_val = fom_match.group(fom_conf['group'])
-                                fom_values[context][fom] = {
-                                    'value': fom_val,
-                                    'units': fom_conf['units']
-                                }
+                            if fom_conf['group'] in fom_conf['regex'].groupindex:
+                                tty.debug(' --- Matched fom %s' % fom_name)
+                                fom_contexts = []
+                                if fom_conf['contexts']:
+                                    for context in fom_conf['contexts']:
+                                        context_name = active_contexts[context] \
+                                            if context in active_contexts \
+                                            else 'null'
+                                        fom_contexts.append(context_name)
+                                else:
+                                    fom_contexts.append('null')
+
+                                for context in fom_contexts:
+                                    if context not in fom_values:
+                                        fom_values[context] = {}
+                                    fom_val = fom_match.group(fom_conf['group'])
+                                    fom_values[context][fom_name] = {
+                                        'value': fom_val,
+                                        'units': fom_conf['units']
+                                    }
 
         exp_ns = self.expander.experiment_namespace
         results = {'name': exp_ns}
