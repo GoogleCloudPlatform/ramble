@@ -305,6 +305,33 @@ Would result in roughly the following bash commands:
     export PATH=prepend_path:$PATH:app_path
     unset LD_LIBRARY_PATH
 
+^^^^^^^^^^^^^^^^^^^^^^
+Templatized Workloads:
+^^^^^^^^^^^^^^^^^^^^^^
+
+As previously shown, variables can be defined using lists or matrices. In addition to
+controlling several aspects of experiments, list and matrix variables can be used to
+replicate an experiment across workloads.
+
+.. code-block:: yaml
+
+    ramble:
+      applications:
+        hostname:
+          variables:
+            application_workloads: ['parallel', 'serial', 'local']
+          workloads:
+            '{application_workloads}':
+              experiments:
+                test_exp:
+                  variables:
+                    n_ranks: '1'
+
+In the above example, we use the ``application_workloads`` variable to define
+the names of the workloads we'd like to generate experiments for. Any variable
+can be used to define the name of the workloads, except those reserved by
+Ramble. These can be seen in the reserved variables section below.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Cross Experiment Variable References:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
