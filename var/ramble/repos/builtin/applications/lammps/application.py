@@ -19,8 +19,7 @@ class Lammps(SpackApplication):
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
-    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274',
-                  compiler='gcc9')
+    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
 
     software_spec('lammps',
                   spack_spec='lammps@20220623 +opt+manybody+molecule+kspace+rigid',
