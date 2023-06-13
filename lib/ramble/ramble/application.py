@@ -748,8 +748,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if not self._vars_are_expanded:
             self._validate_experiment()
             executables = self._get_executables()
-            self._set_input_path()
             self._set_default_experiment_variables()
+            self._set_input_path()
             self._inject_commands(executables)
             # ---------------------------------------------------------------------------------
             # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
@@ -776,7 +776,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             workload = self.workloads[workload_name]
 
             for input_file in workload['inputs']:
-                input_conf = self.inputs[input_file]
+                input_conf = self.inputs[input_file].copy()
+
+                # Expand input value as it may be a var
+                expanded_url = self.expander.expand_var(input_conf['url'])
+                input_conf['url'] = expanded_url
 
                 fetcher = ramble.fetch_strategy.URLFetchStrategy(**input_conf)
 
