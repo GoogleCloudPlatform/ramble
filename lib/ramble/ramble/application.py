@@ -776,7 +776,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             workload = self.workloads[workload_name]
 
             for input_file in workload['inputs']:
-                input_conf = self.inputs[input_file]
+                input_conf = self.inputs[input_file].copy()
 
                 # Expand input value as it may be a var
                 expanded_url = self.expander.expand_var(input_conf['url'])
