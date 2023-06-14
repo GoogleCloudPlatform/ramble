@@ -134,6 +134,7 @@ In this example, ``n_ranks`` will take a value of ``1`` within the ``test_exp``
 experiment. This experiment will also include definitions for
 ``processes_per_node``, ``n_nodes``, and ``n_threads``.
 
+.. _ramble-vector-logic:
 
 ^^^^^^^^^^^^^^
 List Variables:
@@ -168,6 +169,9 @@ There are two notable aspects of this config file are:
 
 All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.
+
+
+.. _ramble-matrix-logic:
 
 ^^^^^^^^^^^^^^^^^^
 Variable Matrices:
@@ -244,40 +248,11 @@ there would be 4 experiments, each defined by a unique
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Variable Control:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Environment variables can be controlled within the workspace configuration
-file. These are defined within the ``env_vars`` configuration section. Below is
-an example of the format of this configuration section.
+Environment variables can be controlled using an
+:ref:`env_var config section<env-var-config>`,
+defined at the appropriate level of the workspace config.
 
-.. code-block:: yaml
-
-    env_vars:
-      set:
-        var_name: var_value
-      append:
-      - var-separator: ','
-        vars:
-          var_to_append: val_to_append
-        paths:
-          path_to_append: val_to_append
-      prepend:
-      - paths:
-          path_to_prepend: val_to_prepend
-      unset:
-      - var_to_unset
-
-
-The above example is general, and intended to show the available functionality
-of configuring environment variables. Below the ``env_vars`` level, one of four
-actions is available. These actions are:
-* ``set`` - Define a variable equal to a given value. Overwrites previously configured values
-* ``append`` - Append the given value to the end of a previous variable definition. Delimited for vars is defined by ``var_separator``, ``paths`` uses ``:``
-* ``prepend`` - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is ``:``
-* ``unset`` - Remove a variable definition, if it is set.
-
-This config section is allowed to be defined anywhere a variables configuration
-can be defined.
-
-As a more concrete example:
+As a concrete example:
 
 .. code-block:: yaml
 
@@ -434,10 +409,10 @@ Controlling Internals:
 Within a workspace config, an internals dictionary can be used to control
 several internal aspects of the application, workload, and experiment.
 
-An internals dictionary can be defined anywhere a variables dictionary can be
-defined (i.e. within a workspace, a specific application, a specific workload,
-or a specific experiment). This section will describe the features available
-within the internals dictionary.
+This config section is defined in the
+:ref:`internals config section<internals-config>`.
+
+Below are examples of using this within a workspace config file.
 
 """""""""""""""""""
 Custom Executables:
@@ -572,45 +547,9 @@ Spack Dictionary:
 -----------------
 
 Within a ramble.yaml file, the ``spack:`` dictionary controls the software
-stack installation that ramble performs. This is accomplished by defining
+stack installation that ramble performs. This configuration section is defined
+in the :ref:`Spack section<spack-config>` documentation.
 a packages dictionary, and an environments dictionary.
-
-The packages dictionary houses ramble descriptions of spack packages that can
-be used to construct environments with. A package is defined as software that
-spack should install for the user. These have one required attribute, and two
-optional attributes. The ``spack_spec`` attribute is required to be defined,
-and should be the spec passed to ``spack install`` on the command line for the
-package. Optionally, a package can defined a ``compiler_spec`` attribute, which
-will be the spec used when this package is used as a compiler for another
-package. Packages can also optionally defined a ``compiler`` attribute, which
-is the name of another package that should be used as it's compiler.
-
-The environments dictionary contains descriptions of spack environments that
-Ramble might generate based on the requested experiments. Environments are
-defined as a list of packages (in the aforementioned packages dictionary) that
-should be bundled into a spack environment.
-
-Below is an annotated example of the spack dictionary.
-
-.. code-block:: yaml
-
-    spack:
-      packages:
-        gcc9: # Abstract name to refer to this package
-          spack_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
-          compiler_spec: gcc@9.3.0 # Spack compiler spec for this package
-        impi2018:
-          spack_spec: intel-mpi@2018.4.274 target=x86_64
-          compiler: gcc9 # Other package name to use as compiler for this package
-        gromacs:
-          spack_spec: gromacs@2022.4
-          compiler: gcc9
-      environments:
-        gromacs:
-          packages: # List of packages to include in this environment
-          - impi2018
-          - gromacs
-
 
 The ``ramble workspace concretize`` command can help construct a functional
 spack dictionary based on the experiments listed.
@@ -622,92 +561,6 @@ Application definition files can define one or more ``software_spec``
 directives, which are packages the application might need to run properly.
 Additionally, spack packages can be marked as required through the
 ``required_package`` directive.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Vector and Matrix Packages and Environments:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-As with experiments, package and environment definitions can generate many
-packages and environments following the same previously mentioned vector and
-matrix syntax.
-
-Below is an example of using this logic within the spack dictionary:
-
-.. code-block:: yaml
-
-    spack:
-      packages:
-        gcc-{ver}:
-          variables:
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: gcc@{ver} target=x86_64
-          compiler_spec: gcc@{ver}
-        intel-mpi-{comp}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: intel-mpi@2018.4.274
-          compiler: {comp}
-        openmpi-{comp}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: openmpi@4.1.4
-          compiler: {comp}
-        wrf-{comp}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: wrf@4.2
-          compiler: {comp}
-      environments:
-        wrf-{comp}-{mpi}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-            mpi: [intel-mpi-{comp}, openmpi-{comp}']
-          matrix:
-          - mpi
-          packages:
-          - {mpi}
-          - wrf-{comp}
-
-The above file will generate 3 versions of ``gcc``, 3 versions each of ``wrf``,
-``intel-mpi`` and ``openmpi`` built with each ``gcc`` version, and 6 spack
-environments, with each combination of the 2 ``mpi`` libraries and 3 compilers.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-External Spack Environment Support:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**NOTE**: Using external Spack environments is an advanced feature.
-
-Some experiments will want to use an externally defined Spack environment
-instead of having Ramble generate its own Spack environment file. This can be
-useful when the Spack environment a user wants to experiment with is
-complicated.
-
-This section shows how this feature can be used.
-
-.. code-block:: yaml
-
-    spack:
-      environments:
-        gromacs:
-          external_spack_env: name_or_path_to_spack_env
-
-In the above example, the ``external_spack_env`` keyword refers an external
-Spack environment. This can be the name of a named Spack environment, or the
-path to a directory which contains a Spack environment. Ramble will copy the
-``spack.yaml`` file from this environment, instead of generating its own.
-
-This allows users to describe custom Spack environments and allow them to be
-used with Ramble generated experiments.
-
-It is important to note that Ramble copies in the external environment files
-every time ``ramble workspace setup`` is called. The new files will clobber the
-old files, changing the configuration of the environment that Ramble will use
-for the experiments it generates.
 
 --------------------------------------------
 Controlling MPI Libraries and Batch Systems:
