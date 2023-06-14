@@ -40,7 +40,7 @@ class Experiment():
         self.processes_per_node = data['RAMBLE_VARIABLES']['processes_per_node']
         self.n_ranks = data['RAMBLE_VARIABLES']['n_ranks']
         self.n_threads = data['RAMBLE_VARIABLES']['n_threads']
-        # 'platform' # TODO: add this (it is hard to know without runtime data)
+        self.node_type = "Not Specified"
 
         # FIXME: this is no longer strictly needed since it is just a concat of known properties
         exps_hash = "{workspace_name}::{application}::{workload}::{date}".format(
@@ -82,6 +82,13 @@ class Experiment():
         return j
 
 
+def determine_node_type(experiment, contexts):
+    for context in contexts:
+        for fom in context['foms']:
+            if 'Model name' in fom['name']:
+                experiment.node_type = fom['value']
+
+
 def format_data(data_in):
     '''
     Goal: convert results to a more searchable and decomposed format for insertion
@@ -121,6 +128,7 @@ def format_data(data_in):
             # 'experiment_id': experiment_id,
             for context in exp['CONTEXTS']:
                 for fom in context['foms']:
+                    # TODO: check on value to make sure it's a number
                     e.foms.append(
                         {
                             'name': fom['name'],
@@ -130,6 +138,10 @@ def format_data(data_in):
                         }
                     )
 
+            # Explicitly try to pull out node type, if the run provided enough data
+            determine_node_type(e, exp['CONTEXTS'])
+
+
     return results
 
 
@@ -138,7 +150,8 @@ class BigQueryUploader(Uploader):
     def insert_data(self, uri: str, workspace_name, results) -> None:
         from google.cloud import bigquery
 
-        # TODO: create these tables
+        # It is expected that the user will create these tables outside of this
+        # tooling
         exp_table_id = "{uri}.{table_name}".format(uri=uri, table_name="experiments")
         fom_table_id = "{uri}.{table_name}".format(uri=uri, table_name="foms")
 
