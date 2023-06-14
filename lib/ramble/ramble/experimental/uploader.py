@@ -10,6 +10,9 @@ import llnl.util.tty as tty
 import json
 
 
+default_node_type_val = "Not Specified"
+
+
 class Uploader():
     # TODO: should the class store the base uri?
     def perform_upload(self, uri, workspace_name, data):
@@ -40,7 +43,7 @@ class Experiment():
         self.processes_per_node = data['RAMBLE_VARIABLES']['processes_per_node']
         self.n_ranks = data['RAMBLE_VARIABLES']['n_ranks']
         self.n_threads = data['RAMBLE_VARIABLES']['n_threads']
-        self.node_type = "Not Specified"
+        self.node_type = default_node_type_val
 
         # FIXME: this is no longer strictly needed since it is just a concat of known properties
         exps_hash = "{workspace_name}::{application}::{workload}::{date}".format(
@@ -83,10 +86,24 @@ class Experiment():
 
 
 def determine_node_type(experiment, contexts):
+    '''
+    Extract node type from available FOMS.
+
+    First prio is machine specific data, such as GCP meta data
+    Second prio is more general data like CPU type
+    '''
     for context in contexts:
         for fom in context['foms']:
-            if 'Model name' in fom['name']:
+            if 'machine-type' in fom['name']:
                 experiment.node_type = fom['value']
+                continue
+            elif 'Model name' in fom['name']:
+                experiment.node_type = fom['value']
+                continue
+
+        # Termination condition
+        if experiment.node_type != default_node_type_val:
+            continue
 
 
 def format_data(data_in):
@@ -140,7 +157,6 @@ def format_data(data_in):
 
             # Explicitly try to pull out node type, if the run provided enough data
             determine_node_type(e, exp['CONTEXTS'])
-
 
     return results
 

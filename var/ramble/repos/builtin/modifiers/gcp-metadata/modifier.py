@@ -25,11 +25,9 @@ class GcpMetadata(BasicModifier):
     variable_modification('log', '{experiment_run_dir}/gcp-metadata.log', method='set', modes=['standard'])
     archive_pattern('{log}')
 
-
     register_builtin('gcp_metadata_exec')
 
     def gcp_metadata_exec(self):
-        #return ['lscpu >> {log}']
         machine_type = 'curl -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/machine-type" -H "Metadata-Flavor: Google" >> {log}'
 
         image = 'curl -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/image" -H "Metadata-Flavor: Google" >> {log}'
@@ -40,7 +38,7 @@ class GcpMetadata(BasicModifier):
 
         return [machine_type, image, gid, ghostname]
 
-    figure_of_merit('machine-type', fom_regex=r'(?P<machine>.*machineTypes.*)', group_name='machine', log_file='{log}')
+    figure_of_merit('machine-type', fom_regex=r'.*machineTypes/(?P<machine>.*)', group_name='machine', log_file='{log}')
     figure_of_merit('image', fom_regex=r'(?P<image>.*global/images.*)', group_name='image', log_file='{log}')
     figure_of_merit('gid', fom_regex=r':(?P<gid>.*)=GID', group_name='gid', log_file='{log}')
     figure_of_merit('ghostname', fom_regex=r'(?P<ghostname>.*internal)', group_name='ghostname', log_file='{log}')
