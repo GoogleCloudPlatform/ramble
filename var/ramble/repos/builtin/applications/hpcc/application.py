@@ -56,15 +56,13 @@ class Hpcc(SpackApplication):
                       workloads=['standard'])
 
     output_sections = ['HPL', 'LatencyBandwidth', 'MPIFFT', 'MPIRandomAccess_LCG',
-        'MPIRandomAccess', 'PTRANS', 'SingleDGEMM', 'SingleFFT',
-        'SingleRandomAccess_LCG', 'SingleRandomAccess', 'SingleSTREAM',
-        'StarDGEMM', 'StarFFT', 'StarRandomAccess_LCG', 'StarRandomAccess',
-        'StarSTREAM', 'Summary']
+                       'MPIRandomAccess', 'PTRANS', 'SingleDGEMM', 'SingleFFT',
+                       'SingleRandomAccess_LCG', 'SingleRandomAccess', 'SingleSTREAM',
+                       'StarDGEMM', 'StarFFT', 'StarRandomAccess_LCG', 'StarRandomAccess',
+                       'StarSTREAM', 'Summary']
 
-
-    for section in output_sections:
-        context_regex = f'Begin of (?P<{section}>\w) section.'
-        figure_of_merit_context(section, regex=context_regex, output_format='{section}')
+    context_regex = 'Begin of Summary section'
+    figure_of_merit_context('Summary', regex=context_regex, output_format='Summary')
 
     summary_metrics = [
         ('HPL_Tflops', 'Tflops'),
@@ -93,7 +91,6 @@ class Hpcc(SpackApplication):
         ('RandomlyOrderedRingBandwidth_GBytes', 'GB/s')
     ]
 
-
     for metric, unit in summary_metrics:
         summary_regex = metric + '=(?P<val>[0-9]+\.[0-9]+)'
         figure_of_merit(metric,
@@ -101,69 +98,70 @@ class Hpcc(SpackApplication):
                         fom_regex=summary_regex,
                         group_name='val', units=unit,
                         contexts=['Summary']
-        )
-
+                        )
+    '''
     # Below is a list of the full metrics available in the output. The current
     # implementation captures the summary metrics, which is sufficient,  but it
     # is possible a feature user wants to expand the FOM capture to include the
     # metrics below. As such they are left here for completeness.
     # Full Metrics:
-      #  HPL
-        # T/V                N    NB     P     Q               Time                 Gflops
-        #--------------------------------------------------------------------------------
-        # WR11C2R4        1000    80     2     2               0.01              7.188e+01
-      #  DGEMM
-        # SingleDGEMM
-          # Single DGEMM Gflop/s 43.075235
+        #  HPL
+            # T/V                N    NB     P     Q               Time                 Gflops
+            #--------------------------------------------------------------------------------
+            # WR11C2R4        1000    80     2     2               0.01              7.188e+01
+        #  DGEMM
+            # SingleDGEMM
+                # Single DGEMM Gflop/s 43.075235
         # StarDGEMM
-          # Minimum Gflop/s 24.895763
-          # Average Gflop/s 33.317999
-          # Maximum Gflop/s 37.322778
-      #  STREAM
-        # StarSTREAM
-          # Minimum Copy GB/s 35.172220
-          # Average Copy GB/s 35.172220
-          # Maximum Copy GB/s 35.172220
-          # Minimum Scale GB/s 33.287994
-          # Average Scale GB/s 33.287994
-          # Maximum Scale GB/s 33.287994
-          # Minimum Add GB/s 30.727379
-          # Average Add GB/s 30.727379
-          # Maximum Add GB/s 30.727379
-          # Minimum Triad GB/s 29.852578
-          # Average Triad GB/s 29.852578
-          # Maximum Triad GB/s 29.852578
-        # SingleSTREAM
-          # Single STREAM Copy GB/s 69.904787
-          # Single STREAM Scale GB/s 66.575988
-          # Single STREAM Add GB/s 60.786771
-          # Single STREAM Triad GB/s 60.786771
-      #  PTRANS
-      # TIME   M     N    MB  NB  P   Q     TIME   CHECK   GB/s   RESID
-      # ---- ----- ----- --- --- --- --- -------- ------ -------- -----
-      # WALL   500   500  80  80   2   2     0.00 PASSED    4.726  0.00
-      #  RandomAccess:
-        # MPIRandomAccess / MPIRandomAccess_LCG
-          # 0.001405858 Billion(10^9) Updates    per second [GUP/s]
-          # 0.000351464 Billion(10^9) Updates/PE per second [GUP/s]
-        # SingleRandomAccess / SingleRandomAccess_LCG
-          # Single GUP/s 0.724316
-        # StarRandomAccess / StarRandomAccess_LCG
-          # Minimum GUP/s 0.380717
-          # Average GUP/s 0.453077
-          # Maximum GUP/s 0.661958
-      #  FFT
-        # SingleFFT
-          # Single FFT Gflop/s 5.151385
-        # MPIFFT
-          # Gflop/s:     7.768
-        # StarFFT
-          # Minimum Gflop/s 4.609983
-          # Average Gflop/s 4.761104
-          # Maximum Gflop/s 4.903864
-      #  LatencyBandwidth
-        # Max Ping Pong Latency:                 0.000489 msecs
-        # Randomly Ordered Ring Latency:         0.000425 msecs
-        # Min Ping Pong Bandwidth:           10958.338341 MB/s
-        # Naturally Ordered Ring Bandwidth:  13421.772800 MB/s
-        # Randomly  Ordered Ring Bandwidth:  12860.856132 MB/s
+            # Minimum Gflop/s 24.895763
+            # Average Gflop/s 33.317999
+            # Maximum Gflop/s 37.322778
+        #  STREAM
+            # StarSTREAM
+                # Minimum Copy GB/s 35.172220
+                # Average Copy GB/s 35.172220
+                # Maximum Copy GB/s 35.172220
+                # Minimum Scale GB/s 33.287994
+                # Average Scale GB/s 33.287994
+                # Maximum Scale GB/s 33.287994
+                # Minimum Add GB/s 30.727379
+                # Average Add GB/s 30.727379
+                # Maximum Add GB/s 30.727379
+                # Minimum Triad GB/s 29.852578
+                # Average Triad GB/s 29.852578
+                # Maximum Triad GB/s 29.852578
+            # SingleSTREAM
+                # Single STREAM Copy GB/s 69.904787
+                # Single STREAM Scale GB/s 66.575988
+                # Single STREAM Add GB/s 60.786771
+                # Single STREAM Triad GB/s 60.786771
+        #  PTRANS
+            # TIME   M     N    MB  NB  P   Q     TIME   CHECK   GB/s   RESID
+            # ---- ----- ----- --- --- --- --- -------- ------ -------- -----
+            # WALL   500   500  80  80   2   2     0.00 PASSED    4.726  0.00
+        #  RandomAccess:
+            # MPIRandomAccess / MPIRandomAccess_LCG
+                # 0.001405858 Billion(10^9) Updates    per second [GUP/s]
+                # 0.000351464 Billion(10^9) Updates/PE per second [GUP/s]
+            # SingleRandomAccess / SingleRandomAccess_LCG
+                # Single GUP/s 0.724316
+            # StarRandomAccess / StarRandomAccess_LCG
+                # Minimum GUP/s 0.380717
+                # Average GUP/s 0.453077
+                # Maximum GUP/s 0.661958
+        #  FFT
+            # SingleFFT
+                # Single FFT Gflop/s 5.151385
+            # MPIFFT
+                # Gflop/s:     7.768
+            # StarFFT
+                # Minimum Gflop/s 4.609983
+                # Average Gflop/s 4.761104
+                # Maximum Gflop/s 4.903864
+        #  LatencyBandwidth
+            # Max Ping Pong Latency:                 0.000489 msecs
+            # Randomly Ordered Ring Latency:         0.000425 msecs
+            # Min Ping Pong Bandwidth:           10958.338341 MB/s
+            # Naturally Ordered Ring Bandwidth:  13421.772800 MB/s
+            # Randomly  Ordered Ring Bandwidth:  12860.856132 MB/s
+    '''
