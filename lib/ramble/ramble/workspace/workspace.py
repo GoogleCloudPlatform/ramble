@@ -433,6 +433,7 @@ class Workspace(object):
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
+        self.always_print_foms = False
 
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
         self._templates = {}
@@ -667,10 +668,7 @@ class Workspace(object):
             tty.debug(' ---- Found success in %s' % scope)
             for conf in contents[namespace.success]:
                 tty.debug(' ---- Adding criteria %s' % conf['name'])
-                self.success_list.add_criteria(scope, conf['name'],
-                                               conf['mode'],
-                                               conf['match'],
-                                               conf['file'])
+                self.success_list.add_criteria(scope, **conf)
 
     def all_specs(self):
         import ramble.spec
@@ -1101,7 +1099,7 @@ class Workspace(object):
                                 exp['name'])
                         f.write('  Status = %s\n' %
                                 exp['RAMBLE_STATUS'])
-                        if exp['RAMBLE_STATUS'] == 'SUCCESS':
+                        if exp['RAMBLE_STATUS'] == 'SUCCESS' or self.always_print_foms:
                             for context in exp['CONTEXTS']:
                                 f.write('  %s figures of merit:\n' %
                                         context['name'])
@@ -1184,8 +1182,10 @@ class Workspace(object):
                             'properly configured.'
             tty.die(error_message)
 
-        self.extract_success_criteria('workspace',
-                                      ramble.config.config.get_config('success_criteria'))
+        workspace_success = {
+            namespace.success: ramble.config.config.get_config(namespace.success)
+        }
+        self.extract_success_criteria('workspace', workspace_success)
 
         if pipeline == 'setup':
             all_experiments_file = open(self.all_experiments_path, 'w+')

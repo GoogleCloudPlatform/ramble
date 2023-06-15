@@ -19,8 +19,11 @@ success_criteria_def = {
     'properties': {
         'name': {'type': 'string'},
         'mode': {'type': 'string'},
-        'match': {'type': 'string'},
-        'file': {'type': 'string'}
+        'match': {'type': 'string', 'default': None},
+        'file': {'type': 'string', 'default': None},
+        'fom_name': {'type': 'string', 'default': None},
+        'fom_context': {'type': 'string', 'default': None},
+        'formula': {'type': 'string', 'default': None}
     },
     'additionalProperties': False,
 }
