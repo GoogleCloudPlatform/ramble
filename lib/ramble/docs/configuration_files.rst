@@ -14,8 +14,8 @@ Ramble supports several different configuration files to control its behavior.
 Some of these apply changes to Ramble's internals, while some modify the
 experiments ramble generates.
 
-This document will describe each config section and its purpose. This document
-will not cover the workspace configuration file, which has its own document.
+This document describes each config section and its purpose. This document
+does not cover the :ref:`workspace configuration file<workspace-config>`, which has its own document.
 
 Ramble's configuration logic closely follows
 `Spack's configuration logic <https://spack.readthedocs.io/en/latest/configuration.html>`.
