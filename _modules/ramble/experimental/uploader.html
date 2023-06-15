@@ -117,6 +117,9 @@
 <span class="kn">import</span> <span class="nn">json</span>
 
 
+<span class="n">default_node_type_val</span> <span class="o">=</span> <span class="s2">&quot;Not Specified&quot;</span>
+
+
 <div class="viewcode-block" id="Uploader"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader">[docs]</a><span class="k">class</span> <span class="nc">Uploader</span><span class="p">():</span>
     <span class="c1"># TODO: should the class store the base uri?</span>
 <div class="viewcode-block" id="Uploader.perform_upload"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader.perform_upload">[docs]</a>    <span class="k">def</span> <span class="nf">perform_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">workspace_name</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -147,7 +150,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">processes_per_node</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;processes_per_node&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_ranks&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_threads</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_threads&#39;</span><span class="p">]</span>
-        <span class="c1"># &#39;platform&#39; # TODO: add this (it is hard to know without runtime data)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">default_node_type_val</span>
 
         <span class="c1"># FIXME: this is no longer strictly needed since it is just a concat of known properties</span>
         <span class="n">exps_hash</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{workspace_name}</span><span class="s2">::</span><span class="si">{application}</span><span class="s2">::</span><span class="si">{workload}</span><span class="s2">::</span><span class="si">{date}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -189,6 +192,27 @@
         <span class="k">return</span> <span class="n">j</span></div></div>
 
 
+<div class="viewcode-block" id="determine_node_type"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.determine_node_type">[docs]</a><span class="k">def</span> <span class="nf">determine_node_type</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">contexts</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Extract node type from available FOMS.</span>
+
+<span class="sd">    First prio is machine specific data, such as GCP meta data</span>
+<span class="sd">    Second prio is more general data like CPU type</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s1">&#39;machine-type&#39;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="s1">&#39;Model name&#39;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Termination condition</span>
+        <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">!=</span> <span class="n">default_node_type_val</span><span class="p">:</span>
+            <span class="k">continue</span></div>
+
+
 <div class="viewcode-block" id="format_data"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.format_data">[docs]</a><span class="k">def</span> <span class="nf">format_data</span><span class="p">(</span><span class="n">data_in</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Goal: convert results to a more searchable and decomposed format for insertion</span>
@@ -228,6 +252,7 @@
             <span class="c1"># &#39;experiment_id&#39;: experiment_id,</span>
             <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]:</span>
                 <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
+                    <span class="c1"># TODO: check on value to make sure it&#39;s a number</span>
                     <span class="n">e</span><span class="o">.</span><span class="n">foms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="p">{</span>
                             <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
@@ -237,6 +262,9 @@
                         <span class="p">}</span>
                     <span class="p">)</span>
 
+            <span class="c1"># Explicitly try to pull out node type, if the run provided enough data</span>
+            <span class="n">determine_node_type</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">])</span>
+
     <span class="k">return</span> <span class="n">results</span></div>
 
 
@@ -245,7 +273,8 @@
 <div class="viewcode-block" id="BigQueryUploader.insert_data"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.insert_data">[docs]</a>    <span class="k">def</span> <span class="nf">insert_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">workspace_name</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
 
-        <span class="c1"># TODO: create these tables</span>
+        <span class="c1"># It is expected that the user will create these tables outside of this</span>
+        <span class="c1"># tooling</span>
         <span class="n">exp_table_id</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{uri}</span><span class="s2">.</span><span class="si">{table_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;experiments&quot;</span><span class="p">)</span>
         <span class="n">fom_table_id</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{uri}</span><span class="s2">.</span><span class="si">{table_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;foms&quot;</span><span class="p">)</span>
 
@@ -312,7 +341,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 14, 2023.
+      <span class="lastupdated">Last updated on Jun 15, 2023.
       </span></p>
   </div>
 

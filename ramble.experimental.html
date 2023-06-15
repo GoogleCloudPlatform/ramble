@@ -213,6 +213,14 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.experimental.uploader.determine_node_type">
+<span class="sig-prename descclassname"><span class="pre">ramble.experimental.uploader.</span></span><span class="sig-name descname"><span class="pre">determine_node_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/experimental/uploader.html#determine_node_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.experimental.uploader.determine_node_type" title="Permalink to this definition"></a></dt>
+<dd><p>Extract node type from available FOMS.</p>
+<p>First prio is machine specific data, such as GCP meta data
+Second prio is more general data like CPU type</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.experimental.uploader.format_data">
 <span class="sig-prename descclassname"><span class="pre">ramble.experimental.uploader.</span></span><span class="sig-name descname"><span class="pre">format_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/experimental/uploader.html#format_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.experimental.uploader.format_data" title="Permalink to this definition"></a></dt>
 <dd><p>Goal: convert results to a more searchable and decomposed format for insertion
@@ -252,7 +260,7 @@ foms: {experiment_id, fom_name, fom_value, fom_unit..} # +context?</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 14, 2023.
+      <span class="lastupdated">Last updated on Jun 15, 2023.
       </span></p>
   </div>
 
