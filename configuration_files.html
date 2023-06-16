@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration Files &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Workspace Configuration File" href="workspace_config.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-sections">Configuration Sections:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#application-section">Application Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-section">Config Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-variables-section">Environment Variables Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#internals-section">Internals Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#licenses-section">Licenses Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mirrors-section">Mirrors Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modifier-repos-section">Modifier Repos Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modifiers-section">Modifiers Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#repos-section">Repos Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spack-section">Spack Section:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#vector-and-matrix-packages-and-environments">Vector and Matrix Packages and Environments:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#external-spack-environment-support">External Spack Environment Support:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#success-criteria-section">Success Criteria Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variables-section">Variables Section:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuration Files</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/configuration_files.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-files">
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this heading"></a></h1>
+<p>Ramble supports several different configuration files to control its behavior.
+Some of these apply changes to Ramble’s internals, while some modify the
+experiments ramble generates.</p>
+<p>This document describes each config section and its purpose. This document
+does not cover the <a class="reference internal" href="workspace_config.html#workspace-config"><span class="std std-ref">workspace configuration file</span></a>, which has its own document.</p>
+<p>Ramble’s configuration logic closely follows
+<cite>Spack’s configuration logic &lt;https://spack.readthedocs.io/en/latest/configuration.html&gt;</cite>.</p>
+<section id="configuration-sections">
+<h2>Configuration Sections:<a class="headerlink" href="#configuration-sections" title="Permalink to this heading"></a></h2>
+<p>Currently, Ramble supports the following configuration sections:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#application-config"><span class="std std-ref">applications</span></a></p></li>
+<li><p><a class="reference internal" href="#config-yaml"><span class="std std-ref">config</span></a></p></li>
+<li><p><a class="reference internal" href="#env-vars-config"><span class="std std-ref">env_vars</span></a></p></li>
+<li><p><a class="reference internal" href="#internals-config"><span class="std std-ref">internals</span></a></p></li>
+<li><p><a class="reference internal" href="#licenses-config"><span class="std std-ref">licenses</span></a></p></li>
+<li><p><a class="reference internal" href="#mirrors-config"><span class="std std-ref">mirrors</span></a></p></li>
+<li><p><a class="reference internal" href="#modifier-repos-config"><span class="std std-ref">modifier_repos</span></a></p></li>
+<li><p><a class="reference internal" href="#modifiers-config"><span class="std std-ref">modifiers</span></a></p></li>
+<li><p><a class="reference internal" href="#repos-config"><span class="std std-ref">repos</span></a></p></li>
+<li><p><a class="reference internal" href="#spack-config"><span class="std std-ref">spack</span></a></p></li>
+<li><p><a class="reference internal" href="#success-criteria-config"><span class="std std-ref">success_criteria</span></a></p></li>
+<li><p><a class="reference internal" href="#variables-config"><span class="std std-ref">variables</span></a></p></li>
+</ul>
+<p>Each of these config sections has a defined schema contained in
+<code class="docutils literal notranslate"><span class="pre">lib/ramble/ramble/schemas</span></code>.</p>
+</section>
+<section id="application-section">
+<span id="application-config"></span><h2>Application Section:<a class="headerlink" href="#application-section" title="Permalink to this heading"></a></h2>
+<p>The application configuration section is used to define the experiments a
+workspace should generate. The general format for this config section is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">&lt;application_name&gt;</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">[</span><span class="nv">optional_definitions</span><span class="p p-Indicator">]:</span>
+<span class="w">    </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">&lt;workload_name&gt;</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">[</span><span class="nv">optional_definitions</span><span class="p p-Indicator">]:</span>
+<span class="w">        </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">&lt;experiment_name&gt;</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">optional_definitions</span><span class="p p-Indicator">]:</span>
+<span class="w">            </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">matrix</span><span class="p p-Indicator">]:</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">matrices</span><span class="p p-Indicator">]:</span>
+</pre></div>
+</div>
+<p>In the above <code class="docutils literal notranslate"><span class="pre">[optional_definitions]</span></code> can include any of:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#env-vars-config"><span class="std std-ref">env_vars</span></a></p></li>
+<li><p><a class="reference internal" href="#internals-config"><span class="std std-ref">internals</span></a></p></li>
+<li><p><a class="reference internal" href="#modifiers-config"><span class="std std-ref">modifiers</span></a></p></li>
+<li><p><a class="reference internal" href="#success-criteria-config"><span class="std std-ref">success_criteria</span></a></p></li>
+<li><p><a class="reference internal" href="#variables-config"><span class="std std-ref">variables</span></a></p></li>
+</ul>
+<p>Each of these will be described in their own section below.</p>
+<p>Within an experiment, each portion of <code class="docutils literal notranslate"><span class="pre">[optional_definitions]</span></code> will be merged
+together, with the order of precedence (from lowest to highest) being:</p>
+<ul class="simple">
+<li><p>application</p></li>
+<li><p>workload</p></li>
+<li><p>experiment</p></li>
+</ul>
+</section>
+<section id="config-section">
+<span id="config-yaml"></span><h2>Config Section:<a class="headerlink" href="#config-section" title="Permalink to this heading"></a></h2>
+<p>The config configuration section is used to control internal aspects of Ramble.
+The current default configuration is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">  </span><span class="nt">spack_flags</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">install</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;--reuse&#39;</span>
+<span class="w">    </span><span class="nt">concretize</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;--reuse&#39;</span>
+<span class="w">    </span><span class="nt">global_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="w">  </span><span class="nt">input_cache</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;$ramble/var/ramble/cache&#39;</span>
+<span class="w">  </span><span class="nt">workspace_dirs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;$ramble/var/ramble/workspaces&#39;</span>
+<span class="w">  </span><span class="nt">upload</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;BigQuery&#39;</span>
+<span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="environment-variables-section">
+<span id="env-vars-config"></span><h2>Environment Variables Section:<a class="headerlink" href="#environment-variables-section" title="Permalink to this heading"></a></h2>
+<p>The environment variables config section is named <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> and controls
+what environment variable modifications ramble should inject into experiments.</p>
+<p>The format of this config section is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">var_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_value</span>
+<span class="w">  </span><span class="nt">append</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">var-separator</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;,&#39;</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">var_to_append</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_append</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path_to_append</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_append</span>
+<span class="w">  </span><span class="nt">prepend</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path_to_prepend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_prepend</span>
+<span class="w">  </span><span class="nt">unset</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_to_unset</span>
+</pre></div>
+</div>
+<p>The above example is general, and intended to show the available functionality
+of configuring environment variables. Below the <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> level, one of four
+actions is available. These actions are:
+* <code class="docutils literal notranslate"><span class="pre">set</span></code> - Define a variable equal to a given value. Overwrites previously configured values
+* <code class="docutils literal notranslate"><span class="pre">append</span></code> - Append the given value to the end of a previous variable definition. Delimited for vars is defined by <code class="docutils literal notranslate"><span class="pre">var_separator</span></code>, <code class="docutils literal notranslate"><span class="pre">paths</span></code> uses <code class="docutils literal notranslate"><span class="pre">:</span></code>
+* <code class="docutils literal notranslate"><span class="pre">prepend</span></code> - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is <code class="docutils literal notranslate"><span class="pre">:</span></code>
+* <code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p>
+</section>
+<section id="internals-section">
+<span id="internals-config"></span><h2>Internals Section:<a class="headerlink" href="#internals-section" title="Permalink to this heading"></a></h2>
+<p>The internals config section is used to modify internal aspects of an
+application definition when creating experiments.</p>
+<p><strong>NOTE:</strong> This section is intended as more of an advanced user section, and can
+easily break aspects of the experiment if used incorrectly.</p>
+<p>The format of the internals config section is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">internals</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">custom_executables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;executable_name&gt;</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">of</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">commands</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">for</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">template</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">True/False</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># Default: False</span>
+<span class="w">      </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;where_to_redirect_output&#39;</span><span class="w"> </span><span class="c1"># Default &#39;{log_file}&#39;</span>
+<span class="w">      </span><span class="nt">output_capture</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;operator_to_use_for_redirection&#39;</span><span class="w"> </span><span class="c1"># Default &gt;&gt;</span>
+<span class="w">  </span><span class="nt">executables</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list of</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">executables</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">to use in</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">experiments</span>
+</pre></div>
+</div>
+<p>Currently this section has two sub-sections.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">custom_executables</span></code> sub-section can be used to define new executables
+that an experiment should use. It can also be used to override the definition
+of an internally defined executable within an experiment.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">executables</span></code> sub-section can be used to control the order executables
+will be used in the experiment. This is also the mechanism to inject custom
+executables into an experiment.</p>
+</section>
+<section id="licenses-section">
+<span id="licenses-config"></span><h2>Licenses Section:<a class="headerlink" href="#licenses-section" title="Permalink to this heading"></a></h2>
+<p>The licenses config section is used to configure license environment variables
+to applications. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">licenses</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">&lt;application_name&gt;</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">var_to_set</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;VALUE&#39;</span>
+<span class="w">    </span><span class="nt">append</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">var-separator</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;,&#39;</span>
+<span class="w">      </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">var_to_append</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;VALUE&#39;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path_to_append</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;VALUE&#39;</span>
+<span class="w">    </span><span class="nt">prepend</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path_to_prepend</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;VALUE&#39;</span>
+<span class="w">    </span><span class="nt">unset</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_to_unset</span>
+</pre></div>
+</div>
+<p>Ramble will automatically inject these environment variable modifications into
+experiments that use the application defined by <code class="docutils literal notranslate"><span class="pre">&lt;application_name&gt;</span></code>.</p>
+</section>
+<section id="mirrors-section">
+<span id="mirrors-config"></span><h2>Mirrors Section:<a class="headerlink" href="#mirrors-section" title="Permalink to this heading"></a></h2>
+<p>The mirrors config section is used to control alternative locations Ramble
+should download input files from. Mirros are checked before the default URL for
+an input file. The format of the mirrors section is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mirrors</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">&lt;mirror1_name&gt;</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;url&#39;</span>
+<span class="w">  </span><span class="nt">&lt;mirror2_name&gt;</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">fetch</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;fetch_url&#39;</span>
+<span class="w">    </span><span class="nt">push</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;push_url&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="modifier-repos-section">
+<span id="modifier-repos-config"></span><h2>Modifier Repos Section:<a class="headerlink" href="#modifier-repos-section" title="Permalink to this heading"></a></h2>
+<p>The modifier repos config section is used to control which repositories should
+be searched for when looking for modifiers. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">modifier_repos</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;path/to/repo&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="modifiers-section">
+<span id="modifiers-config"></span><h2>Modifiers Section:<a class="headerlink" href="#modifiers-section" title="Permalink to this heading"></a></h2>
+<p>The modifiers config section is used to control which modifiers will be used on
+experiments ramble generates. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">modifiers</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;modifier_name&gt;</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;mode_for_modifier&gt;</span><span class="w"> </span><span class="c1"># Optional if modifier only has one mode</span>
+<span class="w">  </span><span class="nt">on_executable</span><span class="p">:</span><span class="w"> </span><span class="c1"># Defaults to &#39;*&#39;, follows glob syntax</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list of</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">executables to apply</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modifier to</span>
+</pre></div>
+</div>
+</section>
+<section id="repos-section">
+<span id="repos-config"></span><h2>Repos Section:<a class="headerlink" href="#repos-section" title="Permalink to this heading"></a></h2>
+<p>The repos config section is used to control which repositories should
+be searched for when looking for application definitions. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">repos</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;path/to/repo&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="spack-section">
+<span id="spack-config"></span><h2>Spack Section:<a class="headerlink" href="#spack-section" title="Permalink to this heading"></a></h2>
+<p>The spack config section is used to define package definitions, and software
+environments created from those packages. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">True/False</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># Should be false unless defined in a concretized workspace</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;package_name&gt;</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;spack_spec_for_package&#39;</span>
+<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Compiler</span><span class="nv"> </span><span class="s">spec,</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">different</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">spack_spec&#39;</span><span class="w"> </span><span class="c1"># Default: None</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;package_name_to_use_as_compiler&#39;</span><span class="w"> </span><span class="c1"># Default: None</span>
+<span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">variables</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{}]</span>
+<span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrix</span><span class="p p-Indicator">:]</span>
+<span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrices</span><span class="p p-Indicator">:]</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;environment_name&gt;</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list of</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">packages in</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">environment</span>
+<span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">variables</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{}]</span>
+<span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrix</span><span class="p p-Indicator">:]</span>
+<span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrices</span><span class="p p-Indicator">:]</span>
+<span class="w">    </span><span class="nt">&lt;external_env_name&gt;</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">external_spack_env</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;name_or_path_to_spack_env&#39;</span>
+</pre></div>
+</div>
+<p>The packages dictionary houses ramble descriptions of spack packages that can
+be used to construct environments with. A package is defined as software that
+spack should install for the user. These have one required attribute, and two
+optional attributes. The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute is required to be defined,
+and should be the spec passed to <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">install</span></code> on the command line for the
+package. Optionally, a package can defined a <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which
+will be the spec used when this package is used as a compiler for another
+package. Packages can also optionally defined a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which
+is the name of another package that should be used as it’s compiler.</p>
+<p>The environments dictionary contains descriptions of spack environments that
+Ramble might generate based on the requested experiments. Environments are
+defined as a list of packages (in the aforementioned packages dictionary) that
+should be bundled into a spack environment.</p>
+<p>Below is an annotated example of the spack dictionary.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span><span class="w"> </span><span class="c1"># Abstract name to refer to this package</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span><span class="w"> </span><span class="c1"># Spack spec for this package</span>
+<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span><span class="w"> </span><span class="c1"># Spack compiler spec for this package</span>
+<span class="w">    </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span><span class="w"> </span><span class="c1"># Other package name to use as compiler for this package</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">packages</span><span class="p">:</span><span class="w"> </span><span class="c1"># List of packages to include in this environment</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+</pre></div>
+</div>
+<section id="vector-and-matrix-packages-and-environments">
+<h3>Vector and Matrix Packages and Environments:<a class="headerlink" href="#vector-and-matrix-packages-and-environments" title="Permalink to this heading"></a></h3>
+<p>Package and environment definitions can generate many packages and environments
+following Ramble’s
+<a class="reference internal" href="workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector</span></a> / <a class="reference internal" href="workspace_config.html#ramble-matrix-logic"><span class="std std-ref">matrix</span></a> logic.</p>
+<p>Below is an example of using this logic within the spack dictionary:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver} target=x86_64</span>
+<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver}</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi-{comp}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">openmpi-{comp}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2</span>
+<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}-{mpi}</span><span class="p p-Indicator">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
+<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">mpi</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">intel-mpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">},</span><span class="w"> </span><span class="nv">openmpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span><span class="s">&#39;]</span>
+<span class="w">      </span><span class="s">matrix:</span>
+<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">mpi</span>
+<span class="w">      </span><span class="s">packages:</span>
+<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">{mpi}</span>
+<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">wrf-{comp}</span>
+</pre></div>
+</div>
+<p>The above file will generate 3 versions of <code class="docutils literal notranslate"><span class="pre">gcc</span></code>, 3 versions each of <code class="docutils literal notranslate"><span class="pre">wrf</span></code>,
+<code class="docutils literal notranslate"><span class="pre">intel-mpi</span></code> and <code class="docutils literal notranslate"><span class="pre">openmpi</span></code> built with each <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version, and 6 spack
+environments, with each combination of the 2 <code class="docutils literal notranslate"><span class="pre">mpi</span></code> libraries and 3 compilers.</p>
+</section>
+<section id="external-spack-environment-support">
+<h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Permalink to this heading"></a></h3>
+<p><strong>NOTE</strong>: Using external Spack environments is an advanced feature.</p>
+<p>Some experiments will want to use an externally defined Spack environment
+instead of having Ramble generate its own Spack environment file. This can be
+useful when the Spack environment a user wants to experiment with is
+complicated.</p>
+<p>This section shows how this feature can be used.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">external_spack_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name_or_path_to_spack_env</span>
+</pre></div>
+</div>
+<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">external_spack_env</span></code> keyword refers an external
+Spack environment. This can be the name of a named Spack environment, or the
+path to a directory which contains a Spack environment. Ramble will copy the
+<code class="docutils literal notranslate"><span class="pre">spack.yaml</span></code> file from this environment, instead of generating its own.</p>
+<p>This allows users to describe custom Spack environments and allow them to be
+used with Ramble generated experiments.</p>
+<p>It is important to note that Ramble copies in the external environment files
+every time <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">setup</span></code> is called. The new files will clobber the
+old files, changing the configuration of the environment that Ramble will use
+for the experiments it generates.</p>
+</section>
+</section>
+<section id="success-criteria-section">
+<span id="success-criteria-config"></span><h2>Success Criteria Section:<a class="headerlink" href="#success-criteria-section" title="Permalink to this heading"></a></h2>
+<p>The success criteria section is used to control what criteria experiment should
+use when determining if they were successful or not. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">success_criteria</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;criteria_name&#39;</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;criteria_mode&#39;</span><span class="w"> </span><span class="c1"># i.e. &#39;string&#39; for string matching</span>
+<span class="w">  </span><span class="nt">match</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;regex_for_matching&#39;</span>
+<span class="w">  </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;file_criteria_should_be_found_in&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="variables-section">
+<span id="variables-config"></span><h2>Variables Section:<a class="headerlink" href="#variables-section" title="Permalink to this heading"></a></h2>
+<p>The variables config section is used to define variables within ramble
+experiments. These variables are used in several places within Ramble. Its
+format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">var_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;var_value&#39;</span>
+<span class="w">  </span><span class="nt">list_var_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;val1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;val2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">cross_reference_var</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;var</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">&lt;app&gt;.&lt;workload&gt;.&lt;exp&gt;&#39;</span>
+</pre></div>
+</div>
+<p>Variables can be defined as lists, scalars, or can refer to a variable defined in
+another fully qualified experiment (through the <code class="docutils literal notranslate"><span class="pre">cross_ref_var</span></code> syntax).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workspace_config.html" class="btn btn-neutral float-right" title="Workspace Configuration File" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jun 16, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

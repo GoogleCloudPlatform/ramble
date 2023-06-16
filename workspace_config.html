@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ramble" href="command_index.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+    <link rel="prev" title="Configuration Files" href="configuration_files.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,6 +50,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="ramble.html">ramble package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration_files.html">Configuration Files</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Workspace Configuration File</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-dictionary">Ramble Dictionary:</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-names">Experiment Names:</a></li>
@@ -73,11 +74,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#spack-dictionary">Spack Dictionary:</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#vector-and-matrix-packages-and-environments">Vector and Matrix Packages and Environments:</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#external-spack-environment-support">External Spack Environment Support:</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#spack-dictionary">Spack Dictionary:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#controlling-mpi-libraries-and-batch-systems">Controlling MPI Libraries and Batch Systems:</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mpi-command-control">MPI Command Control:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#batch-system-control">Batch System Control:</a></li>
@@ -148,7 +145,7 @@
            <div itemprop="articleBody">
              
   <section id="workspace-configuration-file">
-<h1>Workspace Configuration File<a class="headerlink" href="#workspace-configuration-file" title="Permalink to this heading"></a></h1>
+<span id="workspace-config"></span><h1>Workspace Configuration File<a class="headerlink" href="#workspace-configuration-file" title="Permalink to this heading"></a></h1>
 <p>Ramble workspaces are controlled through their configuration files. Each
 workspace has a configuration file stored at <code class="docutils literal notranslate"><span class="pre">$workspace/configs/ramble.yaml</span></code>.</p>
 <p>This document will describe the syntax for writing a workspace configuration file.</p>
@@ -247,7 +244,7 @@ experiment. This experiment will also include definitions for
 <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, and <code class="docutils literal notranslate"><span class="pre">n_threads</span></code>.</p>
 </section>
 <section id="list-variables">
-<h3>List Variables:<a class="headerlink" href="#list-variables" title="Permalink to this heading"></a></h3>
+<span id="ramble-vector-logic"></span><h3>List Variables:<a class="headerlink" href="#list-variables" title="Permalink to this heading"></a></h3>
 <p>Variables can be defined as a list of values as well (again, following the same
 math and variable expansion syntax as defined above).</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -277,7 +274,7 @@ math and variable expansion syntax as defined above).</p>
 length. They are zipped together, and iterated over to generate unique experiments.</p>
 </section>
 <section id="variable-matrices">
-<h3>Variable Matrices:<a class="headerlink" href="#variable-matrices" title="Permalink to this heading"></a></h3>
+<span id="ramble-matrix-logic"></span><h3>Variable Matrices:<a class="headerlink" href="#variable-matrices" title="Permalink to this heading"></a></h3>
 <p>In addition to allowing variables, Ramble’s config file has a special syntax for define variable matrices.</p>
 <p>Matrices consume list variables, and generate a matrix of variables with it.
 Each independent matrix performs the cross product of any list variables it
@@ -341,35 +338,10 @@ there would be 4 experiments, each defined by a unique
 </section>
 <section id="environment-variable-control">
 <h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Permalink to this heading"></a></h3>
-<p>Environment variables can be controlled within the workspace configuration
-file. These are defined within the <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> configuration section. Below is
-an example of the format of this configuration section.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">env_vars</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">set</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">var_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_value</span>
-<span class="w">  </span><span class="nt">append</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">var-separator</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;,&#39;</span>
-<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">var_to_append</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_append</span>
-<span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">path_to_append</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_append</span>
-<span class="w">  </span><span class="nt">prepend</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">paths</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">path_to_prepend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_to_prepend</span>
-<span class="w">  </span><span class="nt">unset</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">var_to_unset</span>
-</pre></div>
-</div>
-<p>The above example is general, and intended to show the available functionality
-of configuring environment variables. Below the <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> level, one of four
-actions is available. These actions are:
-* <code class="docutils literal notranslate"><span class="pre">set</span></code> - Define a variable equal to a given value. Overwrites previously configured values
-* <code class="docutils literal notranslate"><span class="pre">append</span></code> - Append the given value to the end of a previous variable definition. Delimited for vars is defined by <code class="docutils literal notranslate"><span class="pre">var_separator</span></code>, <code class="docutils literal notranslate"><span class="pre">paths</span></code> uses <code class="docutils literal notranslate"><span class="pre">:</span></code>
-* <code class="docutils literal notranslate"><span class="pre">prepend</span></code> - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is <code class="docutils literal notranslate"><span class="pre">:</span></code>
-* <code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p>
-<p>This config section is allowed to be defined anywhere a variables configuration
-can be defined.</p>
-<p>As a more concrete example:</p>
+<p>Environment variables can be controlled using an
+<span class="xref std std-ref">env_var config section</span>,
+defined at the appropriate level of the workspace config.</p>
+<p>As a concrete example:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">SET_VAR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_val</span>
@@ -503,10 +475,9 @@ only act on the correct executable types (i.e. executables with <code class="doc
 <h3>Controlling Internals:<a class="headerlink" href="#controlling-internals" title="Permalink to this heading"></a></h3>
 <p>Within a workspace config, an internals dictionary can be used to control
 several internal aspects of the application, workload, and experiment.</p>
-<p>An internals dictionary can be defined anywhere a variables dictionary can be
-defined (i.e. within a workspace, a specific application, a specific workload,
-or a specific experiment). This section will describe the features available
-within the internals dictionary.</p>
+<p>This config section is defined in the
+<a class="reference internal" href="configuration_files.html#internals-config"><span class="std std-ref">internals config section</span></a>.</p>
+<p>Below are examples of using this within a workspace config file.</p>
 <section id="custom-executables">
 <h4>Custom Executables:<a class="headerlink" href="#custom-executables" title="Permalink to this heading"></a></h4>
 <p>Custom executables can be created within the internals dictionary. Below is an
@@ -627,40 +598,9 @@ an experiment. Set to an empty string for non-spack applications</p></li>
 <section id="spack-dictionary">
 <h2>Spack Dictionary:<a class="headerlink" href="#spack-dictionary" title="Permalink to this heading"></a></h2>
 <p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">spack:</span></code> dictionary controls the software
-stack installation that ramble performs. This is accomplished by defining
+stack installation that ramble performs. This configuration section is defined
+in the <a class="reference internal" href="configuration_files.html#spack-config"><span class="std std-ref">Spack section</span></a> documentation.
 a packages dictionary, and an environments dictionary.</p>
-<p>The packages dictionary houses ramble descriptions of spack packages that can
-be used to construct environments with. A package is defined as software that
-spack should install for the user. These have one required attribute, and two
-optional attributes. The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute is required to be defined,
-and should be the spec passed to <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">install</span></code> on the command line for the
-package. Optionally, a package can defined a <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which
-will be the spec used when this package is used as a compiler for another
-package. Packages can also optionally defined a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which
-is the name of another package that should be used as it’s compiler.</p>
-<p>The environments dictionary contains descriptions of spack environments that
-Ramble might generate based on the requested experiments. Environments are
-defined as a list of packages (in the aforementioned packages dictionary) that
-should be bundled into a spack environment.</p>
-<p>Below is an annotated example of the spack dictionary.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span><span class="w"> </span><span class="c1"># Abstract name to refer to this package</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span><span class="w"> </span><span class="c1"># Spack spec for this package</span>
-<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span><span class="w"> </span><span class="c1"># Spack compiler spec for this package</span>
-<span class="w">    </span><span class="nt">impi2018</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span><span class="w"> </span><span class="c1"># Other package name to use as compiler for this package</span>
-<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
-<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">packages</span><span class="p">:</span><span class="w"> </span><span class="c1"># List of packages to include in this environment</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
-</pre></div>
-</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">concretize</span></code> command can help construct a functional
 spack dictionary based on the experiments listed.</p>
 <p>It is important to note that packages and environments that are not used by an
@@ -669,79 +609,6 @@ experiment are not installed.</p>
 directives, which are packages the application might need to run properly.
 Additionally, spack packages can be marked as required through the
 <code class="docutils literal notranslate"><span class="pre">required_package</span></code> directive.</p>
-<section id="vector-and-matrix-packages-and-environments">
-<h3>Vector and Matrix Packages and Environments:<a class="headerlink" href="#vector-and-matrix-packages-and-environments" title="Permalink to this heading"></a></h3>
-<p>As with experiments, package and environment definitions can generate many
-packages and environments following the same previously mentioned vector and
-matrix syntax.</p>
-<p>Below is an example of using this logic within the spack dictionary:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver} target=x86_64</span>
-<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver}</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi-{comp}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">openmpi-{comp}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
-<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}-{mpi}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="nt">mpi</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">intel-mpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">},</span><span class="w"> </span><span class="nv">openmpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span><span class="s">&#39;]</span>
-<span class="w">      </span><span class="s">matrix:</span>
-<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">mpi</span>
-<span class="w">      </span><span class="s">packages:</span>
-<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">{mpi}</span>
-<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">wrf-{comp}</span>
-</pre></div>
-</div>
-<p>The above file will generate 3 versions of <code class="docutils literal notranslate"><span class="pre">gcc</span></code>, 3 versions each of <code class="docutils literal notranslate"><span class="pre">wrf</span></code>,
-<code class="docutils literal notranslate"><span class="pre">intel-mpi</span></code> and <code class="docutils literal notranslate"><span class="pre">openmpi</span></code> built with each <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version, and 6 spack
-environments, with each combination of the 2 <code class="docutils literal notranslate"><span class="pre">mpi</span></code> libraries and 3 compilers.</p>
-</section>
-<section id="external-spack-environment-support">
-<h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Permalink to this heading"></a></h3>
-<p><strong>NOTE</strong>: Using external Spack environments is an advanced feature.</p>
-<p>Some experiments will want to use an externally defined Spack environment
-instead of having Ramble generate its own Spack environment file. This can be
-useful when the Spack environment a user wants to experiment with is
-complicated.</p>
-<p>This section shows how this feature can be used.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">external_spack_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name_or_path_to_spack_env</span>
-</pre></div>
-</div>
-<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">external_spack_env</span></code> keyword refers an external
-Spack environment. This can be the name of a named Spack environment, or the
-path to a directory which contains a Spack environment. Ramble will copy the
-<code class="docutils literal notranslate"><span class="pre">spack.yaml</span></code> file from this environment, instead of generating its own.</p>
-<p>This allows users to describe custom Spack environments and allow them to be
-used with Ramble generated experiments.</p>
-<p>It is important to note that Ramble copies in the external environment files
-every time <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">setup</span></code> is called. The new files will clobber the
-old files, changing the configuration of the environment that Ramble will use
-for the experiments it generates.</p>
-</section>
 </section>
 <section id="controlling-mpi-libraries-and-batch-systems">
 <h2>Controlling MPI Libraries and Batch Systems:<a class="headerlink" href="#controlling-mpi-libraries-and-batch-systems" title="Permalink to this heading"></a></h2>
@@ -1023,7 +890,7 @@ into the explicitly chained experiment.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="configuration_files.html" class="btn btn-neutral float-left" title="Configuration Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="command_index.html" class="btn btn-neutral float-right" title="ramble" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
@@ -1031,7 +898,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 15, 2023.
+      <span class="lastupdated">Last updated on Jun 16, 2023.
       </span></p>
   </div>
 

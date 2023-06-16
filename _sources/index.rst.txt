@@ -18,6 +18,7 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 
    ramble
    getting_started
+   configuration_files
    workspace_config
 
 .. toctree::
