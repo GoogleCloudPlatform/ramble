@@ -89,8 +89,8 @@ section_schemas = {
     'variables': ramble.schema.variables.schema,
 }
 
-# Same as above, but including keys for environments
-# this allows us to unify config reading between configs and environments
+# Same as above, but including keys for workspaces
+# this allows us to unify config reading between configs and workspaces
 all_schemas = copy.deepcopy(section_schemas)
 all_schemas.update(dict((key, ramble.schema.workspace.schema)
                         for key in ramble.schema.workspace.keys))
@@ -851,12 +851,8 @@ config = llnl.util.lang.Singleton(_config)
 def add_from_file(filename, scope=None):
     """Add updates to a config from a filename
     """
-    import spack.environment as ev
-
     # Get file as config dict
     data = read_config_file(filename)
-    if any(k in data for k in spack.schema.env.keys):
-        data = ev.config_dict(data)
 
     # update all sections from config dict
     # We have to iterate on keys to keep overrides from the file
@@ -973,7 +969,7 @@ def validate(data, schema, filename=None):
 
     if isinstance(test_data, yaml.comments.CommentedMap):
         # HACK to fully copy ruamel CommentedMap that doesn't provide copy
-        # method. Especially necessary for environments
+        # method. Especially necessary for workspaces
         setattr(test_data,
                 yaml.comments.Comment.attrib,
                 getattr(data,
@@ -989,7 +985,7 @@ def validate(data, schema, filename=None):
             line_number = None
         raise six.raise_from(ConfigFormatError(e, data, filename, line_number), e)
     # return the validated data so that we can access the raw data
-    # mostly relevant for environments
+    # mostly relevant for workspaces
     return test_data
 
 
@@ -1164,7 +1160,8 @@ def merge_yaml(dest, source):
         for dk in dest_keys:
             dest[dk] = dest.pop(dk)
 
-        return dest
+        import ruamel.yaml
+        return ruamel.yaml.comments.CommentedMap(dest)
 
     # If we reach here source and dest are either different types or are
     # not both lists or dicts: replace with source.

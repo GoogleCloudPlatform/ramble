@@ -1,0 +1,93 @@
+# Copyright 2022-2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+import os
+
+import pytest
+
+import ramble.workspace
+import ramble.config
+import ramble.software_environments
+from ramble.main import RambleCommand
+
+
+# everything here uses the mock_workspace_path
+pytestmark = pytest.mark.usefixtures('mutable_config',
+                                     'mutable_mock_workspace_path')
+
+workspace = RambleCommand('workspace')
+config = RambleCommand('config')
+
+
+def test_merge_config_files(mutable_config, mutable_mock_workspace_path, mock_applications):
+    test_applications = """
+applications:
+  zlib:
+    workloads:
+      ensure_installed:
+        experiments:
+          test_experiment:
+            variables:
+              n_ranks: '1'
+"""
+
+    test_spack = """
+spack:
+  concretized: true
+  packages:
+    zlib:
+      spack_spec: zlib@1.2.12
+  environments:
+    zlib:
+      packages:
+      - zlib
+"""
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '16'
+    n_threads: '1'
+  applications: {}
+  spack:
+    concretized: false
+    packages: {}
+    environments: {}
+"""
+    workspace_name = 'test_merge_config_files'
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+
+        ws._re_read()
+
+        applications_file = os.path.join(ws.root, 'applications_test.yaml')
+        spack_file = os.path.join(ws.root, 'spack_test.yaml')
+
+        with open(applications_file, 'w+') as f:
+            f.write(test_applications)
+
+        with open(spack_file, 'w+') as f:
+            f.write(test_spack)
+
+        config('add', '-f', applications_file, global_args=['-w', workspace_name])
+        config('add', '-f', spack_file, global_args=['-w', workspace_name])
+
+        ws._re_read()
+
+        with open(config_path, 'r') as f:
+            data = f.read()
+            assert 'ensure_installed' in data
+            assert 'test_experiment' in data
+            assert 'zlib' in data
+            assert 'spack_spec: zlib@1.2.12' in data
