@@ -13,6 +13,36 @@ from ramble.schema.types import OUTPUT_CAPTURE
 import ramble.language.language_helpers
 
 
+"""This package contains directives that can be used within a package.
+
+Directives are functions that can be called inside a package
+definition to modify the package, for example:
+
+    .. code-block:: python
+
+      class Gromacs(SpackApplication):
+          # Workload directive:
+          workload('water_bare', executables=['pre-process', 'execute-gen'],
+               input='water_bare_hbonds')
+
+In the above example, 'workload' is a ramble directive
+
+There are many available directives, the majority of which are implemented here.
+
+Some examples include:
+
+  workload
+  executable
+  figure_of_merit
+  figure_of_merit_context
+  input_file
+
+For a full list see below, or consult the existing application definitions for
+examples
+
+"""
+
+
 class ApplicationMeta(ramble.language.language_base.DirectiveMeta):
     _directive_names = set()
     _diretives_to_be_executed = []
@@ -69,14 +99,14 @@ def executable(name, template, use_mpi=False, redirect='{log_file}',
 
     Executables may or may not use MPI.
 
-    Arguments:
-     - template: The template command this executable should generate from
-     - use_mpi: (Boolean) determines if this executable should be
-                 wrapped with an `mpirun` like command or not.
-     - redirect (optional): Sets the path for outputs to be written to.
-                            defaults to {log_file}
-     - output_capture (optional): Declare which ouptu (stdout, stderr, both) to
-                                  capture. Defaults to stdout
+    Args:
+      template: The template command this executable should generate from
+      use_mpi: (Boolean) determines if this executable should be
+               wrapped with an `mpirun` like command or not.
+      redirect (Optional): Sets the path for outputs to be written to.
+                           defaults to {log_file}
+      output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
+                                 capture. Defaults to stdout
 
     """
 
@@ -95,13 +125,12 @@ def figure_of_merit_context(name, regex, output_format):
 
     Defines a new context to contain figures of merit.
 
-    Inputs:
-     - name: High level name of the context. Can be referred to in
-             the figure of merit
-     - regex: Regular expression, using group names, to match a context.
-     - output_format: String, using python keywords {group_name} to
-                      extract group names from context regular
-                      expression.
+    Args:
+      name: High level name of the context. Can be referred to in
+            the figure of merit
+      regex: Regular expression, using group names, to match a context.
+      output_format: String, using python keywords {group_name} to extract
+                     group names from context regular expression.
     """
 
     def _execute_figure_of_merit_context(app):
@@ -121,8 +150,8 @@ def archive_pattern(pattern):
     Archival will only happen for files that match the pattern when archival
     is being performed.
 
-    Inputs:
-      - pattern: Pattern that refers to files to archive
+    Args:
+      pattern: Pattern that refers to files to archive
     """
 
     def _execute_archive_pattern(app):
@@ -137,14 +166,15 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
     """Adds a figure of merit to track for this application
 
     Defines a new figure of merit.
-    Inputs:
-     - name: High level name of the figure of merit
-     - log_file: File the figure of merit can be extracted from
-     - fom_regex: A regular expression using named groups to extract the FOM
-     - group_name: The name of the group that the FOM should be pulled from
-     - units: The units associated with the FOM
-     - keep_policy: The policy for determining which FOM(s) to keep
-                    can be 'last' or 'all'
+
+    Args:
+      name: High level name of the figure of merit
+      log_file: File the figure of merit can be extracted from
+      fom_regex: A regular expression using named groups to extract the FOM
+      group_name: The name of the group that the FOM should be pulled from
+      units: The units associated with the FOM
+      keep_policy: The policy for determining which FOM(s) to keep can be
+                   'last' or 'all'
     """
 
     def _execute_figure_of_merit(app):
@@ -292,11 +322,11 @@ def success_criteria(name, mode, match, file='{log_file}'):
     These will be checked during the analyze step to see if a job exited properly.
 
     Arguments:
-      - name: The name of this success criteria
-      - mode: The type of success criteria that will be validated
+      name: The name of this success criteria
+      mode: The type of success criteria that will be validated
               Valid values are: 'string'
-      - match: The value to check indicate success (if found, it would mark success)
-      - file: Which file the success criteria should be located in
+      match: The value to check indicate success (if found, it would mark success)
+      file: Which file the success criteria should be located in
     """
 
     def _execute_success_criteria(app):
@@ -325,11 +355,11 @@ def register_builtin(name, required=False):
     `builtin::method_name`. As an example, ApplicationBase has a builtin
     defined as follows:
 
-    ```
-    register_builtin('env_vars', required=True)
-    def env_vars(self):
-       ...
-    ```
+    .. code-block:: python
+
+      register_builtin('env_vars', required=True)
+      def env_vars(self):
+        ...
 
     This can be used in a workload as:
     `workload(..., executables=['builtin::env_vars', ...] ...)`
@@ -341,9 +371,10 @@ def register_builtin(name, required=False):
 
     Application classes that want to disable auto-injecting a builtin into
     their executable lists can use:
-    ```
-    register_builtin('env_vars', required=False)
-    ```
+
+    .. code-block:: python
+
+      register_builtin('env_vars', required=False)
     """
     def _store_builtin(app):
         builtin_name = f'builtin::{name}'

@@ -6,22 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-# TODO Define language features
-"""This package contains directives that can be used within a package.
-
-Directives are functions that can be called inside a package
-definition to modify the package, for example:
-
-    class Gromacs(MpiRunApplication):
-        workload('water_bare_hbonds_1536')
-        ...
-
-    'workload' is a ramble directive
-
-The available directives are:
-
-    <TO BE IMPLEMENTED>
-
+"""This package contains the underlying implementation for the language
+directives, which are to allow functions to be invoked at class level
 """
 
 import functools
@@ -126,11 +112,15 @@ class DirectiveMeta(type):
 
         Here's an example directive:
 
+        .. code-block:: python
+
             @directive(dicts='workloads')
             workload('workload_name', ...):
                 ...
 
         This directive allows you write:
+
+        .. code-block:: python
 
             class Foo(ApplicationBase):
                 workload(...)
