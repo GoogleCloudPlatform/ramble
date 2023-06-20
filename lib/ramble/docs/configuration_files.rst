@@ -297,6 +297,7 @@ environments created from those packages. Its format is as follows:
 
     spack:
       concretized: [True/False] # Should be false unless defined in a concretized workspace
+      [variables: {}]
       packages:
         <package_name>:
           spack_spec: 'spack_spec_for_package'
@@ -352,8 +353,6 @@ Below is an annotated example of the spack dictionary.
           packages: # List of packages to include in this environment
           - impi2018
           - gromacs
-
-
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Vector and Matrix Packages and Environments:
