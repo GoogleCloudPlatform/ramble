@@ -70,6 +70,14 @@ ramble.test.end\_to\_end.known\_applications module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.merge\_config\_files module
+----------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.merge_config_files
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.missing\_required\_dry\_run module
 -----------------------------------------------------------
 
