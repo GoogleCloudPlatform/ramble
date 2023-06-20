@@ -66,6 +66,7 @@ def figure_of_merit(name, fom_regex, group_name, units='', log_file='{log_file}'
     """Adds a figure of merit to track for this modifier
 
     Defines a new figure of merit.
+
     Inputs:
      - name: High level name of the figure of merit
      - log_file: File the figure of merit can be extracted from
@@ -110,15 +111,20 @@ def variable_modification(name, modification, method='set', mode=None, modes=Non
     A variable modification will apply a change to a defined variable within an experiment.
 
     Args:
-    - name: The variable to modify
-    - modification: The value to modify 'name' with
-    - method: How the modification should be applied. Supported values are
-              'append', 'prepend', and 'set'
-       - 'append' will add the modification to the end of 'name'
-       - 'prepend' will add the modification to the beginning of 'name'
-       - 'set' (Default) will overwrite 'name' with the modification
-    - mode: Single mode to group this modification into
-    - modes: List of modes to group this modification into
+      name: The variable to modify
+      modification: The value to modify 'name' with
+      method: How the modification should be applied
+      mode: Single mode to group this modification into
+      modes: List of modes to group this modification into
+
+    Supported values are 'append', 'prepend', and 'set':
+
+      'append' will add the modification to the end of 'name'
+
+      'prepend' will add the modification to the beginning of 'name'
+
+      'set' (Default) will overwrite 'name' with the modification
+
     """
 
     def _execute_variable_modification(mod):
@@ -223,11 +229,11 @@ def register_builtin(name, required=True, injection_method='prepend'):
     `modifier_builtin::modifier_name::method_name`.
     As an example, if a modifier named 'test-modifier' had a builtin defined as follows:
 
-    ```
-    register_builtin('mod_builtin', required=True)
-    def mod_builtin(self):
-       ...
-    ```
+    .. code-block:: python
+
+      register_builtin('mod_builtin', required=True)
+      def mod_builtin(self):
+        ...
 
     Its fully qualified name would be 'modifier_builtin::test-modifier::mod_builtin'
 
@@ -238,9 +244,11 @@ def register_builtin(name, required=True, injection_method='prepend'):
 
     Modifier classes that want to disable auto-injecting a builtin into
     the experiment executable lists can use:
-    ```
-    register_builtin('mod_builtin', required=False)
-    ```
+
+    .. code-block:: python
+
+      register_builtin('mod_builtin', required=False)
+
     In order to use a non-required builtin, the experiment will need to
     explicitly list the builtin in their executable list.
 
@@ -276,20 +284,20 @@ def executable_modifier(name):
 
     For example:
 
-    ```
-    executable_modifier('write_exec_name')
+    .. code-block:: python
 
-    def write_exec_name(self, executable_name, executable):
-      prepend_execs = []
-      append_execs = [ExecutableCommand(
-          template='echo "{executable_name}"',
-          mpi=False,
-          redirect='{log_file}',
-          output_capture=OUTPUT_CAPTURE.DEFAULT
-      )]
+      executable_modifier('write_exec_name')
 
-      return prepend_execs, append_execs
-    ```
+      def write_exec_name(self, executable_name, executable):
+        prepend_execs = []
+        append_execs = [ExecutableCommand(
+            template='echo "{executable_name}"',
+            mpi=False,
+            redirect='{log_file}',
+            output_capture=OUTPUT_CAPTURE.DEFAULT
+        )]
+
+        return prepend_execs, append_execs
 
     Would append the `echo "{executable_name}"` to every non-builtin executable
     in an experiment.
@@ -314,19 +322,22 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
     variables within the application instance.
 
     Args:
-    - name: The name of the environment variable that will be modified
-    - modification: The value of the modification
-    - method: The method of the modification.
-    - mode: Name of mode this env_var_modification should apply in
-    - modes: List of mode names this env_var_modification should apply in
+      name: The name of the environment variable that will be modified
+      modification: The value of the modification
+      method: The method of the modification.
+      mode: Name of mode this env_var_modification should apply in
+      modes: List of mode names this env_var_modification should apply in
 
     Supported values for method are:
-    - set: Defines the variable to equal the modification value
-    - unset: Removes any definition of the variable from the environment
-    - prepend: Prepends the modification to the beginning of the variable.
-               Always uses the separator ':'
-    - append: Appends the modification value to the end of the value. Allows a
-              keyword argument of 'separator' to define the delimiter between values.
+    set: Defines the variable to equal the modification value
+
+    unset: Removes any definition of the variable from the environment
+
+    prepend: Prepends the modification to the beginning of the variable.
+    Always uses the separator ':'
+
+    append: Appends the modification value to the end of the value. Allows a
+    keyword argument of 'separator' to define the delimiter between values.
 
     """
     def _env_var_modification(mod):

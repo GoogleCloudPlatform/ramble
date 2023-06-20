@@ -24,10 +24,10 @@ class Keywords(object):
     variable. This enforces that each keyword can only have a single type.
 
     Current key types are:
-    - Reserved: Ramble defines these, and a user should not be allowed to define them
-    - Optional: Ramble can function with a definition from the user but it isn't required
-    - Required: Ramble requires a definition for these. Ramble will try to set sensible defaults,
-                but it might not be possible always.
+      - Reserved: Ramble defines these, and a user should not be allowed to define them
+      - Optional: Ramble can function with a definition from the user but it isn't required
+      - Required: Ramble requires a definition for these. Ramble will try to set sensible defaults,
+        but it might not be possible always.
 
     """
 

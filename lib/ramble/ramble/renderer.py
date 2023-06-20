@@ -32,7 +32,7 @@ class Renderer(object):
                     'Valid options are: "experiment"')
 
     def render_objects(self, variables, matrices=None):
-        """Render objects based on the input variabls and matrices
+        """Render objects based on the input variables and matrices
 
         Internally collects all matrix and vector variables.
 
@@ -54,10 +54,8 @@ class Renderer(object):
         After collecting the matrices, this method modifies generates new
         objects and injects them into the self.objects dictionary.
 
-        Inputs:
-            - None
         Returns:
-            - A single object definition, through a yield
+          A single object definition, through a yield
         """
         object_variables = variables.copy()
         new_objects = []

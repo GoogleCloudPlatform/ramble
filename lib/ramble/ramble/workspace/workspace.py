@@ -367,10 +367,10 @@ def get_workspace(args, cmd_name, required=False):
     workspace.
 
     Arguments:
-        args (Namespace): argparse namespace with command arguments
+        args (ramble.namespace): argparse namespace with command arguments
         cmd_name (str): name of calling command
         required (bool): if ``True``, raise an exception when no workspace
-            is found; if ``False``, just return ``None``
+                         is found; if ``False``, just return ``None``
 
     Returns:
         (Workspace): if there is an arg or active workspace
