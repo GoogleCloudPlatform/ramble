@@ -163,6 +163,32 @@ class Expander(object):
 
         return self._experiment_run_dir
 
+    def expand_lists(self, var):
+        """Expand a variable into a list if possible
+
+        If expanding a variable would generate a list, this function will
+        return a list. If any error case happens, this function will return
+        the unmodified input value.
+
+        NOTE: This function is generally called early in the expansion. This allows
+        lists to be generated before rendering experiments, but does not support
+        pulling a list from a different experiment.
+        """
+        try:
+            math_ast = ast.parse(str(var), mode='eval')
+            value = self.eval_math(math_ast.body)
+            if isinstance(value, list):
+                return value
+            return var
+        except MathEvaluationError:
+            return var
+        except AttributeError:
+            return var
+        except ValueError:
+            return var
+        except SyntaxError:
+            return var
+
     def expand_var(self, var, extra_vars=None, allow_passthrough=True):
         """Perform expansion of a string
 
@@ -298,6 +324,8 @@ class Expander(object):
             return self._eval_binary_ops(node)
         elif isinstance(node, ast.UnaryOp):
             return self._eval_unary_ops(node)
+        elif isinstance(node, ast.Call):
+            return self._eval_function_call(node)
         else:
             node_type = str(type(node))
             raise MathEvaluationError(f'Unsupported math AST node {node_type}:\n' +
@@ -332,6 +360,19 @@ class Expander(object):
 
         val = f'{base}.{node.attr}'
         return val
+
+    def _eval_function_call(self, node):
+        """Handle a subset of function call nodes in the ast"""
+
+        args = []
+        kwargs = {}
+        for arg in node.args:
+            args.append(self.eval_math(arg))
+        for kw in node.keywords:
+            kwargs[self.eval_math(kw.arg)] = self.eval_math(kw.value)
+
+        if node.func.id == 'range':
+            return list(range(*args, **kwargs))
 
     def _eval_bool_op(self, node):
         """Handle a boolean operator node in the ast"""

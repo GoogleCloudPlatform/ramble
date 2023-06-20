@@ -44,6 +44,7 @@ def exp_dict():
         ('2**4', '16'),
         ('((((16-10+2)/4)**2)*4)', '16.0'),
         ('gromacs +blas', 'gromacs +blas'),
+        ('range(0, 5)', '[0, 1, 2, 3, 4]')
     ]
 )
 def test_expansions(input, output):
