@@ -163,6 +163,7 @@
 <dt class="sig sig-object py" id="ramble.experimental.uploader.BigQueryUploader">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.experimental.uploader.</span></span><span class="sig-name descname"><span class="pre">BigQueryUploader</span></span><a class="reference internal" href="_modules/ramble/experimental/uploader.html#BigQueryUploader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.experimental.uploader.BigQueryUploader" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.experimental.uploader.Uploader" title="ramble.experimental.uploader.Uploader"><code class="xref py py-class docutils literal notranslate"><span class="pre">Uploader</span></code></a></p>
+<p>Class to handle upload of FOMs to BigQuery</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.experimental.uploader.BigQueryUploader.get_expierment_id">
 <span class="sig-name descname"><span class="pre">get_expierment_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/experimental/uploader.html#BigQueryUploader.get_expierment_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.experimental.uploader.BigQueryUploader.get_expierment_id" title="Permalink to this definition"></a></dt>
@@ -226,24 +227,17 @@ Second prio is more general data like CPU type</p>
 <span class="sig-prename descclassname"><span class="pre">ramble.experimental.uploader.</span></span><span class="sig-name descname"><span class="pre">format_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/experimental/uploader.html#format_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.experimental.uploader.format_data" title="Permalink to this definition"></a></dt>
 <dd><p>Goal: convert results to a more searchable and decomposed format for insertion
 into data store (etc)</p>
-<dl>
-<dt>Input:</dt><dd><dl>
-<dt>{ expierment_name:</dt><dd><dl class="simple">
-<dt>{ “CONTEXTS”: {</dt><dd><p>“context_name”: “FOM_name { unit: “value”, “value”:value” }</p>
-</dd>
-</dl>
-<p>…}
-}</p>
-</dd>
-</dl>
-<p>}</p>
-</dd>
-</dl>
+<p>Input:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>{ expierment_name:
+    { &quot;CONTEXTS&quot;: {
+        &quot;context_name&quot;: &quot;FOM_name { unit: &quot;value&quot;, &quot;value&quot;:value&quot; }
+    ...}
+    }
+}
+</pre></div>
+</div>
 <p>Output: The general idea is the decompose the results into a more “database”
-like format, where the runs and FOMs are in a different table, giving:</p>
-<p>experiments: {experiment_id, experiment details…}
-foms: {experiment_id, fom_name, fom_value, fom_unit..} # +context?</p>
-<p>results[table][row][data] ?</p>
+like format, where the runs and FOMs are in a different table.</p>
 </dd></dl>
 
 </section>
@@ -261,7 +255,7 @@ foms: {experiment_id, fom_name, fom_value, fom_unit..} # +context?</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 16, 2023.
+      <span class="lastupdated">Last updated on Jun 20, 2023.
       </span></p>
   </div>
 

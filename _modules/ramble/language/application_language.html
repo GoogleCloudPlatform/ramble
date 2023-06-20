@@ -121,6 +121,36 @@
 <span class="kn">import</span> <span class="nn">ramble.language.language_helpers</span>
 
 
+<span class="sd">&quot;&quot;&quot;This package contains directives that can be used within a package.</span>
+
+<span class="sd">Directives are functions that can be called inside a package</span>
+<span class="sd">definition to modify the package, for example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      class Gromacs(SpackApplication):</span>
+<span class="sd">          # Workload directive:</span>
+<span class="sd">          workload(&#39;water_bare&#39;, executables=[&#39;pre-process&#39;, &#39;execute-gen&#39;],</span>
+<span class="sd">               input=&#39;water_bare_hbonds&#39;)</span>
+
+<span class="sd">In the above example, &#39;workload&#39; is a ramble directive</span>
+
+<span class="sd">There are many available directives, the majority of which are implemented here.</span>
+
+<span class="sd">Some examples include:</span>
+
+<span class="sd">  workload</span>
+<span class="sd">  executable</span>
+<span class="sd">  figure_of_merit</span>
+<span class="sd">  figure_of_merit_context</span>
+<span class="sd">  input_file</span>
+
+<span class="sd">For a full list see below, or consult the existing application definitions for</span>
+<span class="sd">examples</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
 <div class="viewcode-block" id="ApplicationMeta"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.ApplicationMeta">[docs]</a><span class="k">class</span> <span class="nc">ApplicationMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveMeta</span><span class="p">):</span>
     <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">_diretives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span></div>
@@ -177,14 +207,14 @@
 
 <span class="sd">    Executables may or may not use MPI.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">     - template: The template command this executable should generate from</span>
-<span class="sd">     - use_mpi: (Boolean) determines if this executable should be</span>
-<span class="sd">                 wrapped with an `mpirun` like command or not.</span>
-<span class="sd">     - redirect (optional): Sets the path for outputs to be written to.</span>
-<span class="sd">                            defaults to {log_file}</span>
-<span class="sd">     - output_capture (optional): Declare which ouptu (stdout, stderr, both) to</span>
-<span class="sd">                                  capture. Defaults to stdout</span>
+<span class="sd">    Args:</span>
+<span class="sd">      template: The template command this executable should generate from</span>
+<span class="sd">      use_mpi: (Boolean) determines if this executable should be</span>
+<span class="sd">               wrapped with an `mpirun` like command or not.</span>
+<span class="sd">      redirect (Optional): Sets the path for outputs to be written to.</span>
+<span class="sd">                           defaults to {log_file}</span>
+<span class="sd">      output_capture (Optional): Declare which ouptu (stdout, stderr, both) to</span>
+<span class="sd">                                 capture. Defaults to stdout</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -203,13 +233,12 @@
 
 <span class="sd">    Defines a new context to contain figures of merit.</span>
 
-<span class="sd">    Inputs:</span>
-<span class="sd">     - name: High level name of the context. Can be referred to in</span>
-<span class="sd">             the figure of merit</span>
-<span class="sd">     - regex: Regular expression, using group names, to match a context.</span>
-<span class="sd">     - output_format: String, using python keywords {group_name} to</span>
-<span class="sd">                      extract group names from context regular</span>
-<span class="sd">                      expression.</span>
+<span class="sd">    Args:</span>
+<span class="sd">      name: High level name of the context. Can be referred to in</span>
+<span class="sd">            the figure of merit</span>
+<span class="sd">      regex: Regular expression, using group names, to match a context.</span>
+<span class="sd">      output_format: String, using python keywords {group_name} to extract</span>
+<span class="sd">                     group names from context regular expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_figure_of_merit_context</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -229,8 +258,8 @@
 <span class="sd">    Archival will only happen for files that match the pattern when archival</span>
 <span class="sd">    is being performed.</span>
 
-<span class="sd">    Inputs:</span>
-<span class="sd">      - pattern: Pattern that refers to files to archive</span>
+<span class="sd">    Args:</span>
+<span class="sd">      pattern: Pattern that refers to files to archive</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_archive_pattern</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -245,14 +274,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a figure of merit to track for this application</span>
 
 <span class="sd">    Defines a new figure of merit.</span>
-<span class="sd">    Inputs:</span>
-<span class="sd">     - name: High level name of the figure of merit</span>
-<span class="sd">     - log_file: File the figure of merit can be extracted from</span>
-<span class="sd">     - fom_regex: A regular expression using named groups to extract the FOM</span>
-<span class="sd">     - group_name: The name of the group that the FOM should be pulled from</span>
-<span class="sd">     - units: The units associated with the FOM</span>
-<span class="sd">     - keep_policy: The policy for determining which FOM(s) to keep</span>
-<span class="sd">                    can be &#39;last&#39; or &#39;all&#39;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name: High level name of the figure of merit</span>
+<span class="sd">      log_file: File the figure of merit can be extracted from</span>
+<span class="sd">      fom_regex: A regular expression using named groups to extract the FOM</span>
+<span class="sd">      group_name: The name of the group that the FOM should be pulled from</span>
+<span class="sd">      units: The units associated with the FOM</span>
+<span class="sd">      keep_policy: The policy for determining which FOM(s) to keep can be</span>
+<span class="sd">                   &#39;last&#39; or &#39;all&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_figure_of_merit</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -400,11 +430,11 @@
 <span class="sd">    These will be checked during the analyze step to see if a job exited properly.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">      - name: The name of this success criteria</span>
-<span class="sd">      - mode: The type of success criteria that will be validated</span>
+<span class="sd">      name: The name of this success criteria</span>
+<span class="sd">      mode: The type of success criteria that will be validated</span>
 <span class="sd">              Valid values are: &#39;string&#39;</span>
-<span class="sd">      - match: The value to check indicate success (if found, it would mark success)</span>
-<span class="sd">      - file: Which file the success criteria should be located in</span>
+<span class="sd">      match: The value to check indicate success (if found, it would mark success)</span>
+<span class="sd">      file: Which file the success criteria should be located in</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_success_criteria</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -433,11 +463,11 @@
 <span class="sd">    `builtin::method_name`. As an example, ApplicationBase has a builtin</span>
 <span class="sd">    defined as follows:</span>
 
-<span class="sd">    ```</span>
-<span class="sd">    register_builtin(&#39;env_vars&#39;, required=True)</span>
-<span class="sd">    def env_vars(self):</span>
-<span class="sd">       ...</span>
-<span class="sd">    ```</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      register_builtin(&#39;env_vars&#39;, required=True)</span>
+<span class="sd">      def env_vars(self):</span>
+<span class="sd">        ...</span>
 
 <span class="sd">    This can be used in a workload as:</span>
 <span class="sd">    `workload(..., executables=[&#39;builtin::env_vars&#39;, ...] ...)`</span>
@@ -449,9 +479,10 @@
 
 <span class="sd">    Application classes that want to disable auto-injecting a builtin into</span>
 <span class="sd">    their executable lists can use:</span>
-<span class="sd">    ```</span>
-<span class="sd">    register_builtin(&#39;env_vars&#39;, required=False)</span>
-<span class="sd">    ```</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      register_builtin(&#39;env_vars&#39;, required=False)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_store_builtin</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
         <span class="n">builtin_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;builtin::</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -500,7 +531,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 16, 2023.
+      <span class="lastupdated">Last updated on Jun 20, 2023.
       </span></p>
   </div>
 

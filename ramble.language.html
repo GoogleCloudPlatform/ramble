@@ -175,10 +175,9 @@
 <p>Defines a new file pattern that will be archived during workspace archival.
 Archival will only happen for files that match the pattern when archival
 is being performed.</p>
-<dl class="simple">
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><p>pattern: Pattern that refers to files to archive</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern</strong> – Pattern that refers to files to archive</p>
 </dd>
 </dl>
 </dd></dl>
@@ -201,12 +200,12 @@ experiments with.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>template</strong> (<em>-</em>) – The template command this executable should generate from</p></li>
-<li><p><strong>use_mpi</strong> (<em>-</em>) – (Boolean) determines if this executable should be
+<li><p><strong>template</strong> – The template command this executable should generate from</p></li>
+<li><p><strong>use_mpi</strong> – (Boolean) determines if this executable should be
 wrapped with an <cite>mpirun</cite> like command or not.</p></li>
-<li><p><strong>redirect</strong> (<em>-</em>) – Sets the path for outputs to be written to.
+<li><p><strong>redirect</strong> (<em>Optional</em>) – Sets the path for outputs to be written to.
 defaults to {log_file}</p></li>
-<li><p><strong>output_capture</strong> (<em>-</em>) – Declare which ouptu (stdout, stderr, both) to
+<li><p><strong>output_capture</strong> (<em>Optional</em>) – Declare which ouptu (stdout, stderr, both) to
 capture. Defaults to stdout</p></li>
 </ul>
 </dd>
@@ -217,22 +216,20 @@ capture. Defaults to stdout</p></li>
 <dt class="sig sig-object py" id="ramble.language.application_language.figure_of_merit">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.figure_of_merit" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a figure of merit to track for this application</p>
-<p>Defines a new figure of merit.
-Inputs:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>name: High level name of the figure of merit</p></li>
-<li><p>log_file: File the figure of merit can be extracted from</p></li>
-<li><p>fom_regex: A regular expression using named groups to extract the FOM</p></li>
-<li><p>group_name: The name of the group that the FOM should be pulled from</p></li>
-<li><p>units: The units associated with the FOM</p></li>
-<li><dl class="simple">
-<dt>keep_policy: The policy for determining which FOM(s) to keep</dt><dd><p>can be ‘last’ or ‘all’</p>
+<p>Defines a new figure of merit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the figure of merit</p></li>
+<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
+<li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
+<li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
+<li><p><strong>units</strong> – The units associated with the FOM</p></li>
+<li><p><strong>keep_policy</strong> – The policy for determining which FOM(s) to keep can be
+‘last’ or ‘all’</p></li>
+</ul>
 </dd>
 </dl>
-</li>
-</ul>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
@@ -240,20 +237,14 @@ Inputs:</p>
 <span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#figure_of_merit_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.figure_of_merit_context" title="Permalink to this definition"></a></dt>
 <dd><p>Defines a context for figures of merit</p>
 <p>Defines a new context to contain figures of merit.</p>
-<dl class="simple">
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>name: High level name of the context. Can be referred to in</dt><dd><p>the figure of merit</p>
-</dd>
-</dl>
-</li>
-<li><p>regex: Regular expression, using group names, to match a context.</p></li>
-<li><dl class="simple">
-<dt>output_format: String, using python keywords {group_name} to</dt><dd><p>extract group names from context regular
-expression.</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the context. Can be referred to in
+the figure of merit</p></li>
+<li><p><strong>regex</strong> – Regular expression, using group names, to match a context.</p></li>
+<li><p><strong>output_format</strong> – String, using python keywords {group_name} to extract
+group names from context regular expression.</p></li>
 </ul>
 </dd>
 </dl>
@@ -308,13 +299,11 @@ workloads.</p>
 <p>Builtins can be referred to in a list of executables as:
 <cite>builtin::method_name</cite>. As an example, ApplicationBase has a builtin
 defined as follows:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
-register_builtin(‘env_vars’, required=True)
-def env_vars(self):</p>
-<blockquote>
-<div><p>…</p>
-</div></blockquote>
-<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
 <p>This can be used in a workload as:
 <cite>workload(…, executables=[‘builtin::env_vars’, …] …)</cite></p>
 <p>The ‘required’ attribute marks a builtin as required for all workloads. This
@@ -322,10 +311,10 @@ will ensure the builtin is added to the workload if it is not explicitly
 added. If required builtins are not explicitly added to a workload, they
 are injected at the beginning of the list of executables.</p>
 <p>Application classes that want to disable auto-injecting a builtin into
-their executable lists can use:
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">register_builtin('env_vars',</span> <span class="pre">required=False)</span>
-<span class="pre">`</span></code></p>
+their executable lists can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -356,11 +345,11 @@ environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>-</em>) – The name of this success criteria</p></li>
-<li><p><strong>mode</strong> (<em>-</em>) – The type of success criteria that will be validated
+<li><p><strong>name</strong> – The name of this success criteria</p></li>
+<li><p><strong>mode</strong> – The type of success criteria that will be validated
 Valid values are: ‘string’</p></li>
-<li><p><strong>match</strong> (<em>-</em>) – The value to check indicate success (if found, it would mark success)</p></li>
-<li><p><strong>file</strong> (<em>-</em>) – Which file the success criteria should be located in</p></li>
+<li><p><strong>match</strong> – The value to check indicate success (if found, it would mark success)</p></li>
+<li><p><strong>file</strong> – Which file the success criteria should be located in</p></li>
 </ul>
 </dd>
 </dl>
@@ -408,21 +397,8 @@ an experiment.</p>
 </section>
 <section id="module-ramble.language.language_base">
 <span id="ramble-language-language-base-module"></span><h2>ramble.language.language_base module<a class="headerlink" href="#module-ramble.language.language_base" title="Permalink to this heading"></a></h2>
-<p>This package contains directives that can be used within a package.</p>
-<p>Directives are functions that can be called inside a package
-definition to modify the package, for example:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>class Gromacs(MpiRunApplication):</dt><dd><p>workload(‘water_bare_hbonds_1536’)
-…</p>
-</dd>
-</dl>
-<p>‘workload’ is a ramble directive</p>
-</div></blockquote>
-<p>The available directives are:</p>
-<blockquote>
-<div><p>&lt;TO BE IMPLEMENTED&gt;</p>
-</div></blockquote>
+<p>This package contains the underlying implementation for the language
+directives, which are to allow functions to be invoked at class level</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="ramble.language.language_base.DirectiveError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.language_base.</span></span><span class="sig-name descname"><span class="pre">DirectiveError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_base.html#DirectiveError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_base.DirectiveError" title="Permalink to this definition"></a></dt>
@@ -445,20 +421,16 @@ defined, e.g. to add version or dependency information.  Directives are
 one of the key pieces of Ramble’s application “language”, which is
 embedded in python.</p>
 <p>Here’s an example directive:</p>
-<blockquote>
-<div><p>&#64;directive(dicts=’workloads’)
-workload(‘workload_name’, …):</p>
-<blockquote>
-<div><p>…</p>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="s1">&#39;workloads&#39;</span><span class="p">)</span>
+<span class="n">workload</span><span class="p">(</span><span class="s1">&#39;workload_name&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
 <p>This directive allows you write:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>class Foo(ApplicationBase):</dt><dd><p>workload(…)</p>
-</dd>
-</dl>
-</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">ApplicationBase</span><span class="p">):</span>
+    <span class="n">workload</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">&#64;directive</span></code> decorator handles a couple things for you:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -552,26 +524,24 @@ reference a compiler that has been added.</p>
 <dd><p>Define an environment variable modifier</p>
 <p>Environment variable modifications modify the values of environment
 variables within the application instance.</p>
-<p>Args:
-- name: The name of the environment variable that will be modified
-- modification: The value of the modification
-- method: The method of the modification.
-- mode: Name of mode this env_var_modification should apply in
-- modes: List of mode names this env_var_modification should apply in</p>
-<p>Supported values for method are:
-- set: Defines the variable to equal the modification value
-- unset: Removes any definition of the variable from the environment
-- prepend: Prepends the modification to the beginning of the variable.</p>
-<blockquote>
-<div><p>Always uses the separator ‘:’</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>append: Appends the modification value to the end of the value. Allows a</dt><dd><p>keyword argument of ‘separator’ to define the delimiter between values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the environment variable that will be modified</p></li>
+<li><p><strong>modification</strong> – The value of the modification</p></li>
+<li><p><strong>method</strong> – The method of the modification.</p></li>
+<li><p><strong>mode</strong> – Name of mode this env_var_modification should apply in</p></li>
+<li><p><strong>modes</strong> – List of mode names this env_var_modification should apply in</p></li>
+</ul>
 </dd>
 </dl>
-</li>
-</ul>
+<p>Supported values for method are:
+set: Defines the variable to equal the modification value</p>
+<p>unset: Removes any definition of the variable from the environment</p>
+<p>prepend: Prepends the modification to the beginning of the variable.
+Always uses the separator ‘:’</p>
+<p>append: Appends the modification value to the end of the value. Allows a
+keyword argument of ‘separator’ to define the delimiter between values.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -583,22 +553,20 @@ executable definitions.</p>
 <p>These behave similarly to builtins, in that a python method defines the
 actual modifications</p>
 <p>For example:</p>
-<p><a href="#id7"><span class="problematic" id="id8">``</span></a>`
-executable_modifier(‘write_exec_name’)</p>
-<dl>
-<dt>def write_exec_name(self, executable_name, executable):</dt><dd><p>prepend_execs = []
-append_execs = [ExecutableCommand(</p>
-<blockquote>
-<div><p>template=’echo “{executable_name}”’,
-mpi=False,
-redirect=’{log_file}’,
-output_capture=OUTPUT_CAPTURE.DEFAULT</p>
-</div></blockquote>
-<p>)]</p>
-<p>return prepend_execs, append_execs</p>
-</dd>
-</dl>
-<p><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">executable_modifier</span><span class="p">(</span><span class="s1">&#39;write_exec_name&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">write_exec_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">):</span>
+  <span class="n">prepend_execs</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">append_execs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ExecutableCommand</span><span class="p">(</span>
+      <span class="n">template</span><span class="o">=</span><span class="s1">&#39;echo &quot;</span><span class="si">{executable_name}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+      <span class="n">mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+      <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="n">output_capture</span><span class="o">=</span><span class="n">OUTPUT_CAPTURE</span><span class="o">.</span><span class="n">DEFAULT</span>
+  <span class="p">)]</span>
+
+  <span class="k">return</span> <span class="n">prepend_execs</span><span class="p">,</span> <span class="n">append_execs</span>
+</pre></div>
+</div>
 <p>Would append the <cite>echo “{executable_name}”</cite> to every non-builtin executable
 in an experiment.</p>
 <p>Executable modifiers are allowed to modify the input executable in place.
@@ -612,10 +580,9 @@ Returns:
 <dt class="sig sig-object py" id="ramble.language.modifier_language.figure_of_merit">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.figure_of_merit" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a figure of merit to track for this modifier</p>
-<p>Defines a new figure of merit.
-Inputs:</p>
-<blockquote>
-<div><ul class="simple">
+<p>Defines a new figure of merit.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><ul class="simple">
 <li><p>name: High level name of the figure of merit</p></li>
 <li><p>log_file: File the figure of merit can be extracted from</p></li>
 <li><p>fom_regex: A regular expression using named groups to extract the FOM</p></li>
@@ -627,7 +594,8 @@ Inputs:</p>
 </dl>
 </li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -682,24 +650,22 @@ workloads.</p>
 <p>Builtins can be referred to in a list of executables as:
 <cite>modifier_builtin::modifier_name::method_name</cite>.
 As an example, if a modifier named ‘test-modifier’ had a builtin defined as follows:</p>
-<p><a href="#id13"><span class="problematic" id="id14">``</span></a>`
-register_builtin(‘mod_builtin’, required=True)
-def mod_builtin(self):</p>
-<blockquote>
-<div><p>…</p>
-</div></blockquote>
-<p><a href="#id15"><span class="problematic" id="id16">``</span></a><a href="#id17"><span class="problematic" id="id18">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;mod_builtin&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">mod_builtin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
 <p>Its fully qualified name would be ‘modifier_builtin::test-modifier::mod_builtin’</p>
 <p>The ‘required’ attribute marks a builtin as required for all workloads. This
 will ensure the builtin is added to the workload if it is not explicitly
 added. If required builtins are not explicitly added to a workload, they
 are injected at the beginning of the list of executables.</p>
 <p>Modifier classes that want to disable auto-injecting a builtin into
-the experiment executable lists can use:
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">register_builtin('mod_builtin',</span> <span class="pre">required=False)</span>
-<span class="pre">`</span></code>
-In order to use a non-required builtin, the experiment will need to
+the experiment executable lists can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;mod_builtin&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to use a non-required builtin, the experiment will need to
 explicitly list the builtin in their executable list.</p>
 <p>The ‘injection_method’ attribute controls where the builtin will be
 injected into the executable list.
@@ -743,24 +709,23 @@ environment.</p>
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">variable_modification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modification</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'set'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#variable_modification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.variable_modification" title="Permalink to this definition"></a></dt>
 <dd><p>Define a new variable modification for a mode in this modifier.</p>
 <p>A variable modification will apply a change to a defined variable within an experiment.</p>
-<p>Args:
-- name: The variable to modify
-- modification: The value to modify ‘name’ with
-- method: How the modification should be applied. Supported values are</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The variable to modify</p></li>
+<li><p><strong>modification</strong> – The value to modify ‘name’ with</p></li>
+<li><p><strong>method</strong> – How the modification should be applied</p></li>
+<li><p><strong>mode</strong> – Single mode to group this modification into</p></li>
+<li><p><strong>modes</strong> – List of modes to group this modification into</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported values are ‘append’, ‘prepend’, and ‘set’:</p>
 <blockquote>
-<div><blockquote>
-<div><p>‘append’, ‘prepend’, and ‘set’</p>
+<div><p>‘append’ will add the modification to the end of ‘name’</p>
+<p>‘prepend’ will add the modification to the beginning of ‘name’</p>
+<p>‘set’ (Default) will overwrite ‘name’ with the modification</p>
 </div></blockquote>
-<ul class="simple">
-<li><p>‘append’ will add the modification to the end of ‘name’</p></li>
-<li><p>‘prepend’ will add the modification to the beginning of ‘name’</p></li>
-<li><p>‘set’ (Default) will overwrite ‘name’ with the modification</p></li>
-</ul>
-</div></blockquote>
-<ul class="simple">
-<li><p>mode: Single mode to group this modification into</p></li>
-<li><p>modes: List of modes to group this modification into</p></li>
-</ul>
 </dd></dl>
 
 </section>
@@ -778,7 +743,7 @@ environment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 16, 2023.
+      <span class="lastupdated">Last updated on Jun 20, 2023.
       </span></p>
   </div>
 

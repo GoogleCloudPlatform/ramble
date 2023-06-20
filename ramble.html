@@ -2797,13 +2797,16 @@ others will generate integers (if the inputs are integers).</p>
 <dd><p>Perform expansion of a string</p>
 <p>Expand a string by building up a dict of all
 expansion variables.</p>
-<p>Args:
-- var: String variable to expand
-- extra_vars: Variable definitions to use with highest precedence
-- allow_passthrough: Whether the string is allowed to have</p>
-<blockquote>
-<div><p>keywords after expansion</p>
-</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – String variable to expand</p></li>
+<li><p><strong>extra_vars</strong> – Variable definitions to use with highest precedence</p></li>
+<li><p><strong>allow_passthrough</strong> – Whether the string is allowed to have keywords
+after expansion</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4219,13 +4222,15 @@ file.</p>
 ‘key_type’ variable as an enum.</p>
 <p>A map of keys, and their types is provided in the class level ‘keys’
 variable. This enforces that each keyword can only have a single type.</p>
-<p>Current key types are:
-- Reserved: Ramble defines these, and a user should not be allowed to define them
-- Optional: Ramble can function with a definition from the user but it isn’t required
-- Required: Ramble requires a definition for these. Ramble will try to set sensible defaults,</p>
-<blockquote>
-<div><p>but it might not be possible always.</p>
-</div></blockquote>
+<dl class="simple">
+<dt>Current key types are:</dt><dd><ul class="simple">
+<li><p>Reserved: Ramble defines these, and a user should not be allowed to define them</p></li>
+<li><p>Optional: Ramble can function with a definition from the user but it isn’t required</p></li>
+<li><p>Required: Ramble requires a definition for these. Ramble will try to set sensible defaults,
+but it might not be possible always.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.keywords.Keywords.application_input_dir">
 <span class="sig-name descname"><span class="pre">application_input_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'application_input_dir'</span></em><a class="headerlink" href="#ramble.keywords.Keywords.application_input_dir" title="Permalink to this definition"></a></dt>
@@ -5258,7 +5263,7 @@ dependencies.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.renderer.Renderer.render_objects">
 <span class="sig-name descname"><span class="pre">render_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/renderer.html#Renderer.render_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.renderer.Renderer.render_objects" title="Permalink to this definition"></a></dt>
-<dd><p>Render objects based on the input variabls and matrices</p>
+<dd><p>Render objects based on the input variables and matrices</p>
 <p>Internally collects all matrix and vector variables.</p>
 <p>Matrices are processed first.</p>
 <p>Vectors in the same matrix are crossed, sibling matrices are zipped.
@@ -5272,18 +5277,9 @@ together. All vectors are required to be of the same size.</p>
 to build a final list of objects.</p>
 <p>After collecting the matrices, this method modifies generates new
 objects and injects them into the self.objects dictionary.</p>
-<dl class="simple">
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><p>None</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>A single object definition, through a yield</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>A single object definition, through a yield</p>
 </dd>
 </dl>
 </dd></dl>
@@ -6921,7 +6917,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 16, 2023.
+      <span class="lastupdated">Last updated on Jun 20, 2023.
       </span></p>
   </div>
 

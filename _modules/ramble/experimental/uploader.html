@@ -135,9 +135,9 @@
 
 
 <div class="viewcode-block" id="Experiment"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment">[docs]</a><span class="k">class</span> <span class="nc">Experiment</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representation of experiment data</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">foms</span> <span class="o">=</span> <span class="p">[]</span>
@@ -194,12 +194,12 @@
 
 
 <div class="viewcode-block" id="determine_node_type"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.determine_node_type">[docs]</a><span class="k">def</span> <span class="nf">determine_node_type</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">contexts</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract node type from available FOMS.</span>
 
 <span class="sd">    First prio is machine specific data, such as GCP meta data</span>
 <span class="sd">    Second prio is more general data like CPU type</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="s1">&#39;machine-type&#39;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
@@ -215,11 +215,14 @@
 
 
 <div class="viewcode-block" id="format_data"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.format_data">[docs]</a><span class="k">def</span> <span class="nf">format_data</span><span class="p">(</span><span class="n">data_in</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Goal: convert results to a more searchable and decomposed format for insertion</span>
 <span class="sd">    into data store (etc)</span>
 
 <span class="sd">    Input:</span>
+
+<span class="sd">    .. code-block:: text</span>
+
 <span class="sd">        { expierment_name:</span>
 <span class="sd">            { &quot;CONTEXTS&quot;: {</span>
 <span class="sd">                &quot;context_name&quot;: &quot;FOM_name { unit: &quot;value&quot;, &quot;value&quot;:value&quot; }</span>
@@ -228,13 +231,8 @@
 <span class="sd">        }</span>
 
 <span class="sd">    Output: The general idea is the decompose the results into a more &quot;database&quot;</span>
-<span class="sd">    like format, where the runs and FOMs are in a different table, giving:</span>
-
-<span class="sd">    experiments: {experiment_id, experiment details...}</span>
-<span class="sd">    foms: {experiment_id, fom_name, fom_value, fom_unit..} # +context?</span>
-
-<span class="sd">    results[table][row][data] ?</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    like format, where the runs and FOMs are in a different table.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Format Data in&quot;</span><span class="p">)</span>
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">data_in</span><span class="p">)</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
@@ -270,6 +268,8 @@
 
 
 <div class="viewcode-block" id="BigQueryUploader"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader">[docs]</a><span class="k">class</span> <span class="nc">BigQueryUploader</span><span class="p">(</span><span class="n">Uploader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to handle upload of FOMs to BigQuery</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BigQueryUploader.insert_data"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.insert_data">[docs]</a>    <span class="k">def</span> <span class="nf">insert_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">workspace_name</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
@@ -342,7 +342,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 16, 2023.
+      <span class="lastupdated">Last updated on Jun 20, 2023.
       </span></p>
   </div>
 

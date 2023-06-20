@@ -138,9 +138,9 @@ experiment. This experiment will also include definitions for
 
 .. _ramble-vector-logic:
 
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 List Variables:
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 Variables can be defined as a list of values as well (again, following the same
 math and variable expansion syntax as defined above).
 
@@ -251,7 +251,7 @@ there would be 4 experiments, each defined by a unique
 Environment Variable Control:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment variables can be controlled using an
-:ref:`env_var config section<env-var-config>`,
+:ref:`env_var config section<env-vars-config>`,
 defined at the appropriate level of the workspace config.
 
 As a concrete example:
