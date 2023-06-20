@@ -10,6 +10,7 @@ import os
 
 import pytest
 
+from ramble.test.dry_run_helpers import *
 from ramble.test.modifier_functionality.modifier_helpers import *
 import ramble.workspace
 from ramble.main import RambleCommand
@@ -49,7 +50,7 @@ def test_gromacs_single_full_modifier_dry_run(mutable_mock_workspace_path,
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        dry_run_config(test_modifiers, config_path)
+        dry_run_config('modifiers', test_modifiers, config_path, 'gromacs', 'water_bare')
 
         ws1._re_read()
 
@@ -99,7 +100,7 @@ def test_gromacs_single_stub_modifier_dry_run(mutable_mock_workspace_path,
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        dry_run_config(test_modifiers, config_path)
+        dry_run_config('modifiers', test_modifiers, config_path, 'gromacs', 'water_bare')
 
         ws1._re_read()
 
