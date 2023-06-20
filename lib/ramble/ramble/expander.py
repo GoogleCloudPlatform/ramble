@@ -167,10 +167,10 @@ class Expander(object):
         expansion variables.
 
         Args:
-        - var: String variable to expand
-        - extra_vars: Variable definitions to use with highest precedence
-        - allow_passthrough: Whether the string is allowed to have
-                             keywords after expansion
+          var: String variable to expand
+          extra_vars: Variable definitions to use with highest precedence
+          allow_passthrough: Whether the string is allowed to have keywords
+            after expansion
         """
 
         expansions = self._variables
@@ -207,10 +207,10 @@ class Expander(object):
         """Iterator for all keyword arguments in a string
 
         Args:
-        - in_str (string): Input string to detect keywords from
+          - in_str (string): Input string to detect keywords from
 
         Yields:
-        - Each keyword argument in in_str
+          - Each keyword argument in in_str
         """
         if isinstance(in_str, six.string_types):
             for keyword in string.Formatter().parse(in_str):
@@ -221,7 +221,7 @@ class Expander(object):
         """Test if a string is fully expanded
 
         Args:
-        - in_str (string): Input string to test as expanded
+          - in_str (string): Input string to test as expanded
 
         Returns boolean. True if `in_str` contains no keywords, false if a
         keyword is detected.

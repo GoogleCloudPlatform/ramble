@@ -27,9 +27,9 @@ class Uploader():
 
 
 class Experiment():
-    '''
+    """
     Class representation of experiment data
-    '''
+    """
     def __init__(self, name, data, timestamp):
         self.name = name
         self.foms = []
@@ -86,12 +86,12 @@ class Experiment():
 
 
 def determine_node_type(experiment, contexts):
-    '''
+    """
     Extract node type from available FOMS.
 
     First prio is machine specific data, such as GCP meta data
     Second prio is more general data like CPU type
-    '''
+    """
     for context in contexts:
         for fom in context['foms']:
             if 'machine-type' in fom['name']:
@@ -107,11 +107,14 @@ def determine_node_type(experiment, contexts):
 
 
 def format_data(data_in):
-    '''
+    """
     Goal: convert results to a more searchable and decomposed format for insertion
     into data store (etc)
 
     Input:
+
+    .. code-block:: text
+
         { expierment_name:
             { "CONTEXTS": {
                 "context_name": "FOM_name { unit: "value", "value":value" }
@@ -120,13 +123,8 @@ def format_data(data_in):
         }
 
     Output: The general idea is the decompose the results into a more "database"
-    like format, where the runs and FOMs are in a different table, giving:
-
-    experiments: {experiment_id, experiment details...}
-    foms: {experiment_id, fom_name, fom_value, fom_unit..} # +context?
-
-    results[table][row][data] ?
-    '''
+    like format, where the runs and FOMs are in a different table.
+    """
     tty.debug("Format Data in")
     tty.debug(data_in)
     results = []
@@ -162,6 +160,8 @@ def format_data(data_in):
 
 
 class BigQueryUploader(Uploader):
+    """Class to handle upload of FOMs to BigQuery
+    """
 
     def insert_data(self, uri: str, workspace_name, results) -> None:
         from google.cloud import bigquery
