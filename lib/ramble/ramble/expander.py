@@ -365,6 +365,8 @@ class Expander(object):
             left_eval = self.eval_math(node.left)
             right_eval = self.eval_math(node.right)
             op = supported_math_operators[type(node.op)]
+            if isinstance(left_eval, six.string_types) or isinstance(right_eval, six.string_types):
+                raise SyntaxError('Unsupported operand type in binary operator')
             return op(left_eval, right_eval)
         except TypeError:
             raise SyntaxError('Unsupported operand type in binary operator')
@@ -378,6 +380,8 @@ class Expander(object):
         """
         try:
             operand = self.eval_math(node.operand)
+            if isinstance(operand, six.string_types):
+                raise SyntaxError('Unsupported operand type in unary operator')
             op = supported_math_operators[type(node.op)]
             return op(operand)
         except TypeError:
