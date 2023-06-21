@@ -170,6 +170,19 @@ class SoftwareEnvironments(object):
                                                                extra_vars=rendered_vars)
                             env_packages.append(expanded_pkg)
 
+                        pkgs_with_compiler = []
+                        for pkg_name in env_packages:
+                            pkg_info = self._packages[pkg_name]
+
+                            if 'compiler' in pkg_info and pkg_info['compiler'] in env_packages:
+                                pkgs_with_compiler.append((pkg_name, pkg_info['compiler']))
+                        if pkgs_with_compiler:
+                            tty.warn(f'Environment {final_name} contains packages and their '
+                                     'compilers in the package list. These include:')
+                            for pkg_name, comp_name in pkgs_with_compiler:
+                                tty.warn(f'    Package: {pkg_name}, Compiler: {comp_name}')
+                            tty.warn('This might cause problems when installing the packages.')
+
     def print_environments(self, verbosity=0):
         color.cprint(rucolor.section_title('Software Stack:'))
         color.cprint(rucolor.nested_1('  Packages:'))
