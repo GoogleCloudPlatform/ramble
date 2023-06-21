@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import six
 
 import llnl.util.tty as tty
 
@@ -50,7 +51,8 @@ class SpackApplication(ApplicationBase):
             'install_software',
             'define_package_paths',
             'get_inputs',
-            'make_experiments'
+            'make_experiments',
+            'write_inventory',
         ]
 
         self._analyze_phases = ['analyze_experiments']
@@ -294,6 +296,39 @@ class SpackApplication(ApplicationBase):
 
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
+
+    def _write_inventory(self, workspace):
+        """Add software environment information to hash inventory"""
+
+        self.hash_inventory['software'].append(
+            {
+                'name': self.spack_runner.env_path.replace(workspace.root + os.path.sep, ''),
+                'digest': self.spack_runner.inventory_hash()
+            }
+        )
+
+        super()._write_inventory(workspace)
+
+    def _clean_hash_variables(self, workspace, variables):
+        """Perform spack specific cleanup of variables before hashing"""
+
+        self.spack_runner.configure_env(self.expander.expand_var('{spack_env}'))
+        self.spack_runner.activate()
+
+        for var in variables:
+            if isinstance(variables[var], six.string_types):
+                variables[var] = variables[var].replace(
+                    '\n'.join(self.spack_runner.generate_source_command()),
+                    'spack_source'
+                )
+                variables[var] = variables[var].replace(
+                    '\n'.join(self.spack_runner.generate_activate_command()),
+                    'spack_activate'
+                )
+
+        self.spack_runner.deactivate()
+
+        super()._clean_hash_variables(workspace, variables)
 
     register_builtin('spack_source', required=True)
     register_builtin('spack_activate', required=True)

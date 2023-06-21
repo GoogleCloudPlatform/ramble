@@ -23,7 +23,8 @@ class ExecutableApplication(ApplicationBase):
         super().__init__(file_path)
         self._setup_phases = [
             'get_inputs',
-            'make_experiments'
+            'make_experiments',
+            'write_inventory',
         ]
 
         self._analyze_phases = ['analyze_experiments']

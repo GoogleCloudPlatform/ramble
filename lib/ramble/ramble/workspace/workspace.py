@@ -49,6 +49,7 @@ import ramble.schema.merged
 import ramble.util.lock as lk
 from ramble.util.path import substitute_path_variables
 from ramble.util.spec_utils import specs_equiv
+import ramble.util.hashing
 from ramble.namespace import namespace
 
 
@@ -428,6 +429,10 @@ class Workspace(object):
     provides a self contained execution environment where experiments
     can be performed.
     """
+
+    _inventory_file_name = 'ramble_inventory.json'
+    _hash_file_name = 'workspace_hash.sha256'
+
     def __init__(self, root, dry_run=False):
         tty.debug('In workspace init. Root = {}'.format(root))
         self.root = ramble.util.path.canonicalize_path(root)
@@ -445,6 +450,34 @@ class Workspace(object):
         self._input_mirror_cache = None
         self._software_mirror_cache = None
         self._software_environments = None
+        self.workspace_hash = None
+        self.hash_inventory = {
+            'experiments': [],
+            'versions': []
+        }
+
+        from ramble.main import get_version
+        self.hash_inventory['versions'].append(
+            {
+                'name': 'ramble',
+                'version': get_version(),
+                'digest': ramble.util.hashing.hash_string(get_version()),
+            }
+        )
+
+        from ramble.spack_runner import SpackRunner, RunnerError
+        try:
+            runner = SpackRunner()
+            spack_version = runner.get_version()
+            self.hash_inventory['versions'].append(
+                {
+                    'name': 'spack',
+                    'version': spack_version,
+                    'digest': ramble.util.hashing.hash_string(spack_version),
+                }
+            )
+        except RunnerError:
+            pass
 
         self.specs = []
 
@@ -607,7 +640,10 @@ class Workspace(object):
 
     def _read_template(self, name, f):
         """Read a template file"""
-        self._templates[name] = f
+        self._templates[name] = {
+            'contents': f,
+            'digest': ramble.util.hashing.hash_string(f),
+        }
 
     def _read_auxiliary_software_file(self, name, f):
         """Read an auxiliary software file for generated software directories"""
@@ -644,10 +680,10 @@ class Workspace(object):
     def _write_templates(self):
         """Write all templates out to workspace"""
 
-        for name, value in self._templates.items():
+        for name, conf in self._templates.items():
             template_path = self.template_path(name)
             with open(template_path, 'w+') as f:
-                f.write(value)
+                f.write(conf['contents'])
 
     def clear(self):
         self.config_sections = {}
@@ -1200,6 +1236,24 @@ class Workspace(object):
                 app_inst.run_phase(phase, self)
 
         if pipeline == 'setup':
+            for exp, app_inst in experiment_set.all_experiments():
+                if not app_inst.is_template:
+                    self.hash_inventory['experiments'].append(
+                        {
+                            'name': exp,
+                            'digest': app_inst.experiment_hash,
+                            'contents': app_inst.hash_inventory
+                        }
+                    )
+
+            self.workspace_hash = ramble.util.hashing.hash_json(self.hash_inventory)
+
+            with open(os.path.join(self.root, self._inventory_file_name), 'w+') as f:
+                sjson.dump(self.hash_inventory, f)
+
+            with open(os.path.join(self.root, self._hash_file_name), 'w+') as f:
+                f.write(self.workspace_hash + '\n')
+
             all_experiments_file.close()
 
             all_experiments_path = os.path.join(self.root,
@@ -1411,8 +1465,8 @@ class Workspace(object):
 
     def all_templates(self):
         """Iterator over each template in the workspace"""
-        for name, value in self._templates.items():
-            yield name, value
+        for name, conf in self._templates.items():
+            yield name, conf
 
     def all_auxiliary_software_files(self):
         """Iterator over each file in $workspace/configs/auxiliary_software_files"""
