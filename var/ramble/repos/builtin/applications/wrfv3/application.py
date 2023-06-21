@@ -28,6 +28,7 @@ class Wrfv3(SpackApplication):
     required_package('wrf')
 
     input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/bench/conus2.5km_v3911/bench_2.5km.tar.bz2',
+               sha256='1919a0e0499057c1a570619d069817022bae95b17cf1a52bdaa174f8e8d11508',
                description='2.5 km resolution mesh of the continental United States.')
 
     input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/bench/conus12km_v3911/bench_12km.tar.bz2',

@@ -39,6 +39,7 @@ class Hpcc(SpackApplication):
     required_package('hpcc')
 
     input_file('hpccinf', url='{config_file}', expand=False,
+               sha256='fe9e5f4118c1b40980e162dc3c52d224fd6287e9706b95bb40ae7dfc96b38622',
                description='Input/Config file for HPCC benchmark')
 
     executable('copy-config', template='cp -R {workload_input_dir}/* {experiment_run_dir}/.', use_mpi=False)

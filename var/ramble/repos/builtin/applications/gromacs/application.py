@@ -35,22 +35,28 @@ class Gromacs(SpackApplication):
                '-s {input_path}', use_mpi=True)
 
     input_file('water_gmx50_bare', url='https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz',
+               sha256='2219c10acb97787f80f6638132bad3ff2ca1e68600eef1bc8b89d9560e74c66a',
                description='')
     input_file('water_bare_hbonds', url='https://ftp.gromacs.org/pub/benchmarks/water_bare_hbonds.tar.gz',
+               sha256='b2e09d30f5c6b00ecf1c13ea6fa715ad132747863ef89f983f6c09a872cf2776',
                description='')
     input_file('lignocellulose',
                url='https://repository.prace-ri.eu/ueabs/GROMACS/1.2/GROMACS_TestCaseB.tar.gz',
+               sha256='8a12db0232465e1d47c6a4eb89f615cdbbdc8fc360a86088b131331bd462f35c',
                description='A model of cellulose and lignocellulosic biomass in an aqueous ' +
                            'solution. This system of 3.3M atoms is inhomogeneous, at ' +
                            'least with GROMACS 4.5. This system uses reaction-field' +
                            'electrostatics instead of PME and therefore should scale well.')
-    input_file('HECBioSim', url='https://github.com/victorusu/GROMACS_Benchmark_Suite/archive/refs/tags/1.0.0.tar.gz',
+    input_file('HECBioSim',
+               url='https://github.com/victorusu/GROMACS_Benchmark_Suite/archive/refs/tags/1.0.0.tar.gz',
+               sha256='9cb2ad61ec2a422fc33578047e7cb2fd2c37ae9a75a6162d662fa2b711e9737f',
                description='https://www.hecbiosim.ac.uk/access-hpc/benchmarks')
 
     # input_file('BenchPEP', url='https://www.mpinat.mpg.de/632210/benchPEP.zip',
     #            description='12M Atoms, Peptides in Water, 2fs time step, all bonds constrained. https://www.mpinat.mpg.de/grubmueller/bench')
 
     input_file('BenchPEP', url='https://www.mpinat.mpg.de/benchPEP.zip',
+               sha256='f11745201dbb9e6a29a39cb016ee8123f6b0f519b250c94660f0a9623e497b22',
                description='12M Atoms, Peptides in Water, 2fs time step, all bonds constrained. https://www.mpinat.mpg.de/grubmueller/bench')
 
     workload('water_gmx50', executables=['pre-process', 'execute-gen'],
