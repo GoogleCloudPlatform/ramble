@@ -549,3 +549,38 @@ ramble:
         assert len(software_environments._environments['basic-x86_64_v4']['packages']) == 1
         assert 'basic-x86_64_v4' in \
             software_environments._environments['basic-x86_64_v4']['packages']
+
+
+def test_environment_warns_with_pkg_compiler(mutable_mock_workspace_path, capsys):
+    ws_name = 'test_environment_warns_with_pkg_compiler'
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['test_comp'] = {
+            'spack_spec': 'test_comp@1.1'
+        }
+        spack_dict['packages']['basic'] = {
+            'spack_spec': 'basic@1.1',
+            'compiler': 'test_comp'
+        }
+        spack_dict['environments'] = {
+            'basic': {
+                'packages': [
+                    'basic',
+                    'test_comp'
+                ],
+            }
+        }
+
+        ramble.software_environments.SoftwareEnvironments(ws)
+        captured = capsys.readouterr()
+
+        assert 'Environment basic contains packages and their compilers ' + \
+               'in the package list. These include:' in captured.err
+
+        assert 'Package: basic, Compiler: test_comp' in captured.err
