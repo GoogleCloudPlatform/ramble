@@ -85,11 +85,16 @@ class SoftwareEnvironments(object):
 
         expander = ramble.expander.Expander({}, None)
 
+        workspace_vars = self._workspace.get_workspace_vars().copy()
+
+        if namespace.variables in self.spack_dict:
+            workspace_vars.update(self.spack_dict[namespace.variables])
+
         if namespace.packages in self.spack_dict:
             for pkg_template, pkg_info in self.spack_dict[namespace.packages].items():
                 self._raw_packages[pkg_template] = pkg_info
                 self._package_map[pkg_template] = []
-                pkg_vars = {}
+                pkg_vars = workspace_vars.copy()
                 pkg_matrices = []
 
                 if namespace.variables in pkg_info:
@@ -126,7 +131,7 @@ class SoftwareEnvironments(object):
 
         if namespace.environments in self.spack_dict:
             for env_template, env_info in self.spack_dict[namespace.environments].items():
-                env_vars = {}
+                env_vars = workspace_vars.copy()
                 env_matrices = []
                 self._raw_environments[env_template] = env_info
                 self._environment_map[env_template] = []
