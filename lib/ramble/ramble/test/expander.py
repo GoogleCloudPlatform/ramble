@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import pytest
+
 import ramble.expander
 
 
@@ -29,21 +31,27 @@ def exp_dict():
     }
 
 
-def test_expansions():
+@pytest.mark.parametrize(
+    'input,output',
+    [
+        ('{var1}', '3'),
+        ('{var2}', '3'),
+        ('{var3}', '3'),
+        ('{application_name}', 'foo'),
+        ('{n_nodes}', '2'),
+        ('{processes_per_node}', '2'),
+        ('{n_nodes}*{processes_per_node}', '4'),
+        ('2**4', '16'),
+        ('((((16-10+2)/4)**2)*4)', '16.0'),
+        ('gromacs +blas', 'gromacs +blas'),
+    ]
+)
+def test_expansions(input, output):
     expansion_vars = exp_dict()
 
     expander = ramble.expander.Expander(expansion_vars, None)
 
-    assert expander.expand_var('{var1}') == '3'
-    assert expander.expand_var('{var2}') == '3'
-    assert expander.expand_var('{var3}') == '3'
-    assert expander.expand_var('{application_name}') == 'foo'
-
-    assert expander.expand_var('{n_nodes}') == '2'
-    assert expander.expand_var('{processes_per_node}') == '2'
-    assert expander.expand_var('{n_nodes}*{processes_per_node}') == '4'
-    assert expander.expand_var('2**4') == '16'
-    assert expander.expand_var('((((16-10+2)/4)**2)*4)') == '16.0'
+    assert expander.expand_var(input) == output
 
 
 def test_expansion_namespaces():
