@@ -28,13 +28,13 @@ class GcpMetadata(BasicModifier):
     register_builtin('gcp_metadata_exec')
 
     def gcp_metadata_exec(self):
-        machine_type = 'curl -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/machine-type" -H "Metadata-Flavor: Google" >> {log}'
+        machine_type = 'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/machine-type" -H "Metadata-Flavor: Google" >> {log}'
 
-        image = 'curl -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/image" -H "Metadata-Flavor: Google" >> {log}'
+        image = 'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/image" -H "Metadata-Flavor: Google" >> {log}'
 
-        gid = 'curl -w "=GID\\n" "http://metadata.google.internal/computeMetadata/v1/instance/id" -H "Metadata-Flavor: Google" >> {log}'
+        gid = 'curl -s -w "=GID\\n" "http://metadata.google.internal/computeMetadata/v1/instance/id" -H "Metadata-Flavor: Google" >> {log}'
 
-        ghostname = 'curl -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google" >> {log}'
+        ghostname = 'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google" >> {log}'
 
         return [machine_type, image, gid, ghostname]
 
