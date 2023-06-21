@@ -29,9 +29,11 @@ class Wrfv4(SpackApplication):
     required_package('wrf')
 
     input_file('CONUS_2p5km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus2.5km.tar.gz',
+               sha256='dcae9965d1873c1c1e34e21ad653179783302b9a13528ac10fab092b998578f6',
                description='2.5 km resolution mesh of the continental United States.')
 
     input_file('CONUS_12km', url='https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz',
+               sha256='6a0e87e3401efddc50539e71e5437fd7a5af9228b64cd4837e739737c3706fc3',
                description='12 km resolution mesh of the continental United States.')
 
     executable('cleanup', 'rm -f rsl.* wrfout*', use_mpi=False)
