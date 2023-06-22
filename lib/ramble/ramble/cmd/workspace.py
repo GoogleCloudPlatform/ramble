@@ -354,10 +354,10 @@ def workspace_analyze_setup_parser(subparser):
 
 def workspace_analyze(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
+    ws.always_print_foms = args.always_print_foms
 
     tty.debug('Analyzing workspace')
     with ws.write_transaction():
-        ws.always_print_foms = args.always_print_foms
         ws.run_pipeline('analyze')
         ws.dump_results(output_formats=args.output_formats)
 

@@ -15,7 +15,7 @@ import ramble.config
 import ramble.software_environments
 import ramble.namespace
 from ramble.main import RambleCommand
-from ramble.test.dry_run_helpers import *
+from ramble.test.dry_run_helpers import dry_run_config, SCOPES
 
 
 # everything here uses the mock_workspace_path

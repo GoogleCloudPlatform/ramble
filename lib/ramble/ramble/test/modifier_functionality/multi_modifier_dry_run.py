@@ -10,8 +10,8 @@ import os
 
 import pytest
 
-from ramble.test.dry_run_helpers import *
-from ramble.test.modifier_functionality.modifier_helpers import *
+from ramble.test.dry_run_helpers import dry_run_config, SCOPES
+import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.main import RambleCommand
 
@@ -43,7 +43,9 @@ workspace = RambleCommand('workspace')
 @pytest.mark.parametrize(
     'factories,answers',
     [
-        ([intel_aps_modifier, lscpu_modifier], [intel_aps_answer, lscpu_answer]),
+        (
+            [modifier_helpers.intel_aps_modifier, modifier_helpers.lscpu_modifier],
+            [modifier_helpers.intel_aps_answer, modifier_helpers.lscpu_answer]),
     ]
 )
 def test_gromacs_multi_modifier_dry_run(mutable_mock_workspace_path,
@@ -80,9 +82,9 @@ def test_gromacs_multi_modifier_dry_run(mutable_mock_workspace_path,
         # Test software directories
         software_base_dir = ws1.software_dir
 
-        check_software_env(software_base_dir, software_tests)
+        modifier_helpers.check_software_env(software_base_dir, software_tests)
 
         exp_script = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
                                   'test_exp', 'execute_experiment')
 
-        check_execute_script(exp_script, script_tests)
+        modifier_helpers.check_execute_script(exp_script, script_tests)

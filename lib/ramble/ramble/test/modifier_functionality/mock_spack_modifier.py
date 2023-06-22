@@ -10,8 +10,8 @@ import os
 
 import pytest
 
-from ramble.test.dry_run_helpers import *
-from ramble.test.modifier_functionality.modifier_helpers import *
+from ramble.test.dry_run_helpers import dry_run_config, SCOPES
+import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.main import RambleCommand
 
@@ -34,7 +34,7 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
     workspace_name = 'test_gromacs_dry_run_mock_spack_mod'
 
     test_modifiers = [
-        (scope, named_modifier('spack-mod')),
+        (scope, modifier_helpers.named_modifier('spack-mod')),
     ]
 
     software_tests = [
@@ -62,4 +62,4 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
         # Test software directories
         software_base_dir = ws1.software_dir
 
-        check_software_env(software_base_dir, software_tests)
+        modifier_helpers.check_software_env(software_base_dir, software_tests)

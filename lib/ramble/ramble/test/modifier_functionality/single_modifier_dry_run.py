@@ -10,8 +10,8 @@ import os
 
 import pytest
 
-from ramble.test.dry_run_helpers import *
-from ramble.test.modifier_functionality.modifier_helpers import *
+from ramble.test.dry_run_helpers import dry_run_config, SCOPES
+import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.main import RambleCommand
 
@@ -30,8 +30,8 @@ workspace = RambleCommand('workspace')
 @pytest.mark.parametrize(
     'factory,answer',
     [
-        (intel_aps_modifier, intel_aps_answer),
-        (lscpu_modifier, lscpu_answer),
+        (modifier_helpers.intel_aps_modifier, modifier_helpers.intel_aps_answer),
+        (modifier_helpers.lscpu_modifier, modifier_helpers.lscpu_answer),
     ]
 )
 def test_gromacs_single_full_modifier_dry_run(mutable_mock_workspace_path,
@@ -60,12 +60,12 @@ def test_gromacs_single_full_modifier_dry_run(mutable_mock_workspace_path,
         # Test software directories
         software_base_dir = ws1.software_dir
 
-        check_software_env(software_base_dir, software_tests)
+        modifier_helpers.check_software_env(software_base_dir, software_tests)
 
         exp_script = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
                                   'test_exp', 'execute_experiment')
 
-        check_execute_script(exp_script, expected_strs)
+        modifier_helpers.check_execute_script(exp_script, expected_strs)
 
 
 @pytest.mark.parametrize(
@@ -80,8 +80,8 @@ def test_gromacs_single_full_modifier_dry_run(mutable_mock_workspace_path,
 @pytest.mark.parametrize(
     'mod_name,answer',
     [
-        ('intel-aps', intel_aps_answer),
-        ('lscpu', lscpu_answer),
+        ('intel-aps', modifier_helpers.intel_aps_answer),
+        ('lscpu', modifier_helpers.lscpu_answer),
     ]
 )
 def test_gromacs_single_stub_modifier_dry_run(mutable_mock_workspace_path,
@@ -90,7 +90,7 @@ def test_gromacs_single_stub_modifier_dry_run(mutable_mock_workspace_path,
     workspace_name = 'test_gromacs_single_modifier_dry_run'
 
     test_modifiers = [
-        (scope, named_modifier(mod_name)),
+        (scope, modifier_helpers.named_modifier(mod_name)),
     ]
 
     software_tests, expected_strs = answer()
@@ -110,9 +110,9 @@ def test_gromacs_single_stub_modifier_dry_run(mutable_mock_workspace_path,
         # Test software directories
         software_base_dir = ws1.software_dir
 
-        check_software_env(software_base_dir, software_tests)
+        modifier_helpers.check_software_env(software_base_dir, software_tests)
 
         exp_script = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
                                   'test_exp', 'execute_experiment')
 
-        check_execute_script(exp_script, expected_strs)
+        modifier_helpers.check_execute_script(exp_script, expected_strs)

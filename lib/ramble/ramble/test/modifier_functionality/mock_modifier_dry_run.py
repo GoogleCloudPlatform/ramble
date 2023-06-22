@@ -10,8 +10,8 @@ import os
 
 import pytest
 
-from ramble.test.dry_run_helpers import *
-from ramble.test.modifier_functionality.modifier_helpers import *
+from ramble.test.dry_run_helpers import dry_run_config, SCOPES
+import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.modifier import InvalidModeError
 from ramble.language.language_base import DirectiveError
@@ -37,7 +37,7 @@ def test_gromacs_dry_run_mock_mods(mutable_mock_workspace_path,
     workspace_name = 'test_gromacs_dry_run_mock_mods'
 
     test_modifiers = [
-        (scope, named_modifier(mock_modifier)),
+        (scope, modifier_helpers.named_modifier(mock_modifier)),
     ]
 
     expected_failures = {
