@@ -24,6 +24,7 @@ properties = {
                 'type': 'boolean',
                 'default': False
             },
+            'variables': ramble.schema.variables.variables_def,
             'packages': {
                 'type': 'object',
                 'additionalProperties': {
