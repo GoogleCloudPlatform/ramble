@@ -142,7 +142,7 @@
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">new_criteria</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">new_criteria</span><span class="o">.</span><span class="n">passed</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                 <span class="n">new_criteria</span><span class="o">.</span><span class="n">mark_found</span><span class="p">()</span>
 
     <span class="k">assert</span> <span class="n">new_criteria</span><span class="o">.</span><span class="n">found</span></div>
@@ -187,7 +187,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">criteria</span> <span class="ow">in</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">all_criteria</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">passed</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                     <span class="n">criteria</span><span class="o">.</span><span class="n">mark_found</span><span class="p">()</span>
 
     <span class="k">assert</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">passed</span><span class="p">()</span></div>

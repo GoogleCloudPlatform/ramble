@@ -1528,7 +1528,7 @@ ramble workspace analyze
 
 .. code-block:: console
 
-    ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]]
+    ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]] [--always-print-foms]
 
 
 **Optional arguments**
@@ -1541,6 +1541,9 @@ ramble workspace analyze
 
 ``-u, --upload``
   Push experiment data to remote store (as defined in config)
+
+``--always-print-foms``
+  Control if figures of merit are printed even if an experiment fails
 
 
 ----

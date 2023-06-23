@@ -1302,7 +1302,7 @@
 </section>
 <section id="ramble-workspace-analyze">
 <span id="id48"></span><h2>ramble workspace analyze<a class="headerlink" href="#ramble-workspace-analyze" title="Permalink to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]] [--always-print-foms]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1312,6 +1312,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">OUTPUT_FORMATS</span> <span class="pre">[OUTPUT_FORMATS</span> <span class="pre">...],</span> <span class="pre">--formats</span> <span class="pre">OUTPUT_FORMATS</span> <span class="pre">[OUTPUT_FORMATS</span> <span class="pre">...]</span></code></dt><dd><p>list of output formats to write.Supported formats are json, yaml, or text</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">-u,</span> <span class="pre">--upload</span></code></dt><dd><p>Push experiment data to remote store (as defined in config)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--always-print-foms</span></code></dt><dd><p>Control if figures of merit are printed even if an experiment fails</p>
 </dd>
 </dl>
 <hr class="docutils" />

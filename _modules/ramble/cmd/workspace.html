@@ -451,11 +451,19 @@
         <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;upload&#39;</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Push experiment data to remote store (as defined in config)&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--always-print-foms&#39;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;always_print_foms&#39;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Control if figures of merit are printed even if an experiment fails&#39;</span><span class="p">,</span>
         <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="workspace_analyze"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_analyze">[docs]</a><span class="k">def</span> <span class="nf">workspace_analyze</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace analyze&#39;</span><span class="p">)</span>
+    <span class="n">ws</span><span class="o">.</span><span class="n">always_print_foms</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">always_print_foms</span>
 
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Analyzing workspace&#39;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">():</span>

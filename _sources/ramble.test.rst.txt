@@ -12,6 +12,7 @@ Subpackages
    ramble.test.cmd
    ramble.test.end_to_end
    ramble.test.modifier_functionality
+   ramble.test.success_criteria
    ramble.test.util
 
 Submodules
@@ -69,6 +70,14 @@ ramble.test.conftest module
 ---------------------------
 
 .. automodule:: ramble.test.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.dry\_run\_helpers module
+------------------------------------
+
+.. automodule:: ramble.test.dry_run_helpers
    :members:
    :undoc-members:
    :show-inheritance:

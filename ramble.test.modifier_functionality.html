@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="ramble.test.util namespace" href="ramble.test.util.html" />
+    <link rel="next" title="ramble.test.success_criteria namespace" href="ramble.test.success_criteria.html" />
     <link rel="prev" title="ramble.test.end_to_end namespace" href="ramble.test.end_to_end.html" /> 
 </head>
 
@@ -68,6 +68,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-commands-module">ramble.test.commands module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-concretize-builtin-module">ramble.test.concretize_builtin module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-conftest-module">ramble.test.conftest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.dry_run_helpers">ramble.test.dry_run_helpers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-expander-module">ramble.test.expander module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-experiment-set-module">ramble.test.experiment_set module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-gcs-fetch-module">ramble.test.gcs_fetch module</a></li>
@@ -190,33 +191,6 @@
 </section>
 <section id="module-ramble.test.modifier_functionality.modifier_helpers">
 <span id="ramble-test-modifier-functionality-modifier-helpers-module"></span><h2>ramble.test.modifier_functionality.modifier_helpers module<a class="headerlink" href="#module-ramble.test.modifier_functionality.modifier_helpers" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.SCOPES">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.test.modifier_functionality.modifier_helpers.</span></span><span class="sig-name descname"><span class="pre">SCOPES</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.SCOPES" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>An enumeration.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.SCOPES.application">
-<span class="sig-name descname"><span class="pre">application</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.SCOPES.application" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.SCOPES.experiment">
-<span class="sig-name descname"><span class="pre">experiment</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.SCOPES.experiment" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.SCOPES.workload">
-<span class="sig-name descname"><span class="pre">workload</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.SCOPES.workload" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.SCOPES.workspace">
-<span class="sig-name descname"><span class="pre">workspace</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.SCOPES.workspace" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.check_execute_script">
 <span class="sig-prename descclassname"><span class="pre">ramble.test.modifier_functionality.modifier_helpers.</span></span><span class="sig-name descname"><span class="pre">check_execute_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tests</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/modifier_functionality/modifier_helpers.html#check_execute_script"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.check_execute_script" title="Permalink to this definition"></a></dt>
@@ -231,18 +205,6 @@
 - tests: list of tuples. Each tuple should be (env_name, expected_contents).</p>
 <p>This method will validate that expected_contents exists in the spack.yaml
 file in the corresponding env_name.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.modifier_functionality.modifier_helpers.dry_run_config">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.modifier_functionality.modifier_helpers.</span></span><span class="sig-name descname"><span class="pre">dry_run_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modifier_injections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/modifier_functionality/modifier_helpers.html#dry_run_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.modifier_functionality.modifier_helpers.dry_run_config" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a new configuration with modifiers injected</p>
-<p>Input argument modifier_injections is a list of tuples. Each tuple has two
-values, and takes the form:</p>
-<p>(scope, modifier_dict)</p>
-<p>scope is the scope the modifier should be injected into
-modifier_dict is a dict representing the new modifier</p>
-<p>config_path is the path to the config file that should be written</p>
 </dd></dl>
 
 <dl class="py function">
@@ -334,7 +296,7 @@ modifier_dict is a dict representing the new modifier</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="ramble.test.end_to_end.html" class="btn btn-neutral float-left" title="ramble.test.end_to_end namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="ramble.test.util.html" class="btn btn-neutral float-right" title="ramble.test.util namespace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ramble.test.success_criteria.html" class="btn btn-neutral float-right" title="ramble.test.success_criteria namespace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -1,0 +1,39 @@
+ramble.test.success\_criteria namespace
+=======================================
+
+.. py:module:: ramble.test.success_criteria
+
+Submodules
+----------
+
+ramble.test.success\_criteria.always\_print\_foms module
+--------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.always_print_foms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.success\_criteria.success\_fom\_comparison module
+-------------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.success_fom_comparison
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.success\_criteria.success\_fom\_globbing module
+-----------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.success_fom_globbing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.success\_criteria.success\_functions module
+-------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.success_functions
+   :members:
+   :undoc-members:
+   :show-inheritance:

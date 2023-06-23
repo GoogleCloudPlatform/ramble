@@ -1077,7 +1077,7 @@
                     <span class="k">for</span> <span class="n">criteria</span> <span class="ow">in</span> <span class="n">file_conf</span><span class="p">[</span><span class="s1">&#39;success_criteria&#39;</span><span class="p">]:</span>
                         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for criteria </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">criteria</span><span class="p">)</span>
                         <span class="n">criteria_obj</span> <span class="o">=</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">find_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">criteria_obj</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">criteria_obj</span><span class="o">.</span><span class="n">passed</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
                             <span class="n">criteria_obj</span><span class="o">.</span><span class="n">mark_found</span><span class="p">()</span>
 
                     <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">file_conf</span><span class="p">[</span><span class="s1">&#39;contexts&#39;</span><span class="p">]:</span>
@@ -1126,6 +1126,12 @@
                                         <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
                                     <span class="p">}</span>
 
+        <span class="c1"># Test all non-file based success criteria</span>
+        <span class="k">for</span> <span class="n">criteria_obj</span> <span class="ow">in</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">all_criteria</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">criteria_obj</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">criteria_obj</span><span class="o">.</span><span class="n">passed</span><span class="p">(</span><span class="n">app_inst</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">fom_values</span><span class="o">=</span><span class="n">fom_values</span><span class="p">):</span>
+                    <span class="n">criteria_obj</span><span class="o">.</span><span class="n">mark_found</span><span class="p">()</span>
+
         <span class="n">exp_ns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">exp_ns</span><span class="p">}</span>
 
@@ -1136,6 +1142,10 @@
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;EXPERIMENT_CHAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SUCCESS&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;FAILED&#39;</span>
+
+        <span class="k">if</span> <span class="n">success</span> <span class="ow">or</span> <span class="n">workspace</span><span class="o">.</span><span class="n">always_print_foms</span><span class="p">:</span>
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1152,9 +1162,6 @@
                     <span class="n">context_map</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fom_copy</span><span class="p">)</span>
 
                 <span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_map</span><span class="p">)</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;FAILED&#39;</span>
 
         <span class="n">workspace</span><span class="o">.</span><span class="n">append_result</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
@@ -1186,11 +1193,16 @@
 
         <span class="c1"># Add the application defined criteria</span>
         <span class="n">criteria_list</span><span class="o">.</span><span class="n">flush_scope</span><span class="p">(</span><span class="s1">&#39;application_definition&#39;</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
                 <span class="n">criteria_list</span><span class="o">.</span><span class="n">add_criteria</span><span class="p">(</span><span class="s1">&#39;application_definition&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="p">,</span>
                                            <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;match&#39;</span><span class="p">]),</span>
                                            <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
+
+        <span class="n">criteria_list</span><span class="o">.</span><span class="n">add_criteria</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;application_definition&#39;</span><span class="p">,</span>
+                                   <span class="n">name</span><span class="o">=</span><span class="s1">&#39;_application_function&#39;</span><span class="p">,</span>
+                                   <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;application_function&#39;</span><span class="p">)</span>
 
         <span class="c1"># Extract file paths for all criteria</span>
         <span class="k">for</span> <span class="n">criteria</span> <span class="ow">in</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">all_criteria</span><span class="p">():</span>
@@ -1318,7 +1330,15 @@
                     <span class="k">if</span> <span class="n">cmd</span><span class="p">:</span>
                         <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">command</span></div></div>
+        <span class="k">return</span> <span class="n">command</span></div>
+
+<div class="viewcode-block" id="ApplicationBase.evaluate_success"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.evaluate_success">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook for applications to evaluate custom success criteria</span>
+
+<span class="sd">        Expected to perform analysis and return either true or false.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="ApplicationError"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationError">[docs]</a><span class="k">class</span> <span class="nc">ApplicationError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>

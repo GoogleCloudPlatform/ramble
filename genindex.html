@@ -340,7 +340,7 @@
       <ul>
         <li><a href="ramble.html#ramble.spec.Spec.application">(ramble.spec.Spec property)</a>
 </li>
-        <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.application">(ramble.test.modifier_functionality.modifier_helpers.SCOPES attribute)</a>
+        <li><a href="ramble.test.html#ramble.test.dry_run_helpers.SCOPES.application">(ramble.test.dry_run_helpers.SCOPES attribute)</a>
 </li>
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.application">(ramble.workspace.namespace attribute)</a>
 </li>
@@ -909,7 +909,7 @@
 </li>
       <li><a href="ramble.html#ramble.spec.SpecParser.do_parse">do_parse() (ramble.spec.SpecParser method)</a>
 </li>
-      <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.dry_run_config">dry_run_config() (in module ramble.test.modifier_functionality.modifier_helpers)</a>
+      <li><a href="ramble.test.html#ramble.test.dry_run_helpers.dry_run_config">dry_run_config() (in module ramble.test.dry_run_helpers)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.Repo.dump_provenance">dump_provenance() (ramble.repository.Repo method)</a>
 
@@ -1009,6 +1009,8 @@
 </li>
       <li><a href="ramble.html#ramble.expander.Expander.eval_math">eval_math() (ramble.expander.Expander method)</a>
 </li>
+      <li><a href="ramble.html#ramble.application.ApplicationBase.evaluate_success">evaluate_success() (ramble.application.ApplicationBase method)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.flake8.exclude_directories">exclude_directories (in module ramble.cmd.flake8)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.RepositoryNamespaceLoader.exec_module">exec_module() (ramble.repository.RepositoryNamespaceLoader method)</a>
@@ -1033,6 +1035,8 @@
       </ul></li>
       <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication">ExecutableApplication (class in ramble.application_types.executable)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.application.ApplicationBase.executables">executables (ramble.application.ApplicationBase attribute)</a>
 
       <ul>
@@ -1045,8 +1049,6 @@
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.executables">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.exists">exists() (in module ramble.workspace)</a>
 
       <ul>
@@ -1100,7 +1102,7 @@
       <li><a href="ramble.html#ramble.namespace.namespace.experiment">experiment (ramble.namespace.namespace attribute)</a>
 
       <ul>
-        <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.experiment">(ramble.test.modifier_functionality.modifier_helpers.SCOPES attribute)</a>
+        <li><a href="ramble.test.html#ramble.test.dry_run_helpers.SCOPES.experiment">(ramble.test.dry_run_helpers.SCOPES attribute)</a>
 </li>
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.experiment">(ramble.workspace.namespace attribute)</a>
 </li>
@@ -1838,8 +1840,6 @@
       <ul>
         <li><a href="ramble.html#ramble.fetch_strategy.FetchStrategyComposite.matches">(ramble.fetch_strategy.FetchStrategyComposite class method)</a>
 </li>
-        <li><a href="ramble.html#ramble.success_criteria.SuccessCriteria.matches">(ramble.success_criteria.SuccessCriteria method)</a>
-</li>
       </ul></li>
       <li><a href="ramble.html#ramble.config.Configuration.matching_scopes">matching_scopes() (ramble.config.Configuration method)</a>
 </li>
@@ -2125,6 +2125,8 @@
 </li>
         <li><a href="ramble.test.cmd.html#module-ramble.test.cmd.software_definitions">ramble.test.cmd.software_definitions</a>
 </li>
+        <li><a href="ramble.test.html#module-ramble.test.dry_run_helpers">ramble.test.dry_run_helpers</a>
+</li>
         <li><a href="ramble.test.end_to_end.html#module-ramble.test.end_to_end">ramble.test.end_to_end</a>
 </li>
         <li><a href="ramble.test.modifier_functionality.html#module-ramble.test.modifier_functionality">ramble.test.modifier_functionality</a>
@@ -2133,7 +2135,7 @@
 </li>
         <li><a href="ramble.test.html#module-ramble.test.spec_basic">ramble.test.spec_basic</a>
 </li>
-        <li><a href="ramble.test.html#module-ramble.test.success_criteria">ramble.test.success_criteria</a>
+        <li><a href="ramble.test.html#module-ramble.test.success_criteria">ramble.test.success_criteria</a>, <a href="ramble.test.success_criteria.html#module-ramble.test.success_criteria">[1]</a>
 </li>
         <li><a href="ramble.test.util.html#module-ramble.test.util">ramble.test.util</a>
 </li>
@@ -2329,7 +2331,11 @@
       <li><a href="ramble.html#ramble.spec.parse">parse() (in module ramble.spec)</a>
 </li>
       <li><a href="ramble.html#ramble.success_criteria.ScopedCriteriaList.passed">passed() (ramble.success_criteria.ScopedCriteriaList method)</a>
+
+      <ul>
+        <li><a href="ramble.html#ramble.success_criteria.SuccessCriteria.passed">(ramble.success_criteria.SuccessCriteria method)</a>
 </li>
+      </ul></li>
       <li><a href="ramble.html#ramble.stage.StageComposite.path">path (ramble.stage.StageComposite property)</a>
 
       <ul>
@@ -2382,10 +2388,10 @@
 </li>
       <li><a href="ramble.html#ramble.config.Configuration.print_section">print_section() (ramble.config.Configuration method)</a>
 </li>
-      <li><a href="ramble.html#ramble.main.print_setup_info">print_setup_info() (in module ramble.main)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.main.print_setup_info">print_setup_info() (in module ramble.main)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.print_summary">print_summary() (in module ramble.cmd.software_definitions)</a>
 </li>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.info.print_text_info">print_text_info() (in module ramble.cmd.common.info)</a>
@@ -2990,8 +2996,6 @@
         <li><a href="ramble.test.html#module-ramble.test">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.application_inheritance
 
@@ -2999,6 +3003,8 @@
         <li><a href="ramble.test.html#module-ramble.test.application_inheritance">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.cmd
 
@@ -3018,6 +3024,13 @@
 
       <ul>
         <li><a href="ramble.test.cmd.html#module-ramble.test.cmd.software_definitions">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.test.dry_run_helpers
+
+      <ul>
+        <li><a href="ramble.test.html#module-ramble.test.dry_run_helpers">module</a>
 </li>
       </ul></li>
       <li>
@@ -3052,7 +3065,7 @@
     ramble.test.success_criteria
 
       <ul>
-        <li><a href="ramble.test.html#module-ramble.test.success_criteria">module</a>
+        <li><a href="ramble.test.html#module-ramble.test.success_criteria">module</a>, <a href="ramble.test.success_criteria.html#module-ramble.test.success_criteria">[1]</a>
 </li>
       </ul></li>
       <li>
@@ -3447,7 +3460,7 @@
       </ul></li>
       <li><a href="ramble.html#ramble.success_criteria.ScopedCriteriaList">ScopedCriteriaList (class in ramble.success_criteria)</a>
 </li>
-      <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES">SCOPES (class in ramble.test.modifier_functionality.modifier_helpers)</a>
+      <li><a href="ramble.test.html#ramble.test.dry_run_helpers.SCOPES">SCOPES (class in ramble.test.dry_run_helpers)</a>
 </li>
       <li><a href="ramble.html#ramble.config.scopes">scopes() (in module ramble.config)</a>
 </li>
@@ -4010,7 +4023,7 @@
       <li><a href="ramble.html#ramble.namespace.namespace.workload">workload (ramble.namespace.namespace attribute)</a>
 
       <ul>
-        <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.workload">(ramble.test.modifier_functionality.modifier_helpers.SCOPES attribute)</a>
+        <li><a href="ramble.test.html#ramble.test.dry_run_helpers.SCOPES.workload">(ramble.test.dry_run_helpers.SCOPES attribute)</a>
 </li>
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.workload">(ramble.workspace.namespace attribute)</a>
 </li>
@@ -4071,7 +4084,7 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace">(class in ramble.workspace.workspace)</a>
 </li>
       </ul></li>
-      <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.SCOPES.workspace">workspace (ramble.test.modifier_functionality.modifier_helpers.SCOPES attribute)</a>
+      <li><a href="ramble.test.html#ramble.test.dry_run_helpers.SCOPES.workspace">workspace (ramble.test.dry_run_helpers.SCOPES attribute)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace">workspace() (in module ramble.cmd.workspace)</a>
 </li>
