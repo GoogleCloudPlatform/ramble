@@ -8,8 +8,6 @@
 
 import os
 
-from enum import Enum
-
 import spack.util.spack_yaml as syaml
 
 
@@ -40,74 +38,6 @@ def check_execute_script(script_path, tests):
         data = f.read()
         for test in tests:
             assert test in data
-
-
-SCOPES = Enum('SCOPES', ['workspace', 'application', 'workload', 'experiment'])
-
-
-def dry_run_config(modifier_injections, config_path):
-    """Creates a new configuration with modifiers injected
-
-    Input argument modifier_injections is a list of tuples. Each tuple has two
-    values, and takes the form:
-
-    (scope, modifier_dict)
-
-    scope is the scope the modifier should be injected into
-    modifier_dict is a dict representing the new modifier
-
-    config_path is the path to the config file that should be written
-    """
-    ramble_dict = syaml.syaml_dict()
-    ramble_dict['ramble'] = syaml.syaml_dict()
-    test_dict = ramble_dict['ramble']
-
-    test_dict['variables'] = syaml.syaml_dict()
-    test_dict['applications'] = syaml.syaml_dict()
-    test_dict['applications']['gromacs'] = syaml.syaml_dict()
-    test_dict['spack'] = syaml.syaml_dict()
-
-    spack_dict = test_dict['spack']
-    spack_dict['concretized'] = False
-    spack_dict['packages'] = syaml.syaml_dict()
-    spack_dict['environments'] = syaml.syaml_dict()
-
-    ws_var_dict = test_dict['variables']
-    ws_var_dict['mpi_command'] = 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    ws_var_dict['batch_submit'] = 'batch_submit {execute_experiment}'
-    ws_var_dict['processes_per_node'] = '16'
-    ws_var_dict['n_ranks'] = '{processes_per_node}*{n_nodes}'
-    ws_var_dict['n_threads'] = '1'
-
-    app_dict = test_dict['applications']['gromacs']
-    app_dict['workloads'] = syaml.syaml_dict()
-    app_dict['workloads']['water_bare'] = syaml.syaml_dict()
-
-    workload_dict = app_dict['workloads']['water_bare']
-    workload_dict['experiments'] = syaml.syaml_dict()
-    workload_dict['experiments']['test_exp'] = syaml.syaml_dict()
-
-    exp_dict = workload_dict['experiments']['test_exp']
-    exp_dict['variables'] = syaml.syaml_dict()
-    exp_dict['variables']['n_nodes'] = '1'
-
-    for scope, modifier_dict in modifier_injections:
-        if scope == SCOPES.workspace:
-            dict_to_mod = test_dict
-        elif scope == SCOPES.application:
-            dict_to_mod = app_dict
-        elif scope == SCOPES.workload:
-            dict_to_mod = workload_dict
-        elif scope == SCOPES.experiment:
-            dict_to_mod = exp_dict
-
-        if 'modifiers' not in dict_to_mod:
-            dict_to_mod['modifiers'] = syaml.syaml_list()
-
-        dict_to_mod['modifiers'].append(modifier_dict.copy())
-
-    with open(config_path, 'w+') as f:
-        syaml.dump(ramble_dict, stream=f)
 
 
 def named_modifier(name):

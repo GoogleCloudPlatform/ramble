@@ -652,7 +652,7 @@ _ramble_workspace_setup() {
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms"
 }
 
 _ramble_workspace_info() {

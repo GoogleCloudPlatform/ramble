@@ -19,7 +19,10 @@ import ramble.keywords
 supported_math_operators = {
     ast.Add: operator.add, ast.Sub: operator.sub,
     ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow:
-    operator.pow, ast.BitXor: operator.xor, ast.USub: operator.neg
+    operator.pow, ast.BitXor: operator.xor, ast.USub: operator.neg,
+    ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.Gt: operator.gt,
+    ast.GtE: operator.ge, ast.Lt: operator.lt, ast.LtE: operator.le,
+    ast.And: operator.and_, ast.Or: operator.or_
 }
 
 
@@ -289,6 +292,8 @@ class Expander(object):
             return self._ast_attr(node)
         elif isinstance(node, ast.Compare):
             return self._eval_comparisons(node)
+        elif isinstance(node, ast.BoolOp):
+            return self._eval_bool_op(node)
         elif isinstance(node, ast.BinOp):
             return self._eval_binary_ops(node)
         elif isinstance(node, ast.UnaryOp):
@@ -328,13 +333,53 @@ class Expander(object):
         val = f'{base}.{node.attr}'
         return val
 
+    def _eval_bool_op(self, node):
+        """Handle a boolean operator node in the ast"""
+        try:
+            op = supported_math_operators[type(node.op)]
+
+            result = self.eval_math(node.values[0])
+
+            for value in node.values[1:]:
+                result = op(result, self.eval_math(value))
+
+            return result
+
+        except TypeError:
+            raise SyntaxError('Unsupported operand type in boolean operator')
+        except KeyError:
+            raise SyntaxError('Unsupported boolean operator')
+
     def _eval_comparisons(self, node):
         """Handle a comparison node in the ast"""
 
         # Extract In nodes, and call their helper
         if len(node.ops) == 1 and isinstance(node.ops[0], ast.In):
             return self._eval_comp_in(node)
-        return node
+
+        # Try to evaluate the comparison logic, if not return the node as is.
+        try:
+            cur_left = self.eval_math(node.left)
+
+            op = supported_math_operators[type(node.ops[0])]
+            cur_right = self.eval_math(node.comparators[0])
+
+            result = op(cur_left, cur_right)
+
+            if len(node.ops) > 1:
+                cur_left = cur_right
+                for comp, right in zip(node.ops, node.comparators)[1:]:
+                    op = supported_math_operators[type(comp)]
+                    cur_right = self.eval_math(right)
+
+                    result = result and op(cur_left, cur_right)
+
+                    cur_left = cur_right
+            return result
+        except TypeError:
+            raise SyntaxError('Unsupported operand type in binary comparison operator')
+        except KeyError:
+            raise SyntaxError('Unsupported binary comparison operator')
 
     def _eval_comp_in(self, node):
         """Handle in nodes in the ast

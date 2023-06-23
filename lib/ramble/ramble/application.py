@@ -969,7 +969,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     for criteria in file_conf['success_criteria']:
                         tty.debug('Looking for criteria %s' % criteria)
                         criteria_obj = criteria_list.find_criteria(criteria)
-                        if criteria_obj.matches(line):
+                        if criteria_obj.passed(line, self):
                             criteria_obj.mark_found()
 
                     for context in file_conf['contexts']:
@@ -1018,6 +1018,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                         'units': fom_conf['units']
                                     }
 
+        # Test all non-file based success criteria
+        for criteria_obj in criteria_list.all_criteria():
+            if criteria_obj.file is None:
+                if criteria_obj.passed(app_inst=self, fom_values=fom_values):
+                    criteria_obj.mark_found()
+
         exp_ns = self.expander.experiment_namespace
         results = {'name': exp_ns}
 
@@ -1028,6 +1034,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
         if success:
             results['RAMBLE_STATUS'] = 'SUCCESS'
+        else:
+            results['RAMBLE_STATUS'] = 'FAILED'
+
+        if success or workspace.always_print_foms:
             results['RAMBLE_VARIABLES'] = {}
             results['RAMBLE_RAW_VARIABLES'] = {}
             for var, val in self.variables.items():
@@ -1044,9 +1054,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     context_map['foms'].append(fom_copy)
 
                 results['CONTEXTS'].append(context_map)
-
-        else:
-            results['RAMBLE_STATUS'] = 'FAILED'
 
         workspace.append_result(results)
 
@@ -1078,11 +1085,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # Add the application defined criteria
         criteria_list.flush_scope('application_definition')
+
         for criteria, conf in self.success_criteria.items():
             if conf['mode'] == 'string':
                 criteria_list.add_criteria('application_definition', criteria,
                                            conf['mode'], re.compile(conf['match']),
                                            conf['file'])
+
+        criteria_list.add_criteria(scope='application_definition',
+                                   name='_application_function',
+                                   mode='application_function')
 
         # Extract file paths for all criteria
         for criteria in criteria_list.all_criteria():
@@ -1211,6 +1223,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         command.append(cmd)
 
         return command
+
+    def evaluate_success(self):
+        """Hook for applications to evaluate custom success criteria
+
+        Expected to perform analysis and return either true or false.
+        """
+
+        return True
 
 
 class ApplicationError(RambleError):
