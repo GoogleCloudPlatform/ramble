@@ -469,6 +469,53 @@ ramble:
         assert 'basic-x86_64_v4' in software_environments._environments['basic']['packages']
 
 
+def test_package_vector_expansion_multi_level(mutable_mock_workspace_path):
+    ws_name = 'test_package_vector_expansion_multi_level'
+    workspace('create', ws_name)
+
+    test_config = """
+ramble:
+  variables:
+    arch: ['x86_64', 'x86_64_v4']
+  applications: {}
+  spack: {}
+"""
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        with open(os.path.join(ws.config_dir, 'ramble.yaml'), 'w+') as f:
+            f.write(test_config)
+
+        ws._re_read()
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['variables'] = {}
+        spack_dict['variables']['test'] = ['test1', 'test2']
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic-{arch}-{test}-{pkg_level}'] = {
+            'spack_spec': 'basic@1.1 target={arch}',
+            'variables': {
+                'pkg_level': ['ll1', 'll2'],
+            }
+        }
+        spack_dict['environments'] = {
+            'basic': {
+                'packages': ['basic-x86_64-test1-ll1', 'basic-x86_64_v4-test2-ll2']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert len(software_environments._packages.keys()) == 2
+        assert 'basic-x86_64-test1-ll1' in software_environments._packages.keys()
+        assert 'basic-x86_64_v4-test2-ll2' in software_environments._packages.keys()
+        assert 'basic' in software_environments._environments.keys()
+        assert 'basic-x86_64-test1-ll1' in software_environments._environments['basic']['packages']
+        assert 'basic-x86_64_v4-test2-ll2' in \
+            software_environments._environments['basic']['packages']
+
+
 def test_environment_vector_expansion_spack_level(mutable_mock_workspace_path):
     ws_name = 'test_environment_vector_expansion_spack_level'
     workspace('create', ws_name)

@@ -98,7 +98,7 @@ class SoftwareEnvironments(object):
                 pkg_matrices = []
 
                 if namespace.variables in pkg_info:
-                    pkg_vars = pkg_info[namespace.variables].copy()
+                    pkg_vars.update(pkg_info[namespace.variables])
 
                 if namespace.matrices in pkg_info:
                     pkg_matrices = pkg_info[namespace.matrices].copy()
@@ -137,7 +137,7 @@ class SoftwareEnvironments(object):
                 self._environment_map[env_template] = []
 
                 if namespace.variables in env_info:
-                    env_vars = env_info[namespace.variables].copy()
+                    env_vars.update(env_info[namespace.variables])
 
                 if namespace.matrices in env_info:
                     env_matrices = env_info[namespace.matrices].copy()
