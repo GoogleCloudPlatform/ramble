@@ -129,22 +129,15 @@ def variable_modification(name, modification, method='set', mode=None, modes=Non
 
     def _execute_variable_modification(mod):
         supported_methods = ['append', 'prepend', 'set']
-        if not (mode or modes):
-            raise DirectiveError('variable_modification directive requires:\n' +
-                                 '  mode or modes to be defined.')
-
         if method not in supported_methods:
             raise DirectiveError('variable_modification directive given an invalid method.\n'
                                  f'  Valid methods are {str(supported_methods)}')
 
-        all_modes = []
-        if mode:
-            all_modes.append(mode)
-        if modes:
-            if isinstance(modes, list):
-                all_modes.extend(modes)
-            else:
-                all_modes.extend(modes)
+        all_modes = ramble.language.language_helpers.require_definition(mode,
+                                                                        modes,
+                                                                        'mode',
+                                                                        'modes',
+                                                                        'variable_modification')
 
         for mode_name in all_modes:
             if mode_name not in mod.variable_modifications:
@@ -350,18 +343,11 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
             raise DirectiveError(f'env_var_modification directive with method {method} '
                                  'requires a value for the modification argument.')
 
-        if not (mode or modes):
-            raise DirectiveError('env_var_modification directive requires:\n' +
-                                 '  mode or modes to be defined.')
-
-        all_modes = []
-        if mode:
-            all_modes.append(mode)
-        if modes:
-            if isinstance(modes, list):
-                all_modes.extend(modes)
-            else:
-                all_modes.append(modes)
+        all_modes = ramble.language.language_helpers.require_definition(mode,
+                                                                        modes,
+                                                                        'mode',
+                                                                        'modes',
+                                                                        'env_var_modification')
 
         for set_mode in all_modes:
             if set_mode not in mod.env_var_modifications:
