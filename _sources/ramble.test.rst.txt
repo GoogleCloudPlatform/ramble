@@ -12,6 +12,7 @@ Subpackages
    ramble.test.cmd
    ramble.test.end_to_end
    ramble.test.modifier_functionality
+   ramble.test.util
 
 Submodules
 ----------
