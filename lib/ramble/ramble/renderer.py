@@ -11,6 +11,7 @@ import itertools
 import llnl.util.tty as tty
 
 import ramble.error
+import ramble.expander
 
 
 class Renderer(object):
@@ -57,7 +58,14 @@ class Renderer(object):
         Returns:
           A single object definition, through a yield
         """
-        object_variables = variables.copy()
+        object_variables = {}
+        expander = ramble.expander.Expander(variables, None)
+
+        # Expand all variables that generate lists
+        for name, unexpanded in variables.items():
+            value = expander.expand_lists(unexpanded)
+            object_variables[name] = value
+
         new_objects = []
         matrix_objects = []
 

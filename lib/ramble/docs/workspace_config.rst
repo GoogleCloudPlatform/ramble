@@ -172,6 +172,30 @@ There are two notable aspects of this config file are:
 All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.
 
+In addition to accepting explicit lists, Ramble supports using
+`python's range function<https://docs.python.org/3/library/functions.html#func-range>`
+to create a list. With this functionality, the example above could be re-written as:
+
+.. code-block:: yaml
+
+    ramble:
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: 'range(1, 5)'
+              experiments:
+                test_exp_{n_nodes}:
+                  variables:
+                    n_ranks: '1'
 
 .. _ramble-matrix-logic:
 
