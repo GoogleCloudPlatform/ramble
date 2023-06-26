@@ -829,10 +829,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for input_file, input_conf in self._input_fetchers.items():
             if not workspace.dry_run:
+                input_namespace = workload_namespace + '.' + input_file
+                input_tuple = ('input-namespace', input_namespace)
+
+                # Skip inputs that have already been cached
+                if workspace.check_cache(input_tuple):
+                    continue
+
                 mirror_paths = ramble.mirror.mirror_archive_paths(
                     input_conf['fetcher'], os.path.join(self.name, input_file))
-
-                input_namespace = workload_namespace + '.' + input_file
                 input_vars = {keywords.input_name: input_conf['input_name']}
 
                 with ramble.stage.InputStage(input_conf['fetcher'], name=input_namespace,
@@ -851,6 +856,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             stage.expand_archive()
                         except spack.util.executable.ProcessError:
                             pass
+
+                workspace.add_to_cache(input_tuple)
             else:
                 tty.msg('DRY-RUN: Would download %s' % input_conf['fetcher'].url)
 
