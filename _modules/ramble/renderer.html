@@ -119,6 +119,7 @@
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 
 <span class="kn">import</span> <span class="nn">ramble.error</span>
+<span class="kn">import</span> <span class="nn">ramble.expander</span>
 
 
 <div class="viewcode-block" id="Renderer"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer">[docs]</a><span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -165,7 +166,14 @@
 <span class="sd">        Returns:</span>
 <span class="sd">          A single object definition, through a yield</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">object_variables</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">object_variables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Expand all variables that generate lists</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">unexpanded</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">expander</span><span class="o">.</span><span class="n">expand_lists</span><span class="p">(</span><span class="n">unexpanded</span><span class="p">)</span>
+            <span class="n">object_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
         <span class="n">new_objects</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">matrix_objects</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -302,7 +310,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 23, 2023.
+      <span class="lastupdated">Last updated on Jun 26, 2023.
       </span></p>
   </div>
 

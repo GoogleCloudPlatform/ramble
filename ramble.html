@@ -211,6 +211,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.application_run_dir"><code class="docutils literal notranslate"><span class="pre">Expander.application_run_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.env_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.env_namespace</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.eval_math"><code class="docutils literal notranslate"><span class="pre">Expander.eval_math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expand_lists"><code class="docutils literal notranslate"><span class="pre">Expander.expand_lists()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expand_var"><code class="docutils literal notranslate"><span class="pre">Expander.expand_var()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expansion_str"><code class="docutils literal notranslate"><span class="pre">Expander.expansion_str()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_name"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_name</span></code></a></li>
@@ -2802,6 +2803,18 @@ and experiment variables.</p>
 <p>Does not assume a specific type of operands.
 Some operators will generate floating point, while
 others will generate integers (if the inputs are integers).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.Expander.expand_lists">
+<span class="sig-name descname"><span class="pre">expand_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#Expander.expand_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.Expander.expand_lists" title="Permalink to this definition"></a></dt>
+<dd><p>Expand a variable into a list if possible</p>
+<p>If expanding a variable would generate a list, this function will
+return a list. If any error case happens, this function will return
+the unmodified input value.</p>
+<p>NOTE: This function is generally called early in the expansion. This allows
+lists to be generated before rendering experiments, but does not support
+pulling a list from a different experiment.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -6905,7 +6918,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 23, 2023.
+      <span class="lastupdated">Last updated on Jun 26, 2023.
       </span></p>
   </div>
 

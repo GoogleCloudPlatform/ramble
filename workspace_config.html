@@ -272,6 +272,29 @@ math and variable expansion syntax as defined above).</p>
 2. The experiment name references variable values.</p>
 <p>All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.</p>
+<p>In addition to accepting explicit lists, Ramble supports using
+<cite>python’s range function&lt;https://docs.python.org/3/library/functions.html#func-range&gt;</cite>
+to create a list. With this functionality, the example above could be re-written as:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;range(1,</span><span class="nv"> </span><span class="s">5)&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
 </section>
 <section id="variable-matrices">
 <span id="ramble-matrix-logic"></span><h3>Variable Matrices:<a class="headerlink" href="#variable-matrices" title="Permalink to this heading"></a></h3>
@@ -898,7 +921,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 23, 2023.
+      <span class="lastupdated">Last updated on Jun 26, 2023.
       </span></p>
   </div>
 
