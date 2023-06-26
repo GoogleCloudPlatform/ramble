@@ -13,6 +13,8 @@ class UfsWeatherModel(SpackApplication):
     '''Define FV3 application via ufs-weather-model'''
     name = 'UfsWeatherModel'
 
+    maintainers('dodecatheon')
+
     tags('nwp', 'weather')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
