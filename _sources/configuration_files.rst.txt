@@ -460,6 +460,9 @@ use when determining if they were successful or not. Its format is as follows:
       file: 'file_criteria_should_be_found_in'
 
 
+For more information about using success criteria, see the
+:ref:`success criteria documentation<success-criteria>`.
+
 .. _variables-config:
 
 ------------------

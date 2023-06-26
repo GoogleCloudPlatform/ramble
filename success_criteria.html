@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Success Criteria &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Application Developers Guide" href="application_dev_guide.html" />
+    <link rel="prev" title="Workspace Configuration File" href="workspace_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Success Criteria</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types-of-success-criteria">Types of Success Criteria</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#defining-success-criteria">Defining Success Criteria</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#success-criteria-modes">Success Criteria Modes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mode-application-function">Mode: Application Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mode-fom-comparison">Mode: FOM Comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mode-string">Mode: String</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="application_dev_guide.html">Application Developers Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Success Criteria</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/success_criteria.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="success-criteria">
+<span id="id1"></span><h1>Success Criteria<a class="headerlink" href="#success-criteria" title="Permalink to this heading"></a></h1>
+<p>Ramble supports various methods of defining success criteria, which mark
+experiments as successfully completed, or failed when analyzing a workspace.</p>
+<p>This document describes the supported functionality, and how to use success
+criteria in general.</p>
+<section id="types-of-success-criteria">
+<h2>Types of Success Criteria<a class="headerlink" href="#types-of-success-criteria" title="Permalink to this heading"></a></h2>
+<p>Success criteria can be defined in two places:
+* An application.py file
+* A <a class="reference internal" href="workspace_config.html#workspace-config"><span class="std std-ref">ramble.yaml workspace config file</span></a></p>
+<p>Success criteria defined in an application.py file applies to <strong>all</strong>
+experiments this application generates. These are intended to provide more of a
+“did my experiment complete” success criteria.</p>
+<p>Success criteria defined in a workspace config file only applies to those
+specific experiments. These criteria can evaluate if an experiment performed
+adequately.</p>
+<p>The application.py interface will be documented in the
+<a class="reference internal" href="application_dev_guide.html#application-dev-guide"><span class="std std-ref">application developers guide</span></a>.</p>
+<p>The rest of this document focuses on how to write success criteria in a
+workspace configuration file. But it will describe general aspects of success
+criteria that can apply to either definition.</p>
+</section>
+<section id="defining-success-criteria">
+<h2>Defining Success Criteria<a class="headerlink" href="#defining-success-criteria" title="Permalink to this heading"></a></h2>
+<p>Success criteria defined in a workspace config file are all merged together,
+following the logic for optional sections in the workspace config file.</p>
+<p>A block of success criteria is defined as a list of independent criteria that
+should be evaluated.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">success_criteria</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">criteria1</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;string&#39;</span>
+<span class="w">  </span><span class="nt">match</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Completed&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">criteria2</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;application_function&#39;</span>
+</pre></div>
+</div>
+<p>Success criteria can mix modes, and are all evaluated. If <strong>any</strong> success
+criteria returns false, the experiment is marked as <code class="docutils literal notranslate"><span class="pre">FAILED</span></code> in the output of
+<code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span></code>.</p>
+</section>
+<section id="success-criteria-modes">
+<h2>Success Criteria Modes<a class="headerlink" href="#success-criteria-modes" title="Permalink to this heading"></a></h2>
+<p>Each success criteria has a mode. Currently, there are three supported modes.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'application_function'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'fom_comparison'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'string'</span></code></p></li>
+</ul>
+<p>We will cover each of these supported modes in more detail below.</p>
+<section id="mode-application-function">
+<h3>Mode: Application Function<a class="headerlink" href="#mode-application-function" title="Permalink to this heading"></a></h3>
+<p>A success criteria with <code class="docutils literal notranslate"><span class="pre">mode='application_function'</span></code> will use an
+application.py’s defined <code class="docutils literal notranslate"><span class="pre">evaluate_success</span></code> function to test for experiment
+success. This hook allows an application developer to perform more complicated
+actions that are specific to the experiment.</p>
+<p><strong>NOTE:</strong> A success criteria with <code class="docutils literal notranslate"><span class="pre">mode='application_function'</span></code> is added by
+default to all experiments. The base <code class="docutils literal notranslate"><span class="pre">evaluate_success</span></code> function always
+returns <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</section>
+<section id="mode-fom-comparison">
+<h3>Mode: FOM Comparison<a class="headerlink" href="#mode-fom-comparison" title="Permalink to this heading"></a></h3>
+<p>Success criteria with <code class="docutils literal notranslate"><span class="pre">mode='fom_comparison'</span></code> allow experiments to define
+complex mathematical logic to evaluate success of an experiment. Defining
+these criteria within a workspace configuration file is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">success_criteria</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_criteria</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fom_comparison</span>
+<span class="w">  </span><span class="nt">fom_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;application_fom_*&#39;</span>
+<span class="w">  </span><span class="p p-Indicator">[</span><span class="nv">fom_context</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;fom_context_*&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">formula</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{value}</span><span class="nv"> </span><span class="s">&gt;</span><span class="nv"> </span><span class="s">1.0&#39;</span>
+</pre></div>
+</div>
+<p>The above example shows the full interface for defining success criteria with
+<code class="docutils literal notranslate"><span class="pre">mode='fom_comparison'</span></code>. The available attributes are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: The name of the specific criteria</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The mode of the specific criteria</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fom_name</span></code>: The name of the FOM to use for evaluating the formula</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">formula</span></code>: The formula to evaluate for success.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fom_context</span></code>: (Optional) The context <code class="docutils literal notranslate"><span class="pre">fom_name</span></code> should exist in. Defaults to <code class="docutils literal notranslate"><span class="pre">null</span></code>.</p></li>
+</ul>
+<p>Both <code class="docutils literal notranslate"><span class="pre">fom_name</span></code> and <code class="docutils literal notranslate"><span class="pre">fom_context</span></code> support
+<cite>python style globbing&lt;https://docs.python.org/3/library/fnmatch.html&gt;</cite>.</p>
+<p>When using the globbing functionality, all contexts that match the
+<code class="docutils literal notranslate"><span class="pre">fom_context</span></code> argument are searched. Within each context, all FOMs that match
+<code class="docutils literal notranslate"><span class="pre">fom_name</span></code> are tested with <code class="docutils literal notranslate"><span class="pre">formula</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">formula</span></code> attribute can access any variables defined within an
+experiment. Additionally, an extra <code class="docutils literal notranslate"><span class="pre">value</span></code> variable is defined, which takes
+the value of the FOM as extracted from the output.</p>
+</section>
+<section id="mode-string">
+<h3>Mode: String<a class="headerlink" href="#mode-string" title="Permalink to this heading"></a></h3>
+<p>Success criteria with <code class="docutils literal notranslate"><span class="pre">mode='string'</span></code> allow experiments to define expected
+string regular expression matching. This criteria mode is useful if an
+application prints a string whenever it successfully completes. Defining these
+criteria within a workspace configuration file is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">success_criteria</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_criteria</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;string&#39;</span>
+<span class="w">  </span><span class="nt">match</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;\s+Completed\s+&#39;</span>
+<span class="w">  </span><span class="p p-Indicator">[</span><span class="nv">file</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;{log_file}]</span>
+</pre></div>
+</div>
+<p>The above shows the full interface for degining success criteria with
+<code class="docutils literal notranslate"><span class="pre">mode='string'</span></code>. The available attributes are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: The name of the specific criteria.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The mode of the specific criteria.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">match</span></code>: The regular expression used to test for success.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code>: (Optional) The file (or variable that refers to a file) to test for the <code class="docutils literal notranslate"><span class="pre">match</span></code> in.</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">match</span></code> is found inside <code class="docutils literal notranslate"><span class="pre">file</span></code> this criteria is marked as success. If it
+is not found, then the criteria is marked as failed.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="workspace_config.html" class="btn btn-neutral float-left" title="Workspace Configuration File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="application_dev_guide.html" class="btn btn-neutral float-right" title="Application Developers Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jun 26, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

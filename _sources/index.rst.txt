@@ -20,6 +20,8 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    getting_started
    configuration_files
    workspace_config
+   success_criteria
+   application_dev_guide
 
 .. toctree::
    :maxdepth: 2
