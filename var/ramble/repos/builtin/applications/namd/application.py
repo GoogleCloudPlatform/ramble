@@ -86,6 +86,13 @@ class Namd(SpackApplication):
                  inputs=[wl_def[0]])
 
         workload_variable(
+            'namd_flags',
+            default='+ppn {processes_per_node} +setcpuaffinity',
+            description='Flags for running NAMD',
+            workloads=[wl_def[0]]
+        )
+
+        workload_variable(
             'input_path',
             default=Expander.expansion_str(wl_def[0]),
             description=f'Path to the {wl_def[0]} inputs',
