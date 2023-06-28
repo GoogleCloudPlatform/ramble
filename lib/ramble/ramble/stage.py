@@ -467,6 +467,11 @@ class InputStage(object):
                 errors.append('Fetching from {0} failed.'.format(fetcher))
                 tty.debug(e)
                 continue
+            except spack.util.web.SpackWebError as e:
+                errors.append('Fetching from {0} failed.'.format(fetcher))
+                tty.debug(e)
+                continue
+
         else:
             print_errors(errors)
 
