@@ -37,3 +37,11 @@ ramble.test.success\_criteria.success\_functions module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.test.success\_criteria.success\_modifiers module
+-------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.success_modifiers
+   :members:
+   :undoc-members:
+   :show-inheritance:

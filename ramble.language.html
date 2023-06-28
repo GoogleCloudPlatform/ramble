@@ -703,6 +703,32 @@ environment.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.success_criteria">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'null'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.success_criteria" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a success criteria that will be applied to experiments using this modifier</p>
+<p>Adds a new success criteria to this modifier definition.</p>
+<p>These will be checked during the analyze step to see if a job exited properly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of this success criteria</p></li>
+<li><p><strong>mode</strong> – The type of success criteria that will be validated
+Valid values are: ‘string’, ‘application_function’, and ‘fom_comparison’</p></li>
+<li><p><strong>match</strong> – For mode=’string’. Value to check indicate success (if found, it
+would mark success)</p></li>
+<li><p><strong>file</strong> – For mode=’string’. File success criteria should be located in</p></li>
+<li><p><strong>fom_name</strong> – For mode=’fom_comparison’. Name of fom for a criteria.
+Accepts globbing.</p></li>
+<li><p><strong>fom_context</strong> – For mode=’fom_comparison’. Context the fom is contained
+in. Accepts globbing.</p></li>
+<li><p><strong>formula</strong> – For mode=’fom_comparison’. Formula to use to evaluate success.
+‘{value}’ keyword is set as the value of the FOM.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.modifier_language.tags">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.tags" title="Permalink to this definition"></a></dt>
 <dd><p>Add a new tag directive, to specify tags in a declarative way.</p>

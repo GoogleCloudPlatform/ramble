@@ -1196,11 +1196,19 @@
         <span class="c1"># Add the application defined criteria</span>
         <span class="n">criteria_list</span><span class="o">.</span><span class="n">flush_scope</span><span class="p">(</span><span class="s1">&#39;application_definition&#39;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
-                <span class="n">criteria_list</span><span class="o">.</span><span class="n">add_criteria</span><span class="p">(</span><span class="s1">&#39;application_definition&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="p">,</span>
-                                           <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;match&#39;</span><span class="p">]),</span>
-                                           <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
+        <span class="n">success_lists</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;application_definition&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_criteria</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+            <span class="n">success_lists</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;modifier_definition&#39;</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="n">success_criteria</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">success_scope</span><span class="p">,</span> <span class="n">success_list</span> <span class="ow">in</span> <span class="n">success_lists</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">success_list</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+                    <span class="n">criteria_list</span><span class="o">.</span><span class="n">add_criteria</span><span class="p">(</span><span class="n">success_scope</span><span class="p">,</span> <span class="n">criteria</span><span class="p">,</span>
+                                               <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;match&#39;</span><span class="p">]),</span>
+                                               <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
 
         <span class="n">criteria_list</span><span class="o">.</span><span class="n">add_criteria</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;application_definition&#39;</span><span class="p">,</span>
                                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;_application_function&#39;</span><span class="p">,</span>
