@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import llnl.util.tty as tty
+
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
 
@@ -215,6 +217,47 @@ def required_package(name):
             mod.required_packages[name] = True
 
     return _execute_required_package
+
+
+@modifier_directive('success_criteria')
+def success_criteria(name, mode, match=None, file='{log_file}',
+                     fom_name=None, fom_context='null', formula=None):
+    """Defines a success criteria that will be applied to experiments using this modifier
+
+    Adds a new success criteria to this modifier definition.
+
+    These will be checked during the analyze step to see if a job exited properly.
+
+    Arguments:
+      name: The name of this success criteria
+      mode: The type of success criteria that will be validated
+            Valid values are: 'string', 'application_function', and 'fom_comparison'
+      match: For mode='string'. Value to check indicate success (if found, it
+             would mark success)
+      file: For mode='string'. File success criteria should be located in
+      fom_name: For mode='fom_comparison'. Name of fom for a criteria.
+                Accepts globbing.
+      fom_context: For mode='fom_comparison'. Context the fom is contained
+                   in. Accepts globbing.
+      formula: For mode='fom_comparison'. Formula to use to evaluate success.
+               '{value}' keyword is set as the value of the FOM.
+    """
+
+    def _execute_success_criteria(mod):
+        valid_modes = ramble.success_criteria.SuccessCriteria._valid_modes
+        if mode not in valid_modes:
+            tty.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
+
+        mod.success_criteria[name] = {
+            'mode': mode,
+            'match': match,
+            'file': file,
+            'fom_name': fom_name,
+            'fom_context': fom_context,
+            'formula': formula,
+        }
+
+    return _execute_success_criteria
 
 
 @modifier_directive('builtins')

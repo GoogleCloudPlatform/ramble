@@ -43,6 +43,7 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, 'software_specs')
     assert hasattr(test_mod, 'default_compilers')
     assert hasattr(test_mod, 'required_packages')
+    assert hasattr(test_mod, 'success_criteria')
     assert hasattr(test_mod, 'builtins')
     assert hasattr(test_mod, 'executable_modifiers')
     assert hasattr(test_mod, 'env_var_modifications')

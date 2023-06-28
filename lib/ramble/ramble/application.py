@@ -1086,11 +1086,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Add the application defined criteria
         criteria_list.flush_scope('application_definition')
 
-        for criteria, conf in self.success_criteria.items():
-            if conf['mode'] == 'string':
-                criteria_list.add_criteria('application_definition', criteria,
-                                           conf['mode'], re.compile(conf['match']),
-                                           conf['file'])
+        success_lists = [
+            ('application_definition', self.success_criteria),
+        ]
+
+        for mod in self._modifier_instances:
+            success_lists.append(('modifier_definition', mod.success_criteria))
+
+        for success_scope, success_list in success_lists:
+            for criteria, conf in success_list.items():
+                if conf['mode'] == 'string':
+                    criteria_list.add_criteria(success_scope, criteria,
+                                               conf['mode'], re.compile(conf['match']),
+                                               conf['file'])
 
         criteria_list.add_criteria(scope='application_definition',
                                    name='_application_function',
