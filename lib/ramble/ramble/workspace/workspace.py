@@ -1236,7 +1236,7 @@ class Workspace(object):
                 app_inst.run_phase(phase, self)
 
         if pipeline == 'setup':
-            for exp, app_inst in experiment_set.all_experiments():
+            for exp, app_inst in sorted(experiment_set.all_experiments()):
                 if not app_inst.is_template:
                     self.hash_inventory['experiments'].append(
                         {
