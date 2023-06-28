@@ -239,22 +239,15 @@
 
     <span class="k">def</span> <span class="nf">_execute_variable_modification</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
         <span class="n">supported_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;prepend&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mode</span> <span class="ow">or</span> <span class="n">modes</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;variable_modification directive requires:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                                 <span class="s1">&#39;  mode or modes to be defined.&#39;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_methods</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;variable_modification directive given an invalid method.</span><span class="se">\n</span><span class="s1">&#39;</span>
                                  <span class="sa">f</span><span class="s1">&#39;  Valid methods are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">supported_methods</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">all_modes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">mode</span><span class="p">:</span>
-            <span class="n">all_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">modes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">all_modes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">modes</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">all_modes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">modes</span><span class="p">)</span>
+        <span class="n">all_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span>
+                                                                        <span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;modes&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;variable_modification&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">mode_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">variable_modifications</span><span class="p">:</span>
@@ -460,18 +453,11 @@
             <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;env_var_modification directive with method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1"> &#39;</span>
                                  <span class="s1">&#39;requires a value for the modification argument.&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">mode</span> <span class="ow">or</span> <span class="n">modes</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;env_var_modification directive requires:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                                 <span class="s1">&#39;  mode or modes to be defined.&#39;</span><span class="p">)</span>
-
-        <span class="n">all_modes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">mode</span><span class="p">:</span>
-            <span class="n">all_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">modes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">all_modes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">modes</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">all_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modes</span><span class="p">)</span>
+        <span class="n">all_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span>
+                                                                        <span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;modes&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;env_var_modification&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">set_mode</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">set_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">:</span>
