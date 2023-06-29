@@ -158,11 +158,12 @@ class Hpl(SpackApplication):
 
             totalCores = nNodes * processesPerNode
             sqrtCores = int(math.sqrt(totalCores))
+            sqrtCores_p1 = sqrtCores_p1
 
             bestDist = totalCores - 1
             bestP = 1
 
-            for i in range(2, sqrtCores):
+            for i in range(2, sqrtCores_p1):
                 if totalCores % i == 0:
                     testDist = totalCores - i
                     if testDist < bestDist:
