@@ -23,6 +23,7 @@ import spack.util.spack_yaml as syaml
 
 import ramble.config
 import ramble.error
+import ramble.util.hashing
 
 spack_namespace = 'spack'
 
@@ -88,11 +89,17 @@ class SpackRunner(object):
         self.source_script = os.path.join(self.spack_dir,
                                           'share', 'spack', script)
 
+        self.hash = None
         self.env_path = None
         self.active = False
         self.compilers = []
         self.includes = []
         self.dry_run = dry_run
+
+    def get_version(self):
+        """Get spack's version"""
+        version_args = ['-V']
+        return self.exe(*version_args, output=str).strip()
 
     def set_dry_run(self, dry_run=False):
         """
@@ -423,6 +430,24 @@ class SpackRunner(object):
             self.exe(*args)
         else:
             self._dry_run_print(args)
+
+    def inventory_hash(self):
+        """
+        Create a hash of the spack.lock file for ramble inventory purposes
+
+        This command requires an active spack environment.
+        """
+        self._check_active()
+
+        spack_file = os.path.join(self.env_path, 'spack.lock')
+        if self.dry_run:
+            spack_file = os.path.join(self.env_path, 'spack.yaml')
+
+        spack_hash = ramble.util.hashing.hash_file(spack_file)
+        hash_path = os.path.join(self.env_path, 'ramble.hash')
+        with open(hash_path, 'w+') as f:
+            f.write(spack_hash)
+        return spack_hash
 
     def install(self):
         """

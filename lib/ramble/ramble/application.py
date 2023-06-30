@@ -35,6 +35,7 @@ import ramble.repository
 import ramble.modifier
 import ramble.util.executable
 import ramble.util.colors as rucolor
+import ramble.util.hashing
 
 from ramble.keywords import keywords
 from ramble.workspace import namespace
@@ -50,6 +51,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _mod_prefix_builtin = 'modifier_builtin::'
     _builtin_required_key = 'required'
     _workload_exec_key = 'executables'
+    _inventory_file_name = 'ramble_inventory.json'
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.
@@ -80,6 +82,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._modifier_instances = []
         self._modifier_builtins = {}
         self._input_fetchers = None
+
+        self.hash_inventory = {
+            'attributes': [],
+            'inputs': [],
+            'software': [],
+            'templates': [],
+        }
+        self.experiment_hash = None
 
         self._file_path = file_path
 
@@ -720,7 +730,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def _derive_variables_for_template_path(self, workspace):
         """Define variables for template paths (for add_expand_vars)"""
-        for template_name, template_val in workspace.all_templates():
+        for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var(f'{{experiment_run_dir}}'),  # noqa: F541
                 template_name)
@@ -865,16 +875,96 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)
 
-        for template_name, template_val in workspace.all_templates():
+        for template_name, template_conf in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
 
             with open(expand_path, 'w+') as f:
-                f.write(self.expander.expand_var(template_val))
+                f.write(self.expander.expand_var(template_conf['contents']))
             os.chmod(expand_path, stat.S_IRWXU | stat.S_IRWXG
                      | stat.S_IROTH | stat.S_IXOTH)
 
         experiment_script = workspace.experiments_script
         experiment_script.write(self.expander.expand_var('{batch_submit}\n'))
+
+    def _clean_hash_variables(self, workspace, variables):
+        """Cleanup variables to hash before computing the hash
+
+        Perform some general cleanup operations on variables
+        before hashing, to help give useful hashes.
+        """
+
+        # Purge workspace name, as this shouldn't affect the experiments
+        if 'workspace_name' in variables:
+            del variables['workspace_name']
+
+        # Remove the workspace path from variable definitions before hashing
+        for var in variables:
+            if isinstance(variables[var], six.string_types):
+                variables[var] = variables[var].replace(workspace.root + os.path.sep, '')
+
+    def _write_inventory(self, workspace):
+        """Build and write an inventory of an experiment
+
+        Write an inventory file describing all of the contents of this
+        experiment.
+        """
+
+        experiment_run_dir = self.expander.experiment_run_dir
+        inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
+
+        # Clean up variables before hashing
+        vars_to_hash = self.variables.copy()
+        self._clean_hash_variables(workspace, vars_to_hash)
+
+        # Build inventory of attributes
+        attributes_to_hash = [
+            ('variables', vars_to_hash),
+            ('modifiers', self.modifiers),
+            ('chained_experiments', self.chained_experiments),
+            ('internals', self.internals),
+            ('env_vars', self._env_variable_sets),
+        ]
+
+        for attr, attr_dict in attributes_to_hash:
+            self.hash_inventory['attributes'].append(
+                {
+                    'name': attr,
+                    'digest': ramble.util.hashing.hash_json(attr_dict),
+                }
+            )
+
+        # Build inventory of workspace templates
+        for template_name, template_conf in workspace.all_templates():
+            self.hash_inventory['templates'].append(
+                {
+                    'name': template_name,
+                    'digest': template_conf['digest'],
+                }
+            )
+
+        # Build inventory of inputs
+        self._inputs_and_fetchers(self.expander.workload_name)
+
+        for input_file, input_conf in self._input_fetchers.items():
+            if input_conf['fetcher'].digest:
+                self.hash_inventory['inputs'].append(
+                    {
+                        'name': input_conf['input_name'],
+                        'digest': input_conf['fetcher'].digest
+                    }
+                )
+            else:
+                self.hash_inventory['inputs'].append(
+                    {
+                        'name': input_conf['input_name'],
+                        'digest': ramble.util.hashing.hash_string(input_conf['fetcher'].url),
+                    }
+                )
+
+        with open(inventory_file, 'w+') as f:
+            spack.util.spack_json.dump(self.hash_inventory, f)
+
+        self.experiment_hash = ramble.util.hashing.hash_file(inventory_file)
 
     def _archive_experiments(self, workspace):
         """Archive an experiment directory
