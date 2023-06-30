@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../application_dev_guide.html">Application Developers Guide</a></li>
@@ -159,6 +160,7 @@
 <span class="kn">import</span> <span class="nn">ramble.util.lock</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="kn">from</span> <span class="nn">ramble.util.path</span> <span class="kn">import</span> <span class="n">substitute_path_variables</span>
 <span class="kn">from</span> <span class="nn">ramble.util.spec_utils</span> <span class="kn">import</span> <span class="n">specs_equiv</span>
+<span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 <span class="kn">from</span> <span class="nn">ramble.namespace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
 
@@ -538,6 +540,10 @@
 <span class="sd">    provides a self contained execution environment where experiments</span>
 <span class="sd">    can be performed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_inventory_file_name</span> <span class="o">=</span> <span class="s1">&#39;ramble_inventory.json&#39;</span>
+    <span class="n">_hash_file_name</span> <span class="o">=</span> <span class="s1">&#39;workspace_hash.sha256&#39;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;In workspace init. Root = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
@@ -556,6 +562,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_mirror_cache</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_software_mirror_cache</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_software_environments</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;experiments&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;versions&#39;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+
+        <span class="kn">from</span> <span class="nn">ramble.main</span> <span class="kn">import</span> <span class="n">get_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;versions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ramble&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="n">get_version</span><span class="p">(),</span>
+                <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_string</span><span class="p">(</span><span class="n">get_version</span><span class="p">()),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">ramble.spack_runner</span> <span class="kn">import</span> <span class="n">SpackRunner</span><span class="p">,</span> <span class="n">RunnerError</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">runner</span> <span class="o">=</span> <span class="n">SpackRunner</span><span class="p">()</span>
+            <span class="n">spack_version</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;versions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;spack&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="n">spack_version</span><span class="p">,</span>
+                    <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_string</span><span class="p">(</span><span class="n">spack_version</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">RunnerError</span><span class="p">:</span>
+            <span class="k">pass</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -718,7 +752,10 @@
 
     <span class="k">def</span> <span class="nf">_read_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read a template file&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">,</span>
+            <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_string</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_read_auxiliary_software_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read an auxiliary software file for generated software directories&quot;&quot;&quot;</span>
@@ -755,10 +792,10 @@
     <span class="k">def</span> <span class="nf">_write_templates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write all templates out to workspace&quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_path</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="Workspace.clear"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_sections</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1310,6 +1347,24 @@
                 <span class="n">app_inst</span><span class="o">.</span><span class="n">run_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pipeline</span> <span class="o">==</span> <span class="s1">&#39;setup&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">app_inst</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">is_template</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">exp</span><span class="p">,</span>
+                            <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">experiment_hash</span><span class="p">,</span>
+                            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">hash_inventory</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory_file_name</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">sjson</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_file_name</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
             <span class="n">all_experiments_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
             <span class="n">all_experiments_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
@@ -1521,8 +1576,8 @@
 
 <div class="viewcode-block" id="Workspace.all_templates"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.all_templates">[docs]</a>    <span class="k">def</span> <span class="nf">all_templates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over each template in the workspace&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">yield</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span></div>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">name</span><span class="p">,</span> <span class="n">conf</span></div>
 
 <div class="viewcode-block" id="Workspace.all_auxiliary_software_files"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.all_auxiliary_software_files">[docs]</a>    <span class="k">def</span> <span class="nf">all_auxiliary_software_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over each file in $workspace/configs/auxiliary_software_files&quot;&quot;&quot;</span>

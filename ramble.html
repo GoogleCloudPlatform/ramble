@@ -552,11 +552,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.default_compilers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.format_doc"><code class="docutils literal notranslate"><span class="pre">ModifierBase.format_doc()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.inputs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.maintainers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.maintainers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modded_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modded_variables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modes"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modes</span></code></a></li>
@@ -570,8 +568,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.tags"><code class="docutils literal notranslate"><span class="pre">ModifierBase.tags</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.uses_spack"><code class="docutils literal notranslate"><span class="pre">ModifierBase.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.variable_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workload_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workload_variables</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workloads"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workloads</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.modifier.ModifierError"><code class="docutils literal notranslate"><span class="pre">ModifierError</span></code></a></li>
@@ -783,9 +779,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.generate_env_file"><code class="docutils literal notranslate"><span class="pre">SpackRunner.generate_env_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.generate_source_command"><code class="docutils literal notranslate"><span class="pre">SpackRunner.generate_source_command()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.get_package_path"><code class="docutils literal notranslate"><span class="pre">SpackRunner.get_package_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.get_version"><code class="docutils literal notranslate"><span class="pre">SpackRunner.get_version()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.global_arg_config_name"><code class="docutils literal notranslate"><span class="pre">SpackRunner.global_arg_config_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.install"><code class="docutils literal notranslate"><span class="pre">SpackRunner.install()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.install_compiler"><code class="docutils literal notranslate"><span class="pre">SpackRunner.install_compiler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.inventory_hash"><code class="docutils literal notranslate"><span class="pre">SpackRunner.inventory_hash()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.load_compiler"><code class="docutils literal notranslate"><span class="pre">SpackRunner.load_compiler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.mirror_environment"><code class="docutils literal notranslate"><span class="pre">SpackRunner.mirror_environment()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.set_dry_run"><code class="docutils literal notranslate"><span class="pre">SpackRunner.set_dry_run()</span></code></a></li>
@@ -906,6 +904,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="success_criteria.html">Success Criteria</a></li>
 <li class="toctree-l1"><a class="reference internal" href="application_dev_guide.html">Application Developers Guide</a></li>
@@ -1542,6 +1541,12 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.util.html#ramble-test-util-editor-module">ramble.test.util.editor module</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.test.workspace_hashing.html">ramble.test.workspace_hashing namespace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.workspace_hashing.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.workspace_hashing.html#ramble-test-workspace-hashing-workspace-name-does-not-change-hash-module">ramble.test.workspace_hashing.workspace_name_does_not_change_hash module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.workspace_hashing.html#ramble-test-workspace-hashing-workspace-setup-creates-inventory-module">ramble.test.workspace_hashing.workspace_setup_creates_inventory module</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#submodules">Submodules</a></li>
@@ -1638,6 +1643,12 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.file_cache.FileCache.write_transaction"><code class="docutils literal notranslate"><span class="pre">FileCache.write_transaction()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.hashing">ramble.util.hashing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.hashing.hash_file"><code class="docutils literal notranslate"><span class="pre">hash_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.hashing.hash_json"><code class="docutils literal notranslate"><span class="pre">hash_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.hashing.hash_string"><code class="docutils literal notranslate"><span class="pre">hash_string()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.install_cache">ramble.util.install_cache module</a><ul>
@@ -5003,11 +5014,6 @@ which to push resources.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.executables">
-<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.executables" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.figure_of_merit_contexts">
 <span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -5022,11 +5028,6 @@ which to push resources.</p>
 <span class="sig-name descname"><span class="pre">format_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier.html#ModifierBase.format_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier.ModifierBase.format_doc" title="Permalink to this definition"></a></dt>
 <dd><p>Wrap doc string at 72 characters and format nicely</p>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.inputs">
-<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.inputs" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.maintainers">
@@ -5098,16 +5099,6 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.variable_modifications">
 <span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.variable_modifications" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workload_variables">
-<span class="sig-name descname"><span class="pre">workload_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workload_variables" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workloads">
-<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workloads" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -6288,6 +6279,12 @@ this runner.</p>
 <dd><p>Return the installation directory for a package</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.get_version">
+<span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.get_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.get_version" title="Permalink to this definition"></a></dt>
+<dd><p>Get spack’s version</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.global_arg_config_name">
 <span class="sig-name descname"><span class="pre">global_arg_config_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'config:spack_flags:global_args'</span></em><a class="headerlink" href="#ramble.spack_runner.SpackRunner.global_arg_config_name" title="Permalink to this definition"></a></dt>
@@ -6311,6 +6308,13 @@ the list of environment specs. This can cause conflicts if an
 incompatible package is explicitly added to the environment later.</p>
 <p>Also, if it is added to an environment, sometimes it will cause a
 compiler to be installed multiple times with different base compilers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.inventory_hash">
+<span class="sig-name descname"><span class="pre">inventory_hash</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.inventory_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.inventory_hash" title="Permalink to this definition"></a></dt>
+<dd><p>Create a hash of the spack.lock file for ramble inventory purposes</p>
+<p>This command requires an active spack environment.</p>
 </dd></dl>
 
 <dl class="py method">

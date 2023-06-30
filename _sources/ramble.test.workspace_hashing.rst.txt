@@ -1,0 +1,23 @@
+ramble.test.workspace\_hashing namespace
+========================================
+
+.. py:module:: ramble.test.workspace_hashing
+
+Submodules
+----------
+
+ramble.test.workspace\_hashing.workspace\_name\_does\_not\_change\_hash module
+------------------------------------------------------------------------------
+
+.. automodule:: ramble.test.workspace_hashing.workspace_name_does_not_change_hash
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.workspace\_hashing.workspace\_setup\_creates\_inventory module
+--------------------------------------------------------------------------
+
+.. automodule:: ramble.test.workspace_hashing.workspace_setup_creates_inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:

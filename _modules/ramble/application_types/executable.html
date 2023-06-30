@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../application_dev_guide.html">Application Developers Guide</a></li>
@@ -133,7 +134,8 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;make_experiments&#39;</span>
+            <span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;write_inventory&#39;</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">]</span>

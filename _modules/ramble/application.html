@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../application_dev_guide.html">Application Developers Guide</a></li>
@@ -145,6 +146,7 @@
 <span class="kn">import</span> <span class="nn">ramble.modifier</span>
 <span class="kn">import</span> <span class="nn">ramble.util.executable</span>
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
+<span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 
 <span class="kn">from</span> <span class="nn">ramble.keywords</span> <span class="kn">import</span> <span class="n">keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
@@ -160,6 +162,7 @@
     <span class="n">_mod_prefix_builtin</span> <span class="o">=</span> <span class="s1">&#39;modifier_builtin::&#39;</span>
     <span class="n">_builtin_required_key</span> <span class="o">=</span> <span class="s1">&#39;required&#39;</span>
     <span class="n">_workload_exec_key</span> <span class="o">=</span> <span class="s1">&#39;executables&#39;</span>
+    <span class="n">_inventory_file_name</span> <span class="o">=</span> <span class="s1">&#39;ramble_inventory.json&#39;</span>
 
     <span class="c1">#: Lists of strings which contains GitHub usernames of attributes.</span>
     <span class="c1">#: Do not include @ here in order not to unnecessarily ping the users.</span>
@@ -190,6 +193,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_builtins</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;software&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;templates&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiment_hash</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span> <span class="o">=</span> <span class="n">file_path</span>
 
@@ -830,7 +841,7 @@
 
     <span class="k">def</span> <span class="nf">_derive_variables_for_template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables for template paths (for add_expand_vars)&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">template_val</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_templates</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_templates</span><span class="p">():</span>
             <span class="n">expand_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">{{</span><span class="s1">experiment_run_dir</span><span class="se">}}</span><span class="s1">&#39;</span><span class="p">),</span>  <span class="c1"># noqa: F541</span>
                 <span class="n">template_name</span><span class="p">)</span>
@@ -975,16 +986,96 @@
         <span class="n">experiment_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_run_dir</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="n">experiment_run_dir</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">template_val</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_templates</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">template_conf</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_templates</span><span class="p">():</span>
             <span class="n">expand_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">experiment_run_dir</span><span class="p">,</span> <span class="n">template_name</span><span class="p">)</span>
 
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">expand_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">template_val</span><span class="p">))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">template_conf</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]))</span>
             <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">expand_path</span><span class="p">,</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span> <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXG</span>
                      <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IROTH</span> <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IXOTH</span><span class="p">)</span>
 
         <span class="n">experiment_script</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">experiments_script</span>
         <span class="n">experiment_script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{batch_submit}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_clean_hash_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleanup variables to hash before computing the hash</span>
+
+<span class="sd">        Perform some general cleanup operations on variables</span>
+<span class="sd">        before hashing, to help give useful hashes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Purge workspace name, as this shouldn&#39;t affect the experiments</span>
+        <span class="k">if</span> <span class="s1">&#39;workspace_name&#39;</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">variables</span><span class="p">[</span><span class="s1">&#39;workspace_name&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Remove the workspace path from variable definitions before hashing</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+                <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and write an inventory of an experiment</span>
+
+<span class="sd">        Write an inventory file describing all of the contents of this</span>
+<span class="sd">        experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">experiment_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_run_dir</span>
+        <span class="n">inventory_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">experiment_run_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory_file_name</span><span class="p">)</span>
+
+        <span class="c1"># Clean up variables before hashing</span>
+        <span class="n">vars_to_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_hash_variables</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">vars_to_hash</span><span class="p">)</span>
+
+        <span class="c1"># Build inventory of attributes</span>
+        <span class="n">attributes_to_hash</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;variables&#39;</span><span class="p">,</span> <span class="n">vars_to_hash</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;modifiers&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modifiers</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;chained_experiments&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;internals&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variable_sets</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">attr_dict</span> <span class="ow">in</span> <span class="n">attributes_to_hash</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">attr</span><span class="p">,</span>
+                    <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Build inventory of workspace templates</span>
+        <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">template_conf</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_templates</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;templates&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">template_name</span><span class="p">,</span>
+                    <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">template_conf</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Build inventory of inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;input_name&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;input_name&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_string</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inventory_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiment_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_file</span><span class="p">(</span><span class="n">inventory_file</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_archive_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Archive an experiment directory</span>

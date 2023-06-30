@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.test.workspace_hashing namespace &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ramble.util package" href="ramble.util.html" />
+    <link rel="prev" title="ramble.test.util namespace" href="ramble.test.util.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ramble.html">ramble package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble.ramble_version"><code class="docutils literal notranslate"><span class="pre">ramble_version</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble.ramble_version_info"><code class="docutils literal notranslate"><span class="pre">ramble_version_info</span></code></a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ramble.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ramble.application_types.html">ramble.application_types package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html">ramble.cmd package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ramble.test.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.application_inheritance">ramble.test.application_inheritance module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-application-language-module">ramble.test.application_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-application-tests-module">ramble.test.application_tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-cache-fetch-module">ramble.test.cache_fetch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-commands-module">ramble.test.commands module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-concretize-builtin-module">ramble.test.concretize_builtin module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-conftest-module">ramble.test.conftest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.dry_run_helpers">ramble.test.dry_run_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-expander-module">ramble.test.expander module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-experiment-set-module">ramble.test.experiment_set module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-gcs-fetch-module">ramble.test.gcs_fetch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-mirror-tests-module">ramble.test.mirror_tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-modifier-application-module">ramble.test.modifier_application module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-modifier-language-module">ramble.test.modifier_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-namespace-trie-module">ramble.test.namespace_trie module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-repository-module">ramble.test.repository module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-software-environment-module">ramble.test.software_environment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-spack-runner-module">ramble.test.spack_runner module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.spec_basic">ramble.test.spec_basic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-stage-module">ramble.test.stage module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.success_criteria">ramble.test.success_criteria module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-workspace-tests-module">ramble.test.workspace_tests module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html">ramble.util package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html">ramble.workspace package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.error">ramble.error module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.expander">ramble.expander module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.experiment_set">ramble.experiment_set module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.fetch_strategy">ramble.fetch_strategy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spec">ramble.spec module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.stage">ramble.stage module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.success_criteria">ramble.success_criteria module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="success_criteria.html">Success Criteria</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application_dev_guide.html">Application Developers Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="ramble.html">ramble package</a></li>
+          <li class="breadcrumb-item"><a href="ramble.test.html">ramble.test namespace</a></li>
+      <li class="breadcrumb-item active">ramble.test.workspace_hashing namespace</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ramble.test.workspace_hashing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-ramble.test.workspace_hashing">
+<span id="ramble-test-workspace-hashing-namespace"></span><h1>ramble.test.workspace_hashing namespace<a class="headerlink" href="#module-ramble.test.workspace_hashing" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="ramble-test-workspace-hashing-workspace-name-does-not-change-hash-module">
+<h2>ramble.test.workspace_hashing.workspace_name_does_not_change_hash module<a class="headerlink" href="#ramble-test-workspace-hashing-workspace-name-does-not-change-hash-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="ramble-test-workspace-hashing-workspace-setup-creates-inventory-module">
+<h2>ramble.test.workspace_hashing.workspace_setup_creates_inventory module<a class="headerlink" href="#ramble-test-workspace-hashing-workspace-setup-creates-inventory-module" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ramble.test.util.html" class="btn btn-neutral float-left" title="ramble.test.util namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ramble.util.html" class="btn btn-neutral float-right" title="ramble.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jun 30, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

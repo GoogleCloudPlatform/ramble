@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../application_dev_guide.html">Application Developers Guide</a></li>
@@ -133,6 +134,7 @@
 
 <span class="kn">import</span> <span class="nn">ramble.config</span>
 <span class="kn">import</span> <span class="nn">ramble.error</span>
+<span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 
 <span class="n">spack_namespace</span> <span class="o">=</span> <span class="s1">&#39;spack&#39;</span>
 
@@ -198,11 +200,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">source_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">,</span>
                                           <span class="s1">&#39;share&#39;</span><span class="p">,</span> <span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="n">script</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compilers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="n">dry_run</span>
+
+<div class="viewcode-block" id="SpackRunner.get_version"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get spack&#39;s version&quot;&quot;&quot;</span>
+        <span class="n">version_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-V&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="p">(</span><span class="o">*</span><span class="n">version_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SpackRunner.set_dry_run"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_dry_run">[docs]</a>    <span class="k">def</span> <span class="nf">set_dry_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -533,6 +541,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpackRunner.inventory_hash"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.inventory_hash">[docs]</a>    <span class="k">def</span> <span class="nf">inventory_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a hash of the spack.lock file for ramble inventory purposes</span>
+
+<span class="sd">        This command requires an active spack environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
+
+        <span class="n">spack_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.lock&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+            <span class="n">spack_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)</span>
+
+        <span class="n">spack_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_file</span><span class="p">(</span><span class="n">spack_file</span><span class="p">)</span>
+        <span class="n">hash_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;ramble.hash&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">hash_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">spack_hash</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">spack_hash</span></div>
 
 <div class="viewcode-block" id="SpackRunner.install"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

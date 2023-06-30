@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../application_dev_guide.html">Application Developers Guide</a></li>
@@ -117,6 +118,7 @@
 <span class="c1"># except according to those terms.</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">six</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 
@@ -160,7 +162,8 @@
             <span class="s1">&#39;install_software&#39;</span><span class="p">,</span>
             <span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span>
             <span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;make_experiments&#39;</span>
+            <span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;write_inventory&#39;</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">]</span>
@@ -404,6 +407,39 @@
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add software environment information to hash inventory&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;software&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">env_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_write_inventory</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clean_hash_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform spack specific cleanup of variables before hashing&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{spack_env}</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+                <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_source_command</span><span class="p">()),</span>
+                    <span class="s1">&#39;spack_source&#39;</span>
+                <span class="p">)</span>
+                <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_activate_command</span><span class="p">()),</span>
+                    <span class="s1">&#39;spack_activate&#39;</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_clean_hash_variables</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
 
     <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_source&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_activate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

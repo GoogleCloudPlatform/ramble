@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramble Workspace &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Workspace Configuration File" href="workspace_config.html" />
+    <link rel="prev" title="Configuration Files" href="configuration_files.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ramble Workspace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-workspaces">Creating Workspaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#named-workspace">Named Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#anonymous-workspace">Anonymous Workspace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#workspace-structure">Workspace Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#activating-a-workspace">Activating a Workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#printing-workspace-information">Printing Workspace Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concretizing-a-workspace">Concretizing a Workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-a-workspace">Setting up a Workspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#workspace-invetory-and-hash">Workspace Invetory and Hash</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#executing-a-workspace">Executing a Workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analyzing-a-workspace">Analyzing a Workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#archiving-a-workspace">Archiving a Workspace</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="success_criteria.html">Success Criteria</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application_dev_guide.html">Application Developers Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Ramble Workspace</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/workspace.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ramble-workspace">
+<span id="workspace"></span><h1>Ramble Workspace<a class="headerlink" href="#ramble-workspace" title="Permalink to this heading"></a></h1>
+<p>In Ramble, a workspace is a self contained directory representing a set of
+experiments that should be executed. This document describes overall aspects of
+workspaces, and how to use them.</p>
+<section id="creating-workspaces">
+<h2>Creating Workspaces<a class="headerlink" href="#creating-workspaces" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">create</span></code> command can be used to create workspaces.</p>
+<p>Workspaces are created with a standard structure, and some basic configuration
+files that the user can modify to control the exact behavior of the experiments
+within the workspace.</p>
+<p>Ramble can create two types of workspaces:
+* anonymous workspaces
+* named workspaces</p>
+<section id="named-workspace">
+<h3>Named Workspace<a class="headerlink" href="#named-workspace" title="Permalink to this heading"></a></h3>
+<p>By default, Ramble creates named workspaces, which are workspaces which Ramble
+will manage. To create a named workspace, use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>&lt;name_of_workspace&gt;
+</pre></div>
+</div>
+<p>These workspaces are created by default in <code class="docutils literal notranslate"><span class="pre">$ramble/var/ramble/workspaces</span></code>.</p>
+</section>
+<section id="anonymous-workspace">
+<h3>Anonymous Workspace<a class="headerlink" href="#anonymous-workspace" title="Permalink to this heading"></a></h3>
+<p>Anonymous workspaces are workspaces that Ramble will not manage and will live
+in a specified directory. To create an anonymous workspace, use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>-d<span class="w"> </span>&lt;path_to_workspace&gt;
+</pre></div>
+</div>
+</section>
+</section>
+<section id="workspace-structure">
+<h2>Workspace Structure<a class="headerlink" href="#workspace-structure" title="Permalink to this heading"></a></h2>
+<p>Ramble creates workspaces using the following structure by default:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span>workspace
+<span class="go">| - configs/</span>
+<span class="go">|   | - ramble.yaml</span>
+<span class="go">|   | - execute_experiment.tpl</span>
+<span class="go">|   | - auxiliary_software_files/</span>
+<span class="go">| - experiments/</span>
+<span class="go">| - inputs/</span>
+<span class="go">| - logs/</span>
+<span class="go">| - software/</span>
+</pre></div>
+</div>
+<p>This various parts of this directory structure are defined as:
+* <code class="docutils literal notranslate"><span class="pre">configs/</span></code>: Contain configuration for the workspace
+* <code class="docutils literal notranslate"><span class="pre">configs/auxiliary_software_files</span></code>: Contain files used by the package managers
+* <code class="docutils literal notranslate"><span class="pre">experiments/</span></code>: Contain experiments define by the workspace configuration
+* <code class="docutils literal notranslate"><span class="pre">inputs</span></code>: Contain the inputs experiments in this workspace require
+* <code class="docutils literal notranslate"><span class="pre">logs</span></code>: Contain some logging output from ramble
+* <code class="docutils literal notranslate"><span class="pre">software</span></code>: Contain software environments an application’s package manager creates</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory, the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file is the primary workspace
+configuration file. The definition for this file is documented in the
+:ref:<code class="docutils literal notranslate"><span class="pre">workspace</span> <span class="pre">config</span> <span class="pre">documentation&lt;workspace-config&gt;</span></code></p>
+<p>Every file with the <code class="docutils literal notranslate"><span class="pre">.tpl</span></code> extension is considered a template file in the
+workspace. These are rendered into each experiment (with the extension
+omitted). This allows control over the script format to execute an experiment.</p>
+</section>
+<section id="activating-a-workspace">
+<h2>Activating a Workspace<a class="headerlink" href="#activating-a-workspace" title="Permalink to this heading"></a></h2>
+<p>Several Ramble commands require an activated workspace to function properly. A workspace can be activated in a few different ways:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>&lt;name_or_path&gt;
+</pre></div>
+</div>
+<p>will activate a workspace until it is deactivated, while</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>-D<span class="w"> </span>&lt;path_to_workspace<span class="w"> </span>workspace<span class="w"> </span>...
+
+<span class="go">or</span>
+
+<span class="gp">$ </span>ramble<span class="w"> </span>-w<span class="w"> </span>&lt;workspace_name&gt;<span class="w"> </span>workspace<span class="w"> </span>...
+</pre></div>
+</div>
+<p>will activate a workspace for the specific command.</p>
+</section>
+<section id="printing-workspace-information">
+<h2>Printing Workspace Information<a class="headerlink" href="#printing-workspace-information" title="Permalink to this heading"></a></h2>
+<p>In order to see an overview of what experiments a workspace contains, one can
+use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>To get basic information, and:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info<span class="w"> </span>-v
+</pre></div>
+</div>
+<p>To get more detailed information, including which variables are defined and
+where they come from.</p>
+</section>
+<section id="concretizing-a-workspace">
+<h2>Concretizing a Workspace<a class="headerlink" href="#concretizing-a-workspace" title="Permalink to this heading"></a></h2>
+<p>The software definitions in a workspace need to be concretized before the
+workspace can be set up. To have Ramble pull software definitions from the
+appliaction definition files, one can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>concretize
+</pre></div>
+</div>
+</section>
+<section id="setting-up-a-workspace">
+<h2>Setting up a Workspace<a class="headerlink" href="#setting-up-a-workspace" title="Permalink to this heading"></a></h2>
+<p>To make Ramble fully configure a workspace, one can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+</pre></div>
+</div>
+<p>This can be an expensive process, and Ramble will:
+* Install software
+* Download input files
+* Create all experiment directives and content</p>
+<p>To perform a light-weight test version of this, one can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+<p>Which will create experiments, but it won’t download or install anything.</p>
+<section id="workspace-invetory-and-hash">
+<h3>Workspace Invetory and Hash<a class="headerlink" href="#workspace-invetory-and-hash" title="Permalink to this heading"></a></h3>
+<p>Setting up a workspace will create inventory files that can be used to identify
+which aspects of experiments or workspaces change between different
+invocations.</p>
+<p>Most of an experiment’s inventory is defined regardless of if <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> is
+used or not. The notable exception to this is the <code class="docutils literal notranslate"><span class="pre">software</span></code> hashes. The file
+that is hashed depends on if the underlying software environment is fully
+defined or not.</p>
+<p>As an example, if Spack applications are used, <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> only creates (and
+hashes) <code class="docutils literal notranslate"><span class="pre">spack.yaml</span></code> files, which are not concrete. When <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> is not
+used, Ramble will cause Spack to generate <code class="docutils literal notranslate"><span class="pre">spack.lock</span></code> files, which will then
+be hashed, giving better information about if the file changes or not.</p>
+<p>The hash for a workspace is written to <code class="docutils literal notranslate"><span class="pre">$workspace/workspace_hash.sha256</span></code>,
+and the inventories are written to
+<code class="docutils literal notranslate"><span class="pre">$workspace/experiments/&lt;application&gt;/&lt;workload&gt;/&lt;experiment&gt;/ramble_inventory.json</span></code>
+and <code class="docutils literal notranslate"><span class="pre">$workspace/ramble_inventory.json</span></code>.</p>
+<p>Below is an example of a workspace inventory:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;experiments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gromacs.water_bare.test&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3f4a333db9f76a06826e4c3775bb4384af8904f474a74a4b1eb61f4d6d02939c&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;contents&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;attributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variables&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0fc2c3b848885404201f5435389e9028460ea68affd6c78149b7a8c7e925d004&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;modifiers&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chained_experiments&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;internals&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;env_vars&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;035f0c03572706ee6da6f0f74614717b201aabe0f7671fc094478d1a97e5dcc4&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;template&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;inputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;water_bare&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2fb58b2b856117515c75be9141450cca14642be2a1afe53baae3c85d06935caf&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;software&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;software/gromacs.water_bare&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;12f222f06ca05cb6fca37368452b3adedf316bc224ea447e894c87d672333cca&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;templates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;execute_experiment&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ea07af55040670edaf23e2bfd0b537c8ed70280a3616021a5203bdf65e08a4c6&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;versions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ramble&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.3.0 (9947210de68fb42dfd843ed1ab982aba0145e9d3)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;02f5fbbfe0a9fe38b99186619e7fb1d11e6398c637a24bb972fffa66e82bf3fe&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;spack&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.20.0.dev0 (3c3a4c75776ece43c95df46908dea026ac2a9276)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;digest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;21fb90b4cffd46b2257469da346cdf0bcf7070227290262b000bb6c467acfc44&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As mentioned above, the only part that varies when switching <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> on
+and off are the digest values for each software attribute. The hash of the
+workspace is the hash of its inventory file. All hashes are sha256.</p>
+</section>
+</section>
+<section id="executing-a-workspace">
+<h2>Executing a Workspace<a class="headerlink" href="#executing-a-workspace" title="Permalink to this heading"></a></h2>
+<p>Once a workspace is set up, the experiments inside it can be executed using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>on
+</pre></div>
+</div>
+</section>
+<section id="analyzing-a-workspace">
+<h2>Analyzing a Workspace<a class="headerlink" href="#analyzing-a-workspace" title="Permalink to this heading"></a></h2>
+<p>After the experiments inside a workspace are complete, they can be analyzed using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>By default this creates text output describing the figures of merit from the
+workspace’s experiments. The format can be controlled using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze<span class="w"> </span>--format<span class="w"> </span>text<span class="w"> </span>json<span class="w"> </span>yaml
+</pre></div>
+</div>
+<p>With supported formats being <code class="docutils literal notranslate"><span class="pre">text</span></code>, <code class="docutils literal notranslate"><span class="pre">json</span></code>, or <code class="docutils literal notranslate"><span class="pre">yaml</span></code>.</p>
+<p>Ramble also include an experimental capability to uplodate figures of merit
+into a back-end data base. Currently BigQuery is the only supported back-end,
+however more back-ends can be implemented. To upload data, one can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze<span class="w"> </span>--upload
+</pre></div>
+</div>
+<p>This will automatically read the upload configuration from the <code class="docutils literal notranslate"><span class="pre">upload</span></code> block
+of <a class="reference internal" href="configuration_files.html#config-yaml"><span class="std std-ref">Ramble’s config file</span></a>.</p>
+</section>
+<section id="archiving-a-workspace">
+<h2>Archiving a Workspace<a class="headerlink" href="#archiving-a-workspace" title="Permalink to this heading"></a></h2>
+<p>A workspace can be archived to either:
+* Share with other people
+* Keep for future reproduction</p>
+<p>In order to archive a workspace, one can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>archive
+</pre></div>
+</div>
+<p>An archive can be automatically uploaded to a mirror using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>archive<span class="w"> </span>-t<span class="w"> </span>--upload-url<span class="w"> </span>&lt;mirror_url&gt;
+</pre></div>
+</div>
+<p>When Ramble creates an archive, it will collect the following files:
+* All files in <code class="docutils literal notranslate"><span class="pre">$workspace/configs</span></code>
+* Generated files for each software environment. (i.e. Each <code class="docutils literal notranslate"><span class="pre">spack.yaml</span></code> for spack environments)
+* For each experiment, the following are collected:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Every rendered template (created from a <code class="docutils literal notranslate"><span class="pre">$workspace/configs/*.tpl</span></code> file)</p></li>
+<li><p>Every file a success criteria or figure of merit would be extract from</p></li>
+<li><p>Every file that matches an <code class="docutils literal notranslate"><span class="pre">archive_pattern</span></code> from the <code class="docutils literal notranslate"><span class="pre">application.py</span></code></p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration_files.html" class="btn btn-neutral float-left" title="Configuration Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workspace_config.html" class="btn btn-neutral float-right" title="Workspace Configuration File" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jun 30, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
