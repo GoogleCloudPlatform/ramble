@@ -36,12 +36,20 @@ class Openfoam(SpackApplication):
                                        'snappyHexMesh', 'patchSummary', 'potentialFoam',
                                        'simpleFoam', 'reconstructParMesh', 'reconstructPar'])
 
+    workload('motorbike_20m', executables=['get_inputs', 'configure', 'serial_decompose',
+                                           'snappyHexMesh', 'patchSummary', 'potentialFoam',
+                                           'simpleFoam', 'reconstructParMesh', 'reconstructPar'])
+
+    workload('motorbike_42m', executables=['get_inputs', 'configure', 'serial_decompose',
+                                           'snappyHexMesh', 'patchSummary', 'potentialFoam',
+                                           'simpleFoam', 'reconstructParMesh', 'reconstructPar'])
+
     workload_variable('input_path', default='$FOAM_TUTORIALS/incompressible/simpleFoam/motorBike',
                       description='Path to the tutorial input',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42'])
     workload_variable('geometry_path', default='$FOAM_TUTORIALS/resources/geometry/motorBike.obj.gz',
                       description='Path to the geometry resource',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42'])
     workload_variable('decomposition_path', default='system/decomposeParDict*',
                       description='Path to decomposition files',
                       workloads=['hpc_motorbike', 'motorbike'])
@@ -55,51 +63,60 @@ class Openfoam(SpackApplication):
                       description='Path to hexh mesh file',
                       workloads=['hpc_motorbike', 'motorbike'])
 
-    workload_variable('timestep', default='500',
-                      description='Timestep for simulation',
-                      workload='motorbike')
+    workload_variable('end_time', default='500',
+                      description='End time for simulation',
+                      workloads=['motorbike'])
+    workload_variable('end_time', default='250',
+                      description='End time for simulation',
+                      workloads=['motorbike_20m', 'motorbike_42'])
     workload_variable('mesh_size', default='(20 8 8)',
-                      description='Timestep for simulation',
+                      description='Mesh size for simulation',
                       workload='motorbike')
-    workload_variable('mesh_size', default='(50 20 20)',
-                      description='Timestep for simulation',
+    workload_variable('mesh_size', default='(100 40 40)',
+                      description='Mesh size for simulation',
+                      workload='motorbike')
+    workload_variable('mesh_size', default='(130 52 52)',
+                      description='Mesh size for simulation',
                       workload='hpc_motorbike')
     workload_variable('max_local_cells', default='100000',
                       description='Max local cells for simulation',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42m'])
     workload_variable('max_local_cells', default='10000000',
                       description='Max local cells for simulation',
                       workload='hpc_motorbike')
     workload_variable('max_global_cells', default='200000',
                       description='Max global cells for simulation',
                       workload='motorbike')
+    workload_variable('max_global_cells', default='50000000',
+                      description='Max global cells for simulation',
+                      workloads=['motorbike_20m', 'motorbike_42m'])
     workload_variable('max_global_cells', default='200000000',
                       description='Max global cells for simulation',
                       workload='hpc_motorbike')
 
     workload_variable('x_decomp', default='{n_ranks}',
                       description='Workload X decomposition',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42'])
     workload_variable('y_decomp', default='1',
                       description='Workload Y decomposition',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42'])
     workload_variable('z_decomp', default='1',
                       description='Workload Z decomposition',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42'])
 
     workload_variable('decomp', default='({x_decomp} {y_decomp} {z_decomp})',
                       description='Workload decomposition',
-                      workload='motorbike')
+                      workloads=['motorbike', 'motorbike_20m', 'motorbike_42'])
 
     workload_variable('hex_flags', default='-overwrite -parallel',
                       description='Flags for snappyHexMesh',
-                      workloads=['hpc_motorbike', 'motorbike'])
+                      workloads=['hpc_motorbike', 'motorbike', 'motorbike_20m', 'motorbike_42m'])
     workload_variable('potential_flags', default='-parallel',
                       description='Flags for potentialFoam',
-                      workloads=['hpc_motorbike', 'motorbike'])
+                      workloads=['hpc_motorbike', 'motorbike', 'motorbike_20m', 'motorbike_42m'])
     workload_variable('simple_flags', default='-parallel',
                       description='Flags for simpleFoam',
-                      workloads=['hpc_motorbike', 'motorbike'])
+                      workloads=['hpc_motorbike', 'motorbike', 'motorbike_20m', 'motorbike_42m'])
 
     workload('hpc_motorbike', executables=['build_mesh', 'allRun'],
              input='hpc_motorbike')
@@ -134,8 +151,8 @@ class Openfoam(SpackApplication):
     executable('configure', template=[r'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
                                       r'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
                                       'sed "s/(3 2 1)/{decomp}/" -i {decomposition_path}',
-                                      r'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
-                                      r'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
+                                      r'sed "/^endTime/c\\endTime {end_time};" -i {control_path}',
+                                      r'sed "/^writeInterval/c\\writeInterval {end_time};" -i {control_path}',
                                       'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
                                       'sed "s/maxLocalCells 100000/maxLocalCells {max_local_cells}/" -i {hex_mesh_path}',
                                       'sed "s/maxGlobalCells 2000000/maxGlobalCells {max_global_cells}/" -i {hex_mesh_path}',

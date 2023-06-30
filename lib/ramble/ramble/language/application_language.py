@@ -6,9 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
-
 import ramble.language.language_base
+import ramble.language.shared_language
 from ramble.schema.types import OUTPUT_CAPTURE
 import ramble.language.language_helpers
 import ramble.success_criteria
@@ -44,7 +43,7 @@ examples
 """
 
 
-class ApplicationMeta(ramble.language.language_base.DirectiveMeta):
+class ApplicationMeta(ramble.language.shared_language.SharedMeta):
     _directive_names = set()
     _diretives_to_be_executed = []
 
@@ -120,76 +119,6 @@ def executable(name, template, use_mpi=False, redirect='{log_file}',
     return _execute_executable
 
 
-@application_directive('figure_of_merit_contexts')
-def figure_of_merit_context(name, regex, output_format):
-    """Defines a context for figures of merit
-
-    Defines a new context to contain figures of merit.
-
-    Args:
-      name: High level name of the context. Can be referred to in
-            the figure of merit
-      regex: Regular expression, using group names, to match a context.
-      output_format: String, using python keywords {group_name} to extract
-                     group names from context regular expression.
-    """
-
-    def _execute_figure_of_merit_context(app):
-        app.figure_of_merit_contexts[name] = {
-            'regex': regex,
-            'output_format': output_format
-        }
-
-    return _execute_figure_of_merit_context
-
-
-@application_directive('archive_patterns')
-def archive_pattern(pattern):
-    """Adds a file pattern to be archived in addition to figure of merit logs
-
-    Defines a new file pattern that will be archived during workspace archival.
-    Archival will only happen for files that match the pattern when archival
-    is being performed.
-
-    Args:
-      pattern: Pattern that refers to files to archive
-    """
-
-    def _execute_archive_pattern(app):
-        app.archive_patterns[pattern] = pattern
-
-    return _execute_archive_pattern
-
-
-@application_directive('figures_of_merit')
-def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units='',
-                    contexts=[]):
-    """Adds a figure of merit to track for this application
-
-    Defines a new figure of merit.
-
-    Args:
-      name: High level name of the figure of merit
-      log_file: File the figure of merit can be extracted from
-      fom_regex: A regular expression using named groups to extract the FOM
-      group_name: The name of the group that the FOM should be pulled from
-      units: The units associated with the FOM
-      keep_policy: The policy for determining which FOM(s) to keep can be
-                   'last' or 'all'
-    """
-
-    def _execute_figure_of_merit(app):
-        app.figures_of_merit[name] = {
-            'log_file': log_file,
-            'regex': fom_regex,
-            'group_name': group_name,
-            'units': units,
-            'contexts': contexts
-        }
-
-    return _execute_figure_of_merit
-
-
 @application_directive('inputs')
 def input_file(name, url, description, target_dir='{input_name}', sha256=None, extension=None,
                expand=True, **kwargs):
@@ -254,174 +183,3 @@ def workload_variable(name, default, description, values=None, workload=None,
                 app.workload_variables[wl_name][name]['values'] = values
 
     return _execute_workload_variable
-
-
-@application_directive('default_compilers')
-def default_compiler(name, spack_spec, compiler_spec=None, compiler=None):
-    """Defines the default compiler that will be used with this application
-
-    Adds a new compiler spec to this application. Software specs should
-    reference a compiler that has been added.
-    """
-
-    def _execute_default_compiler(app):
-        if app.uses_spack:
-            app.default_compilers[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
-            }
-
-    return _execute_default_compiler
-
-
-@application_directive('software_specs')
-def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
-    """Defines a new software spec needed for this application.
-
-    Adds a new software spec (for spack to use) that this application
-    needs to execute properly.
-
-    Only adds specs to applications that use spack.
-
-    Specs can be described as an mpi spec, which means they
-    will depend on the MPI library within the resulting spack
-    environment.
-    """
-
-    def _execute_software_spec(app):
-        if app.uses_spack:
-
-            # Define the spec
-            app.software_specs[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
-            }
-
-    return _execute_software_spec
-
-
-@application_directive('required_packages')
-def required_package(name):
-    """Defines a new spack package that is required for this application
-    to function properly.
-    """
-
-    def _execute_required_package(app):
-        app.required_packages[name] = True
-
-    return _execute_required_package
-
-
-@application_directive('success_criteria')
-def success_criteria(name, mode, match=None, file='{log_file}',
-                     fom_name=None, fom_context='null', formula=None):
-    """Defines a success criteria used by experiments of this application
-
-    Adds a new success criteria to this application definition.
-
-    These will be checked during the analyze step to see if a job exited properly.
-
-    Arguments:
-      name: The name of this success criteria
-      mode: The type of success criteria that will be validated
-            Valid values are: 'string', 'application_function', and 'fom_comparison'
-      match: For mode='string'. Value to check indicate success (if found, it
-             would mark success)
-      file: For mode='string'. File success criteria should be located in
-      fom_name: For mode='fom_comparison'. Name of fom for a criteria.
-                Accepts globbing.
-      fom_context: For mode='fom_comparison'. Context the fom is contained
-                   in. Accepts globbing.
-      formula: For mode='fom_comparison'. Formula to use to evaluate success.
-               '{value}' keyword is set as the value of the FOM.
-    """
-
-    def _execute_success_criteria(app):
-        valid_modes = ramble.success_criteria.SuccessCriteria._valid_modes
-        if mode not in valid_modes:
-            tty.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
-
-        app.success_criteria[name] = {
-            'mode': mode,
-            'match': match,
-            'file': file,
-            'fom_name': fom_name,
-            'fom_context': fom_context,
-            'formula': formula,
-        }
-
-    return _execute_success_criteria
-
-
-@application_directive('builtins')
-def register_builtin(name, required=False):
-    """Register a builtin
-
-    Builtins are methods that return lists of strings. These methods represent
-    a way to write python code to generate executables for building up
-    workloads.
-
-    Builtins can be referred to in a list of executables as:
-    `builtin::method_name`. As an example, ApplicationBase has a builtin
-    defined as follows:
-
-    .. code-block:: python
-
-      register_builtin('env_vars', required=True)
-      def env_vars(self):
-        ...
-
-    This can be used in a workload as:
-    `workload(..., executables=['builtin::env_vars', ...] ...)`
-
-    The 'required' attribute marks a builtin as required for all workloads. This
-    will ensure the builtin is added to the workload if it is not explicitly
-    added. If required builtins are not explicitly added to a workload, they
-    are injected at the beginning of the list of executables.
-
-    Application classes that want to disable auto-injecting a builtin into
-    their executable lists can use:
-
-    .. code-block:: python
-
-      register_builtin('env_vars', required=False)
-    """
-    def _store_builtin(app):
-        builtin_name = f'builtin::{name}'
-        app.builtins[builtin_name] = {'name': name,
-                                      'required': required}
-    return _store_builtin
-
-
-@application_directive(dicts=())
-def maintainers(*names: str):
-    """Add a new maintainer directive, to specify maintainers in a declarative way.
-
-    Args:
-        names: GitHub username for the maintainer
-    """
-
-    def _execute_maintainer(app):
-        maintainers_from_base = getattr(app, "maintainers", [])
-        # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        app.maintainers = list(sorted(set(maintainers_from_base + list(names))))
-
-    return _execute_maintainer
-
-
-@application_directive(dicts=())
-def tags(*values: str):
-    """Add a new tag directive, to specify tags in a declarative way.
-
-    Args:
-        values: Value to mark as a tag
-    """
-
-    def _execute_tag(app):
-        tags_from_base = getattr(app, "tags", [])
-        # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        app.tags = list(sorted(set(tags_from_base + list(values))))
-
-    return _execute_tag
