@@ -40,13 +40,15 @@ import ramble.util.hashing
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
-from ramble.language.application_language import ApplicationMeta, register_builtin
+from ramble.language.application_language import ApplicationMeta
+from ramble.language.shared_language import register_builtin
 from ramble.error import RambleError
 
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
     uses_spack = False
+    _builtin_name = 'builtin::{name}'
     _exec_prefix_builtin = 'builtin::'
     _mod_prefix_builtin = 'modifier_builtin::'
     _builtin_required_key = 'required'
@@ -120,8 +122,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if self._workload_exec_key in wl_conf:
                 # Insert in reverse order, to make sure they are correctly ordered.
                 for builtin in reversed(required_builtins):
+                    blt_conf = self.builtins[builtin]
                     if builtin not in wl_conf[self._workload_exec_key]:
-                        wl_conf[self._workload_exec_key].insert(0, builtin)
+                        if blt_conf['injection_method'] == 'prepend':
+                            wl_conf[self._workload_exec_key].insert(0, builtin)
+                        else:
+                            wl_conf[self._workload_exec_key].append(builtin)
 
     def _inject_required_modifier_builtins(self):
         """Inject builtins defined as required from each modifier into this

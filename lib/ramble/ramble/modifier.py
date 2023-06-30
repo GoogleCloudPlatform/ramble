@@ -16,7 +16,8 @@ from typing import List
 from llnl.util.tty.colify import colified
 import llnl.util.tty as tty
 
-from ramble.language.modifier_language import ModifierMeta, register_builtin  # noqa: F401
+from ramble.language.modifier_language import ModifierMeta
+from ramble.language.shared_language import register_builtin  # noqa: F401
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
 
@@ -24,6 +25,7 @@ import ramble.util.colors as rucolor
 class ModifierBase(object, metaclass=ModifierMeta):
     name = None
     uses_spack = False
+    _builtin_name = 'modifier_builtin::{obj_name}::{name}'
     _mod_prefix_builtin = r'modifier_builtin::'
     _mod_builtin_regex = r'modifier_builtin::(?P<modifier>[\w-]+)::'
     _builtin_required_key = 'required'
