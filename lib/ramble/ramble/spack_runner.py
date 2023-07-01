@@ -98,8 +98,25 @@ class SpackRunner(object):
 
     def get_version(self):
         """Get spack's version"""
-        version_args = ['-V']
-        return self.exe(*version_args, output=str).strip()
+        from ramble.main import get_git_hash
+        import importlib.util
+
+        version_spec = importlib.util.spec_from_file_location(
+            'spack_version',
+            os.path.join(self.spack_dir,
+                         'lib', 'spack',
+                         'spack', '__init__.py')
+        )
+        version_mod = importlib.util.module_from_spec(version_spec)
+        version_spec.loader.exec_module(version_mod)
+
+        spack_version = version_mod.spack_version
+        spack_hash = get_git_hash(path=self.spack_dir)
+
+        if spack_hash:
+            spack_version += f' ({spack_hash})'
+
+        return spack_version
 
     def set_dry_run(self, dry_run=False):
         """
