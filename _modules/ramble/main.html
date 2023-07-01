@@ -227,16 +227,29 @@
 
 <span class="sd">    The commit sha is only added when available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">spack.util.git</span>
     <span class="n">version</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">ramble_version</span>
-    <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;.git&quot;</span><span class="p">)</span>
+    <span class="n">git_hash</span> <span class="o">=</span> <span class="n">get_git_hash</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">git_hash</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="n">git_hash</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+    <span class="k">return</span> <span class="n">version</span></div>
+
+
+<div class="viewcode-block" id="get_git_hash"><a class="viewcode-back" href="../../ramble.html#ramble.main.get_git_hash">[docs]</a><span class="k">def</span> <span class="nf">get_git_hash</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get get hash from a path</span>
+
+<span class="sd">    Outputs &#39;&lt;git commit sha&gt;&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">spack.util.git</span>
+    <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;.git&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
         <span class="n">git</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">git</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">git</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">version</span>
+            <span class="k">return</span>
         <span class="n">rev</span> <span class="o">=</span> <span class="n">git</span><span class="p">(</span>
             <span class="s2">&quot;-C&quot;</span><span class="p">,</span>
-            <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">path</span><span class="p">,</span>
             <span class="s2">&quot;rev-parse&quot;</span><span class="p">,</span>
             <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span>
             <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
@@ -244,12 +257,12 @@
             <span class="n">fail_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">git</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">version</span>
+            <span class="k">return</span>
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-f\d]{7,}$&quot;</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-            <span class="n">version</span> <span class="o">+=</span> <span class="s2">&quot; (</span><span class="si">{0}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">version</span></div>
+    <span class="k">return</span></div>
 
 
 <div class="viewcode-block" id="index_commands"><a class="viewcode-back" href="../../ramble.html#ramble.main.index_commands">[docs]</a><span class="k">def</span> <span class="nf">index_commands</span><span class="p">():</span>
@@ -1014,7 +1027,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 30, 2023.
+      <span class="lastupdated">Last updated on Jul 01, 2023.
       </span></p>
   </div>
 

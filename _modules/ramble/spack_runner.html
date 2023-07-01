@@ -209,8 +209,25 @@
 
 <div class="viewcode-block" id="SpackRunner.get_version"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get spack&#39;s version&quot;&quot;&quot;</span>
-        <span class="n">version_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-V&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="p">(</span><span class="o">*</span><span class="n">version_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+        <span class="kn">from</span> <span class="nn">ramble.main</span> <span class="kn">import</span> <span class="n">get_git_hash</span>
+        <span class="kn">import</span> <span class="nn">importlib.util</span>
+
+        <span class="n">version_spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span>
+            <span class="s1">&#39;spack_version&#39;</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">,</span>
+                         <span class="s1">&#39;lib&#39;</span><span class="p">,</span> <span class="s1">&#39;spack&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="s1">&#39;__init__.py&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">version_mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">version_spec</span><span class="p">)</span>
+        <span class="n">version_spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">version_mod</span><span class="p">)</span>
+
+        <span class="n">spack_version</span> <span class="o">=</span> <span class="n">version_mod</span><span class="o">.</span><span class="n">spack_version</span>
+        <span class="n">spack_hash</span> <span class="o">=</span> <span class="n">get_git_hash</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">spack_hash</span><span class="p">:</span>
+            <span class="n">spack_version</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="n">spack_hash</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+        <span class="k">return</span> <span class="n">spack_version</span></div>
 
 <div class="viewcode-block" id="SpackRunner.set_dry_run"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_dry_run">[docs]</a>    <span class="k">def</span> <span class="nf">set_dry_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -674,7 +691,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 30, 2023.
+      <span class="lastupdated">Last updated on Jul 01, 2023.
       </span></p>
   </div>
 
