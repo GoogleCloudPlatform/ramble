@@ -116,16 +116,29 @@ def get_version():
 
     The commit sha is only added when available.
     """
-    import spack.util.git
     version = ramble.ramble_version
-    git_path = os.path.join(ramble.paths.prefix, ".git")
+    git_hash = get_git_hash(path=ramble.paths.prefix)
+
+    if git_hash:
+        version += f' ({git_hash})'
+
+    return version
+
+
+def get_git_hash(path=ramble.paths.prefix):
+    """Get get hash from a path
+
+    Outputs '<git commit sha>'.
+    """
+    import spack.util.git
+    git_path = os.path.join(path, ".git")
     if os.path.exists(git_path):
         git = spack.util.git.git()
         if not git:
-            return version
+            return
         rev = git(
             "-C",
-            ramble.paths.prefix,
+            path,
             "rev-parse",
             "HEAD",
             output=str,
@@ -133,12 +146,12 @@ def get_version():
             fail_on_error=False,
         )
         if git.returncode != 0:
-            return version
+            return
         match = re.match(r"[a-f\d]{7,}$", rev)
         if match:
-            version += " ({0})".format(match.group(0))
+            return match.group(0)
 
-    return version
+    return
 
 
 def index_commands():
