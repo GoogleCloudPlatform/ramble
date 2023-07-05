@@ -20,7 +20,7 @@ class Minixyce(SpackApplication):
 
     default_compiler('gcc12', spack_spec="gcc@12.2.0")
 
-    software_spec('ompi415', spack_spec='openmpi@4.1.5 +legacylaunchers +pmi +cxx',
+    software_spec('ompi415cxx', spack_spec='openmpi@4.1.5 +legacylaunchers +pmi +cxx',
                   compiler='gcc12')
 
     software_spec('minixyce', spack_spec='minixyce@1.0 +mpi',
