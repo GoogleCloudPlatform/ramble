@@ -950,10 +950,15 @@
 
         <span class="k">for</span> <span class="n">input_file</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+                <span class="n">input_namespace</span> <span class="o">=</span> <span class="n">workload_namespace</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">input_file</span>
+                <span class="n">input_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;input-namespace&#39;</span><span class="p">,</span> <span class="n">input_namespace</span><span class="p">)</span>
+
+                <span class="c1"># Skip inputs that have already been cached</span>
+                <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
                 <span class="n">mirror_paths</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">mirror_archive_paths</span><span class="p">(</span>
                     <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">input_file</span><span class="p">))</span>
-
-                <span class="n">input_namespace</span> <span class="o">=</span> <span class="n">workload_namespace</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">input_file</span>
                 <span class="n">input_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">keywords</span><span class="o">.</span><span class="n">input_name</span><span class="p">:</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;input_name&#39;</span><span class="p">]}</span>
 
                 <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">InputStage</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">input_namespace</span><span class="p">,</span>
@@ -972,6 +977,8 @@
                             <span class="n">stage</span><span class="o">.</span><span class="n">expand_archive</span><span class="p">()</span>
                         <span class="k">except</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">:</span>
                             <span class="k">pass</span>
+
+                <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;DRY-RUN: Would download </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">input_conf</span><span class="p">[</span><span class="s1">&#39;fetcher&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 
