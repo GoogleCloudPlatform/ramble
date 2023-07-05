@@ -119,20 +119,23 @@ def count_conflicts():
 
 def print_conflicts():
     """Print conflict information, if any exist"""
-    color.cprint(section_title('Software Definition Conflicts:'))
-    for pkg_name in conflicts:
+    if len(conflicts) > 0:
+        color.cprint(section_title('Software Definition Conflicts:'))
+        for pkg_name in conflicts:
 
-        color.cprint(f'{nested_1("Package")}: {pkg_name}:')
-        color.cprint('\tDefined as:')
-        for attr in ['spack_spec', 'compiler_spec', 'compiler']:
-            if attr in definitions[pkg_name]:
-                attr_def = definitions[pkg_name][attr]
-                if attr_def:
-                    color.cprint(f'\t\t{attr} = {attr_def.replace("@", "@@")}')
-        color.cprint('\tIn objects:')
-        colify(used_by[pkg_name], indent=24, output=sys.stdout)
-        color.cprint('\tConflicts with objects:')
-        colify(conflicts[pkg_name], indent=24, output=sys.stdout)
+            color.cprint(f'{nested_1("Package")}: {pkg_name}:')
+            color.cprint('\tDefined as:')
+            for attr in ['spack_spec', 'compiler_spec', 'compiler']:
+                if attr in definitions[pkg_name]:
+                    attr_def = definitions[pkg_name][attr]
+                    if attr_def:
+                        color.cprint(f'\t\t{attr} = {attr_def.replace("@", "@@")}')
+            color.cprint('\tIn objects:')
+            colify(used_by[pkg_name], indent=24, output=sys.stdout)
+            color.cprint('\tConflicts with objects:')
+            colify(conflicts[pkg_name], indent=24, output=sys.stdout)
+    else:
+        color.cprint(section_title('No Conflicts Detected'))
 
 
 def setup_parser(subparser):
