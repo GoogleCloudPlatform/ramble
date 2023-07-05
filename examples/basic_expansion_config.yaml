@@ -1,6 +1,6 @@
 ramble:
   variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node} -hosfile hostfile'
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: '{execute_experiment}'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -28,34 +28,34 @@ ramble:
               variables:
                 n_ranks: '1'
                 n_nodes: '1'
-spack:
-  concretized: true
-  packages:
-    gcc9:
-      spack_spec: gcc@9.3.0 target=x86_64
-      compiler_spec: gcc@9.3.0
-    ompi412:
-      spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
-      compiler: gcc9
-    impi2018:
-      spack_spec: intel-mpi@2018.4.274
-      compiler: gcc9
-    openfoam:
-      spack_spec: openfoam-org@7
-      compiler: gcc9
-    flex:
-      spack_spec: flex@2.6.4
-      compiler: gcc9
-    wrfv4:
-      spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
-      compiler: gcc9
-  environments:
-    openfoam:
-      packages:
-      - ompi412
-      - flex
-      - openfoam
-    wrfv4:
-      packages:
-      - impi2018
-      - wrfv4
+  spack:
+    concretized: true
+    packages:
+      gcc9:
+        spack_spec: gcc@9.3.0 target=x86_64
+        compiler_spec: gcc@9.3.0
+      ompi412:
+        spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
+        compiler: gcc9
+      impi2018:
+        spack_spec: intel-mpi@2018.4.274
+        compiler: gcc9
+      openfoam:
+        spack_spec: openfoam-org@7
+        compiler: gcc9
+      flex:
+        spack_spec: flex@2.6.4
+        compiler: gcc9
+      wrfv4:
+        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        compiler: gcc9
+    environments:
+      openfoam:
+        packages:
+        - ompi412
+        - flex
+        - openfoam
+      wrfv4:
+        packages:
+        - impi2018
+        - wrfv4
