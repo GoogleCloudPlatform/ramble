@@ -324,7 +324,7 @@ def executable_modifier(name):
 
       executable_modifier('write_exec_name')
 
-      def write_exec_name(self, executable_name, executable):
+      def write_exec_name(self, executable_name, executable, app_inst=None):
         prepend_execs = []
         append_execs = [ExecutableCommand(
             template='echo "{executable_name}"',

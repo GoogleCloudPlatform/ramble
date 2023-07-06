@@ -220,13 +220,13 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
         return apply
 
-    def apply_executable_modifiers(self, executable_name, executable):
+    def apply_executable_modifiers(self, executable_name, executable, app_inst=None):
         pre_execs = []
         post_execs = []
         for exec_mod in self.executable_modifiers:
             mod_func = getattr(self, exec_mod)
 
-            pre_exec, post_exec = mod_func(executable_name, executable)
+            pre_exec, post_exec = mod_func(executable_name, executable, app_inst=app_inst)
 
             pre_execs.extend(pre_exec)
             post_execs.extend(post_exec)

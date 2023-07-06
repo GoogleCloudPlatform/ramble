@@ -37,7 +37,7 @@ class IntelAps(SpackModifier):
 
     executable_modifier('aps_summary')
 
-    def aps_summary(self, executable_name, executable):
+    def aps_summary(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
         pre_exec = []
