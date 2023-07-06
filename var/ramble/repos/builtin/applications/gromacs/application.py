@@ -59,6 +59,23 @@ class Gromacs(SpackApplication):
                sha256='f11745201dbb9e6a29a39cb016ee8123f6b0f519b250c94660f0a9623e497b22',
                description='12M Atoms, Peptides in Water, 2fs time step, all bonds constrained. https://www.mpinat.mpg.de/grubmueller/bench')
 
+    input_file('BenchPEP_h', url='https://www.mpinat.mpg.de/benchPEP-h.zip',
+               sha256='3ca8902fd9a6cf005b266f83b57217397b4ba4af987b97dc01e04185bd098bce',
+               description='12M Atoms, Peptides in Water, 2fs time step, h-bonds constrained. https://www.mpinat.mpg.de/grubmueller/bench')
+
+    input_file('BenchMEM', url='https://www.mpinat.mpg.de/benchMEM.zip',
+               sha256='3c1c8cd4f274d532f48c4668e1490d389486850d6b3b258dfad4581aa11380a4',
+               description='82k atoms, protein in membrane surrounded by water, 2 fs time step. https://www.mpinat.mpg.de/grubmueller/bench')
+
+    input_file('BenchRIB', url='https://www.mpinat.mpg.de/benchRIB.zip',
+               sha256='39acb014a79ed9a9ff2ad6294a2c09f9b85ea6986dfc204a3639814503eeb60a',
+               description='2 M atoms, ribosome in water, 4 fs time step. https://www.mpinat.mpg.de/grubmueller/bench')
+
+    input_file('JCP_benchmarks',
+               url='https://zenodo.org/record/3893789/files/GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP.tar.gz?download=1',
+               sha256='82449291f44f4d5b7e5c192d688b57b7c2a2e267fe8b12e7a15b5d68f96c7b20',
+               description='GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP')
+
     workload('water_gmx50', executables=['pre-process', 'execute-gen'],
              input='water_gmx50_bare')
     workload('water_bare', executables=['pre-process', 'execute-gen'],
@@ -69,6 +86,20 @@ class Gromacs(SpackApplication):
              input='HECBioSim')
     workload('benchpep', executables=['execute'],
              input='BenchPEP')
+    workload('benchpep_h', executables=['execute'],
+             input='BenchPEP_h')
+    workload('benchmem', executables=['execute'],
+             input='BenchMEM')
+    workload('benchrib', executables=['execute'],
+             input='BenchRIB')
+    workload('stmv_rf', executables=['pre-process', 'execute-gen'],
+             input='JCP_benchmarks')
+    workload('stmv_pme', executables=['pre-process', 'execute-gen'],
+             input='JCP_benchmarks')
+    workload('rnase_cubic', executables=['pre-process', 'execute-gen'],
+             input='JCP_benchmarks')
+    workload('ion_channel', executables=['pre-process', 'execute-gen'],
+             input='JCP_benchmarks')
 
     workload_variable('size', default='1536',
                       description='Workload size',
@@ -94,6 +125,30 @@ class Gromacs(SpackApplication):
     workload_variable('input_path', default='{BenchPEP}/benchPEP.tpr',
                       description='Input path for Bench PEP workload',
                       workload='benchpep')
+    workload_variable('input_path', default='{BenchMEM}/benchMEM.tpr',
+                      description='Input path for Bench MEM workload',
+                      workload='benchmem')
+    workload_variable('input_path', default='{BenchRIB}/benchRIB.tpr',
+                      description='Input path for Bench RIB workload',
+                      workload='benchrib')
+    workload_variable('input_path', default='{BenchPEP_h}/benchPEP-h.tpr',
+                      description='Input path for Bench PEP-h workload',
+                      workload='benchpep_h')
+    workload_variable('type', default='rf_nvt',
+                      description='Workload type for JCP_benchmarks',
+                      workload='stmv_rf')
+    workload_variable('type', default='pme_nvt',
+                      description='Workload type for JCP_benchmarks',
+                      workload='stmv_pme')
+    workload_variable('type', default='grompp',
+                      description='Workload type for JCP_benchmarks',
+                      workloads=['ion_channel', 'rnase_cubic'])
+    workload_variable('input_path', default='{JCP_benchmarks}/stmv',
+                      description='Input path for JCP_benchmark {workload_name}',
+                      workloads=['stmv_rf', 'stmv_pme'])
+    workload_variable('input_path', default='{JCP_benchmarks}/{workload_name}',
+                      description='Input path for JCP_benchmark {workload_name}',
+                      workloads=['ion_channel', 'rnase_cubic'])
 
     figure_of_merit('Core Time', log_file='{experiment_run_dir}/md.log',
                     fom_regex=r'\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*',
