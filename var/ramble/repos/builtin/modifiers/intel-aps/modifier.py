@@ -27,7 +27,7 @@ class IntelAps(SpackModifier):
     variable_modification('aps_log_dir', 'aps_{executable_name}_results_dir',
                           method='set', modes=['mpi'])
     variable_modification('aps_flags', '-c mpi -r {aps_log_dir}', method='set', modes=['mpi'])
-    variable_modification('mpi_command', 'aps {aps_flags}', method='prepend', modes=['mpi'])
+    variable_modification('mpi_command', 'aps {aps_flags}', method='append', modes=['mpi'])
 
     archive_pattern('aps_*_results_dir/*')
 
