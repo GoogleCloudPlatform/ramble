@@ -71,6 +71,41 @@ def test_env_concretize(tmpdir):
         pytest.skip('%s' % e)
 
 
+def test_env_concretize_skips_already_concretized_envs(tmpdir, capsys):
+    import time
+    try:
+        env_path = tmpdir.join('spack-env')
+        sr = ramble.spack_runner.SpackRunner()
+        sr.create_env(env_path)
+        sr.activate()
+        sr.add_spec('zlib')
+
+        # Generate an initial env file
+        sr.generate_env_file()
+
+        time.sleep(0.5)
+
+        # Create a spack.lock file in the env
+        with open(os.path.join(env_path, 'spack.lock'), 'w+') as f:
+            f.write('')
+
+        # Mock regenerating an env file, after the lock was created.
+        sr.generate_env_file()
+
+        sr.concretize()
+
+        output = capsys.readouterr()
+        assert f'Environment {env_path} will not be regenerated' in output.out
+        assert f'Environment {env_path} is already concretized. Skipping concretize...' \
+            in output.out
+
+        sr.deactivate()
+
+        assert os.path.exists(os.path.join(env_path, 'spack.yaml'))
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)
+
+
 def test_env_install(tmpdir, capsys):
     try:
         env_path = str(tmpdir.join('spack-env'))
