@@ -293,7 +293,7 @@ class Expander(object):
                     except SyntaxError:
                         pass
                 elif not allow_passthrough:
-                    tty.deubg(f'Expansion stack errors: attempted to expand "{kw}" = "{val}"')
+                    tty.debug(f'Expansion stack errors: attempted to expand "{kw}" = "{val}"')
                 else:
                     for kw in self._all_keywords(val):
                         passthrough_vars[kw] = '{' + kw + '}'
