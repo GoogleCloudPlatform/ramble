@@ -410,7 +410,14 @@
                         <span class="n">passthrough_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">kw</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
             <span class="n">exp_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">passthrough_vars</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="n">in_str</span><span class="o">.</span><span class="n">format_map</span><span class="p">(</span><span class="n">exp_dict</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">in_str</span><span class="o">.</span><span class="n">format_map</span><span class="p">(</span><span class="n">exp_dict</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error encountered while trying to expand variable </span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion dict was: </span><span class="si">{</span><span class="n">exp_dict</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion failed on variable </span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;Variable names cannot contain decimals.&#39;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">in_str</span>
 
 <div class="viewcode-block" id="Expander.eval_math"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.eval_math">[docs]</a>    <span class="k">def</span> <span class="nf">eval_math</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
