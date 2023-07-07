@@ -555,8 +555,6 @@ Ramble automatically generates definitions for the following varialbes:
   absolute path to: ``{experiment_run_dir}/<template_name>`` where
   ``<template_name>`` is the filename of the template, without the extension.
 * ``command`` - Set to all of the commands needed to perform an experiment.
-* ``spack_setup`` - Set to the commands needed to load a spack environment for
-  an experiment. Set to an empty string for non-spack applications
 
 """""""""""""""""""""""""""""""""""
 Spack Specific Generated Variables:
