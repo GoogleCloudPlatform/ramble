@@ -59,11 +59,11 @@ class Minixyce(SpackApplication):
     all_workloads = cir_workloads + rc_workloads
     workload_variable('t_start', default='0', description='Start time', workloads=all_workloads)
     workload_variable('t_step', default='1e-8', description='Time step', workloads=all_workloads)
-    workload_variable('t_stop', default='5e-6', description='Stop time', workloads=all_workloads)
+    workload_variable('t_stop', default='5e-5', description='Stop time', workloads=all_workloads)
     workload_variable('tol', default='1e-6', description='Tolerance', workloads=all_workloads)
     workload_variable('k', default='10', description='Tells GMRES how often to restart', workloads=all_workloads)
 
-    workload_variable('num_ladder_stages', default='8',
+    workload_variable('num_ladder_stages', default='1024',
                       description='Number of Ladder stages for RC|RLC ladder|ladder2 test generation',
                       workloads=rc_workloads)
 
@@ -79,41 +79,56 @@ class Minixyce(SpackApplication):
                      match=success_regex,
                      file=log_file)
 
-    figure_of_merit('Time', log_file=log_file,
-                    fom_regex=r'\s+(?P<time>' + floating_point_regex + r')',
+    figure_of_merit('Total Simulation Time', log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'Total Simulation Time:\s+(?P<time>' + floating_point_regex + r')',
+                    group_name='time',
+                    units='s'
+                    )
+    figure_of_merit('I/O File Time', log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'I/O File Time:\s+(?P<time>' + floating_point_regex + r')',
                     group_name='time',
                     units='s'
                     )
 
-    figure_of_merit('num_GMRES_iters', log_file=log_file,
-                    fom_regex=result_regex,
-                    group_name='num_iters',
-                    units=''
-                    )
+    enable_deck_based_FOMs = False
+    if enable_deck_based_FOMs:
+        # FIXME: This is not a float in seconds when printed by the app, it's in scientific notation
+        figure_of_merit('Time_end', log_file=log_file,
+                        fom_regex=r'\s+(?P<time>' + floating_point_regex + r')',
+                        group_name='time',
+                        units='s'
+                        )
 
-    figure_of_merit('num_GMRES_restarts', log_file=log_file,
-                    fom_regex=result_regex,
-                    group_name='num_restarts',
-                    units=''
-                    )
+        figure_of_merit('num_GMRES_iters', log_file=log_file,
+                        fom_regex=result_regex,
+                        group_name='num_iters',
+                        units=''
+                        )
 
-    state_var_regex = r'\s*(?P<State_Variable>[0-9]+)*:*\s*(?P<name>[0-9A-Za-z]+)\s*=\s*(?P<value>' + floating_point_regex + r')'
+        figure_of_merit('num_GMRES_restarts', log_file=log_file,
+                        fom_regex=result_regex,
+                        group_name='num_restarts',
+                        units=''
+                        )
 
-    figure_of_merit('Name', log_file=processed_output,
-                    fom_regex=state_var_regex,
-                    group_name='name',
-                    units='', contexts=['state_variable']
-                    )
+        # FIXME: This is also likely to be in scientific notation, and is not guarenteed to be a float
+        state_var_regex = r'\s*(?P<State_Variable>[0-9]+)*:*\s*(?P<name>[0-9A-Za-z]+)\s*=\s*(?P<value>' + floating_point_regex + r')'
 
-    figure_of_merit('Value', log_file=processed_output,
-                    fom_regex=state_var_regex,
-                    group_name='value',
-                    units='', contexts=['state_variable']
-                    )
+        figure_of_merit('Name', log_file=processed_output,
+                        fom_regex=state_var_regex,
+                        group_name='name',
+                        units='', contexts=['state_variable']
+                        )
 
-    figure_of_merit_context('state_variable',
-                            regex=state_var_regex,
-                            output_format='{State_Variable}')
+        figure_of_merit('Value', log_file=processed_output,
+                        fom_regex=state_var_regex,
+                        group_name='value',
+                        units='', contexts=['state_variable']
+                        )
+
+        figure_of_merit_context('state_variable',
+                                regex=state_var_regex,
+                                output_format='{State_Variable}')
 
     def _make_experiments(self, workspace):
         super()._make_experiments(workspace)
@@ -124,7 +139,7 @@ class Minixyce(SpackApplication):
 
         with open(input_path, 'w+') as f:
             for setting in settings:
-                f.write(setting + ' = ' + self.expander.expansion_str(setting) + '\n')
+                f.write(setting + ' = ' + self.expander.expand_var(self.expander.expansion_str(setting)) + '\n')
 
     def _analyze_experiments(self, workspace):
         import os
