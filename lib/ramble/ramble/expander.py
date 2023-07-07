@@ -299,7 +299,14 @@ class Expander(object):
                         passthrough_vars[kw] = '{' + kw + '}'
             exp_dict.update(passthrough_vars)
 
-            return in_str.format_map(exp_dict)
+            try:
+                return in_str.format_map(exp_dict)
+            except AttributeError:
+                tty.debug(f'Error encountered while trying to expand variable {in_str}')
+                tty.debug(f'Expansion dict was: {exp_dict}')
+                raise RambleSyntaxError(f'Expansion failed on variable {in_str}',
+                                        'Variable names cannot contain decimals.')
+
         return in_str
 
     def eval_math(self, node):
