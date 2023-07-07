@@ -28,6 +28,7 @@ def exp_dict():
         'var1': '{var2}',
         'var2': '{var3}',
         'var3': '3',
+        'decimal.06.var': 'foo',
     }
 
 
@@ -53,6 +54,24 @@ def test_expansions(input, output):
     expander = ramble.expander.Expander(expansion_vars, None)
 
     assert expander.expand_var(input) == output
+
+
+@pytest.mark.parametrize(
+    'input,expected_error,error_string',
+    [
+        ('{decimal.06.var}',
+         ramble.expander.RambleSyntaxError,
+         'Variable names cannot contain decimals'),
+    ]
+)
+def test_failed_expansions(input, expected_error, error_string):
+    expansion_vars = exp_dict()
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    with pytest.raises(expected_error) as e:
+        expander.expand_var(input)
+        assert error_string in e
 
 
 def test_expansion_namespaces():
