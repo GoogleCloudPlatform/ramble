@@ -404,7 +404,7 @@
                     <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
                         <span class="k">pass</span>
                 <span class="k">elif</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
-                    <span class="n">tty</span><span class="o">.</span><span class="n">deubg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion stack errors: attempted to expand &quot;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s1">&quot; = &quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion stack errors: attempted to expand &quot;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s1">&quot; = &quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
                         <span class="n">passthrough_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">kw</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
@@ -622,7 +622,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 06, 2023.
+      <span class="lastupdated">Last updated on Jul 07, 2023.
       </span></p>
   </div>
 
