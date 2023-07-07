@@ -8,6 +8,7 @@
 
 import llnl.util.tty as tty
 
+import ramble.language.language_helpers
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
 
