@@ -72,7 +72,8 @@ class Minixyce(SpackApplication):
 
     result_regex = r'.*\s+(?P<num_iters>[0-9]+)\s+(?P<num_restarts>[0-9]+)'
 
-    floating_point_regex = r'[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*'
+    floating_point_regex = r'\d+\.\d+'
+    scientific_number_regex = r'[\+\-]*\d+\.\d+[eE][\+\-]*\d+'
 
     success_regex = r'^\s*TIME.*num_GMRES_iters\s*num_GMRES_restarts'
     success_criteria('valid', mode='string',
@@ -92,9 +93,8 @@ class Minixyce(SpackApplication):
 
     enable_deck_based_FOMs = False
     if enable_deck_based_FOMs:
-        # FIXME: This is not a float in seconds when printed by the app, it's in scientific notation
         figure_of_merit('Time_end', log_file=log_file,
-                        fom_regex=r'\s+(?P<time>' + floating_point_regex + r')',
+                        fom_regex=r'\s+(?P<time>' + scientific_number_regex + r')',
                         group_name='time',
                         units='s'
                         )
@@ -111,8 +111,7 @@ class Minixyce(SpackApplication):
                         units=''
                         )
 
-        # FIXME: This is also likely to be in scientific notation, and is not guarenteed to be a float
-        state_var_regex = r'\s*(?P<State_Variable>[0-9]+)*:*\s*(?P<name>[0-9A-Za-z]+)\s*=\s*(?P<value>' + floating_point_regex + r')'
+        state_var_regex = r'\s*(?P<State_Variable>[0-9]+)*:*\s*(?P<name>[0-9A-Za-z]+)\s*=\s*(?P<value>' + scientific_number_regex + r')'
 
         figure_of_merit('Name', log_file=processed_output,
                         fom_regex=state_var_regex,
