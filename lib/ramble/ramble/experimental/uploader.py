@@ -8,6 +8,8 @@
 
 import llnl.util.tty as tty
 import json
+import sys
+import math
 
 
 default_node_type_val = "Not Specified"
@@ -163,15 +165,43 @@ class BigQueryUploader(Uploader):
     """Class to handle upload of FOMs to BigQuery
     """
 
-    def insert_data(self, uri: str, workspace_name, results) -> None:
+    """
+    Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements
+    """
+    def chunked_upload(self, table_id, data):
         from google.cloud import bigquery
+        client = bigquery.Client()
+        error = None
+        approx_max_request = 1000000.0  # 1MB
+
+        data_len = len(data)
+        approx_request_size = sys.getsizeof(json.dumps(data))
+        approx_num_batches = math.ceil(approx_request_size / approx_max_request)
+        rows_per_batch = math.floor(data_len / approx_num_batches)
+        if rows_per_batch <= 1:
+            rows_per_batch = 1
+
+        tty.debug("Size: {}B".format(sys.getsizeof(json.dumps(data))))
+        tty.debug("Length in rows: {}".format(data_len))
+        tty.debug("Num Batches: {}".format(approx_num_batches))
+        tty.debug("Rows per Batch: {}".format(rows_per_batch))
+
+        for i in range(0, data_len, rows_per_batch):
+            end = i + rows_per_batch
+            if end > data_len:
+                end = data_len
+            tty.debug("Uploading rows {} to {}".format(i, end))
+            error = client.insert_rows_json(table_id, data[i:end])
+            if error:
+                return error
+        return error
+
+    def insert_data(self, uri: str, workspace_name, results) -> None:
 
         # It is expected that the user will create these tables outside of this
         # tooling
         exp_table_id = "{uri}.{table_name}".format(uri=uri, table_name="experiments")
         fom_table_id = "{uri}.{table_name}".format(uri=uri, table_name="foms")
-
-        client = bigquery.Client()
 
         exps_to_insert = []
         foms_to_insert = []
@@ -188,11 +218,13 @@ class BigQueryUploader(Uploader):
         tty.debug("Experiments to insert:")
         tty.debug(exps_to_insert)
 
-        # Make an API request.
-        errors1 = client.insert_rows_json(exp_table_id, exps_to_insert)
+        tty.msg("Upload experiments...")
+        errors1 = self.chunked_upload(exp_table_id, exps_to_insert)
         errors2 = None
+
         if errors1 == []:
-            errors2 = client.insert_rows_json(fom_table_id, foms_to_insert)
+            tty.msg("Upload FOMs...")
+            errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
 
         for errors, name in zip([errors1, errors2], ['exp', 'fom']):
             if errors == []:
