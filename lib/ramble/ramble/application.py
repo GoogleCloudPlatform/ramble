@@ -699,7 +699,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 for mod in self._modifier_instances:
                     if mod.applies_to_executable(executable):
                         pre_cmd, post_cmd = mod.apply_executable_modifiers(executable,
-                                                                           base_command)
+                                                                           base_command,
+                                                                           app_inst=self)
                         pre_commands.extend(pre_cmd)
                         post_commands.extend(post_cmd)
 
