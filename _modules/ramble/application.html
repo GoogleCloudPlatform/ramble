@@ -810,7 +810,8 @@
                 <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">mod</span><span class="o">.</span><span class="n">applies_to_executable</span><span class="p">(</span><span class="n">executable</span><span class="p">):</span>
                         <span class="n">pre_cmd</span><span class="p">,</span> <span class="n">post_cmd</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">apply_executable_modifiers</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span>
-                                                                           <span class="n">base_command</span><span class="p">)</span>
+                                                                           <span class="n">base_command</span><span class="p">,</span>
+                                                                           <span class="n">app_inst</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                         <span class="n">pre_commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pre_cmd</span><span class="p">)</span>
                         <span class="n">post_commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">post_cmd</span><span class="p">)</span>
 

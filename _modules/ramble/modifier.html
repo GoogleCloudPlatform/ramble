@@ -331,13 +331,13 @@
 
         <span class="k">return</span> <span class="n">apply</span></div>
 
-<div class="viewcode-block" id="ModifierBase.apply_executable_modifiers"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.apply_executable_modifiers">[docs]</a>    <span class="k">def</span> <span class="nf">apply_executable_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">):</span>
+<div class="viewcode-block" id="ModifierBase.apply_executable_modifiers"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.apply_executable_modifiers">[docs]</a>    <span class="k">def</span> <span class="nf">apply_executable_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">pre_execs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">post_execs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">exec_mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_modifiers</span><span class="p">:</span>
             <span class="n">mod_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exec_mod</span><span class="p">)</span>
 
-            <span class="n">pre_exec</span><span class="p">,</span> <span class="n">post_exec</span> <span class="o">=</span> <span class="n">mod_func</span><span class="p">(</span><span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">)</span>
+            <span class="n">pre_exec</span><span class="p">,</span> <span class="n">post_exec</span> <span class="o">=</span> <span class="n">mod_func</span><span class="p">(</span><span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="n">app_inst</span><span class="p">)</span>
 
             <span class="n">pre_execs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pre_exec</span><span class="p">)</span>
             <span class="n">post_execs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">post_exec</span><span class="p">)</span>

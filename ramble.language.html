@@ -565,7 +565,7 @@ actual modifications</p>
 <p>For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">executable_modifier</span><span class="p">(</span><span class="s1">&#39;write_exec_name&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">write_exec_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">write_exec_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
   <span class="n">prepend_execs</span> <span class="o">=</span> <span class="p">[]</span>
   <span class="n">append_execs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ExecutableCommand</span><span class="p">(</span>
       <span class="n">template</span><span class="o">=</span><span class="s1">&#39;echo &quot;</span><span class="si">{executable_name}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
