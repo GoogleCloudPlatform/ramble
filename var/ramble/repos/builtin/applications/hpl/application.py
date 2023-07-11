@@ -260,11 +260,11 @@ class Hpl(SpackApplication):
             for var, config in self.workload_variables['standard'].items():
                 self.variables[var] = config['default']
 
-            pfact = expander.expand_var('{pfact}')
-            nbmin = expander.expand_var('{nbmin}')
-            rfact = expander.expand_var('{rfact}')
-            bcast = expander.expand_var('{bcast}')
-            depth = expander.expand_var('{depth}')
+            pfact = expander.expand_var(expander.expansion_str('pfact'))
+            nbmin = expander.expand_var(expander.expansion_str('nbmin'))
+            rfact = expander.expand_var(expander.expansion_str('rfact'))
+            bcast = expander.expand_var(expander.expansion_str('bcast'))
+            depth = expander.expand_var(expander.expansion_str('depth'))
 
             self.variables['N-Ns'] = '{:13} Number of problems sizes (N)'.format('1')  # vs 4
 
