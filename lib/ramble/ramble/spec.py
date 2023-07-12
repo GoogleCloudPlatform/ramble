@@ -178,7 +178,7 @@ class Spec(object):
         Keyword Args:
             color (bool): True if returned string is colored
             transform (dict): maps full-string formats to a callable \
-                that accepts a string and returns another one
+                              that accepts a string and returns another one
 
         """
 

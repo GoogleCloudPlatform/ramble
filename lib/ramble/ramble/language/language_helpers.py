@@ -18,11 +18,11 @@ def merge_definitions(single_type, multiple_type):
     multiple_type.
 
     Args:
-    - single_type: Single string for type name
-    - multiple_type: List of strings for type names
+        single_type: Single string for type name
+        multiple_type: List of strings for type names
 
     Returns:
-    - List of all type names (Merged if both single_type and multiple_type definitions are valid)
+        List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
 
     all_types = []
@@ -47,14 +47,14 @@ def require_definition(single_type, multiple_type,
     either are the incorrect type.
 
     Args:
-    - single_type: Single string for type name
-    - multiple_type: List of strings for type names
-    - single_arg_name: String name of the single_type argument in the directive
-    - multiple_arg_name: String name of the multiple_type argument in the directive
-    - directive_name: Name of the directive requiring a type
+        single_type: Single string for type name
+        multiple_type: List of strings for type names
+        single_arg_name: String name of the single_type argument in the directive
+        multiple_arg_name: String name of the multiple_type argument in the directive
+        directive_name: Name of the directive requiring a type
 
     Returns:
-    - List of all type names (Merged if both single_type and multiple_type definitions are valid)
+        List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
 
     if not (single_type or multiple_type):

@@ -1172,9 +1172,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         Additionally, ensure the success criteria list is complete.
 
         Returns:
-           - files (dict): All files that need to be processed
-           - contexts (dict): Any contexts that have been defined
-           - foms (dict): All figures of merit that need to be extracted
+            files (dict): All files that need to be processed
+            contexts (dict): Any contexts that have been defined
+            foms (dict): All figures of merit that need to be extracted
         """
 
         files = {}

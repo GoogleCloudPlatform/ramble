@@ -60,11 +60,11 @@ def workload(name, executables=None, executable=None, input=None,
     Defines a new workload that can be used within the context of
     its application.
 
-    Input arguments:
-        - executable: The name of an executable to be used
-        - executables: A list of executable names to be used
-        - input (Optional): The name of an input be used
-        - inputs (Optional): A list of input names that will be used
+    Args:
+        executable: The name of an executable to be used
+        executables: A list of executable names to be used
+        input (Optional): The name of an input be used
+        inputs (Optional): A list of input names that will be used
 
     Either executable, or executables is a required input argument.
     """
@@ -101,13 +101,13 @@ def executable(name, template, use_mpi=False, redirect='{log_file}',
     Executables may or may not use MPI.
 
     Args:
-      template: The template command this executable should generate from
-      use_mpi: (Boolean) determines if this executable should be
-               wrapped with an `mpirun` like command or not.
-      redirect (Optional): Sets the path for outputs to be written to.
-                           defaults to {log_file}
-      output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
-                                 capture. Defaults to stdout
+        template: The template command this executable should generate from
+        use_mpi: (Boolean) determines if this executable should be
+                 wrapped with an `mpirun` like command or not.
+        redirect (Optional): Sets the path for outputs to be written to.
+                             defaults to {log_file}
+        output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
+                                   capture. Defaults to stdout
 
     """
 
@@ -127,11 +127,11 @@ def figure_of_merit_context(name, regex, output_format):
     Defines a new context to contain figures of merit.
 
     Args:
-      name: High level name of the context. Can be referred to in
-            the figure of merit
-      regex: Regular expression, using group names, to match a context.
-      output_format: String, using python keywords {group_name} to extract
-                     group names from context regular expression.
+        name: High level name of the context. Can be referred to in
+              the figure of merit
+        regex: Regular expression, using group names, to match a context.
+        output_format: String, using python keywords {group_name} to extract
+                       group names from context regular expression.
     """
 
     def _execute_figure_of_merit_context(app):
@@ -152,7 +152,7 @@ def archive_pattern(pattern):
     is being performed.
 
     Args:
-      pattern: Pattern that refers to files to archive
+        pattern: Pattern that refers to files to archive
     """
 
     def _execute_archive_pattern(app):
@@ -169,13 +169,13 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
     Defines a new figure of merit.
 
     Args:
-      name: High level name of the figure of merit
-      log_file: File the figure of merit can be extracted from
-      fom_regex: A regular expression using named groups to extract the FOM
-      group_name: The name of the group that the FOM should be pulled from
-      units: The units associated with the FOM
-      keep_policy: The policy for determining which FOM(s) to keep can be
-                   'last' or 'all'
+        name: High level name of the figure of merit
+        log_file: File the figure of merit can be extracted from
+        fom_regex: A regular expression using named groups to extract the FOM
+        group_name: The name of the group that the FOM should be pulled from
+        units: The units associated with the FOM
+        keep_policy: The policy for determining which FOM(s) to keep can be
+                     'last' or 'all'
     """
 
     def _execute_figure_of_merit(app):
@@ -199,15 +199,15 @@ def input_file(name, url, description, target_dir='{input_name}', sha256=None, e
     An input file must define it's name, and a url where the input can be
     fetched from.
 
-    Arguments are:
-      - url: Path to the input file / archive
-      - description: Description of this input file
-      - target_dir (Optional): The directory where the archive will be
+    Args:
+        url: Path to the input file / archive
+        description: Description of this input file
+        target_dir (Optional): The directory where the archive will be
                                expanded. Defaults to 'input'
-      - sha256 (Optional): The expected sha256 checksum for the input file
-      - extension (Optional): The extension to use for the input, if it isn't part of the
+        sha256 (Optional): The expected sha256 checksum for the input file
+        extension (Optional): The extension to use for the input, if it isn't part of the
                               file name.
-      - expand (Optional): Whether the input should be expanded or not. Defaults to True
+        expand (Optional): Whether the input should be expanded or not. Defaults to True
     """
 
     def _execute_input_file(app):
