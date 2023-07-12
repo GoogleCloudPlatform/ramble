@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
 
 
@@ -22,7 +23,7 @@ class Lammps(SpackApplication):
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
 
     software_spec('lammps',
-                  spack_spec='lammps@20220623 +opt+manybody+molecule+kspace+rigid',
+                  spack_spec='lammps@20220623.3 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth',
                   compiler='gcc9')
 
     required_package('lammps')
@@ -43,6 +44,11 @@ class Lammps(SpackApplication):
                sha256='4b6cc70db1b8fe269c48b8e06749f144f400e9a4054bf180ac9b1b9a5a5bb07f',
                description='All-atom rhodopsin protein in solvated lipid bilayer with CHARMM force field, long-range Coulombics via PPPM (particle-particle particle mesh), SHAKE constraints. This model contains counter-ions and a reduced amount of water to make a 32K atom system. 32k atoms. 100 timesteps. https://www.lammps.org/bench.html#rhodo')
 
+    input_file('lammps-stage', url='https://github.com/lammps/lammps/archive/refs/tags/stable_23Jun2022_update3.tar.gz',
+               target_dir='{application_input_dir}/stable_23Jun2022_update3',
+               description='Stage of lammps source from 20220623.3 release',
+               sha256='8a276a01b50d37eecfe6eb36f420f354cde51936d20aca7944dea60d3c098c89')
+
     executable('copy', template=['cp {input_path} {experiment_run_dir}/input.txt'],
                use_mpi=False)
     executable('set-size',
@@ -53,18 +59,26 @@ class Lammps(SpackApplication):
     executable('set-timesteps',
                template=["sed 's/run.*[0-9]+/run\t\t{timesteps}/g' -i input.txt"],
                use_mpi=False)
-    executable('execute', '{lammps}/bin/lmp -i input.txt', use_mpi=True)
+
+    exec_path = os.path.join('{lammps}', 'bin', 'lmp')
+    executable('execute', f'{exec_path}' + ' -i input.txt {lammps_flags}', use_mpi=True)
+
+    executable(
+        'set-data-path',
+        template=["sed 's|data\.|" + os.path.join("{lammps-stage}", "bench", "data.") + "|g' -i input.txt"],
+        use_mpi=False
+    )
 
     workload('lj', executables=['copy', 'set-size', 'set-timesteps', 'execute'],
              input='leonard-jones')
     workload('eam', executables=['copy', 'set-size', 'set-timesteps', 'execute'],
              input='eam')
-    workload('chain', executables=['copy', 'set-timesteps', 'execute'],
-             input='polymer-chain-melt')
+    workload('chain', executables=['copy', 'set-timesteps', 'set-data-path', 'execute'],
+             inputs=['polymer-chain-melt', 'lammps-stage'])
     workload('chute', executables=['copy', 'set-timesteps', 'execute'],
              input='chute')
-    workload('rhodo', executables=['copy', 'set-timesteps', 'execute'],
-             input='rhodo')
+    workload('rhodo', executables=['copy', 'set-timesteps', 'set-data-path', 'execute'],
+             inputs=['rhodo', 'lammps-stage'])
 
     workload_variable('xx', default='20*$x',
                       description='Number of atoms in the x direction',
@@ -83,12 +97,54 @@ class Lammps(SpackApplication):
                       description='Path for the workload input file.',
                       workloads=['lj', 'eam', 'chain', 'chute', 'rhodo'])
 
-    figure_of_merit('Nanoseconds per day', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'Performance: (?P<nspd>[0-9]+\.[0-9]*) tau/day, (?P<tsps>[0-9]+\.[0-9]*) timesteps/s',
-                    group_name='nspd', units='ns/day')
-    figure_of_merit('Timesteps per second', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'Performance: (?P<nspd>[0-9]+\.[0-9]*) tau/day, (?P<tsps>[0-9]+\.[0-9]*) timesteps/s',
-                    group_name='tsps', units='timesteps/s')
-    figure_of_merit('Wallclock time', log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'Total wall time: (?P<walltime>[0-9]+:[0-9]+:[0-9]+)',
-                    group_name='walltime', units='')
+    workload_variable('lammps_flags', default='',
+                      description='Additional execution flags for lammps',
+                      workloads=['lj', 'eam', 'chain', 'chute', 'rhodo'])
+
+    intel_wl_names = [
+        'airebo',
+        'dpd',
+        'eam',
+        'lc',
+        'lj',
+        'rhodo',
+        'sw',
+        'tersoff',
+        'water',
+    ]
+
+    executable(
+        'change-root',
+        template=["sed 's|${root}|{lammps-stage}" + os.path.sep + "|g' -i input.txt"],
+        use_mpi=False
+    )
+    intel_test_path = os.path.join('{lammps-stage}', 'src', 'INTEL', 'TEST')
+    executable(
+        'copy-cube',
+        template=[
+            'cp ' + os.path.join(intel_test_path, 'mW*.data') + ' {experiment_run_dir}' + os.path.sep + '.'
+            'cp ' + os.path.join(intel_test_path, 'mW.sw') + ' {experiment_run_dir}' + os.path.sep + '.'
+        ],
+        use_mpi=False
+    )
+
+    for wl_name in intel_wl_names:
+        workload_name = f'intel.{wl_name}'
+        if wl_name in ['water']:
+            workload(workload_name, executables=['copy', 'copy-cube', 'change-root', 'execute'], inputs=['lammps-stage'])
+        elif wl_name in ['rhodo', 'chain']:
+            workload(workload_name, executables=['copy', 'set-data-path', 'change-root', 'execute'], inputs=['lammps-stage'])
+        else:
+            workload(workload_name, executables=['copy', 'change-root', 'execute'], inputs=['lammps-stage'])
+
+        workload_variable('input_path', default=os.path.join(f'{intel_test_path}', f'in.{workload_name}'),
+                          description=f'Path to input file for {workload_name} workload',
+                          workloads=[workload_name])
+
+        workload_variable('lammps_flags', default='',
+                          description='Additional execution flags for lammps',
+                          workloads=[workload_name])
+
+    figure_of_merit('Nanoseconds per day', fom_regex=r'Performance.* (?P<nspd>[0-9\.]+) (ns|tau)/day', group_name='nspd', units='ns/day')
+    figure_of_merit('Hours per nanosecond', fom_regex=r'Performance.* (?P<hpns>[0-9\.]+) hours/ns', group_name='hpns', units='timesteps/s')
+    figure_of_merit('Timesteps per second', fom_regex=r'Performance.* (?P<tsps>[0-9\.]+) timesteps/s', group_name='tsps', units='hours/ns')
