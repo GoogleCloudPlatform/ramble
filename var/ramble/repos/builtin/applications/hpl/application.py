@@ -11,6 +11,10 @@ from ramble.appkit import *
 import math
 
 
+def pad_value(val, desc):
+    return ('{:<14}'.format(val) + desc)
+
+
 class Hpl(SpackApplication):
     '''Define HPL application'''
     name = 'hpl'
@@ -33,119 +37,119 @@ class Hpl(SpackApplication):
     workload('calculator', executables=['execute'])
 
     workload_variable('output_file',
-                      default='{:13} output file name (if any)'.format('HPL.out'),
+                      default=pad_value('HPL.out', 'output file name (if any)'),
                       description='Output file name (if any)',
                       workloads=['standard'])
     workload_variable('device_out',
-                      default='{:13} device out (6=stdout,7=stderr,file)'.format('6'),
+                      default=pad_value('6', 'device out (6=stdout,7=stderr,file)'),
                       description='Output device',
                       workloads=['standard'])
     workload_variable('N-Ns',
-                      default='{:13} Number of problems sizes (N)'.format('4'),
+                      default=pad_value('4', 'Number of problems sizes (N)'),
                       description='Number of problems sizes',
                       workloads=['standard'])
     workload_variable('Ns',
-                      default='{:13} Ns'.format('29 30 34 35'),
+                      default=pad_value('29 30 34 35', 'Ns'),
                       description='Problem sizes',
                       workloads=['standard'])
     workload_variable('N-NBs',
-                      default='{:13} Number of NBs'.format('4'),
+                      default=pad_value('4', 'Number of NBs'),
                       description='Number of NBs',
                       workloads=['standard'])
     workload_variable('NBs',
-                      default='{:13} NBs'.format('1 2 3 4'),
+                      default=pad_value('1 2 3 4', 'NBs'),
                       description='NB values',
                       workloads=['standard'])
     workload_variable('PMAP',
-                      default='{:13} PMAP process mapping (0=Row-,1=Column-major)'.format('0'),
+                      default=pad_value('0', 'PMAP process mapping (0=Row-,1=Column-major)'),
                       description='PMAP Process mapping. (0=Row-, 1=Column-Major)',
                       workloads=['standard'])
     workload_variable('N-Grids',
-                      default='{:13} Number of process grids (P x Q)'.format('3'),
+                      default=pad_value('3', 'Number of process grids (P x Q)'),
                       description='Number of process grids (P x Q)',
                       workloads=['standard'])
     workload_variable('Ps',
-                      default='{:13} Ps'.format('2 1 4'),
+                      default=pad_value('2 1 4', 'Ps'),
                       description='P values',
                       workloads=['standard'])
     workload_variable('Qs',
-                      default='{:13} Qs'.format('2 4 1'),
+                      default=pad_value('2 4 1', 'Qs'),
                       description='Q values',
                       workloads=['standard'])
     workload_variable('threshold',
-                      default='{:13} threshold'.format('16.0'),
+                      default=pad_value('16.0', 'threshold'),
                       description='Residual threshold',
                       workloads=['standard'])
     workload_variable('NPFACTs',
-                      default='{:13} Number of PFACTs, panel fact'.format('3'),
+                      default=pad_value('3', 'Number of PFACTs, panel fact'),
                       description='Number of PFACTs',
                       workloads=['standard'])
     workload_variable('PFACTs',
-                      default='{:13} PFACTs (0=left, 1=Crout, 2=Right)'.format('0 1 2'),
+                      default=pad_value('0 1 2', 'PFACTs (0=left, 1=Crout, 2=Right)'),
                       description='PFACT Values',
                       workloads=['standard'])
     workload_variable('N-NBMINs',
-                      default='{:13} Number of NBMINs, recursive stopping criteria'.format('2'),
+                      default=pad_value('2', 'Number of NBMINs, recursive stopping criteria'),
                       description='Number of NBMINs',
                       workloads=['standard'])
     workload_variable('NBMINs',
-                      default='{:13} NBMINs (>= 1)'.format('2 4'),
+                      default=pad_value('2 4', 'NBMINs (>= 1)'),
                       description='NBMIN values',
                       workloads=['standard'])
     workload_variable('N-NDIVs',
-                      default='{:13} Number of NDIVs, panels in recursion'.format('1'),
+                      default=pad_value('1', 'Number of NDIVs, panels in recursion'),
                       description='Number of NDIVs',
                       workloads=['standard'])
     workload_variable('NDIVs',
-                      default='{:13} NDIVs'.format('2'),
+                      default=pad_value('2', 'NDIVs'),
                       description='NDIV values',
                       workloads=['standard'])
     workload_variable('N-RFACTs',
-                      default='{:13} Number of RFACTs, recursive panel fact.'.format('3'),
+                      default=pad_value('3', 'Number of RFACTs, recursive panel fact.'),
                       description='Number of RFACTs',
                       workloads=['standard'])
     workload_variable('RFACTs',
-                      default='{:13} RFACTs (0=left, 1=Crout, 2=Right)'.format('0 1 2'),
+                      default=pad_value('0 1 2', 'RFACTs (0=left, 1=Crout, 2=Right)'),
                       description='RFACT values',
                       workloads=['standard'])
     workload_variable('N-BCASTs',
-                      default='{:13} Number of BCASTs, broadcast'.format('1'),
+                      default=pad_value('1', 'Number of BCASTs, broadcast'),
                       description='Number of BCASTs',
                       workloads=['standard'])
     workload_variable('BCASTs',
-                      default='{:13} BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM)'.format('0'),
+                      default=pad_value('0', 'BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM)'),
                       description='BCAST values',
                       workloads=['standard'])
     workload_variable('N-DEPTHs',
-                      default='{:13} Number of DEPTHs, lookahead depth'.format('1'),
+                      default=pad_value('1', 'Number of DEPTHs, lookahead depth'),
                       description='Number of DEPTHs',
                       workloads=['standard'])
     workload_variable('DEPTHs',
-                      default='{:13} DEPTHs (>=0)'.format('0'),
+                      default=pad_value('0', 'DEPTHs (>=0)'),
                       description='DEPTH values',
                       workloads=['standard'])
     workload_variable('SWAP',
-                      default='{:13} SWAP (0=bin-exch,1=long,2=mix)'.format('2'),
+                      default=pad_value('2', 'SWAP (0=bin-exch,1=long,2=mix)'),
                       description='Swapping algorithm',
                       workloads=['standard'])
     workload_variable('swapping_threshold',
-                      default='{:13} swapping threshold'.format('64'),
+                      default=pad_value('64', 'swapping threshold'),
                       description='Swapping threshold',
                       workloads=['standard'])
     workload_variable('L1',
-                      default='{:13} L1 in (0=transposed,1=no-transposed) form'.format('0'),
+                      default=pad_value('0', 'L1 in (0=transposed,1=no-transposed) form'),
                       description='Storage for upper triangular portion of columns',
                       workloads=['standard'])
     workload_variable('U',
-                      default='{:13} U  in (0=transposed,1=no-transposed) form'.format('0'),
+                      default=pad_value('0', 'U  in (0=transposed,1=no-transposed) form'),
                       description='Storage for the rows of U',
                       workloads=['standard'])
     workload_variable('Equilibration',
-                      default='{:13} Equilibration (0=no,1=yes)'.format('1'),
+                      default=pad_value('1', 'Equilibration (0=no,1=yes)'),
                       description='Determines if equilibration should be enabled or disabled.',
                       workloads=['standard'])
     workload_variable('mem_alignment',
-                      default='{:13} memory alignment in double (> 0)'.format('8'),
+                      default=pad_value('8', 'memory alignment in double (> 0)'),
                       description='Sets the alignment in doubles for memory addresses',
                       workloads=['standard'])
 
@@ -155,8 +159,7 @@ class Hpl(SpackApplication):
                       description='Percent of memory to use (default 85)',
                       workloads=['calculator'])
 
-    workload_variable('memory_per_node',
-                      default='240',
+    workload_variable('memory_per_node', default='240',
                       description='Memory per node in GB',
                       workloads=['calculator'])
 
@@ -164,28 +167,23 @@ class Hpl(SpackApplication):
                       description='Size of each block',
                       workloads=['calculator'])
 
-    workload_variable('pfact',
-                      default='0',
+    workload_variable('pfact', default='0',
                       description='PFACT for optimized calculator',
                       workloads=['calculator'])
 
-    workload_variable('nbmin',
-                      default='2',
+    workload_variable('nbmin', default='2',
                       description='NBMIN for optimized calculator',
                       workloads=['calculator'])
 
-    workload_variable('rfact',
-                      default='0',
+    workload_variable('rfact', default='0',
                       description='RFACT for optimized calculator',
                       workloads=['calculator'])
 
-    workload_variable('bcast',
-                      default='0',
+    workload_variable('bcast', default='0',
                       description='BCAST for optimized calculator',
                       workloads=['calculator'])
 
-    workload_variable('depth',
-                      default='0',
+    workload_variable('depth', default='0',
                       description='DEPTH for optimized calculator',
                       workloads=['calculator'])
 
@@ -240,9 +238,9 @@ class Hpl(SpackApplication):
 
             # HPL maintainers recommend basing the target problem size on
             # the square root of 80% of total memory in words.
-            memoryPerNode = int(expander.expand_var('{memory_per_node}'))
-            memFraction = int(expander.expand_var('{percent_mem}')) / 100
-            blockSize = int(expander.expand_var('{block_size}'))
+            memoryPerNode = int(expander.expand_var(expander.expansion_str('memory_per_node')))
+            memFraction = int(expander.expand_var(expander.expansion_str('percent_mem'))) / 100
+            blockSize = int(expander.expand_var(expander.expansion_str('block_size')))
             one_gb_mem_in_words = (1 << 30) / 8
 
             fullMemWords = nNodes * memoryPerNode * one_gb_mem_in_words
@@ -266,50 +264,45 @@ class Hpl(SpackApplication):
             bcast = expander.expand_var(expander.expansion_str('bcast'))
             depth = expander.expand_var(expander.expansion_str('depth'))
 
-            self.variables['N-Ns'] = '{:13} Number of problems sizes (N)'.format('1')  # vs 4
+            self.variables['N-Ns'] = pad_value('1', 'Number of problems sizes (N)')  # vs 4
 
             # Calculated:
-            self.variables['Ns'] = ("{:<13} Ns (= {}% of "
-                                    "total available memory)").format(int(problemSize),
-                                                                      usedPercentage)
-            self.variables['N-NBs'] = '{:13} Number of NBs'.format('1')  # vs 4
+            self.variables['Ns'] = pad_value(int(problemSize),
+                                                  f"Ns (= {usedPercentage}% of total available memory)")
+
+            self.variables['N-NBs'] = pad_value('1', 'Number of NBs')  # vs 4
 
             # Calculated:
-            self.variables['NBs'] = "{:<13} NBs".format(blockSize)  # calculated, vs 4 samples
+            self.variables['NBs'] = pad_value(blockSize, "NBs")  # calculated, vs 4 samples
 
-            self.variables['N-Grids'] = ('{:13} Number of Grids,'
-                                         'process grids (P x Q)').format('1')  # vs 3
-            # Calculated:
-            self.variables['Ps'] = "{:<13} Ps".format(int(bestP))
+            self.variables['N-Grids'] = pad_value('1', 'Number of Grids, process grids (P x Q)')  # vs 3
 
             # Calculated:
-            self.variables['Qs'] = "{:<13} Qs".format(int(bestQ))
+            self.variables['Ps'] = pad_value(int(bestP), "Ps")
 
-            self.variables['NPFACTs'] = '{:13} Number of PFACTs, panel fact'.format('1')  # vs 3
+            # Calculated:
+            self.variables['Qs'] = pad_value(int(bestQ), "Qs")
 
-            # ramble.yaml configurable
-            self.variables['PFACTs'] = '{:13} PFACT Values (0=left, 1=Crout, 2=Right)'.format(pfact)  # vs 0 1 2
-
-            self.variables['N-NBMINs'] = '{:13} Number of NBMINs, recursive stopping criteria'.format('1')  # vs 2
+            self.variables['NPFACTs'] = pad_value('1', 'Number of PFACTs, panel fact')  # vs 3
 
             # ramble.yaml configurable
-            self.variables['NBMINs'] = '{:13} NBMINs (>= 1)'.format(nbmin)  # vs '2 4'
+            self.variables['PFACTs'] = pad_value(pfact, 'PFACT Values (0=left, 1=Crout, 2=Right)')  # vs 0 1 2
 
-            self.variables['N-RFACTs'] = '{:13} Number of RFACTS, recursive panel fact.'.format('1')  # vs '3'
-
-            # ramble.yaml configurable
-            self.variables['RFACTs'] = '{:13} RFACTs (0=left, 1=Crout, 2=Right)'.format(rfact)  # vs '0 1 2'
-
-            self.variables['N-BCASTs'] = '{:13} Number of BCASTs, broadcast'.format('1')
+            self.variables['N-NBMINs'] = pad_value('1', 'Number of NBMINs, recursive stopping criteria')  # vs 2
 
             # ramble.yaml configurable
-            self.variables['BCASTs'] = ('{:13} BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,'
-                                        '5=LnM,6=MKL BPUSH,7=AMD Hybrid Panel)').format(bcast)  # vs '0'
+            self.variables['NBMINs'] = pad_value(nbmin, 'NBMINs (>= 1)')  # vs '2 4'
 
-            self.variables['N-DEPTHs'] = '{:13} Number of DEPTHs, lookahead depth'.format('1')
+            self.variables['N-RFACTs'] = pad_value('1', 'Number of RFACTS, recursive panel fact.')  # vs '3'
 
             # ramble.yaml configurable
-            self.variables['DEPTHs'] = '{:13} DEPTHs (>=0)'.format(depth)  # vs '0'
+            self.variables['RFACTs'] = pad_value(rfact, 'RFACTs (0=left, 1=Crout, 2=Right)')  # vs '0 1 2'
+
+            # ramble.yaml configurable
+            self.variables['BCASTs'] = pad_value(bcast, 'BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM,6=MKL BPUSH,7=AMD Hybrid Panel)')  # vs '0'
+
+            # ramble.yaml configurable
+            self.variables['DEPTHs'] = pad_value(depth, 'DEPTHs (>=0)')  # vs '0'
 
     def _make_experiments(self, workspace):
         super()._make_experiments(workspace)
@@ -329,7 +322,10 @@ class Hpl(SpackApplication):
             f.write('Innovative Computing Laboratory, University of Tennessee\n')
 
             for setting in settings:
-                f.write(self.expander.expand_var('{' + setting + '}') + '\n')
+                # This gets around an issue in expander where trailing comments
+                # after '#' are not printed
+                hash_replace_str = self.expander.expand_var(self.expander.expansion_str(setting)).replace('Number', '#')
+                f.write(hash_replace_str + '\n')
 
             # Write some documentation at the bottom of the input file:
             f.write('##### This line (no. 32) is ignored (it serves as a separator). ######')
