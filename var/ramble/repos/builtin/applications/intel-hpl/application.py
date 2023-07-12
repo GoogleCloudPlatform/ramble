@@ -15,23 +15,23 @@ def pad_value(val, desc):
     return ('{:<14}'.format(val) + desc)
 
 
-class Hpl(SpackApplication):
-    '''Define HPL application'''
-    name = 'hpl'
+class IntelHpl(SpackApplication):
+    '''Define HPL application using Intel MKL optimized binary from intel-oneapi-mpi package'''
+    name = 'intel-hpl'
 
-    maintainers('douglasjacobsen', 'dodecatheon')
+    maintainers('dodecatheon')
 
-    tags('benchmark-app', 'benchmark', 'linpack')
+    tags('benchmark-app', 'benchmark', 'linpack', 'optimized', 'intel', 'mkl')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
-
+    software_spec('imkl_2023p1', spack_spec='intel-oneapi-mkl@2023.1.0 threads=openmp')
     software_spec('impi_2018', spack_spec='intel-mpi@2018.4.274')
 
-    software_spec('hpl', spack_spec='hpl@2.3 +openmp', compiler='gcc9')
+    required_package('intel-oneapi-mkl')
 
-    required_package('hpl')
-
-    executable('execute', 'xhpl', use_mpi=True)
+    executable('execute',
+               '{intel-oneapi-mkl}/mkl/latest/benchmarks/mp_linpack/xhpl_intel64_dynamic',
+               use_mpi=True)
 
     workload('standard', executables=['execute'])
     workload('calculator', executables=['execute'])
@@ -179,8 +179,9 @@ class Hpl(SpackApplication):
                       description='RFACT for optimized calculator',
                       workloads=['calculator'])
 
-    workload_variable('bcast', default='0',
-                      description='BCAST for optimized calculator',
+    # Redefine default bcast to 6 for the MKL-optimized case
+    workload_variable('bcast', default='6',
+                      description='BCAST for Intel MKL optimized calculator',
                       workloads=['calculator'])
 
     workload_variable('depth', default='0',
