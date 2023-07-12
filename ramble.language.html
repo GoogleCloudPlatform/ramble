@@ -228,12 +228,11 @@ capture. Defaults to stdout</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – High level name of the figure of merit</p></li>
-<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
 <li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
 <li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
+<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
 <li><p><strong>units</strong> – The units associated with the FOM</p></li>
-<li><p><strong>keep_policy</strong> – The policy for determining which FOM(s) to keep can be
-‘last’ or ‘all’</p></li>
+<li><p><strong>contexts</strong> – List of context this is applicable to</p></li>
 </ul>
 </dd>
 </dl>
@@ -264,22 +263,17 @@ group names from context regular expression.</p></li>
 <p>Defines a new input file.
 An input file must define it’s name, and a url where the input can be
 fetched from.</p>
-<dl class="simple">
-<dt>Arguments are:</dt><dd><ul class="simple">
-<li><p>url: Path to the input file / archive</p></li>
-<li><p>description: Description of this input file</p></li>
-<li><dl class="simple">
-<dt>target_dir (Optional): The directory where the archive will be</dt><dd><p>expanded. Defaults to ‘input’</p>
-</dd>
-</dl>
-</li>
-<li><p>sha256 (Optional): The expected sha256 checksum for the input file</p></li>
-<li><dl class="simple">
-<dt>extension (Optional): The extension to use for the input, if it isn’t part of the</dt><dd><p>file name.</p>
-</dd>
-</dl>
-</li>
-<li><p>expand (Optional): Whether the input should be expanded or not. Defaults to True</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – Path to the input file / archive</p></li>
+<li><p><strong>description</strong> – Description of this input file</p></li>
+<li><p><strong>target_dir</strong> (<em>Optional</em>) – The directory where the archive will be
+expanded. Defaults to ‘input’</p></li>
+<li><p><strong>sha256</strong> (<em>Optional</em>) – The expected sha256 checksum for the input file</p></li>
+<li><p><strong>extension</strong> (<em>Optional</em>) – The extension to use for the input, if it isn’t part of the
+file name.</p></li>
+<li><p><strong>expand</strong> (<em>Optional</em>) – Whether the input should be expanded or not. Defaults to True</p></li>
 </ul>
 </dd>
 </dl>
@@ -386,12 +380,13 @@ in. Accepts globbing.</p></li>
 <dd><p>Adds a workload to this application</p>
 <p>Defines a new workload that can be used within the context of
 its application.</p>
-<dl class="simple">
-<dt>Input arguments:</dt><dd><ul class="simple">
-<li><p>executable: The name of an executable to be used</p></li>
-<li><p>executables: A list of executable names to be used</p></li>
-<li><p>input (Optional): The name of an input be used</p></li>
-<li><p>inputs (Optional): A list of input names that will be used</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executable</strong> – The name of an executable to be used</p></li>
+<li><p><strong>executables</strong> – A list of executable names to be used</p></li>
+<li><p><strong>input</strong> (<em>Optional</em>) – The name of an input be used</p></li>
+<li><p><strong>inputs</strong> (<em>Optional</em>) – A list of input names that will be used</p></li>
 </ul>
 </dd>
 </dl>
@@ -476,11 +471,17 @@ the core.</p>
 <dd><p>Merge definitions of a type</p>
 <p>This method will merge two optional definitions of single_type and
 multiple_type.</p>
-<p>Args:
-- single_type: Single string for type name
-- multiple_type: List of strings for type names</p>
-<p>Returns:
-- List of all type names (Merged if both single_type and multiple_type definitions are valid)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>single_type</strong> – Single string for type name</p></li>
+<li><p><strong>multiple_type</strong> – List of strings for type names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of all type names (Merged if both single_type and multiple_type definitions are valid)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -490,14 +491,20 @@ multiple_type.</p>
 <p>This method will validate that single_type / multiple_type are properly defined.</p>
 <p>It will raise an error if at least one type is not defined, or if
 either are the incorrect type.</p>
-<p>Args:
-- single_type: Single string for type name
-- multiple_type: List of strings for type names
-- single_arg_name: String name of the single_type argument in the directive
-- multiple_arg_name: String name of the multiple_type argument in the directive
-- directive_name: Name of the directive requiring a type</p>
-<p>Returns:
-- List of all type names (Merged if both single_type and multiple_type definitions are valid)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>single_type</strong> – Single string for type name</p></li>
+<li><p><strong>multiple_type</strong> – List of strings for type names</p></li>
+<li><p><strong>single_arg_name</strong> – String name of the single_type argument in the directive</p></li>
+<li><p><strong>multiple_arg_name</strong> – String name of the multiple_type argument in the directive</p></li>
+<li><p><strong>directive_name</strong> – Name of the directive requiring a type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of all type names (Merged if both single_type and multiple_type definitions are valid)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -516,10 +523,9 @@ either are the incorrect type.</p>
 <p>Defines a new file pattern that will be archived during workspace archival.
 Archival will only happen for files that match the pattern when archival
 is being performed.</p>
-<dl class="simple">
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><p>pattern: Pattern that refers to files to archive</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern</strong> – Pattern that refers to files to archive</p>
 </dd>
 </dl>
 </dd></dl>
@@ -584,10 +590,16 @@ actual modifications</p>
 <p>Would append the <cite>echo “{executable_name}”</cite> to every non-builtin executable
 in an experiment.</p>
 <p>Executable modifiers are allowed to modify the input executable in place.
-Executable modifiers must return two lists of executables.
-Returns:
-- prepend_execs: List of executables to inject before the base executable
-- append_execs: List of executables to inject after the base executable</p>
+Executable modifiers must return two lists of executables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of executables to inject before the base executable
+append_execs: List of executables to inject after the base executable</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>prepend_execs</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -595,18 +607,15 @@ Returns:
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.figure_of_merit" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a figure of merit to track for this modifier</p>
 <p>Defines a new figure of merit.</p>
-<dl class="simple">
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><p>name: High level name of the figure of merit</p></li>
-<li><p>log_file: File the figure of merit can be extracted from</p></li>
-<li><p>fom_regex: A regular expression using named groups to extract the FOM</p></li>
-<li><p>group_name: The name of the group that the FOM should be pulled from</p></li>
-<li><p>units: The units associated with the FOM</p></li>
-<li><dl class="simple">
-<dt>keep_policy: The policy for determining which FOM(s) to keep</dt><dd><p>can be ‘last’ or ‘all’</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the figure of merit</p></li>
+<li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
+<li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
+<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
+<li><p><strong>units</strong> – The units associated with the FOM</p></li>
+<li><p><strong>contexts</strong> – List of context this is applicable to</p></li>
 </ul>
 </dd>
 </dl>
@@ -617,20 +626,15 @@ Returns:
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#figure_of_merit_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.figure_of_merit_context" title="Permalink to this definition"></a></dt>
 <dd><p>Defines a context for figures of merit</p>
 <p>Defines a new context to contain figures of merit.</p>
-<dl class="simple">
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>name: High level name of the context. Can be referred to in</dt><dd><p>the figure of merit</p>
-</dd>
-</dl>
-</li>
-<li><p>regex: Regular expression, using group names, to match a context.</p></li>
-<li><dl class="simple">
-<dt>output_format: String, using python keywords {group_name} to</dt><dd><p>extract group names from context regular
-expression.</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the context. Can be referred to in
+the figure of merit</p></li>
+<li><p><strong>regex</strong> – Regular expression, using group names, to match a context.</p></li>
+<li><p><strong>output_format</strong> – String, using python keywords {group_name} to
+extract group names from context regular
+expression.</p></li>
 </ul>
 </dd>
 </dl>
@@ -683,9 +687,11 @@ the experiment executable lists can use:</p>
 explicitly list the builtin in their executable list.</p>
 <p>The ‘injection_method’ attribute controls where the builtin will be
 injected into the executable list.
-Options are:
-- ‘prepend’ – This builtin will be injected at the beginning of the executable list
-- ‘append’ – This builtin will be injected at the end of the executable list</p>
+Options are:</p>
+<ul class="simple">
+<li><p>‘prepend’ – This builtin will be injected at the beginning of the executable list</p></li>
+<li><p>‘append’ – This builtin will be injected at the end of the executable list</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py function">

@@ -175,11 +175,11 @@
 <span class="sd">    Defines a new workload that can be used within the context of</span>
 <span class="sd">    its application.</span>
 
-<span class="sd">    Input arguments:</span>
-<span class="sd">        - executable: The name of an executable to be used</span>
-<span class="sd">        - executables: A list of executable names to be used</span>
-<span class="sd">        - input (Optional): The name of an input be used</span>
-<span class="sd">        - inputs (Optional): A list of input names that will be used</span>
+<span class="sd">    Args:</span>
+<span class="sd">        executable: The name of an executable to be used</span>
+<span class="sd">        executables: A list of executable names to be used</span>
+<span class="sd">        input (Optional): The name of an input be used</span>
+<span class="sd">        inputs (Optional): A list of input names that will be used</span>
 
 <span class="sd">    Either executable, or executables is a required input argument.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -216,13 +216,13 @@
 <span class="sd">    Executables may or may not use MPI.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      template: The template command this executable should generate from</span>
-<span class="sd">      use_mpi: (Boolean) determines if this executable should be</span>
-<span class="sd">               wrapped with an `mpirun` like command or not.</span>
-<span class="sd">      redirect (Optional): Sets the path for outputs to be written to.</span>
-<span class="sd">                           defaults to {log_file}</span>
-<span class="sd">      output_capture (Optional): Declare which ouptu (stdout, stderr, both) to</span>
-<span class="sd">                                 capture. Defaults to stdout</span>
+<span class="sd">        template: The template command this executable should generate from</span>
+<span class="sd">        use_mpi: (Boolean) determines if this executable should be</span>
+<span class="sd">                 wrapped with an `mpirun` like command or not.</span>
+<span class="sd">        redirect (Optional): Sets the path for outputs to be written to.</span>
+<span class="sd">                             defaults to {log_file}</span>
+<span class="sd">        output_capture (Optional): Declare which ouptu (stdout, stderr, both) to</span>
+<span class="sd">                                   capture. Defaults to stdout</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -242,11 +242,11 @@
 <span class="sd">    Defines a new context to contain figures of merit.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      name: High level name of the context. Can be referred to in</span>
-<span class="sd">            the figure of merit</span>
-<span class="sd">      regex: Regular expression, using group names, to match a context.</span>
-<span class="sd">      output_format: String, using python keywords {group_name} to extract</span>
-<span class="sd">                     group names from context regular expression.</span>
+<span class="sd">        name: High level name of the context. Can be referred to in</span>
+<span class="sd">              the figure of merit</span>
+<span class="sd">        regex: Regular expression, using group names, to match a context.</span>
+<span class="sd">        output_format: String, using python keywords {group_name} to extract</span>
+<span class="sd">                       group names from context regular expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_figure_of_merit_context</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -267,7 +267,7 @@
 <span class="sd">    is being performed.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      pattern: Pattern that refers to files to archive</span>
+<span class="sd">        pattern: Pattern that refers to files to archive</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_archive_pattern</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -284,13 +284,12 @@
 <span class="sd">    Defines a new figure of merit.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      name: High level name of the figure of merit</span>
-<span class="sd">      log_file: File the figure of merit can be extracted from</span>
-<span class="sd">      fom_regex: A regular expression using named groups to extract the FOM</span>
-<span class="sd">      group_name: The name of the group that the FOM should be pulled from</span>
-<span class="sd">      units: The units associated with the FOM</span>
-<span class="sd">      keep_policy: The policy for determining which FOM(s) to keep can be</span>
-<span class="sd">                   &#39;last&#39; or &#39;all&#39;</span>
+<span class="sd">        name: High level name of the figure of merit</span>
+<span class="sd">        fom_regex: A regular expression using named groups to extract the FOM</span>
+<span class="sd">        group_name: The name of the group that the FOM should be pulled from</span>
+<span class="sd">        log_file: File the figure of merit can be extracted from</span>
+<span class="sd">        units: The units associated with the FOM</span>
+<span class="sd">        contexts: List of context this is applicable to</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_figure_of_merit</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
@@ -314,15 +313,15 @@
 <span class="sd">    An input file must define it&#39;s name, and a url where the input can be</span>
 <span class="sd">    fetched from.</span>
 
-<span class="sd">    Arguments are:</span>
-<span class="sd">      - url: Path to the input file / archive</span>
-<span class="sd">      - description: Description of this input file</span>
-<span class="sd">      - target_dir (Optional): The directory where the archive will be</span>
+<span class="sd">    Args:</span>
+<span class="sd">        url: Path to the input file / archive</span>
+<span class="sd">        description: Description of this input file</span>
+<span class="sd">        target_dir (Optional): The directory where the archive will be</span>
 <span class="sd">                               expanded. Defaults to &#39;input&#39;</span>
-<span class="sd">      - sha256 (Optional): The expected sha256 checksum for the input file</span>
-<span class="sd">      - extension (Optional): The extension to use for the input, if it isn&#39;t part of the</span>
+<span class="sd">        sha256 (Optional): The expected sha256 checksum for the input file</span>
+<span class="sd">        extension (Optional): The extension to use for the input, if it isn&#39;t part of the</span>
 <span class="sd">                              file name.</span>
-<span class="sd">      - expand (Optional): Whether the input should be expanded or not. Defaults to True</span>
+<span class="sd">        expand (Optional): Whether the input should be expanded or not. Defaults to True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_input_file</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>

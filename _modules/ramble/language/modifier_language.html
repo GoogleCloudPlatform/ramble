@@ -142,13 +142,13 @@
 
 <span class="sd">    Defines a new context to contain figures of merit.</span>
 
-<span class="sd">    Inputs:</span>
-<span class="sd">     - name: High level name of the context. Can be referred to in</span>
-<span class="sd">             the figure of merit</span>
-<span class="sd">     - regex: Regular expression, using group names, to match a context.</span>
-<span class="sd">     - output_format: String, using python keywords {group_name} to</span>
-<span class="sd">                      extract group names from context regular</span>
-<span class="sd">                      expression.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name: High level name of the context. Can be referred to in</span>
+<span class="sd">              the figure of merit</span>
+<span class="sd">        regex: Regular expression, using group names, to match a context.</span>
+<span class="sd">        output_format: String, using python keywords {group_name} to</span>
+<span class="sd">                       extract group names from context regular</span>
+<span class="sd">                       expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_figure_of_merit_context</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
@@ -168,8 +168,8 @@
 <span class="sd">    Archival will only happen for files that match the pattern when archival</span>
 <span class="sd">    is being performed.</span>
 
-<span class="sd">    Inputs:</span>
-<span class="sd">      - pattern: Pattern that refers to files to archive</span>
+<span class="sd">    Args:</span>
+<span class="sd">        pattern: Pattern that refers to files to archive</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_archive_pattern</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
@@ -185,14 +185,13 @@
 
 <span class="sd">    Defines a new figure of merit.</span>
 
-<span class="sd">    Inputs:</span>
-<span class="sd">     - name: High level name of the figure of merit</span>
-<span class="sd">     - log_file: File the figure of merit can be extracted from</span>
-<span class="sd">     - fom_regex: A regular expression using named groups to extract the FOM</span>
-<span class="sd">     - group_name: The name of the group that the FOM should be pulled from</span>
-<span class="sd">     - units: The units associated with the FOM</span>
-<span class="sd">     - keep_policy: The policy for determining which FOM(s) to keep</span>
-<span class="sd">                    can be &#39;last&#39; or &#39;all&#39;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name: High level name of the figure of merit</span>
+<span class="sd">        fom_regex: A regular expression using named groups to extract the FOM</span>
+<span class="sd">        group_name: The name of the group that the FOM should be pulled from</span>
+<span class="sd">        log_file: File the figure of merit can be extracted from</span>
+<span class="sd">        units: The units associated with the FOM</span>
+<span class="sd">        contexts: List of context this is applicable to</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_execute_figure_of_merit</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
@@ -229,11 +228,11 @@
 <span class="sd">    A variable modification will apply a change to a defined variable within an experiment.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      name: The variable to modify</span>
-<span class="sd">      modification: The value to modify &#39;name&#39; with</span>
-<span class="sd">      method: How the modification should be applied</span>
-<span class="sd">      mode: Single mode to group this modification into</span>
-<span class="sd">      modes: List of modes to group this modification into</span>
+<span class="sd">        name: The variable to modify</span>
+<span class="sd">        modification: The value to modify &#39;name&#39; with</span>
+<span class="sd">        method: How the modification should be applied</span>
+<span class="sd">        mode: Single mode to group this modification into</span>
+<span class="sd">        modes: List of modes to group this modification into</span>
 
 <span class="sd">    Supported values are &#39;append&#39;, &#39;prepend&#39;, and &#39;set&#39;:</span>
 
@@ -407,8 +406,11 @@
 <span class="sd">    The &#39;injection_method&#39; attribute controls where the builtin will be</span>
 <span class="sd">    injected into the executable list.</span>
 <span class="sd">    Options are:</span>
+
 <span class="sd">    - &#39;prepend&#39; -- This builtin will be injected at the beginning of the executable list</span>
+
 <span class="sd">    - &#39;append&#39; -- This builtin will be injected at the end of the executable list</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">supported_injection_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;prepend&#39;</span><span class="p">,</span> <span class="s1">&#39;append&#39;</span><span class="p">]</span>
 
@@ -456,9 +458,10 @@
 
 <span class="sd">    Executable modifiers are allowed to modify the input executable in place.</span>
 <span class="sd">    Executable modifiers must return two lists of executables.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">    - prepend_execs: List of executables to inject before the base executable</span>
-<span class="sd">    - append_execs: List of executables to inject after the base executable</span>
+<span class="sd">      prepend_execs: List of executables to inject before the base executable</span>
+<span class="sd">      append_execs: List of executables to inject after the base executable</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_executable_modifier</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">executable_modifiers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
@@ -474,11 +477,11 @@
 <span class="sd">    variables within the application instance.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      name: The name of the environment variable that will be modified</span>
-<span class="sd">      modification: The value of the modification</span>
-<span class="sd">      method: The method of the modification.</span>
-<span class="sd">      mode: Name of mode this env_var_modification should apply in</span>
-<span class="sd">      modes: List of mode names this env_var_modification should apply in</span>
+<span class="sd">        name: The name of the environment variable that will be modified</span>
+<span class="sd">        modification: The value of the modification</span>
+<span class="sd">        method: The method of the modification.</span>
+<span class="sd">        mode: Name of mode this env_var_modification should apply in</span>
+<span class="sd">        modes: List of mode names this env_var_modification should apply in</span>
 
 <span class="sd">    Supported values for method are:</span>
 <span class="sd">    set: Defines the variable to equal the modification value</span>

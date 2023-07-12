@@ -451,10 +451,11 @@
 <span class="sd">        After collecting the matrices, this method modifies generates new</span>
 <span class="sd">        experiments and injects them into the self.experiments dictionary.</span>
 
-<span class="sd">        Inputs:</span>
-<span class="sd">            - None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
 <span class="sd">        Returns:</span>
-<span class="sd">            - None</span>
+<span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">context_variables</span> <span class="o">=</span> <span class="p">{}</span>
@@ -624,8 +625,8 @@
 <span class="sd">        pass through to rendered content.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          experiment: A fully qualified experiment name (application.workload.experiment)</span>
-<span class="sd">          variable: Name of variable to look up</span>
+<span class="sd">            experiment: A fully qualified experiment name (application.workload.experiment)</span>
+<span class="sd">            variable: Name of variable to look up</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">experiment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>

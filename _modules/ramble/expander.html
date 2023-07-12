@@ -312,10 +312,10 @@
 <span class="sd">        expansion variables.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          var: String variable to expand</span>
-<span class="sd">          extra_vars: Variable definitions to use with highest precedence</span>
-<span class="sd">          allow_passthrough: Whether the string is allowed to have keywords</span>
-<span class="sd">            after expansion</span>
+<span class="sd">            var: String variable to expand</span>
+<span class="sd">            extra_vars: Variable definitions to use with highest precedence</span>
+<span class="sd">            allow_passthrough: Whether the string is allowed to have keywords</span>
+<span class="sd">                               after expansion</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
@@ -352,10 +352,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator for all keyword arguments in a string</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          - in_str (string): Input string to detect keywords from</span>
+<span class="sd">            in_str (string): Input string to detect keywords from</span>
 
 <span class="sd">        Yields:</span>
-<span class="sd">          - Each keyword argument in in_str</span>
+<span class="sd">          Each keyword argument in in_str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
@@ -366,7 +366,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if a string is fully expanded</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          - in_str (string): Input string to test as expanded</span>
+<span class="sd">            in_str (string): Input string to test as expanded</span>
 
 <span class="sd">        Returns boolean. True if `in_str` contains no keywords, false if a</span>
 <span class="sd">        keyword is detected.</span>
