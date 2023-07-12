@@ -269,7 +269,7 @@ class IntelHpl(SpackApplication):
 
             # Calculated:
             self.variables['Ns'] = pad_value(int(problemSize),
-                                                  f"Ns (= {usedPercentage}% of total available memory)")
+                                             f"Ns (= {usedPercentage}% of total available memory)")
 
             self.variables['N-NBs'] = pad_value('1', 'Number of NBs')  # vs 4
 
