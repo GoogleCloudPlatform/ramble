@@ -56,7 +56,7 @@ class Renderer(object):
         objects and injects them into the self.objects dictionary.
 
         Returns:
-          A single object definition, through a yield
+            A single object definition, through a yield
         """
         object_variables = {}
         expander = ramble.expander.Expander(variables, None)

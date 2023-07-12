@@ -336,10 +336,11 @@ class ExperimentSet(object):
         After collecting the matrices, this method modifies generates new
         experiments and injects them into the self.experiments dictionary.
 
-        Inputs:
-            - None
+        Args:
+            None
+
         Returns:
-            - None
+            None
         """
 
         context_variables = {}
@@ -509,8 +510,8 @@ class ExperimentSet(object):
         pass through to rendered content.
 
         Args:
-          experiment: A fully qualified experiment name (application.workload.experiment)
-          variable: Name of variable to look up
+            experiment: A fully qualified experiment name (application.workload.experiment)
+            variable: Name of variable to look up
         """
 
         if experiment not in self.experiments.keys():

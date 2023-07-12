@@ -374,7 +374,7 @@ class SpackRunner(object):
          - Path to an external spack environment
 
         Returns:
-         - (bool) found_lock: True if a spack.lock file was copied. False otherwise.
+            (bool) found_lock: True if a spack.lock file was copied. False otherwise.
         """
 
         self._check_active()

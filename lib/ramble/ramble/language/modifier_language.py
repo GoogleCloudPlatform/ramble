@@ -27,13 +27,13 @@ def figure_of_merit_context(name, regex, output_format):
 
     Defines a new context to contain figures of merit.
 
-    Inputs:
-     - name: High level name of the context. Can be referred to in
-             the figure of merit
-     - regex: Regular expression, using group names, to match a context.
-     - output_format: String, using python keywords {group_name} to
-                      extract group names from context regular
-                      expression.
+    Args:
+        name: High level name of the context. Can be referred to in
+              the figure of merit
+        regex: Regular expression, using group names, to match a context.
+        output_format: String, using python keywords {group_name} to
+                       extract group names from context regular
+                       expression.
     """
 
     def _execute_figure_of_merit_context(mod):
@@ -53,8 +53,8 @@ def archive_pattern(pattern):
     Archival will only happen for files that match the pattern when archival
     is being performed.
 
-    Inputs:
-      - pattern: Pattern that refers to files to archive
+    Args:
+        pattern: Pattern that refers to files to archive
     """
 
     def _execute_archive_pattern(mod):
@@ -70,14 +70,13 @@ def figure_of_merit(name, fom_regex, group_name, units='', log_file='{log_file}'
 
     Defines a new figure of merit.
 
-    Inputs:
-     - name: High level name of the figure of merit
-     - log_file: File the figure of merit can be extracted from
-     - fom_regex: A regular expression using named groups to extract the FOM
-     - group_name: The name of the group that the FOM should be pulled from
-     - units: The units associated with the FOM
-     - keep_policy: The policy for determining which FOM(s) to keep
-                    can be 'last' or 'all'
+    Args:
+        name: High level name of the figure of merit
+        fom_regex: A regular expression using named groups to extract the FOM
+        group_name: The name of the group that the FOM should be pulled from
+        log_file: File the figure of merit can be extracted from
+        units: The units associated with the FOM
+        contexts: List of context this is applicable to
     """
 
     def _execute_figure_of_merit(mod):
@@ -114,11 +113,11 @@ def variable_modification(name, modification, method='set', mode=None, modes=Non
     A variable modification will apply a change to a defined variable within an experiment.
 
     Args:
-      name: The variable to modify
-      modification: The value to modify 'name' with
-      method: How the modification should be applied
-      mode: Single mode to group this modification into
-      modes: List of modes to group this modification into
+        name: The variable to modify
+        modification: The value to modify 'name' with
+        method: How the modification should be applied
+        mode: Single mode to group this modification into
+        modes: List of modes to group this modification into
 
     Supported values are 'append', 'prepend', and 'set':
 
@@ -292,8 +291,11 @@ def register_builtin(name, required=True, injection_method='prepend'):
     The 'injection_method' attribute controls where the builtin will be
     injected into the executable list.
     Options are:
+
     - 'prepend' -- This builtin will be injected at the beginning of the executable list
+
     - 'append' -- This builtin will be injected at the end of the executable list
+
     """
     supported_injection_methods = ['prepend', 'append']
 
@@ -341,9 +343,10 @@ def executable_modifier(name):
 
     Executable modifiers are allowed to modify the input executable in place.
     Executable modifiers must return two lists of executables.
+
     Returns:
-    - prepend_execs: List of executables to inject before the base executable
-    - append_execs: List of executables to inject after the base executable
+      prepend_execs: List of executables to inject before the base executable
+      append_execs: List of executables to inject after the base executable
     """
     def _executable_modifier(mod):
         mod.executable_modifiers[name] = name
@@ -359,11 +362,11 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
     variables within the application instance.
 
     Args:
-      name: The name of the environment variable that will be modified
-      modification: The value of the modification
-      method: The method of the modification.
-      mode: Name of mode this env_var_modification should apply in
-      modes: List of mode names this env_var_modification should apply in
+        name: The name of the environment variable that will be modified
+        modification: The value of the modification
+        method: The method of the modification.
+        mode: Name of mode this env_var_modification should apply in
+        modes: List of mode names this env_var_modification should apply in
 
     Supported values for method are:
     set: Defines the variable to equal the modification value

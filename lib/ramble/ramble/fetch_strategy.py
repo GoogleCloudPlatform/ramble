@@ -1493,7 +1493,7 @@ def from_kwargs(**kwargs):
 
     Returns:
         FetchStrategy: The fetch strategy that matches the args, based
-            on attribute names (e.g., ``git``, ``hg``, etc.)
+          on attribute names (e.g., ``git``, ``hg``, etc.)
 
     Raises:
         FetchError: If no ``fetch_strategy`` matches the args.
