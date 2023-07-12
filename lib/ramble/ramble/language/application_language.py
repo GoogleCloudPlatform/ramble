@@ -170,12 +170,11 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
 
     Args:
         name: High level name of the figure of merit
-        log_file: File the figure of merit can be extracted from
         fom_regex: A regular expression using named groups to extract the FOM
         group_name: The name of the group that the FOM should be pulled from
+        log_file: File the figure of merit can be extracted from
         units: The units associated with the FOM
-        keep_policy: The policy for determining which FOM(s) to keep can be
-                     'last' or 'all'
+        contexts: List of context this is applicable to
     """
 
     def _execute_figure_of_merit(app):
