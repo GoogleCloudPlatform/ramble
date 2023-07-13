@@ -52,9 +52,6 @@ class Gromacs(SpackApplication):
                sha256='9cb2ad61ec2a422fc33578047e7cb2fd2c37ae9a75a6162d662fa2b711e9737f',
                description='https://www.hecbiosim.ac.uk/access-hpc/benchmarks')
 
-    # input_file('BenchPEP', url='https://www.mpinat.mpg.de/632210/benchPEP.zip',
-    #            description='12M Atoms, Peptides in Water, 2fs time step, all bonds constrained. https://www.mpinat.mpg.de/grubmueller/bench')
-
     input_file('BenchPEP', url='https://www.mpinat.mpg.de/benchPEP.zip',
                sha256='f11745201dbb9e6a29a39cb016ee8123f6b0f519b250c94660f0a9623e497b22',
                description='12M Atoms, Peptides in Water, 2fs time step, all bonds constrained. https://www.mpinat.mpg.de/grubmueller/bench')
