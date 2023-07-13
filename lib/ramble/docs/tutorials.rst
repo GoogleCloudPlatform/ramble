@@ -20,3 +20,4 @@ various features.
     :caption: Commands Introduction
 
     tutorials/general_usage
+    tutorials/mirrors
