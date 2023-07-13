@@ -32,13 +32,14 @@ class Experiment():
     """
     Class representation of experiment data
     """
-    def __init__(self, name, data, timestamp):
+    def __init__(self, name, workspace_hash, data, timestamp):
         self.name = name
         self.foms = []
         self.id = None  # This is essentially the hash
         self.data = data
         self.application_name = data['RAMBLE_VARIABLES']['application_name']
         self.workspace_name = data['RAMBLE_VARIABLES']['workspace_name']
+        self.workspace_hash = workspace_hash
         self.workload_name = data['RAMBLE_VARIABLES']['workload_name']
         self.bulk_hash = None  # proxy for workspace or "uploaded with"
         self.n_nodes = data['RAMBLE_VARIABLES']['n_nodes']
@@ -139,7 +140,7 @@ def format_data(data_in):
 
     for exp in data_in['experiments']:
         if exp['RAMBLE_STATUS'] == 'SUCCESS':
-            e = Experiment(exp['name'], exp, current_dateTime)
+            e = Experiment(exp['name'], data_in['workspace_hash'], exp, current_dateTime)
             results.append(e)
             # experiment_id = exp.hash()
             # 'experiment_id': experiment_id,

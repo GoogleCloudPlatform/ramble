@@ -451,7 +451,6 @@ class Workspace(object):
         self._input_mirror_cache = None
         self._software_mirror_cache = None
         self._software_environments = None
-        self.workspace_hash = None
         self.hash_inventory = {
             'experiments': [],
             'versions': []
@@ -479,6 +478,7 @@ class Workspace(object):
             )
         except RunnerError:
             pass
+        self.workspace_hash = None
 
         self.specs = []
 
@@ -1083,9 +1083,25 @@ class Workspace(object):
         else:
             raise ConfigError("Missing correct conifg:upload parameters")
 
+    def default_results(self):
+        res = {}
+
+        if self.workspace_hash:
+            res['workspace_hash'] = self.workspace_hash
+        else:
+            try:
+                with open(os.path.join(self.root, self._hash_file_name)) as f:
+                    res['workspace_hash'] = f.readline().rstrip()
+            except OSError:
+                res['workspace_hash'] = "Unknown.."
+
+        res['experiments'] = []
+
+        return res
+
     def append_result(self, result):
         if not self.results:
-            self.results = {'experiments': []}
+            self.results = self.default_results()
 
         self.results['experiments'].append(result)
 
@@ -1129,6 +1145,7 @@ class Workspace(object):
             results_written.append(out_file)
 
             with open(out_file, 'w+') as f:
+                f.write(f"From Workspace: {self.name} ({self.results['workspace_hash']})\n")
                 if 'experiments' in self.results:
                     for exp in self.results['experiments']:
                         f.write('Experiment %s figures of merit:\n' %
