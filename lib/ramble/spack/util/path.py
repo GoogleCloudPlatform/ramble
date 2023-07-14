@@ -205,14 +205,8 @@ def substitute_config_variables(path):
     replaced if there is an active environment, and should only be used in
     environment yaml files.
     """
-    import spack.environment as ev  # break circular
     _replacements = replacements()
-    env = ev.active_environment()
-    if env:
-        _replacements.update({'env': env.path})
-    else:
-        # If a previous invocation added env, remove it
-        _replacements.pop('env', None)
+    _replacements.pop('env', None)
 
     # Look up replacements
     def repl(match):
