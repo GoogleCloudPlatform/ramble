@@ -85,6 +85,9 @@ class Wrfv4(SpackApplication):
                     fom_regex=r'Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*',
                     group_name='avg_max_ratio', units='')
 
+    success_criteria('Complete', mode='string', match=r'.*wrf: SUCCESS COMPLETE WRF.*',
+                     file='{experiment_run_dir}/rsl.out.0000')
+
     archive_pattern('{experiment_run_dir}/rsl.out.*')
     archive_pattern('{experiment_run_dir}/rsl.error.*')
 

@@ -220,6 +220,7 @@ licenses:
             with open(os.path.join(exp_dir, 'rsl.out.0000'), 'w+') as f:
                 for i in range(1, 6):
                     f.write(f'Timing for main {i}{i}.{i}\n')
+                f.write('wrf: SUCCESS COMPLETE WRF\n')
 
             # Create files that match archive patterns
             for i in range(0, 5):
