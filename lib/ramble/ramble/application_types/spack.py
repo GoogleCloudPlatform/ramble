@@ -46,8 +46,9 @@ class SpackApplication(ApplicationBase):
     def __init__(self, file_path):
         super().__init__(file_path)
         self._setup_phases = [
-            'install_compilers',
             'create_spack_env',
+            'install_compilers',
+            'concretize_spack_env',
             'install_software',
             'define_package_paths',
             'get_inputs',
@@ -99,6 +100,7 @@ class SpackApplication(ApplicationBase):
             workspace.add_to_cache(cache_tupl)
 
         try:
+            self.spack_runner.set_compiler_config_dir(workspace.auxiliary_software_dir)
             self.spack_runner.set_dry_run(workspace.dry_run)
 
             app_context = self.expander.expand_var('{env_name}')
@@ -135,6 +137,7 @@ class SpackApplication(ApplicationBase):
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.create_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.activate()
 
             # Write auxiliary software files into created spack env.
             for name, contents in workspace.all_auxiliary_software_files():
@@ -143,14 +146,10 @@ class SpackApplication(ApplicationBase):
                 with open(aux_file_path, 'w+') as f:
                     f.write(self.expander.expand_var(contents))
 
-            self.spack_runner.activate()
-
             env_context = self.expander.expand_var('{env_name}')
-
-            env_concretized = False
             external_spack_env = workspace.external_spack_env(env_context)
             if external_spack_env:
-                env_concretized = self.spack_runner.copy_from_external_env(external_spack_env)
+                self.spack_runner.copy_from_external_env(external_spack_env)
             else:
                 for pkg_name in workspace.software_environments.get_env_packages(env_context):
                     spec_str = workspace.software_environments.get_spec_string(pkg_name)
@@ -173,6 +172,37 @@ class SpackApplication(ApplicationBase):
                                 f'in environment {env_context}, but is required '
                                 f'to by the {mod_inst.name} modifier '
                                 'definition')
+
+            self.spack_runner.deactivate()
+
+        except ramble.spack_runner.RunnerError as e:
+            tty.die(e)
+
+    def _concretize_spack_env(self, workspace):
+        """Concretize the spack environment for this experiment
+
+        Perform spack's concretize step on the software environment generated
+        for  this experiment.
+        """
+
+        # See if we cached this already, and if so return
+        namespace = self.expander.env_namespace
+        if not namespace:
+            raise ApplicationError('Ramble env_namespace is set to None.')
+
+        cache_tupl = ('concretize-env', namespace)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already in cache.'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
+
+            self.spack_runner.activate()
+
+            env_concretized = self.spack_runner.concretized
 
             if not env_concretized:
                 self.spack_runner.concretize()
