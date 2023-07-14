@@ -58,11 +58,14 @@ class Openfoam(SpackApplication):
     workload_variable('timestep', default='500',
                       description='Timestep for simulation',
                       workload='motorbike')
+    workload_variable('write_interval', default='500',
+                      description='Interval to write output files',
+                      workload='motorbike')
     workload_variable('mesh_size', default='(20 8 8)',
-                      description='Timestep for simulation',
+                      description='Mesh size for simulation',
                       workload='motorbike')
     workload_variable('mesh_size', default='(50 20 20)',
-                      description='Timestep for simulation',
+                      description='Mesh size for simulation',
                       workload='hpc_motorbike')
     workload_variable('max_local_cells', default='100000',
                       description='Max local cells for simulation',
@@ -135,7 +138,7 @@ class Openfoam(SpackApplication):
                                       r'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
                                       'sed "s/(3 2 1)/{decomp}/" -i {decomposition_path}',
                                       r'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
-                                      r'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
+                                      r'sed "/^writeInterval/c\\writeInterval {write_interval};" -i {control_path}',
                                       'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
                                       'sed "s/maxLocalCells 100000/maxLocalCells {max_local_cells}/" -i {hex_mesh_path}',
                                       'sed "s/maxGlobalCells 2000000/maxGlobalCells {max_global_cells}/" -i {hex_mesh_path}',
