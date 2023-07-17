@@ -486,7 +486,7 @@ class Workspace(object):
 
         self.install_cache = ramble.util.install_cache.SetCache()
 
-        self.results = None
+        self.results = self.default_results()
 
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
 
@@ -1145,7 +1145,7 @@ class Workspace(object):
             results_written.append(out_file)
 
             with open(out_file, 'w+') as f:
-                f.write(f"From Workspace: {self.name} ({self.results['workspace_hash']})\n")
+                f.write(f"From Workspace: {self.name} (hash: {self.results['workspace_hash']})\n")
                 if 'experiments' in self.results:
                     for exp in self.results['experiments']:
                         f.write('Experiment %s figures of merit:\n' %
