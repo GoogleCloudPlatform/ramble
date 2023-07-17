@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mirrors &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ramble package" href="../ramble.html" />
+    <link rel="prev" title="General Usage" href="general_usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="general_usage.html">General Usage</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Mirrors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mirror-creation">Mirror creation:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mirror-use">Mirror use:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../application_dev_guide.html">Application Developers Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Mirrors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/mirrors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mirrors">
+<span id="mirrors-tutorial"></span><h1>Mirrors<a class="headerlink" href="#mirrors" title="Permalink to this heading"></a></h1>
+<p>This tutorial will provide a simple example demonstrating the creation
+and use of <a class="reference internal" href="../mirror-config.html#mirror-config"><span class="std std-ref">Ramble mirrors</span></a>.</p>
+<section id="mirror-creation">
+<h2>Mirror creation:<a class="headerlink" href="#mirror-creation" title="Permalink to this heading"></a></h2>
+<p>To start off with, let’s set up a workspace with a basic experiment in it.
+The experiment doesn’t have to be very sophisticated, but it does need to
+specify the application you want to mirror, and any application workloads
+(with sha256 sums) that you want to have mirrored.</p>
+<p>For the purpose of this demonstration, let’s assume that you’re using
+a named workspace, and the application you want to mirror is <code class="docutils literal notranslate"><span class="pre">wrfv4</span></code>.
+We will call the workspace <code class="docutils literal notranslate"><span class="pre">wrfv4_mirror_test</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>wrfv4_mirror_test
+
+<span class="go">==&gt; Created workspace in wrfv4_mirror_test</span>
+<span class="go">==&gt; You can activate this workspace with:</span>
+<span class="go">==&gt;   ramble workspace activate wrfv4_mirror_test</span>
+
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>wrfv4_mirror_test
+
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit<span class="w"> </span>-c
+</pre></div>
+</div>
+<p>(The workspace’s ramble.yaml file opens up in your favorite editor)</p>
+<p>Write the following configuration into the file, save, and exit:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">app_workloads</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">CONUS_2p5km</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">CONUS_12km</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;{app_workloads}&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">single_node_{workload_name}_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">                </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+</pre></div>
+</div>
+<p>Run <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">concretize</span></code> to fill in the spack section. The result
+will look something like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">app_workloads</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">CONUS_2p5km</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">CONUS_12km</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;{app_workloads}&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">single_node_{workload_name}_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">                </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>Edit the file again (using <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">edit</span> <span class="pre">-c</span></code>) if you need to
+change compiler or mpi versions. Since we will be using this workspace only
+for mirror creation, you don’t need to be particular about the compiler version,
+so use whatever compiler is already installed on your local system.</p>
+<p>Then run the command <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">mirror</span> <span class="pre">-d</span> <span class="pre">$HOME/wrfv4_mirror</span></code>. Warning,
+it may take a long time to run, due to the time required to download input and
+source files, which gives an example of why you would want to create
+this mirror in the first place.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>mirror<span class="w"> </span>-d<span class="w"> </span><span class="nv">$HOME</span>/wrfv4_mirror
+
+<span class="go">==&gt;     Executing phase mirror_inputs</span>
+<span class="go">==&gt;     Executing phase create_spack_env</span>
+<span class="go">==&gt; Concretized intel-mpi@2018.4.274%gcc@&lt;gcc-version&gt;</span>
+<span class="go"> -   &lt;hash&gt;   intel-mpi@2018.4.274%gcc@&lt;version&gt;_etc.</span>
+<span class="go"> -   &lt;etc&gt;        ^(short list of software prerequisistes for intel-mpi)</span>
+
+<span class="go">==&gt; Concretized wrf@4.2%gcc@&lt;version&gt; &lt;wrf options&gt;</span>
+<span class="go"> -   (long list of software prerequisites for wrf@4.2)</span>
+
+<span class="go">==&gt;     Executing phase mirror_software</span>
+<span class="go">==&gt;     Executing phase mirror_inputs</span>
+<span class="go">==&gt;     Executing phase create_spack_env</span>
+<span class="go">==&gt; Created environment in &lt;workspace_dirs path&gt;/wrfv4_mirror_test/software/wrfv4.CONUS_12km</span>
+<span class="go">==&gt; You can activate this environment with:</span>
+<span class="go">==&gt;   spack env activate &lt;workspace_dirs path&gt;/wrfv4_mirror_test/software/wrfv4.CONUS_12km</span>
+<span class="go">==&gt; Concretized wrf@4.2%gcc@&lt;version&gt; &lt;wrf options&gt;</span>
+<span class="go"> -   (long list of software prerequisites for wrf@4.2)</span>
+
+<span class="go">==&gt; Concretized intel-mpi@2018.4.274%gcc@&lt;gcc-version&gt;</span>
+<span class="go"> -   &lt;hash&gt;   intel-mpi@2018.4.274%gcc@&lt;version&gt;_etc.</span>
+<span class="go"> -   &lt;etc&gt;        ^(short list of software prerequisistes for intel-mpi)</span>
+
+<span class="go">==&gt;     Executing phase mirror_software</span>
+<span class="go">==&gt; Successfully updated spack software in $HOME/wrfv4_mirror</span>
+<span class="go">  Archive stats:</span>
+<span class="go">    44   already present</span>
+<span class="go">    44   added</span>
+<span class="go">    0    failed to fetch.</span>
+<span class="go">==&gt; Successfully updated inputs in $HOME/wrfv4_mirror</span>
+<span class="go">  Archive stats:</span>
+<span class="go">    1    already present</span>
+<span class="go">    1    added</span>
+<span class="go">    0    failed to fetch.</span>
+</pre></div>
+</div>
+<p>The resulting structure of <code class="docutils literal notranslate"><span class="pre">$HOME/wrfv4_mirror</span></code> looks like</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>tree<span class="w"> </span><span class="nv">$HOME</span>/wrfv4_mirror/
+
+<span class="go">/home/sternt/wrfv4_mirror/</span>
+<span class="go">├── inputs</span>
+<span class="go">│   ├── _input-cache</span>
+<span class="go">│   │   └── archive</span>
+<span class="go">│   │       ├── 6a</span>
+<span class="go">│   │       │   └── 6a0e87e3401efddc50539e71e5437fd7a5af9228b64cd4837e739737c3706fc3.tar.gz</span>
+<span class="go">│   │       └── dc</span>
+<span class="go">│   │           └── dcae9965d1873c1c1e34e21ad653179783302b9a13528ac10fab092b998578f6.tar.gz</span>
+<span class="go">│   └── wrfv4</span>
+<span class="go">│       ├── v42_bench_conus12km.tar.gz</span>
+<span class="go">│       └── v42_bench_conus2.5km.tar.gz</span>
+<span class="go">└── software</span>
+<span class="go">    ├── berkeley-db</span>
+<span class="go">    │   └── berkeley-db-18.1.40.tar.gz -&gt; ../_source-cache/archive/0c/0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8.tar.gz</span>
+<span class="go">    ├── bison</span>
+<span class="go">    │   └── bison-3.8.2.tar.gz -&gt; ../_source-cache/archive/06/06c9e13bdf7eb24d4ceb6b59205a4f67c2c7e7213119644430fe82fbd14a0abb.tar.gz</span>
+<span class="go">    ├── bzip2</span>
+<span class="go">    │   └── bzip2-1.0.8.tar.gz -&gt; ../_source-cache/archive/ab/ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269.tar.gz</span>
+<span class="go">    ├── ca-certificates-mozilla</span>
+<span class="go">    │   └── ca-certificates-mozilla-2023-05-30 -&gt; ../_source-cache/archive/5f/5fadcae90aa4ae041150f8e2d26c37d980522cdb49f923fc1e1b5eb8d74e71ad</span>
+<span class="go">    ├── c-blosc</span>
+<span class="go">    │   └── c-blosc-1.21.4.tar.gz -&gt; ../_source-cache/archive/e7/e72bd03827b8564bbb3dc3ea0d0e689b4863871ce3861d946f2efd7a186ecf3e.tar.gz</span>
+<span class="go">    ├── cmake</span>
+<span class="go">    │   └── cmake-3.26.3.tar.gz -&gt; ../_source-cache/archive/bb/bbd8d39217509d163cb544a40d6428ac666ddc83e22905d3e52c925781f0f659.tar.gz</span>
+<span class="go">    ├── cpio</span>
+<span class="go">    │   └── cpio-2.14.tar.gz -&gt; ../_source-cache/archive/14/145a340fd9d55f0b84779a44a12d5f79d77c99663967f8cfa168d7905ca52454.tar.gz</span>
+<span class="go">    ├── curl</span>
+<span class="go">    │   └── curl-8.1.2.tar.bz2 -&gt; ../_source-cache/archive/b5/b54974d32fd610acace92e3df1f643144015ac65847f0a041fdc17db6f43f243.tar.bz2</span>
+<span class="go">    ├── diffutils</span>
+<span class="go">    │   └── diffutils-3.9.tar.xz -&gt; ../_source-cache/archive/d8/d80d3be90a201868de83d78dad3413ad88160cc53bcc36eb9eaf7c20dbf023f1.tar.xz</span>
+<span class="go">    ├── findutils</span>
+<span class="go">    │   └── findutils-4.9.0.tar.xz -&gt; ../_source-cache/archive/a2/a2bfb8c09d436770edc59f50fa483e785b161a3b7b9d547573cb08065fd462fe.tar.xz</span>
+<span class="go">    ├── gdbm</span>
+<span class="go">    │   └── gdbm-1.23.tar.gz -&gt; ../_source-cache/archive/74/74b1081d21fff13ae4bd7c16e5d6e504a4c26f7cde1dca0d963a484174bbcacd.tar.gz</span>
+<span class="go">    ├── gettext</span>
+<span class="go">    │   └── gettext-0.21.1.tar.xz -&gt; ../_source-cache/archive/50/50dbc8f39797950aa2c98e939947c527e5ac9ebd2c1b99dd7b06ba33a6767ae6.tar.xz</span>
+<span class="go">    ├── gmake</span>
+<span class="go">    │   ├── gmake-4.4.1.tar.gz -&gt; ../_source-cache/archive/dd/dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3.tar.gz</span>
+<span class="go">    │   ├── make-4.2.1-glob-fix-2.patch-fe5b60d -&gt; ../_source-cache/archive/fe/fe5b60d091c33f169740df8cb718bf4259f84528b42435194ffe0dd5b79cd125</span>
+<span class="go">    │   └── make-4.2.1-glob-fix-3.patch-ca60bd9 -&gt; ../_source-cache/archive/ca/ca60bd9c1a1b35bc0dc58b6a4a19d5c2651f7a94a4b22b2c5ea001a1ca7a8a7f</span>
+<span class="go">    ├── hdf5</span>
+<span class="go">    │   ├── gcc-8.patch-57cee5f -&gt; ../_source-cache/archive/57/57cee5ff1992b4098eda079815c36fc2da9b10e00a9056df054f2384c4fc7523</span>
+<span class="go">    │   └── hdf5-1.14.1-2.tar.gz -&gt; ../_source-cache/archive/cb/cbe93f275d5231df28ced9549253793e40cd2b555e3d288df09d7b89a9967b07.tar.gz</span>
+<span class="go">    ├── intel-mpi</span>
+<span class="go">    │   └── intel-mpi-2018.4.274.tgz -&gt; ../_source-cache/archive/a1/a1114b3eb4149c2f108964b83cad02150d619e50032059d119ac4ffc9d5dd8e0.tgz</span>
+<span class="go">    ├── jasper</span>
+<span class="go">    │   └── jasper-3.0.3.tar.gz -&gt; ../_source-cache/archive/1b/1b324f7746681f6d24d06fcf163cf3b8ae7ac320adc776c3d611b2b62c31b65f.tar.gz</span>
+<span class="go">    ├── krb5</span>
+<span class="go">    │   └── krb5-1.20.1.tar.gz -&gt; ../_source-cache/archive/70/704aed49b19eb5a7178b34b2873620ec299db08752d6a8574f95d41879ab8851.tar.gz</span>
+<span class="go">    ├── libaec</span>
+<span class="go">    │   └── libaec-1.0.6.tar.gz -&gt; ../_source-cache/archive/ab/abab8c237d85c982bb4d6bde9b03c1f3d611dcacbd58bca55afac2496d61d4be.tar.gz</span>
+<span class="go">    ├── libiconv</span>
+<span class="go">    │   └── libiconv-1.17.tar.gz -&gt; ../_source-cache/archive/8f/8f74213b56238c85a50a5329f77e06198771e70dd9a739779f4c02f65d971313.tar.gz</span>
+<span class="go">    ├── libjpeg-turbo</span>
+<span class="go">    │   └── libjpeg-turbo-2.1.5.tar.gz -&gt; ../_source-cache/archive/25/254f3642b04e309fee775123133c6464181addc150499561020312ec61c1bf7c.tar.gz</span>
+<span class="go">    ├── libpng</span>
+<span class="go">    │   └── libpng-1.6.39.tar.xz -&gt; ../_source-cache/archive/1f/1f4696ce70b4ee5f85f1e1623dc1229b210029fa4b7aee573df3e2ba7b036937.tar.xz</span>
+<span class="go">    ├── libsigsegv</span>
+<span class="go">    │   └── libsigsegv-2.14.tar.gz -&gt; ../_source-cache/archive/cd/cdac3941803364cf81a908499beb79c200ead60b6b5b40cad124fd1e06caa295.tar.gz</span>
+<span class="go">    ├── libtirpc</span>
+<span class="go">    │   └── libtirpc-1.2.6.tar.bz2 -&gt; ../_source-cache/archive/42/4278e9a5181d5af9cd7885322fdecebc444f9a3da87c526e7d47f7a12a37d1cc.tar.bz2</span>
+<span class="go">    ├── libtool</span>
+<span class="go">    │   └── libtool-2.4.7.tar.gz -&gt; ../_source-cache/archive/04/04e96c2404ea70c590c546eba4202a4e12722c640016c12b9b2f1ce3d481e9a8.tar.gz</span>
+<span class="go">    ├── libxml2</span>
+<span class="go">    │   ├── c9925454fd384a17c8c03d358c6778a552e9287b.patch-3e06d42 -&gt; ../_source-cache/archive/3e/3e06d42596b105839648070a5921157fe284b932289ffdbfa304ddc3457e5637</span>
+<span class="go">    │   ├── libxml2-2.10.3.tar.xz -&gt; ../_source-cache/archive/5d/5d2cc3d78bec3dbe212a9d7fa629ada25a7da928af432c93060ff5c17ee28a9c.tar.xz</span>
+<span class="go">    │   └── xmlts-2.10.3.tar.gz -&gt; ../_source-cache/archive/96/96151685cec997e1f9f3387e3626d61e6284d4d6e66e0e440c209286c03e9cc7.tar.gz</span>
+<span class="go">    ├── lz4</span>
+<span class="go">    │   └── lz4-1.9.4.tar.gz -&gt; ../_source-cache/archive/0b/0b0e3aa07c8c063ddf40b082bdf7e37a1562bda40a0ff5272957f3e987e0e54b.tar.gz</span>
+<span class="go">    ├── m4</span>
+<span class="go">    │   ├── m4-1.4.18-glibc-change-work-around.patch-fc9b616 -&gt; ../_source-cache/archive/fc/fc9b61654a3ba1a8d6cd78ce087e7c96366c290bc8d2c299f09828d793b853c8</span>
+<span class="go">    │   └── m4-1.4.19.tar.gz -&gt; ../_source-cache/archive/3b/3be4a26d825ffdfda52a56fc43246456989a3630093cced3fbddf4771ee58a70.tar.gz</span>
+<span class="go">    ├── nasm</span>
+<span class="go">    │   ├── 0001-Remove-invalid-pure_func-qualifiers.patch-ac9f315 -&gt; ../_source-cache/archive/ac/ac9f315d204afa6b99ceefa1fe46d4eed2b8a23c7315d32d33c0f378d930e950</span>
+<span class="go">    │   └── nasm-2.15.05.tar.gz -&gt; ../_source-cache/archive/91/9182a118244b058651c576baa9d0366ee05983c4d4ae1d9ddd3236a9f2304997.tar.gz</span>
+<span class="go">    ├── ncurses</span>
+<span class="go">    │   └── ncurses-6.4.tar.gz -&gt; ../_source-cache/archive/69/6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159.tar.gz</span>
+<span class="go">    ├── netcdf-c</span>
+<span class="go">    │   ├── 00a722b253bae186bba403d0f92ff1eba719591f.patch?full_index=1-25b83de -&gt; ../_source-cache/archive/25/25b83de1e081f020efa9e21c94c595220849f78c125ad43d8015631d453dfcb9</span>
+<span class="go">    │   ├── 1505.patch?full_index=1-495b3e5 -&gt; ../_source-cache/archive/49/495b3e5beb7f074625bcec2ca76aebd339e42719e9c5ccbedbdcc4ffb81a7450</span>
+<span class="go">    │   ├── 1508.patch?full_index=1-19e7f31 -&gt; ../_source-cache/archive/19/19e7f31b96536928621b1c29bb6d1a57bcb7aa672cea8719acf9ac934cdd2a3e</span>
+<span class="go">    │   ├── 386e2695286702156eba27ab7c68816efb192230.patch?full_index=1-cb928a9 -&gt; ../_source-cache/archive/cb/cb928a91f87c1615a0788f95b95d7a2e3df91dc16822f8b8a34a85d4e926c0de</span>
+<span class="go">    │   ├── a7ea050ebb3c412a99cc352859d5176a9b5ef986.patch?full_index=1-38d34de -&gt; ../_source-cache/archive/38/38d34de38bad99737d3308867071196f20a3fb39b936de7bfcfbc85eb0c7ef54</span>
+<span class="go">    │   ├── cfe6231aa6b018062b443cbe2fd9073f15283344.patch?full_index=1-4e10547 -&gt; ../_source-cache/archive/4e/4e105472de95a1bb5d8b0b910d6935ce9152777d4fe18b678b58347fa0122abc</span>
+<span class="go">    │   ├── f8904d5a1d89420dde0f9d2c0e051ba08d08e086.patch?full_index=1-0161eb8 -&gt; ../_source-cache/archive/01/0161eb870fdfaf61be9d70132c9447a537320342366362e76b8460c823bf95ca</span>
+<span class="go">    │   └── netcdf-c-4.9.2.tar.gz -&gt; ../_source-cache/archive/bc/bc104d101278c68b303359b3dc4192f81592ae8640f1aee486921138f7f88cb7.tar.gz</span>
+<span class="go">    ├── netcdf-fortran</span>
+<span class="go">    │   └── netcdf-fortran-4.6.0.tar.gz -&gt; ../_source-cache/archive/19/198bff6534cc85a121adc9e12f1c4bc53406c403bda331775a1291509e7b2f23.tar.gz</span>
+<span class="go">    ├── openssl</span>
+<span class="go">    │   ├── f9e578e720bb35228948564192adbe3bc503d5fb.patch?full_index=1-3fdcf2d -&gt; ../_source-cache/archive/3f/3fdcf2d1e47c34f3a012f23306322c5a35cad55b180c9b6fb34537b55884645c</span>
+<span class="go">    │   └── openssl-3.1.1.tar.gz -&gt; ../_source-cache/archive/b3/b3aa61334233b852b63ddb048df181177c2c659eb9d4376008118f9c08d07674.tar.gz</span>
+<span class="go">    ├── perl</span>
+<span class="go">    │   ├── 0001-Fix-Time-Local-tests.patch-8cf4302 -&gt; ../_source-cache/archive/8c/8cf4302ca8b480c60ccdcaa29ec53d9d50a71d4baf469ac8c6fca00ca31e58a2</span>
+<span class="go">    │   ├── cpanm-5.38.0.tar.gz -&gt; ../_source-cache/archive/9d/9da50e155df72bce55cb69f51f1dbb4b62d23740fb99f6178bb27f22ebdf8a46.tar.gz</span>
+<span class="go">    │   ├── perl5162-timelocal-y2020.patch-3bbd7d6 -&gt; ../_source-cache/archive/3b/3bbd7d6f9933d80b9571533867b444c6f8f5a1ba0575bfba1fba4db9d885a71a</span>
+<span class="go">    │   ├── perl-5.26.1-guard_old_libcrypt_fix.patch-0eac10e -&gt; ../_source-cache/archive/0e/0eac10ed90aeb0459ad8851f88081d439a4e41978e586ec743069e8b059370ac</span>
+<span class="go">    │   └── perl-5.38.0.tar.gz -&gt; ../_source-cache/archive/21/213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517.tar.gz</span>
+<span class="go">    ├── pigz</span>
+<span class="go">    │   └── pigz-2.7.tar.gz -&gt; ../_source-cache/archive/d2/d2045087dae5e9482158f1f1c0f21c7d3de6f7cdc7cc5848bdabda544e69aa58.tar.gz</span>
+<span class="go">    ├── pkgconf</span>
+<span class="go">    │   └── pkgconf-1.9.5.tar.xz -&gt; ../_source-cache/archive/1a/1ac1656debb27497563036f7bffc281490f83f9b8457c0d60bcfb638fb6b6171.tar.xz</span>
+<span class="go">    ├── readline</span>
+<span class="go">    │   ├── readline63-001-1a79bbb -&gt; ../_source-cache/archive/1a/1a79bbb6eaee750e0d6f7f3d059b30a45fc54e8e388a8e05e9c3ae598590146f</span>
+<span class="go">    │   ├── readline63-002-39e304c -&gt; ../_source-cache/archive/39/39e304c7a526888f9e112e733848215736fb7b9d540729b9e31f3347b7a1e0a5</span>
+<span class="go">    │   ├── readline63-003-ec41bdd -&gt; ../_source-cache/archive/ec/ec41bdd8b00fd884e847708513df41d51b1243cecb680189e31b7173d01ca52f</span>
+<span class="go">    │   ├── readline63-004-4547b90 -&gt; ../_source-cache/archive/45/4547b906fb2570866c21887807de5dee19838a60a1afb66385b272155e4355cc</span>
+<span class="go">    │   ├── readline63-005-877788f -&gt; ../_source-cache/archive/87/877788f9228d1a9907a4bcfe3d6dd0439c08d728949458b41208d9bf9060274b</span>
+<span class="go">    │   ├── readline63-006-5c237ab -&gt; ../_source-cache/archive/5c/5c237ab3c6c97c23cf52b2a118adc265b7fb411b57c93a5f7c221d50fafbe556</span>
+<span class="go">    │   ├── readline63-007-4d79b5a -&gt; ../_source-cache/archive/4d/4d79b5a2adec3c2e8114cbd3d63c1771f7c6cf64035368624903d257014f5bea</span>
+<span class="go">    │   ├── readline63-008-3bc093c -&gt; ../_source-cache/archive/3b/3bc093cf526ceac23eb80256b0ec87fa1735540d659742107b6284d635c43787</span>
+<span class="go">    │   ├── readline70-001-9ac1b3a -&gt; ../_source-cache/archive/9a/9ac1b3ac2ec7b1bf0709af047f2d7d2a34ccde353684e57c6b47ebca77d7a376</span>
+<span class="go">    │   ├── readline70-002-8747c92 -&gt; ../_source-cache/archive/87/8747c92c35d5db32eae99af66f17b384abaca961653e185677f9c9a571ed2d58</span>
+<span class="go">    │   ├── readline70-003-9e43aa9 -&gt; ../_source-cache/archive/9e/9e43aa93378c7e9f7001d8174b1beb948deefa6799b6f581673f465b7d9d4780</span>
+<span class="go">    │   ├── readline70-004-f925683 -&gt; ../_source-cache/archive/f9/f925683429f20973c552bff6702c74c58c2a38ff6e5cf305a8e847119c5a6b64</span>
+<span class="go">    │   ├── readline70-005-ca159c8 -&gt; ../_source-cache/archive/ca/ca159c83706541c6bbe39129a33d63bbd76ac594303f67e4d35678711c51b753</span>
+<span class="go">    │   ├── readline80-001-d8e5e98 -&gt; ../_source-cache/archive/d8/d8e5e98933cf5756f862243c0601cb69d3667bb33f2c7b751fe4e40b2c3fd069</span>
+<span class="go">    │   ├── readline80-002-36b0feb -&gt; ../_source-cache/archive/36/36b0febff1e560091ae7476026921f31b6d1dd4c918dcb7b741aa2dad1aec8f7</span>
+<span class="go">    │   ├── readline80-003-94ddb22 -&gt; ../_source-cache/archive/94/94ddb2210b71eb5389c7756865d60e343666dfb722c85892f8226b26bb3eeaef</span>
+<span class="go">    │   ├── readline80-004-b1aa3d2 -&gt; ../_source-cache/archive/b1/b1aa3d2a40eee2dea9708229740742e649c32bb8db13535ea78f8ac15377394c</span>
+<span class="go">    │   ├── readline81-001-682a465 -&gt; ../_source-cache/archive/68/682a465a68633650565c43d59f0b8cdf149c13a874682d3c20cb4af6709b9144</span>
+<span class="go">    │   ├── readline81-002-e55be05 -&gt; ../_source-cache/archive/e5/e55be055a68cb0719b0ccb5edc9a74edcc1d1f689e8a501525b3bc5ebad325dc</span>
+<span class="go">    │   ├── readline82-001-bbf97f1 -&gt; ../_source-cache/archive/bb/bbf97f1ec40a929edab5aa81998c1e2ef435436c597754916e6a5868f273aff7</span>
+<span class="go">    │   └── readline-8.2.tar.gz -&gt; ../_source-cache/archive/3f/3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35.tar.gz</span>
+<span class="go">    ├── snappy</span>
+<span class="go">    │   └── snappy-1.1.10.tar.gz -&gt; ../_source-cache/archive/49/49d831bffcc5f3d01482340fe5af59852ca2fe76c3e05df0e67203ebbe0f1d90.tar.gz</span>
+<span class="go">    ├── _source-cache</span>
+<span class="go">    │   └── archive</span>
+<span class="go">    │       ├── 01</span>
+<span class="go">    │       │   └── 0161eb870fdfaf61be9d70132c9447a537320342366362e76b8460c823bf95ca</span>
+<span class="go">    │       ├── 03</span>
+<span class="go">    │       │   └── 03d908cf5768cfe6b7ad588c921c6ed21acabfb2b79b788d1330453507647aed.tar.gz</span>
+<span class="go">    │       ├── 04</span>
+<span class="go">    │       │   └── 04e96c2404ea70c590c546eba4202a4e12722c640016c12b9b2f1ce3d481e9a8.tar.gz</span>
+<span class="go">    │       ├── 06</span>
+<span class="go">    │       │   └── 06c9e13bdf7eb24d4ceb6b59205a4f67c2c7e7213119644430fe82fbd14a0abb.tar.gz</span>
+<span class="go">    │       ├── 0b</span>
+<span class="go">    │       │   └── 0b0e3aa07c8c063ddf40b082bdf7e37a1562bda40a0ff5272957f3e987e0e54b.tar.gz</span>
+<span class="go">    │       ├── 0c</span>
+<span class="go">    │       │   └── 0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8.tar.gz</span>
+<span class="go">    │       ├── 0e</span>
+<span class="go">    │       │   └── 0eac10ed90aeb0459ad8851f88081d439a4e41978e586ec743069e8b059370ac</span>
+<span class="go">    │       ├── 14</span>
+<span class="go">    │       │   └── 145a340fd9d55f0b84779a44a12d5f79d77c99663967f8cfa168d7905ca52454.tar.gz</span>
+<span class="go">    │       ├── 19</span>
+<span class="go">    │       │   ├── 198bff6534cc85a121adc9e12f1c4bc53406c403bda331775a1291509e7b2f23.tar.gz</span>
+<span class="go">    │       │   └── 19e7f31b96536928621b1c29bb6d1a57bcb7aa672cea8719acf9ac934cdd2a3e</span>
+<span class="go">    │       ├── 1a</span>
+<span class="go">    │       │   ├── 1a79bbb6eaee750e0d6f7f3d059b30a45fc54e8e388a8e05e9c3ae598590146f</span>
+<span class="go">    │       │   └── 1ac1656debb27497563036f7bffc281490f83f9b8457c0d60bcfb638fb6b6171.tar.xz</span>
+<span class="go">    │       ├── 1b</span>
+<span class="go">    │       │   └── 1b324f7746681f6d24d06fcf163cf3b8ae7ac320adc776c3d611b2b62c31b65f.tar.gz</span>
+<span class="go">    │       ├── 1c</span>
+<span class="go">    │       │   └── 1ce97f4fd09e440bdf00f67711b1c50439ac27595ea6796efbfb32e0b9a1f3e4</span>
+<span class="go">    │       ├── 1f</span>
+<span class="go">    │       │   └── 1f4696ce70b4ee5f85f1e1623dc1229b210029fa4b7aee573df3e2ba7b036937.tar.xz</span>
+<span class="go">    │       ├── 21</span>
+<span class="go">    │       │   └── 213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517.tar.gz</span>
+<span class="go">    │       ├── 25</span>
+<span class="go">    │       │   ├── 254f3642b04e309fee775123133c6464181addc150499561020312ec61c1bf7c.tar.gz</span>
+<span class="go">    │       │   └── 25b83de1e081f020efa9e21c94c595220849f78c125ad43d8015631d453dfcb9</span>
+<span class="go">    │       ├── 27</span>
+<span class="go">    │       │   └── 27c7268f6c84b884d21e4afad0bab8554b06961cf4d6bfd7d0f5a457dcfdffb1</span>
+<span class="go">    │       ├── 33</span>
+<span class="go">    │       │   └── 333e111ed39f7452f904590b47b996812590b8818f1c51ad68407dc05a1b18b0</span>
+<span class="go">    │       ├── 36</span>
+<span class="go">    │       │   └── 36b0febff1e560091ae7476026921f31b6d1dd4c918dcb7b741aa2dad1aec8f7</span>
+<span class="go">    │       ├── 38</span>
+<span class="go">    │       │   └── 38d34de38bad99737d3308867071196f20a3fb39b936de7bfcfbc85eb0c7ef54</span>
+<span class="go">    │       ├── 39</span>
+<span class="go">    │       │   ├── 392615011adb7afeb0010152409a37b150f03dbde5b534503e9cd7363b742a19</span>
+<span class="go">    │       │   └── 39e304c7a526888f9e112e733848215736fb7b9d540729b9e31f3347b7a1e0a5</span>
+<span class="go">    │       ├── 3a</span>
+<span class="go">    │       │   └── 3a4e60fe56a450632140c48acbf14d22850c1d72835bf441e3f8514d6c617a9f</span>
+<span class="go">    │       ├── 3b</span>
+<span class="go">    │       │   ├── 3bbd7d6f9933d80b9571533867b444c6f8f5a1ba0575bfba1fba4db9d885a71a</span>
+<span class="go">    │       │   ├── 3bc093cf526ceac23eb80256b0ec87fa1735540d659742107b6284d635c43787</span>
+<span class="go">    │       │   └── 3be4a26d825ffdfda52a56fc43246456989a3630093cced3fbddf4771ee58a70.tar.gz</span>
+<span class="go">    │       ├── 3e</span>
+<span class="go">    │       │   └── 3e06d42596b105839648070a5921157fe284b932289ffdbfa304ddc3457e5637</span>
+<span class="go">    │       ├── 3f</span>
+<span class="go">    │       │   ├── 3fdcf2d1e47c34f3a012f23306322c5a35cad55b180c9b6fb34537b55884645c</span>
+<span class="go">    │       │   └── 3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35.tar.gz</span>
+<span class="go">    │       ├── 42</span>
+<span class="go">    │       │   └── 4278e9a5181d5af9cd7885322fdecebc444f9a3da87c526e7d47f7a12a37d1cc.tar.bz2</span>
+<span class="go">    │       ├── 45</span>
+<span class="go">    │       │   └── 4547b906fb2570866c21887807de5dee19838a60a1afb66385b272155e4355cc</span>
+<span class="go">    │       ├── 49</span>
+<span class="go">    │       │   ├── 495b3e5beb7f074625bcec2ca76aebd339e42719e9c5ccbedbdcc4ffb81a7450</span>
+<span class="go">    │       │   └── 49d831bffcc5f3d01482340fe5af59852ca2fe76c3e05df0e67203ebbe0f1d90.tar.gz</span>
+<span class="go">    │       ├── 4d</span>
+<span class="go">    │       │   └── 4d79b5a2adec3c2e8114cbd3d63c1771f7c6cf64035368624903d257014f5bea</span>
+<span class="go">    │       ├── 4e</span>
+<span class="go">    │       │   └── 4e105472de95a1bb5d8b0b910d6935ce9152777d4fe18b678b58347fa0122abc</span>
+<span class="go">    │       ├── 50</span>
+<span class="go">    │       │   └── 50dbc8f39797950aa2c98e939947c527e5ac9ebd2c1b99dd7b06ba33a6767ae6.tar.xz</span>
+<span class="go">    │       ├── 57</span>
+<span class="go">    │       │   ├── 57c7a9b0d94dd41e4276b57b0a4a89d91303d36180c1068b9e3ab8f6149b18dd</span>
+<span class="go">    │       │   └── 57cee5ff1992b4098eda079815c36fc2da9b10e00a9056df054f2384c4fc7523</span>
+<span class="go">    │       ├── 5c</span>
+<span class="go">    │       │   └── 5c237ab3c6c97c23cf52b2a118adc265b7fb411b57c93a5f7c221d50fafbe556</span>
+<span class="go">    │       ├── 5d</span>
+<span class="go">    │       │   └── 5d2cc3d78bec3dbe212a9d7fa629ada25a7da928af432c93060ff5c17ee28a9c.tar.xz</span>
+<span class="go">    │       ├── 5f</span>
+<span class="go">    │       │   └── 5fadcae90aa4ae041150f8e2d26c37d980522cdb49f923fc1e1b5eb8d74e71ad</span>
+<span class="go">    │       ├── 60</span>
+<span class="go">    │       │   └── 60be2c504bd8f1fa6e424b1956495d7e7ced52a2ac94db5fd27f4b6bfc8f74f0.tar.gz</span>
+<span class="go">    │       ├── 68</span>
+<span class="go">    │       │   └── 682a465a68633650565c43d59f0b8cdf149c13a874682d3c20cb4af6709b9144</span>
+<span class="go">    │       ├── 69</span>
+<span class="go">    │       │   └── 6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159.tar.gz</span>
+<span class="go">    │       ├── 70</span>
+<span class="go">    │       │   └── 704aed49b19eb5a7178b34b2873620ec299db08752d6a8574f95d41879ab8851.tar.gz</span>
+<span class="go">    │       ├── 74</span>
+<span class="go">    │       │   └── 74b1081d21fff13ae4bd7c16e5d6e504a4c26f7cde1dca0d963a484174bbcacd.tar.gz</span>
+<span class="go">    │       ├── 7b</span>
+<span class="go">    │       │   └── 7be2968c67c2175cd40b57118d9732eda5fdb0828edaa25baf57cc289da1a9b8.tar.gz</span>
+<span class="go">    │       ├── 7e</span>
+<span class="go">    │       │   └── 7ee195e4ce4c9eac81920843b4d4d27254bec7b43e0b744f457858a9f156e621</span>
+<span class="go">    │       ├── 83</span>
+<span class="go">    │       │   └── 837a6a82f815c0905cf7ea4c4ef0112f36396fc8b2138028204000178a1befa5</span>
+<span class="go">    │       ├── 87</span>
+<span class="go">    │       │   ├── 8747c92c35d5db32eae99af66f17b384abaca961653e185677f9c9a571ed2d58</span>
+<span class="go">    │       │   └── 877788f9228d1a9907a4bcfe3d6dd0439c08d728949458b41208d9bf9060274b</span>
+<span class="go">    │       ├── 8c</span>
+<span class="go">    │       │   └── 8cf4302ca8b480c60ccdcaa29ec53d9d50a71d4baf469ac8c6fca00ca31e58a2</span>
+<span class="go">    │       ├── 8f</span>
+<span class="go">    │       │   └── 8f74213b56238c85a50a5329f77e06198771e70dd9a739779f4c02f65d971313.tar.gz</span>
+<span class="go">    │       ├── 91</span>
+<span class="go">    │       │   └── 9182a118244b058651c576baa9d0366ee05983c4d4ae1d9ddd3236a9f2304997.tar.gz</span>
+<span class="go">    │       ├── 94</span>
+<span class="go">    │       │   └── 94ddb2210b71eb5389c7756865d60e343666dfb722c85892f8226b26bb3eeaef</span>
+<span class="go">    │       ├── 96</span>
+<span class="go">    │       │   └── 96151685cec997e1f9f3387e3626d61e6284d4d6e66e0e440c209286c03e9cc7.tar.gz</span>
+<span class="go">    │       ├── 98</span>
+<span class="go">    │       │   └── 98e9c3d949d1b924e28e01eccb7deed865eefebf25c2f21c702e5cd5b63b85e1.tar.gz</span>
+<span class="go">    │       ├── 9a</span>
+<span class="go">    │       │   └── 9ac1b3ac2ec7b1bf0709af047f2d7d2a34ccde353684e57c6b47ebca77d7a376</span>
+<span class="go">    │       ├── 9d</span>
+<span class="go">    │       │   └── 9da50e155df72bce55cb69f51f1dbb4b62d23740fb99f6178bb27f22ebdf8a46.tar.gz</span>
+<span class="go">    │       ├── 9e</span>
+<span class="go">    │       │   └── 9e43aa93378c7e9f7001d8174b1beb948deefa6799b6f581673f465b7d9d4780</span>
+<span class="go">    │       ├── a1</span>
+<span class="go">    │       │   └── a1114b3eb4149c2f108964b83cad02150d619e50032059d119ac4ffc9d5dd8e0.tgz</span>
+<span class="go">    │       ├── a2</span>
+<span class="go">    │       │   └── a2bfb8c09d436770edc59f50fa483e785b161a3b7b9d547573cb08065fd462fe.tar.xz</span>
+<span class="go">    │       ├── ab</span>
+<span class="go">    │       │   ├── ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269.tar.gz</span>
+<span class="go">    │       │   └── abab8c237d85c982bb4d6bde9b03c1f3d611dcacbd58bca55afac2496d61d4be.tar.gz</span>
+<span class="go">    │       ├── ac</span>
+<span class="go">    │       │   └── ac9f315d204afa6b99ceefa1fe46d4eed2b8a23c7315d32d33c0f378d930e950</span>
+<span class="go">    │       ├── b1</span>
+<span class="go">    │       │   └── b1aa3d2a40eee2dea9708229740742e649c32bb8db13535ea78f8ac15377394c</span>
+<span class="go">    │       ├── b3</span>
+<span class="go">    │       │   ├── b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30.tar.gz</span>
+<span class="go">    │       │   └── b3aa61334233b852b63ddb048df181177c2c659eb9d4376008118f9c08d07674.tar.gz</span>
+<span class="go">    │       ├── b4</span>
+<span class="go">    │       │   └── b4e7428ac6c2918beacc1b73f33e784ac520ef981d87e98285610b1bfa299d7b</span>
+<span class="go">    │       ├── b5</span>
+<span class="go">    │       │   └── b54974d32fd610acace92e3df1f643144015ac65847f0a041fdc17db6f43f243.tar.bz2</span>
+<span class="go">    │       ├── bb</span>
+<span class="go">    │       │   ├── bbd8d39217509d163cb544a40d6428ac666ddc83e22905d3e52c925781f0f659.tar.gz</span>
+<span class="go">    │       │   └── bbf97f1ec40a929edab5aa81998c1e2ef435436c597754916e6a5868f273aff7</span>
+<span class="go">    │       ├── bc</span>
+<span class="go">    │       │   └── bc104d101278c68b303359b3dc4192f81592ae8640f1aee486921138f7f88cb7.tar.gz</span>
+<span class="go">    │       ├── c5</span>
+<span class="go">    │       │   ├── c5162c23a132b377132924f8f1545313861c6cee5a627e9ebbdcf7b7b9d5726f</span>
+<span class="go">    │       │   └── c522c4733720df9a18237c06d8ab6199fa9674d78375b644aec7017cb38af9c5</span>
+<span class="go">    │       ├── ca</span>
+<span class="go">    │       │   ├── ca159c83706541c6bbe39129a33d63bbd76ac594303f67e4d35678711c51b753</span>
+<span class="go">    │       │   └── ca60bd9c1a1b35bc0dc58b6a4a19d5c2651f7a94a4b22b2c5ea001a1ca7a8a7f</span>
+<span class="go">    │       ├── cb</span>
+<span class="go">    │       │   ├── cb928a91f87c1615a0788f95b95d7a2e3df91dc16822f8b8a34a85d4e926c0de</span>
+<span class="go">    │       │   └── cbe93f275d5231df28ced9549253793e40cd2b555e3d288df09d7b89a9967b07.tar.gz</span>
+<span class="go">    │       ├── cd</span>
+<span class="go">    │       │   └── cdac3941803364cf81a908499beb79c200ead60b6b5b40cad124fd1e06caa295.tar.gz</span>
+<span class="go">    │       ├── d1</span>
+<span class="go">    │       │   └── d1b54b5c5432faed9791ffde813560e226896a68fc5933d066172bcf3b2eb8bd</span>
+<span class="go">    │       ├── d2</span>
+<span class="go">    │       │   ├── d2045087dae5e9482158f1f1c0f21c7d3de6f7cdc7cc5848bdabda544e69aa58.tar.gz</span>
+<span class="go">    │       │   └── d2358c930d5ab89e5965204dded499591b42a22d0a865e2149b8c0f1446fac34</span>
+<span class="go">    │       ├── d8</span>
+<span class="go">    │       │   ├── d80d3be90a201868de83d78dad3413ad88160cc53bcc36eb9eaf7c20dbf023f1.tar.xz</span>
+<span class="go">    │       │   └── d8e5e98933cf5756f862243c0601cb69d3667bb33f2c7b751fe4e40b2c3fd069</span>
+<span class="go">    │       ├── dd</span>
+<span class="go">    │       │   ├── dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3.tar.gz</span>
+<span class="go">    │       │   └── dd172acb53867a68012f94c17389401b2f274a1aa5ae8f84cbfb8b7e383ea8d3.tar.bz2</span>
+<span class="go">    │       ├── e5</span>
+<span class="go">    │       │   └── e55be055a68cb0719b0ccb5edc9a74edcc1d1f689e8a501525b3bc5ebad325dc</span>
+<span class="go">    │       ├── e6</span>
+<span class="go">    │       │   └── e6c88ffc291c9d4bda4d6bedf3c9be89cb96ce7dc245163e251345221fa77216</span>
+<span class="go">    │       ├── e7</span>
+<span class="go">    │       │   └── e72bd03827b8564bbb3dc3ea0d0e689b4863871ce3861d946f2efd7a186ecf3e.tar.gz</span>
+<span class="go">    │       ├── ec</span>
+<span class="go">    │       │   └── ec41bdd8b00fd884e847708513df41d51b1243cecb680189e31b7173d01ca52f</span>
+<span class="go">    │       ├── f8</span>
+<span class="go">    │       │   ├── f8266916189ebbdfbad5c2c28ac00ed25f07be70f054d9830eb84ba84b3d03ef</span>
+<span class="go">    │       │   └── f82a18cf7334e0cbbfdf4ef3aa91ca26d4a372709f114ce0116b3fbb136ffac6</span>
+<span class="go">    │       ├── f9</span>
+<span class="go">    │       │   ├── f925683429f20973c552bff6702c74c58c2a38ff6e5cf305a8e847119c5a6b64</span>
+<span class="go">    │       │   └── f973bd33a7fd8af0002a9b8992216ffc04fdf2927917113e42e58f28b702dc14</span>
+<span class="go">    │       ├── fb</span>
+<span class="go">    │       │   └── fbacf0c81e62429df3e33bda4cee38756604f18e01d977338e23306a3e3b521e.tar.gz</span>
+<span class="go">    │       ├── fc</span>
+<span class="go">    │       │   └── fc9b61654a3ba1a8d6cd78ce087e7c96366c290bc8d2c299f09828d793b853c8</span>
+<span class="go">    │       └── fe</span>
+<span class="go">    │           └── fe5b60d091c33f169740df8cb718bf4259f84528b42435194ffe0dd5b79cd125</span>
+<span class="go">    ├── tar</span>
+<span class="go">    │   └── tar-1.34.tar.gz -&gt; ../_source-cache/archive/03/03d908cf5768cfe6b7ad588c921c6ed21acabfb2b79b788d1330453507647aed.tar.gz</span>
+<span class="go">    ├── tcsh</span>
+<span class="go">    │   ├── tcsh-6.20.00-000-add-all-flags-for-gethost-build.patch-f826691 -&gt; ../_source-cache/archive/f8/f8266916189ebbdfbad5c2c28ac00ed25f07be70f054d9830eb84ba84b3d03ef</span>
+<span class="go">    │   ├── tcsh-6.20.00-001-delay-arginp-interpreting.patch-57c7a9b -&gt; ../_source-cache/archive/57/57c7a9b0d94dd41e4276b57b0a4a89d91303d36180c1068b9e3ab8f6149b18dd</span>
+<span class="go">    │   ├── tcsh-6.20.00-002-type-of-read-in-prompt-confirm.patch-837a6a8 -&gt; ../_source-cache/archive/83/837a6a82f815c0905cf7ea4c4ef0112f36396fc8b2138028204000178a1befa5</span>
+<span class="go">    │   ├── tcsh-6.20.00-003-fix-out-of-bounds-read.patch-f973bd3 -&gt; ../_source-cache/archive/f9/f973bd33a7fd8af0002a9b8992216ffc04fdf2927917113e42e58f28b702dc14</span>
+<span class="go">    │   ├── tcsh-6.20.00-004-do-not-use-old-pointer-tricks.patch-333e111 -&gt; ../_source-cache/archive/33/333e111ed39f7452f904590b47b996812590b8818f1c51ad68407dc05a1b18b0</span>
+<span class="go">    │   ├── tcsh-6.20.00-005-reset-fixes-numbering.patch-d1b54b5 -&gt; ../_source-cache/archive/d1/d1b54b5c5432faed9791ffde813560e226896a68fc5933d066172bcf3b2eb8bd</span>
+<span class="go">    │   ├── tcsh-6.20.00-006-cleanup-in-readme-files.patch-b4e7428 -&gt; ../_source-cache/archive/b4/b4e7428ac6c2918beacc1b73f33e784ac520ef981d87e98285610b1bfa299d7b</span>
+<span class="go">    │   ├── tcsh-6.20.00-007-look-for-tgetent-in-libtinfo.patch-e6c88ff -&gt; ../_source-cache/archive/e6/e6c88ffc291c9d4bda4d6bedf3c9be89cb96ce7dc245163e251345221fa77216</span>
+<span class="go">    │   ├── tcsh-6.20.00-008-guard-ascii-only-reversion.patch-7ee195e -&gt; ../_source-cache/archive/7e/7ee195e4ce4c9eac81920843b4d4d27254bec7b43e0b744f457858a9f156e621</span>
+<span class="go">    │   ├── tcsh-6.20.00-009-fix-regexp-for-backlash-quoting-tests.patch-d2358c9 -&gt; ../_source-cache/archive/d2/d2358c930d5ab89e5965204dded499591b42a22d0a865e2149b8c0f1446fac34</span>
+<span class="go">    │   ├── tcsh-6.20.00-manpage-memoryuse.patch-3a4e60f -&gt; ../_source-cache/archive/3a/3a4e60fe56a450632140c48acbf14d22850c1d72835bf441e3f8514d6c617a9f</span>
+<span class="go">    │   ├── tcsh-6.22.02-avoid-gcc-to-fail.patch-3926150 -&gt; ../_source-cache/archive/39/392615011adb7afeb0010152409a37b150f03dbde5b534503e9cd7363b742a19</span>
+<span class="go">    │   └── tcsh-6.24.00.tar.gz -&gt; ../_source-cache/archive/60/60be2c504bd8f1fa6e424b1956495d7e7ced52a2ac94db5fd27f4b6bfc8f74f0.tar.gz</span>
+<span class="go">    ├── time</span>
+<span class="go">    │   └── time-1.9.tar.gz -&gt; ../_source-cache/archive/fb/fbacf0c81e62429df3e33bda4cee38756604f18e01d977338e23306a3e3b521e.tar.gz</span>
+<span class="go">    ├── wrf</span>
+<span class="go">    │   ├── 238a7d219b7c8e285db28fe4f0c96ebe5068d91c.patch?full_index=1-27c7268 -&gt; ../_source-cache/archive/27/27c7268f6c84b884d21e4afad0bab8554b06961cf4d6bfd7d0f5a457dcfdffb1</span>
+<span class="go">    │   ├── 4a084e03575da65f254917ef5d8eb39074abd3fc.patch-c522c47 -&gt; ../_source-cache/archive/c5/c522c4733720df9a18237c06d8ab6199fa9674d78375b644aec7017cb38af9c5</span>
+<span class="go">    │   ├── 6087d9192f7f91967147e50f5bc8b9e49310cf98.patch-f82a18c -&gt; ../_source-cache/archive/f8/f82a18cf7334e0cbbfdf4ef3aa91ca26d4a372709f114ce0116b3fbb136ffac6</span>
+<span class="go">    │   ├── 6502d5d9c15f5f9a652dec244cc12434af737c3c.patch?full_index=1-c5162c2 -&gt; ../_source-cache/archive/c5/c5162c23a132b377132924f8f1545313861c6cee5a627e9ebbdcf7b7b9d5726f</span>
+<span class="go">    │   ├── 7c6fd575b7a8fe5715b07b38db160e606c302956.patch?full_index=1-1ce97f4 -&gt; ../_source-cache/archive/1c/1ce97f4fd09e440bdf00f67711b1c50439ac27595ea6796efbfb32e0b9a1f3e4</span>
+<span class="go">    │   └── wrf-4.2.2.tar.gz -&gt; ../_source-cache/archive/7b/7be2968c67c2175cd40b57118d9732eda5fdb0828edaa25baf57cc289da1a9b8.tar.gz</span>
+<span class="go">    ├── xz</span>
+<span class="go">    │   └── xz-5.4.1.tar.bz2 -&gt; ../_source-cache/archive/dd/dd172acb53867a68012f94c17389401b2f274a1aa5ae8f84cbfb8b7e383ea8d3.tar.bz2</span>
+<span class="go">    ├── zlib</span>
+<span class="go">    │   └── zlib-1.2.13.tar.gz -&gt; ../_source-cache/archive/b3/b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30.tar.gz</span>
+<span class="go">    └── zstd</span>
+<span class="go">        └── zstd-1.5.5.tar.gz -&gt; ../_source-cache/archive/98/98e9c3d949d1b924e28e01eccb7deed865eefebf25c2f21c702e5cd5b63b85e1.tar.gz</span>
+
+<span class="go">133 directories, 204 files</span>
+</pre></div>
+</div>
+</section>
+<section id="mirror-use">
+<h2>Mirror use:<a class="headerlink" href="#mirror-use" title="Permalink to this heading"></a></h2>
+<p>Once a mirror has been created locally, follow the directions in <a class="reference internal" href="../mirror-config.html#using-created-mirrors"><span class="std std-ref">Mirror use</span></a> to use
+the <code class="docutils literal notranslate"><span class="pre">inputs</span></code> and <code class="docutils literal notranslate"><span class="pre">software</span></code> directories as Ramble input and Spack software mirrors, respectively.</p>
+<p>For example, using the  mirror directories we created above,</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>mirror<span class="w"> </span>add<span class="w"> </span>--scope<span class="o">=[</span>site,user<span class="o">]</span><span class="w"> </span><span class="nv">$HOME</span>/wrfv4_mirror/inputs
+
+<span class="gp">$ </span>spack<span class="w"> </span>mirror<span class="w"> </span>add<span class="w"> </span><span class="nv">$HOME</span>/wrfv4_mirror/software
+</pre></div>
+</div>
+<p>To validate that the mirrors were installed correctly, try something like the following,</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>spack<span class="w"> </span>clean<span class="w"> </span>-a
+
+<span class="gp">$ </span>ramble<span class="w"> </span>clean<span class="w"> </span>-a
+
+<span class="gp">$ </span>ramble<span class="w"> </span>-d<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+<p>and see if files are being retrieved from your mirrors instead of the internet.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="general_usage.html" class="btn btn-neutral float-left" title="General Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ramble.html" class="btn btn-neutral float-right" title="ramble package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jul 17, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
