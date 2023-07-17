@@ -15,7 +15,6 @@ import llnl.util.tty as tty
 
 import ramble.error
 import ramble.keywords
-import ramble.util.hashing
 
 supported_math_operators = {
     ast.Add: operator.add, ast.Sub: operator.sub,
