@@ -566,7 +566,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_mirror_cache</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_software_mirror_cache</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_software_environments</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;experiments&#39;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s1">&#39;versions&#39;</span><span class="p">:</span> <span class="p">[]</span>
@@ -594,6 +593,7 @@
             <span class="p">)</span>
         <span class="k">except</span> <span class="n">RunnerError</span><span class="p">:</span>
             <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -601,7 +601,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">install_cache</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">install_cache</span><span class="o">.</span><span class="n">SetCache</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_results</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">success_list</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">ScopedCriteriaList</span><span class="p">()</span>
 
@@ -1198,9 +1198,25 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Missing correct conifg:upload parameters&quot;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Workspace.default_results"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.default_results">[docs]</a>    <span class="k">def</span> <span class="nf">default_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="s1">&#39;workspace_hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_file_name</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">res</span><span class="p">[</span><span class="s1">&#39;workspace_hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="n">res</span><span class="p">[</span><span class="s1">&#39;workspace_hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Unknown..&quot;</span>
+
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
 <div class="viewcode-block" id="Workspace.append_result"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.append_result">[docs]</a>    <span class="k">def</span> <span class="nf">append_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;experiments&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_results</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
 
@@ -1244,6 +1260,7 @@
             <span class="n">results_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
 
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;From Workspace: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (hash: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;workspace_hash&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s1">&#39;experiments&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]:</span>
                         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Experiment </span><span class="si">%s</span><span class="s1"> figures of merit:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
@@ -1851,7 +1868,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 14, 2023.
+      <span class="lastupdated">Last updated on Jul 17, 2023.
       </span></p>
   </div>
 

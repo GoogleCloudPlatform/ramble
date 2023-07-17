@@ -147,13 +147,14 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representation of experiment data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">workspace_hash</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">foms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># This is essentially the hash</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;application_name&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workspace_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;workspace_name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="n">workspace_hash</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;workload_name&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bulk_hash</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># proxy for workspace or &quot;uploaded with&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_nodes&#39;</span><span class="p">]</span>
@@ -254,7 +255,7 @@
 
     <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">data_in</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;SUCCESS&#39;</span><span class="p">:</span>
-            <span class="n">e</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">exp</span><span class="p">,</span> <span class="n">current_dateTime</span><span class="p">)</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">data_in</span><span class="p">[</span><span class="s1">&#39;workspace_hash&#39;</span><span class="p">],</span> <span class="n">exp</span><span class="p">,</span> <span class="n">current_dateTime</span><span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="c1"># experiment_id = exp.hash()</span>
             <span class="c1"># &#39;experiment_id&#39;: experiment_id,</span>
@@ -381,7 +382,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 14, 2023.
+      <span class="lastupdated">Last updated on Jul 17, 2023.
       </span></p>
   </div>
 
