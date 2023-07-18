@@ -11,7 +11,7 @@ import six
 
 import llnl.util.tty as tty
 
-from ramble.language.application_language import register_builtin
+from ramble.language.shared_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
 

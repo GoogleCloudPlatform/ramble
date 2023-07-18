@@ -6,89 +6,18 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
-
 import ramble.language.language_helpers
 import ramble.language.language_base
+import ramble.language.shared_language
 from ramble.language.language_base import DirectiveError
 
 
-class ModifierMeta(ramble.language.language_base.DirectiveMeta):
+class ModifierMeta(ramble.language.shared_language.SharedMeta):
     _directive_names = set()
     _diretives_to_be_executed = []
 
 
 modifier_directive = ModifierMeta.directive
-
-
-@modifier_directive('figure_of_merit_contexts')
-def figure_of_merit_context(name, regex, output_format):
-    """Defines a context for figures of merit
-
-    Defines a new context to contain figures of merit.
-
-    Args:
-        name: High level name of the context. Can be referred to in
-              the figure of merit
-        regex: Regular expression, using group names, to match a context.
-        output_format: String, using python keywords {group_name} to
-                       extract group names from context regular
-                       expression.
-    """
-
-    def _execute_figure_of_merit_context(mod):
-        mod.figure_of_merit_contexts[name] = {
-            'regex': regex,
-            'output_format': output_format
-        }
-
-    return _execute_figure_of_merit_context
-
-
-@modifier_directive('archive_patterns')
-def archive_pattern(pattern):
-    """Adds a file pattern to be archived in addition to figure of merit logs
-
-    Defines a new file pattern that will be archived during workspace archival.
-    Archival will only happen for files that match the pattern when archival
-    is being performed.
-
-    Args:
-        pattern: Pattern that refers to files to archive
-    """
-
-    def _execute_archive_pattern(mod):
-        mod.archive_patterns[pattern] = pattern
-
-    return _execute_archive_pattern
-
-
-@modifier_directive('figures_of_merit')
-def figure_of_merit(name, fom_regex, group_name, units='', log_file='{log_file}',
-                    contexts=[]):
-    """Adds a figure of merit to track for this modifier
-
-    Defines a new figure of merit.
-
-    Args:
-        name: High level name of the figure of merit
-        fom_regex: A regular expression using named groups to extract the FOM
-        group_name: The name of the group that the FOM should be pulled from
-        log_file: File the figure of merit can be extracted from
-        units: The units associated with the FOM
-        contexts: List of context this is applicable to
-    """
-
-    def _execute_figure_of_merit(mod):
-        mod.figures_of_merit[name] = {
-            'log_file': log_file,
-            'regex': fom_regex,
-            'group_name': group_name,
-            'units': units,
-            'contexts': contexts
-        }
-
-    return _execute_figure_of_merit
 
 
 @modifier_directive('modes')
@@ -151,164 +80,6 @@ def variable_modification(name, modification, method='set', mode=None, modes=Non
             }
 
     return _execute_variable_modification
-
-
-@modifier_directive('software_specs')
-def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
-    """Defines a new software spec needed for this modifier.
-
-    Adds a new software spec (for spack to use) that this modifier
-    needs to execute properly.
-
-    Only adds specs to modifiers that use spack.
-
-    Specs can be described as an mpi spec, which means they
-    will depend on the MPI library within the resulting spack
-    environment.
-    """
-
-    def _execute_software_spec(mod):
-        if mod.uses_spack:
-
-            # Define the spec
-            mod.software_specs[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
-            }
-
-    return _execute_software_spec
-
-
-@modifier_directive('default_compilers')
-def default_compiler(name, spack_spec, compiler_spec=None, compiler=None):
-    """Defines the default compiler that will be used with this modifier
-
-    Adds a new compiler spec to this modifier. Software specs should
-    reference a compiler that has been added.
-    """
-
-    def _execute_default_compiler(mod):
-        if mod.uses_spack:
-            mod.default_compilers[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
-            }
-
-    return _execute_default_compiler
-
-
-@modifier_directive('required_packages')
-def required_package(name):
-    """Defines a new spack package that is required for this modifier
-    to function properly.
-    """
-
-    def _execute_required_package(mod):
-        if mod.uses_spack:
-            mod.required_packages[name] = True
-
-    return _execute_required_package
-
-
-@modifier_directive('success_criteria')
-def success_criteria(name, mode, match=None, file='{log_file}',
-                     fom_name=None, fom_context='null', formula=None):
-    """Defines a success criteria that will be applied to experiments using this modifier
-
-    Adds a new success criteria to this modifier definition.
-
-    These will be checked during the analyze step to see if a job exited properly.
-
-    Arguments:
-      name: The name of this success criteria
-      mode: The type of success criteria that will be validated
-            Valid values are: 'string', 'application_function', and 'fom_comparison'
-      match: For mode='string'. Value to check indicate success (if found, it
-             would mark success)
-      file: For mode='string'. File success criteria should be located in
-      fom_name: For mode='fom_comparison'. Name of fom for a criteria.
-                Accepts globbing.
-      fom_context: For mode='fom_comparison'. Context the fom is contained
-                   in. Accepts globbing.
-      formula: For mode='fom_comparison'. Formula to use to evaluate success.
-               '{value}' keyword is set as the value of the FOM.
-    """
-
-    def _execute_success_criteria(mod):
-        valid_modes = ramble.success_criteria.SuccessCriteria._valid_modes
-        if mode not in valid_modes:
-            tty.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
-
-        mod.success_criteria[name] = {
-            'mode': mode,
-            'match': match,
-            'file': file,
-            'fom_name': fom_name,
-            'fom_context': fom_context,
-            'formula': formula,
-        }
-
-    return _execute_success_criteria
-
-
-@modifier_directive('builtins')
-def register_builtin(name, required=True, injection_method='prepend'):
-    """Register a builtin
-
-    Builtins are methods that return lists of strings. These methods represent
-    a way to write python code to generate executables for building up
-    workloads.
-
-    Builtins can be referred to in a list of executables as:
-    `modifier_builtin::modifier_name::method_name`.
-    As an example, if a modifier named 'test-modifier' had a builtin defined as follows:
-
-    .. code-block:: python
-
-      register_builtin('mod_builtin', required=True)
-      def mod_builtin(self):
-        ...
-
-    Its fully qualified name would be 'modifier_builtin::test-modifier::mod_builtin'
-
-    The 'required' attribute marks a builtin as required for all workloads. This
-    will ensure the builtin is added to the workload if it is not explicitly
-    added. If required builtins are not explicitly added to a workload, they
-    are injected at the beginning of the list of executables.
-
-    Modifier classes that want to disable auto-injecting a builtin into
-    the experiment executable lists can use:
-
-    .. code-block:: python
-
-      register_builtin('mod_builtin', required=False)
-
-    In order to use a non-required builtin, the experiment will need to
-    explicitly list the builtin in their executable list.
-
-    The 'injection_method' attribute controls where the builtin will be
-    injected into the executable list.
-    Options are:
-
-    - 'prepend' -- This builtin will be injected at the beginning of the executable list
-
-    - 'append' -- This builtin will be injected at the end of the executable list
-
-    """
-    supported_injection_methods = ['prepend', 'append']
-
-    def _store_builtin(mod):
-        if injection_method not in supported_injection_methods:
-            raise DirectiveError(f'Modifier {mod.name} has an invalid '
-                                 f'injection method of {injection_method}.\n'
-                                 f'Valid methods are {str(supported_injection_methods)}')
-        builtin_name = f'modifier_builtin::{mod.name}::{name}'
-        mod.builtins[builtin_name] = {'name': name,
-                                      'required': required,
-                                      'injection_method': injection_method}
-    return _store_builtin
 
 
 @modifier_directive('executable_modifiers')
@@ -435,35 +206,3 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
             mod.env_var_modifications[mode][method].append(append_dict.copy())
 
     return _env_var_modification
-
-
-@modifier_directive(dicts=())
-def maintainers(*names: str):
-    """Add a new maintainer directive, to specify maintainers in a declarative way.
-
-    Args:
-        names: GitHub username for the maintainer
-    """
-
-    def _execute_maintainer(mod):
-        maintainers_from_base = getattr(mod, "maintainers", [])
-        # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        mod.maintainers = list(sorted(set(maintainers_from_base + list(names))))
-
-    return _execute_maintainer
-
-
-@modifier_directive(dicts=())
-def tags(*values: str):
-    """Add a new tag directive, to specify tags in a declarative way.
-
-    Args:
-        values: Value to mark as a tag
-    """
-
-    def _execute_tag(mod):
-        tags_from_base = getattr(mod, "tags", [])
-        # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        mod.tags = list(sorted(set(tags_from_base + list(values))))
-
-    return _execute_tag
