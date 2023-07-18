@@ -210,6 +210,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">compilers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">includes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="n">dry_run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compiler_config_dir</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SpackRunner.get_version"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get spack&#39;s version&quot;&quot;&quot;</span>
@@ -238,6 +240,12 @@
 <span class="sd">        Set the dry_run state of this spack runner</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="n">dry_run</span></div>
+
+<div class="viewcode-block" id="SpackRunner.set_compiler_config_dir"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_compiler_config_dir">[docs]</a>    <span class="k">def</span> <span class="nf">set_compiler_config_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the config path to use when installing compilers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compiler_config_dir</span> <span class="o">=</span> <span class="n">path</span></div>
 
 <div class="viewcode-block" id="SpackRunner.set_env"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_path</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
@@ -368,13 +376,13 @@
         <span class="n">active_env</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
             <span class="n">active_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="o">.</span><span class="n">default_env</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">]</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="o">.</span><span class="n">default_env</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="o">.</span><span class="n">default_env</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="o">.</span><span class="n">default_env</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">]</span>
 
-        <span class="n">comp_info_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;compiler&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;info&#39;</span><span class="p">,</span>
-            <span class="n">spec</span>
-        <span class="p">]</span>
+        <span class="n">comp_info_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler_config_dir</span><span class="p">:</span>
+            <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">])</span>
+        <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">spec</span><span class="p">])</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="p">(</span><span class="o">*</span><span class="n">comp_info_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
@@ -488,8 +496,10 @@
 <span class="sd">         - Name of a named spack environment</span>
 <span class="sd">         - Path to an external spack environment</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            (bool) found_lock: True if a spack.lock file was copied. False otherwise.</span>
+<span class="sd">         Sets self.concretized if a spack.lock file is found in the env</span>
+
+<span class="sd">         Args:</span>
+<span class="sd">         - env_name_or_path: Name or path to existing spack environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
@@ -522,7 +532,7 @@
 
         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">conf_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">found_lock</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="n">found_lock</span></div>
 
 <div class="viewcode-block" id="SpackRunner.generate_env_file"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_env_file">[docs]</a>    <span class="k">def</span> <span class="nf">generate_env_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -695,7 +705,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 17, 2023.
+      <span class="lastupdated">Last updated on Jul 18, 2023.
       </span></p>
   </div>
 

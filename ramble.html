@@ -557,9 +557,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.default_compilers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executable_modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.format_doc"><code class="docutils literal notranslate"><span class="pre">ModifierBase.format_doc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.inputs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.maintainers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.maintainers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modded_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modded_variables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modes"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modes</span></code></a></li>
@@ -573,6 +575,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.tags"><code class="docutils literal notranslate"><span class="pre">ModifierBase.tags</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.uses_spack"><code class="docutils literal notranslate"><span class="pre">ModifierBase.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.variable_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workload_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workload_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workloads"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workloads</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.modifier.ModifierError"><code class="docutils literal notranslate"><span class="pre">ModifierError</span></code></a></li>
@@ -791,6 +795,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.inventory_hash"><code class="docutils literal notranslate"><span class="pre">SpackRunner.inventory_hash()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.load_compiler"><code class="docutils literal notranslate"><span class="pre">SpackRunner.load_compiler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.mirror_environment"><code class="docutils literal notranslate"><span class="pre">SpackRunner.mirror_environment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.set_compiler_config_dir"><code class="docutils literal notranslate"><span class="pre">SpackRunner.set_compiler_config_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.set_dry_run"><code class="docutils literal notranslate"><span class="pre">SpackRunner.set_dry_run()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.set_env"><code class="docutils literal notranslate"><span class="pre">SpackRunner.set_env()</span></code></a></li>
 </ul>
@@ -5029,6 +5034,11 @@ which to push resources.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.executables">
+<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.executables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.figure_of_merit_contexts">
 <span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -5043,6 +5053,11 @@ which to push resources.</p>
 <span class="sig-name descname"><span class="pre">format_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier.html#ModifierBase.format_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier.ModifierBase.format_doc" title="Permalink to this definition"></a></dt>
 <dd><p>Wrap doc string at 72 characters and format nicely</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.inputs">
+<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.inputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.maintainers">
@@ -5114,6 +5129,16 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.variable_modifications">
 <span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.variable_modifications" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workload_variables">
+<span class="sig-name descname"><span class="pre">workload_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workload_variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workloads">
+<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workloads" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -6221,19 +6246,14 @@ spack will error. So, we validate against a list of supported sections.</p>
 <dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.copy_from_external_env">
 <span class="sig-name descname"><span class="pre">copy_from_external_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_name_or_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.copy_from_external_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.copy_from_external_env" title="Permalink to this definition"></a></dt>
 <dd><p>Copy an external spack environment file into the generated environment.</p>
-<dl class="simple">
+<dl>
 <dt>env_name_or_path can be either:</dt><dd><ul class="simple">
 <li><p>Name of a named spack environment</p></li>
 <li><p>Path to an external spack environment</p></li>
 </ul>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if a spack.lock file was copied. False otherwise.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>(bool) found_lock</p>
+<p>Sets self.concretized if a spack.lock file is found in the env</p>
+<p>Args:
+- env_name_or_path: Name or path to existing spack environment</p>
 </dd>
 </dl>
 </dd></dl>
@@ -6339,6 +6359,12 @@ compiler to be installed multiple times with different base compilers.</p>
 <dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.mirror_environment">
 <span class="sig-name descname"><span class="pre">mirror_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mirror_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.mirror_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.mirror_environment" title="Permalink to this definition"></a></dt>
 <dd><p>Create a spack mirror from the activated environment</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.set_compiler_config_dir">
+<span class="sig-name descname"><span class="pre">set_compiler_config_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.set_compiler_config_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.set_compiler_config_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Set the config path to use when installing compilers</p>
 </dd></dl>
 
 <dl class="py method">
@@ -6978,7 +7004,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 17, 2023.
+      <span class="lastupdated">Last updated on Jul 18, 2023.
       </span></p>
   </div>
 

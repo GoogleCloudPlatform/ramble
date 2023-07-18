@@ -161,8 +161,9 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;install_compilers&#39;</span><span class="p">,</span>
             <span class="s1">&#39;create_spack_env&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;install_compilers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;concretize_spack_env&#39;</span><span class="p">,</span>
             <span class="s1">&#39;install_software&#39;</span><span class="p">,</span>
             <span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span>
             <span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span>
@@ -214,6 +215,7 @@
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_compiler_config_dir</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">auxiliary_software_dir</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
 
             <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{env_name}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -250,6 +252,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">create_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{spack_env}</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
 
             <span class="c1"># Write auxiliary software files into created spack env.</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">contents</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_auxiliary_software_files</span><span class="p">():</span>
@@ -258,14 +261,10 @@
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">aux_file_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">contents</span><span class="p">))</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
-
             <span class="n">env_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{env_name}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-            <span class="n">env_concretized</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">external_spack_env</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">external_spack_env</span><span class="p">(</span><span class="n">env_context</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">external_spack_env</span><span class="p">:</span>
-                <span class="n">env_concretized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">copy_from_external_env</span><span class="p">(</span><span class="n">external_spack_env</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">copy_from_external_env</span><span class="p">(</span><span class="n">external_spack_env</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_env_packages</span><span class="p">(</span><span class="n">env_context</span><span class="p">):</span>
                     <span class="n">spec_str</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_spec_string</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
@@ -288,6 +287,37 @@
                                 <span class="sa">f</span><span class="s1">&#39;in environment </span><span class="si">{</span><span class="n">env_context</span><span class="si">}</span><span class="s1">, but is required &#39;</span>
                                 <span class="sa">f</span><span class="s1">&#39;to by the </span><span class="si">{</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> modifier &#39;</span>
                                 <span class="s1">&#39;definition&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_concretize_spack_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Concretize the spack environment for this experiment</span>
+
+<span class="sd">        Perform spack&#39;s concretize step on the software environment generated</span>
+<span class="sd">        for  this experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># See if we cached this already, and if so return</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_namespace</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s1">&#39;Ramble env_namespace is set to None.&#39;</span><span class="p">)</span>
+
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;concretize-env&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+
+            <span class="n">env_concretized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">concretized</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">env_concretized</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">concretize</span><span class="p">()</span>
@@ -471,7 +501,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 17, 2023.
+      <span class="lastupdated">Last updated on Jul 18, 2023.
       </span></p>
   </div>
 
