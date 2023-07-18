@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.language.shared_language &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../application_dev_guide.html">Application Developers Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.language.shared_language</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.language.shared_language</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+
+<span class="kn">import</span> <span class="nn">ramble.language.language_base</span>
+<span class="kn">import</span> <span class="nn">ramble.language.language_helpers</span>
+<span class="kn">import</span> <span class="nn">ramble.success_criteria</span>
+
+
+<span class="sd">&quot;&quot;&quot;This module contains directives directives that are shared between multiple object types</span>
+
+<span class="sd">Directives are functions that can be called inside an object</span>
+<span class="sd">definition to modify the object, for example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      class Gromacs(SpackApplication):</span>
+<span class="sd">          # Required package directive</span>
+<span class="sd">          required_package(&#39;zlib&#39;)</span>
+
+<span class="sd">In the above example, &#39;required_package&#39; is a ramble directive</span>
+
+<span class="sd">Directives defined in this module are used by multiple object types, which</span>
+<span class="sd">inherit from the SharedMeta class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="SharedMeta"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.SharedMeta">[docs]</a><span class="k">class</span> <span class="nc">SharedMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveMeta</span><span class="p">):</span>
+    <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">_diretives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<span class="c1"># shared_directive = ramble.language.language_base.DirectiveMeta.directive</span>
+<span class="n">shared_directive</span> <span class="o">=</span> <span class="n">SharedMeta</span><span class="o">.</span><span class="n">directive</span>
+
+
+<div class="viewcode-block" id="archive_pattern"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.archive_pattern">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;archive_patterns&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">archive_pattern</span><span class="p">(</span><span class="n">pattern</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a file pattern to be archived in addition to figure of merit logs</span>
+
+<span class="sd">    Defines a new file pattern that will be archived during workspace archival.</span>
+<span class="sd">    Archival will only happen for files that match the pattern when archival</span>
+<span class="sd">    is being performed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      pattern: Pattern that refers to files to archive</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_archive_pattern</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">archive_patterns</span><span class="p">[</span><span class="n">pattern</span><span class="p">]</span> <span class="o">=</span> <span class="n">pattern</span>
+
+    <span class="k">return</span> <span class="n">_execute_archive_pattern</span></div>
+
+
+<div class="viewcode-block" id="figure_of_merit_context"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.figure_of_merit_context">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;figure_of_merit_contexts&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">figure_of_merit_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">regex</span><span class="p">,</span> <span class="n">output_format</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a context for figures of merit</span>
+
+<span class="sd">    Defines a new context to contain figures of merit.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name: High level name of the context. Can be referred to in</span>
+<span class="sd">            the figure of merit</span>
+<span class="sd">      regex: Regular expression, using group names, to match a context.</span>
+<span class="sd">      output_format: String, using python keywords {group_name} to extract</span>
+<span class="sd">                     group names from context regular expression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_figure_of_merit_context</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">figure_of_merit_contexts</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;regex&#39;</span><span class="p">:</span> <span class="n">regex</span><span class="p">,</span>
+            <span class="s1">&#39;output_format&#39;</span><span class="p">:</span> <span class="n">output_format</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_figure_of_merit_context</span></div>
+
+
+<div class="viewcode-block" id="figure_of_merit"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.figure_of_merit">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;figures_of_merit&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">figure_of_merit</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fom_regex</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">contexts</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a figure of merit to track for this object</span>
+
+<span class="sd">    Defines a new figure of merit.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name: High level name of the figure of merit</span>
+<span class="sd">      log_file: File the figure of merit can be extracted from</span>
+<span class="sd">      fom_regex: A regular expression using named groups to extract the FOM</span>
+<span class="sd">      group_name: The name of the group that the FOM should be pulled from</span>
+<span class="sd">      units: The units associated with the FOM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_figure_of_merit</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">figures_of_merit</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;log_file&#39;</span><span class="p">:</span> <span class="n">log_file</span><span class="p">,</span>
+            <span class="s1">&#39;regex&#39;</span><span class="p">:</span> <span class="n">fom_regex</span><span class="p">,</span>
+            <span class="s1">&#39;group_name&#39;</span><span class="p">:</span> <span class="n">group_name</span><span class="p">,</span>
+            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
+            <span class="s1">&#39;contexts&#39;</span><span class="p">:</span> <span class="n">contexts</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_figure_of_merit</span></div>
+
+
+<div class="viewcode-block" id="default_compiler"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.default_compiler">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;default_compilers&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">default_compiler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">spack_spec</span><span class="p">,</span> <span class="n">compiler_spec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines the default compiler that will be used with this object</span>
+
+<span class="sd">    Adds a new compiler spec to this object. Software specs should</span>
+<span class="sd">    reference a compiler that has been added.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_default_compiler</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;uses_spack&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;uses_spack&#39;</span><span class="p">):</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">default_compilers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;spack_spec&#39;</span><span class="p">:</span> <span class="n">spack_spec</span><span class="p">,</span>
+                <span class="s1">&#39;compiler_spec&#39;</span><span class="p">:</span> <span class="n">compiler_spec</span><span class="p">,</span>
+                <span class="s1">&#39;compiler&#39;</span><span class="p">:</span> <span class="n">compiler</span>
+            <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_default_compiler</span></div>
+
+
+<div class="viewcode-block" id="software_spec"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.software_spec">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;software_specs&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">software_spec</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">spack_spec</span><span class="p">,</span> <span class="n">compiler_spec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a new software spec needed for this object.</span>
+
+<span class="sd">    Adds a new software spec (for spack to use) that this object</span>
+<span class="sd">    needs to execute properly.</span>
+
+<span class="sd">    Only adds specs to object that use spack.</span>
+
+<span class="sd">    Specs can be described as an mpi spec, which means they</span>
+<span class="sd">    will depend on the MPI library within the resulting spack</span>
+<span class="sd">    environment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_software_spec</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;uses_spack&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;uses_spack&#39;</span><span class="p">):</span>
+
+            <span class="c1"># Define the spec</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">software_specs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;spack_spec&#39;</span><span class="p">:</span> <span class="n">spack_spec</span><span class="p">,</span>
+                <span class="s1">&#39;compiler_spec&#39;</span><span class="p">:</span> <span class="n">compiler_spec</span><span class="p">,</span>
+                <span class="s1">&#39;compiler&#39;</span><span class="p">:</span> <span class="n">compiler</span>
+            <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_software_spec</span></div>
+
+
+<div class="viewcode-block" id="required_package"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.required_package">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;required_packages&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">required_package</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a new spack package that is required for this object</span>
+<span class="sd">    to function properly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_required_package</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">required_packages</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">_execute_required_package</span></div>
+
+
+<div class="viewcode-block" id="success_criteria"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.success_criteria">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;success_criteria&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">success_criteria</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
+                     <span class="n">fom_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fom_context</span><span class="o">=</span><span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a success criteria used by experiments of this object</span>
+
+<span class="sd">    Adds a new success criteria to this object definition.</span>
+
+<span class="sd">    These will be checked during the analyze step to see if a job exited properly.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      name: The name of this success criteria</span>
+<span class="sd">      mode: The type of success criteria that will be validated</span>
+<span class="sd">            Valid values are: &#39;string&#39;, &#39;application_function&#39;, and &#39;fom_comparison&#39;</span>
+<span class="sd">      match: For mode=&#39;string&#39;. Value to check indicate success (if found, it</span>
+<span class="sd">             would mark success)</span>
+<span class="sd">      file: For mode=&#39;string&#39;. File success criteria should be located in</span>
+<span class="sd">      fom_name: For mode=&#39;fom_comparison&#39;. Name of fom for a criteria.</span>
+<span class="sd">                Accepts globbing.</span>
+<span class="sd">      fom_context: For mode=&#39;fom_comparison&#39;. Context the fom is contained</span>
+<span class="sd">                   in. Accepts globbing.</span>
+<span class="sd">      formula: For mode=&#39;fom_comparison&#39;. Formula to use to evaluate success.</span>
+<span class="sd">               &#39;{value}&#39; keyword is set as the value of the FOM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_success_criteria</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">valid_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">SuccessCriteria</span><span class="o">.</span><span class="n">_valid_modes</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_modes</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1"> is not valid. Valid values are </span><span class="si">{</span><span class="n">valid_modes</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="n">success_criteria</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+            <span class="s1">&#39;match&#39;</span><span class="p">:</span> <span class="n">match</span><span class="p">,</span>
+            <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">file</span><span class="p">,</span>
+            <span class="s1">&#39;fom_name&#39;</span><span class="p">:</span> <span class="n">fom_name</span><span class="p">,</span>
+            <span class="s1">&#39;fom_context&#39;</span><span class="p">:</span> <span class="n">fom_context</span><span class="p">,</span>
+            <span class="s1">&#39;formula&#39;</span><span class="p">:</span> <span class="n">formula</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_success_criteria</span></div>
+
+
+<div class="viewcode-block" id="register_builtin"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.register_builtin">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;builtins&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">register_builtin</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">injection_method</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a builtin</span>
+
+<span class="sd">    Builtins are methods that return lists of strings. These methods represent</span>
+<span class="sd">    a way to write python code to generate executables for building up</span>
+<span class="sd">    workloads.</span>
+
+<span class="sd">    Manual injection of a builtins can be performed through modifying the</span>
+<span class="sd">    execution order in the internals config section.</span>
+
+<span class="sd">    Modifier builtins are named:</span>
+<span class="sd">    `modifier_builtin::modifier_name::method_name`.</span>
+
+<span class="sd">    Application modifiers are named:</span>
+<span class="sd">    `builtin::method_name`</span>
+
+<span class="sd">    As an example, if the following builtin was defined:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      register_builtin(&#39;example_builtin&#39;, required=True)</span>
+<span class="sd">      def example_builtin(self):</span>
+<span class="sd">        ...</span>
+
+<span class="sd">    Its fully qualified name would be:</span>
+<span class="sd">    * `modifier_builtin::test-modifier::example_builtin` when defined in a</span>
+<span class="sd">    modifier named `test-modifier`</span>
+<span class="sd">    * `builtin::example_builtin` when defined in an application</span>
+
+<span class="sd">    The &#39;required&#39; attribute marks a builtin as required for all workloads. This</span>
+<span class="sd">    will ensure the builtin is added to the workload if it is not explicitly</span>
+<span class="sd">    added. If required builtins are not explicitly added to a workload, they</span>
+<span class="sd">    are injected  into the list of executables, based on the injection_method</span>
+<span class="sd">    attribute.</span>
+
+<span class="sd">    The &#39;injection_method&#39; attribute controls where the builtin will be</span>
+<span class="sd">    injected into the executable list.</span>
+<span class="sd">    Options are:</span>
+<span class="sd">    - &#39;prepend&#39; -- This builtin will be injected at the beginning of the executable list</span>
+<span class="sd">    - &#39;append&#39; -- This builtin will be injected at the end of the executable list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">supported_injection_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;prepend&#39;</span><span class="p">,</span> <span class="s1">&#39;append&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_store_builtin</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">injection_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_injection_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Object </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> has an invalid &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;injection method of </span><span class="si">{</span><span class="n">injection_method</span><span class="si">}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Valid methods are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">supported_injection_methods</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">builtin_name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_builtin_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj_name</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="n">builtins</span><span class="p">[</span><span class="n">builtin_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                                      <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="n">required</span><span class="p">,</span>
+                                      <span class="s1">&#39;injection_method&#39;</span><span class="p">:</span> <span class="n">injection_method</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">_store_builtin</span></div>
+
+
+<div class="viewcode-block" id="maintainers"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.maintainers">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">maintainers</span><span class="p">(</span><span class="o">*</span><span class="n">names</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a new maintainer directive, to specify maintainers in a declarative way.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        names: GitHub username for the maintainer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_maintainer</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">maintainers_from_base</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;maintainers&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="c1"># Here it is essential to copy, otherwise we might add to an empty list in the parent</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">maintainers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">maintainers_from_base</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">names</span><span class="p">))))</span>
+
+    <span class="k">return</span> <span class="n">_execute_maintainer</span></div>
+
+
+<div class="viewcode-block" id="tags"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.tags">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">tags</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a new tag directive, to specify tags in a declarative way.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        values: Value to mark as a tag</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">tags_from_base</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="c1"># Here it is essential to copy, otherwise we might add to an empty list in the parent</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tags_from_base</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">))))</span>
+
+    <span class="k">return</span> <span class="n">_execute_tag</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jul 18, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

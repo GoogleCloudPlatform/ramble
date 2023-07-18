@@ -155,13 +155,15 @@
 <span class="kn">from</span> <span class="nn">ramble.keywords</span> <span class="kn">import</span> <span class="n">keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span><span class="p">,</span> <span class="n">register_builtin</span>
+<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
 
 <div class="viewcode-block" id="ApplicationBase"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase">[docs]</a><span class="k">class</span> <span class="nc">ApplicationBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ApplicationMeta</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">uses_spack</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_builtin_name</span> <span class="o">=</span> <span class="s1">&#39;builtin::</span><span class="si">{name}</span><span class="s1">&#39;</span>
     <span class="n">_exec_prefix_builtin</span> <span class="o">=</span> <span class="s1">&#39;builtin::&#39;</span>
     <span class="n">_mod_prefix_builtin</span> <span class="o">=</span> <span class="s1">&#39;modifier_builtin::&#39;</span>
     <span class="n">_builtin_required_key</span> <span class="o">=</span> <span class="s1">&#39;required&#39;</span>
@@ -235,8 +237,12 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_exec_key</span> <span class="ow">in</span> <span class="n">wl_conf</span><span class="p">:</span>
                 <span class="c1"># Insert in reverse order, to make sure they are correctly ordered.</span>
                 <span class="k">for</span> <span class="n">builtin</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">required_builtins</span><span class="p">):</span>
+                    <span class="n">blt_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="p">[</span><span class="n">builtin</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">builtin</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">wl_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_workload_exec_key</span><span class="p">]:</span>
-                        <span class="n">wl_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_workload_exec_key</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">builtin</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;injection_method&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;prepend&#39;</span><span class="p">:</span>
+                            <span class="n">wl_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_workload_exec_key</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">builtin</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">wl_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_workload_exec_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">builtin</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_inject_required_modifier_builtins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Inject builtins defined as required from each modifier into this</span>

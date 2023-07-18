@@ -131,7 +131,8 @@
 <span class="kn">from</span> <span class="nn">llnl.util.tty.colify</span> <span class="kn">import</span> <span class="n">colified</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.modifier_language</span> <span class="kn">import</span> <span class="n">ModifierMeta</span><span class="p">,</span> <span class="n">register_builtin</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">ramble.language.modifier_language</span> <span class="kn">import</span> <span class="n">ModifierMeta</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 
@@ -139,6 +140,7 @@
 <div class="viewcode-block" id="ModifierBase"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase">[docs]</a><span class="k">class</span> <span class="nc">ModifierBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ModifierMeta</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">uses_spack</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_builtin_name</span> <span class="o">=</span> <span class="s1">&#39;modifier_builtin::</span><span class="si">{obj_name}</span><span class="s1">::</span><span class="si">{name}</span><span class="s1">&#39;</span>
     <span class="n">_mod_prefix_builtin</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;modifier_builtin::&#39;</span>
     <span class="n">_mod_builtin_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;modifier_builtin::(?P&lt;modifier&gt;[\w-]+)::&#39;</span>
     <span class="n">_builtin_required_key</span> <span class="o">=</span> <span class="s1">&#39;required&#39;</span>

@@ -37,3 +37,11 @@ ramble.language.modifier\_language module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.language.shared\_language module
+---------------------------------------
+
+.. automodule:: ramble.language.shared_language
+   :members:
+   :undoc-members:
+   :show-inheritance:

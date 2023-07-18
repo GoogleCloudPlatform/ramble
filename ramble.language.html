@@ -65,6 +65,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_base">ramble.language.language_base module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_helpers">ramble.language.language_helpers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.modifier_language">ramble.language.modifier_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.shared_language">ramble.language.shared_language module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
@@ -172,29 +173,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.language.application_language.ApplicationMeta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">ApplicationMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#ApplicationMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.ApplicationMeta" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#ramble.language.language_base.DirectiveMeta" title="ramble.language.language_base.DirectiveMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectiveMeta</span></code></a></p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.archive_pattern">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">archive_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#archive_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.archive_pattern" title="Permalink to this definition"></a></dt>
-<dd><p>Adds a file pattern to be archived in addition to figure of merit logs</p>
-<p>Defines a new file pattern that will be archived during workspace archival.
-Archival will only happen for files that match the pattern when archival
-is being performed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pattern</strong> – Pattern that refers to files to archive</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.default_compiler">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">default_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#default_compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.default_compiler" title="Permalink to this definition"></a></dt>
-<dd><p>Defines the default compiler that will be used with this application</p>
-<p>Adds a new compiler spec to this application. Software specs should
-reference a compiler that has been added.</p>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.shared_language.SharedMeta" title="ramble.language.shared_language.SharedMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMeta</span></code></a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -220,43 +199,6 @@ capture. Defaults to stdout</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.figure_of_merit">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.figure_of_merit" title="Permalink to this definition"></a></dt>
-<dd><p>Adds a figure of merit to track for this application</p>
-<p>Defines a new figure of merit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – High level name of the figure of merit</p></li>
-<li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
-<li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
-<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
-<li><p><strong>units</strong> – The units associated with the FOM</p></li>
-<li><p><strong>contexts</strong> – List of context this is applicable to</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.figure_of_merit_context">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#figure_of_merit_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.figure_of_merit_context" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a context for figures of merit</p>
-<p>Defines a new context to contain figures of merit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – High level name of the context. Can be referred to in
-the figure of merit</p></li>
-<li><p><strong>regex</strong> – Regular expression, using group names, to match a context.</p></li>
-<li><p><strong>output_format</strong> – String, using python keywords {group_name} to extract
-group names from context regular expression.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.input_file">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">input_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{input_name}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sha256</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#input_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.input_file" title="Permalink to this definition"></a></dt>
 <dd><p>Adds an input file definition to this application</p>
@@ -275,101 +217,6 @@ expanded. Defaults to ‘input’</p></li>
 file name.</p></li>
 <li><p><strong>expand</strong> (<em>Optional</em>) – Whether the input should be expanded or not. Defaults to True</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.maintainers">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">maintainers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#maintainers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.maintainers" title="Permalink to this definition"></a></dt>
-<dd><p>Add a new maintainer directive, to specify maintainers in a declarative way.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>names</strong> – GitHub username for the maintainer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.register_builtin">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">register_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#register_builtin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.register_builtin" title="Permalink to this definition"></a></dt>
-<dd><p>Register a builtin</p>
-<p>Builtins are methods that return lists of strings. These methods represent
-a way to write python code to generate executables for building up
-workloads.</p>
-<p>Builtins can be referred to in a list of executables as:
-<cite>builtin::method_name</cite>. As an example, ApplicationBase has a builtin
-defined as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-  <span class="o">...</span>
-</pre></div>
-</div>
-<p>This can be used in a workload as:
-<cite>workload(…, executables=[‘builtin::env_vars’, …] …)</cite></p>
-<p>The ‘required’ attribute marks a builtin as required for all workloads. This
-will ensure the builtin is added to the workload if it is not explicitly
-added. If required builtins are not explicitly added to a workload, they
-are injected at the beginning of the list of executables.</p>
-<p>Application classes that want to disable auto-injecting a builtin into
-their executable lists can use:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.required_package">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">required_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#required_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.required_package" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a new spack package that is required for this application
-to function properly.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.software_spec">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">software_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#software_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.software_spec" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a new software spec needed for this application.</p>
-<p>Adds a new software spec (for spack to use) that this application
-needs to execute properly.</p>
-<p>Only adds specs to applications that use spack.</p>
-<p>Specs can be described as an mpi spec, which means they
-will depend on the MPI library within the resulting spack
-environment.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.success_criteria">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'null'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.success_criteria" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a success criteria used by experiments of this application</p>
-<p>Adds a new success criteria to this application definition.</p>
-<p>These will be checked during the analyze step to see if a job exited properly.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – The name of this success criteria</p></li>
-<li><p><strong>mode</strong> – The type of success criteria that will be validated
-Valid values are: ‘string’, ‘application_function’, and ‘fom_comparison’</p></li>
-<li><p><strong>match</strong> – For mode=’string’. Value to check indicate success (if found, it
-would mark success)</p></li>
-<li><p><strong>file</strong> – For mode=’string’. File success criteria should be located in</p></li>
-<li><p><strong>fom_name</strong> – For mode=’fom_comparison’. Name of fom for a criteria.
-Accepts globbing.</p></li>
-<li><p><strong>fom_context</strong> – For mode=’fom_comparison’. Context the fom is contained
-in. Accepts globbing.</p></li>
-<li><p><strong>formula</strong> – For mode=’fom_comparison’. Formula to use to evaluate success.
-‘{value}’ keyword is set as the value of the FOM.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.application_language.tags">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.tags" title="Permalink to this definition"></a></dt>
-<dd><p>Add a new tag directive, to specify tags in a declarative way.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> – Value to mark as a tag</p>
 </dd>
 </dl>
 </dd></dl>
@@ -513,29 +360,7 @@ either are the incorrect type.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.language.modifier_language.ModifierMeta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">ModifierMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#ModifierMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.ModifierMeta" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#ramble.language.language_base.DirectiveMeta" title="ramble.language.language_base.DirectiveMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectiveMeta</span></code></a></p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.archive_pattern">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">archive_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#archive_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.archive_pattern" title="Permalink to this definition"></a></dt>
-<dd><p>Adds a file pattern to be archived in addition to figure of merit logs</p>
-<p>Defines a new file pattern that will be archived during workspace archival.
-Archival will only happen for files that match the pattern when archival
-is being performed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pattern</strong> – Pattern that refers to files to archive</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.default_compiler">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">default_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#default_compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.default_compiler" title="Permalink to this definition"></a></dt>
-<dd><p>Defines the default compiler that will be used with this modifier</p>
-<p>Adds a new compiler spec to this modifier. Software specs should
-reference a compiler that has been added.</p>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.shared_language.SharedMeta" title="ramble.language.shared_language.SharedMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMeta</span></code></a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -603,151 +428,10 @@ append_execs: List of executables to inject after the base executable</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.figure_of_merit">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.figure_of_merit" title="Permalink to this definition"></a></dt>
-<dd><p>Adds a figure of merit to track for this modifier</p>
-<p>Defines a new figure of merit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – High level name of the figure of merit</p></li>
-<li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
-<li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
-<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
-<li><p><strong>units</strong> – The units associated with the FOM</p></li>
-<li><p><strong>contexts</strong> – List of context this is applicable to</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.figure_of_merit_context">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#figure_of_merit_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.figure_of_merit_context" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a context for figures of merit</p>
-<p>Defines a new context to contain figures of merit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – High level name of the context. Can be referred to in
-the figure of merit</p></li>
-<li><p><strong>regex</strong> – Regular expression, using group names, to match a context.</p></li>
-<li><p><strong>output_format</strong> – String, using python keywords {group_name} to
-extract group names from context regular
-expression.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.maintainers">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">maintainers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#maintainers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.maintainers" title="Permalink to this definition"></a></dt>
-<dd><p>Add a new maintainer directive, to specify maintainers in a declarative way.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>names</strong> – GitHub username for the maintainer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.modifier_language.mode">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.mode" title="Permalink to this definition"></a></dt>
 <dd><p>Define a new mode for this modifier.</p>
 <p>Modes allow a modifier to bundle a set of modifications together.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.register_builtin">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">register_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#register_builtin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.register_builtin" title="Permalink to this definition"></a></dt>
-<dd><p>Register a builtin</p>
-<p>Builtins are methods that return lists of strings. These methods represent
-a way to write python code to generate executables for building up
-workloads.</p>
-<p>Builtins can be referred to in a list of executables as:
-<cite>modifier_builtin::modifier_name::method_name</cite>.
-As an example, if a modifier named ‘test-modifier’ had a builtin defined as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;mod_builtin&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">mod_builtin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-  <span class="o">...</span>
-</pre></div>
-</div>
-<p>Its fully qualified name would be ‘modifier_builtin::test-modifier::mod_builtin’</p>
-<p>The ‘required’ attribute marks a builtin as required for all workloads. This
-will ensure the builtin is added to the workload if it is not explicitly
-added. If required builtins are not explicitly added to a workload, they
-are injected at the beginning of the list of executables.</p>
-<p>Modifier classes that want to disable auto-injecting a builtin into
-the experiment executable lists can use:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;mod_builtin&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>In order to use a non-required builtin, the experiment will need to
-explicitly list the builtin in their executable list.</p>
-<p>The ‘injection_method’ attribute controls where the builtin will be
-injected into the executable list.
-Options are:</p>
-<ul class="simple">
-<li><p>‘prepend’ – This builtin will be injected at the beginning of the executable list</p></li>
-<li><p>‘append’ – This builtin will be injected at the end of the executable list</p></li>
-</ul>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.required_package">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">required_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#required_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.required_package" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a new spack package that is required for this modifier
-to function properly.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.software_spec">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">software_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#software_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.software_spec" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a new software spec needed for this modifier.</p>
-<p>Adds a new software spec (for spack to use) that this modifier
-needs to execute properly.</p>
-<p>Only adds specs to modifiers that use spack.</p>
-<p>Specs can be described as an mpi spec, which means they
-will depend on the MPI library within the resulting spack
-environment.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.success_criteria">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'null'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.success_criteria" title="Permalink to this definition"></a></dt>
-<dd><p>Defines a success criteria that will be applied to experiments using this modifier</p>
-<p>Adds a new success criteria to this modifier definition.</p>
-<p>These will be checked during the analyze step to see if a job exited properly.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – The name of this success criteria</p></li>
-<li><p><strong>mode</strong> – The type of success criteria that will be validated
-Valid values are: ‘string’, ‘application_function’, and ‘fom_comparison’</p></li>
-<li><p><strong>match</strong> – For mode=’string’. Value to check indicate success (if found, it
-would mark success)</p></li>
-<li><p><strong>file</strong> – For mode=’string’. File success criteria should be located in</p></li>
-<li><p><strong>fom_name</strong> – For mode=’fom_comparison’. Name of fom for a criteria.
-Accepts globbing.</p></li>
-<li><p><strong>fom_context</strong> – For mode=’fom_comparison’. Context the fom is contained
-in. Accepts globbing.</p></li>
-<li><p><strong>formula</strong> – For mode=’fom_comparison’. Formula to use to evaluate success.
-‘{value}’ keyword is set as the value of the FOM.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.language.modifier_language.tags">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.tags" title="Permalink to this definition"></a></dt>
-<dd><p>Add a new tag directive, to specify tags in a declarative way.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> – Value to mark as a tag</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -772,6 +456,175 @@ in. Accepts globbing.</p></li>
 <p>‘prepend’ will add the modification to the beginning of ‘name’</p>
 <p>‘set’ (Default) will overwrite ‘name’ with the modification</p>
 </div></blockquote>
+</dd></dl>
+
+</section>
+<section id="module-ramble.language.shared_language">
+<span id="ramble-language-shared-language-module"></span><h2>ramble.language.shared_language module<a class="headerlink" href="#module-ramble.language.shared_language" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.language.shared_language.SharedMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">SharedMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#SharedMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.SharedMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.language_base.DirectiveMeta" title="ramble.language.language_base.DirectiveMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectiveMeta</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.archive_pattern">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">archive_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#archive_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.archive_pattern" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a file pattern to be archived in addition to figure of merit logs</p>
+<p>Defines a new file pattern that will be archived during workspace archival.
+Archival will only happen for files that match the pattern when archival
+is being performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern</strong> – Pattern that refers to files to archive</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.default_compiler">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">default_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#default_compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.default_compiler" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the default compiler that will be used with this object</p>
+<p>Adds a new compiler spec to this object. Software specs should
+reference a compiler that has been added.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.figure_of_merit">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.figure_of_merit" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a figure of merit to track for this object</p>
+<p>Defines a new figure of merit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the figure of merit</p></li>
+<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
+<li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
+<li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
+<li><p><strong>units</strong> – The units associated with the FOM</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.figure_of_merit_context">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#figure_of_merit_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.figure_of_merit_context" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a context for figures of merit</p>
+<p>Defines a new context to contain figures of merit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the context. Can be referred to in
+the figure of merit</p></li>
+<li><p><strong>regex</strong> – Regular expression, using group names, to match a context.</p></li>
+<li><p><strong>output_format</strong> – String, using python keywords {group_name} to extract
+group names from context regular expression.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.maintainers">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">maintainers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#maintainers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.maintainers" title="Permalink to this definition"></a></dt>
+<dd><p>Add a new maintainer directive, to specify maintainers in a declarative way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>names</strong> – GitHub username for the maintainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.register_builtin">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">register_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#register_builtin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.register_builtin" title="Permalink to this definition"></a></dt>
+<dd><p>Register a builtin</p>
+<p>Builtins are methods that return lists of strings. These methods represent
+a way to write python code to generate executables for building up
+workloads.</p>
+<p>Manual injection of a builtins can be performed through modifying the
+execution order in the internals config section.</p>
+<p>Modifier builtins are named:
+<cite>modifier_builtin::modifier_name::method_name</cite>.</p>
+<p>Application modifiers are named:
+<cite>builtin::method_name</cite></p>
+<p>As an example, if the following builtin was defined:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;example_builtin&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">example_builtin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
+<p>Its fully qualified name would be:
+* <cite>modifier_builtin::test-modifier::example_builtin</cite> when defined in a
+modifier named <cite>test-modifier</cite>
+* <cite>builtin::example_builtin</cite> when defined in an application</p>
+<p>The ‘required’ attribute marks a builtin as required for all workloads. This
+will ensure the builtin is added to the workload if it is not explicitly
+added. If required builtins are not explicitly added to a workload, they
+are injected  into the list of executables, based on the injection_method
+attribute.</p>
+<p>The ‘injection_method’ attribute controls where the builtin will be
+injected into the executable list.
+Options are:
+- ‘prepend’ – This builtin will be injected at the beginning of the executable list
+- ‘append’ – This builtin will be injected at the end of the executable list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.required_package">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">required_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#required_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.required_package" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a new spack package that is required for this object
+to function properly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.software_spec">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">software_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#software_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.software_spec" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a new software spec needed for this object.</p>
+<p>Adds a new software spec (for spack to use) that this object
+needs to execute properly.</p>
+<p>Only adds specs to object that use spack.</p>
+<p>Specs can be described as an mpi spec, which means they
+will depend on the MPI library within the resulting spack
+environment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.success_criteria">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'null'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.success_criteria" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a success criteria used by experiments of this object</p>
+<p>Adds a new success criteria to this object definition.</p>
+<p>These will be checked during the analyze step to see if a job exited properly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of this success criteria</p></li>
+<li><p><strong>mode</strong> – The type of success criteria that will be validated
+Valid values are: ‘string’, ‘application_function’, and ‘fom_comparison’</p></li>
+<li><p><strong>match</strong> – For mode=’string’. Value to check indicate success (if found, it
+would mark success)</p></li>
+<li><p><strong>file</strong> – For mode=’string’. File success criteria should be located in</p></li>
+<li><p><strong>fom_name</strong> – For mode=’fom_comparison’. Name of fom for a criteria.
+Accepts globbing.</p></li>
+<li><p><strong>fom_context</strong> – For mode=’fom_comparison’. Context the fom is contained
+in. Accepts globbing.</p></li>
+<li><p><strong>formula</strong> – For mode=’fom_comparison’. Formula to use to evaluate success.
+‘{value}’ keyword is set as the value of the FOM.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.tags">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.tags" title="Permalink to this definition"></a></dt>
+<dd><p>Add a new tag directive, to specify tags in a declarative way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> – Value to mark as a tag</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
