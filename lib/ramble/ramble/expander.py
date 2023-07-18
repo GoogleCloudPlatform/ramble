@@ -25,6 +25,8 @@ supported_math_operators = {
     ast.And: operator.and_, ast.Or: operator.or_
 }
 
+formatter = string.Formatter()
+
 
 class ExpansionDict(dict):
     def __missing__(self, key):
@@ -273,12 +275,16 @@ class Expander(object):
         """
 
         exp_dict = ExpansionDict()
+        exp_positional = []
         if isinstance(in_str, six.string_types):
-            for kw in self._all_keywords(in_str):
-                if kw in expansion_vars:
-                    exp_dict[kw] = \
-                        self._partial_expand(expansion_vars,
-                                             expansion_vars[kw])
+            for tup in formatter.parse(in_str):
+                kw = tup[1]
+                if kw is not None:
+                    if len(kw) > 0 and kw in expansion_vars:
+                        exp_dict[kw] = self._partial_expand(expansion_vars,
+                                                            expansion_vars[kw])
+                    elif len(kw) == 0:
+                        exp_positional.append('{}')
 
             passthrough_vars = {}
             for kw, val in exp_dict.items():
@@ -299,7 +305,30 @@ class Expander(object):
             exp_dict.update(passthrough_vars)
 
             try:
-                return in_str.format_map(exp_dict)
+                return formatter.vformat(in_str, exp_positional, exp_dict)
+            except IndexError as e:
+                if allow_passthrough:
+                    return in_str
+
+                tty.debug('Index error when parsing:\n')
+                tty.debug(in_str)
+                tty.debug(e)
+                raise RambleSyntaxError('Error occurred while parsing an expansion string.')
+            except KeyError as e:
+                tty.debug('Invalid variable name encountered')
+                tty.debug(e)
+                raise RambleSyntaxError('Expansion failed on:\n'
+                                        f'{in_str}\n'
+                                        'Which contains an invalid variable name')
+            except ValueError as e:
+                return in_str
+                tty.debug('JSON/YAML dict syntax should not be manually escaped.')
+                tty.debug('   {} will be automatically escaped')
+                tty.debug('   {{}} raises a syntax error')
+                tty.debug(e)
+                raise RambleSyntaxError('Expansion failed on:\n'
+                                        f'{in_str}\n'
+                                        'JSON/YAML dict syntax should not be manually escaped')
             except AttributeError:
                 tty.debug(f'Error encountered while trying to expand variable {in_str}')
                 tty.debug(f'Expansion dict was: {exp_dict}')

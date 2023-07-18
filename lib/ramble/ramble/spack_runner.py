@@ -95,6 +95,8 @@ class SpackRunner(object):
         self.compilers = []
         self.includes = []
         self.dry_run = dry_run
+        self.concretized = False
+        self.compiler_config_dir = None
 
     def get_version(self):
         """Get spack's version"""
@@ -123,6 +125,12 @@ class SpackRunner(object):
         Set the dry_run state of this spack runner
         """
         self.dry_run = dry_run
+
+    def set_compiler_config_dir(self, path=None):
+        """
+        Set the config path to use when installing compilers
+        """
+        self.compiler_config_dir = path
 
     def set_env(self, env_path):
         if not os.path.isdir(env_path) or not os.path.exists(os.path.join(env_path, 'spack.yaml')):
@@ -253,13 +261,13 @@ class SpackRunner(object):
         active_env = None
         if self.active:
             active_env = self.exe.default_env[self.env_key]
-            del self.exe.default_env[self.env_key]
+            if self.env_key in self.exe.default_env:
+                del self.exe.default_env[self.env_key]
 
-        comp_info_args = [
-            'compiler',
-            'info',
-            spec
-        ]
+        comp_info_args = []
+        if self.compiler_config_dir:
+            comp_info_args.extend(['-C', self.env_path])
+        comp_info_args.extend(['compiler', 'info', spec])
 
         try:
             self.exe(*comp_info_args, output=os.devnull, error=os.devnull)
@@ -373,8 +381,10 @@ class SpackRunner(object):
          - Name of a named spack environment
          - Path to an external spack environment
 
-        Returns:
-            (bool) found_lock: True if a spack.lock file was copied. False otherwise.
+         Sets self.concretized if a spack.lock file is found in the env
+
+         Args:
+         - env_name_or_path: Name or path to existing spack environment
         """
 
         self._check_active()
@@ -407,7 +417,7 @@ class SpackRunner(object):
 
         shutil.copyfile(conf_file, os.path.join(self.env_path, 'spack.yaml'))
 
-        return found_lock
+        self.concretized = found_lock
 
     def generate_env_file(self):
         """
