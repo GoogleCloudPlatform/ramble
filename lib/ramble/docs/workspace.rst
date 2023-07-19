@@ -41,7 +41,14 @@ will manage. To create a named workspace, use:
 
     $ ramble workspace create <name_of_workspace>
 
-These workspaces are created by default in ``$ramble/var/ramble/workspaces``.
+These workspaces are created by default in ``$ramble/var/ramble/workspaces``,
+but that location can be changed. For example, the following command will
+change the default location for creating workspaces to
+``~/.ramble/workspaces``:
+
+.. code-block:: console
+
+    $ ramble config add 'config:workspace_dirs:~/.ramble/workspaces'
 
 ^^^^^^^^^^^^^^^^^^^
 Anonymous Workspace
