@@ -197,6 +197,7 @@ to create a list. With this functionality, the example above could be re-written
                   variables:
                     n_ranks: '1'
 
+
 .. _ramble-matrix-logic:
 
 ^^^^^^^^^^^^^^^^^^
@@ -270,6 +271,57 @@ while the second is a 1x4 matrix. All matrices are required to have the same
 number of elements, as they are flattened and zipped together. In this case,
 there would be 4 experiments, each defined by a unique
 ``(processes_per_node, partition, n_nodes)`` tuple.
+
+
+.. _ramble-explicit-zips:
+
+
+^^^^^^^^^^^^^^^^^^^^^^^
+Explicit Variable Zips:
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble's worksapce config contains syntax for defining explicit variable zips.
+These zips are named grouping of variables that are related and should be
+iterated over together when generating experiments.
+
+Zips consume list variables and generate a named grouping, which can be
+consumed by matrices just as list variables would be.
+
+Below is an example showing how to define explicit zips:
+
+.. code-block:: yaml
+   :linenos:
+
+    ramble:
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                processes_per_node: ['16', '32']
+                partition: ['part1', 'part2']
+                n_nodes: ['1', '2', '3', '4']
+              experiments:
+                test_exp_{n_nodes}_{processes_per_node}:
+                  variables:
+                    n_ranks: '1'
+                  zips:
+                    partition_defs:
+                    - partition
+                    - processes_per_node
+                  matrices:
+                  - partition_defs
+                  - n_nodes
+
+
+Which would result in eight experiments, crossing the ``n_nodes`` variable with
+the zip of ``partition`` and ``processes_per_node``.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Variable Control:
