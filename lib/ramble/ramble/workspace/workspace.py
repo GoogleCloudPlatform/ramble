@@ -742,12 +742,13 @@ class Workspace(object):
                                                     workload_template, workload_chained_exps,
                                                     workload_mods)
 
-                for experiment, _, exp_vars, exp_env_vars, exp_matrices, exp_ints, \
+                for experiment, _, exp_vars, exp_env_vars, exp_zips, exp_matrices, exp_ints, \
                         exp_template, exp_chained_exps, exp_mods \
                         in self.all_experiments(experiments):
                     experiment_set.set_experiment_context(experiment,
                                                           exp_vars,
                                                           exp_env_vars,
+                                                          exp_zips,
                                                           exp_matrices,
                                                           exp_ints,
                                                           exp_template,
@@ -908,6 +909,7 @@ class Workspace(object):
             experiment_template = False
             experiment_chained_experiments = None
             experiment_modifiers = None
+            experiment_zips = None
 
             if namespace.variables in contents:
                 experiment_vars = contents[namespace.variables]
@@ -929,6 +931,9 @@ class Workspace(object):
 
             self.extract_success_criteria('experiment', contents)
 
+            if namespace.zips in contents:
+                experiment_zips = contents[namespace.zips]
+
             matrices = []
             if 'matrix' in contents:
                 matrices.append(contents['matrix'])
@@ -948,7 +953,7 @@ class Workspace(object):
                         matrices.append(matrix)
 
             yield experiment, contents, experiment_vars, \
-                experiment_env_vars, matrices, experiment_internals, \
+                experiment_env_vars, experiment_zips, matrices, experiment_internals, \
                 experiment_template, experiment_chained_experiments, \
                 experiment_modifiers
 

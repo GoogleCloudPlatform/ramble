@@ -68,6 +68,10 @@ class ExperimentSet(object):
         self._variables[self._contexts.base] = {}
         self._variables[self._contexts.required] = {}
 
+        self._zips = {
+            self._contexts.experiment: None
+        }
+
         self._matrices = {
             self._contexts.experiment: None
         }
@@ -198,6 +202,7 @@ class ExperimentSet(object):
     def set_experiment_context(self, experiment_name_template,
                                experiment_variables,
                                experiment_env_variables,
+                               experiment_zips,
                                experiment_matrices,
                                experiment_internals,
                                experiment_template,
@@ -219,6 +224,7 @@ class ExperimentSet(object):
                           experiment_chained_experiments,
                           experiment_modifiers)
 
+        self._zips[self._contexts.experiment] = experiment_zips
         self._matrices[self._contexts.experiment] = experiment_matrices
         self._ingest_experiments()
 
@@ -316,25 +322,8 @@ class ExperimentSet(object):
     def _ingest_experiments(self):
         """Ingest experiments based on the current context.
 
-        Internally collects all matrix and vector variables.
-
-        Matrices are processed first.
-
-        Vectors in the same matrix are crossed, sibling matrices are zipped.
-        All matrices are required to result in the same number of elements, but
-        not be the same shape.
-
-        Matrix elements are only allowed to be the names of variables. These
-        variables are required to be vectors.
-
-        After matrices are processed, any remaining vectors are zipped
-        together. All vectors are required to be of the same size.
-
-        The resulting zip of vectors is then crossed with all of the matrices
-        to build a final list of experiments.
-
-        After collecting the matrices, this method modifies generates new
-        experiments and injects them into the self.experiments dictionary.
+        Merge all contexts, and render individual experiments. Track these
+        experiments within this experiment set.
 
         Args:
             None
@@ -420,6 +409,7 @@ class ExperimentSet(object):
         rendered_experiments = set()
         for experiment_vars in \
                 renderer.render_objects(context_variables,
+                                        self._zips[self._contexts.experiment],
                                         self._matrices[self._contexts.experiment]):
             experiment_vars[self.keywords.spack_env] = \
                 os.path.join(self._workspace.software_dir,

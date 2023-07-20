@@ -28,6 +28,7 @@ class namespace:
 
     # For rendering objects
     variables = 'variables'
+    zips = 'zips'
     matrices = 'matrices'
     matrix = 'matrix'
 
