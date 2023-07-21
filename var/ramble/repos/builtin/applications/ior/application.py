@@ -7,6 +7,7 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Ior(SpackApplication):
@@ -20,6 +21,8 @@ class Ior(SpackApplication):
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
     software_spec('ior', spack_spec='ior', compiler='gcc')
+
+    required_package('ior')
 
     workload('multi-file', executable='ior')
 
@@ -63,11 +66,13 @@ class Ior(SpackApplication):
     figure_of_merit_context('iter', regex=access_regex,
                             output_format='{iter}')
 
+    log_str = Expander.expansion_str('log_file')
+
     # Capture Per Iteration Data
     for metric, unit in zip(metrics, units):
         fom_regex = r'\w+' + iter_regex
         figure_of_merit(metric,
-                        log_file='{log_file}',
+                        log_file=log_str,
                         fom_regex=fom_regex,
                         group_name=metric,
                         units=unit,
@@ -123,7 +128,7 @@ class Ior(SpackApplication):
 
     for metric, unit, _ in metrics:
         figure_of_merit(metric,
-                        log_file='{log_file}',
+                        log_file=log_str,
                         fom_regex=summary_regex,
                         group_name=metric,
                         units=unit,

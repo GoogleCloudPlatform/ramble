@@ -7,6 +7,7 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class MdTest(SpackApplication):
@@ -23,6 +24,8 @@ class MdTest(SpackApplication):
     # The IOR spack package also includes MDTest, but we implement it as a
     # seperate application in ramble
     software_spec('ior', spack_spec='ior', compiler='gcc')
+
+    required_package('ior')
 
     workload('multi-file', executable='ior')
 
@@ -49,11 +52,13 @@ class MdTest(SpackApplication):
     for metric in metrics:
         base_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'
 
+    log_str = Expander.expansion_str('log_file')
+
     for op in operations:
         fom_regex = r'\s*' + op + r'\s+' + base_regex
         for metric in metrics:
             figure_of_merit(f'{op}-{metric}',
-                            log_file='{log_file}',
+                            log_file=log_str,
                             fom_regex=fom_regex,
                             group_name=metric,
                             units=unit)

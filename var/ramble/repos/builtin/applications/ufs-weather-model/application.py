@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class UfsWeatherModel(SpackApplication):
@@ -43,7 +45,8 @@ class UfsWeatherModel(SpackApplication):
                       description='extracted simple-test-case tarfile path',
                       workloads=['simple_test_case'])
 
-    log_str = '{experiment_run_dir}/{experiment_name}.out'
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name') + '.out')
 
     figure_of_merit('Total wall clock time',
                     fom_regex=(r'^\s*The total amount of wall time\s+=\s+'

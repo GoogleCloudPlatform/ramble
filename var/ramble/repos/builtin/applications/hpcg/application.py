@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Hpcg(SpackApplication):
@@ -47,45 +49,48 @@ class Hpcg(SpackApplication):
                       description='Output file for results',
                       workloads=['standard'])
 
-    figure_of_merit('Status', log_file='{out_file}',
+    log_str = Expander.expansion_str('out_file')
+
+    figure_of_merit('Status', log_file=log_str,
                     fom_regex=r'Final Summary::HPCG result is (?P<status>[a-zA-Z]+) with a GFLOP/s rating of=(?P<gflops>[0-9]+\.[0-9]+)',
                     group_name='status', units='')
 
-    figure_of_merit('Gflops', log_file='{out_file}',
+    figure_of_merit('Gflops', log_file=log_str,
                     fom_regex=r'Final Summary::HPCG result is (?P<status>[a-zA-Z]+) with a GFLOP/s rating of=(?P<gflops>[0-9]+\.[0-9]+)',
                     group_name='gflops', units='GFLOP/s')
 
-    figure_of_merit('Time', log_file='{out_file}',
+    figure_of_merit('Time', log_file=log_str,
                     fom_regex=r'Final Summary::Results are.* execution time.*is=(?P<exec_time>[0-9]+\.[0-9]*)',
                     group_name='exec_time', units='s')
 
-    figure_of_merit('ComputeDotProductMsg', log_file='{out_file}',
+    figure_of_merit('ComputeDotProductMsg', log_file=log_str,
                     fom_regex=r'Final Summary::Reference version of ComputeDotProduct used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
-    figure_of_merit('ComputeSPMVMsg', log_file='{out_file}',
+    figure_of_merit('ComputeSPMVMsg', log_file=log_str,
                     fom_regex=r'Final Summary::Reference version of ComputeSPMV used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
-    figure_of_merit('ComputeMGMsg', log_file='{out_file}',
+    figure_of_merit('ComputeMGMsg', log_file=log_str,
                     fom_regex=r'Final Summary::Reference version of ComputeMG used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
-    figure_of_merit('ComputeWAXPBYMsg', log_file='{out_file}',
+    figure_of_merit('ComputeWAXPBYMsg', log_file=log_str,
                     fom_regex=r'Final Summary::Reference version of ComputeWAXPBY used.*=(?P<msg>.*)',
                     group_name='msg', units='')
 
-    figure_of_merit('HPCG 2.4 Rating', log_file='{out_file}',
+    figure_of_merit('HPCG 2.4 Rating', log_file=log_str,
                     fom_regex=r'Final Summary::HPCG 2\.4 rating.*=(?P<rating>[0-9]+\.*[0-9]*)',
                     group_name='rating', units='')
 
     def _make_experiments(self, workspace):
         super()._make_experiments(workspace)
 
-        input_path = self.expander.expand_var('{experiment_run_dir}/hpcg.dat')
+        input_path = os.path.join(self.expander.expand_var_name('experiment_run_dir'),
+                                  'hpcg.dat')
 
         with open(input_path, 'w+') as f:
             f.write('HPCG benchmark input file\n')
             f.write('Sandia National Laboratories; University of Tennessee, Knoxville\n')
-            f.write(self.expander.expand_var('{matrix_size}\n'))
-            f.write(self.expander.expand_var('{iterations}\n'))
+            f.write(self.expander.expand_var_name('matrix_size') + '\n')
+            f.write(self.expander.expand_var_name('iterations') + '\n')

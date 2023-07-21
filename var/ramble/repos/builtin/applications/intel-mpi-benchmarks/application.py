@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 # Genral Guidance:
 # - Use compact placement policy
@@ -106,22 +108,25 @@ class IntelMpiBenchmarks(SpackApplication):
     latency_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+' + \
                     r'(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<t_max>\d+\.\d+)$'
 
-    figure_of_merit('Latency min', log_file='{experiment_run_dir}/{experiment_name}.out',
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name') + '.out')
+
+    figure_of_merit('Latency min', log_file=log_str,
                     fom_regex=latency_regex,
                     group_name='t_min', units='usec', contexts=['latency-bytes'])
 
-    figure_of_merit('Latency avg', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Latency avg', log_file=log_str,
                     fom_regex=latency_regex,
                     group_name='t_avg', units='usec', contexts=['latency-bytes'])
 
-    figure_of_merit('Latency max', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Latency max', log_file=log_str,
                     fom_regex=latency_regex,
                     group_name='t_max', units='usec', contexts=['latency-bytes'])
 
     # Matches tables like:
     #  bytes #repetitions      t[usec]   Mbytes/sec
     bw_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+(?P<t_avg>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
-    figure_of_merit('Bandwidth', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Bandwidth', log_file=log_str,
                     fom_regex=bw_regex,
                     group_name='bw', units='Mbytes/sec', contexts=['bw-bytes'])
 
@@ -131,7 +136,7 @@ class IntelMpiBenchmarks(SpackApplication):
     combined_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+' + \
                      r'(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+' + \
                      r'(?P<t_max>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
-    figure_of_merit('Combo', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Combo', log_file=log_str,
                     fom_regex=combined_regex,
                     group_name='bw', units='Mbytes/sec', contexts=['combo-bytes'])
 

@@ -7,7 +7,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Hostname(ExecutableApplication):
@@ -28,7 +30,11 @@ class Hostname(ExecutableApplication):
     workload('serial', executable='serial')
     workload('parallel', executable='parallel')
 
-    figure_of_merit('user time', log_file='{experiment_run_dir}/{experiment_name}.out',
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name'),
+                           '.out')
+
+    figure_of_merit('user time', log_file=log_str,
                     fom_regex=r'(?P<user_time>[0-9]+\.[0-9]+)user.*',
                     group_name='user_time', units='s')
 

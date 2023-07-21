@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 import math
 
@@ -189,12 +191,14 @@ class IntelHpl(SpackApplication):
                       workloads=['calculator'])
 
     # FoMs:
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name') + '.out')
 
-    figure_of_merit('Time', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Time', log_file=log_str,
                     fom_regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n',
                     group_name='time', units='s', contexts=['problem-name'])
 
-    figure_of_merit('GFlops', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('GFlops', log_file=log_str,
                     fom_regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n',
                     group_name='gflops', units='GFLOP/s',
                     contexts=['problem-name'])
@@ -215,12 +219,13 @@ class IntelHpl(SpackApplication):
             else:
                 return (hi)
 
-    def _calculate_values(self, workspace, expander):
+    def _calculate_values(self, workspace):
+        expander = self.expander
         if expander.workload_name == 'calculator':
             # Find the best P and Q whose product is the number of available
             # cores, with P less than Q
-            nNodes = int(expander.expand_var('{n_nodes}'))
-            processesPerNode = int(expander.expand_var('{processes_per_node}'))
+            nNodes = int(expander.expand_var_name('n_nodes'))
+            processesPerNode = int(expander.expand_var_name('processes_per_node'))
 
             totalCores = nNodes * processesPerNode
 
@@ -239,9 +244,9 @@ class IntelHpl(SpackApplication):
 
             # HPL maintainers recommend basing the target problem size on
             # the square root of 80% of total memory in words.
-            memoryPerNode = int(expander.expand_var(expander.expansion_str('memory_per_node')))
-            memFraction = int(expander.expand_var(expander.expansion_str('percent_mem'))) / 100
-            blockSize = int(expander.expand_var(expander.expansion_str('block_size')))
+            memoryPerNode = int(expander.expand_var_name('memory_per_node'))
+            memFraction = int(expander.expand_var_name('percent_mem')) / 100
+            blockSize = int(expander.expand_var_name('block_size'))
             one_gb_mem_in_words = (1 << 30) / 8
 
             fullMemWords = nNodes * memoryPerNode * one_gb_mem_in_words
@@ -259,11 +264,11 @@ class IntelHpl(SpackApplication):
             for var, config in self.workload_variables['standard'].items():
                 self.variables[var] = config['default']
 
-            pfact = expander.expand_var(expander.expansion_str('pfact'))
-            nbmin = expander.expand_var(expander.expansion_str('nbmin'))
-            rfact = expander.expand_var(expander.expansion_str('rfact'))
-            bcast = expander.expand_var(expander.expansion_str('bcast'))
-            depth = expander.expand_var(expander.expansion_str('depth'))
+            pfact = expander.expand_var_name('pfact')
+            nbmin = expander.expand_var_name('nbmin')
+            rfact = expander.expand_var_name('rfact')
+            bcast = expander.expand_var_name('bcast')
+            depth = expander.expand_var_name('depth')
 
             self.variables['N-Ns'] = pad_value('1', 'Number of problems sizes (N)')  # vs 4
 
@@ -307,9 +312,10 @@ class IntelHpl(SpackApplication):
 
     def _make_experiments(self, workspace):
         super()._make_experiments(workspace)
-        self._calculate_values(workspace, self.expander)
+        self._calculate_values(workspace)
 
-        input_path = self.expander.expand_var('{experiment_run_dir}/HPL.dat')
+        input_path = os.path.join(self.expander.expand_var_name('experiment_run_dir'),
+                                  'HPL.dat')
 
         settings = ['output_file', 'device_out', 'N-Ns', 'Ns', 'N-NBs', 'NBs',
                     'PMAP', 'N-Grids', 'Ps', 'Qs', 'threshold', 'NPFACTs',
@@ -325,7 +331,7 @@ class IntelHpl(SpackApplication):
             for setting in settings:
                 # This gets around an issue in expander where trailing comments
                 # after '#' are not printed
-                hash_replace_str = self.expander.expand_var(self.expander.expansion_str(setting)).replace('Number', '#')
+                hash_replace_str = self.expander.expand_var_name(setting).replace('Number', '#')
                 f.write(hash_replace_str + '\n')
 
             # Write some documentation at the bottom of the input file:

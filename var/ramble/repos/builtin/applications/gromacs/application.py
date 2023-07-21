@@ -6,8 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Gromacs(SpackApplication):
@@ -147,26 +148,29 @@ class Gromacs(SpackApplication):
                       description='Input path for JCP_benchmark {workload_name}',
                       workloads=['ion_channel', 'rnase_cubic'])
 
-    figure_of_merit('Core Time', log_file='{experiment_run_dir}/md.log',
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           'md.log')
+
+    figure_of_merit('Core Time', log_file=log_str,
                     fom_regex=r'\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*',
                     group_name='core_time', units='s')
 
-    figure_of_merit('Wall Time', log_file='{experiment_run_dir}/md.log',
+    figure_of_merit('Wall Time', log_file=log_str,
                     fom_regex=r'\s+Time:\s+[0-9]+\.[0-9]+\s+' +
                               r'(?P<wall_time>[0-9]+\.[0-9]+).*',
                     group_name='wall_time', units='s')
 
-    figure_of_merit('Percent Core Time', log_file='{experiment_run_dir}/md.log',
+    figure_of_merit('Percent Core Time', log_file=log_str,
                     fom_regex=r'\s+Time:\s+[0-9]+\.[0-9]+\s+[0-9]+\.[0-9]+\s+' +
                               r'(?P<perc_core_time>[0-9]+\.[0-9]+).*',
                     group_name='perc_core_time', units='%')
 
-    figure_of_merit('Nanosecs per day', log_file='{experiment_run_dir}/md.log',
+    figure_of_merit('Nanosecs per day', log_file=log_str,
                     fom_regex=r'Performance:\s+' +
                               r'(?P<ns_per_day>[0-9]+\.[0-9]+).*',
                     group_name='ns_per_day', units='ns/day')
 
-    figure_of_merit('Hours per nanosec', log_file='{experiment_run_dir}/md.log',
+    figure_of_merit('Hours per nanosec', log_file=log_str,
                     fom_regex=r'Performance:\s+[0-9]+\.[0-9]+\s+' +
                               r'(?P<hours_per_ns>[0-9]+\.[0-9]+).*',
                     group_name='hours_per_ns', units='hours/ns')

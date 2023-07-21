@@ -7,7 +7,9 @@
 # except according to those terms.
 
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Cloverleaf(SpackApplication):
@@ -58,7 +60,7 @@ class Cloverleaf(SpackApplication):
     for k in range(15):
         workload('bm' + str(2**k) + 's_short', executables=['get_input', 'execute'])
 
-    log_file = '{experiment_run_dir}/clover.out'
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'), 'clover.out')
 
     floating_point_regex = r'[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*'
 
@@ -66,13 +68,13 @@ class Cloverleaf(SpackApplication):
 
     wall_clock_regex = r'\s*Wall clock\s+(?P<wall_clock>[0-9]+\.[0-9]+)'
 
-    figure_of_merit('Timestep', log_file=log_file,
+    figure_of_merit('Timestep', log_file=log_str,
                     fom_regex=step_count_regex,
                     group_name='timestep',
                     units='s', contexts=['step']
                     )
 
-    figure_of_merit('Wall Clock', log_file=log_file,
+    figure_of_merit('Wall Clock', log_file=log_str,
                     fom_regex=wall_clock_regex,
                     group_name='wall_clock',
                     units='s', contexts=['step']
@@ -91,25 +93,25 @@ class Cloverleaf(SpackApplication):
                           r'(?P<kinetic_energy>'  + floating_point_regex + r')\s+' +
                           r'(?P<total_energy>'    + floating_point_regex + r')')
 
-    figure_of_merit('Total step count', log_file=log_file,
+    figure_of_merit('Total step count', log_file=log_str,
                     fom_regex=step_summary_regex,
                     group_name='step',
                     units=''
                     )
 
-    figure_of_merit('Final Kinetic Energy', log_file=log_file,
+    figure_of_merit('Final Kinetic Energy', log_file=log_str,
                     fom_regex=step_summary_regex,
                     group_name='kinetic_energy',
                     units='Joules'
                     )
 
-    figure_of_merit('Total Elapsed Time', log_file=log_file,
+    figure_of_merit('Total Elapsed Time', log_file=log_str,
                     fom_regex=wall_clock_regex,
                     group_name='wall_clock',
                     units='s'
                     )
 
-    figure_of_merit('First step overhead', log_file=log_file,
+    figure_of_merit('First step overhead', log_file=log_str,
                     fom_regex=(r'\s*First step overhead\s+(?P<overhead>' + floating_point_regex + r')'),
                     group_name='overhead',
                     units='s'

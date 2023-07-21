@@ -7,6 +7,7 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class OsuMicroBenchmarks(SpackApplication):
@@ -21,6 +22,8 @@ class OsuMicroBenchmarks(SpackApplication):
     software_spec('openmpi', spack_spec='openmpi')
     software_spec('osu-micro-benchmarks', spack_spec='osu-micro-benchmarks',
                   compiler='gcc')
+
+    required_package('osu-micro-benchmarks')
 
     workload_variable('message-size', default='0:4194304',
                       description='Message size interval',
@@ -50,13 +53,14 @@ class OsuMicroBenchmarks(SpackApplication):
                             regex=size_time_regex,
                             output_format='Messae Size: {msg_size}')
 
+    log_str = Expander.expansion_str('log_file')
     for benchmark, unit in pt2pt:
         executable(name=f'execute-{benchmark}', template=benchmark, use_mpi=True,
-                   redirect='{log_file}' + f'-{benchmark}')
+                   redirect=log_str + f'-{benchmark}')
         workload(benchmark, executable=f'execute-{benchmark}')
 
         figure_of_merit(f'osu_{benchmark}',
-                        log_file='{log_file}' + f'-{benchmark}',
+                        log_file=log_str + f'-{benchmark}',
                         fom_regex=size_time_regex,
                         group_name='fom',
                         units=unit,

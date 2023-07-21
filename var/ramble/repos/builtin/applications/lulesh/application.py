@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Lulesh(SpackApplication):
@@ -46,27 +48,30 @@ class Lulesh(SpackApplication):
                       description='Flags to pass in to LULESH',
                       workloads=['standard'])
 
-    figure_of_merit('Time', log_file='{experiment_run_dir}/{experiment_name}.out',
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name') + '.out')
+
+    figure_of_merit('Time', log_file=log_str,
                     fom_regex=r'\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+).*',
                     group_name='time', units='s')
 
-    figure_of_merit('FOM', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('FOM', log_file=log_str,
                     fom_regex=r'\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+).*',
                     group_name='fom', units='z/s')
 
-    figure_of_merit('Size', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Size', log_file=log_str,
                     fom_regex=r'\s*Problem size\s+=\s+(?P<size>[0-9]+)',
                     group_name='size', units='')
 
-    figure_of_merit('Grind Time', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Grind Time', log_file=log_str,
                     fom_regex=r'\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+).*',
                     group_name='grind', units='s/element')
 
-    figure_of_merit('NumTasks', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('NumTasks', log_file=log_str,
                     fom_regex=r'\s*MPI tasks\s+=\s+(?P<tasks>[0-9]+)',
                     group_name='tasks', units='')
 
-    figure_of_merit('Iterations', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('Iterations', log_file=log_str,
                     fom_regex=r'\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
                     group_name='iterations', units='')
 
@@ -80,7 +85,7 @@ class Lulesh(SpackApplication):
         We also need to recompute the number of nodes, or the value of
         processes per node here too.
         """
-        num_ranks = int(self.expander.expand_var('{n_ranks}'))
+        num_ranks = int(self.expander.expand_var_name('n_ranks'))
 
         cube_root = int(num_ranks ** (1. / 3.))
 

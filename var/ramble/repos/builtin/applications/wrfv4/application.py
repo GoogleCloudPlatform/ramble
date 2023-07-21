@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Wrfv4(SpackApplication):
@@ -61,27 +63,30 @@ class Wrfv4(SpackApplication):
                       description='Path for CONUS 2.5km inputs.',
                       workloads=['CONUS_2p5km'])
 
-    figure_of_merit('Average Timestep Time', log_file='{experiment_run_dir}/stats.out',
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           'stats.out')
+
+    figure_of_merit('Average Timestep Time', log_file=log_str,
                     fom_regex=r'Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*).*',
                     group_name='avg_time', units='s')
 
-    figure_of_merit('Cumulative Timestep Time', log_file='{experiment_run_dir}/stats.out',
+    figure_of_merit('Cumulative Timestep Time', log_file=log_str,
                     fom_regex=r'Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*).*',
                     group_name='total_time', units='s')
 
-    figure_of_merit('Minimum Timestep Time', log_file='{experiment_run_dir}/stats.out',
+    figure_of_merit('Minimum Timestep Time', log_file=log_str,
                     fom_regex=r'Min time:\s+(?P<min_time>[0-9]+\.[0-9]*).*',
                     group_name='min_time', units='s')
 
-    figure_of_merit('Maximum Timestep Time', log_file='{experiment_run_dir}/stats.out',
+    figure_of_merit('Maximum Timestep Time', log_file=log_str,
                     fom_regex=r'Max time:\s+(?P<max_time>[0-9]+\.[0-9]*).*',
                     group_name='max_time', units='s')
 
-    figure_of_merit('Number of timesteps', log_file='{experiment_run_dir}/stats.out',
+    figure_of_merit('Number of timesteps', log_file=log_str,
                     fom_regex=r'Number of times:\s+(?P<count>[0-9]+)',
                     group_name='count', units='')
 
-    figure_of_merit('Avg. Max Ratio Time', log_file='{experiment_run_dir}/stats.out',
+    figure_of_merit('Avg. Max Ratio Time', log_file=log_str,
                     fom_regex=r'Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*',
                     group_name='avg_max_ratio', units='')
 
@@ -96,7 +101,8 @@ class Wrfv4(SpackApplication):
         import re
         # Generate stats file
 
-        file_list = glob.glob(self.expander.expand_var('{experiment_run_dir}/rsl.out.*'))
+        file_list = glob.glob(os.path.join(self.expander.expand_var_name('experiment_run_dir'),
+                                           'rsl.out.*'))
 
         if file_list:
             timing_regex = re.compile(r'Timing for main.*(?P<main_time>[0-9]+\.[0-9]*).*')
@@ -118,7 +124,8 @@ class Wrfv4(SpackApplication):
 
             avg_time = sum_time / max(count, 1)
 
-            stats_path = self.expander.expand_var('{experiment_run_dir}/stats.out')
+            stats_path = os.path.join(self.expander.expand_var_name('experiment_run_dir'),
+                                      'stats.out')
             with open(stats_path, 'w+') as f:
                 f.write('Average time: %s s\n' % (avg_time))
                 f.write('Cumulative time: %s s\n' % (sum_time))
