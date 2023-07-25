@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Streamc(SpackApplication):
@@ -29,7 +31,8 @@ class Streamc(SpackApplication):
 
     workload('streamc', executable='execute_c')
 
-    log_file = '{experiment_run_dir}/{experiment_name}.out'
+    log_file = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                            Expander.expansion_str('experiment_name') + '.out')
 
     success_criteria('valid', mode='string',
                      match=r'Solution Validates: avg error less than 1.000000e-13 on all three arrays',

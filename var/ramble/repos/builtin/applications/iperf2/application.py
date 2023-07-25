@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Iperf2(SpackApplication):
@@ -74,10 +76,12 @@ class Iperf2(SpackApplication):
                template='iperf {input_flags} {additional_flags}',
                use_mpi=False)
 
-    # TODO: addsuccess_criteria(..
+    # TODO: add success_criteria(..
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name') + '.out')
     figure_of_merit(
         'Total BW',
-        log_file='{experiment_run_dir}/{experiment_name}.out',
+        log_file=log_str,
         fom_regex=r'\[SUM\]\s.*sec\s.*GBytes\s(?P<bw>.*)\sGbits/sec.*',
         group_name='bw',
         units='Gbits/sec'

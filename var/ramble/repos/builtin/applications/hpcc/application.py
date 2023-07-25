@@ -7,6 +7,7 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Hpcc(SpackApplication):
@@ -92,10 +93,12 @@ class Hpcc(SpackApplication):
         ('RandomlyOrderedRingBandwidth_GBytes', 'GB/s')
     ]
 
+    log_str = Expander.expansion_str('out_file')
+
     for metric, unit in summary_metrics:
         summary_regex = metric + '=(?P<val>[0-9]+\.[0-9]+)'
         figure_of_merit(metric,
-                        log_file='{out_file}',
+                        log_file=log_str,
                         fom_regex=summary_regex,
                         group_name='val', units=unit,
                         contexts=['Summary']

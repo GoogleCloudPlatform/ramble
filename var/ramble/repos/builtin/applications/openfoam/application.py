@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Openfoam(SpackApplication):
@@ -170,14 +172,16 @@ class Openfoam(SpackApplication):
                                    './Allrun'],
                use_mpi=False)
 
-    figure_of_merit('snappyHexMesh Time', log_file='{experiment_run_dir}/log.snappyHexMesh',
+    log_prefix = os.path.join(Expander.expansion_str('experiment_run_dir'), 'log.')
+
+    figure_of_merit('snappyHexMesh Time', log_file=(log_prefix + 'snappyHexMesh'),
                     fom_regex=r'Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*',
                     group_name='mesh_time', units='s')
 
-    figure_of_merit('simpleFoam Time', log_file='{experiment_run_dir}/log.simpleFoam',
+    figure_of_merit('simpleFoam Time', log_file=(log_prefix + 'simpleFoam'),
                     fom_regex=r'\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
                     group_name='foam_time', units='s')
 
-    figure_of_merit('potentialFoam Time', log_file='{experiment_run_dir}/log.potentialFoam',
+    figure_of_merit('potentialFoam Time', log_file=(log_prefix + 'potentialFoam'),
                     fom_regex=r'\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
                     group_name='foam_time', units='s')

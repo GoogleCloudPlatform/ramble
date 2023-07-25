@@ -29,6 +29,8 @@ class Namd(SpackApplication):
 
     software_spec('namd', spack_spec='namd@2.14 interface=tcl', compiler='gcc12')
 
+    required_package('namd')
+
     input_file('stmv', url='https://www.ks.uiuc.edu/Research/namd/utilities/stmv.tar.gz',
                sha256='2ef8beaa22046f2bf4ddc85bb8141391a27041302f101f5302f937d04104ccdd',
                description='STMV (virus) benchmark (1,066,628 atoms, periodic, PME')
@@ -308,9 +310,11 @@ class Namd(SpackApplication):
         units='MB'
     )
 
+    namd_nspd_stat_file = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                                       'namd_nspd_stat.out')
     figure_of_merit(
         'Nanoseconds per day',
-        log_file='{experiment_run_dir}/namd_nspd_stat.out',
+        log_file=namd_nspd_stat_file,
         fom_regex=r'(?P<ns_per_day>[0-9]+\.*[0-9]*) ns/day',
         group_name='ns_per_day',
         units='ns/day'
