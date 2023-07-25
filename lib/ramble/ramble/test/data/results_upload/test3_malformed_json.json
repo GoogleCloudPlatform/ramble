@@ -1,0 +1,113 @@
+
+experiments": [
+  {
+    "name": "gromacs.water_gmx50.pme_single_rank",
+    "EXPERIMENT_CHAIN": [],
+    "RAMBLE_STATUS": "SUCCESS",
+    "RAMBLE_VARIABLES": {
+      "log_dir": "/home/user/gromacs_example/logs",
+      "env_name": "gromacs",
+      "experiments_file": "/home/user/gromacs_example/all_experiments",
+      "processes_per_node": "16",
+      "mpi_command": "mpirun -n 1 -ppn 16",
+      "batch_submit": "/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/execute_experiment",
+      "n_ranks": "1",
+      "n_threads": "1",
+      "size": "0003",
+      "type": "pme",
+      "global_conf_name": "global_conf",
+      "base_name": "None",
+      "workspace_name": "gromacs_example",
+      "application_name": "gromacs",
+      "workload_name": "water_gmx50",
+      "experiment_name": "pme_single_rank",
+      "required_name": "None",
+      "application_namespace": "gromacs",
+      "workload_namespace": "gromacs.water_gmx50",
+      "experiment_namespace": "gromacs.water_gmx50.pme_single_rank",
+      "application_run_dir": "/home/user/gromacs_example/experiments/gromacs",
+      "application_input_dir": "/home/user/gromacs_example/inputs/gromacs",
+      "workload_run_dir": "/home/user/gromacs_example/experiments/gromacs/water_gmx50",
+      "workload_input_dir": "/home/user/gromacs_example/inputs/gromacs/water_gmx50",
+      "experiment_run_dir": "/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank",
+      "spack_env": "/home/user/gromacs_example/software/gromacs.water_gmx50",
+      "n_nodes": "1",
+      "experiment_template_name": "pme_single_rank",
+      "log_file": "/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out",
+      "input_path": "/home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003",
+      "water_gmx50_bare": "/home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare",
+      "command": "rm -f \"/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out\"\ntouch \"/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out\"\n. /opt/apps/spack/share/spack/setup-env.sh\nspack env activate /home/user/gromacs_example/software/gromacs.water_gmx50\ngmx_mpi grompp -f /home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr >> \"/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out\"\nmpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes -v -resethway -noconfout -nsteps 4000 -s exp_input.tpr >> \"/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out\"",
+      "spack_setup": "",
+      "execute_experiment": "/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/execute_experiment"
+    },
+    "RAMBLE_RAW_VARIABLES": {
+      "log_dir": "/home/user/gromacs_example/logs",
+      "env_name": "{application_name}",
+      "experiments_file": "/home/user/gromacs_example/all_experiments",
+      "processes_per_node": 16,
+      "mpi_command": "mpirun -n {n_ranks} -ppn {processes_per_node}",
+      "batch_submit": "{execute_experiment}",
+      "n_ranks": "1",
+      "n_threads": "1",
+      "size": "0003",
+      "type": "pme",
+      "global_conf_name": "global_conf",
+      "base_name": null,
+      "workspace_name": "gromacs_example",
+      "application_name": "gromacs",
+      "workload_name": "water_gmx50",
+      "experiment_name": "pme_single_rank",
+      "required_name": null,
+      "application_namespace": "gromacs",
+      "workload_namespace": "gromacs.water_gmx50",
+      "experiment_namespace": "gromacs.water_gmx50.pme_single_rank",
+      "application_run_dir": "/home/user/gromacs_example/experiments/{application_name}",
+      "application_input_dir": "/home/user/gromacs_example/inputs/{application_name}",
+      "workload_run_dir": "{application_run_dir}/{workload_name}",
+      "workload_input_dir": "{application_input_dir}/{workload_name}",
+      "experiment_run_dir": "{workload_run_dir}/{experiment_name}",
+      "spack_env": "/home/user/gromacs_example/software/{env_name}.{workload_name}",
+      "n_nodes": 1,
+      "experiment_template_name": "pme_single_rank",
+      "log_file": "{experiment_run_dir}/{experiment_name}.out",
+      "input_path": "{water_gmx50_bare}/{size}",
+      "water_gmx50_bare": "/home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare",
+      "command": "rm -f \"{log_file}\"\ntouch \"{log_file}\"\n. /opt/apps/spack/share/spack/setup-env.sh\nspack env activate /home/user/gromacs_example/software/gromacs.water_gmx50\ngmx_mpi grompp -f /home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /home/user/gromacs_example/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr >> \"/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out\"\nmpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes -v -resethway -noconfout -nsteps 4000 -s exp_input.tpr >> \"/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/pme_single_rank.out\"",
+      "spack_setup": "",
+      "execute_experiment": "/home/user/gromacs_example/experiments/gromacs/water_gmx50/pme_single_rank/execute_experiment"
+    },
+    "CONTEXTS": [
+      {
+        "name": "null",
+        "foms": [
+          {
+            "value": "42.556",
+            "units": "s",
+            "name": "Core Time"
+          },
+          {
+            "value": "21.280",
+            "units": "s",
+            "name": "Wall Time"
+          },
+          {
+            "value": "200.0",
+            "units": "%",
+            "name": "Percent Core Time"
+          },
+          {
+            "value": "16.249",
+            "units": "ns/day",
+            "name": "Nanosecs per day"
+          },
+          {
+            "value": "1.477",
+            "units": "hours/ns",
+            "name": "Hours per nanosec"
+          }
+        ]
+      }
+    ]
+  }
+]
+}

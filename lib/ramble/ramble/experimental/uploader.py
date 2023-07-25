@@ -162,6 +162,27 @@ def format_data(data_in):
     return results
 
 
+def results_file_import(filename):
+    """
+    Import Ramble experiment results from a JSON file.
+    """
+    tty.debug("Import file")
+    tty.debug(filename)
+
+    imported_file = open(filename)
+
+    try:
+        tty.msg("Import file...")
+        parsed_json_file = json.load(imported_file)
+        # Check if data contains an experiment
+        if parsed_json_file.get('experiments'):
+            return parsed_json_file
+        else:
+            tty.die("Error parsing file: Does not contain valid data.")
+    except ValueError:
+        tty.die("Error parsing file: Invalid JSON formatting.")
+
+
 class BigQueryUploader(Uploader):
     """Class to handle upload of FOMs to BigQuery
     """
@@ -251,7 +272,7 @@ class BigQueryUploader(Uploader):
         # results = query_job.result()  # Waits for job to complete.
         # return results[0]
 
-    def get_expierment_id(experiment):
+    def get_experiment_id(experiment):
         # get_max_current_id(...) # Warning: dangerous..
 
         # This should be stable per machine/python version, but is not
