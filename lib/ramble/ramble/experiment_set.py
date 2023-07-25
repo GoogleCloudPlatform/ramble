@@ -428,10 +428,10 @@ class ExperimentSet(object):
 
             expander = ramble.expander.Expander(experiment_vars, self)
             self._compute_mpi_vars(expander, experiment_vars)
-            final_app_name = expander.expand_var(
-                Expander.expansion_str(self.keywords.application_name), allow_passthrough=False)
-            final_wl_name = expander.expand_var(
-                Expander.expansion_str(self.keywords.workload_name), allow_passthrough=False)
+            final_app_name = expander.expand_var_name(self.keywords.application_name,
+                                                      allow_passthrough=False)
+            final_wl_name = expander.expand_var_name(self.keywords.workload_name,
+                                                     allow_passthrough=False)
             final_exp_name = expander.expand_var(experiment_template_name, allow_passthrough=False)
 
             experiment_vars[self.keywords.experiment_template_name] = experiment_template_name

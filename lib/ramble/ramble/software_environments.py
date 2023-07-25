@@ -109,9 +109,8 @@ class SoftwareEnvironments(object):
                 pkg_vars['package_name'] = pkg_template
 
                 for rendered_vars in pkg_renderer.render_objects(pkg_vars, pkg_matrices):
-                    expansion_str = expander.expansion_str('package_name')
-                    final_name = expander.expand_var(expansion_str,
-                                                     extra_vars=rendered_vars)
+                    final_name = expander.expand_var_name('package_name',
+                                                          extra_vars=rendered_vars)
                     self._packages[final_name] = {}
                     self._package_map[pkg_template].append(final_name)
 
@@ -148,9 +147,8 @@ class SoftwareEnvironments(object):
                 env_vars['environment_name'] = env_template
 
                 for rendered_vars in env_renderer.render_objects(env_vars, env_matrices):
-                    expansion_str = expander.expansion_str('environment_name')
-                    final_name = expander.expand_var(expansion_str,
-                                                     extra_vars=rendered_vars)
+                    final_name = expander.expand_var_name('environment_name',
+                                                          extra_vars=rendered_vars)
                     self._environment_map[env_template].append(final_name)
 
                     self._environments[final_name] = {}

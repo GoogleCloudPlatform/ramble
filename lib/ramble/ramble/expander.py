@@ -71,24 +71,21 @@ class Expander(object):
     @property
     def application_name(self):
         if not self._application_name:
-            var = self.expansion_str(self._keywords.application_name)
-            self._application_name = self.expand_var(var)
+            self._application_name = self.expand_var_name(self._keywords.application_name)
 
         return self._application_name
 
     @property
     def workload_name(self):
         if not self._workload_name:
-            var = self.expansion_str(self._keywords.workload_name)
-            self._workload_name = self.expand_var(var)
+            self._workload_name = self.expand_var_name(self._keywords.workload_name)
 
         return self._workload_name
 
     @property
     def experiment_name(self):
         if not self._experiment_name:
-            var = self.expansion_str(self._keywords.experiment_name)
-            self._experiment_name = self.expand_var(var)
+            self._experiment_name = self.expand_var_name(self._keywords.experiment_name)
 
         return self._experiment_name
 
@@ -128,40 +125,36 @@ class Expander(object):
     @property
     def application_input_dir(self):
         if not self._application_input_dir:
-            var = self.expansion_str(self._keywords.application_input_dir)
-            self._application_input_dir = self.expand_var(var)
+            self._application_input_dir = \
+                self.expand_var_name(self._keywords.application_input_dir)
 
         return self._application_input_dir
 
     @property
     def workload_input_dir(self):
         if not self._workload_input_dir:
-            var = self.expansion_str(self._keywords.workload_input_dir)
-            self._workload_input_dir = self.expand_var(var)
+            self._workload_input_dir = self.expand_var_name(self._keywords.workload_input_dir)
 
         return self._workload_input_dir
 
     @property
     def application_run_dir(self):
         if not self._application_run_dir:
-            var = self.expansion_str(self._keywords.application_run_dir)
-            self._application_run_dir = self.expand_var(var)
+            self._application_run_dir = self.expand_var_name(self._keywords.application_run_dir)
 
         return self._application_run_dir
 
     @property
     def workload_run_dir(self):
         if not self._workload_run_dir:
-            var = self.expansion_str(self._keywords.workload_run_dir)
-            self._workload_run_dir = self.expand_var(var)
+            self._workload_run_dir = self.expand_var_name(self._keywords.workload_run_dir)
 
         return self._workload_run_dir
 
     @property
     def experiment_run_dir(self):
         if not self._experiment_run_dir:
-            var = self.expansion_str(self._keywords.experiment_run_dir)
-            self._experiment_run_dir = self.expand_var(var)
+            self._experiment_run_dir = self.expand_var_name(self._keywords.experiment_run_dir)
 
         return self._experiment_run_dir
 
@@ -190,6 +183,23 @@ class Expander(object):
             return var
         except SyntaxError:
             return var
+
+    def expand_var_name(self, var_name, extra_vars=None, allow_passthrough=True):
+        """Convert a variable name to an expansion string, and expand it
+
+        Take a variable name (var) and convert it to an expansion string by
+        calling the expansion_str function. Pass the expansion string into
+        expand_var, and return the result.
+
+        Args:
+            var_name: String name of variable to expand
+            extra_vars: Variable definitions to use with highest precedence
+            allow_passthrough: Whether the string is allowed to have keywords
+                               after expansion
+        """
+        return self.expand_var(self.expansion_str(var_name),
+                               extra_vars=extra_vars,
+                               allow_passthrough=allow_passthrough)
 
     def expand_var(self, var, extra_vars=None, allow_passthrough=True):
         """Perform expansion of a string
