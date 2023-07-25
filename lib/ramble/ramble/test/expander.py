@@ -58,6 +58,25 @@ def test_expansions(input, output):
 
 
 @pytest.mark.parametrize(
+    'input,output',
+    [
+        ('application_name', 'foo'),
+        ('workload_name', 'bar'),
+        ('experiment_name', 'baz'),
+        ('var1', '3'),
+        ('var2', '3'),
+        ('var3', '3'),
+    ]
+)
+def test_expand_var_name(input, output):
+    expansion_vars = exp_dict()
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    assert expander.expand_var_name(input) == output
+
+
+@pytest.mark.parametrize(
     'input,expected_error,error_string',
     [
         ('{decimal.06.var}',
