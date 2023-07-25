@@ -217,6 +217,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.eval_math"><code class="docutils literal notranslate"><span class="pre">Expander.eval_math()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expand_lists"><code class="docutils literal notranslate"><span class="pre">Expander.expand_lists()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expand_var"><code class="docutils literal notranslate"><span class="pre">Expander.expand_var()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expand_var_name"><code class="docutils literal notranslate"><span class="pre">Expander.expand_var_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.expansion_str"><code class="docutils literal notranslate"><span class="pre">Expander.expansion_str()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_name"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_namespace</span></code></a></li>
@@ -1356,14 +1357,18 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.default_compilers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executable_modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figures_of_merit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modes"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">BasicModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workload_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workload_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workloads"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1375,8 +1380,10 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.default_compilers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executable_modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figures_of_merit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modes"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">SpackModifier.required_packages</span></code></a></li>
@@ -1384,6 +1391,8 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">SpackModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.uses_spack"><code class="docutils literal notranslate"><span class="pre">SpackModifier.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workload_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workload_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workloads"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2852,6 +2861,25 @@ expansion variables.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>var</strong> – String variable to expand</p></li>
+<li><p><strong>extra_vars</strong> – Variable definitions to use with highest precedence</p></li>
+<li><p><strong>allow_passthrough</strong> – Whether the string is allowed to have keywords
+after expansion</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.Expander.expand_var_name">
+<span class="sig-name descname"><span class="pre">expand_var_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_passthrough</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#Expander.expand_var_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.Expander.expand_var_name" title="Permalink to this definition"></a></dt>
+<dd><p>Convert a variable name to an expansion string, and expand it</p>
+<p>Take a variable name (var) and convert it to an expansion string by
+calling the expansion_str function. Pass the expansion string into
+expand_var, and return the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_name</strong> – String name of variable to expand</p></li>
 <li><p><strong>extra_vars</strong> – Variable definitions to use with highest precedence</p></li>
 <li><p><strong>allow_passthrough</strong> – Whether the string is allowed to have keywords
 after expansion</p></li>

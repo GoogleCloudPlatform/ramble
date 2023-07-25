@@ -186,24 +186,21 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">workload_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_name</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span>
 
@@ -243,40 +240,36 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_input_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_input_dir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_input_dir</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">workload_input_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_input_dir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_input_dir</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_run_dir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">application_run_dir</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">workload_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_run_dir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">workload_run_dir</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">experiment_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">experiment_run_dir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">experiment_run_dir</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span>
 
@@ -305,6 +298,23 @@
             <span class="k">return</span> <span class="n">var</span>
         <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">var</span></div>
+
+<div class="viewcode-block" id="Expander.expand_var_name"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var_name">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a variable name to an expansion string, and expand it</span>
+
+<span class="sd">        Take a variable name (var) and convert it to an expansion string by</span>
+<span class="sd">        calling the expansion_str function. Pass the expansion string into</span>
+<span class="sd">        expand_var, and return the result.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var_name: String name of variable to expand</span>
+<span class="sd">            extra_vars: Variable definitions to use with highest precedence</span>
+<span class="sd">            allow_passthrough: Whether the string is allowed to have keywords</span>
+<span class="sd">                               after expansion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">var_name</span><span class="p">),</span>
+                               <span class="n">extra_vars</span><span class="o">=</span><span class="n">extra_vars</span><span class="p">,</span>
+                               <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Expander.expand_var"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform expansion of a string</span>
