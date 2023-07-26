@@ -14,6 +14,7 @@ import llnl.util.tty as tty
 from ramble.language.shared_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
+from ramble.keywords import Keywords
 
 header_color = '@*b'
 level1_color = '@*g'
@@ -186,11 +187,11 @@ class SpackApplication(ApplicationBase):
         """
 
         # See if we cached this already, and if so return
-        namespace = self.expander.env_namespace
-        if not namespace:
-            raise ApplicationError('Ramble env_namespace is set to None.')
+        env_path_or_name = self.expander.expand_var(
+            self.expander.expansion_str(Keywords.env_name)
+        )
 
-        cache_tupl = ('concretize-env', namespace)
+        cache_tupl = ('concretize-env', env_path_or_name)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
@@ -214,11 +215,11 @@ class SpackApplication(ApplicationBase):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
-        namespace = self.expander.env_namespace
-        if not namespace:
-            raise ApplicationError('Ramble env_namespace is set to None.')
+        env_path_or_name = self.expander.expand_var(
+            self.expander.expansion_str(Keywords.env_name)
+        )
 
-        cache_tupl = ('spack-install', namespace)
+        cache_tupl = ('spack-install', env_path_or_name)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return

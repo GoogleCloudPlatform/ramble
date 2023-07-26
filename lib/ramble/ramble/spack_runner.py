@@ -89,6 +89,8 @@ class SpackRunner(object):
         self.source_script = os.path.join(self.spack_dir,
                                           'share', 'spack', script)
 
+        self.concretized = False
+        self.installed = False
         self.hash = None
         self.env_path = None
         self.active = False
@@ -425,15 +427,39 @@ class SpackRunner(object):
         """
         self._check_active()
 
-        env_file = {}
-        env_file[spack_namespace] = {}
-        env_file[spack_namespace]['concretizer'] = {}
+        env_file = syaml.syaml_dict()
+        env_file[spack_namespace] = syaml.syaml_dict()
+        env_file[spack_namespace]['concretizer'] = syaml.syaml_dict()
         env_file[spack_namespace]['concretizer']['unify'] = True
 
-        env_file[spack_namespace]['specs'] = []
+        env_file[spack_namespace]['specs'] = syaml.syaml_list()
         env_file[spack_namespace]['specs'].extend(self.env_contents)
 
         env_file[spack_namespace]['include'] = self.includes
+
+        spack_env_file = os.path.join(self.env_path, 'spack.yaml')
+        spack_lock_file = os.path.join(self.env_path, 'spack.lock')
+
+        # Check that a spack.yaml and spack.lock file exist already
+        if os.path.exists(spack_env_file) and os.path.exists(spack_lock_file):
+            existing_env_mtime = os.path.getmtime(spack_env_file)
+            existing_lock_mtime = os.path.getmtime(spack_lock_file)
+
+            # If the lock file was last modified after the yaml file...
+            if existing_lock_mtime > existing_env_mtime:
+                env_data = syaml.load_config(syaml.dump_config(env_file, default_flow_style=False))
+                with open(spack_env_file, 'r') as f:
+                    existing_data = syaml.load_config(f)
+                gen_env_hash = ramble.util.hashing.hash_json(env_data)
+                existing_env_hash = ramble.util.hashing.hash_json(existing_data)
+                tty.msg(f' Generated hash: {gen_env_hash}')
+                tty.msg(f' Existing hash: {existing_env_hash}')
+
+                # If the yaml hash matches the new generated data hash...
+                if gen_env_hash == existing_env_hash:
+                    self.concretized = True
+                    tty.msg(f'Environment {self.env_path} will not be regenerated.')
+                    return
 
         # Write spack.yaml to environment before concretizing
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
@@ -447,6 +473,10 @@ class SpackRunner(object):
         """
         self._check_active()
 
+        if self.concretized:
+            tty.msg(f'Environment {self.env_path} is already concretized. Skipping concretize...')
+            return
+
         concretize_flags = ramble.config.get('config:spack_flags:concretize')
 
         args = [
@@ -457,6 +487,8 @@ class SpackRunner(object):
             self.exe(*args)
         else:
             self._dry_run_print(args)
+
+        self.concretized = True
 
     def inventory_hash(self):
         """
@@ -483,6 +515,10 @@ class SpackRunner(object):
         This command requires an active spack environment.
         """
         self._check_active()
+
+        if self.installed:
+            tty.msg(f'Environment {self.env_path} is already installed. Skipping installation...')
+            return
 
         install_flags = ramble.config.get('config:spack_flags:install')
 
@@ -517,6 +553,8 @@ class SpackRunner(object):
             self.exe(*args)
         else:
             self._dry_run_print(args)
+
+        self.installed = True
 
     def get_package_path(self, package_spec):
         """Return the installation directory for a package"""
