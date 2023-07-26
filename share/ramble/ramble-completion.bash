@@ -276,7 +276,7 @@ _ramble_attributes() {
     then
         RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --maintainers --tags"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -289,7 +289,7 @@ _ramble_commands() {
     then
         RAMBLE_COMPREPLY="-h --help --update-completion -a --aliases --format --header --update"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -338,7 +338,7 @@ _ramble_config_add() {
     then
         RAMBLE_COMPREPLY="-h --help -f --file"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -347,7 +347,7 @@ _ramble_config_remove() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -356,7 +356,7 @@ _ramble_config_rm() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -405,7 +405,7 @@ _ramble_flake8() {
     then
         RAMBLE_COMPREPLY="-h --help -b --base -k --keep-temp -a --all -o --output -r --root-relative -U --no-untracked"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -471,7 +471,7 @@ _ramble_mirror_add() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -480,7 +480,7 @@ _ramble_mirror_remove() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -489,7 +489,7 @@ _ramble_mirror_rm() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -498,7 +498,7 @@ _ramble_mirror_set_url() {
     then
         RAMBLE_COMPREPLY="-h --help --push --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -538,7 +538,7 @@ _ramble_mods_info() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -573,7 +573,7 @@ _ramble_repo_add() {
     then
         RAMBLE_COMPREPLY="-h --help --scope -t --type"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -639,7 +639,7 @@ _ramble_workspace_create() {
     then
         RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -680,7 +680,7 @@ _ramble_workspace_remove() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -689,6 +689,6 @@ _ramble_workspace_rm() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
