@@ -129,6 +129,7 @@
 <span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>
 <span class="kn">from</span> <span class="nn">ramble.application</span> <span class="kn">import</span> <span class="n">ApplicationBase</span><span class="p">,</span> <span class="n">ApplicationError</span>
 <span class="kn">import</span> <span class="nn">ramble.spack_runner</span>
+<span class="kn">from</span> <span class="nn">ramble.keywords</span> <span class="kn">import</span> <span class="n">Keywords</span>
 
 <span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
 <span class="n">level1_color</span> <span class="o">=</span> <span class="s1">&#39;@*g&#39;</span>
@@ -301,11 +302,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
-        <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_namespace</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s1">&#39;Ramble env_namespace is set to None.&#39;</span><span class="p">)</span>
+        <span class="n">env_path_or_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+        <span class="p">)</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;concretize-env&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;concretize-env&#39;</span><span class="p">,</span> <span class="n">env_path_or_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
@@ -329,11 +330,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install application&#39;s software using spack&quot;&quot;&quot;</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
-        <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_namespace</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s1">&#39;Ramble env_namespace is set to None.&#39;</span><span class="p">)</span>
+        <span class="n">env_path_or_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+        <span class="p">)</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;spack-install&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;spack-install&#39;</span><span class="p">,</span> <span class="n">env_path_or_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
@@ -501,7 +502,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 25, 2023.
+      <span class="lastupdated">Last updated on Jul 26, 2023.
       </span></p>
   </div>
 
