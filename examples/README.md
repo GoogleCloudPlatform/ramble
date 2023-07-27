@@ -74,7 +74,7 @@ This configuration changes from a pre-existing binary to using spack to build gr
 ### [Basic Expansion Config](basic_expansion_config.yaml)
 The basic expansion configuration file shows some examples of the experiment generation syntax.
 
-It changes from using groamcs to using OpenFoam and WRF.
+It changes from using gromacs to using OpenFoam and WRF.
 
 Additionally, it shows how a configuration file can contain experiments for
 multiple applications and / or workloads at the same time.
