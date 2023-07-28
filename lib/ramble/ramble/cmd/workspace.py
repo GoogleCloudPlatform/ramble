@@ -26,6 +26,7 @@ import ramble.config
 import ramble.workspace
 import ramble.workspace.shell
 import ramble.experiment_set
+import ramble.experimental.uploader
 import ramble.software_environments
 import ramble.util.colors as rucolor
 
@@ -363,7 +364,7 @@ def workspace_analyze(args):
 
     # FIXME: this will fire the analyze logic of twice currently
     if args.upload:
-        ws.upload_results()
+        ramble.experimental.uploader.upload_results(ws.results)
 
 
 def workspace_info_setup_parser(subparser):

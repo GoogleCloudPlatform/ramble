@@ -11,20 +11,23 @@ import json
 import sys
 import math
 
+import ramble.config
+from ramble.config import ConfigError
+
 
 default_node_type_val = "Not Specified"
 
 
 class Uploader():
     # TODO: should the class store the base uri?
-    def perform_upload(self, uri, workspace_name, data):
+    def perform_upload(self, uri, data):
         # TODO: move content checking to __init__ ?
         if not uri:
             raise ValueError(
-                "%s requires %s argument." % (self.__class__, uri))
+                f"{self.__class__} requires {uri} argument.")
         if not data:
             raise ValueError(
-                "%s requires %s argument." % (self.__class__, data))
+                f"{self.__class__} requires %{data} argument.")
         pass
 
 
@@ -109,6 +112,31 @@ def determine_node_type(experiment, contexts):
             continue
 
 
+def upload_results(results):
+    if ramble.config.get('config:upload'):
+        # Read upload type and push it there
+        if ramble.config.get('config:upload:type') == 'BigQuery':  # TODO: enum?
+            try:
+                formatted_data = ramble.experimental.uploader.format_data(results)
+            except KeyError:
+                tty.die("Error parsing file: Does not contain valid data to upload.")
+            # TODO: strategy object?
+
+            uploader = BigQueryUploader()
+
+            uri = ramble.config.get('config:upload:uri')
+            if not uri:
+                tty.die('No upload URI (config:upload:uri) in config.')
+
+            tty.msg('Uploading Results to ' + uri)
+            uploader.perform_upload(uri, formatted_data)
+        else:
+            raise ConfigError("Unknown config:upload:type value")
+
+    else:
+        raise ConfigError("Missing correct config:upload parameters")
+
+
 def format_data(data_in):
     """
     Goal: convert results to a more searchable and decomposed format for insertion
@@ -118,7 +146,7 @@ def format_data(data_in):
 
     .. code-block:: text
 
-        { expierment_name:
+        { experiment_name:
             { "CONTEXTS": {
                 "context_name": "FOM_name { unit: "value", "value":value" }
             ...}
@@ -162,27 +190,6 @@ def format_data(data_in):
     return results
 
 
-def results_file_import(filename):
-    """
-    Import Ramble experiment results from a JSON file.
-    """
-    tty.debug("Import file")
-    tty.debug(filename)
-
-    imported_file = open(filename)
-
-    try:
-        tty.msg("Import file...")
-        parsed_json_file = json.load(imported_file)
-        # Check if data contains an experiment
-        if parsed_json_file.get('experiments'):
-            return parsed_json_file
-        else:
-            tty.die("Error parsing file: Does not contain valid data.")
-    except ValueError:
-        tty.die("Error parsing file: Invalid JSON formatting.")
-
-
 class BigQueryUploader(Uploader):
     """Class to handle upload of FOMs to BigQuery
     """
@@ -218,7 +225,7 @@ class BigQueryUploader(Uploader):
                 return error
         return error
 
-    def insert_data(self, uri: str, workspace_name, results) -> None:
+    def insert_data(self, uri: str, results) -> None:
 
         # It is expected that the user will create these tables outside of this
         # tooling
@@ -254,13 +261,13 @@ class BigQueryUploader(Uploader):
             else:
                 tty.die("Encountered errors while inserting rows: {}".format(errors))
 
-    def perform_upload(self, uri, workspace_name, results):
-        super().perform_upload(uri, workspace_name, results)
+    def perform_upload(self, uri, results):
+        super().perform_upload(uri, results)
 
         # import spack.util.spack_json as sjson
         # json_str = sjson.dump(results)
 
-        self.insert_data(uri, workspace_name, results)
+        self.insert_data(uri, results)
 
     # def get_max_current_id(uri, table):
         # TODO: Generating an id based on the max in use id is dangerous, and

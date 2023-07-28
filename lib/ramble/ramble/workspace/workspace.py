@@ -33,8 +33,6 @@ import ramble.success_criteria
 import ramble.keywords
 import ramble.software_environments
 from ramble.mirror import MirrorStats
-from ramble.config import ConfigError
-import ramble.experimental.uploader
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
@@ -1066,27 +1064,6 @@ class Workspace(object):
         with open(out_file, 'w+') as f:
             sjson.dump(self.results, f)
         return out_file
-
-    def upload_results(self):
-        if ramble.config.get('config:upload'):
-            # Read upload type and push it there
-            if ramble.config.get('config:upload:type') == 'BigQuery':  # TODO: enum?
-                formatted_data = ramble.experimental.uploader.format_data(self.results)
-
-                # TODO: strategy object?
-                uploader = ramble.experimental.uploader.BigQueryUploader()
-
-                uri = ramble.config.get('config:upload:uri')
-                if not uri:
-                    tty.die('No upload URI (config:upload:uri) in config.')
-
-                tty.msg('Uploading Results to ' + uri)
-                uploader.perform_upload(uri, self.name, formatted_data)
-            else:
-                raise ConfigError("Unknown config:upload:type value")
-
-        else:
-            raise ConfigError("Missing correct conifg:upload parameters")
 
     def default_results(self):
         res = {}

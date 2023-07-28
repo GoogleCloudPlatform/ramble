@@ -600,16 +600,16 @@ _ramble_results() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="file_upload"
+        RAMBLE_COMPREPLY="upload"
     fi
 }
 
-_ramble_results_file_upload() {
+_ramble_results_upload() {
     if $list_options
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
