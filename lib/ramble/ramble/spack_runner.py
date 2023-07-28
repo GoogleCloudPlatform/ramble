@@ -569,29 +569,6 @@ class SpackRunner(object):
         else:
             self._dry_run_print(args)
 
-        for mod_type in ['tcl', 'lmod']:
-            args = [
-                'module',
-                mod_type,
-                'refresh',
-                '-y'
-            ]
-
-            if not self.dry_run:
-                self.exe(*args)
-            else:
-                self._dry_run_print(args)
-
-        args = [
-            'env',
-            'loads'
-        ]
-
-        if not self.dry_run:
-            self.exe(*args)
-        else:
-            self._dry_run_print(args)
-
         self.installed = True
 
     def get_package_path(self, package_spec):

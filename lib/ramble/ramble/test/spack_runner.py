@@ -120,7 +120,6 @@ def test_env_install(tmpdir, capsys):
 
         captured = capsys.readouterr()
         assert "with args: ['install'" in captured.out
-        assert "with args: ['env', 'loads']" in captured.out
 
         sr.deactivate()
 
