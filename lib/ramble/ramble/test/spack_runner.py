@@ -135,6 +135,35 @@ def test_env_install(tmpdir, capsys):
         pytest.skip('%s' % e)
 
 
+def test_env_configs_apply(tmpdir, capsys):
+    try:
+        env_path = str(tmpdir.join('spack-env'))
+        # Dry run so we don't actually install zlib
+        sr = ramble.spack_runner.SpackRunner(dry_run=True)
+        sr.create_env(env_path)
+        sr.activate()
+        sr.add_spec('zlib')
+        sr.add_config('config:debug:true')
+        sr.generate_env_file()
+
+        captured = capsys.readouterr()
+        assert "with args: ['config', 'add', 'config:debug:true']" in captured.out
+
+        sr.deactivate()
+
+        env_file = os.path.join(env_path, 'spack.yaml')
+
+        assert os.path.exists(env_file)
+
+        with open(env_file, 'r') as f:
+            data = f.read()
+            assert 'zlib' in data
+            assert 'debug: true' in data
+
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)
+
+
 def test_default_concretize_flags(tmpdir, capsys):
     try:
         env_path = tmpdir.join('spack-env')
@@ -372,6 +401,34 @@ spack:
 
             with open(os.path.join(generated_env, 'spack.yaml'), 'r') as f:
                 assert 'zlib' in f.read()
+        except ramble.spack_runner.RunnerError as e:
+            pytest.skip('%s' % e)
+
+
+def test_configs_apply_to_external_env(tmpdir):
+    src_spack_yaml = """
+spack:
+  specs: [ 'zlib' ]
+"""
+    with tmpdir.as_cwd():
+        with open(os.path.join(os.getcwd(), 'spack.yaml'), 'w+') as f:
+            f.write(src_spack_yaml)
+
+        try:
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            generated_env = os.path.join(os.getcwd(), 'dest_env')
+            sr.create_env(os.path.join(generated_env))
+            sr.activate()
+            sr.add_config('config:debug:true')
+            sr.copy_from_external_env(os.getcwd())
+
+            assert os.path.exists(os.path.join(generated_env, 'spack.yaml'))
+
+            with open(os.path.join(generated_env, 'spack.yaml'), 'r') as f:
+                data = f.read()
+                assert 'zlib' in data
+                assert 'config:' in data
+                assert 'debug: true' in data
         except ramble.spack_runner.RunnerError as e:
             pytest.skip('%s' % e)
 

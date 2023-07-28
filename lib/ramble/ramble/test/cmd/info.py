@@ -78,7 +78,25 @@ def test_spack_info_software(app_query):
         'Tags:',
         'spack_spec =',
         'compiler =',
+    )
 
+    out = info(app_query)
+
+    for field in expected_fields:
+        assert field in out
+
+
+@pytest.mark.parametrize('app_query', [
+    'zlib-configs',
+])
+def test_mock_spack_info_software(mock_applications, app_query):
+    expected_fields = (
+        'Description:',
+        'Setup Pipeline Phases:',
+        'Analyze Pipeline Phases:',
+        'Tags:',
+        'Package Manager Configs:',
+        'spack_spec =',
     )
 
     out = info(app_query)

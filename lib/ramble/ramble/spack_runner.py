@@ -99,6 +99,8 @@ class SpackRunner(object):
         self.dry_run = dry_run
         self.concretized = False
         self.compiler_config_dir = None
+        self.configs = []
+        self.configs_applied = False
 
     def get_version(self):
         """Get spack's version"""
@@ -179,6 +181,12 @@ class SpackRunner(object):
 
         # Ensure subsequent commands use the created env now.
         self.env_path = path
+
+    def add_config(self, config):
+        """
+        Add a config option to this spack environment.
+        """
+        self.configs.append(config)
 
     def create_env(self, path, output=None, error=None):
         """
@@ -375,6 +383,30 @@ class SpackRunner(object):
         if file_name in self._allowed_config_files:
             self.includes.append(include_file)
 
+    def apply_configs(self):
+        """
+        Add all defined configs to the environment
+        """
+
+        if self.configs_applied:
+            return
+
+        self._check_active()
+
+        config_args = [
+            'config',
+            'add'
+        ]
+
+        for config in self.configs:
+            args = config_args.copy()
+            args.append(config)
+            self.exe(*args)
+            if self.dry_run:
+                self._dry_run_print(args)
+
+        self.configs_applied = True
+
     def copy_from_external_env(self, env_name_or_path):
         """
         Copy an external spack environment file into the generated environment.
@@ -418,6 +450,9 @@ class SpackRunner(object):
             raise InvalidExternalEnvironment(f'{path} is not a spack environment.')
 
         shutil.copyfile(conf_file, os.path.join(self.env_path, 'spack.yaml'))
+
+        if self.configs:
+            self.apply_configs()
 
         self.concretized = found_lock
 
@@ -464,6 +499,9 @@ class SpackRunner(object):
         # Write spack.yaml to environment before concretizing
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
             syaml.dump_config(env_file, f, default_flow_style=False)
+
+        if self.configs:
+            self.apply_configs()
 
     def concretize(self):
         """

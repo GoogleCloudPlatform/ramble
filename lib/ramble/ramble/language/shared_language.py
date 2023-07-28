@@ -154,6 +154,21 @@ def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
     return _execute_software_spec
 
 
+@shared_directive('package_manager_configs')
+def package_manager_config(name, config, **kwargs):
+    """Defines a config option to set within a package manager
+
+    Define a new config which will be passed to a package manager. The
+    resulting experiment instance will pass the config to the package manager,
+    which will control the logic of applying it.
+    """
+
+    def _execute_package_manager_config(obj):
+        obj.package_manager_configs[name] = config
+
+    return _execute_package_manager_config
+
+
 @shared_directive('required_packages')
 def required_package(name):
     """Defines a new spack package that is required for this object
