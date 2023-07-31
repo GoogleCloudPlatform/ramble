@@ -34,7 +34,7 @@ Success criteria defined in a workspace config file only applies to those
 specific experiments. These criteria can evaluate if an experiment performed
 adequately.
 
-The application.py interface will be documented in the
+The ``application.py`` interface is documented in the
 :ref:`application developers guide<application-dev-guide>`.
 
 The rest of this document focuses on how to write success criteria in a

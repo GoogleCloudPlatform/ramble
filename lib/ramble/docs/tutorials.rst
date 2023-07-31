@@ -17,7 +17,7 @@ various features.
 
 .. toctree::
     :maxdepth: 1
-    :caption: Commands Introduction
+    :caption: Tutorials
 
     tutorials/general_usage
     tutorials/mirrors

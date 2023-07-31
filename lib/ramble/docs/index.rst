@@ -28,7 +28,6 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    workspace
    workspace_config
    success_criteria
-   application_dev_guide
 
 .. toctree::
    :maxdepth: 2
@@ -41,7 +40,7 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    :caption: Contributing
 
    Contributing Guidelines <https://github.com/GoogleCloudPlatform/ramble#contributing>
-   developer_guide
+   dev_guides
 
 .. toctree::
    :maxdepth: 2
