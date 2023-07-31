@@ -130,6 +130,12 @@ class ModifierBase(object, metaclass=ModifierMeta):
             out_str.append(rucolor.section_title('Executable Modifiers:\n'))
             out_str.append('\t' + colified(self.executable_modifiers.keys(), tty=True) + '\n')
 
+        if hasattr(self, 'package_manager_configs'):
+            out_str.append(rucolor.section_title('Package Manager Configs:\n'))
+            for name, config in self.package_manager_configs.items():
+                out_str.append(f'\t{name} = {config}\n')
+            out_str.append('\n')
+
         if hasattr(self, 'default_compilers'):
             out_str.append(rucolor.section_title('Default Compilers:\n'))
             for comp_name, comp_def in self.default_compilers.items():

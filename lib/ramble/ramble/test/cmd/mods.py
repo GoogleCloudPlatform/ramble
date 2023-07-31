@@ -16,7 +16,7 @@ mods = RambleCommand('mods')
 def check_info(output):
     expected_sections = ['Tags', 'Mode', 'Builtin Executables',
                          'Executable Modifiers', 'Default Compilers',
-                         'Software Specs']
+                         'Software Specs', 'Package Manager Configs']
 
     for section in expected_sections:
         assert section in output

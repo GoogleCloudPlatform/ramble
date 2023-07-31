@@ -48,6 +48,7 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, 'executable_modifiers')
     assert hasattr(test_mod, 'env_var_modifications')
     assert hasattr(test_mod, 'maintainers')
+    assert hasattr(test_mod, 'package_manager_configs')
 
 
 def add_mode(mod_inst, mode_num=1):

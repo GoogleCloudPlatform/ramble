@@ -71,6 +71,12 @@ class SpackApplication(ApplicationBase):
     def _long_print(self):
         out_str = super()._long_print()
 
+        if hasattr(self, 'package_manager_configs'):
+            out_str.append('\n')
+            out_str.append(section_title('Package Manager Configs:\n'))
+            for name, config in self.package_manager_configs.items():
+                out_str.append(f'\t{name} = {config}\n')
+
         for group in self._spec_groups:
             if hasattr(self, group[0]):
                 out_str.append('\n')
@@ -134,6 +140,14 @@ class SpackApplication(ApplicationBase):
             return
         else:
             workspace.add_to_cache(cache_tupl)
+
+        package_manager_config_dicts = [self.package_manager_configs]
+        for mod_inst in self._modifier_instances:
+            package_manager_config_dicts.append(mod_inst.package_manager_configs)
+
+        for config_dict in package_manager_config_dicts:
+            for _, config in config_dict.items():
+                self.spack_runner.add_config(config)
 
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
