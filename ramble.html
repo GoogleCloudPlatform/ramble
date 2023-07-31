@@ -91,6 +91,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.maintainers"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.maintainers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.modes"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.name"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.print_chain_order"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.print_chain_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.print_internals"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.print_internals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.print_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.print_vars()</span></code></a></li>
@@ -566,6 +567,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modes"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modifier_class"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.name"><code class="docutils literal notranslate"><span class="pre">ModifierBase.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.required_packages"><code class="docutils literal notranslate"><span class="pre">ModifierBase.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.set_on_executables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.set_on_executables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.set_usage_mode"><code class="docutils literal notranslate"><span class="pre">ModifierBase.set_usage_mode()</span></code></a></li>
@@ -770,9 +772,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#ramble.spack_runner.RunnerError"><code class="docutils literal notranslate"><span class="pre">RunnerError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.spack_runner.SpackRunner"><code class="docutils literal notranslate"><span class="pre">SpackRunner</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.activate"><code class="docutils literal notranslate"><span class="pre">SpackRunner.activate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.add_config"><code class="docutils literal notranslate"><span class="pre">SpackRunner.add_config()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.add_include_file"><code class="docutils literal notranslate"><span class="pre">SpackRunner.add_include_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.add_spec"><code class="docutils literal notranslate"><span class="pre">SpackRunner.add_spec()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.added_packages"><code class="docutils literal notranslate"><span class="pre">SpackRunner.added_packages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.apply_configs"><code class="docutils literal notranslate"><span class="pre">SpackRunner.apply_configs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.compiler_find_args"><code class="docutils literal notranslate"><span class="pre">SpackRunner.compiler_find_args</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.concretize"><code class="docutils literal notranslate"><span class="pre">SpackRunner.concretize()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.configure_env"><code class="docutils literal notranslate"><span class="pre">SpackRunner.configure_env()</span></code></a></li>
@@ -1004,6 +1008,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.inputs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.modes"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.required_packages"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.software_specs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.success_criteria"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.success_criteria</span></code></a></li>
@@ -1026,6 +1031,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">SpackApplication.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.inputs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.modes"><code class="docutils literal notranslate"><span class="pre">SpackApplication.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.required_packages"><code class="docutils literal notranslate"><span class="pre">SpackApplication.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.software_specs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_activate"><code class="docutils literal notranslate"><span class="pre">SpackApplication.spack_activate()</span></code></a></li>
@@ -1340,6 +1346,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.figure_of_merit"><code class="docutils literal notranslate"><span class="pre">figure_of_merit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.figure_of_merit_context"><code class="docutils literal notranslate"><span class="pre">figure_of_merit_context()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.maintainers"><code class="docutils literal notranslate"><span class="pre">maintainers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.package_manager_config"><code class="docutils literal notranslate"><span class="pre">package_manager_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.register_builtin"><code class="docutils literal notranslate"><span class="pre">register_builtin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.required_package"><code class="docutils literal notranslate"><span class="pre">required_package()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.shared_language.software_spec"><code class="docutils literal notranslate"><span class="pre">software_spec()</span></code></a></li>
@@ -1364,6 +1371,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modes"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">BasicModifier.success_criteria</span></code></a></li>
@@ -1387,6 +1395,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modes"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">SpackModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">SpackModifier.success_criteria</span></code></a></li>
@@ -1514,6 +1523,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-known-applications-module">ramble.test.end_to_end.known_applications module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-merge-config-files-module">ramble.test.end_to_end.merge_config_files module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-missing-required-dry-run-module">ramble.test.end_to_end.missing_required_dry_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-package-manager-config-module">ramble.test.end_to_end.package_manager_config module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-passthrough-variables-module">ramble.test.end_to_end.passthrough_variables module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-test-configvar-dry-run-module">ramble.test.end_to_end.test_configvar_dry_run module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-unused-compilers-are-skipped-module">ramble.test.end_to_end.unused_compilers_are_skipped module</a></li>
@@ -1525,6 +1535,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-env-var-modifiers-module">ramble.test.modifier_functionality.mock_env_var_modifiers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-modifier-dry-run-module">ramble.test.modifier_functionality.mock_modifier_dry_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-modifier-spack-configs-module">ramble.test.modifier_functionality.mock_modifier_spack_configs module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-mock-spack-modifier-module">ramble.test.modifier_functionality.mock_spack_modifier module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#module-ramble.test.modifier_functionality.modifier_helpers">ramble.test.modifier_functionality.modifier_helpers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.modifier_functionality.html#ramble-test-modifier-functionality-multi-modifier-dry-run-module">ramble.test.modifier_functionality.multi_modifier_dry_run module</a></li>
@@ -2080,6 +2091,11 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.package_manager_configs">
+<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.package_manager_configs" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -5090,6 +5106,11 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.package_manager_configs">
+<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.package_manager_configs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.required_packages">
 <span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.required_packages" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -6205,6 +6226,12 @@ is loaded within an execution script.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.add_config">
+<span class="sig-name descname"><span class="pre">add_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.add_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.add_config" title="Permalink to this definition"></a></dt>
+<dd><p>Add a config option to this spack environment.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.add_include_file">
 <span class="sig-name descname"><span class="pre">add_include_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.add_include_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.add_include_file" title="Permalink to this definition"></a></dt>
 <dd><p>Add an include file to this spack environment.</p>
@@ -6223,6 +6250,12 @@ spack will error. So, we validate against a list of supported sections.</p>
 <dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.added_packages">
 <span class="sig-name descname"><span class="pre">added_packages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.added_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.added_packages" title="Permalink to this definition"></a></dt>
 <dd><p>Return a list of base package names that are added to an environment</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.apply_configs">
+<span class="sig-name descname"><span class="pre">apply_configs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.apply_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.apply_configs" title="Permalink to this definition"></a></dt>
+<dd><p>Add all defined configs to the environment</p>
 </dd></dl>
 
 <dl class="py attribute">

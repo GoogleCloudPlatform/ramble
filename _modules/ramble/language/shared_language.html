@@ -269,6 +269,21 @@
     <span class="k">return</span> <span class="n">_execute_software_spec</span></div>
 
 
+<div class="viewcode-block" id="package_manager_config"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.package_manager_config">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;package_manager_configs&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">package_manager_config</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a config option to set within a package manager</span>
+
+<span class="sd">    Define a new config which will be passed to a package manager. The</span>
+<span class="sd">    resulting experiment instance will pass the config to the package manager,</span>
+<span class="sd">    which will control the logic of applying it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_package_manager_config</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span>
+
+    <span class="k">return</span> <span class="n">_execute_package_manager_config</span></div>
+
+
 <div class="viewcode-block" id="required_package"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.required_package">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;required_packages&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">required_package</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a new spack package that is required for this object</span>

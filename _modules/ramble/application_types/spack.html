@@ -186,6 +186,12 @@
     <span class="k">def</span> <span class="nf">_long_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">out_str</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_long_print</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;package_manager_configs&#39;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Package Manager Configs:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_groups</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -249,6 +255,14 @@
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
+
+        <span class="n">package_manager_config_dicts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+            <span class="n">package_manager_config_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">config_dict</span> <span class="ow">in</span> <span class="n">package_manager_config_dicts</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">config_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">add_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>

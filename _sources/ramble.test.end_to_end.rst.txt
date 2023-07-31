@@ -94,6 +94,14 @@ ramble.test.end\_to\_end.missing\_required\_dry\_run module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.package\_manager\_config module
+--------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.package_manager_config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.passthrough\_variables module
 ------------------------------------------------------
 

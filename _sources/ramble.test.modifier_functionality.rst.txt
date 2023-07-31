@@ -22,6 +22,14 @@ ramble.test.modifier\_functionality.mock\_modifier\_dry\_run module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.modifier\_functionality.mock\_modifier\_spack\_configs module
+-------------------------------------------------------------------------
+
+.. automodule:: ramble.test.modifier_functionality.mock_modifier_spack_configs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.modifier\_functionality.mock\_spack\_modifier module
 ----------------------------------------------------------------
 
