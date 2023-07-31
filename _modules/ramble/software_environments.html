@@ -210,10 +210,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_raw_packages</span><span class="p">[</span><span class="n">pkg_template</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_info</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_package_map</span><span class="p">[</span><span class="n">pkg_template</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">pkg_vars</span> <span class="o">=</span> <span class="n">workspace_vars</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">pkg_zips</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">pkg_matrices</span> <span class="o">=</span> <span class="p">[]</span>
 
                 <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">pkg_info</span><span class="p">:</span>
                     <span class="n">pkg_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pkg_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">zips</span> <span class="ow">in</span> <span class="n">pkg_info</span><span class="p">:</span>
+                    <span class="n">pkg_zips</span> <span class="o">=</span> <span class="n">pkg_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">zips</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">matrices</span> <span class="ow">in</span> <span class="n">pkg_info</span><span class="p">:</span>
                     <span class="n">pkg_matrices</span> <span class="o">=</span> <span class="n">pkg_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">matrices</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -223,7 +227,7 @@
 
                 <span class="n">pkg_vars</span><span class="p">[</span><span class="s1">&#39;package_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_template</span>
 
-                <span class="k">for</span> <span class="n">rendered_vars</span> <span class="ow">in</span> <span class="n">pkg_renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">pkg_vars</span><span class="p">,</span> <span class="n">pkg_matrices</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">rendered_vars</span> <span class="ow">in</span> <span class="n">pkg_renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">pkg_vars</span><span class="p">,</span> <span class="n">pkg_zips</span><span class="p">,</span> <span class="n">pkg_matrices</span><span class="p">):</span>
                     <span class="n">final_name</span> <span class="o">=</span> <span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="s1">&#39;package_name&#39;</span><span class="p">,</span>
                                                           <span class="n">extra_vars</span><span class="o">=</span><span class="n">rendered_vars</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">[</span><span class="n">final_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -246,12 +250,16 @@
         <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">environments</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_dict</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">env_template</span><span class="p">,</span> <span class="n">env_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">env_vars</span> <span class="o">=</span> <span class="n">workspace_vars</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">env_zips</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">env_matrices</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_raw_environments</span><span class="p">[</span><span class="n">env_template</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_info</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_environment_map</span><span class="p">[</span><span class="n">env_template</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
                 <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">env_info</span><span class="p">:</span>
                     <span class="n">env_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">zips</span> <span class="ow">in</span> <span class="n">env_info</span><span class="p">:</span>
+                    <span class="n">env_zips</span> <span class="o">=</span> <span class="n">env_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">zips</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">matrices</span> <span class="ow">in</span> <span class="n">env_info</span><span class="p">:</span>
                     <span class="n">env_matrices</span> <span class="o">=</span> <span class="n">env_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">matrices</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -261,7 +269,7 @@
 
                 <span class="n">env_vars</span><span class="p">[</span><span class="s1">&#39;environment_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_template</span>
 
-                <span class="k">for</span> <span class="n">rendered_vars</span> <span class="ow">in</span> <span class="n">env_renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">env_vars</span><span class="p">,</span> <span class="n">env_matrices</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">rendered_vars</span> <span class="ow">in</span> <span class="n">env_renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">env_vars</span><span class="p">,</span> <span class="n">env_zips</span><span class="p">,</span> <span class="n">env_matrices</span><span class="p">):</span>
                     <span class="n">final_name</span> <span class="o">=</span> <span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="s1">&#39;environment_name&#39;</span><span class="p">,</span>
                                                           <span class="n">extra_vars</span><span class="o">=</span><span class="n">rendered_vars</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_environment_map</span><span class="p">[</span><span class="n">env_template</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_name</span><span class="p">)</span>
@@ -488,7 +496,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 27, 2023.
+      <span class="lastupdated">Last updated on Jul 31, 2023.
       </span></p>
   </div>
 

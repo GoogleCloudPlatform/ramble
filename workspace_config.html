@@ -62,6 +62,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#variable-dictionaries">Variable Dictionaries:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#list-variables">List Variables:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#explicit-variable-zips">Explicit Variable Zips:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#templatized-workloads">Templatized Workloads:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
@@ -365,6 +366,45 @@ while the second is a 1x4 matrix. All matrices are required to have the same
 number of elements, as they are flattened and zipped together. In this case,
 there would be 4 experiments, each defined by a unique
 <code class="docutils literal notranslate"><span class="pre">(processes_per_node,</span> <span class="pre">partition,</span> <span class="pre">n_nodes)</span></code> tuple.</p>
+</section>
+<section id="explicit-variable-zips">
+<span id="ramble-explicit-zips"></span><h3>Explicit Variable Zips:<a class="headerlink" href="#explicit-variable-zips" title="Permalink to this heading"></a></h3>
+<p>Ramble’s worksapce config contains syntax for defining explicit variable zips.
+These zips are named grouping of variables that are related and should be
+iterated over together when generating experiments.</p>
+<p>Zips consume list variables and generate a named grouping, which can be
+consumed by matrices just as list variables would be.</p>
+<p>Below is an example showing how to define explicit zips:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="w"> </span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">   </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">     </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="linenos"> 4</span><span class="w">     </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 5</span><span class="w">     </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="linenos"> 6</span><span class="w">   </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">     </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">       </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">         </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">10</span><span class="w">       </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">         </span><span class="nt">serial</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">           </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">             </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;32&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">14</span><span class="w">             </span><span class="nt">partition</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;part1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;part2&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">15</span><span class="w">             </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">16</span><span class="w">           </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="linenos">18</span><span class="w">               </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">                 </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">20</span><span class="w">               </span><span class="nt">zips</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">                 </span><span class="nt">partition_defs</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition</span>
+<span class="linenos">23</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="linenos">24</span><span class="w">               </span><span class="nt">matrices</span><span class="p">:</span>
+<span class="linenos">25</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition_defs</span>
+<span class="linenos">26</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+</pre></div>
+</div>
+<p>Which would result in eight experiments, crossing the <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> variable with
+the zip of <code class="docutils literal notranslate"><span class="pre">partition</span></code> and <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>.</p>
 </section>
 <section id="environment-variable-control">
 <h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Permalink to this heading"></a></h3>
@@ -926,7 +966,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 27, 2023.
+      <span class="lastupdated">Last updated on Jul 31, 2023.
       </span></p>
   </div>
 

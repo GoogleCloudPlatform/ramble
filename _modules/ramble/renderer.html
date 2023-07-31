@@ -147,12 +147,16 @@
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Object type </span><span class="si">{</span><span class="n">obj_type</span><span class="si">}</span><span class="s1"> is not valid to render.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                     <span class="s1">&#39;Valid options are: &quot;experiment&quot;&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Renderer.render_objects"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">matrices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Renderer.render_objects"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">zips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matrices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render objects based on the input variables and matrices</span>
 
 <span class="sd">        Internally collects all matrix and vector variables.</span>
 
-<span class="sd">        Matrices are processed first.</span>
+<span class="sd">        First, zips are created. Zips extract vector variables, and group them</span>
+<span class="sd">        into a higher level name.</span>
+
+<span class="sd">        Next, matrices are processed. Matrices consume vector variables, or</span>
+<span class="sd">        explicit zips.</span>
 
 <span class="sd">        Vectors in the same matrix are crossed, sibling matrices are zipped.</span>
 <span class="sd">        All matrices are required to result in the same number of elements, but</span>
@@ -182,7 +186,47 @@
             <span class="n">object_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="n">new_objects</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">defined_zips</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">consumed_zips</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">matrix_objects</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">zips</span><span class="p">:</span>
+            <span class="n">zipped_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">zip_group</span><span class="p">,</span> <span class="n">group_def</span> <span class="ow">in</span> <span class="n">zips</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Create a new defined zip</span>
+                <span class="n">defined_zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vars&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+                <span class="n">cur_zip</span> <span class="o">=</span> <span class="n">defined_zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">group_def</span><span class="p">:</span>
+                    <span class="c1"># Ensure the variable is defined</span>
+                    <span class="k">if</span> <span class="n">var_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">object_variables</span><span class="p">:</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;An undefined variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> is defined in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">zipped_vars</span><span class="p">:</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> is used across multiple zips.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="s1">&#39;Ensure it is only used in a single zip&#39;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                <span class="s1">&#39;does not refer to a vector.&#39;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                <span class="s1">&#39;has an invalid length of 0&#39;</span><span class="p">)</span>
+
+                    <span class="c1"># Validate the length of the variables is the same</span>
+                    <span class="n">cur_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_len</span>
+                    <span class="k">elif</span> <span class="n">cur_len</span> <span class="o">!=</span> <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]:</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39;has a length of </span><span class="si">{</span><span class="n">cur_len</span><span class="si">}</span><span class="s1"> which differs from</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39;the current max of </span><span class="si">{</span><span class="n">cur_zip</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                    <span class="c1"># Add variable to the zip, and remove from the definitions</span>
+                    <span class="n">zipped_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+                    <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">][</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+                    <span class="k">del</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">matrices</span><span class="p">:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot; Matrix syntax is:</span>
@@ -209,6 +253,7 @@
             <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">:</span>
                 <span class="n">matrix_size</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="n">vectors</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">zips</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">variable_names</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">matrix_vars</span><span class="p">:</span>
@@ -216,23 +261,30 @@
                                 <span class="o">+</span> <span class="s1">&#39;Ensure each variable is only used once across all matrices&#39;</span><span class="p">)</span>
                     <span class="n">matrix_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">object_variables</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">object_variables</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
+                                    <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; variable </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> does not refer to a vector.&#39;</span><span class="p">)</span>
+
+                        <span class="n">matrix_size</span> <span class="o">=</span> <span class="n">matrix_size</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
+                        <span class="n">vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
+                        <span class="n">variable_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+                        <span class="c1"># Remove the variable, so it&#39;s not processed as a vector anymore.</span>
+                        <span class="k">del</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+
+                    <span class="k">elif</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">defined_zips</span><span class="p">:</span>
+                        <span class="n">zip_len</span> <span class="o">=</span> <span class="n">defined_zips</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;length&#39;</span><span class="p">]</span>
+                        <span class="n">idx_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">zip_len</span><span class="p">)]</span>
+
+                        <span class="n">matrix_size</span> <span class="o">=</span> <span class="n">matrix_size</span> <span class="o">*</span> <span class="n">zip_len</span>
+                        <span class="n">vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_vector</span><span class="p">)</span>
+                        <span class="n">variable_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
                         <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
                         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; variable </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> has not been defined yet.&#39;</span><span class="p">)</span>
-
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                        <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
-                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; variable </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> does not refer to a vector.&#39;</span><span class="p">)</span>
-
-                    <span class="n">matrix_size</span> <span class="o">=</span> <span class="n">matrix_size</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
-
-                    <span class="n">vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
-                    <span class="n">variable_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-
-                    <span class="c1"># Remove the variable, so it&#39;s not processed as a vector anymore.</span>
-                    <span class="k">del</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                                <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; variable or zip </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> has not been defined yet.&#39;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">last_size</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">last_size</span> <span class="o">=</span> <span class="n">matrix_size</span>
@@ -254,7 +306,28 @@
             <span class="k">for</span> <span class="n">names</span><span class="p">,</span> <span class="n">vectors</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">matrix_variables</span><span class="p">,</span> <span class="n">matrix_vectors</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">obj_idx</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">vectors</span><span class="p">)):</span>
                     <span class="k">for</span> <span class="n">name_idx</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
-                        <span class="n">matrix_objects</span><span class="p">[</span><span class="n">obj_idx</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">name_idx</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">defined_zips</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="c1"># Replace the zip name with the constituent variables</span>
+                            <span class="k">for</span> <span class="n">zip_var</span> <span class="ow">in</span> <span class="n">defined_zips</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
+                                <span class="n">matrix_objects</span><span class="p">[</span><span class="n">obj_idx</span><span class="p">][</span><span class="n">zip_var</span><span class="p">]</span> <span class="o">=</span> \
+                                    <span class="n">defined_zips</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;vars&#39;</span><span class="p">][</span><span class="n">zip_var</span><span class="p">][</span><span class="n">entry</span><span class="p">[</span><span class="n">name_idx</span><span class="p">]]</span>
+
+                            <span class="c1"># Consume the defined zip</span>
+                            <span class="n">consumed_zips</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">matrix_objects</span><span class="p">[</span><span class="n">obj_idx</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">name_idx</span><span class="p">]</span>
+
+        <span class="c1"># Remove all consumed zips and return all remaining zipped variables</span>
+        <span class="c1"># back to real vector definitions</span>
+        <span class="k">if</span> <span class="n">defined_zips</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">consumed_zips</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">zip_group</span> <span class="ow">in</span> <span class="n">consumed_zips</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">zip_group</span> <span class="ow">in</span> <span class="n">defined_zips</span><span class="p">:</span>
+                        <span class="k">del</span> <span class="n">defined_zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">zip_name</span> <span class="ow">in</span> <span class="n">defined_zips</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">defined_zips</span><span class="p">[</span><span class="n">zip_name</span><span class="p">][</span><span class="s1">&#39;vars&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
 
         <span class="c1"># After matrices have been processed, extract any remaining vector variables</span>
         <span class="n">vector_vars</span> <span class="o">=</span> <span class="p">{}</span>
@@ -272,7 +345,7 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="n">max_vector_size</span><span class="p">:</span>
                     <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
                     <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Size of vector </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> is not&#39;</span>
-                            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; the same as max </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; the same as max </span><span class="si">{</span><span class="n">max_vector_size</span><span class="si">}</span><span class="s1">&#39;</span>
                             <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;. In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
             <span class="c1"># Iterate over the vector length, and set the value in the</span>
@@ -317,7 +390,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 27, 2023.
+      <span class="lastupdated">Last updated on Jul 31, 2023.
       </span></p>
   </div>
 
