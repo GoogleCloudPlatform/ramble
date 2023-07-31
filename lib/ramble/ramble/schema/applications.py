@@ -24,6 +24,19 @@ import ramble.schema.licenses
 import ramble.schema.modifiers
 
 
+zip_def = {
+    'type': 'array',
+    'default': [],
+    'items': {'type': 'string'}
+}
+
+zips_def = {
+    'type': 'object',
+    'default': {},
+    'properties': {},
+    'additionalProperties': zip_def
+}
+
 matrix_def = {
     'type': 'array',
     'default': [],
@@ -111,6 +124,7 @@ properties = {
                                             'properties': union_dicts(
                                                 sub_props,
                                                 {
+                                                    'zips': zips_def,
                                                     'matrix': matrix_def,
                                                     'matrices': matrices_def,
                                                     'success_criteria': success_list_def,

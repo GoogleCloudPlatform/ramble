@@ -40,6 +40,7 @@ properties = {
                             'default': None,
                         },
                         'variables': ramble.schema.variables.variables_def,
+                        'zips': ramble.schema.applications.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
                     },
@@ -64,6 +65,7 @@ properties = {
                             'default': []
                         },
                         'variables': ramble.schema.variables.variables_def,
+                        'zips': ramble.schema.applications.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
                     },

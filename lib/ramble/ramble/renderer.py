@@ -32,12 +32,16 @@ class Renderer(object):
             tty.die(f'Object type {obj_type} is not valid to render.\n' +
                     'Valid options are: "experiment"')
 
-    def render_objects(self, variables, matrices=None):
+    def render_objects(self, variables, zips=None, matrices=None):
         """Render objects based on the input variables and matrices
 
         Internally collects all matrix and vector variables.
 
-        Matrices are processed first.
+        First, zips are created. Zips extract vector variables, and group them
+        into a higher level name.
+
+        Next, matrices are processed. Matrices consume vector variables, or
+        explicit zips.
 
         Vectors in the same matrix are crossed, sibling matrices are zipped.
         All matrices are required to result in the same number of elements, but
@@ -67,7 +71,47 @@ class Renderer(object):
             object_variables[name] = value
 
         new_objects = []
+        defined_zips = {}
+        consumed_zips = set()
         matrix_objects = []
+
+        if zips:
+            zipped_vars = set()
+
+            for zip_group, group_def in zips.items():
+                # Create a new defined zip
+                defined_zips[zip_group] = {'vars': {}, 'length': 0}
+                cur_zip = defined_zips[zip_group]
+                for var_name in group_def:
+                    # Ensure the variable is defined
+                    if var_name not in object_variables:
+                        tty.die(f'An undefined variable {var_name} is defined in zip {zip_group}')
+
+                    if var_name in zipped_vars:
+                        tty.die(f'Variable {var_name} is used across multiple zips.\n'
+                                'Ensure it is only used in a single zip')
+
+                    if not isinstance(object_variables[var_name], list):
+                        tty.die(f'Variable {var_name} in zip {zip_group} '
+                                'does not refer to a vector.')
+
+                    if len(object_variables[var_name]) == 0:
+                        tty.die(f'Variable {var_name} in zip {zip_group} '
+                                'has an invalid length of 0')
+
+                    # Validate the length of the variables is the same
+                    cur_len = len(object_variables[var_name])
+                    if cur_zip['length'] == 0:
+                        cur_zip['length'] = cur_len
+                    elif cur_len != cur_zip['length']:
+                        tty.die(f'Variable {var_name} in zip {zip_group}\n'
+                                f'has a length of {cur_len} which differs from\n'
+                                f'the current max of {cur_zip["length"]}')
+
+                    # Add variable to the zip, and remove from the definitions
+                    zipped_vars.add(var_name)
+                    cur_zip['vars'][var_name] = object_variables[var_name]
+                    del object_variables[var_name]
 
         if matrices:
             """ Matrix syntax is:
@@ -94,6 +138,7 @@ class Renderer(object):
             for matrix in matrices:
                 matrix_size = 1
                 vectors = []
+                zips = []
                 variable_names = []
                 for var in matrix:
                     if var in matrix_vars:
@@ -101,23 +146,30 @@ class Renderer(object):
                                 + 'Ensure each variable is only used once across all matrices')
                     matrix_vars.add(var)
 
-                    if var not in object_variables:
+                    if var in object_variables:
+                        if not isinstance(object_variables[var], list):
+                            err_context = object_variables[self.context]
+                            tty.die(f'In {self.object} {err_context}'
+                                    + f' variable {var} does not refer to a vector.')
+
+                        matrix_size = matrix_size * len(object_variables[var])
+                        vectors.append(object_variables[var])
+                        variable_names.append(var)
+
+                        # Remove the variable, so it's not processed as a vector anymore.
+                        del object_variables[var]
+
+                    elif var in defined_zips:
+                        zip_len = defined_zips[var]['length']
+                        idx_vector = [i for i in range(0, zip_len)]
+
+                        matrix_size = matrix_size * zip_len
+                        vectors.append(idx_vector)
+                        variable_names.append(var)
+                    else:
                         err_context = object_variables[self.context]
                         tty.die(f'In {self.object} {err_context}'
-                                + f' variable {var} has not been defined yet.')
-
-                    if not isinstance(object_variables[var], list):
-                        err_context = object_variables[self.context]
-                        tty.die(f'In {self.object} {err_context}'
-                                + f' variable {var} does not refer to a vector.')
-
-                    matrix_size = matrix_size * len(object_variables[var])
-
-                    vectors.append(object_variables[var])
-                    variable_names.append(var)
-
-                    # Remove the variable, so it's not processed as a vector anymore.
-                    del object_variables[var]
+                                + f' variable or zip {var} has not been defined yet.')
 
                 if last_size == -1:
                     last_size = matrix_size
@@ -139,7 +191,28 @@ class Renderer(object):
             for names, vectors in zip(matrix_variables, matrix_vectors):
                 for obj_idx, entry in enumerate(itertools.product(*vectors)):
                     for name_idx, name in enumerate(names):
-                        matrix_objects[obj_idx][name] = entry[name_idx]
+                        if name in defined_zips.keys():
+                            # Replace the zip name with the constituent variables
+                            for zip_var in defined_zips[name]['vars']:
+                                matrix_objects[obj_idx][zip_var] = \
+                                    defined_zips[name]['vars'][zip_var][entry[name_idx]]
+
+                            # Consume the defined zip
+                            consumed_zips.add(name)
+                        else:
+                            matrix_objects[obj_idx][name] = entry[name_idx]
+
+        # Remove all consumed zips and return all remaining zipped variables
+        # back to real vector definitions
+        if defined_zips:
+            if consumed_zips:
+                for zip_group in consumed_zips:
+                    if zip_group in defined_zips:
+                        del defined_zips[zip_group]
+
+            for zip_name in defined_zips:
+                for var, val in defined_zips[zip_name]['vars'].items():
+                    object_variables[var] = val
 
         # After matrices have been processed, extract any remaining vector variables
         vector_vars = {}
@@ -157,7 +230,7 @@ class Renderer(object):
                 if len(val) != max_vector_size:
                     err_context = object_variables[self.context]
                     tty.die(f'Size of vector {var} is not'
-                            + f' the same as max {len(val)}'
+                            + f' the same as max {max_vector_size}'
                             + f'. In {self.object} {err_context}.')
 
             # Iterate over the vector length, and set the value in the

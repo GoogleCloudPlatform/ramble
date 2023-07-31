@@ -882,12 +882,12 @@ ramble:
     workspace_flags = ['-w', workspace_name]
 
     output = workspace('info', global_args=workspace_flags, fail_on_error=False)
-    assert "variable foo has not been defined yet" in output
+    assert "variable or zip foo has not been defined yet" in output
 
     output = workspace('setup', '--dry-run',
                        global_args=workspace_flags,
                        fail_on_error=False)
-    assert "variable foo has not been defined yet" in output
+    assert "variable or zip foo has not been defined yet" in output
 
 
 def test_non_vector_var_matrices_workspace():

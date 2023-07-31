@@ -95,10 +95,14 @@ class SoftwareEnvironments(object):
                 self._raw_packages[pkg_template] = pkg_info
                 self._package_map[pkg_template] = []
                 pkg_vars = workspace_vars.copy()
+                pkg_zips = {}
                 pkg_matrices = []
 
                 if namespace.variables in pkg_info:
                     pkg_vars.update(pkg_info[namespace.variables])
+
+                if namespace.zips in pkg_info:
+                    pkg_zips = pkg_info[namespace.zips].copy()
 
                 if namespace.matrices in pkg_info:
                     pkg_matrices = pkg_info[namespace.matrices].copy()
@@ -108,7 +112,7 @@ class SoftwareEnvironments(object):
 
                 pkg_vars['package_name'] = pkg_template
 
-                for rendered_vars in pkg_renderer.render_objects(pkg_vars, pkg_matrices):
+                for rendered_vars in pkg_renderer.render_objects(pkg_vars, pkg_zips, pkg_matrices):
                     final_name = expander.expand_var_name('package_name',
                                                           extra_vars=rendered_vars)
                     self._packages[final_name] = {}
@@ -131,12 +135,16 @@ class SoftwareEnvironments(object):
         if namespace.environments in self.spack_dict:
             for env_template, env_info in self.spack_dict[namespace.environments].items():
                 env_vars = workspace_vars.copy()
+                env_zips = {}
                 env_matrices = []
                 self._raw_environments[env_template] = env_info
                 self._environment_map[env_template] = []
 
                 if namespace.variables in env_info:
                     env_vars.update(env_info[namespace.variables])
+
+                if namespace.zips in env_info:
+                    env_zips = env_info[namespace.zips].copy()
 
                 if namespace.matrices in env_info:
                     env_matrices = env_info[namespace.matrices].copy()
@@ -146,7 +154,7 @@ class SoftwareEnvironments(object):
 
                 env_vars['environment_name'] = env_template
 
-                for rendered_vars in env_renderer.render_objects(env_vars, env_matrices):
+                for rendered_vars in env_renderer.render_objects(env_vars, env_zips, env_matrices):
                     final_name = expander.expand_var_name('environment_name',
                                                           extra_vars=rendered_vars)
                     self._environment_map[env_template].append(final_name)
