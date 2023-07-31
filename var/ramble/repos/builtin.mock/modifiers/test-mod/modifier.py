@@ -31,7 +31,12 @@ class TestMod(BasicModifier):
     figure_of_merit('test_mod_fom', fom_regex=fom_regex, group_name='fom',
                     units='', log_file='{analysis_log}', contexts=['test_mod_context'])
 
+    figure_of_merit('shared_context_fom', fom_regex=fom_regex, group_name='fom',
+                    units='', log_file='{analysis_log}', contexts=['test_shared_context'])
+
     figure_of_merit_context('test_mod_context', regex=fom_regex, output_format='{context}')
+
+    figure_of_merit_context('test_shared_context', regex=fom_regex, output_format='matched_shared_context')
 
     register_builtin('test_builtin', required=True, injection_method='append')
 
