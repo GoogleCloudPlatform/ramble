@@ -404,7 +404,7 @@ def workspace_info(args):
                 workload_template, workload_chained_exps, workload_mods \
                 in ws.all_workloads(workloads):
             for exp, _, exp_vars, exp_env_vars, exp_zips, exp_matrices, exp_internals, \
-                    exp_template, exp_chained_exps, exp_mods \
+                    exp_template, exp_chained_exps, exp_mods, exp_excludes \
                     in ws.all_experiments(experiments):
                 print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
                 print_experiment_set.set_application_context(app, app_vars,
@@ -423,7 +423,8 @@ def workspace_info(args):
                                                             exp_internals,
                                                             exp_template,
                                                             exp_chained_exps,
-                                                            exp_mods)
+                                                            exp_mods,
+                                                            exp_excludes)
 
                 print_experiment_set.build_experiment_chains()
 

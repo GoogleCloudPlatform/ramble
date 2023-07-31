@@ -15,11 +15,13 @@ import llnl.util.tty as tty
 
 import ramble.expander
 from ramble.expander import Expander
+from ramble.namespace import namespace
 import ramble.repository
 import ramble.workspace
 import ramble.keywords
 import ramble.error
 import ramble.renderer
+import ramble.util.matrices
 
 
 class ExperimentSet(object):
@@ -67,6 +69,10 @@ class ExperimentSet(object):
 
         self._variables[self._contexts.base] = {}
         self._variables[self._contexts.required] = {}
+
+        self._exclude = {
+            self._contexts.experiment: None
+        }
 
         self._zips = {
             self._contexts.experiment: None
@@ -118,15 +124,15 @@ class ExperimentSet(object):
 
     def get_config_vars(self, workspace):
         conf = ramble.config.config.get_config('config')
-        if conf and ramble.workspace.namespace.variables in conf:
-            site_vars = conf[ramble.workspace.namespace.variables]
+        if conf and namespace.variables in conf:
+            site_vars = conf[namespace.variables]
             return site_vars
         return None
 
     def get_config_env_vars(self, workspace):
         conf = ramble.config.config.get_config('config')
-        if conf and ramble.workspace.namespace.env_var in conf:
-            site_env_vars = conf[ramble.workspace.namespace.env_var]
+        if conf and namespace.env_var in conf:
+            site_env_vars = conf[namespace.env_var]
             return site_env_vars
         return None
 
@@ -207,7 +213,8 @@ class ExperimentSet(object):
                                experiment_internals,
                                experiment_template,
                                experiment_chained_experiments,
-                               experiment_modifiers=None):
+                               experiment_modifiers=None,
+                               experiment_exclude=None):
         """Set up current experiment context"""
 
         try:
@@ -224,6 +231,7 @@ class ExperimentSet(object):
                           experiment_chained_experiments,
                           experiment_modifiers)
 
+        self._exclude[self._contexts.experiment] = experiment_exclude
         self._zips[self._contexts.experiment] = experiment_zips
         self._matrices[self._contexts.experiment] = experiment_matrices
         self._ingest_experiments()
@@ -339,8 +347,8 @@ class ExperimentSet(object):
         merged_mods = []
         is_template = False
 
-        internal_sections = [ramble.workspace.namespace.custom_executables,
-                             ramble.workspace.namespace.executables]
+        internal_sections = [namespace.custom_executables,
+                             namespace.executables]
 
         for context in self._contexts:
             if context in self._variables and self._variables[context]:
@@ -404,13 +412,37 @@ class ExperimentSet(object):
 
         experiment_template_name = context_variables[self.keywords.experiment_name]
 
-        renderer = ramble.renderer.Renderer('experiment')
+        renderer = ramble.renderer.Renderer()
+
+        render_group = ramble.renderer.RenderGroup('experiment', 'create')
+        render_group.variables = context_variables
+        render_group.zips = self._zips[self._contexts.experiment]
+        render_group.matrices = self._matrices[self._contexts.experiment]
+
+        excluded_experiments = set()
+        if self._exclude[self._contexts.experiment]:
+            exclude_group = ramble.renderer.RenderGroup('experiment', 'exclude')
+            exclude_group.copy_contents(render_group)
+            perform_explicit_exclude = \
+                exclude_group.from_dict(experiment_template_name,
+                                        self._exclude[self._contexts.experiment])
+
+            if perform_explicit_exclude:
+                for exclude_exp_vars in renderer.render_objects(exclude_group):
+                    expander = ramble.expander.Expander(exclude_exp_vars, self)
+                    self._compute_mpi_vars(expander, exclude_exp_vars)
+                    exclude_exp_name = expander.expand_var(experiment_template_name,
+                                                           allow_passthrough=False)
+                    excluded_experiments.add(exclude_exp_name)
+
+        exclude_where = []
+        if self._exclude[self._contexts.experiment]:
+            if namespace.where in self._exclude[self._contexts.experiment]:
+                exclude_where = self._exclude[self._contexts.experiment][namespace.where]
 
         rendered_experiments = set()
         for experiment_vars in \
-                renderer.render_objects(context_variables,
-                                        self._zips[self._contexts.experiment],
-                                        self._matrices[self._contexts.experiment]):
+                renderer.render_objects(render_group, exclude_where=exclude_where):
             experiment_vars[self.keywords.spack_env] = \
                 os.path.join(self._workspace.software_dir,
                              Expander.expansion_str(self.keywords.env_name) + '.' +
@@ -423,6 +455,10 @@ class ExperimentSet(object):
             final_wl_name = expander.expand_var_name(self.keywords.workload_name,
                                                      allow_passthrough=False)
             final_exp_name = expander.expand_var(experiment_template_name, allow_passthrough=False)
+
+            # Skip explicitly excluded experiments
+            if final_exp_name in excluded_experiments:
+                continue
 
             experiment_vars[self.keywords.experiment_template_name] = experiment_template_name
             experiment_vars[self.keywords.application_name] = final_app_name
