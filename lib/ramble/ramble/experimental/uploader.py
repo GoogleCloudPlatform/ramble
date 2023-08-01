@@ -180,6 +180,8 @@ def format_data(data_in):
                             'name': fom['name'],
                             'value': fom['value'],
                             'unit': fom['units'],
+                            'origin': fom['origin'],
+                            'origin_type': fom['origin_type'],
                             'context': context['name'],
                         }
                     )
