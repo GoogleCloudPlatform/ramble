@@ -1205,7 +1205,9 @@
                                       <span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">context_name</span><span class="p">))</span>
 
                             <span class="n">active_contexts</span><span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="n">context_name</span>
-                            <span class="n">fom_values</span><span class="p">[</span><span class="n">context_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+                            <span class="k">if</span> <span class="n">context_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fom_values</span><span class="p">:</span>
+                                <span class="n">fom_values</span><span class="p">[</span><span class="n">context_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
                     <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">file_conf</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
                         <span class="n">fom_conf</span> <span class="o">=</span> <span class="n">foms</span><span class="p">[</span><span class="n">fom</span><span class="p">]</span>
@@ -1235,7 +1237,9 @@
                                     <span class="n">fom_val</span> <span class="o">=</span> <span class="n">fom_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">])</span>
                                     <span class="n">fom_values</span><span class="p">[</span><span class="n">context</span><span class="p">][</span><span class="n">fom_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                                         <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">fom_val</span><span class="p">,</span>
-                                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">],</span>
+                                        <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">],</span>
+                                        <span class="s1">&#39;origin_type&#39;</span><span class="p">:</span> <span class="n">fom_conf</span><span class="p">[</span><span class="s1">&#39;origin_type&#39;</span><span class="p">]</span>
                                     <span class="p">}</span>
 
         <span class="c1"># Test all non-file based success criteria</span>
@@ -1336,6 +1340,10 @@
         <span class="c1"># Remap fom / context / file data</span>
         <span class="c1"># Could push this into the language features in the future</span>
         <span class="n">fom_definitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figures_of_merit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">fom</span><span class="p">,</span> <span class="n">fom_def</span> <span class="ow">in</span> <span class="n">fom_definitions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">fom_def</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">fom_def</span><span class="p">[</span><span class="s1">&#39;origin_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;application&#39;</span>
+
         <span class="n">fom_contexts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure_of_merit_contexts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
             <span class="n">fom_contexts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">figure_of_merit_contexts</span><span class="p">)</span>
@@ -1343,7 +1351,7 @@
             <span class="n">mod_vars</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">modded_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">fom</span><span class="p">,</span> <span class="n">fom_def</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">figures_of_merit</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">fom_definitions</span><span class="p">[</span><span class="n">fom</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">fom_definitions</span><span class="p">[</span><span class="n">fom</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;origin_type&#39;</span><span class="p">:</span> <span class="s1">&#39;modifier&#39;</span><span class="p">}</span>
                 <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">fom_def</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fom_def</span><span class="p">[</span><span class="n">attr</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
                         <span class="n">fom_definitions</span><span class="p">[</span><span class="n">fom</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">fom_def</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1367,7 +1375,9 @@
                 <span class="s1">&#39;regex&#39;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;regex&#39;</span><span class="p">]),</span>
                 <span class="s1">&#39;contexts&#39;</span><span class="p">:</span> <span class="p">[],</span>
                 <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;group_name&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;origin_type&#39;</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;origin_type&#39;</span><span class="p">]</span>
             <span class="p">}</span>
             <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;contexts&#39;</span><span class="p">]:</span>
                 <span class="n">foms</span><span class="p">[</span><span class="n">fom</span><span class="p">][</span><span class="s1">&#39;contexts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;contexts&#39;</span><span class="p">])</span>
@@ -1487,7 +1497,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 31, 2023.
+      <span class="lastupdated">Last updated on Aug 01, 2023.
       </span></p>
   </div>
 

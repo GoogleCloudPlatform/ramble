@@ -110,6 +110,14 @@ ramble.test.end\_to\_end.passthrough\_variables module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.shared\_context module
+-----------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.shared_context
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.test\_configvar\_dry\_run module
 ---------------------------------------------------------
 
