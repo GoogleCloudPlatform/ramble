@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Definition Developers Guide &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Developer Guides" href="../dev_guides.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-results">ramble results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dev_guides.html">Developer Guides</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Application Definition Developers Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparation">Preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#compilation-installation">Compilation / Installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#collecting-inputs">Collecting Inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-execution">Testing Execution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output-information">Output Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#application-definition-creation">Application Definition Creation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#base-classes">Base Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-an-application-definition">Writing an application definition</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#executables">Executables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-files">Input Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#workloads">Workloads</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#workload-variables">Workload Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#success-criteria">Success Criteria</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#figures-of-merit">Figures Of Merit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#figure-of-merit-contexts">Figure Of Merit Contexts</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#package-manager-directives">Package Manager Directives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage-while-developing">Usage While Developing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#generating-experiments">Generating Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#analyzing-results">Analyzing Results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../dev_guides.html">Developer Guides</a></li>
+      <li class="breadcrumb-item active">Application Definition Developers Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guides/application_dev_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="application-definition-developers-guide">
+<span id="application-dev-guide"></span><h1>Application Definition Developers Guide<a class="headerlink" href="#application-definition-developers-guide" title="Permalink to this heading"></a></h1>
+<p>Application definition files represent building blocks to create experiments
+from. They are intended to be portable, and as a result should not contain any
+system specific logic. Each definition is a python module, with a specifically
+named python class contained inside. The python class can be written with
+provided directives, or can optionally override internal functions for more
+advanced behavior.</p>
+<p>This gudie will provide general steps for creating a new application definition file.</p>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading"></a></h2>
+<p>To begin, it can be useful to prepare a few things about the application you
+are writing a definition file for. These include:</p>
+<ol class="arabic simple">
+<li><p>Instructions for compiling / installing your application</p></li>
+<li><p>A set of input files you would like to create workloads for</p></li>
+<li><p>A working set of execution commands</p></li>
+<li><p>Information about the output from the application</p></li>
+</ol>
+<p>Most of these steps require some research, or up front exploration of the
+application, but are incredibly helpful in lowering the effort required to
+write an application definition file.</p>
+<p>Below we will provide some basics of how to get started with these steps.
+However, this guide will not provide exhaustive information for all
+applications. So, in general, this step is left to you to complete.</p>
+<section id="compilation-installation">
+<h3>Compilation / Installation<a class="headerlink" href="#compilation-installation" title="Permalink to this heading"></a></h3>
+<p>Ramble has first party support for some package managers (currently, Spack). To
+improve provenance information that Ramble is able to track, we strongly
+recommend using a supported package manager.</p>
+<p>You have two options at this stage. The first (and arguably more complicated)
+option is to add support for a new package manager, if your application is not
+included in any of the supported package manager yet. The second is to add your
+application to one of the supported package managers.</p>
+<p>This might include writing a Spack package definition file. While this guide
+will not walk you through this process, Spack has
+<a class="reference external" href="https://spack.readthedocs.io/en/latest/packaging_guide.html">documentation to help write package definition files</a>.</p>
+</section>
+<section id="collecting-inputs">
+<span id="experiment-input-files"></span><h3>Collecting Inputs<a class="headerlink" href="#collecting-inputs" title="Permalink to this heading"></a></h3>
+<p>Some, but not all, applications will require input files. They may require
+multiple input files per experiment, or a single input file for each
+experiment. Applications can also have a wide range of input files, that each
+represent different workloads.</p>
+<p>In Ramble, a workload can have an arbitrary number of input files. Before
+writing an application definition file, it is useful to collect, and organize
+the application’s input files based on the workloads you want to create. This
+might only involve collecting URLs and SHA256 checksums for the input files.</p>
+</section>
+<section id="testing-execution">
+<span id="example-execution"></span><h3>Testing Execution<a class="headerlink" href="#testing-execution" title="Permalink to this heading"></a></h3>
+<p>Since an application definition file will be used to generate experiments, it
+is necessary to understand how to execute an experiment with the application.
+For this step, it can be useful to manually test the application with a set of
+input files for a specific workload.</p>
+</section>
+<section id="output-information">
+<span id="collect-output"></span><h3>Output Information<a class="headerlink" href="#output-information" title="Permalink to this heading"></a></h3>
+<p>As a manual execution is recommended, once a successful test has been
+performed, it can be useful to retain the output of the application. Examining
+this output, you can determine what figures of merit might be useful to extract
+from the application output.</p>
+<p>However, this step can be performed after experiments are functional from the
+application definition file as well.</p>
+</section>
+</section>
+<section id="application-definition-creation">
+<h2>Application Definition Creation<a class="headerlink" href="#application-definition-creation" title="Permalink to this heading"></a></h2>
+<p>Application definition files are stored within application repositories. These
+repositories generally store all applications within a directory named
+<code class="docutils literal notranslate"><span class="pre">applications</span></code>, however each repository can control this through their own
+config file ( <code class="docutils literal notranslate"><span class="pre">repo.yaml</span></code> ).</p>
+<p>Within the repository, each application definition file is a python module that
+is stored within a directory named for the application. As an example, Ramble
+comes with a repository named <code class="docutils literal notranslate"><span class="pre">builtin</span></code>. This repository contains several
+standard application definitions that are provided to the community. One of the
+application definition files provided is
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/tree/develop/var/ramble/repos/builtin/applications/hpl">HPL</a>.
+The HPL application definition file is named <code class="docutils literal notranslate"><span class="pre">application.py</span></code> and is stored
+within a directory named <code class="docutils literal notranslate"><span class="pre">hpl</span></code>. Within the <code class="docutils literal notranslate"><span class="pre">application.py</span></code> file, a python
+class is defined with a similar name to the application directory. Ramble’s
+application definition naming syntax follows
+<a class="reference external" href="https://spack.readthedocs.io/en/latest/packaging_guide.html#naming-directory-structure">Spack’s package naming rules</a>.</p>
+<section id="base-classes">
+<h3>Base Classes<a class="headerlink" href="#base-classes" title="Permalink to this heading"></a></h3>
+<p>Ramble provides base classes which can be inherited from when creating new
+application definition files. Currently, these are used to abstract the package
+manager logic, but more generally change the behavior of the underlying
+application definitions. These can be seen in more detail in
+<a class="reference internal" href="../ramble.application_types.html#module-ramble.application_types" title="ramble.application_types"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.application_types</span></code></a>.</p>
+</section>
+</section>
+<section id="writing-an-application-definition">
+<h2>Writing an application definition<a class="headerlink" href="#writing-an-application-definition" title="Permalink to this heading"></a></h2>
+<p>After an application’s <code class="docutils literal notranslate"><span class="pre">application.py</span></code> file is created, Ramble’s language
+features can be used to fill out the application definition. These language
+features provide directives which define specific portions of the application’s
+functionality. This guide will introduce some of the basic language features to
+create functional application definition files, but will not be exhaustive. For
+an exhaustive list of application language features, see
+<a class="reference internal" href="../ramble.language.html#module-ramble.language" title="ramble.language"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.language</span></code></a>.</p>
+<p>The directives from Ramble’s application language are placed alongside class
+variables, as in:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Hpl</span><span class="p">(</span><span class="n">SpackPackage</span><span class="p">):</span>
+    <span class="n">executable</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
+    <span class="n">executable</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
+    <span class="n">input_file</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
+    <span class="n">input_file</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
+    <span class="n">workload</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="executables">
+<h3>Executables<a class="headerlink" href="#executables" title="Permalink to this heading"></a></h3>
+<p>A named executable in Ramble is one or more commands that should be executed
+together within an experiment. Ramble contains a directive for defining named
+executables <a class="reference internal" href="../ramble.language.html#ramble.language.application_language.executable" title="ramble.language.application_language.executable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.executable()</span></code></a></p>
+<p>Having performed a test execution in <span class="xref std std-ref">exambple-execution</span>, you should be
+able to transcribe the execution commands into <code class="docutils literal notranslate"><span class="pre">executable</span></code> statements.</p>
+<p>It is important to make sure every step needed to go from a vanilla input file
+to performing an experiment is captured in named executables though.</p>
+</section>
+<section id="input-files">
+<h3>Input Files<a class="headerlink" href="#input-files" title="Permalink to this heading"></a></h3>
+<p>A named input file in Ramble describes a URL, a SHA256 checksum, and some
+additional information about a file that a workload will require for its
+experiments. The <code class="docutils literal notranslate"><span class="pre">input_file</span></code> directive 
+(<a class="reference internal" href="../ramble.language.html#ramble.language.application_language.input_file" title="ramble.language.application_language.input_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.input_file()</span></code></a>) can be used to
+define a named input file in an application definition file.</p>
+<p>After collecting the input files needed for the workloads you are defining (as
+in <a class="reference internal" href="#experiment-input-files"><span class="std std-ref">Collecting Inputs</span></a>), each input file can be written as its own
+<code class="docutils literal notranslate"><span class="pre">input_file</span></code> directive.</p>
+</section>
+<section id="workloads">
+<h3>Workloads<a class="headerlink" href="#workloads" title="Permalink to this heading"></a></h3>
+<p>Having used <code class="docutils literal notranslate"><span class="pre">executable</span></code> and <code class="docutils literal notranslate"><span class="pre">input_file</span></code> directives, these can now be
+pieced together into a workload, using the <code class="docutils literal notranslate"><span class="pre">workload</span></code> directive
+(<a class="reference internal" href="../ramble.language.html#ramble.language.application_language.workload" title="ramble.language.application_language.workload"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.workload()</span></code></a>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">workload</span></code> directive is used to define a named workload from which
+experiments can be generated. A workload in Ramble is defined as the pairing of
+one or more named executables with zero or more named input files. Defining a
+workload in an <code class="docutils literal notranslate"><span class="pre">application.py</span></code> allows it to be used within a
+<a class="reference internal" href="../workspace_config.html#workspace-config"><span class="std std-ref">Workspace Configuration File</span></a> and will be shown when executing <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">info</span> <span class="pre">&lt;app&gt;</span></code>
+on the named application.</p>
+</section>
+<section id="workload-variables">
+<h3>Workload Variables<a class="headerlink" href="#workload-variables" title="Permalink to this heading"></a></h3>
+<p>While a workload by itself can generate an experiment, sometimes a variable
+should be exposed that can allow a parameter study or help abstract the
+definition of the workload (such as executable commands). Each workload can
+have an arbitrary number of workload variables, defined by
+<a class="reference internal" href="../ramble.language.html#ramble.language.application_language.workload_variable" title="ramble.language.application_language.workload_variable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.workload_variable()</span></code></a>.</p>
+<p>Each variable has a default value, which can be override within a
+<a class="reference internal" href="../workspace_config.html#workspace-config"><span class="std std-ref">Workspace Configuration File</span></a>.</p>
+</section>
+<section id="success-criteria">
+<h3>Success Criteria<a class="headerlink" href="#success-criteria" title="Permalink to this heading"></a></h3>
+<p>Success criteria help Ramble identify if an experiment was executed
+successfully or not. This information is extracted when <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span>
+<span class="pre">analyze</span></code> is executed to help convey if the extract figures of merti should be
+considered valid or not.</p>
+<p>Applications can define any number of named success criteria, using
+<a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.success_criteria" title="ramble.language.shared_language.success_criteria"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.success_criteria()</span></code></a>. For an experiment
+to be considered successful, all of its success criteria must resolve to
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>The simplest success criteria is a basic string match that requires a specific
+string show up in an experiment’s output file. More complex success criteria
+can also be written (including defining an <code class="docutils literal notranslate"><span class="pre">evaluate_success</span></code> function within
+the application definition file).</p>
+</section>
+<section id="figures-of-merit">
+<h3>Figures Of Merit<a class="headerlink" href="#figures-of-merit" title="Permalink to this heading"></a></h3>
+<p>Named figures of merit represent quantities that ramble should extract from an
+experiment. They are allowed to relate to any metric of interest, whether it is
+a physical quantity (such as total mass or energy), or a performance quantity
+(such as wallclock time), or some other application output.</p>
+<p>Each figure of merit is defined by
+<a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.figure_of_merit" title="ramble.language.shared_language.figure_of_merit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.figure_of_merit()</span></code></a> and contains
+information about where the metric can be found, what the units of the metric
+are, and how to extract it from a given output file.</p>
+</section>
+<section id="figure-of-merit-contexts">
+<h3>Figure Of Merit Contexts<a class="headerlink" href="#figure-of-merit-contexts" title="Permalink to this heading"></a></h3>
+<p>Sometimes, a figure of merit needs additional information (such as what
+timestep it was collected from). To augment a figure of merit with this
+additional information, Ramble has the ability to define a figure of merit
+context. Each context represents a grouping of figures of merit that are
+collected together. A figure of merit context can be defined using
+<a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.figure_of_merit_context" title="ramble.language.shared_language.figure_of_merit_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.figure_of_merit_context()</span></code></a>.</p>
+</section>
+</section>
+<section id="package-manager-directives">
+<h2>Package Manager Directives<a class="headerlink" href="#package-manager-directives" title="Permalink to this heading"></a></h2>
+<p>Each package manager will be its own base class, but additionally there are
+directives that are intended to be package manager specific. As an example,
+there are directives for Spack defined by:
+* <a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.software_spec" title="ramble.language.shared_language.software_spec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.software_spec()</span></code></a>
+* <a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.default_compiler" title="ramble.language.shared_language.default_compiler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.default_compiler()</span></code></a>
+* <a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.required_package" title="ramble.language.shared_language.required_package"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.required_package()</span></code></a></p>
+<p>These provide Ramble with information about how Spack could install and require
+packages. For more information, see the above reference.</p>
+</section>
+<section id="usage-while-developing">
+<h2>Usage While Developing<a class="headerlink" href="#usage-while-developing" title="Permalink to this heading"></a></h2>
+<p>It can be useful to test an <code class="docutils literal notranslate"><span class="pre">application.py</span></code> while developing it, to make
+sure it behaves as expected. This section will describe how you can interact
+with the various parts of an application definition file.</p>
+<section id="generating-experiments">
+<h3>Generating Experiments<a class="headerlink" href="#generating-experiments" title="Permalink to this heading"></a></h3>
+<p>The most useful part of an application definition file is the ability to
+generate new experiments for its workloads. To do this, the application
+definition needs to contain a complete definition of at least one workload.
+This includes its executables, input files, and workload variables.</p>
+<p>Once this is complete, a workspace can be configured (following
+<a class="reference internal" href="../workspace_config.html#workspace-config"><span class="std std-ref">Workspace Configuration File</span></a>) to create experiments from the new workload. After
+setting up the workspace, requested experiments will be created following
+<a class="reference internal" href="../workspace.html#workspace-structure"><span class="std std-ref">Workspace Structure</span></a>. In order to debug any issues with the experiments,
+you can use the dry-run option from <a class="reference internal" href="../workspace.html#workspace-setup"><span class="std std-ref">Setting up a Workspace</span></a>.</p>
+</section>
+<section id="analyzing-results">
+<h3>Analyzing Results<a class="headerlink" href="#analyzing-results" title="Permalink to this heading"></a></h3>
+<p>Experimeny analysis only works once figures of merit, and success criteria are
+defined. Without these, Ramble has no information about how to extract relevant
+metrics.</p>
+<p>Once an experiment can be executed using the <code class="docutils literal notranslate"><span class="pre">application.py</span></code> file, you can
+analyze the experiment to extract all of the figures of merit. However, if you
+have the output file from <a class="reference internal" href="#collect-output"><span class="std std-ref">Output Information</span></a>, you can copy it into one of
+the experiment directories to allow analyze to extract the correct information
+without having to execute the experiment.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../dev_guides.html" class="btn btn-neutral float-left" title="Developer Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Aug 01, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
