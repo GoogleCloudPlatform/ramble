@@ -61,6 +61,8 @@ in a specified directory. To create an anonymous workspace, use:
 
     $ ramble workspace create -d <path_to_workspace>
 
+.. _workspace-structure:
+
 -------------------
 Workspace Structure
 -------------------
@@ -151,6 +153,8 @@ appliaction definition files, one can use:
 
     $ ramble workspace concretize
 
+
+.. _workspace-setup:
 
 ----------------------
 Setting up a Workspace
