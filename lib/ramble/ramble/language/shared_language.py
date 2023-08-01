@@ -216,7 +216,7 @@ def success_criteria(name, mode, match=None, file='{log_file}',
             'file': file,
             'fom_name': fom_name,
             'fom_context': fom_context,
-            'formula': formula,
+            'formula': formula
         }
 
     return _execute_success_criteria

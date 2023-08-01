@@ -1162,7 +1162,13 @@ class Workspace(object):
                                 f.write('  %s figures of merit:\n' %
                                         context['name'])
                                 for fom in context['foms']:
-                                    output = '%s = %s %s' % (fom['name'],
+                                    name = fom['name']
+                                    if fom['origin_type'] == 'modifier':
+                                        delim = '::'
+                                        mod = fom['origin']
+                                        name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
+
+                                    output = '%s = %s %s' % (name,
                                                              fom['value'],
                                                              fom['units'])
                                     f.write('    %s\n' % (output.strip()))

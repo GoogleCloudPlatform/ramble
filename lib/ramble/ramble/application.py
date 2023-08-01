@@ -1090,7 +1090,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                       (context, context_name))
 
                             active_contexts[context] = context_name
-                            fom_values[context_name] = {}
+
+                            if context_name not in fom_values:
+                                fom_values[context_name] = {}
 
                     for fom in file_conf['foms']:
                         fom_conf = foms[fom]
@@ -1120,7 +1122,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                     fom_val = fom_match.group(fom_conf['group'])
                                     fom_values[context][fom_name] = {
                                         'value': fom_val,
-                                        'units': fom_conf['units']
+                                        'units': fom_conf['units'],
+                                        'origin': fom_conf['origin'],
+                                        'origin_type': fom_conf['origin_type']
                                     }
 
         # Test all non-file based success criteria
@@ -1221,6 +1225,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Remap fom / context / file data
         # Could push this into the language features in the future
         fom_definitions = self.figures_of_merit.copy()
+        for fom, fom_def in fom_definitions.items():
+            fom_def['origin'] = self.name
+            fom_def['origin_type'] = 'application'
+
         fom_contexts = self.figure_of_merit_contexts.copy()
         for mod in self._modifier_instances:
             fom_contexts.update(mod.figure_of_merit_contexts)
@@ -1228,7 +1236,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             mod_vars = mod.modded_variables(self)
 
             for fom, fom_def in mod.figures_of_merit.items():
-                fom_definitions[fom] = {}
+                fom_definitions[fom] = {'origin': f'{mod}', 'origin_type': 'modifier'}
                 for attr in fom_def.keys():
                     if isinstance(fom_def[attr], list):
                         fom_definitions[fom][attr] = fom_def[attr].copy()
@@ -1252,7 +1260,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 'regex': re.compile(r'%s' % conf['regex']),
                 'contexts': [],
                 'group': conf['group_name'],
-                'units': conf['units']
+                'units': conf['units'],
+                'origin': conf['origin'],
+                'origin_type': conf['origin_type']
             }
             if conf['contexts']:
                 foms[fom]['contexts'].extend(conf['contexts'])
