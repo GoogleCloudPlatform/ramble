@@ -75,6 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-results">ramble results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-workspace">ramble workspace</a></li>
@@ -142,6 +143,7 @@
 <span class="kn">import</span> <span class="nn">ramble.workspace</span>
 <span class="kn">import</span> <span class="nn">ramble.workspace.shell</span>
 <span class="kn">import</span> <span class="nn">ramble.experiment_set</span>
+<span class="kn">import</span> <span class="nn">ramble.experimental.uploader</span>
 <span class="kn">import</span> <span class="nn">ramble.software_environments</span>
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 
@@ -479,7 +481,7 @@
 
     <span class="c1"># FIXME: this will fire the analyze logic of twice currently</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">upload</span><span class="p">:</span>
-        <span class="n">ws</span><span class="o">.</span><span class="n">upload_results</span><span class="p">()</span></div>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">upload_results</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">results</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="workspace_info_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_info_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_info_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>

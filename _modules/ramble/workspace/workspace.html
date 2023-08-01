@@ -75,6 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-results">ramble results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-workspace">ramble workspace</a></li>
@@ -148,8 +149,6 @@
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
 <span class="kn">import</span> <span class="nn">ramble.software_environments</span>
 <span class="kn">from</span> <span class="nn">ramble.mirror</span> <span class="kn">import</span> <span class="n">MirrorStats</span>
-<span class="kn">from</span> <span class="nn">ramble.config</span> <span class="kn">import</span> <span class="n">ConfigError</span>
-<span class="kn">import</span> <span class="nn">ramble.experimental.uploader</span>
 
 <span class="kn">import</span> <span class="nn">spack.util.spack_yaml</span> <span class="k">as</span> <span class="nn">syaml</span>
 <span class="kn">import</span> <span class="nn">spack.util.spack_json</span> <span class="k">as</span> <span class="nn">sjson</span>
@@ -1181,27 +1180,6 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">sjson</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out_file</span></div>
-
-<div class="viewcode-block" id="Workspace.upload_results"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.upload_results">[docs]</a>    <span class="k">def</span> <span class="nf">upload_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload&#39;</span><span class="p">):</span>
-            <span class="c1"># Read upload type and push it there</span>
-            <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload:type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;BigQuery&#39;</span><span class="p">:</span>  <span class="c1"># TODO: enum?</span>
-                <span class="n">formatted_data</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-
-                <span class="c1"># TODO: strategy object?</span>
-                <span class="n">uploader</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">BigQueryUploader</span><span class="p">()</span>
-
-                <span class="n">uri</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload:uri&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="p">:</span>
-                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;No upload URI (config:upload:uri) in config.&#39;</span><span class="p">)</span>
-
-                <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Uploading Results to &#39;</span> <span class="o">+</span> <span class="n">uri</span><span class="p">)</span>
-                <span class="n">uploader</span><span class="o">.</span><span class="n">perform_upload</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">formatted_data</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Unknown config:upload:type value&quot;</span><span class="p">)</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Missing correct conifg:upload parameters&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Workspace.default_results"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.default_results">[docs]</a>    <span class="k">def</span> <span class="nf">default_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>

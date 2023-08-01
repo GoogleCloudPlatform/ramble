@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ramble.language.language_helpers &mdash; Ramble 0.3.0 documentation</title>
+  <title>ramble.cmd.results &mdash; Ramble 0.3.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -104,7 +104,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">ramble.language.language_helpers</li>
+          <li class="breadcrumb-item"><a href="../cmd.html">ramble.cmd</a></li>
+      <li class="breadcrumb-item active">ramble.cmd.results</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -113,7 +114,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for ramble.language.language_helpers</h1><div class="highlight"><pre>
+  <h1>Source code for ramble.cmd.results</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
 <span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -122,72 +123,58 @@
 <span class="c1"># option. This file may not be copied, modified, or distributed</span>
 <span class="c1"># except according to those terms.</span>
 
-<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
+<span class="kn">import</span> <span class="nn">ramble.experimental.uploader</span>
+
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;take actions on experiment results&quot;</span>
+<span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;results&quot;</span>
+<span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;short&quot;</span>
 
 
-<div class="viewcode-block" id="merge_definitions"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.merge_definitions">[docs]</a><span class="k">def</span> <span class="nf">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge definitions of a type</span>
+<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span>
+                                  <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;results_command&#39;</span><span class="p">)</span>
 
-<span class="sd">    This method will merge two optional definitions of single_type and</span>
-<span class="sd">    multiple_type.</span>
+    <span class="c1"># Upload</span>
+    <span class="n">upload_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;upload&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">results_upload</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">upload_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path of file to upload&#39;</span><span class="p">)</span></div>
 
-<span class="sd">    Args:</span>
-<span class="sd">        single_type: Single string for type name</span>
-<span class="sd">        multiple_type: List of strings for type names</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
+<div class="viewcode-block" id="results_upload"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.results_upload">[docs]</a><span class="k">def</span> <span class="nf">results_upload</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Imports Ramble experiment results from JSON file and uploads them as</span>
+<span class="sd">    specified in the upload block of Ramble&#39;s config file.&quot;&quot;&quot;</span>
+    <span class="n">imported_results</span> <span class="o">=</span> <span class="n">import_results_file</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">upload_results</span><span class="p">(</span><span class="n">imported_results</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="import_results_file"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.import_results_file">[docs]</a><span class="k">def</span> <span class="nf">import_results_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Import Ramble experiment results from a JSON file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;File to import:&quot;</span><span class="p">)</span>
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
-    <span class="n">all_types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">imported_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">single_type</span><span class="p">:</span>
-        <span class="n">all_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Import file...&quot;</span><span class="p">)</span>
+        <span class="n">parsed_json_file</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">imported_file</span><span class="p">)</span>
+        <span class="c1"># Check if data contains an experiment</span>
+        <span class="k">if</span> <span class="n">parsed_json_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;experiments&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">parsed_json_file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Error parsing file: Does not contain valid data to upload.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Error parsing file: Invalid JSON formatting.&quot;</span><span class="p">)</span></div>
 
-    <span class="k">if</span> <span class="n">multiple_type</span><span class="p">:</span>
-        <span class="n">all_types</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">all_types</span></div>
-
-
-<div class="viewcode-block" id="require_definition"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.require_definition">[docs]</a><span class="k">def</span> <span class="nf">require_definition</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span>
-                       <span class="n">single_arg_name</span><span class="p">,</span> <span class="n">multiple_arg_name</span><span class="p">,</span>
-                       <span class="n">directive_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require at least one definition for a type in a directive</span>
-
-<span class="sd">    This method will validate that single_type / multiple_type are properly defined.</span>
-
-<span class="sd">    It will raise an error if at least one type is not defined, or if</span>
-<span class="sd">    either are the incorrect type.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        single_type: Single string for type name</span>
-<span class="sd">        multiple_type: List of strings for type names</span>
-<span class="sd">        single_arg_name: String name of the single_type argument in the directive</span>
-<span class="sd">        multiple_arg_name: String name of the multiple_type argument in the directive</span>
-<span class="sd">        directive_name: Name of the directive requiring a type</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">single_type</span> <span class="ow">or</span> <span class="n">multiple_type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> requires at least one of &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s1"> or </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s1"> to be defined.&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> was given an invalid type &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s1"> argument. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">multiple_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> was given an invalid type &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;for the </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s1"> argument. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">)</span></div>
+<div class="viewcode-block" id="results"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.results">[docs]</a><span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">action</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;upload&#39;</span><span class="p">:</span> <span class="n">results_upload</span><span class="p">}</span>
+    <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">results_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

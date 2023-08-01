@@ -92,6 +92,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mods">ramble.cmd.mods module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.on">ramble.cmd.on module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.repo">ramble.cmd.repo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.results">ramble.cmd.results module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.unit_test">ramble.cmd.unit_test module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.workspace">ramble.cmd.workspace module</a></li>
@@ -156,6 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-results">ramble results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
@@ -1112,6 +1114,32 @@ so far, just this command – so it can find LGPL things elsewhere</p>
 the locations ramble reads object definition files from.</p>
 <p>This command has subcommands for create, add, remove, and list.</p>
 </dd></dl>
+
+</section>
+<section id="module-ramble.cmd.results">
+<span id="ramble-cmd-results-module"></span><h2>ramble.cmd.results module<a class="headerlink" href="#module-ramble.cmd.results" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.results.import_results_file">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.results.</span></span><span class="sig-name descname"><span class="pre">import_results_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/results.html#import_results_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.results.import_results_file" title="Permalink to this definition"></a></dt>
+<dd><p>Import Ramble experiment results from a JSON file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.results.results">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.results.</span></span><span class="sig-name descname"><span class="pre">results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/results.html#results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.results.results" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.results.results_upload">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.results.</span></span><span class="sig-name descname"><span class="pre">results_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/results.html#results_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.results.results_upload" title="Permalink to this definition"></a></dt>
+<dd><p>Imports Ramble experiment results from JSON file and uploads them as
+specified in the upload block of Ramble’s config file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.results.setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.results.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/results.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.results.setup_parser" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-ramble.cmd.software_definitions">

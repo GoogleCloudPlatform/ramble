@@ -18,6 +18,7 @@ Developer             | :ref:`attributes <ramble-attributes>`,
                         :ref:`software-definitions <ramble-software-definitions>`,
                         :ref:`unit-test <ramble-unit-test>`
 More help             | :ref:`help <ramble-help>`
+Results               | :ref:`results <ramble-results>`
 Secret                | :ref:`on <ramble-on>`
 Workspaces            | :ref:`workspace <ramble-workspace>`
 ====================  ===================================================================
@@ -132,6 +133,7 @@ A flexible benchmark experiment manager.
    * :ref:`mods <ramble-mods>`
    * :ref:`on <ramble-on>`
    * :ref:`repo <ramble-repo>`
+   * :ref:`results <ramble-results>`
    * :ref:`software-definitions <ramble-software-definitions>`
    * :ref:`unit-test <ramble-unit-test>`
    * :ref:`workspace <ramble-workspace>`
@@ -1228,6 +1230,58 @@ namespace_or_path
 
 ``-t TYPE, --type TYPE``
   type of repositories to manage. Defaults to 'applications'. Allowed types are ['applications', 'modifiers']
+
+
+----
+
+.. _ramble-results:
+
+ramble results
+--------------
+
+take actions on experiment results
+
+.. code-block:: console
+
+    ramble results [-h] SUBCOMMAND ...
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+
+**Subcommands**
+
+.. hlist::
+   :columns: 4
+
+   * :ref:`results upload <ramble-results-upload>`
+
+
+----
+
+.. _ramble-results-upload:
+
+ramble results upload
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: console
+
+    ramble results upload [-h] filename
+
+
+**Positional arguments**
+
+filename
+  path of file to upload
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
 
 
 ----

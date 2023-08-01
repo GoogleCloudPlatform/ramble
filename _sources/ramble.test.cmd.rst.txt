@@ -86,6 +86,14 @@ ramble.test.cmd.repo module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.cmd.results module
+------------------------------
+
+.. automodule:: ramble.test.cmd.results
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.cmd.software\_definitions module
 --------------------------------------------
 
