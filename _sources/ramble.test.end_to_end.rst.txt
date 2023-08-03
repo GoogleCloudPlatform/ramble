@@ -62,6 +62,14 @@ ramble.test.end\_to\_end.expanded\_fom\_dry\_run module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.experiment\_excludes module
+----------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.experiment_excludes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.explicit\_zips module
 ----------------------------------------------
 

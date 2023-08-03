@@ -280,7 +280,7 @@ there would be 4 experiments, each defined by a unique
 Explicit Variable Zips:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Ramble's worksapce config contains syntax for defining explicit variable zips.
+Ramble's workspace config contains syntax for defining explicit variable zips.
 These zips are named grouping of variables that are related and should be
 iterated over together when generating experiments.
 
@@ -315,13 +315,110 @@ Below is an example showing how to define explicit zips:
                     partition_defs:
                     - partition
                     - processes_per_node
-                  matrices:
+                  matrix:
                   - partition_defs
                   - n_nodes
 
 
 Which would result in eight experiments, crossing the ``n_nodes`` variable with
 the zip of ``partition`` and ``processes_per_node``.
+
+
+.. _ramble-experiment-exclusion:
+
+^^^^^^^^^^^^^^^^^^^^^
+Experiment Exclusion:
+^^^^^^^^^^^^^^^^^^^^^
+
+When writing a workspace configuration file, experiments can be explicitly
+excluded from the generated set using an ``exclude`` block inside the
+experiment definition. This block contains definitions of ``variables``,
+``matrices``, ``zips``, and optional mathematical ``where`` statements to
+define which experiments should be excluded from the generation process.
+
+.. code-block::yaml
+   :linenos:
+
+    ramble:
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                processes_per_node: ['16', '32']
+                partition: ['part1', 'part2']
+                n_nodes: ['1', '2', '3', '4']
+              experiments:
+                test_exp_{n_nodes}_{processes_per_node}:
+                  variables:
+                    n_ranks: '1'
+                  zips:
+                    partition_defs:
+                    - partition
+                    - processes_per_node
+                  matrices:
+                  - - partition_defs
+                    - n_nodes
+                  exclude:
+                    variables:
+                      n_nodes: ['2', '3']
+                    matrix:
+                    - partition_defs
+                    - n_nodes
+
+In the example above, of the eight experiments that would be generated from the
+experiment definition, four will be excluded. In the defined ``exclude`` block
+experiments with ``n_nodes = 2`` or ``n_nodes = 3`` will be excluded from the
+generation process.
+
+This logic can be replicated in a ``where`` statement as well:
+
+.. code-block::yaml
+   :linenos:
+
+    ramble:
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                processes_per_node: ['16', '32']
+                partition: ['part1', 'part2']
+                n_nodes: ['1', '2', '3', '4']
+              experiments:
+                test_exp_{n_nodes}_{processes_per_node}:
+                  variables:
+                    n_ranks: '1'
+                  zips:
+                    partition_defs:
+                    - partition
+                    - processes_per_node
+                  matrices:
+                  - - partition_defs
+                    - n_nodes
+                  exclude:
+                    where:
+                    - '{n_nodes} == 2'
+                    - '{n_nodes} == 3'
+
+``where`` statements can contain mathematical operations, but must result in a
+boolean value. If any of the ``where`` statements evalaute to ``True`` within
+an experiment, that experiment will be excluded from generation. To be more
+explicit, all ``where`` statements are joined together with ``or`` operators.
+Within any single ``where`` statement, operators can be joined together with
+``and`` and ``or`` operators as well.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Variable Control:

@@ -522,7 +522,7 @@
                 <span class="n">workload_template</span><span class="p">,</span> <span class="n">workload_chained_exps</span><span class="p">,</span> <span class="n">workload_mods</span> \
                 <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_workloads</span><span class="p">(</span><span class="n">workloads</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">exp_vars</span><span class="p">,</span> <span class="n">exp_env_vars</span><span class="p">,</span> <span class="n">exp_zips</span><span class="p">,</span> <span class="n">exp_matrices</span><span class="p">,</span> <span class="n">exp_internals</span><span class="p">,</span> \
-                    <span class="n">exp_template</span><span class="p">,</span> <span class="n">exp_chained_exps</span><span class="p">,</span> <span class="n">exp_mods</span> \
+                    <span class="n">exp_template</span><span class="p">,</span> <span class="n">exp_chained_exps</span><span class="p">,</span> <span class="n">exp_mods</span><span class="p">,</span> <span class="n">exp_excludes</span> \
                     <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">(</span><span class="n">experiments</span><span class="p">):</span>
                 <span class="n">print_experiment_set</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">ExperimentSet</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
                 <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">set_application_context</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span>
@@ -541,7 +541,8 @@
                                                             <span class="n">exp_internals</span><span class="p">,</span>
                                                             <span class="n">exp_template</span><span class="p">,</span>
                                                             <span class="n">exp_chained_exps</span><span class="p">,</span>
-                                                            <span class="n">exp_mods</span><span class="p">)</span>
+                                                            <span class="n">exp_mods</span><span class="p">,</span>
+                                                            <span class="n">exp_excludes</span><span class="p">)</span>
 
                 <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">build_experiment_chains</span><span class="p">()</span>
 
@@ -747,7 +748,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 01, 2023.
+      <span class="lastupdated">Last updated on Aug 03, 2023.
       </span></p>
   </div>
 

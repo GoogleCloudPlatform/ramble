@@ -73,6 +73,14 @@ ramble.util.lock module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.matrices module
+---------------------------
+
+.. automodule:: ramble.util.matrices
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.naming module
 -------------------------
 

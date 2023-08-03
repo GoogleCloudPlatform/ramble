@@ -128,10 +128,21 @@
 
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.expander</span>
+<span class="kn">from</span> <span class="nn">ramble.namespace</span> <span class="kn">import</span> <span class="n">namespace</span>
+
+<span class="kn">import</span> <span class="nn">ramble.util.matrices</span>
 
 
-<div class="viewcode-block" id="Renderer"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer">[docs]</a><span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="RenderGroup"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup">[docs]</a><span class="k">class</span> <span class="nc">RenderGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_obj_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">,</span> <span class="s1">&#39;package&#39;</span><span class="p">,</span> <span class="s1">&#39;environment&#39;</span><span class="p">]</span>
+    <span class="n">_actions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for a RenderGroup.</span>
+
+<span class="sd">        Create a RenderGroup object, defining several the input to</span>
+<span class="sd">        a Renderer object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">obj_type</span> <span class="o">==</span> <span class="s1">&#39;experiment&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s1">&#39;experiment&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="s1">&#39;experiments&#39;</span>
@@ -146,9 +157,71 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="s1">&#39;environment_name&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Object type </span><span class="si">{</span><span class="n">obj_type</span><span class="si">}</span><span class="s1"> is not valid to render.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                    <span class="s1">&#39;Valid options are: &quot;experiment&quot;&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s1">&#39;Valid options are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj_types</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Renderer.render_objects"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">zips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matrices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s1"> is not valid to render.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                    <span class="sa">f</span><span class="s1">&#39;Valid options are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zips</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="RenderGroup.copy_contents"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.copy_contents">[docs]</a>    <span class="k">def</span> <span class="nf">copy_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_group</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy contents of in_group into self&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">zips</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">zips</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderGroup.from_dict"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_template</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract RenderGroup definitions from a dictionary</span>
+
+<span class="sd">        Dictionaries should follow the below format:</span>
+
+<span class="sd">        in_dict = {</span>
+<span class="sd">            &#39;variables&#39;: {},</span>
+<span class="sd">            &#39;zips&#39;: {},</span>
+<span class="sd">            &#39;matrix&#39;: [],</span>
+<span class="sd">            &#39;matrices&#39;: {} or [],</span>
+<span class="sd">        }</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name_template: The name template for the objects this group represents</span>
+<span class="sd">            in_dict: A dictionary representing the group definitions</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            boolean: True if anything was extracted from the dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">extracted</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">in_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">])</span>
+            <span class="n">extracted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">zips</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">in_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">zips</span><span class="p">])</span>
+            <span class="n">extracted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">matrices</span><span class="o">.</span><span class="n">extract_matrices</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                                              <span class="n">name_template</span><span class="p">,</span>
+                                                              <span class="n">in_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">extracted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">extracted</span></div></div>
+
+
+<div class="viewcode-block" id="Renderer"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer">[docs]</a><span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Renderer.render_objects"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render objects based on the input variables and matrices</span>
 
 <span class="sd">        Internally collects all matrix and vector variables.</span>
@@ -172,12 +245,16 @@
 <span class="sd">        The resulting zip of vectors is then crossed with all of the matrices</span>
 <span class="sd">        to build a final list of objects.</span>
 
-<span class="sd">        After collecting the matrices, this method modifies generates new</span>
-<span class="sd">        objects and injects them into the self.objects dictionary.</span>
+<span class="sd">        After processing the expansion logic, this function yields a dictionary</span>
+<span class="sd">        of variable definitions, one for each object that would be rendered.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            A single object definition, through a yield</span>
+<span class="sd">            Yield a dictionary of variables for single object definition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">variables</span>
+        <span class="n">zips</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">zips</span>
+        <span class="n">matrices</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">matrices</span>
+
         <span class="n">object_variables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -264,8 +341,8 @@
 
                     <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">object_variables</span><span class="p">:</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                            <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
-                            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
+                            <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
                                     <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; variable </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> does not refer to a vector.&#39;</span><span class="p">)</span>
 
                         <span class="n">matrix_size</span> <span class="o">=</span> <span class="n">matrix_size</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
@@ -283,16 +360,16 @@
                         <span class="n">vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_vector</span><span class="p">)</span>
                         <span class="n">variable_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
-                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
+                        <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
                                 <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; variable or zip </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> has not been defined yet.&#39;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">last_size</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">last_size</span> <span class="o">=</span> <span class="n">matrix_size</span>
 
                 <span class="k">if</span> <span class="n">last_size</span> <span class="o">!=</span> <span class="n">matrix_size</span><span class="p">:</span>
-                    <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
-                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Matrices defined in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Matrices defined in </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">&#39;</span>
                             <span class="o">+</span> <span class="s1">&#39; do not result in the same number of elements.&#39;</span><span class="p">)</span>
 
                 <span class="n">matrix_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>
@@ -344,10 +421,10 @@
             <span class="c1"># Check that sizes are the same</span>
             <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vector_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="n">max_vector_size</span><span class="p">:</span>
-                    <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                    <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
                     <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Size of vector </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> is not&#39;</span>
                             <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; the same as max </span><span class="si">{</span><span class="n">max_vector_size</span><span class="si">}</span><span class="s1">&#39;</span>
-                            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;. In </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;. In </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
             <span class="c1"># Iterate over the vector length, and set the value in the</span>
             <span class="c1"># object dict to the index value.</span>
@@ -371,12 +448,22 @@
             <span class="c1"># Ensure at least one object is rendered, if everything was a scalar</span>
             <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">({})</span>
 
+        <span class="n">where_expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="n">object_variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">new_objects</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rendering </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rendering </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
 
-            <span class="k">yield</span> <span class="n">object_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div></div>
+            <span class="n">keep_object</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">exclude_where</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">where</span> <span class="ow">in</span> <span class="n">exclude_where</span><span class="p">:</span>
+                    <span class="n">evaluated</span> <span class="o">=</span> <span class="n">where_expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">where</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">evaluated</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+                        <span class="n">keep_object</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">keep_object</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">object_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="RambleRendererError"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RambleRendererError">[docs]</a><span class="k">class</span> <span class="nc">RambleRendererError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
@@ -391,7 +478,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 01, 2023.
+      <span class="lastupdated">Last updated on Aug 03, 2023.
       </span></p>
   </div>
 

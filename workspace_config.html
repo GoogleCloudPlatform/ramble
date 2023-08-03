@@ -63,6 +63,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#list-variables">List Variables:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#explicit-variable-zips">Explicit Variable Zips:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#experiment-exclusion">Experiment Exclusion:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#templatized-workloads">Templatized Workloads:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
@@ -370,7 +371,7 @@ there would be 4 experiments, each defined by a unique
 </section>
 <section id="explicit-variable-zips">
 <span id="ramble-explicit-zips"></span><h3>Explicit Variable Zips:<a class="headerlink" href="#explicit-variable-zips" title="Permalink to this heading"></a></h3>
-<p>Ramble’s worksapce config contains syntax for defining explicit variable zips.
+<p>Ramble’s workspace config contains syntax for defining explicit variable zips.
 These zips are named grouping of variables that are related and should be
 iterated over together when generating experiments.</p>
 <p>Zips consume list variables and generate a named grouping, which can be
@@ -399,13 +400,32 @@ consumed by matrices just as list variables would be.</p>
 <span class="linenos">21</span><span class="w">                 </span><span class="nt">partition_defs</span><span class="p">:</span>
 <span class="linenos">22</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition</span>
 <span class="linenos">23</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
-<span class="linenos">24</span><span class="w">               </span><span class="nt">matrices</span><span class="p">:</span>
+<span class="linenos">24</span><span class="w">               </span><span class="nt">matrix</span><span class="p">:</span>
 <span class="linenos">25</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition_defs</span>
 <span class="linenos">26</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
 </pre></div>
 </div>
 <p>Which would result in eight experiments, crossing the <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> variable with
 the zip of <code class="docutils literal notranslate"><span class="pre">partition</span></code> and <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>.</p>
+</section>
+<section id="experiment-exclusion">
+<span id="ramble-experiment-exclusion"></span><h3>Experiment Exclusion:<a class="headerlink" href="#experiment-exclusion" title="Permalink to this heading"></a></h3>
+<p>When writing a workspace configuration file, experiments can be explicitly
+excluded from the generated set using an <code class="docutils literal notranslate"><span class="pre">exclude</span></code> block inside the
+experiment definition. This block contains definitions of <code class="docutils literal notranslate"><span class="pre">variables</span></code>,
+<code class="docutils literal notranslate"><span class="pre">matrices</span></code>, <code class="docutils literal notranslate"><span class="pre">zips</span></code>, and optional mathematical <code class="docutils literal notranslate"><span class="pre">where</span></code> statements to
+define which experiments should be excluded from the generation process.</p>
+<p>In the example above, of the eight experiments that would be generated from the
+experiment definition, four will be excluded. In the defined <code class="docutils literal notranslate"><span class="pre">exclude</span></code> block
+experiments with <code class="docutils literal notranslate"><span class="pre">n_nodes</span> <span class="pre">=</span> <span class="pre">2</span></code> or <code class="docutils literal notranslate"><span class="pre">n_nodes</span> <span class="pre">=</span> <span class="pre">3</span></code> will be excluded from the
+generation process.</p>
+<p>This logic can be replicated in a <code class="docutils literal notranslate"><span class="pre">where</span></code> statement as well:</p>
+<p><code class="docutils literal notranslate"><span class="pre">where</span></code> statements can contain mathematical operations, but must result in a
+boolean value. If any of the <code class="docutils literal notranslate"><span class="pre">where</span></code> statements evalaute to <code class="docutils literal notranslate"><span class="pre">True</span></code> within
+an experiment, that experiment will be excluded from generation. To be more
+explicit, all <code class="docutils literal notranslate"><span class="pre">where</span></code> statements are joined together with <code class="docutils literal notranslate"><span class="pre">or</span></code> operators.
+Within any single <code class="docutils literal notranslate"><span class="pre">where</span></code> statement, operators can be joined together with
+<code class="docutils literal notranslate"><span class="pre">and</span></code> and <code class="docutils literal notranslate"><span class="pre">or</span></code> operators as well.</p>
 </section>
 <section id="environment-variable-control">
 <h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Permalink to this heading"></a></h3>
@@ -967,7 +987,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 01, 2023.
+      <span class="lastupdated">Last updated on Aug 03, 2023.
       </span></p>
   </div>
 

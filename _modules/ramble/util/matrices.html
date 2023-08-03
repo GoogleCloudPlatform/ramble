@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ramble.cmd.info &mdash; Ramble 0.3.0 documentation</title>
+  <title>ramble.util.matrices &mdash; Ramble 0.3.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -104,8 +104,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-          <li class="breadcrumb-item"><a href="../cmd.html">ramble.cmd</a></li>
-      <li class="breadcrumb-item active">ramble.cmd.info</li>
+      <li class="breadcrumb-item active">ramble.util.matrices</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -114,7 +113,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for ramble.cmd.info</h1><div class="highlight"><pre>
+  <h1>Source code for ramble.util.matrices</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
 <span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -123,23 +122,42 @@
 <span class="c1"># option. This file may not be copied, modified, or distributed</span>
 <span class="c1"># except according to those terms.</span>
 
-<span class="kn">import</span> <span class="nn">ramble.cmd.common.info</span>
-<span class="kn">import</span> <span class="nn">ramble.repository</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+
+<span class="kn">from</span> <span class="nn">ramble.namespace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
 
-<span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;get detailed information on a particular application&#39;</span>
-<span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;basic&#39;</span>
-<span class="n">level</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
+<div class="viewcode-block" id="extract_matrices"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.matrices.extract_matrices">[docs]</a><span class="k">def</span> <span class="nf">extract_matrices</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract matrix definitions from a dictionary</span>
 
-<span class="n">app_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">applications</span>
+<span class="sd">    Args:</span>
+<span class="sd">        action: The action of an object definition where</span>
+<span class="sd">                 matrices are being extracted from</span>
+<span class="sd">        name: The name of the object</span>
+<span class="sd">        in_dict: The dictionary containing definitions</span>
 
+<span class="sd">    Returns:</span>
+<span class="sd">        list of matrix definitions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matrices</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.info.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
-    <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">setup_info_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="n">app_type</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">matrix</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
+        <span class="n">matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">in_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">matrix</span><span class="p">])</span>
 
+    <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">matrices</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">matrices</span><span class="p">]:</span>
+            <span class="c1"># Extract named matrices</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;While performing </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &#39;</span>
+                            <span class="s1">&#39; each list element may only contain &#39;</span>
+                            <span class="s1">&#39;1 matrix in a matrices definition.&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.info.info">[docs]</a><span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-    <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">app_type</span><span class="p">)</span></div>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">matrix</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">matrices</span></div>
 </pre></div>
 
            </div>
