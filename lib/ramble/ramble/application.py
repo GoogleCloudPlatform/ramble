@@ -348,9 +348,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             tty.debug(f'{self.name} is a template. Skipping phases')
             return
 
-        if hasattr(self, '_%s' % phase):
-            tty.msg('    Executing phase ' + phase)
-            phase_func = getattr(self, '_%s' % phase)
+        if hasattr(self, f'_{phase}'):
+            tty.verbose('    Executing phase ' + phase)
+            phase_func = getattr(self, f'_{phase}')
             phase_func(workspace)
 
     def _get_env_set_commands(self, var_conf, var_set, shell='sh'):
