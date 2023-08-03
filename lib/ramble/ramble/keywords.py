@@ -40,6 +40,7 @@ class Keywords(object):
         'workload_name': key_type.reserved,
         'workload_run_dir': key_type.reserved,
         'workload_input_dir': key_type.reserved,
+        'license_input_dir': key_type.reserved,
         'experiment_name': key_type.reserved,
         'experiment_run_dir': key_type.reserved,
         'log_dir': key_type.reserved,

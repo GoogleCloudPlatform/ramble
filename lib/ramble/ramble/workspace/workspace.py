@@ -50,7 +50,7 @@ from ramble.util.spec_utils import specs_equiv
 import ramble.util.hashing
 from ramble.namespace import namespace
 import ramble.util.matrices
-
+import ramble.util.env
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = 'RAMBLE_WORKSPACE'
@@ -76,6 +76,12 @@ workspace_software_path = 'software'
 
 #: Name of the subdirectory where workspace archives are stored
 workspace_archive_path = 'archive'
+
+#: Name of the subdirectory where shared/sourale files are stored
+workspace_shared_path = 'shared'
+
+#: Name of the subdirectory where shared/sourale files are stored
+workspace_shared_license_path = 'licenses'
 
 #: regex for validating workspace names
 valid_workspace_name_re = r'^\w[\w-]*$'
@@ -284,6 +290,13 @@ def _root(name):
 def root(name):
     """Get the root directory for a workspace by name."""
     validate_workspace_name(name)
+    return _root(name)
+
+
+def license_path(name):
+    """Get the root directory for a workspace by name."""
+    shared_license_path = os.path.join(workspace_shared_path, workspace_shared_license_path)
+    os.path.join(root(name), shared_license_path)
     return _root(name)
 
 
@@ -660,6 +673,8 @@ class Workspace(object):
         fs.mkdirp(self.experiment_dir)
         fs.mkdirp(self.input_dir)
         fs.mkdirp(self.software_dir)
+        fs.mkdirp(self.shared_dir)
+        fs.mkdirp(self.shared_license_dir)
 
         self._write_config(config_section)
 
@@ -1453,6 +1468,16 @@ class Workspace(object):
     def archive_dir(self):
         """Path to the archive directory"""
         return os.path.join(self.root, workspace_archive_path)
+
+    @property
+    def shared_dir(self):
+        """Path to the shared directory"""
+        return os.path.join(self.root, workspace_shared_path)
+
+    @property
+    def shared_license_dir(self):
+        """Path to the shared license directory"""
+        return os.path.join(self.shared_dir, workspace_shared_license_path)
 
     def template_path(self, name):
         if name in self._templates.keys():

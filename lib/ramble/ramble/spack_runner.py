@@ -81,7 +81,7 @@ class SpackRunner(object):
         self.shell = shell
 
         if self.shell == 'bash':
-            script = 'setup-env.sh'
+            script = 'setup-env.py'
         elif self.shell == 'csh':
             script = 'setup-env.csh'
         elif self.shell == 'fish':
