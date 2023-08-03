@@ -49,6 +49,7 @@ from ramble.util.path import substitute_path_variables
 from ramble.util.spec_utils import specs_equiv
 import ramble.util.hashing
 from ramble.namespace import namespace
+import ramble.util.matrices
 
 
 #: Environment variable used to indicate the active workspace
@@ -741,7 +742,7 @@ class Workspace(object):
                                                     workload_mods)
 
                 for experiment, _, exp_vars, exp_env_vars, exp_zips, exp_matrices, exp_ints, \
-                        exp_template, exp_chained_exps, exp_mods \
+                        exp_template, exp_chained_exps, exp_mods, exp_exclude \
                         in self.all_experiments(experiments):
                     experiment_set.set_experiment_context(experiment,
                                                           exp_vars,
@@ -751,7 +752,8 @@ class Workspace(object):
                                                           exp_ints,
                                                           exp_template,
                                                           exp_chained_exps,
-                                                          exp_mods)
+                                                          exp_mods,
+                                                          exp_exclude)
 
         experiment_set.build_experiment_chains()
 
@@ -908,6 +910,7 @@ class Workspace(object):
             experiment_chained_experiments = None
             experiment_modifiers = None
             experiment_zips = None
+            experiment_exclude = None
 
             if namespace.variables in contents:
                 experiment_vars = contents[namespace.variables]
@@ -927,33 +930,22 @@ class Workspace(object):
             if namespace.modifiers in contents:
                 experiment_modifiers = contents[namespace.modifiers]
 
+            if namespace.exclude in contents:
+                experiment_exclude = contents[namespace.exclude]
+
             self.extract_success_criteria('experiment', contents)
 
             if namespace.zips in contents:
                 experiment_zips = contents[namespace.zips]
 
-            matrices = []
-            if 'matrix' in contents:
-                matrices.append(contents['matrix'])
-
-            if 'matrices' in contents:
-                for matrix in contents['matrices']:
-                    # Extract named matrices
-                    if isinstance(matrix, dict):
-                        if len(matrix.keys()) != 1:
-                            tty.die('In experiment %s' % experiment
-                                    + ' each list element may only contain '
-                                    + '1 matrix in a matrices definition.')
-
-                        for name, val in matrix.items():
-                            matrices.append(val)
-                    elif isinstance(matrix, list):
-                        matrices.append(matrix)
+            matrices = ramble.util.matrices.extract_matrices('experiment creation',
+                                                             experiment,
+                                                             contents)
 
             yield experiment, contents, experiment_vars, \
                 experiment_env_vars, experiment_zips, matrices, experiment_internals, \
                 experiment_template, experiment_chained_experiments, \
-                experiment_modifiers
+                experiment_modifiers, experiment_exclude
 
     def external_spack_env(self, env_name):
         env_context = self.software_environments.get_env(env_name)

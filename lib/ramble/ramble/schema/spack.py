@@ -43,6 +43,7 @@ properties = {
                         'zips': ramble.schema.applications.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
+                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}
@@ -68,6 +69,7 @@ properties = {
                         'zips': ramble.schema.applications.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
+                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}

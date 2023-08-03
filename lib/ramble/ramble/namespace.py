@@ -31,6 +31,8 @@ class namespace:
     zips = 'zips'
     matrices = 'matrices'
     matrix = 'matrix'
+    exclude = 'exclude'
+    where = 'where'
 
     # For software definitions
     spack = 'spack'

@@ -12,10 +12,21 @@ import llnl.util.tty as tty
 
 import ramble.error
 import ramble.expander
+from ramble.namespace import namespace
+
+import ramble.util.matrices
 
 
-class Renderer(object):
-    def __init__(self, obj_type=None):
+class RenderGroup(object):
+    _obj_types = ['experiment', 'package', 'environment']
+    _actions = ['create', 'exclude']
+
+    def __init__(self, obj_type=None, action='create'):
+        """Constructor for a RenderGroup.
+
+        Create a RenderGroup object, defining several the input to
+        a Renderer object.
+        """
         if obj_type == 'experiment':
             self.object = 'experiment'
             self.objects = 'experiments'
@@ -30,9 +41,71 @@ class Renderer(object):
             self.context = 'environment_name'
         else:
             tty.die(f'Object type {obj_type} is not valid to render.\n' +
-                    'Valid options are: "experiment"')
+                    f'Valid options are: {self._obj_types}')
 
-    def render_objects(self, variables, zips=None, matrices=None):
+        if action not in self._actions:
+            tty.die(f'Action {action} is not valid to render.\n' +
+                    f'Valid options are: {self._actions}')
+        self.action = action
+
+        self.variables = {}
+        self.zips = {}
+        self.matrices = []
+
+    def copy_contents(self, in_group):
+        """Copy contents of in_group into self"""
+
+        if in_group.variables:
+            self.variables.update(in_group.variables)
+
+        if in_group.zips:
+            self.zips.update(in_group.zips)
+
+        if in_group.matrices:
+            self.matrices.extend(in_group.matrices)
+
+    def from_dict(self, name_template, in_dict):
+        """Extract RenderGroup definitions from a dictionary
+
+        Dictionaries should follow the below format:
+
+        in_dict = {
+            'variables': {},
+            'zips': {},
+            'matrix': [],
+            'matrices': {} or [],
+        }
+
+        Args:
+            name_template: The name template for the objects this group represents
+            in_dict: A dictionary representing the group definitions
+
+        Returns:
+            boolean: True if anything was extracted from the dictionary
+        """
+
+        extracted = False
+
+        if namespace.variables in in_dict:
+            self.variables.update(in_dict[namespace.variables])
+            extracted = True
+
+        if namespace.zips in in_dict:
+            self.zips.update(in_dict[namespace.zips])
+            extracted = True
+
+        self.matrices = ramble.util.matrices.extract_matrices(f'{self.action} {self.object}',
+                                                              name_template,
+                                                              in_dict)
+
+        if len(self.matrices) > 0:
+            extracted = True
+
+        return extracted
+
+
+class Renderer(object):
+    def render_objects(self, render_group, exclude_where=None):
         """Render objects based on the input variables and matrices
 
         Internally collects all matrix and vector variables.
@@ -56,12 +129,16 @@ class Renderer(object):
         The resulting zip of vectors is then crossed with all of the matrices
         to build a final list of objects.
 
-        After collecting the matrices, this method modifies generates new
-        objects and injects them into the self.objects dictionary.
+        After processing the expansion logic, this function yields a dictionary
+        of variable definitions, one for each object that would be rendered.
 
         Returns:
-            A single object definition, through a yield
+            Yield a dictionary of variables for single object definition
         """
+        variables = render_group.variables
+        zips = render_group.zips
+        matrices = render_group.matrices
+
         object_variables = {}
         expander = ramble.expander.Expander(variables, None)
 
@@ -148,8 +225,8 @@ class Renderer(object):
 
                     if var in object_variables:
                         if not isinstance(object_variables[var], list):
-                            err_context = object_variables[self.context]
-                            tty.die(f'In {self.object} {err_context}'
+                            err_context = object_variables[render_group.context]
+                            tty.die(f'In {render_group.object} {err_context}'
                                     + f' variable {var} does not refer to a vector.')
 
                         matrix_size = matrix_size * len(object_variables[var])
@@ -167,16 +244,16 @@ class Renderer(object):
                         vectors.append(idx_vector)
                         variable_names.append(var)
                     else:
-                        err_context = object_variables[self.context]
-                        tty.die(f'In {self.object} {err_context}'
+                        err_context = object_variables[render_group.context]
+                        tty.die(f'In {render_group.object} {err_context}'
                                 + f' variable or zip {var} has not been defined yet.')
 
                 if last_size == -1:
                     last_size = matrix_size
 
                 if last_size != matrix_size:
-                    err_context = object_variables[self.context]
-                    tty.die(f'Matrices defined in {self.object} {err_context}'
+                    err_context = object_variables[render_group.context]
+                    tty.die(f'Matrices defined in {render_group.object} {err_context}'
                             + ' do not result in the same number of elements.')
 
                 matrix_vectors.append(vectors)
@@ -228,10 +305,10 @@ class Renderer(object):
             # Check that sizes are the same
             for var, val in vector_vars.items():
                 if len(val) != max_vector_size:
-                    err_context = object_variables[self.context]
+                    err_context = object_variables[render_group.context]
                     tty.die(f'Size of vector {var} is not'
                             + f' the same as max {max_vector_size}'
-                            + f'. In {self.object} {err_context}.')
+                            + f'. In {render_group.object} {err_context}.')
 
             # Iterate over the vector length, and set the value in the
             # object dict to the index value.
@@ -255,12 +332,22 @@ class Renderer(object):
             # Ensure at least one object is rendered, if everything was a scalar
             new_objects.append({})
 
+        where_expander = ramble.expander.Expander(object_variables, None)
+
         for obj in new_objects:
-            tty.debug(f'Rendering {self.object}:')
+            tty.debug(f'Rendering {render_group.object}:')
             for var, val in obj.items():
                 object_variables[var] = val
 
-            yield object_variables.copy()
+            keep_object = True
+            if exclude_where:
+                for where in exclude_where:
+                    evaluated = where_expander.expand_var(where)
+                    if evaluated == 'True':
+                        keep_object = False
+
+            if keep_object:
+                yield object_variables.copy()
 
 
 class RambleRendererError(ramble.error.RambleError):

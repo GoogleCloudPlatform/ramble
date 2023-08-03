@@ -77,6 +77,27 @@ chained_experiment_def = {
     }
 }
 
+where_def = {
+    'type': 'array',
+    'items': {'type': 'string'},
+    'default': [],
+}
+
+exclude_def = {
+    'type': 'object',
+    'default': {},
+    'properties': union_dicts(
+        ramble.schema.variables.properties,
+        {
+            'matrix': matrix_def,
+            'matrices': matrices_def,
+            'zips': zips_def,
+            'where': where_def,
+        }
+    ),
+    'additionalProperties': False
+}
+
 sub_props = union_dicts(
     ramble.schema.variables.properties,
     ramble.schema.success_criteria.properties,
@@ -128,6 +149,7 @@ properties = {
                                                     'matrix': matrix_def,
                                                     'matrices': matrices_def,
                                                     'success_criteria': success_list_def,
+                                                    'exclude': exclude_def,
                                                 }
                                             )
                                         }

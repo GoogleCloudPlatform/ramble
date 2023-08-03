@@ -17,6 +17,7 @@ import ramble.renderer
 import ramble.expander
 from ramble.namespace import namespace
 
+import ramble.util.matrices
 import ramble.util.colors as rucolor
 
 
@@ -80,8 +81,8 @@ class SoftwareEnvironments(object):
         """Process a v2 `spack:` dictionary in the workspace configuration."""
         tty.debug('Performing v2 software setup.')
 
-        pkg_renderer = ramble.renderer.Renderer('package')
-        env_renderer = ramble.renderer.Renderer('environment')
+        pkg_renderer = ramble.renderer.Renderer()
+        env_renderer = ramble.renderer.Renderer()
 
         expander = ramble.expander.Expander({}, None)
 
@@ -94,27 +95,37 @@ class SoftwareEnvironments(object):
             for pkg_template, pkg_info in self.spack_dict[namespace.packages].items():
                 self._raw_packages[pkg_template] = pkg_info
                 self._package_map[pkg_template] = []
-                pkg_vars = workspace_vars.copy()
-                pkg_zips = {}
-                pkg_matrices = []
+                pkg_group = ramble.renderer.RenderGroup('package', 'create')
+                pkg_group.variables.update(workspace_vars)
+                pkg_group.from_dict(pkg_template, pkg_info)
 
-                if namespace.variables in pkg_info:
-                    pkg_vars.update(pkg_info[namespace.variables])
+                pkg_group.variables['package_name'] = pkg_template
 
-                if namespace.zips in pkg_info:
-                    pkg_zips = pkg_info[namespace.zips].copy()
+                exclude_pkgs = set()
+                exclude_where = []
+                if namespace.exclude in pkg_info:
+                    exclude_group = ramble.renderer.RenderGroup('package', 'exclude')
+                    exclude_group.variables.update(workspace_vars)
+                    exclude_group.variables['package_name'] = pkg_template
+                    perform_explicit_exclude = \
+                        exclude_group.from_dict(pkg_template, pkg_info[namespace.exclude])
 
-                if namespace.matrices in pkg_info:
-                    pkg_matrices = pkg_info[namespace.matrices].copy()
+                    if namespace.where in pkg_info[namespace.exclude]:
+                        exclude_where = pkg_info[namespace.exclude][namespace.where].copy()
 
-                if namespace.matrix in pkg_info:
-                    pkg_matrices.append(pkg_info[namespace.matrix].copy())
+                    if perform_explicit_exclude:
+                        for exclude_vars in pkg_renderer.render_objects(exclude_group):
+                            final_name = expander.expand_var_name('package_name',
+                                                                  extra_vars=exclude_vars)
+                            exclude_pkgs.add(final_name)
 
-                pkg_vars['package_name'] = pkg_template
-
-                for rendered_vars in pkg_renderer.render_objects(pkg_vars, pkg_zips, pkg_matrices):
+                for rendered_vars in pkg_renderer.render_objects(pkg_group,
+                                                                 exclude_where=exclude_where):
                     final_name = expander.expand_var_name('package_name',
                                                           extra_vars=rendered_vars)
+                    if final_name in exclude_pkgs:
+                        continue
+
                     self._packages[final_name] = {}
                     self._package_map[pkg_template].append(final_name)
 
@@ -134,29 +145,40 @@ class SoftwareEnvironments(object):
 
         if namespace.environments in self.spack_dict:
             for env_template, env_info in self.spack_dict[namespace.environments].items():
-                env_vars = workspace_vars.copy()
-                env_zips = {}
-                env_matrices = []
+                env_group = ramble.renderer.RenderGroup('environment', 'create')
+                env_group.variables.update(workspace_vars)
+                env_group.from_dict(env_template, env_info)
                 self._raw_environments[env_template] = env_info
                 self._environment_map[env_template] = []
 
-                if namespace.variables in env_info:
-                    env_vars.update(env_info[namespace.variables])
+                env_group.variables['environment_name'] = env_template
 
-                if namespace.zips in env_info:
-                    env_zips = env_info[namespace.zips].copy()
+                exclude_envs = set()
+                exclude_where = []
+                if namespace.exclude in env_info:
+                    exclude_group = ramble.renderer.RenderGroup('environment', 'exclude')
+                    exclude_group.variables.update(workspace_vars)
+                    exclude_group.variables['environment_name'] = env_template
+                    perform_explicit_exclude = \
+                        exclude_group.from_dict(env_template, env_info[namespace.exclude])
 
-                if namespace.matrices in env_info:
-                    env_matrices = env_info[namespace.matrices].copy()
+                    if namespace.where in env_info[namespace.exclude]:
+                        exclude_where = env_info[namespace.exclude][namespace.where].copy()
 
-                if namespace.matrix in env_info:
-                    env_matrices.append(env_info[namespace.matrix].copy())
+                    if perform_explicit_exclude:
+                        for exclude_vars in env_renderer.render_objects(exclude_group):
+                            final_name = expander.expand_var_name('environment_name',
+                                                                  extra_vars=exclude_vars)
+                            exclude_envs.add(final_name)
 
-                env_vars['environment_name'] = env_template
-
-                for rendered_vars in env_renderer.render_objects(env_vars, env_zips, env_matrices):
+                for rendered_vars in env_renderer.render_objects(env_group,
+                                                                 exclude_where=exclude_where):
                     final_name = expander.expand_var_name('environment_name',
                                                           extra_vars=rendered_vars)
+
+                    if final_name in exclude_envs:
+                        continue
+
                     self._environment_map[env_template].append(final_name)
 
                     self._environments[final_name] = {}
