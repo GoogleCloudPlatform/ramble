@@ -17,7 +17,8 @@ class Minixyce(SpackApplication):
 
     maintainers('dodecatheon')
 
-    tags('circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark')
+    tags('circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark',
+         'proxy', 'proxyapp', 'proxy-app')
 
     default_compiler('gcc12', spack_spec="gcc@12.2.0")
 

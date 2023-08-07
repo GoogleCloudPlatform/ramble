@@ -17,7 +17,7 @@ class Openfoam(SpackApplication):
 
     maintainers('douglasjacobsen')
 
-    tags('cfd', 'fluid', 'dynamics')
+    tags('cfd', 'fluid', 'dynamics', 'fluid-dynamics', 'cae')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

@@ -13,11 +13,13 @@ from ramble.expander import Expander
 
 class Lulesh(SpackApplication):
     '''Define LULESH application'''
-    name = 'LULESH'
+    name = 'lulesh'
 
     maintainers('douglasjacobsen')
 
-    tags('proxy-app', 'mini-app')
+    tags('proxy', 'proxy-app',
+         'miniapp', 'mini-app',
+         'shock', 'cfd', 'fluid-dynamics')
 
     default_compiler('intel202160',
                      spack_spec='intel-oneapi-compilers@2022.1.0',

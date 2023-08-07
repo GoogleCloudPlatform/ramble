@@ -26,7 +26,8 @@ class Hmmer(SpackApplication):
 
     maintainers('dodecatheon')
 
-    tags('molecular-dynamics', 'hidden-markov-models', 'bio-molecule')
+    tags('molecular-dynamics', 'hidden-markov-models', 'bio-molecule',
+         'hcls', 'healthcare', 'life-sciences')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

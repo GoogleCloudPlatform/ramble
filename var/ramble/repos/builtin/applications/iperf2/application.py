@@ -17,6 +17,8 @@ class Iperf2(SpackApplication):
 
     maintainers('rfbgo')
 
+    tags('networking', 'benchmark', 'bandwidth')
+
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('iperf2',

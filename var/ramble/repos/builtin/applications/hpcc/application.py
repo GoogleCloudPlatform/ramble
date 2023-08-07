@@ -26,8 +26,7 @@ class Hpcc(SpackApplication):
 
     maintainers('rfbgo')
 
-    tags('benchmark-app', 'mini-app', 'benchmark', 'DGEMM')
-
+    tags('benchmark', 'benchmark-app', 'mini-app', 'miniapp', 'DGEMM', 'linear-algebra')
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('impi2018',

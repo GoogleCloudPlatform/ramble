@@ -23,7 +23,7 @@ class Hpl(SpackApplication):
 
     maintainers('douglasjacobsen', 'dodecatheon')
 
-    tags('benchmark-app', 'benchmark', 'linpack')
+    tags('benchmark-app', 'benchmark', 'linpack', 'linear-algrebra')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

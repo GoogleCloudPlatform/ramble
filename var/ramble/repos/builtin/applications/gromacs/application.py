@@ -17,7 +17,7 @@ class Gromacs(SpackApplication):
 
     maintainers('douglasjacobsen')
 
-    tags('molecular-dynamics')
+    tags('molecular-dynamics', 'hcls', 'healthcare', 'life-sciences')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')

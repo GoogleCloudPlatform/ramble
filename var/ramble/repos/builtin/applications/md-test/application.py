@@ -16,7 +16,7 @@ class MdTest(SpackApplication):
 
     maintainers('rfbgo')
 
-    tags('synthetic-benchmarks', 'IO')
+    tags('synthetic-benchmarks', 'IO', 'metadata', 'filesystem')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')

@@ -19,7 +19,8 @@ class Namd(SpackApplication):
 
     maintainers('douglasjacobsen')
 
-    tags('molecular-dynamics', 'charm++', 'task-parallelism')
+    tags('molecular-dynamics', 'charm++', 'task-parallelism',
+         'hcls', 'healthcare', 'life-sciences')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 

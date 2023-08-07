@@ -27,7 +27,7 @@ class IntelMpiBenchmarks(SpackApplication):
 
     maintainers('rfbgo')
 
-    tags('micro-benchmark', 'benchmark', 'mpi')
+    tags('micro-benchmark', 'benchmark', 'mpi', 'intel')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
