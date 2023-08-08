@@ -16,7 +16,7 @@ class Lammps(SpackApplication):
 
     maintainers('douglasjacobsen')
 
-    tags('molecular-dynamics', 'hcls', 'healthcare', 'life-sciences', 'multithreading')
+    tags('molecular-dynamics', 'hcls', 'life-sciences', 'multithreading')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

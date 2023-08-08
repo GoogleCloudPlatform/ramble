@@ -17,9 +17,7 @@ class Lulesh(SpackApplication):
 
     maintainers('douglasjacobsen')
 
-    tags('proxy', 'proxy-app',
-         'miniapp', 'mini-app',
-         'shock', 'cfd', 'fluid-dynamics')
+    tags('proxy-app', 'mini-app', 'shock', 'cfd')
 
     default_compiler('intel202160',
                      spack_spec='intel-oneapi-compilers@2022.1.0',

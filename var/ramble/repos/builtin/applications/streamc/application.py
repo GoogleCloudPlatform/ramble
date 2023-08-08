@@ -17,8 +17,7 @@ class Streamc(SpackApplication):
 
     maintainers('dodecatheon')
 
-    tags('memorybenchmark', 'microbenchmark',
-         'memory-benchmark', 'micro-benchmark',
+    tags('memory-benchmark', 'micro-benchmark',
          'benchmark', 'bandwidth')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')

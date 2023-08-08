@@ -17,7 +17,7 @@ class Hpcg(SpackApplication):
 
     maintainers('douglasjacobsen')
 
-    tags('benchmark', 'benchmark-app', 'mini-app', 'miniapp', 'linear-algebra')
+    tags('benchmark', 'benchmark-app', 'mini-app', 'linear-algebra')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 

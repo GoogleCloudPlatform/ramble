@@ -18,8 +18,7 @@ class QuantumEspresso(SpackApplication):
     maintainers('douglasjacobsen')
 
     tags('electronic-structure', 'materials', 'dft', 'density-functional-theory',
-         'plane-waves', 'pseudopotentials',
-         'structure')
+         'plane-waves', 'pseudo-potentials')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 

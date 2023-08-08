@@ -18,9 +18,7 @@ class Cloverleaf(SpackApplication):
 
     maintainers('dodecatheon')
 
-    tags('cfd', 'fluid', 'dynamics', 'euler', 'fluid-dynamics',
-         'miniapp', 'minibenchmark',
-         'mini-app', 'mini-benchmark')
+    tags('cfd', 'euler', 'mini-app', 'mini-benchmark')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 

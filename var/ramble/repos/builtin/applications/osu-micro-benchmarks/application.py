@@ -16,9 +16,7 @@ class OsuMicroBenchmarks(SpackApplication):
 
     maintainers('rfbgo')
 
-    tags('synthetic-benchmarks',
-         'micro-benchmark', 'micro', 'benchmark',
-         'suite', 'network', 'latency', 'bandwidth')
+    tags('synthetic-benchmarks', 'micro-benchmark', 'suite', 'network', 'latency', 'bandwidth')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
