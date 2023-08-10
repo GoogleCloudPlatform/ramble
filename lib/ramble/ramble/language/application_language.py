@@ -45,7 +45,7 @@ examples
 
 class ApplicationMeta(ramble.language.shared_language.SharedMeta):
     _directive_names = set()
-    _diretives_to_be_executed = []
+    _directives_to_be_executed = []
 
 
 application_directive = ApplicationMeta.directive
