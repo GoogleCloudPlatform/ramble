@@ -33,7 +33,7 @@ inherit from the SharedMeta class.
 
 class SharedMeta(ramble.language.language_base.DirectiveMeta):
     _directive_names = set()
-    _diretives_to_be_executed = []
+    _directives_to_be_executed = []
 
 
 # shared_directive = ramble.language.language_base.DirectiveMeta.directive

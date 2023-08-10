@@ -14,7 +14,7 @@ from ramble.language.language_base import DirectiveError
 
 class ModifierMeta(ramble.language.shared_language.SharedMeta):
     _directive_names = set()
-    _diretives_to_be_executed = []
+    _directives_to_be_executed = []
 
 
 modifier_directive = ModifierMeta.directive
