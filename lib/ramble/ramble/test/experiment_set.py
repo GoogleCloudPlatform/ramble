@@ -102,6 +102,50 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
 
 
+def test_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_name = 'basic'
+        app_vars = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        wl_name = 'test_wl'
+        wl_vars = {
+            'wl_var1': '1',
+            'wl_var2': ['2'],
+            'processes_per_node': '2'
+        }
+        exp_name = 'series1_{n_ranks}'
+        exp_vars = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'n_nodes': ['2', '4']
+        }
+
+        exp_set.set_application_context(app_name, app_vars, None, None, None, None)
+        exp_set.set_workload_context(wl_name, wl_vars, None, None, None, None)
+        with pytest.raises(SystemExit):
+            exp_set.set_experiment_context(exp_name, exp_vars, None, None, None,
+                                           None, None, None, None)
+
+            captured = capsys.readouterr()
+
+            assert 'Length mismatch in vector variables in experiment series1_{n_ranks}' \
+                in captured
+            assert 'Variable wl_var2 has length 1' in captured
+            assert 'Variable n_nodes has length 2' in captured
+
+
 def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
     workspace('create', 'test')
 
@@ -1518,9 +1562,9 @@ def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
             exp_set.set_experiment_context(exp_name, exp_vars, None, exp_zips, None, None,
                                            None, None, None, None)
             captured = capsys.readouterr()
-            assert 'Variable exp_var2 in zip test_zip' in captured
-            assert 'has a length of 1 which differs from' in captured
-            assert 'the current max of 2' in captured
+            assert 'Length mismatch in zip test_zip in experiment series1_{n_ranks}' in captured
+            assert 'Variable exp_var has length 1' in captured
+            assert 'Variable n_nodes has length 2' in captured
 
 
 def test_vector_experiment_with_explicit_excludes(mutable_mock_workspace_path):

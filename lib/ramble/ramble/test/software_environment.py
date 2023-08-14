@@ -81,6 +81,39 @@ def test_package_vector_expansion(mutable_mock_workspace_path):
         assert 'basic-x86_64_v4' in software_environments._environments['basic']['packages']
 
 
+def test_package_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
+    ws_name = 'test_package_vector_expansion'
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic-{arch}'] = {
+            'spack_spec': 'basic@{ver} target={arch}',
+            'variables': {
+                'arch': ['x86_64', 'x86_64_v4'],
+                'ver': ['1.1']
+            }
+        }
+        spack_dict['environments'] = {
+            'basic': {
+                'packages': ['basic-x86_64', 'basic-x86_64_v4']
+            }
+        }
+
+        with pytest.raises(SystemExit):
+            ramble.software_environments.SoftwareEnvironments(ws)
+
+            captured = capsys.readouterr()
+
+            assert 'Length mismatch in vector variables in package basic-{arch}' in captured
+            assert 'Variable arch has length 2' in captured
+            assert 'Variable ver has length 1' in captured
+
+
 def test_package_matrix_expansion(mutable_mock_workspace_path):
     ws_name = 'test_package_matrix_expansion'
     workspace('create', ws_name)
@@ -242,6 +275,43 @@ def test_environment_vector_expansion(mutable_mock_workspace_path):
         assert len(software_environments._environments['basic-x86_64_v4']['packages']) == 1
         assert 'basic-x86_64_v4' in \
             software_environments._environments['basic-x86_64_v4']['packages']
+
+
+def test_environment_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
+    ws_name = 'test_environment_vector_expansion'
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic-{arch}'] = {
+            'spack_spec': 'basic@1.1 target={arch}',
+            'variables': {
+                'arch': ['x86_64', 'x86_64_v4']
+            }
+        }
+        spack_dict['environments'] = {
+            'basic-{ver}-{arch}': {
+                'packages': ['basic-{arch}'],
+                'variables': {
+                    'arch': ['x86_64', 'x86_64_v4'],
+                    'ver': ['1.1']
+                }
+            }
+        }
+
+        with pytest.raises(SystemExit):
+            ramble.software_environments.SoftwareEnvironments(ws)
+
+            captured = capsys.readouterr()
+
+            assert 'Length mismatch in vector variables in environment basic-{ver}-{arch}' \
+                in captured
+            assert 'Variable arch has length 2' in captured
+            assert 'Variable ver has length 1' in captured
 
 
 def test_environment_matrix_expansion(mutable_mock_workspace_path):

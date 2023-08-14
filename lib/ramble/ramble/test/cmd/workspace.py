@@ -788,15 +788,14 @@ ramble:
     workspace_flags = ['-w', workspace_name]
 
     output = workspace('info', global_args=workspace_flags, fail_on_error=False)
-    assert "Size of vector" in output
-    assert "is not the same as max" in output
+    assert "Length mismatch in vector variables in " + \
+        "experiment exp_series_{idx}_{n_nodes}_{cells}_{processes_per_node}" in output
 
     output = workspace('setup', '--dry-run',
                        global_args=workspace_flags,
                        fail_on_error=False)
-
-    assert "Size of vector" in output
-    assert "is not the same as max" in output
+    assert "Length mismatch in vector variables in " + \
+        "experiment exp_series_{idx}_{n_nodes}_{cells}_{processes_per_node}" in output
 
 
 def test_invalid_size_matrices_workspace():
