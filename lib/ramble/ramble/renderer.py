@@ -159,8 +159,9 @@ class Renderer(object):
                 # Create a new defined zip
                 defined_zips[zip_group] = {'vars': {}, 'length': 0}
                 cur_zip = defined_zips[zip_group]
+
+                # Validate variable definitions
                 for var_name in group_def:
-                    # Ensure the variable is defined
                     if var_name not in object_variables:
                         tty.die(f'An undefined variable {var_name} is defined in zip {zip_group}')
 
@@ -176,15 +177,31 @@ class Renderer(object):
                         tty.die(f'Variable {var_name} in zip {zip_group} '
                                 'has an invalid length of 0')
 
+                # Validate variable lengths:
+                length_mismatch = False
+                for var_name in group_def:
                     # Validate the length of the variables is the same
                     cur_len = len(object_variables[var_name])
                     if cur_zip['length'] == 0:
                         cur_zip['length'] = cur_len
                     elif cur_len != cur_zip['length']:
+                        length_mismatch = True
                         tty.die(f'Variable {var_name} in zip {zip_group}\n'
                                 f'has a length of {cur_len} which differs from\n'
                                 f'the current max of {cur_zip["length"]}')
 
+                # Print length information in error case
+                if length_mismatch:
+                    err_context = object_variables[render_group.context]
+                    err_str = f'Length mismatch in zip {zip_group} in {render_group.object} '\
+                              f'{err_context}\n'
+                    for var_name in group_def:
+                        err_str += f'\tVariable {var_name} has length ' \
+                                   f'of {len(object_variables[var_name])}\n'
+                    tty.die(err_str)
+
+                # Extract variables for zip
+                for var_name in group_def:
                     # Add variable to the zip, and remove from the definitions
                     zipped_vars.add(var_name)
                     cur_zip['vars'][var_name] = object_variables[var_name]
@@ -303,12 +320,18 @@ class Renderer(object):
 
         if vector_vars:
             # Check that sizes are the same
+            length_mismatch = False
             for var, val in vector_vars.items():
                 if len(val) != max_vector_size:
-                    err_context = object_variables[render_group.context]
-                    tty.die(f'Size of vector {var} is not'
-                            + f' the same as max {max_vector_size}'
-                            + f'. In {render_group.object} {err_context}.')
+                    length_mismatch = True
+
+            if length_mismatch:
+                err_context = object_variables[render_group.context]
+                err_str = f'Length mismatch in vector variables in {render_group.object} ' \
+                          f'{err_context}\n'
+                for var, val in vector_vars.items():
+                    err_str += f'\tVariable {var} has length {len(val)}\n'
+                tty.die(err_str)
 
             # Iterate over the vector length, and set the value in the
             # object dict to the index value.
