@@ -275,8 +275,9 @@
                 <span class="c1"># Create a new defined zip</span>
                 <span class="n">defined_zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vars&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
                 <span class="n">cur_zip</span> <span class="o">=</span> <span class="n">defined_zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]</span>
+
+                <span class="c1"># Validate variable definitions</span>
                 <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">group_def</span><span class="p">:</span>
-                    <span class="c1"># Ensure the variable is defined</span>
                     <span class="k">if</span> <span class="n">var_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">object_variables</span><span class="p">:</span>
                         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;An undefined variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> is defined in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
@@ -292,15 +293,31 @@
                         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="s1"> &#39;</span>
                                 <span class="s1">&#39;has an invalid length of 0&#39;</span><span class="p">)</span>
 
+                <span class="c1"># Validate variable lengths:</span>
+                <span class="n">length_mismatch</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">group_def</span><span class="p">:</span>
                     <span class="c1"># Validate the length of the variables is the same</span>
                     <span class="n">cur_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_len</span>
                     <span class="k">elif</span> <span class="n">cur_len</span> <span class="o">!=</span> <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]:</span>
+                        <span class="n">length_mismatch</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
                                 <span class="sa">f</span><span class="s1">&#39;has a length of </span><span class="si">{</span><span class="n">cur_len</span><span class="si">}</span><span class="s1"> which differs from</span><span class="se">\n</span><span class="s1">&#39;</span>
                                 <span class="sa">f</span><span class="s1">&#39;the current max of </span><span class="si">{</span><span class="n">cur_zip</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
+                <span class="c1"># Print length information in error case</span>
+                <span class="k">if</span> <span class="n">length_mismatch</span><span class="p">:</span>
+                    <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                    <span class="n">err_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Length mismatch in zip </span><span class="si">{</span><span class="n">zip_group</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> &#39;</span>\
+                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">group_def</span><span class="p">:</span>
+                        <span class="n">err_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Variable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> has length &#39;</span> \
+                                   <span class="sa">f</span><span class="s1">&#39;of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">err_str</span><span class="p">)</span>
+
+                <span class="c1"># Extract variables for zip</span>
+                <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">group_def</span><span class="p">:</span>
                     <span class="c1"># Add variable to the zip, and remove from the definitions</span>
                     <span class="n">zipped_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
                     <span class="n">cur_zip</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">][</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
@@ -419,12 +436,18 @@
 
         <span class="k">if</span> <span class="n">vector_vars</span><span class="p">:</span>
             <span class="c1"># Check that sizes are the same</span>
+            <span class="n">length_mismatch</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vector_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="n">max_vector_size</span><span class="p">:</span>
-                    <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
-                    <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Size of vector </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> is not&#39;</span>
-                            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; the same as max </span><span class="si">{</span><span class="n">max_vector_size</span><span class="si">}</span><span class="s1">&#39;</span>
-                            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;. In </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+                    <span class="n">length_mismatch</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">length_mismatch</span><span class="p">:</span>
+                <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+                <span class="n">err_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Length mismatch in vector variables in </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> &#39;</span> \
+                          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vector_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">err_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Variable </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> has length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">err_str</span><span class="p">)</span>
 
             <span class="c1"># Iterate over the vector length, and set the value in the</span>
             <span class="c1"># object dict to the index value.</span>
