@@ -230,25 +230,35 @@ licenses:
                 f = open(new_file, 'w+')
                 f.close()
 
+        tmp_results_file = os.path.join(ws1.root, 'temp.results.txt')
+        simlink_results_file = os.path.join(ws1.root, 'results.latest.txt')
+        # Temporarily store some temp data in the "latest" result and check it
+        # gets updated
+        with open(tmp_results_file, 'w+') as f:
+            f.write("Dummy data...")
+        os.symlink(tmp_results_file, simlink_results_file)
+
         output = workspace('analyze', '-f', 'text',
                            'json', 'yaml', global_args=['-w', workspace_name])
-        text_simlink_results_files = glob.glob(os.path.join(ws1.root, 'results.latest.txt'))
+
         text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
         json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
         yaml_results_files = glob.glob(os.path.join(ws1.root, 'results*.yaml'))
-        assert len(text_simlink_results_files) == 1
+
+        # Match both the file and the simlink
         assert len(text_results_files) == 2
         assert len(json_results_files) == 2
         assert len(yaml_results_files) == 2
 
-        with open(text_results_files[0], 'r') as f:
-            data = f.read()
-            assert 'Average Timestep Time = 3.3 s' in data
-            assert 'Cumulative Timestep Time = 16.5 s' in data
-            assert 'Minimum Timestep Time = 1.1 s' in data
-            assert 'Maximum Timestep Time = 5.5 s' in data
-            assert 'Avg. Max Ratio Time = 0.6' in data
-            assert 'Number of timesteps = 5' in data
+        for text_result in text_results_files:
+            with open(text_result, 'r') as f:
+                data = f.read()
+                assert 'Average Timestep Time = 3.3 s' in data
+                assert 'Cumulative Timestep Time = 16.5 s' in data
+                assert 'Minimum Timestep Time = 1.1 s' in data
+                assert 'Maximum Timestep Time = 5.5 s' in data
+                assert 'Avg. Max Ratio Time = 0.6' in data
+                assert 'Number of timesteps = 5' in data
 
         output = workspace('archive', global_args=['-w', workspace_name])
 
