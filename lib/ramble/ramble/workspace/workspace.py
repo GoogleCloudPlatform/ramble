@@ -1228,7 +1228,7 @@ class Workspace(object):
         experiment_set = self.build_experiment_set()
 
         for exp, app_inst in experiment_set.all_experiments():
-            tty.debug('On experiment: %s' % exp)
+            tty.msg(f'    Configuring experiment {exp}')
             for phase in app_inst.get_pipeline_phases(pipeline):
                 app_inst.run_phase(phase, self)
 
