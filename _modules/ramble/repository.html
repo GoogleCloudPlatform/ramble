@@ -386,7 +386,9 @@
 
             <span class="c1"># Warn about invalid names that look like objects.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">nm</span><span class="o">.</span><span class="n">valid_module_name</span><span class="p">(</span><span class="n">obj_name</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">obj_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">obj_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="n">obj_name</span> <span class="o">==</span> <span class="n">obj_info</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">obj_info</span> <span class="ow">in</span> <span class="n">type_definitions</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">):</span>
                     <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Skipping </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="si">}</span><span class="s1"> &#39;</span>
                              <span class="sa">f</span><span class="s1">&#39;at </span><span class="si">{</span><span class="n">obj_dir</span><span class="si">}</span><span class="s1">. &quot;</span><span class="si">{</span><span class="n">obj_name</span><span class="si">}</span><span class="s1">&quot; is not &#39;</span>
                              <span class="s1">&#39;a valid Ramble module name.&#39;</span><span class="p">)</span>
@@ -1580,7 +1582,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 14, 2023.
+      <span class="lastupdated">Last updated on Aug 15, 2023.
       </span></p>
   </div>
 
