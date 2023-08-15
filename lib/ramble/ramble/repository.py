@@ -270,7 +270,9 @@ class FastObjectChecker(Mapping):
 
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
-                if not obj_name.startswith('.'):
+                if not obj_name.startswith('.') and not any(
+                    obj_name == obj_info['config'] for obj_info in type_definitions.values()
+                ):
                     tty.warn(f'Skipping {self.object_type} '
                              f'at {obj_dir}. "{obj_name}" is not '
                              'a valid Ramble module name.')
