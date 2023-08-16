@@ -14,6 +14,7 @@ import six
 import textwrap
 import string
 import shutil
+import fnmatch
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -64,6 +65,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
 
+        self._pipelines = ['setup', 'analyze', 'archive', 'mirror']
         self._setup_phases = ['license_includes']
         self._analyze_phases = ['analyze_experiments']
         self._archive_phases = ['archive_experiments']
@@ -278,10 +280,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if modifiers:
             self.modifiers = modifiers.copy()
 
-    def get_pipeline_phases(self, pipeline):
+    def get_pipeline_phases(self, pipeline, phase_filters=['*']):
         phases = []
-        if hasattr(self, '_%s_phases' % pipeline):
-            phases = getattr(self, '_%s_phases' % pipeline).copy()
+        if hasattr(self, f'_{pipeline}_phases'):
+            for phase in getattr(self, f'_{pipeline}_phases'):
+                for phase_filter in phase_filters:
+                    if fnmatch.fnmatch(phase, phase_filter):
+                        phases.append(phase)
+
         return phases
 
     def _short_print(self):
