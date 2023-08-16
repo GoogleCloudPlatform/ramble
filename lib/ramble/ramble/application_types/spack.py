@@ -46,11 +46,12 @@ class SpackApplication(ApplicationBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
+
         self._setup_phases += [
-            'create_spack_env',
-            'install_compilers',
-            'concretize_spack_env',
-            'install_software',
+            'software_create_env',
+            'software_install_requested_compilers',
+            'software_configure',
+            'software_install',
             'define_package_paths',
             'get_inputs',
             'make_experiments',
@@ -59,7 +60,7 @@ class SpackApplication(ApplicationBase):
 
         self._mirror_phases = [
             'mirror_inputs',
-            'create_spack_env',
+            'create_software_env',
             'mirror_software'
         ]
 
@@ -88,7 +89,7 @@ class SpackApplication(ApplicationBase):
 
         return ''.join(out_str)
 
-    def _install_compilers(self, workspace):
+    def _software_install_requested_compilers(self, workspace):
         """Install compilers an application uses"""
 
         # See if we cached this already, and if so return
@@ -120,7 +121,7 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _create_spack_env(self, workspace):
+    def _software_create_env(self, workspace):
         """Create the spack environment for this experiment
 
         Extract all specs this experiment uses, and write the spack environment
@@ -191,7 +192,7 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _concretize_spack_env(self, workspace):
+    def _software_configure(self, workspace):
         """Concretize the spack environment for this experiment
 
         Perform spack's concretize step on the software environment generated
@@ -223,7 +224,7 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             tty.die(e)
 
-    def _install_software(self, workspace):
+    def _software_install(self, workspace):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
