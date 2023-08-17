@@ -36,6 +36,7 @@ import ramble.modifier
 import ramble.util.executable
 import ramble.util.colors as rucolor
 import ramble.util.hashing
+import ramble.util.env
 
 from ramble.keywords import keywords
 from ramble.workspace import namespace
@@ -63,8 +64,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        self._setup_phases = []
-        self._analyze_phases = []
+        self._setup_phases = ['license_includes']
+        self._analyze_phases = ['analyze_experiments']
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
 
@@ -99,6 +100,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self._verbosity = 'short'
         self._inject_required_builtins()
+
+        self.license_path = ''
+        self.license_file = ''
+        self.license_inc_name = 'license.inc'
 
     def copy(self):
         """Deep copy an application instance"""
@@ -352,75 +357,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             tty.verbose('    Executing phase ' + phase)
             phase_func = getattr(self, f'_{phase}')
             phase_func(workspace)
-
-    def _get_env_set_commands(self, var_conf, var_set, shell='sh'):
-        env_mods = spack.util.environment.EnvironmentModifications()
-        for var, val in var_conf.items():
-            var_set.add(var)
-            env_mods.set(var, val)
-
-        env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
-
-        return (env_cmds_arr.split('\n'), var_set)
-
-    def _get_env_unset_commands(self, var_conf, var_set, shell='sh'):
-        env_mods = spack.util.environment.EnvironmentModifications()
-        for var in var_conf:
-            if var in var_set:
-                var_set.remove(var)
-            env_mods.unset(var)
-
-        env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
-
-        return (env_cmds_arr.split('\n'), var_set)
-
-    def _get_env_append_commands(self, var_conf, var_set, shell='sh'):
-        env_mods = spack.util.environment.EnvironmentModifications()
-
-        append_funcs = {
-            'vars': env_mods.append_flags,
-            'paths': env_mods.append_path,
-        }
-
-        var_set_orig = var_set.copy()
-
-        for append_group in var_conf:
-            sep = ' '
-            if 'var-separator' in append_group:
-                sep = append_group['var-separator']
-
-            for group in append_funcs.keys():
-                if group in append_group.keys():
-                    for var, val in append_group[group].items():
-                        if var not in var_set:
-                            env_mods.set(var, '${%s}' % var)
-                            var_set.add(var)
-                        append_funcs[group](var, val, sep=sep)
-
-        env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
-
-        return (env_cmds_arr.split('\n'), var_set_orig)
-
-    def _get_env_prepend_commands(self, var_conf, var_set, shell='sh'):
-        env_mods = spack.util.environment.EnvironmentModifications()
-
-        prepend_funcs = {
-            'paths': env_mods.prepend_path,
-        }
-
-        var_set_orig = var_set.copy()
-
-        for prepend_group in var_conf:
-            for group in prepend_group.keys():
-                for var, val in prepend_group[group].items():
-                    if var not in var_set:
-                        env_mods.set(var, '${%s}' % var)
-                        var_set.add(var)
-                    prepend_funcs[group](var, val)
-
-        env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
-
-        return (env_cmds_arr.split('\n'), var_set_orig)
 
     def create_experiment_chain(self, workspace):
         """Create the necessary chained experiments for this instance
@@ -879,6 +815,37 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             else:
                 tty.msg('DRY-RUN: Would download %s' % input_conf['fetcher'].url)
 
+    def _prepare_license_path(self, workspace):
+        self.license_path = os.path.join(workspace.shared_license_dir, self.name)
+        self.license_file = os.path.join(self.license_path, self.license_inc_name)
+
+        fs.mkdirp(self.license_path)
+
+    def _license_includes(self, workspace):
+        tty.debug("Writing License Includes")
+        self._prepare_license_path(workspace)
+
+        action_funcs = ramble.util.env.action_funcs
+        config_scopes = ramble.config.scopes()
+        shell = ramble.config.get('config:shell')
+        var_set = set()
+        for scope in config_scopes:
+            license_conf = ramble.config.config.get_config('licenses',
+                                                           scope=scope)
+            if license_conf:
+                app_licenses = license_conf[self.name] if self.name \
+                    in license_conf else {}
+
+                for action, conf in app_licenses.items():
+                    (env_cmds, var_set) = action_funcs[action](conf,
+                                                               var_set,
+                                                               shell=shell)
+
+                    with open(self.license_file, 'w+') as f:
+                        for cmd in env_cmds:
+                            if cmd:
+                                f.write(cmd + '\n')
+
     def _make_experiments(self, workspace):
         """Create experiment directories
 
@@ -887,6 +854,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         templates, and injecting the experiment into the workspace all
         experiments file.
         """
+
         experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)
 
@@ -1299,30 +1267,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # highest-precedence scopes are processed last
         config_scopes = ramble.config.scopes()
         shell = ramble.config.get('config:shell')
-        var_set = set()
 
-        action_funcs = {
-            'set': self._get_env_set_commands,
-            'unset': self._get_env_unset_commands,
-            'append': self._get_env_append_commands,
-            'prepend': self._get_env_prepend_commands
-        }
+        action_funcs = ramble.util.env.action_funcs
 
         for scope in config_scopes:
             license_conf = ramble.config.config.get_config('licenses',
                                                            scope=scope)
             if license_conf:
-                app_licenses = license_conf[self.name] if self.name \
-                    in license_conf else {}
-
-                for action, conf in app_licenses.items():
-                    (env_cmds, var_set) = action_funcs[action](conf,
-                                                               var_set,
-                                                               shell=shell)
-
-                    for cmd in env_cmds:
-                        if cmd:
-                            command.append(cmd)
+                app_licenses = license_conf[self.name]
+                if app_licenses:
+                    # Append logic to source file which contains the exports
+                    command.append(f". {{license_input_dir}}/{self.license_inc_name}")
 
         # Process environment variable actions
         for env_var_set in self._env_variable_sets:

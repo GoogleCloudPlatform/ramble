@@ -46,7 +46,7 @@ class SpackApplication(ApplicationBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
-        self._setup_phases = [
+        self._setup_phases += [
             'create_spack_env',
             'install_compilers',
             'concretize_spack_env',
@@ -57,8 +57,6 @@ class SpackApplication(ApplicationBase):
             'write_inventory',
         ]
 
-        self._analyze_phases = ['analyze_experiments']
-        self._archive_phases = ['archive_experiments']
         self._mirror_phases = [
             'mirror_inputs',
             'create_spack_env',

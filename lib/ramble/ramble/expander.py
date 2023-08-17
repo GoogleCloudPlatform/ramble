@@ -63,6 +63,7 @@ class Expander(object):
 
         self._application_input_dir = None
         self._workload_input_dir = None
+        self._license_input_dir = None
 
         self._application_run_dir = None
         self._workload_run_dir = None
@@ -136,6 +137,13 @@ class Expander(object):
             self._workload_input_dir = self.expand_var_name(self._keywords.workload_input_dir)
 
         return self._workload_input_dir
+
+    @property
+    def license_input_dir(self):
+        if not self._license_input_dir:
+            self._license_input_dir = self.expand_var_name(self._keywords.license_input_dir)
+
+        return self._license_input_dir
 
     @property
     def application_run_dir(self):

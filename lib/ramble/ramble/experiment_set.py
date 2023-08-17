@@ -406,6 +406,10 @@ class ExperimentSet(object):
             os.path.join(Expander.expansion_str(self.keywords.application_input_dir),
                          Expander.expansion_str(self.keywords.workload_name))
 
+        context_variables[self.keywords.license_input_dir] = \
+            os.path.join(self._workspace.shared_license_dir,
+                         Expander.expansion_str(self.keywords.application_name))
+
         context_variables[self.keywords.experiment_run_dir] = \
             os.path.join(Expander.expansion_str(self.keywords.workload_run_dir),
                          Expander.expansion_str(self.keywords.experiment_name))
