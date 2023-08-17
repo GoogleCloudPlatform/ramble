@@ -68,6 +68,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.colors">ramble.util.colors module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.editor">ramble.util.editor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.env">ramble.util.env module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.executable">ramble.util.executable module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.file_cache">ramble.util.file_cache module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.hashing">ramble.util.hashing module</a></li>
@@ -270,6 +271,35 @@ searching the full list above, we’ll raise an error.</p>
 <dt>Optional Arguments:</dt><dd><p>_exec_func (function): invoke this function instead of <code class="docutils literal notranslate"><span class="pre">os.execv()</span></code></p>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+<section id="module-ramble.util.env">
+<span id="ramble-util-env-module"></span><h2>ramble.util.env module<a class="headerlink" href="#module-ramble.util.env" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.env.Env">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.env.</span></span><span class="sig-name descname"><span class="pre">Env</span></span><a class="reference internal" href="_modules/ramble/util/env.html#Env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.env.Env" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.env.Env.get_env_append_commands">
+<span class="sig-name descname"><span class="pre">get_env_append_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sh'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/env.html#Env.get_env_append_commands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.env.Env.get_env_append_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.env.Env.get_env_prepend_commands">
+<span class="sig-name descname"><span class="pre">get_env_prepend_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sh'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/env.html#Env.get_env_prepend_commands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.env.Env.get_env_prepend_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.env.Env.get_env_set_commands">
+<span class="sig-name descname"><span class="pre">get_env_set_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sh'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/env.html#Env.get_env_set_commands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.env.Env.get_env_set_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.env.Env.get_env_unset_commands">
+<span class="sig-name descname"><span class="pre">get_env_unset_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sh'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/env.html#Env.get_env_unset_commands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.env.Env.get_env_unset_commands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -783,7 +813,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 15, 2023.
+      <span class="lastupdated">Last updated on Aug 17, 2023.
       </span></p>
   </div>
 

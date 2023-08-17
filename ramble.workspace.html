@@ -558,6 +558,18 @@ the internal scope stack (so, in reverse, from lowest to highest).</p>
 <span class="sig-name descname"><span class="pre">run_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.run_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.Workspace.run_pipeline" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.Workspace.shared_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shared_dir</span></span><a class="headerlink" href="#ramble.workspace.Workspace.shared_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the shared directory</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.Workspace.shared_license_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shared_license_dir</span></span><a class="headerlink" href="#ramble.workspace.Workspace.shared_license_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the shared license directory</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.workspace.Workspace.simlink_result">
 <span class="sig-name descname"><span class="pre">simlink_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latest_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.simlink_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.Workspace.simlink_result" title="Permalink to this definition"></a></dt>
@@ -1292,6 +1304,18 @@ the internal scope stack (so, in reverse, from lowest to highest).</p>
 <span class="sig-name descname"><span class="pre">run_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.run_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.Workspace.run_pipeline" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace.shared_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shared_dir</span></span><a class="headerlink" href="#ramble.workspace.workspace.Workspace.shared_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the shared directory</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace.shared_license_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shared_license_dir</span></span><a class="headerlink" href="#ramble.workspace.workspace.Workspace.shared_license_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the shared license directory</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace.simlink_result">
 <span class="sig-name descname"><span class="pre">simlink_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latest_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.simlink_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.Workspace.simlink_result" title="Permalink to this definition"></a></dt>
@@ -1491,6 +1515,12 @@ is found; if <code class="docutils literal notranslate"><span class="pre">False<
 <dd><p>Whether a directory contains a ramble workspace.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.license_path">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">license_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#license_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.license_path" title="Permalink to this definition"></a></dt>
+<dd><p>Get the root directory for a workspace by name.</p>
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.lockfile_name">
 <span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">lockfile_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ramble.lock'</span></em><a class="headerlink" href="#ramble.workspace.workspace.lockfile_name" title="Permalink to this definition"></a></dt>
@@ -1581,6 +1611,18 @@ effect when there is no active workspace.</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.workspace_shared_license_path">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_shared_license_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'licenses'</span></em><a class="headerlink" href="#ramble.workspace.workspace.workspace_shared_license_path" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the subdirectory where shared/sourale files are stored</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.workspace_shared_path">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_shared_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'shared'</span></em><a class="headerlink" href="#ramble.workspace.workspace.workspace_shared_path" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the subdirectory where shared/sourale files are stored</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.workspace_software_path">
 <span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_software_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'software'</span></em><a class="headerlink" href="#ramble.workspace.workspace.workspace_software_path" title="Permalink to this definition"></a></dt>
 <dd><p>Name of subdirectory within workspaces where software environment
@@ -1614,7 +1656,7 @@ are stored</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 15, 2023.
+      <span class="lastupdated">Last updated on Aug 17, 2023.
       </span></p>
   </div>
 

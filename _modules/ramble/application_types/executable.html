@@ -137,13 +137,11 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">+=</span> <span class="p">[</span>
             <span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span>
             <span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span>
             <span class="s1">&#39;write_inventory&#39;</span><span class="p">,</span>
         <span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">application_class</span> <span class="o">=</span> <span class="s1">&#39;ExecutableApplication&#39;</span></div>
 </pre></div>
@@ -156,7 +154,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 15, 2023.
+      <span class="lastupdated">Last updated on Aug 17, 2023.
       </span></p>
   </div>
 

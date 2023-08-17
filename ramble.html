@@ -223,6 +223,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_name"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_namespace</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_run_dir"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_run_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.license_input_dir"><code class="docutils literal notranslate"><span class="pre">Expander.license_input_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.workload_input_dir"><code class="docutils literal notranslate"><span class="pre">Expander.workload_input_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.workload_name"><code class="docutils literal notranslate"><span class="pre">Expander.workload_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.workload_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.workload_namespace</span></code></a></li>
@@ -439,6 +440,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.is_valid"><code class="docutils literal notranslate"><span class="pre">Keywords.is_valid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.key_type"><code class="docutils literal notranslate"><span class="pre">Keywords.key_type</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.keys"><code class="docutils literal notranslate"><span class="pre">Keywords.keys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.license_input_dir"><code class="docutils literal notranslate"><span class="pre">Keywords.license_input_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.log_dir"><code class="docutils literal notranslate"><span class="pre">Keywords.log_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.log_file"><code class="docutils literal notranslate"><span class="pre">Keywords.log_file</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.mpi_command"><code class="docutils literal notranslate"><span class="pre">Keywords.mpi_command</span></code></a></li>
@@ -1573,6 +1575,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.util.html">ramble.test.util namespace</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.util.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.util.html#ramble-test-util-editor-module">ramble.test.util.editor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.util.html#module-ramble.test.util.env">ramble.test.util.env module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.workspace_hashing.html">ramble.test.workspace_hashing namespace</a><ul>
@@ -1655,6 +1658,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.editor">ramble.util.editor module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.editor.editor"><code class="docutils literal notranslate"><span class="pre">editor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.env">ramble.util.env module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.env.Env"><code class="docutils literal notranslate"><span class="pre">Env</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.env.Env.get_env_append_commands"><code class="docutils literal notranslate"><span class="pre">Env.get_env_append_commands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.env.Env.get_env_prepend_commands"><code class="docutils literal notranslate"><span class="pre">Env.get_env_prepend_commands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.env.Env.get_env_set_commands"><code class="docutils literal notranslate"><span class="pre">Env.get_env_set_commands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.env.Env.get_env_unset_commands"><code class="docutils literal notranslate"><span class="pre">Env.get_env_unset_commands()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.executable">ramble.util.executable module</a><ul>
@@ -1810,6 +1823,8 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.path"><code class="docutils literal notranslate"><span class="pre">Workspace.path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.run_experiments"><code class="docutils literal notranslate"><span class="pre">Workspace.run_experiments()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.run_pipeline"><code class="docutils literal notranslate"><span class="pre">Workspace.run_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.shared_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.shared_license_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_license_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.simlink_result"><code class="docutils literal notranslate"><span class="pre">Workspace.simlink_result()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.software_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.software_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.template_path"><code class="docutils literal notranslate"><span class="pre">Workspace.template_path()</span></code></a></li>
@@ -1929,6 +1944,8 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.path"><code class="docutils literal notranslate"><span class="pre">Workspace.path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.run_experiments"><code class="docutils literal notranslate"><span class="pre">Workspace.run_experiments()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.run_pipeline"><code class="docutils literal notranslate"><span class="pre">Workspace.run_pipeline()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_license_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_license_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.simlink_result"><code class="docutils literal notranslate"><span class="pre">Workspace.simlink_result()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.software_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.software_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.template_path"><code class="docutils literal notranslate"><span class="pre">Workspace.template_path()</span></code></a></li>
@@ -1958,6 +1975,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.get_workspace"><code class="docutils literal notranslate"><span class="pre">get_workspace()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.get_workspace_path"><code class="docutils literal notranslate"><span class="pre">get_workspace_path()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.is_workspace_dir"><code class="docutils literal notranslate"><span class="pre">is_workspace_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.license_path"><code class="docutils literal notranslate"><span class="pre">license_path()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.lockfile_name"><code class="docutils literal notranslate"><span class="pre">lockfile_name</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.no_active_workspace"><code class="docutils literal notranslate"><span class="pre">no_active_workspace()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.prepare_config_scope"><code class="docutils literal notranslate"><span class="pre">prepare_config_scope()</span></code></a></li>
@@ -1973,6 +1991,8 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_experiment_path"><code class="docutils literal notranslate"><span class="pre">workspace_experiment_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_input_path"><code class="docutils literal notranslate"><span class="pre">workspace_input_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_log_path"><code class="docutils literal notranslate"><span class="pre">workspace_log_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_shared_license_path"><code class="docutils literal notranslate"><span class="pre">workspace_shared_license_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_shared_path"><code class="docutils literal notranslate"><span class="pre">workspace_shared_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_software_path"><code class="docutils literal notranslate"><span class="pre">workspace_software_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_template_extension"><code class="docutils literal notranslate"><span class="pre">workspace_template_extension</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.yaml_equivalent"><code class="docutils literal notranslate"><span class="pre">yaml_equivalent()</span></code></a></li>
@@ -2948,6 +2968,11 @@ after expansion</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="ramble.expander.Expander.experiment_run_dir">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">experiment_run_dir</span></span><a class="headerlink" href="#ramble.expander.Expander.experiment_run_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.expander.Expander.license_input_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">license_input_dir</span></span><a class="headerlink" href="#ramble.expander.Expander.license_input_dir" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -4451,7 +4476,12 @@ but it might not be possible always.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.keywords.Keywords.keys">
-<span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'application_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'batch_submit':</span> <span class="pre">type.required,</span> <span class="pre">'command':</span> <span class="pre">type.reserved,</span> <span class="pre">'env_name':</span> <span class="pre">type.optional,</span> <span class="pre">'err_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_template_name':</span> <span class="pre">type.required,</span> <span class="pre">'input_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'mpi_command':</span> <span class="pre">type.required,</span> <span class="pre">'n_nodes':</span> <span class="pre">type.required,</span> <span class="pre">'n_ranks':</span> <span class="pre">type.required,</span> <span class="pre">'n_threads':</span> <span class="pre">type.required,</span> <span class="pre">'processes_per_node':</span> <span class="pre">type.required,</span> <span class="pre">'spack_env':</span> <span class="pre">type.reserved,</span> <span class="pre">'spec_name':</span> <span class="pre">type.optional,</span> <span class="pre">'workload_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_run_dir':</span> <span class="pre">type.reserved}</span></em><a class="headerlink" href="#ramble.keywords.Keywords.keys" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'application_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'batch_submit':</span> <span class="pre">type.required,</span> <span class="pre">'command':</span> <span class="pre">type.reserved,</span> <span class="pre">'env_name':</span> <span class="pre">type.optional,</span> <span class="pre">'err_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_template_name':</span> <span class="pre">type.required,</span> <span class="pre">'input_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'license_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'mpi_command':</span> <span class="pre">type.required,</span> <span class="pre">'n_nodes':</span> <span class="pre">type.required,</span> <span class="pre">'n_ranks':</span> <span class="pre">type.required,</span> <span class="pre">'n_threads':</span> <span class="pre">type.required,</span> <span class="pre">'processes_per_node':</span> <span class="pre">type.required,</span> <span class="pre">'spack_env':</span> <span class="pre">type.reserved,</span> <span class="pre">'spec_name':</span> <span class="pre">type.optional,</span> <span class="pre">'workload_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_run_dir':</span> <span class="pre">type.reserved}</span></em><a class="headerlink" href="#ramble.keywords.Keywords.keys" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.keywords.Keywords.license_input_dir">
+<span class="sig-name descname"><span class="pre">license_input_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'license_input_dir'</span></em><a class="headerlink" href="#ramble.keywords.Keywords.license_input_dir" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -7112,7 +7142,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 15, 2023.
+      <span class="lastupdated">Last updated on Aug 17, 2023.
       </span></p>
   </div>
 

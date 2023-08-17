@@ -166,7 +166,7 @@
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 <span class="kn">from</span> <span class="nn">ramble.namespace</span> <span class="kn">import</span> <span class="n">namespace</span>
 <span class="kn">import</span> <span class="nn">ramble.util.matrices</span>
-
+<span class="kn">import</span> <span class="nn">ramble.util.env</span>
 
 <span class="c1">#: Environment variable used to indicate the active workspace</span>
 <span class="n">ramble_workspace_var</span> <span class="o">=</span> <span class="s1">&#39;RAMBLE_WORKSPACE&#39;</span>
@@ -192,6 +192,12 @@
 
 <span class="c1">#: Name of the subdirectory where workspace archives are stored</span>
 <span class="n">workspace_archive_path</span> <span class="o">=</span> <span class="s1">&#39;archive&#39;</span>
+
+<span class="c1">#: Name of the subdirectory where shared/sourale files are stored</span>
+<span class="n">workspace_shared_path</span> <span class="o">=</span> <span class="s1">&#39;shared&#39;</span>
+
+<span class="c1">#: Name of the subdirectory where shared/sourale files are stored</span>
+<span class="n">workspace_shared_license_path</span> <span class="o">=</span> <span class="s1">&#39;licenses&#39;</span>
 
 <span class="c1">#: regex for validating workspace names</span>
 <span class="n">valid_workspace_name_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\w[\w-]*$&#39;</span>
@@ -400,6 +406,13 @@
 <div class="viewcode-block" id="root"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.root">[docs]</a><span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the root directory for a workspace by name.&quot;&quot;&quot;</span>
     <span class="n">validate_workspace_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_root</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="license_path"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.license_path">[docs]</a><span class="k">def</span> <span class="nf">license_path</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the root directory for a workspace by name.&quot;&quot;&quot;</span>
+    <span class="n">shared_license_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_shared_path</span><span class="p">,</span> <span class="n">workspace_shared_license_path</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">shared_license_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_root</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 
@@ -776,6 +789,8 @@
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">)</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">)</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">software_dir</span><span class="p">)</span>
+        <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_dir</span><span class="p">)</span>
+        <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_license_dir</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_config</span><span class="p">(</span><span class="n">config_section</span><span class="p">)</span>
 
@@ -1570,6 +1585,16 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the archive directory&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">workspace_archive_path</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shared_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the shared directory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">workspace_shared_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shared_license_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the shared license directory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_dir</span><span class="p">,</span> <span class="n">workspace_shared_license_path</span><span class="p">)</span>
+
 <div class="viewcode-block" id="Workspace.template_path"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.template_path">[docs]</a>    <span class="k">def</span> <span class="nf">template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="n">name</span> <span class="o">+</span>
@@ -1849,7 +1874,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 15, 2023.
+      <span class="lastupdated">Last updated on Aug 17, 2023.
       </span></p>
   </div>
 

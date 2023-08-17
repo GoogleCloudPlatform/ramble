@@ -33,6 +33,14 @@ ramble.util.editor module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.env module
+----------------------
+
+.. automodule:: ramble.util.env
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.executable module
 -----------------------------
 

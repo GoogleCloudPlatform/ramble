@@ -956,6 +956,8 @@
 </li>
       <li><a href="ramble.html#ramble.config.ensure_latest_format_fn">ensure_latest_format_fn() (in module ramble.config)</a>
 </li>
+      <li><a href="ramble.util.html#ramble.util.env.Env">Env (class in ramble.util.env)</a>
+</li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.env_create_args">env_create_args (ramble.spack_runner.SpackRunner attribute)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.env_key">env_key (ramble.spack_runner.SpackRunner attribute)</a>
@@ -1448,7 +1450,15 @@
 </li>
       <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.get_env">get_env() (ramble.software_environments.SoftwareEnvironments method)</a>
 </li>
+      <li><a href="ramble.util.html#ramble.util.env.Env.get_env_append_commands">get_env_append_commands() (ramble.util.env.Env method)</a>
+</li>
       <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.get_env_packages">get_env_packages() (ramble.software_environments.SoftwareEnvironments method)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.env.Env.get_env_prepend_commands">get_env_prepend_commands() (ramble.util.env.Env method)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.env.Env.get_env_set_commands">get_env_set_commands() (ramble.util.env.Env method)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.env.Env.get_env_unset_commands">get_env_unset_commands() (ramble.util.env.Env method)</a>
 </li>
       <li><a href="ramble.html#ramble.experiment_set.ExperimentSet.get_experiment">get_experiment() (ramble.experiment_set.ExperimentSet method)</a>
 </li>
@@ -1470,12 +1480,12 @@
         <li><a href="ramble.html#ramble.repository.RepoPath.get_obj_class">(ramble.repository.RepoPath method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.get_package_path">get_package_path() (ramble.spack_runner.SpackRunner method)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.get_pipeline_phases">get_pipeline_phases() (ramble.application.ApplicationBase method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.mirror.Mirror.get_profile">get_profile() (ramble.mirror.Mirror method)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.RepoPath.get_repo">get_repo() (ramble.repository.RepoPath method)</a>
@@ -1794,7 +1804,15 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.license.license">license() (in module ramble.cmd.license)</a>
 </li>
+      <li><a href="ramble.html#ramble.expander.Expander.license_input_dir">license_input_dir (ramble.expander.Expander property)</a>
+
+      <ul>
+        <li><a href="ramble.html#ramble.keywords.Keywords.license_input_dir">(ramble.keywords.Keywords attribute)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.cmd.html#ramble.cmd.license.license_lines">license_lines (in module ramble.cmd.license)</a>
+</li>
+      <li><a href="ramble.workspace.html#ramble.workspace.workspace.license_path">license_path() (in module ramble.workspace.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.license.licensed_files">licensed_files (in module ramble.cmd.license)</a>
 </li>
@@ -1802,12 +1820,12 @@
 </li>
       <li><a href="ramble.util.html#ramble.util.web.LinkParser">LinkParser (class in ramble.util.web)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.cmd.html#ramble.cmd.list.list">list() (in module ramble.cmd.list)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.license.list_files">list_files() (in module ramble.cmd.license)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.util.html#ramble.util.web.list_url">list_url() (in module ramble.util.web)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.load_compiler">load_compiler() (ramble.spack_runner.SpackRunner method)</a>
@@ -2184,6 +2202,8 @@
 </li>
         <li><a href="ramble.test.util.html#module-ramble.test.util">ramble.test.util</a>
 </li>
+        <li><a href="ramble.test.util.html#module-ramble.test.util.env">ramble.test.util.env</a>
+</li>
         <li><a href="ramble.test.workspace_hashing.html#module-ramble.test.workspace_hashing">ramble.test.workspace_hashing</a>
 </li>
         <li><a href="ramble.util.html#module-ramble.util">ramble.util</a>
@@ -2191,6 +2211,8 @@
         <li><a href="ramble.util.html#module-ramble.util.colors">ramble.util.colors</a>
 </li>
         <li><a href="ramble.util.html#module-ramble.util.editor">ramble.util.editor</a>
+</li>
+        <li><a href="ramble.util.html#module-ramble.util.env">ramble.util.env</a>
 </li>
         <li><a href="ramble.util.html#module-ramble.util.executable">ramble.util.executable</a>
 </li>
@@ -3091,8 +3113,6 @@
         <li><a href="ramble.test.cmd.html#module-ramble.test.cmd">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.cmd.debug
 
@@ -3100,6 +3120,8 @@
         <li><a href="ramble.test.cmd.html#module-ramble.test.cmd.debug">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.cmd.software_definitions
 
@@ -3157,6 +3179,13 @@
 </li>
       </ul></li>
       <li>
+    ramble.test.util.env
+
+      <ul>
+        <li><a href="ramble.test.util.html#module-ramble.test.util.env">module</a>
+</li>
+      </ul></li>
+      <li>
     ramble.test.workspace_hashing
 
       <ul>
@@ -3182,6 +3211,13 @@
 
       <ul>
         <li><a href="ramble.util.html#module-ramble.util.editor">module</a>
+</li>
+      </ul></li>
+      <li>
+    ramble.util.env
+
+      <ul>
+        <li><a href="ramble.util.html#module-ramble.util.env">module</a>
 </li>
       </ul></li>
       <li>
@@ -3688,8 +3724,22 @@
         <li><a href="ramble.cmd.html#ramble.cmd.workspace.setup_parser">(in module ramble.cmd.workspace)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.workspace.html#ramble.workspace.Workspace.shared_dir">shared_dir (ramble.workspace.Workspace property)</a>
+
+      <ul>
+        <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_dir">(ramble.workspace.workspace.Workspace property)</a>
+</li>
+      </ul></li>
+      <li><a href="ramble.workspace.html#ramble.workspace.Workspace.shared_license_dir">shared_license_dir (ramble.workspace.Workspace property)</a>
+
+      <ul>
+        <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_license_dir">(ramble.workspace.workspace.Workspace property)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.language.html#ramble.language.shared_language.SharedMeta">SharedMeta (class in ramble.language.shared_language)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.shell_init_instructions">shell_init_instructions() (in module ramble.cmd.common)</a>
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.simlink_result">simlink_result() (ramble.workspace.Workspace method)</a>
@@ -3698,8 +3748,6 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.simlink_result">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.util.html#ramble.util.naming.simplify_name">simplify_name() (in module ramble.util.naming)</a>
 </li>
       <li><a href="ramble.html#ramble.config.SingleFileScope">SingleFileScope (class in ramble.config)</a>
@@ -3926,8 +3974,16 @@
 </li>
       <li><a href="ramble.test.cmd.html#ramble.test.cmd.debug.test_debug_report">test_debug_report() (in module ramble.test.cmd.debug)</a>
 </li>
+      <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_append_command_gen">test_env_var_append_command_gen() (in module ramble.test.util.env)</a>
+</li>
+      <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_prepend_command_gen">test_env_var_prepend_command_gen() (in module ramble.test.util.env)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_set_command_gen">test_env_var_set_command_gen() (in module ramble.test.util.env)</a>
+</li>
+      <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_unset_command_gen">test_env_var_unset_command_gen() (in module ramble.test.util.env)</a>
+</li>
       <li><a href="ramble.test.html#ramble.test.success_criteria.test_single_criteria">test_single_criteria() (in module ramble.test.success_criteria)</a>
 </li>
       <li><a href="ramble.test.cmd.html#ramble.test.cmd.software_definitions.test_software_definitions_conflicts_runs">test_software_definitions_conflicts_runs() (in module ramble.test.cmd.software_definitions)</a>
@@ -4212,10 +4268,10 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_archive">workspace_archive() (in module ramble.cmd.workspace)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.workspace.workspace_archive_path">workspace_archive_path (in module ramble.workspace.workspace)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_archive_setup_parser">workspace_archive_setup_parser() (in module ramble.cmd.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_concretize">workspace_concretize() (in module ramble.cmd.workspace)</a>
@@ -4261,6 +4317,10 @@
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_setup">workspace_setup() (in module ramble.cmd.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_setup_setup_parser">workspace_setup_setup_parser() (in module ramble.cmd.workspace)</a>
+</li>
+      <li><a href="ramble.workspace.html#ramble.workspace.workspace.workspace_shared_license_path">workspace_shared_license_path (in module ramble.workspace.workspace)</a>
+</li>
+      <li><a href="ramble.workspace.html#ramble.workspace.workspace.workspace_shared_path">workspace_shared_path (in module ramble.workspace.workspace)</a>
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.workspace.workspace_software_path">workspace_software_path (in module ramble.workspace.workspace)</a>
 </li>
@@ -4335,7 +4395,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 15, 2023.
+      <span class="lastupdated">Last updated on Aug 17, 2023.
       </span></p>
   </div>
 
