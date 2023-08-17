@@ -65,7 +65,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         super().__init__()
 
         self._setup_phases = ['license_includes']
-        self._analyze_phases = []
+        self._analyze_phases = ['analyze_experiments']
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
 

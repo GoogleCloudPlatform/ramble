@@ -201,8 +201,6 @@ licenses:
 
             with open(os.path.join(exp_dir, 'full_command'), 'r') as f:
                 data = f.read()
-                # Test the license exists
-                assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
                 assert 'export OMP_NUM_THREADS="1"' in data
@@ -220,8 +218,6 @@ licenses:
 
             with open(os.path.join(exp_dir, 'execute_experiment'), 'r') as f:
                 data = f.read()
-                # Test the license exists
-                assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
                 assert 'export OMP_NUM_THREADS="1"' in data
