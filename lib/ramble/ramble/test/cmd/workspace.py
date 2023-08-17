@@ -56,13 +56,13 @@ def check_basic(ws):
     found_test_wl = False
     found_test_wl2 = False
 
-    for app, workloads, *_ in ws.all_applications():
-        if app == 'basic':
+    for workloads, application_context in ws.all_applications():
+        if application_context.context_name == 'basic':
             found_basic = True
-        for workload, experiments, *_ in ws.all_workloads(workloads):
-            if workload == 'test_wl':
+        for experiments, workload_context in ws.all_workloads(workloads):
+            if workload_context.context_name == 'test_wl':
                 found_test_wl = True
-            elif workload == 'test_wl2':
+            elif workload_context.context_name == 'test_wl2':
                 found_test_wl2 = True
 
     assert found_basic
@@ -75,13 +75,13 @@ def check_no_basic(ws):
     found_test_wl = False
     found_test_wl2 = False
 
-    for app, workloads, *_ in ws.all_applications():
-        if app == 'basic':
+    for workloads, application_context in ws.all_applications():
+        if application_context.context_name == 'basic':
             found_basic = True
-        for workload, experiments, *_ in ws.all_workloads(workloads):
-            if workload == 'test_wl':
+        for experiments, workload_context in ws.all_workloads(workloads):
+            if workload_context.context_name == 'test_wl':
                 found_test_wl = True
-            elif workload == 'test_wl2':
+            elif workload_context.context_name == 'test_wl2':
                 found_test_wl2 = True
 
     assert not found_basic
@@ -1247,7 +1247,8 @@ ramble:
     remote_archive_path = os.path.join(ws1.root, 'archive_backup')
     fs.mkdirp(remote_archive_path)
 
-    output = workspace('archive', '-t', '-u', 'file://' + remote_archive_path, global_args=['-w', workspace_name])
+    output = workspace('archive', '-t', '-u', 'file://' + remote_archive_path,
+                       global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)

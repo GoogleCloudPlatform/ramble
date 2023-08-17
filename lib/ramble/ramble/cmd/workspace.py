@@ -26,6 +26,7 @@ import ramble.config
 import ramble.workspace
 import ramble.workspace.shell
 import ramble.experiment_set
+import ramble.context
 import ramble.experimental.uploader
 import ramble.software_environments
 import ramble.util.colors as rucolor
@@ -404,38 +405,18 @@ def workspace_info(args):
     all_pipelines = {}
     color.cprint('')
     color.cprint(rucolor.section_title('Experiments:'))
-    for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps, \
-            app_mods in ws.all_applications():
-        for workload, experiments, workload_vars, workload_env_vars, workload_internals, \
-                workload_template, workload_chained_exps, workload_mods \
-                in ws.all_workloads(workloads):
-            for exp, _, exp_vars, exp_env_vars, exp_zips, exp_matrices, exp_internals, \
-                    exp_template, exp_chained_exps, exp_mods, exp_excludes \
-                    in ws.all_experiments(experiments):
+    for workloads, application_context in ws.all_applications():
+        for experiments, workload_context in ws.all_workloads(workloads):
+            for _, experiment_context in ws.all_experiments(experiments):
                 print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
-                print_experiment_set.set_application_context(app, app_vars,
-                                                             app_env_vars, app_internals,
-                                                             app_template, app_chained_exps,
-                                                             app_mods)
-                print_experiment_set.set_workload_context(workload, workload_vars,
-                                                          workload_env_vars, workload_internals,
-                                                          workload_template, workload_chained_exps,
-                                                          workload_mods)
-                print_experiment_set.set_experiment_context(exp,
-                                                            exp_vars,
-                                                            exp_env_vars,
-                                                            exp_zips,
-                                                            exp_matrices,
-                                                            exp_internals,
-                                                            exp_template,
-                                                            exp_chained_exps,
-                                                            exp_mods,
-                                                            exp_excludes)
-
+                print_experiment_set.set_application_context(application_context)
+                print_experiment_set.set_workload_context(workload_context)
+                print_experiment_set.set_experiment_context(experiment_context)
                 print_experiment_set.build_experiment_chains()
 
-                color.cprint(rucolor.nested_1('  Application: ') + app)
-                color.cprint(rucolor.nested_2('    Workload: ') + workload)
+                color.cprint(rucolor.nested_1('  Application: ') +
+                             application_context.context_name)
+                color.cprint(rucolor.nested_2('    Workload: ') + workload_context.context_name)
 
                 # Define variable printing groups.
                 var_indent = '        '
@@ -466,7 +447,9 @@ def workspace_info(args):
 
                     if args.verbose >= 1:
                         var_groups = [config_vars, workspace_vars,
-                                      app_vars, workload_vars, exp_vars]
+                                      application_context.variables,
+                                      workload_context.variables,
+                                      experiment_context.variables]
 
                         # Print each group that has variables in it
                         for group, name in zip(var_groups, var_group_names):
