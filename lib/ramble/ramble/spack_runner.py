@@ -15,10 +15,12 @@ environment by calling an externally available spack.
 import os
 import re
 import shutil
+import shlex
 
 import llnl.util.tty as tty
 import llnl.util.filesystem as fs
-from spack.util.executable import which, CommandNotFoundError, ProcessError
+from spack.util.executable import CommandNotFoundError, ProcessError
+from ramble.util.executable import which
 import spack.util.spack_yaml as syaml
 
 import ramble.config
@@ -43,7 +45,9 @@ class SpackRunner(object):
     """
     env_key = 'SPACK_ENV'
 
-    global_arg_config_name = 'config:spack_flags:global_args'
+    global_config_name = 'config:spack:global'
+    install_config_name = 'config:spack:install'
+    concretize_config_name = 'config:spack:concretize'
 
     env_create_args = [
         'env',
@@ -65,19 +69,19 @@ class SpackRunner(object):
         Ensure spack is found in the path, and setup some default variables.
         """
         try:
-            self.exe = which('spack', required=True)
+            self.spack = which('spack', required=True)
         except CommandNotFoundError:
             raise RunnerError("Spack command is not found in path")
 
         # Add default arguments to spack command.
         # This allows us to inject custom config scope dirs
         # primarily for unit testing.
-        global_args = ramble.config.get(self.global_arg_config_name)
-        if global_args:
-            for arg in global_args.split():
-                self.exe.add_default_arg(arg)
+        global_args = ramble.config.get(f'{self.global_config_name}:flags')
+        if global_args is not None:
+            for arg in shlex.split(global_args):
+                self.spack.add_default_arg(arg)
 
-        self.spack_dir = os.path.dirname(os.path.dirname(self.exe.exe[0]))
+        self.spack_dir = os.path.dirname(os.path.dirname(self.spack.exe[0]))
         self.shell = shell
 
         if self.shell == 'bash':
@@ -101,6 +105,16 @@ class SpackRunner(object):
         self.compiler_config_dir = None
         self.configs = []
         self.configs_applied = False
+
+        self.installer = self.spack.copy()
+        self.installer.add_default_prefix(ramble.config.get(f'{self.install_config_name}:prefix'))
+        self.installer.add_default_arg('install')
+
+        self.concretizer = self.spack.copy()
+        self.concretizer.add_default_prefix(
+            ramble.config.get(f'{self.concretize_config_name}:prefix')
+        )
+        self.concretizer.add_default_arg('concretize')
 
     def get_version(self):
         """Get spack's version"""
@@ -203,7 +217,7 @@ class SpackRunner(object):
         if not self.dry_run:
             if not os.path.exists(os.path.join(path, 'spack.yaml')):
                 with fs.working_dir(path):
-                    self.exe(*self.env_create_args)
+                    self.spack(*self.env_create_args)
 
         # Ensure subsequent commands use the created env now.
         self.env_path = path
@@ -244,15 +258,19 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            load_cmds = self.exe(*args, output=str).split('\n')
+            load_cmds = self.spack(*args, output=str).split('\n')
 
             for cmd in load_cmds:
                 env_var = regex.match(cmd)
                 if env_var:
-                    self.exe.add_default_env(env_var.group('var'),
-                                             env_var.group('val'))
+                    self.spack.add_default_env(env_var.group('var'),
+                                               env_var.group('val'))
+                    self.installer.add_default_env(env_var.group('var'),
+                                                   env_var.group('val'))
+                    self.concertizer.add_default_env(env_var.group('var'),
+                                                     env_var.group('val'))
         else:
-            self._dry_run_print(args)
+            self._dry_run_print(self.spack, args)
 
     def install_compiler(self, spec):
         """
@@ -270,9 +288,11 @@ class SpackRunner(object):
         """
         active_env = None
         if self.active:
-            active_env = self.exe.default_env[self.env_key]
-            if self.env_key in self.exe.default_env:
-                del self.exe.default_env[self.env_key]
+            active_env = self.spack.default_env[self.env_key]
+            if self.env_key in self.spack.default_env:
+                del self.spack.default_env[self.env_key]
+                del self.installer.default_env[self.env_key]
+                del self.concretizer.default_env[self.env_key]
 
         comp_info_args = []
         if self.compiler_config_dir:
@@ -280,31 +300,37 @@ class SpackRunner(object):
         comp_info_args.extend(['compiler', 'info', spec])
 
         try:
-            self.exe(*comp_info_args, output=os.devnull, error=os.devnull)
+            self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
             tty.msg(f'{spec} is already an available compiler')
         except ProcessError:
-            args = [
-                'install',
-                '--reuse',
-                spec
-            ]
+
+            args = []
+
+            install_flags = ramble.config.get(f'{self.install_config_name}:flags')
+            if install_flags is not None:
+                for flag in shlex.split(install_flags):
+                    args.append(flag)
+
+            args.append(spec)
 
             if not self.dry_run:
-                self.exe(*args)
+                self.installer(*args)
             else:
-                self._dry_run_print(args)
+                self._dry_run_print(self.installer, args)
 
             self.load_compiler(spec)
 
             if not self.dry_run:
-                self.exe(*self.compiler_find_args)
+                self.spack(*self.compiler_find_args)
 
                 self.compilers.append(spec)
 
                 if self.active:
-                    self.exe.add_default_env(self.env_key, active_env)
+                    self.spack.add_default_env(self.env_key, active_env)
+                    self.installer.add_default_env(self.env_key, active_env)
+                    self.concretizer.add_default_env(self.env_key, active_env)
             else:
-                self._dry_run_print(self.compiler_find_args)
+                self._dry_run_print(self.spack, self.compiler_find_args)
 
     def activate(self):
         """
@@ -314,7 +340,9 @@ class SpackRunner(object):
             raise NoPathRunnerError('Environment runner has no ' +
                                     'path congfigured')
 
-        self.exe.add_default_env(self.env_key, self.env_path)
+        self.spack.add_default_env(self.env_key, self.env_path)
+        self.installer.add_default_env(self.env_key, self.env_path)
+        self.concretizer.add_default_env(self.env_key, self.env_path)
 
         self.env_contents = []
 
@@ -328,8 +356,10 @@ class SpackRunner(object):
             raise NoPathRunnerError('Environment runner has no ' +
                                     'path congfigured')
 
-        if self.active and self.env_key in self.exe.default_env.keys():
-            del self.exe.default_env[self.env_key]
+        if self.active and self.env_key in self.spack.default_env.keys():
+            del self.spack.default_env[self.env_key]
+            del self.installer.default_env[self.env_key]
+            del self.concretizer.default_env[self.env_key]
             self.active = False
 
     def _check_active(self):
@@ -364,7 +394,7 @@ class SpackRunner(object):
 
         pkg_names = []
 
-        for pkg in self.exe(*args, output=str).split('\n'):
+        for pkg in self.spack(*args, output=str).split('\n'):
             match = package_name_regex.match(pkg)
             if match:
                 pkg_names.append(match.group('package_name'))
@@ -401,9 +431,9 @@ class SpackRunner(object):
         for config in self.configs:
             args = config_args.copy()
             args.append(config)
-            self.exe(*args)
+            self.spack(*args)
             if self.dry_run:
-                self._dry_run_print(args)
+                self._dry_run_print(self.spack, args)
 
         self.configs_applied = True
 
@@ -433,7 +463,7 @@ class SpackRunner(object):
         path = env_name_or_path
         if not os.path.exists(path):
             try:
-                path = self.exe(*named_location_args, output=str).strip('\n')
+                path = self.spack(*named_location_args, output=str).strip('\n')
             # If a named environment fails, copy directly from the path
             except ProcessError:
                 raise InvalidExternalEnvironment(f'{path} is not a spack environment.')
@@ -487,14 +517,16 @@ class SpackRunner(object):
                     existing_data = syaml.load_config(f)
                 gen_env_hash = ramble.util.hashing.hash_json(env_data)
                 existing_env_hash = ramble.util.hashing.hash_json(existing_data)
-                tty.msg(f' Generated hash: {gen_env_hash}')
-                tty.msg(f' Existing hash: {existing_env_hash}')
 
                 # If the yaml hash matches the new generated data hash...
                 if gen_env_hash == existing_env_hash:
                     self.concretized = True
                     tty.msg(f'Environment {self.env_path} will not be regenerated.')
                     return
+
+            if not self.concretized:
+                tty.verbose(f'Removing invalid spack lock file {spack_lock_file}')
+                fs.force_remove(spack_lock_file)
 
         # Write spack.yaml to environment before concretizing
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
@@ -515,16 +547,16 @@ class SpackRunner(object):
             tty.msg(f'Environment {self.env_path} is already concretized. Skipping concretize...')
             return
 
-        concretize_flags = ramble.config.get('config:spack_flags:concretize')
+        concretize_flags = ramble.config.get(f'{self.concretize_config_name}:flags')
 
-        args = [
-            'concretize'
-        ]
-        args.extend(concretize_flags.split())
+        args = []
+        if concretize_flags is not None:
+            args.extend(shlex.split(concretize_flags))
+
         if not self.dry_run:
-            self.exe(*args)
+            self.concretizer(*args)
         else:
-            self._dry_run_print(args)
+            self._dry_run_print(self.concretizer, args)
 
         self.concretized = True
 
@@ -558,16 +590,17 @@ class SpackRunner(object):
             tty.msg(f'Environment {self.env_path} is already installed. Skipping installation...')
             return
 
-        install_flags = ramble.config.get('config:spack_flags:install')
+        install_flags = ramble.config.get(f'{self.install_config_name}:flags')
 
-        args = [
-            'install'
-        ]
-        args.extend(install_flags.split())
+        args = []
+
+        if install_flags is not None:
+            args.extend(shlex.split(install_flags))
+
         if not self.dry_run:
-            self.exe(*args)
+            self.installer(*args)
         else:
-            self._dry_run_print(args)
+            self._dry_run_print(self.installer, args)
 
         self.installed = True
 
@@ -580,12 +613,12 @@ class SpackRunner(object):
         name_args.extend(package_spec.split())
 
         if not self.dry_run:
-            name = self.exe(*name_args, output=str).strip()
-            location = self.exe(*loc_args, output=str).strip()
+            name = self.spack(*name_args, output=str).strip()
+            location = self.spack(*loc_args, output=str).strip()
             return (name, location)
         else:
-            self._dry_run_print(name_args)
-            self._dry_run_print(loc_args)
+            self._dry_run_print(self.spack, name_args)
+            self._dry_run_print(self.spack, loc_args)
 
             name = os.path.join(package_spec.split()[0])
             location = os.path.join('dry-run', 'path', 'to', package_spec.split()[0])
@@ -605,16 +638,16 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            return self.exe(*args, output=str).strip()
+            return self.spack(*args, output=str).strip()
         else:
-            self._dry_run_print(args)
+            self._dry_run_print(self.spack, args)
             return """
   %-4d already present
   %-4d added
   %-4d failed to fetch.""" % (0, 0, 0)
 
-    def _dry_run_print(self, args):
-        tty.msg('DRY-RUN: would run %s' % self.exe.command)
+    def _dry_run_print(self, executable, args):
+        tty.msg('DRY-RUN: would run %s' % executable)
         tty.msg('         with args: %s' % args)
 
 

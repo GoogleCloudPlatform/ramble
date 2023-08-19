@@ -55,7 +55,7 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
         workspace('concretize', global_args=['-D', ws1.root])
         output = workspace('setup', '--dry-run', global_args=['-D', ws1.root])
 
-        expected_str = "with args: ['install', '--reuse', 'mod_compiler@1.1 target=x86_64']"
+        expected_str = "with args: ['--reuse', 'mod_compiler@1.1 target=x86_64']"
 
         assert expected_str in output
 

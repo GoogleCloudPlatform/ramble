@@ -128,9 +128,11 @@ config_defaults = {
         'concretizer': 'clingo',
         'license_dir': spack.paths.default_license_dir,
         'shell': 'sh',
-        'spack_flags': {
-            'install': '--reuse',
-            'concretize': '--reuse'
+        'spack': {
+            'flags': {
+                'install': '--reuse',
+                'concretize': '--reuse'
+            }
         },
         'input_cache': '$ramble/var/ramble/cache',
         'workspace_dirs': '$ramble/var/ramble/workspaces'
