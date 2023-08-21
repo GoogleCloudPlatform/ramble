@@ -323,9 +323,9 @@ be used to construct environments with. A package is defined as software that
 spack should install for the user. These have one required attribute, and two
 optional attributes. The ``spack_spec`` attribute is required to be defined,
 and should be the spec passed to ``spack install`` on the command line for the
-package. Optionally, a package can defined a ``compiler_spec`` attribute, which
+package. Optionally, a package can define a ``compiler_spec`` attribute, which
 will be the spec used when this package is used as a compiler for another
-package. Packages can also optionally defined a ``compiler`` attribute, which
+package. Packages can also optionally define a ``compiler`` attribute, which
 is the name of another package that should be used as it's compiler.
 
 The environments dictionary contains descriptions of spack environments that

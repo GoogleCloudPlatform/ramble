@@ -177,7 +177,8 @@ To perform a light-weight test version of this, one can use:
 
     $ ramble workspace setup --dry-run
 
-Which will create experiments, but it won't download or install anything.
+Which will create experiments, but it won't download anything, or execute any
+package manager commands.
 
 ^^^^^^^^^^^^^^^^^^^^^
 Software Environments
