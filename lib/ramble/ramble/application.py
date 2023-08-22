@@ -56,6 +56,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _builtin_required_key = 'required'
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup']
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.
@@ -64,8 +65,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def __init__(self, file_path):
         super().__init__()
-
-        self._pipelines = ['setup', 'analyze', 'archive', 'mirror']
         self._setup_phases = ['license_includes']
         self._analyze_phases = ['analyze_experiments']
         self._archive_phases = ['archive_experiments']
@@ -281,12 +280,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             self.modifiers = modifiers.copy()
 
     def get_pipeline_phases(self, pipeline, phase_filters=['*']):
+        if pipeline not in self._pipelines:
+            tty.die(f'Requested pipeline {pipeline} is not valid.\n',
+                    f'\tAvailable pipelinese are {self._pipelines}')
+
         phases = []
         if hasattr(self, f'_{pipeline}_phases'):
             for phase in getattr(self, f'_{pipeline}_phases'):
                 for phase_filter in phase_filters:
                     if fnmatch.fnmatch(phase, phase_filter):
                         phases.append(phase)
+        else:
+            tty.die(f'Pipeline {pipeline} is not defined in application {self.name}')
 
         return phases
 
