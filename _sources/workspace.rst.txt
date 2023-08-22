@@ -180,6 +180,35 @@ To perform a light-weight test version of this, one can use:
 Which will create experiments, but it won't download anything, or execute any
 package manager commands.
 
+^^^^^^^^^^^^^^^
+Phase Selection
+^^^^^^^^^^^^^^^
+
+Some workflows would benefit from more fine-grained control of the phases that
+are executed by Ramble. A good example is that sometimes one only wants to run
+the ``make_experiments`` phase of a workspace instead of all of the phases.
+
+The ``ramble workspace setup`` command has a ``--phases`` argument, which can
+take phase filters which will be used to down-select the phases which should be
+executed.
+
+As an example:
+
+.. code-block:: console
+
+    $ ramble workspace setup --phases make_experiments
+
+Would execute only the ``make_experiments`` phase of all experiments that have
+this phase.
+
+The ``--phases`` argument supports wildcard matching, i.e.:
+
+.. code-block:: console
+
+    $ ramble workspace setup --phases *_experiments
+
+Would execute all phases that have then ``_experiments`` suffix.
+
 ^^^^^^^^^^^^^^^^^^^^^
 Software Environments
 ^^^^^^^^^^^^^^^^^^^^^

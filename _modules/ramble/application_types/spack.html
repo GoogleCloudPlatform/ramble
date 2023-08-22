@@ -170,11 +170,12 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">+=</span> <span class="p">[</span>
-            <span class="s1">&#39;create_spack_env&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;install_compilers&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;concretize_spack_env&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;install_software&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;software_configure&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;software_install&#39;</span><span class="p">,</span>
             <span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span>
             <span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span>
             <span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span>
@@ -183,7 +184,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_mirror_phases</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s1">&#39;mirror_inputs&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;create_spack_env&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;create_software_env&#39;</span><span class="p">,</span>
             <span class="s1">&#39;mirror_software&#39;</span>
         <span class="p">]</span>
 
@@ -212,7 +213,7 @@
 
         <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_str</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_install_compilers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_install_requested_compilers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install compilers an application uses&quot;&quot;&quot;</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
@@ -244,7 +245,7 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_spack_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the spack environment for this experiment</span>
 
 <span class="sd">        Extract all specs this experiment uses, and write the spack environment</span>
@@ -315,7 +316,7 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_concretize_spack_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concretize the spack environment for this experiment</span>
 
 <span class="sd">        Perform spack&#39;s concretize step on the software environment generated</span>
@@ -347,7 +348,7 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_install_software</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install application&#39;s software using spack&quot;&quot;&quot;</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>

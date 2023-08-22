@@ -66,6 +66,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#printing-workspace-information">Printing Workspace Information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#concretizing-a-workspace">Concretizing a Workspace</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up-a-workspace">Setting up a Workspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-selection">Phase Selection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#software-environments">Software Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#workspace-invetory-and-hash">Workspace Invetory and Hash</a></li>
 </ul>
@@ -256,6 +257,26 @@ appliaction definition files, one can use:</p>
 </div>
 <p>Which will create experiments, but it won’t download anything, or execute any
 package manager commands.</p>
+<section id="phase-selection">
+<h3>Phase Selection<a class="headerlink" href="#phase-selection" title="Link to this heading"></a></h3>
+<p>Some workflows would benefit from more fine-grained control of the phases that
+are executed by Ramble. A good example is that sometimes one only wants to run
+the <code class="docutils literal notranslate"><span class="pre">make_experiments</span></code> phase of a workspace instead of all of the phases.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">setup</span></code> command has a <code class="docutils literal notranslate"><span class="pre">--phases</span></code> argument, which can
+take phase filters which will be used to down-select the phases which should be
+executed.</p>
+<p>As an example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--phases<span class="w"> </span>make_experiments
+</pre></div>
+</div>
+<p>Would execute only the <code class="docutils literal notranslate"><span class="pre">make_experiments</span></code> phase of all experiments that have
+this phase.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--phases</span></code> argument supports wildcard matching, i.e.:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--phases<span class="w"> </span>*_experiments
+</pre></div>
+</div>
+<p>Would execute all phases that have then <code class="docutils literal notranslate"><span class="pre">_experiments</span></code> suffix.</p>
+</section>
 <section id="software-environments">
 <h3>Software Environments<a class="headerlink" href="#software-environments" title="Link to this heading"></a></h3>
 <p>When setting up a workspace, Ramble will install software defined by the

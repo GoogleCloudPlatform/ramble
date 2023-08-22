@@ -1456,7 +1456,7 @@ ramble workspace archive
 
 .. code-block:: console
 
-    ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL]
+    ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL] [--phases PHASES [PHASES ...]]
 
 
 **Optional arguments**
@@ -1469,6 +1469,9 @@ ramble workspace archive
 
 ``--upload-url UPLOAD_URL, -u UPLOAD_URL``
   URL to upload tar archive into. Does nothing if `-t` is not specified.
+
+``--phases PHASES [PHASES ...]``
+  select phases to execute when performing setup. Phase names support globbing
 
 
 ----
@@ -1561,7 +1564,7 @@ ramble workspace setup
 
 .. code-block:: console
 
-    ramble workspace setup [-h] [--dry-run]
+    ramble workspace setup [-h] [--dry-run] [--phases PHASES [PHASES ...]]
 
 
 **Optional arguments**
@@ -1571,6 +1574,9 @@ ramble workspace setup
 
 ``--dry-run``
   perform a dry run. Sets up directories and generates all scripts. Prints commands that would be executed for installation, and files that would be downloaded.
+
+``--phases PHASES [PHASES ...]``
+  select phases to execute when performing setup. Phase names support globbing
 
 
 ----
@@ -1583,6 +1589,7 @@ ramble workspace analyze
 .. code-block:: console
 
     ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]] [--always-print-foms]
+                         [--phases PHASES [PHASES ...]]
 
 
 **Optional arguments**
@@ -1598,6 +1605,9 @@ ramble workspace analyze
 
 ``--always-print-foms``
   Control if figures of merit are printed even if an experiment fails
+
+``--phases PHASES [PHASES ...]``
+  select phases to execute when performing setup. Phase names support globbing
 
 
 ----
@@ -1657,7 +1667,7 @@ ramble workspace mirror
 
 .. code-block:: console
 
-    ramble workspace mirror [-h] [-d MIRROR_PATH] [--dry-run]
+    ramble workspace mirror [-h] [-d MIRROR_PATH] [--dry-run] [--phases PHASES [PHASES ...]]
 
 
 **Optional arguments**
@@ -1670,6 +1680,9 @@ ramble workspace mirror
 
 ``--dry-run``
   perform a dry run. Creates spack environments, prints commands that would be executed for installation, and files that would be downloaded.
+
+``--phases PHASES [PHASES ...]``
+  select phases to execute when performing setup. Phase names support globbing
 
 
 ----

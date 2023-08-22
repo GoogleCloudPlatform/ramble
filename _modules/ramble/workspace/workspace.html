@@ -1452,7 +1452,7 @@
 
 <div class="viewcode-block" id="Workspace.run_pipeline">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.run_pipeline">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
         <span class="n">all_experiments_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">experiment_set</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">ExperimentSet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span> <span class="o">=</span> \
@@ -1481,7 +1481,7 @@
 
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">app_inst</span> <span class="ow">in</span> <span class="n">experiment_set</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">():</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Configuring experiment </span><span class="si">{</span><span class="n">exp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">get_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">get_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">phases</span><span class="p">):</span>
                 <span class="n">app_inst</span><span class="o">.</span><span class="n">run_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pipeline</span> <span class="o">==</span> <span class="s1">&#39;setup&#39;</span><span class="p">:</span>

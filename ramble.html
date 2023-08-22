@@ -1549,6 +1549,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-missing-required-dry-run-module">ramble.test.end_to_end.missing_required_dry_run module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-package-manager-config-module">ramble.test.end_to_end.package_manager_config module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-passthrough-variables-module">ramble.test.end_to_end.passthrough_variables module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-phase-selection-module">ramble.test.end_to_end.phase_selection module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-shared-context-module">ramble.test.end_to_end.shared_context module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-test-configvar-dry-run-module">ramble.test.end_to_end.test_configvar_dry_run module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-unused-compilers-are-skipped-module">ramble.test.end_to_end.unused_compilers_are_skipped module</a></li>
@@ -2115,7 +2116,7 @@ and builds an internal mapping from unique name to the chaining definition.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.get_pipeline_phases">
-<span class="sig-name descname"><span class="pre">get_pipeline_phases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.get_pipeline_phases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.get_pipeline_phases" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_pipeline_phases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['*']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.get_pipeline_phases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.get_pipeline_phases" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

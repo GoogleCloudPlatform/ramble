@@ -118,6 +118,14 @@ ramble.test.end\_to\_end.passthrough\_variables module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.phase\_selection module
+------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.phase_selection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.shared\_context module
 -----------------------------------------------
 

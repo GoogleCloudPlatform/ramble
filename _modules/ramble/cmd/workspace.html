@@ -466,7 +466,9 @@
         <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;perform a dry run. Sets up directories and generates &#39;</span> <span class="o">+</span>
              <span class="s1">&#39;all scripts. Prints commands that would be executed &#39;</span> <span class="o">+</span>
-             <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span></div>
+             <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span>
+
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">])</span></div>
 
 
 
@@ -480,7 +482,7 @@
 
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Setting up workspace&#39;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">():</span>
-        <span class="n">ws</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">(</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span></div>
+        <span class="n">ws</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">(</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">phases</span><span class="p">)</span></div>
 
 
 
@@ -508,7 +510,9 @@
         <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;always_print_foms&#39;</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Control if figures of merit are printed even if an experiment fails&#39;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">])</span></div>
 
 
 
@@ -564,6 +568,7 @@
     <span class="c1"># We built a &quot;print_experiment_set&quot; to access the scopes of variables for each</span>
     <span class="c1"># experiment, rather than having merged scopes as we do in the base experiment_set.</span>
     <span class="c1"># The base experiment_set is used to list *all* experiments.</span>
+    <span class="n">all_pipelines</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Experiments:&#39;</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">workloads</span><span class="p">,</span> <span class="n">app_vars</span><span class="p">,</span> <span class="n">app_env_vars</span><span class="p">,</span> <span class="n">app_internals</span><span class="p">,</span> <span class="n">app_template</span><span class="p">,</span> <span class="n">app_chained_exps</span><span class="p">,</span> \
@@ -613,6 +618,14 @@
 
                 <span class="k">for</span> <span class="n">exp_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">print_experiment_set</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">():</span>
                     <span class="n">app_inst</span> <span class="o">=</span> <span class="n">experiment_set</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="n">exp_name</span><span class="p">)</span>
+
+                    <span class="c1"># Aggregate pipeline phases</span>
+                    <span class="k">for</span> <span class="n">pipeline</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_pipelines</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_pipelines</span><span class="p">:</span>
+                            <span class="n">all_pipelines</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                        <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">get_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
+                            <span class="n">all_pipelines</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
+
                     <span class="k">if</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">is_template</span><span class="p">:</span>
                         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">nested_3</span><span class="p">(</span><span class="s1">&#39;      Template Experiment: &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">exp_name</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -632,6 +645,11 @@
 
                         <span class="n">app_inst</span><span class="o">.</span><span class="n">print_internals</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">var_indent</span><span class="p">)</span>
                         <span class="n">app_inst</span><span class="o">.</span><span class="n">print_chain_order</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">var_indent</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pipeline</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_pipelines</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Phases for </span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1"> pipeline:&#39;</span><span class="p">))</span>
+        <span class="n">colify</span><span class="p">(</span><span class="n">all_pipelines</span><span class="p">[</span><span class="n">pipeline</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
     <span class="c1"># Print software stack information</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -735,7 +753,9 @@
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--upload-url&#39;</span><span class="p">,</span> <span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;upload_url&#39;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;URL to upload tar archive into. Does nothing if `-t` is not specified.&#39;</span><span class="p">)</span></div>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;URL to upload tar archive into. Does nothing if `-t` is not specified.&#39;</span><span class="p">)</span>
+
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">])</span></div>
 
 
 
@@ -763,7 +783,9 @@
         <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;perform a dry run. Creates spack environments, &#39;</span> <span class="o">+</span>
              <span class="s1">&#39;prints commands that would be executed &#39;</span> <span class="o">+</span>
-             <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span></div>
+             <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span>
+
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">])</span></div>
 
 
 

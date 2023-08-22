@@ -1277,7 +1277,7 @@
 </section>
 <section id="ramble-workspace-archive">
 <span id="id45"></span><h2>ramble workspace archive<a class="headerlink" href="#ramble-workspace-archive" title="Link to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL] [--phases PHASES [PHASES ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1287,6 +1287,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">--tar-archive,</span> <span class="pre">-t</span></code></dt><dd><p>create a tar.gz of the archive directory for backing up.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--upload-url</span> <span class="pre">UPLOAD_URL,</span> <span class="pre">-u</span> <span class="pre">UPLOAD_URL</span></code></dt><dd><p>URL to upload tar archive into. Does nothing if <cite>-t</cite> is not specified.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
 </dd>
 </dl>
 <hr class="docutils" />
@@ -1348,7 +1350,7 @@
 </section>
 <section id="ramble-workspace-setup">
 <span id="id49"></span><h2>ramble workspace setup<a class="headerlink" href="#ramble-workspace-setup" title="Link to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace setup [-h] [--dry-run]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace setup [-h] [--dry-run] [--phases PHASES [PHASES ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1357,12 +1359,15 @@
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--dry-run</span></code></dt><dd><p>perform a dry run. Sets up directories and generates all scripts. Prints commands that would be executed for installation, and files that would be downloaded.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
+</dd>
 </dl>
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-analyze">
 <span id="id50"></span><h2>ramble workspace analyze<a class="headerlink" href="#ramble-workspace-analyze" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]] [--always-print-foms]</span>
+<span class="go">                     [--phases PHASES [PHASES ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1374,6 +1379,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">-u,</span> <span class="pre">--upload</span></code></dt><dd><p>Push experiment data to remote store (as defined in config)</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--always-print-foms</span></code></dt><dd><p>Control if figures of merit are printed even if an experiment fails</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
 </dd>
 </dl>
 <hr class="docutils" />
@@ -1412,7 +1419,7 @@
 </section>
 <section id="ramble-workspace-mirror">
 <span id="id53"></span><h2>ramble workspace mirror<a class="headerlink" href="#ramble-workspace-mirror" title="Link to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace mirror [-h] [-d MIRROR_PATH] [--dry-run]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace mirror [-h] [-d MIRROR_PATH] [--dry-run] [--phases PHASES [PHASES ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1422,6 +1429,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">-d</span> <span class="pre">MIRROR_PATH</span></code></dt><dd><p>Path to create mirror in.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--dry-run</span></code></dt><dd><p>perform a dry run. Creates spack environments, prints commands that would be executed for installation, and files that would be downloaded.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
 </dd>
 </dl>
 <hr class="docutils" />
