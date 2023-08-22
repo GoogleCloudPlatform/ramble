@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -165,11 +165,16 @@
     <span class="kn">from</span> <span class="nn">html.parser</span> <span class="kn">import</span> <span class="n">HTMLParser</span>
 
     <span class="c1"># Also, HTMLParseError is deprecated and never raised.</span>
-<div class="viewcode-block" id="HTMLParseError"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.HTMLParseError">[docs]</a>    <span class="k">class</span> <span class="nc">HTMLParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="HTMLParseError">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.HTMLParseError">[docs]</a>
+    <span class="k">class</span> <span class="nc">HTMLParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="LinkParser"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.LinkParser">[docs]</a><span class="k">class</span> <span class="nc">LinkParser</span><span class="p">(</span><span class="n">HTMLParser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LinkParser">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.LinkParser">[docs]</a>
+<span class="k">class</span> <span class="nc">LinkParser</span><span class="p">(</span><span class="n">HTMLParser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This parser just takes an HTML page and strips out the hrefs on the</span>
 <span class="sd">       links.  Good enough for a really simple spider. &quot;&quot;&quot;</span>
 
@@ -177,14 +182,20 @@
         <span class="n">HTMLParser</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="LinkParser.handle_starttag"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.LinkParser.handle_starttag">[docs]</a>    <span class="k">def</span> <span class="nf">handle_starttag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+<div class="viewcode-block" id="LinkParser.handle_starttag">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.LinkParser.handle_starttag">[docs]</a>
+    <span class="k">def</span> <span class="nf">handle_starttag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;href&#39;</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div></div>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="uses_ssl"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.uses_ssl">[docs]</a><span class="k">def</span> <span class="nf">uses_ssl</span><span class="p">(</span><span class="n">parsed_url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="uses_ssl">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.uses_ssl">[docs]</a>
+<span class="k">def</span> <span class="nf">uses_ssl</span><span class="p">(</span><span class="n">parsed_url</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;https&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
 
@@ -203,6 +214,7 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
+
 <span class="n">__UNABLE_TO_VERIFY_SSL</span> <span class="o">=</span> <span class="p">(</span>
     <span class="k">lambda</span> <span class="n">pyver</span><span class="p">:</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">pyver</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="ow">or</span>
@@ -210,7 +222,9 @@
     <span class="p">))(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="read_from_url"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.read_from_url">[docs]</a><span class="k">def</span> <span class="nf">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">accept_content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="read_from_url">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.read_from_url">[docs]</a>
+<span class="k">def</span> <span class="nf">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">accept_content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -282,12 +296,18 @@
     <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">geturl</span><span class="p">(),</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">response</span></div>
 
 
-<div class="viewcode-block" id="warn_no_ssl_cert_checking"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.warn_no_ssl_cert_checking">[docs]</a><span class="k">def</span> <span class="nf">warn_no_ssl_cert_checking</span><span class="p">():</span>
+
+<div class="viewcode-block" id="warn_no_ssl_cert_checking">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.warn_no_ssl_cert_checking">[docs]</a>
+<span class="k">def</span> <span class="nf">warn_no_ssl_cert_checking</span><span class="p">():</span>
     <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Spack will not check SSL certificates. You need to update &quot;</span>
              <span class="s2">&quot;your Python to enable certificate verification.&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="push_to_url"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.push_to_url">[docs]</a><span class="k">def</span> <span class="nf">push_to_url</span><span class="p">(</span>
+
+<div class="viewcode-block" id="push_to_url">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.push_to_url">[docs]</a>
+<span class="k">def</span> <span class="nf">push_to_url</span><span class="p">(</span>
         <span class="n">local_file_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">keep_original</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">remote_path</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
@@ -346,7 +366,10 @@
                 <span class="n">SCHEME</span><span class="o">=</span><span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="url_exists"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.url_exists">[docs]</a><span class="k">def</span> <span class="nf">url_exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="url_exists">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.url_exists">[docs]</a>
+<span class="k">def</span> <span class="nf">url_exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">local_file_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">local_path</span><span class="p">:</span>
@@ -377,6 +400,7 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_debug_print_delete_results</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
     <span class="k">if</span> <span class="s1">&#39;Deleted&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;Deleted&#39;</span><span class="p">]:</span>
@@ -387,7 +411,9 @@
                 <span class="n">e</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;Message&#39;</span><span class="p">]))</span>
 
 
-<div class="viewcode-block" id="remove_url"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.remove_url">[docs]</a><span class="k">def</span> <span class="nf">remove_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="remove_url">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.remove_url">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">local_file_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -439,6 +465,7 @@
             <span class="n">blob</span> <span class="o">=</span> <span class="n">gcs_util</span><span class="o">.</span><span class="n">GCSBlob</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="n">blob</span><span class="o">.</span><span class="n">delete_blob</span><span class="p">()</span>
         <span class="k">return</span></div>
+
 
     <span class="c1"># Don&#39;t even try for other URL schemes.</span>
 
@@ -500,7 +527,9 @@
             <span class="k">yield</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="list_url"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.list_url">[docs]</a><span class="k">def</span> <span class="nf">list_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="list_url">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.list_url">[docs]</a>
+<span class="k">def</span> <span class="nf">list_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">local_file_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -524,7 +553,10 @@
         <span class="k">return</span> <span class="n">gcs</span><span class="o">.</span><span class="n">get_all_blobs</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="spider"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.spider">[docs]</a><span class="k">def</span> <span class="nf">spider</span><span class="p">(</span><span class="n">root_urls</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">concurrency</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+
+<div class="viewcode-block" id="spider">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.spider">[docs]</a>
+<span class="k">def</span> <span class="nf">spider</span><span class="p">(</span><span class="n">root_urls</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">concurrency</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get web pages from root URLs.</span>
 
 <span class="sd">    If depth is specified (e.g., depth=2), then this will also follow</span>
@@ -664,6 +696,7 @@
     <span class="k">return</span> <span class="n">pages</span><span class="p">,</span> <span class="n">links</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for compatibility with old versions of Python.&quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">req</span>
@@ -694,7 +727,9 @@
         <span class="k">return</span> <span class="n">opener</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="find_versions_of_archive"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.find_versions_of_archive">[docs]</a><span class="k">def</span> <span class="nf">find_versions_of_archive</span><span class="p">(</span>
+<div class="viewcode-block" id="find_versions_of_archive">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.find_versions_of_archive">[docs]</a>
+<span class="k">def</span> <span class="nf">find_versions_of_archive</span><span class="p">(</span>
     <span class="n">archive_urls</span><span class="p">,</span> <span class="n">list_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">concurrency</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">reference_package</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Scrape web pages for new versions of a tarball. This function prefers URLs in the</span>
@@ -810,7 +845,10 @@
     <span class="k">return</span> <span class="n">versions</span></div>
 
 
-<div class="viewcode-block" id="get_header"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.get_header">[docs]</a><span class="k">def</span> <span class="nf">get_header</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">header_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_header">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.get_header">[docs]</a>
+<span class="k">def</span> <span class="nf">get_header</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">header_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Looks up a dict of headers for the given header value.</span>
 
 <span class="sd">    Looks up a dict of headers, [headers], for a header value given by</span>
@@ -840,17 +878,24 @@
         <span class="k">raise</span></div>
 
 
-<div class="viewcode-block" id="SpackWebError"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.SpackWebError">[docs]</a><span class="k">class</span> <span class="nc">SpackWebError</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">SpackError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackWebError">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.SpackWebError">[docs]</a>
+<span class="k">class</span> <span class="nc">SpackWebError</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">SpackError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass for Spack web spidering errors.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="NoNetworkConnectionError"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.NoNetworkConnectionError">[docs]</a><span class="k">class</span> <span class="nc">NoNetworkConnectionError</span><span class="p">(</span><span class="n">SpackWebError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NoNetworkConnectionError">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.NoNetworkConnectionError">[docs]</a>
+<span class="k">class</span> <span class="nc">NoNetworkConnectionError</span><span class="p">(</span><span class="n">SpackWebError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an operation can&#39;t get an internet connection.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NoNetworkConnectionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="s2">&quot;No network connection: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">),</span>
             <span class="s2">&quot;URL was: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span></div>
+
 </pre></div>
 
            </div>
@@ -861,7 +906,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

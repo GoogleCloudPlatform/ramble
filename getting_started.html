@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e259d695"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -136,9 +136,9 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <section id="system-requirements">
-<h2>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this heading"></a></h2>
+<h2>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading"></a></h2>
 <p>Ramble’s dependencies are listed within the top level
 requirements.txt file.</p>
 <p>In addition to the listed python dependencies, Ramble depends on
@@ -146,7 +146,7 @@ spack for some application definition files.</p>
 <p>Please see Spack’s <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html">documentation</a> for getting spack installed.</p>
 </section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>Installing ramble is easy. You can clone it from the
 <a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble">github repository</a> using this command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>-c<span class="w"> </span>feature.manyFiles<span class="o">=</span><span class="nb">true</span><span class="w"> </span>https://github.com/GoogleCloudPlatform/ramble.git
@@ -154,7 +154,7 @@ spack for some application definition files.</p>
 </div>
 <p>This will create a directory called <code class="docutils literal notranslate"><span class="pre">ramble</span></code>.</p>
 <section id="shell-support">
-<h3>Shell Support<a class="headerlink" href="#shell-support" title="Permalink to this heading"></a></h3>
+<h3>Shell Support<a class="headerlink" href="#shell-support" title="Link to this heading"></a></h3>
 <p>Once you have cloned Ramble, we recommend sourcing the appropriate script for your shell:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>For<span class="w"> </span>bash/zsh/sh
 <span class="gp">$ </span>.<span class="w"> </span>ramble/share/ramble/setup-env.sh
@@ -180,7 +180,7 @@ environment.</p>
 </section>
 </section>
 <section id="command-help">
-<h2>Command Help<a class="headerlink" href="#command-help" title="Permalink to this heading"></a></h2>
+<h2>Command Help<a class="headerlink" href="#command-help" title="Link to this heading"></a></h2>
 <p>To get information on the available commands, you can execute:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span><span class="nb">help</span><span class="w"> </span>--all
 </pre></div>
@@ -191,7 +191,7 @@ environment.</p>
 </div>
 </section>
 <section id="defined-applications">
-<h2>Defined Applications<a class="headerlink" href="#defined-applications" title="Permalink to this heading"></a></h2>
+<h2>Defined Applications<a class="headerlink" href="#defined-applications" title="Link to this heading"></a></h2>
 <p>In order to get information about the available applications defined within
 <code class="docutils literal notranslate"><span class="pre">ramble</span></code>, you can use the command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list
@@ -204,7 +204,7 @@ environment.</p>
 <p>will list both <code class="docutils literal notranslate"><span class="pre">wrfv3</span></code> and <code class="docutils literal notranslate"><span class="pre">wrfv4</span></code>.</p>
 </section>
 <section id="ramble-workspaces">
-<h2>Ramble Workspaces<a class="headerlink" href="#ramble-workspaces" title="Permalink to this heading"></a></h2>
+<h2>Ramble Workspaces<a class="headerlink" href="#ramble-workspaces" title="Link to this heading"></a></h2>
 <p>To configure experiments, you need to use a Ramble workspace. A workspace is a
 self contained directory that contains configuration files, template files, and
 eventually will contain spack environments, input files, and experiment
@@ -219,7 +219,7 @@ commands.</p>
 <p>A workspace can be selected when executing <code class="docutils literal notranslate"><span class="pre">ramble</span></code> through the use of the
 <code class="docutils literal notranslate"><span class="pre">-w</span></code> and <code class="docutils literal notranslate"><span class="pre">-D</span></code> flags.</p>
 <section id="creating-workspaces">
-<h3>Creating Workspaces<a class="headerlink" href="#creating-workspaces" title="Permalink to this heading"></a></h3>
+<h3>Creating Workspaces<a class="headerlink" href="#creating-workspaces" title="Link to this heading"></a></h3>
 <p>To create a new Ramble workspace, you can use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>&lt;name&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>-d<span class="w"> </span>&lt;path&gt;<span class="o">]</span>
 </pre></div>
@@ -236,7 +236,7 @@ is done through:</p>
 </div>
 </section>
 <section id="configuring-a-workspace">
-<h3>Configuring A Workspace<a class="headerlink" href="#configuring-a-workspace" title="Permalink to this heading"></a></h3>
+<h3>Configuring A Workspace<a class="headerlink" href="#configuring-a-workspace" title="Link to this heading"></a></h3>
 <p>Within the created workspace, a <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory is created to house the
 configuration files.</p>
 <p>A newly created workspace will contain:</p>
@@ -264,7 +264,7 @@ generated file.
 (More explicitly, <code class="docutils literal notranslate"><span class="pre">execute_experiment={experiment_run_dir}/{template_name_sans_extension}</span></code>)</p>
 </section>
 <section id="concretizing-a-workspace">
-<h3>Concretizing A Workspace<a class="headerlink" href="#concretizing-a-workspace" title="Permalink to this heading"></a></h3>
+<h3>Concretizing A Workspace<a class="headerlink" href="#concretizing-a-workspace" title="Link to this heading"></a></h3>
 <p>After configuring a workspace with applications, workloads, and experiments,
 Ramble can be used to inject default software configurations for the requested
 experiments. To do this, you can use the:</p>
@@ -276,7 +276,7 @@ with defaults. The defaults can be configured however you want before
 installing the actual software.</p>
 </section>
 <section id="setting-up-a-workspace">
-<h3>Setting Up A Workspace<a class="headerlink" href="#setting-up-a-workspace" title="Permalink to this heading"></a></h3>
+<h3>Setting Up A Workspace<a class="headerlink" href="#setting-up-a-workspace" title="Link to this heading"></a></h3>
 <p>Once a workspace is concretized, it can be set up. This process is executed through:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
 </pre></div>
@@ -292,7 +292,7 @@ installing the actual software.</p>
 </dl>
 </section>
 <section id="executing-experiments">
-<h3>Executing Experiments<a class="headerlink" href="#executing-experiments" title="Permalink to this heading"></a></h3>
+<h3>Executing Experiments<a class="headerlink" href="#executing-experiments" title="Link to this heading"></a></h3>
 <p>After the workspace is set up, its experiments can be executed. The two methods
 to run the experiments are:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"> $ </span>ramble<span class="w"> </span>on
@@ -302,7 +302,7 @@ to run the experiments are:</p>
 </div>
 </section>
 <section id="analyzing-experiments">
-<h3>Analyzing Experiments<a class="headerlink" href="#analyzing-experiments" title="Permalink to this heading"></a></h3>
+<h3>Analyzing Experiments<a class="headerlink" href="#analyzing-experiments" title="Link to this heading"></a></h3>
 <p>Once the experiments within a workspace are complete, the experiments can be
 analyzed. This is done through:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
@@ -312,7 +312,7 @@ analyzed. This is done through:</p>
 extracted figures of merit.</p>
 </section>
 <section id="archiving-a-workspace">
-<h3>Archiving A Workspace<a class="headerlink" href="#archiving-a-workspace" title="Permalink to this heading"></a></h3>
+<h3>Archiving A Workspace<a class="headerlink" href="#archiving-a-workspace" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Ramble can create an archive of a workspace. This is a self contained copy of various important aspects of the workspace, including:</dt><dd><ul class="simple">
 <li><p>All files in the <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory</p></li>
@@ -347,7 +347,7 @@ extracted figures of merit.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

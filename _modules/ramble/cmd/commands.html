@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -167,13 +167,18 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="formatter"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.formatter">[docs]</a><span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="formatter">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.formatter">[docs]</a>
+<span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator used to register formatters&quot;&quot;&quot;</span>
     <span class="n">formatters</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
     <span class="k">return</span> <span class="n">func</span></div>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;--update-completion&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;regenerate ramble&#39;s tab completion scripts&quot;</span><span class="p">)</span>
@@ -195,7 +200,10 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;list of rst files to search for `_cmd-ramble-&lt;cmd&gt;` cross-refs&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="RambleArgparseRstWriter"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.RambleArgparseRstWriter">[docs]</a><span class="k">class</span> <span class="nc">RambleArgparseRstWriter</span><span class="p">(</span><span class="n">ArgparseRstWriter</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleArgparseRstWriter">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.RambleArgparseRstWriter">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleArgparseRstWriter</span><span class="p">(</span><span class="n">ArgparseRstWriter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;RST writer tailored for ramble documentation.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -206,19 +214,29 @@
             <span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">aliases</span><span class="p">,</span> <span class="n">rst_levels</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">documented</span> <span class="o">=</span> <span class="n">documented_commands</span>
 
-<div class="viewcode-block" id="RambleArgparseRstWriter.usage"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.RambleArgparseRstWriter.usage">[docs]</a>    <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="RambleArgparseRstWriter.usage">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.RambleArgparseRstWriter.usage">[docs]</a>
+    <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">string</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RambleArgparseRstWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">usage</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
         <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">prog</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">documented</span><span class="p">:</span>
             <span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">:ref:`More documentation &lt;cmd-</span><span class="si">{0}</span><span class="s1">&gt;`</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">string</span></div></div>
+        <span class="k">return</span> <span class="n">string</span></div>
+</div>
 
 
-<div class="viewcode-block" id="SubcommandWriter"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.SubcommandWriter">[docs]</a><span class="k">class</span> <span class="nc">SubcommandWriter</span><span class="p">(</span><span class="n">ArgparseWriter</span><span class="p">):</span>
-<div class="viewcode-block" id="SubcommandWriter.format"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.SubcommandWriter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;    &#39;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">+</span> <span class="n">cmd</span><span class="o">.</span><span class="n">prog</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div></div>
+
+<div class="viewcode-block" id="SubcommandWriter">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.SubcommandWriter">[docs]</a>
+<span class="k">class</span> <span class="nc">SubcommandWriter</span><span class="p">(</span><span class="n">ArgparseWriter</span><span class="p">):</span>
+<div class="viewcode-block" id="SubcommandWriter.format">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.SubcommandWriter.format">[docs]</a>
+    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;    &#39;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">+</span> <span class="n">cmd</span><span class="o">.</span><span class="n">prog</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div>
+</div>
+
 
 
 <span class="n">_positional_to_subroutine</span> <span class="o">=</span> <span class="p">{</span>
@@ -234,10 +252,14 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="BashCompletionWriter"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter">[docs]</a><span class="k">class</span> <span class="nc">BashCompletionWriter</span><span class="p">(</span><span class="n">ArgparseCompletionWriter</span><span class="p">):</span>
+<div class="viewcode-block" id="BashCompletionWriter">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter">[docs]</a>
+<span class="k">class</span> <span class="nc">BashCompletionWriter</span><span class="p">(</span><span class="n">ArgparseCompletionWriter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write argparse output as bash programmable tab completion.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BashCompletionWriter.body"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.body">[docs]</a>    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positionals</span><span class="p">,</span> <span class="n">optionals</span><span class="p">,</span> <span class="n">subcommands</span><span class="p">):</span>
+<div class="viewcode-block" id="BashCompletionWriter.body">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.body">[docs]</a>
+    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positionals</span><span class="p">,</span> <span class="n">optionals</span><span class="p">,</span> <span class="n">subcommands</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">positionals</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    if $list_options</span>
@@ -261,7 +283,10 @@
 <span class="s2">    </span><span class="si">{0}</span>
 <span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="BashCompletionWriter.positionals"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.positionals">[docs]</a>    <span class="k">def</span> <span class="nf">positionals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positionals</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BashCompletionWriter.positionals">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.positionals">[docs]</a>
+    <span class="k">def</span> <span class="nf">positionals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positionals</span><span class="p">):</span>
         <span class="c1"># If match found, return function name</span>
         <span class="k">for</span> <span class="n">positional</span> <span class="ow">in</span> <span class="n">positionals</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">_positional_to_subroutine</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -271,14 +296,24 @@
         <span class="c1"># If no matches found, return empty list</span>
         <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMREPLY=&quot;&quot;&#39;</span></div>
 
-<div class="viewcode-block" id="BashCompletionWriter.optionals"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.optionals">[docs]</a>    <span class="k">def</span> <span class="nf">optionals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optionals</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BashCompletionWriter.optionals">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.optionals">[docs]</a>
+    <span class="k">def</span> <span class="nf">optionals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optionals</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">optionals</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="BashCompletionWriter.subcommands"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.subcommands">[docs]</a>    <span class="k">def</span> <span class="nf">subcommands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcommands</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subcommands</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="BashCompletionWriter.subcommands">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.subcommands">[docs]</a>
+    <span class="k">def</span> <span class="nf">subcommands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcommands</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subcommands</span><span class="p">))</span></div>
+</div>
 
 
-<div class="viewcode-block" id="subcommands"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.subcommands">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="subcommands">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.subcommands">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">subcommands</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">make_argument_parser</span><span class="p">()</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">add_all_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
@@ -286,7 +321,10 @@
     <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rst_index"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.rst_index">[docs]</a><span class="k">def</span> <span class="nf">rst_index</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
+
+<div class="viewcode-block" id="rst_index">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.rst_index">[docs]</a>
+<span class="k">def</span> <span class="nf">rst_index</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="n">index</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">index_commands</span><span class="p">()</span>
@@ -313,7 +351,10 @@
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rst"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.rst">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="rst">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.rst">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">rst</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="c1"># create a parser with all commands</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">make_argument_parser</span><span class="p">()</span>
@@ -338,7 +379,10 @@
     <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="names"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.names">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="names">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.names">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">names</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="n">commands</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">all_commands</span><span class="p">())</span>
 
@@ -348,7 +392,10 @@
     <span class="n">colify</span><span class="p">(</span><span class="n">commands</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="bash"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.bash">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="bash">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.bash">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">bash</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">make_argument_parser</span><span class="p">()</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">add_all_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
@@ -357,12 +404,16 @@
     <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="prepend_header"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.prepend_header">[docs]</a><span class="k">def</span> <span class="nf">prepend_header</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+
+<div class="viewcode-block" id="prepend_header">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.prepend_header">[docs]</a>
+<span class="k">def</span> <span class="nf">prepend_header</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
         <span class="k">return</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">header</span><span class="p">)</span> <span class="k">as</span> <span class="n">header</span><span class="p">:</span>
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
@@ -392,7 +443,9 @@
         <span class="n">formatter</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="update_completion"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.update_completion">[docs]</a><span class="k">def</span> <span class="nf">update_completion</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="update_completion">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.update_completion">[docs]</a>
+<span class="k">def</span> <span class="nf">update_completion</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate through the shells and update the standard completion files.</span>
 
 <span class="sd">    This is a convenience method to avoid calling this command many</span>
@@ -405,7 +458,10 @@
         <span class="n">_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="commands"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.commands">[docs]</a><span class="k">def</span> <span class="nf">commands</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="commands">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.commands">[docs]</a>
+<span class="k">def</span> <span class="nf">commands</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">update_completion</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s1">&#39;names&#39;</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([</span>
                 <span class="n">args</span><span class="o">.</span><span class="n">aliases</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">header</span>
@@ -418,6 +474,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># run commands normally</span>
         <span class="k">return</span> <span class="n">_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -428,7 +485,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

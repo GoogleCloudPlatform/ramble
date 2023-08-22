@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -162,7 +162,9 @@
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
 
-<div class="viewcode-block" id="ApplicationBase"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase">[docs]</a><span class="k">class</span> <span class="nc">ApplicationBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ApplicationMeta</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase">[docs]</a>
+<span class="k">class</span> <span class="nc">ApplicationBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ApplicationMeta</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">uses_spack</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_builtin_name</span> <span class="o">=</span> <span class="s1">&#39;builtin::</span><span class="si">{name}</span><span class="s1">&#39;</span>
@@ -221,7 +223,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">license_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span> <span class="o">=</span> <span class="s1">&#39;license.inc&#39;</span>
 
-<div class="viewcode-block" id="ApplicationBase.copy"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deep copy an application instance&quot;&quot;&quot;</span>
         <span class="n">new_copy</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">)</span>
 
@@ -232,6 +236,7 @@
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_chained_experiments</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_copy</span></div>
+
 
     <span class="k">def</span> <span class="nf">_inject_required_builtins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">required_builtins</span> <span class="o">=</span> <span class="p">[]</span>
@@ -358,12 +363,17 @@
             <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">colified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out_str</span>
 
-<div class="viewcode-block" id="ApplicationBase.set_env_variable_sets"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_env_variable_sets">[docs]</a>    <span class="k">def</span> <span class="nf">set_env_variable_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_variable_sets</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase.set_env_variable_sets">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_env_variable_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_env_variable_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_variable_sets</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set internal reference to environment variable sets&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_env_variable_sets</span> <span class="o">=</span> <span class="n">env_variable_sets</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.set_variables"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_variables">[docs]</a>    <span class="k">def</span> <span class="nf">set_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">experiment_set</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.set_variables">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_variables">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">experiment_set</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set internal reference to variables</span>
 
 <span class="sd">        Also, create an application specific expander class.</span>
@@ -373,32 +383,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span> <span class="o">=</span> <span class="n">experiment_set</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.set_internals"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_internals">[docs]</a>    <span class="k">def</span> <span class="nf">set_internals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">internals</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.set_internals">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_internals">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_internals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">internals</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set internal reference to application internals</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="n">internals</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.set_template"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_template">[docs]</a>    <span class="k">def</span> <span class="nf">set_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_template</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.set_template">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_template">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_template</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set if this instance is a template or not&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_template</span> <span class="o">=</span> <span class="n">is_template</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.set_chained_experiments"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_chained_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">set_chained_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chained_experiments</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.set_chained_experiments">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_chained_experiments">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_chained_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chained_experiments</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set chained experiments for this instance&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">chained_experiments</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="o">=</span> <span class="n">chained_experiments</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.set_modifiers"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_modifiers">[docs]</a>    <span class="k">def</span> <span class="nf">set_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modifiers</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.set_modifiers">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_modifiers">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modifiers</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set modifiers for this instance&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">modifiers</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modifiers</span> <span class="o">=</span> <span class="n">modifiers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.get_pipeline_phases"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.get_pipeline_phases">[docs]</a>    <span class="k">def</span> <span class="nf">get_pipeline_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.get_pipeline_phases">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.get_pipeline_phases">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_pipeline_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
         <span class="n">phases</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">_phases&#39;</span> <span class="o">%</span> <span class="n">pipeline</span><span class="p">):</span>
             <span class="n">phases</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">_phases&#39;</span> <span class="o">%</span> <span class="n">pipeline</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">phases</span></div>
+
 
     <span class="k">def</span> <span class="nf">_short_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
@@ -410,7 +436,9 @@
             <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_short_print</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-<div class="viewcode-block" id="ApplicationBase.print_vars"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_vars">[docs]</a>    <span class="k">def</span> <span class="nf">print_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">vars_to_print</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase.print_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">vars_to_print</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="n">print_vars</span> <span class="o">=</span> <span class="n">vars_to_print</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">print_vars</span><span class="p">:</span>
             <span class="n">print_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span>
@@ -421,7 +449,10 @@
             <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">expansion_var</span><span class="p">)</span>
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1"> ==&gt; </span><span class="si">{</span><span class="n">expanded</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;@@&#39;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.print_internals"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_internals">[docs]</a>    <span class="k">def</span> <span class="nf">print_internals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.print_internals">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_internals">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_internals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -436,7 +467,10 @@
             <span class="n">header</span> <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_4</span><span class="p">(</span><span class="s1">&#39;Executable Order&#39;</span><span class="p">)</span>
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}{</span><span class="n">header</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">executables</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.print_chain_order"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_chain_order">[docs]</a>    <span class="k">def</span> <span class="nf">print_chain_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.print_chain_order">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_chain_order">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_chain_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -445,7 +479,10 @@
         <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="p">:</span>
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}</span><span class="s1">- </span><span class="si">{</span><span class="n">exp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.format_doc"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.format_doc">[docs]</a>    <span class="k">def</span> <span class="nf">format_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.format_doc">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.format_doc">[docs]</a>
+    <span class="k">def</span> <span class="nf">format_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wrap doc string at 72 characters and format nicely&quot;&quot;&quot;</span>
         <span class="n">indent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
@@ -459,8 +496,11 @@
             <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">)</span> <span class="o">+</span> <span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
 
+
     <span class="c1"># Phase execution helpers</span>
-<div class="viewcode-block" id="ApplicationBase.run_phase"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.run_phase">[docs]</a>    <span class="k">def</span> <span class="nf">run_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase.run_phase">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.run_phase">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a phase, by getting its function pointer&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_modifier_instances</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inject_required_modifier_builtins</span><span class="p">()</span>
@@ -474,7 +514,10 @@
             <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.create_experiment_chain"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.create_experiment_chain">[docs]</a>    <span class="k">def</span> <span class="nf">create_experiment_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.create_experiment_chain">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.create_experiment_chain">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_experiment_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the necessary chained experiments for this instance</span>
 
 <span class="sd">        This method determines which experiments need to be chained, grabs the</span>
@@ -632,7 +675,10 @@
             <span class="k">if</span> <span class="n">exp_inst</span><span class="p">:</span>
                 <span class="n">exp_inst</span><span class="o">.</span><span class="n">chain_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.build_modifier_instances"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.build_modifier_instances">[docs]</a>    <span class="k">def</span> <span class="nf">build_modifier_instances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.build_modifier_instances">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.build_modifier_instances">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_modifier_instances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Built a map of modifier names to modifier instances needed for this</span>
 <span class="sd">           application instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -656,6 +702,7 @@
                 <span class="n">mod_inst</span><span class="o">.</span><span class="n">set_usage_mode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_get_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return executables for add_expand_vars&quot;&quot;&quot;</span>
@@ -806,7 +853,9 @@
             <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Workload </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="si">}</span><span class="s1"> is not defined &#39;</span>
                                    <span class="sa">f</span><span class="s1">&#39;as a workload of application </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ApplicationBase.add_expand_vars"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.add_expand_vars">[docs]</a>    <span class="k">def</span> <span class="nf">add_expand_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase.add_expand_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.add_expand_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_expand_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add application specific expansion variables</span>
 
 <span class="sd">        Applications require several variables to be defined to function properly.</span>
@@ -827,6 +876,7 @@
             <span class="c1"># ---------------------------------------------------------------------------------</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_derive_variables_for_template_path</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span> <span class="o">=</span> <span class="kc">True</span></div>
+
 
     <span class="k">def</span> <span class="nf">_inputs_and_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract all inputs for a given workload</span>
@@ -1376,7 +1426,9 @@
 
     <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ApplicationBase.env_vars"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.env_vars">[docs]</a>    <span class="k">def</span> <span class="nf">env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationBase.env_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.env_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">command</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># ensure license variables are set / modified</span>
         <span class="c1"># Process one scope at a time, to ensure</span>
@@ -1418,31 +1470,45 @@
 
         <span class="k">return</span> <span class="n">command</span></div>
 
-<div class="viewcode-block" id="ApplicationBase.evaluate_success"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.evaluate_success">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationBase.evaluate_success">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.evaluate_success">[docs]</a>
+    <span class="k">def</span> <span class="nf">evaluate_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook for applications to evaluate custom success criteria</span>
 
 <span class="sd">        Expected to perform analysis and return either true or false.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="kc">True</span></div></div>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ApplicationError"><a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationError">[docs]</a><span class="k">class</span> <span class="nc">ApplicationError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationError">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationError">[docs]</a>
+<span class="k">class</span> <span class="nc">ApplicationError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception that is raised by applications</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ChainCycleDetectedError"><a class="viewcode-back" href="../../ramble.html#ramble.application.ChainCycleDetectedError">[docs]</a><span class="k">class</span> <span class="nc">ChainCycleDetectedError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChainCycleDetectedError">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ChainCycleDetectedError">[docs]</a>
+<span class="k">class</span> <span class="nc">ChainCycleDetectedError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception raised when a cycle is detected in a defined experiment chain</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="InvalidChainError"><a class="viewcode-back" href="../../ramble.html#ramble.application.InvalidChainError">[docs]</a><span class="k">class</span> <span class="nc">InvalidChainError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InvalidChainError">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.InvalidChainError">[docs]</a>
+<span class="k">class</span> <span class="nc">InvalidChainError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception raised when a invalid chained experiment is defined</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -1453,7 +1519,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

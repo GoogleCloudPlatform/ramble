@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -144,9 +144,12 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;debug_command&#39;</span><span class="p">)</span>
     <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print information useful for bug reports&#39;</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_debug_tarball_suffix</span><span class="p">():</span>
@@ -176,7 +179,9 @@
             <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">symbolic</span><span class="p">,</span> <span class="n">commit</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="report"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.report">[docs]</a><span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="report">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.report">[docs]</a>
+<span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">host_platform</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">platforms</span><span class="o">.</span><span class="n">host</span><span class="p">()</span>
     <span class="n">host_os</span> <span class="o">=</span> <span class="n">host_platform</span><span class="o">.</span><span class="n">operating_system</span><span class="p">(</span><span class="s1">&#39;frontend&#39;</span><span class="p">)</span>
     <span class="n">host_target</span> <span class="o">=</span> <span class="n">host_platform</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="s1">&#39;frontend&#39;</span><span class="p">)</span>
@@ -188,11 +193,15 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* **Platform:**&#39;</span><span class="p">,</span> <span class="n">architecture</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="debug"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.debug">[docs]</a><span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="debug">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.debug">[docs]</a>
+<span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">action</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;report&#39;</span><span class="p">:</span> <span class="n">report</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">debug_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -203,7 +212,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

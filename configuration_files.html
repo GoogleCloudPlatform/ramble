@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e259d695"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -136,7 +136,7 @@
            <div itemprop="articleBody">
              
   <section id="configuration-files">
-<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this heading"></a></h1>
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h1>
 <p>Ramble supports several different configuration files to control its behavior.
 Some of these apply changes to Ramble’s internals, while some modify the
 experiments ramble generates.</p>
@@ -145,7 +145,7 @@ does not cover the <a class="reference internal" href="workspace_config.html#wor
 <p>Ramble’s configuration logic closely follows
 <cite>Spack’s configuration logic &lt;https://spack.readthedocs.io/en/latest/configuration.html&gt;</cite>.</p>
 <section id="configuration-sections">
-<h2>Configuration Sections:<a class="headerlink" href="#configuration-sections" title="Permalink to this heading"></a></h2>
+<h2>Configuration Sections:<a class="headerlink" href="#configuration-sections" title="Link to this heading"></a></h2>
 <p>Currently, Ramble supports the following configuration sections:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#application-config"><span class="std std-ref">applications</span></a></p></li>
@@ -165,7 +165,7 @@ does not cover the <a class="reference internal" href="workspace_config.html#wor
 <code class="docutils literal notranslate"><span class="pre">lib/ramble/ramble/schemas</span></code>.</p>
 </section>
 <section id="application-section">
-<span id="application-config"></span><h2>Application Section:<a class="headerlink" href="#application-section" title="Permalink to this heading"></a></h2>
+<span id="application-config"></span><h2>Application Section:<a class="headerlink" href="#application-section" title="Link to this heading"></a></h2>
 <p>The application configuration section is used to define the experiments a
 workspace should generate. The general format for this config section is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">applications</span><span class="p">:</span>
@@ -200,7 +200,7 @@ together, with the order of precedence (from lowest to highest) being:</p>
 </ul>
 </section>
 <section id="config-section">
-<span id="config-yaml"></span><h2>Config Section:<a class="headerlink" href="#config-section" title="Permalink to this heading"></a></h2>
+<span id="config-yaml"></span><h2>Config Section:<a class="headerlink" href="#config-section" title="Link to this heading"></a></h2>
 <p>The config configuration section is used to control internal aspects of Ramble.
 The current default configuration is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
@@ -218,7 +218,7 @@ The current default configuration is as follows:</p>
 </div>
 </section>
 <section id="environment-variables-section">
-<span id="env-vars-config"></span><h2>Environment Variables Section:<a class="headerlink" href="#environment-variables-section" title="Permalink to this heading"></a></h2>
+<span id="env-vars-config"></span><h2>Environment Variables Section:<a class="headerlink" href="#environment-variables-section" title="Link to this heading"></a></h2>
 <p>The environment variables config section is named <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> and controls
 what environment variable modifications ramble should inject into experiments.</p>
 <p>The format of this config section is as follows:</p>
@@ -247,7 +247,7 @@ actions is available. These actions are:
 * <code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p>
 </section>
 <section id="internals-section">
-<span id="internals-config"></span><h2>Internals Section:<a class="headerlink" href="#internals-section" title="Permalink to this heading"></a></h2>
+<span id="internals-config"></span><h2>Internals Section:<a class="headerlink" href="#internals-section" title="Link to this heading"></a></h2>
 <p>The internals config section is used to modify internal aspects of an
 application definition when creating experiments.</p>
 <p><strong>NOTE:</strong> This section is intended as more of an advanced user section, and can
@@ -276,7 +276,7 @@ will be used in the experiment. This is also the mechanism to inject custom
 executables into an experiment.</p>
 </section>
 <section id="licenses-section">
-<span id="licenses-config"></span><h2>Licenses Section:<a class="headerlink" href="#licenses-section" title="Permalink to this heading"></a></h2>
+<span id="licenses-config"></span><h2>Licenses Section:<a class="headerlink" href="#licenses-section" title="Link to this heading"></a></h2>
 <p>The licenses config section is used to configure license environment variables
 to applications. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">licenses</span><span class="p">:</span>
@@ -300,7 +300,7 @@ to applications. Its format is as follows:</p>
 experiments that use the application defined by <code class="docutils literal notranslate"><span class="pre">&lt;application_name&gt;</span></code>.</p>
 </section>
 <section id="mirrors-section">
-<span id="mirrors-config"></span><h2>Mirrors Section:<a class="headerlink" href="#mirrors-section" title="Permalink to this heading"></a></h2>
+<span id="mirrors-config"></span><h2>Mirrors Section:<a class="headerlink" href="#mirrors-section" title="Link to this heading"></a></h2>
 <p>The mirrors config section is used to control alternative locations Ramble
 should download input files from. Mirros are checked before the default URL for
 an input file. The format of the mirrors section is as follows:</p>
@@ -313,7 +313,7 @@ an input file. The format of the mirrors section is as follows:</p>
 </div>
 </section>
 <section id="modifier-repos-section">
-<span id="modifier-repos-config"></span><h2>Modifier Repos Section:<a class="headerlink" href="#modifier-repos-section" title="Permalink to this heading"></a></h2>
+<span id="modifier-repos-config"></span><h2>Modifier Repos Section:<a class="headerlink" href="#modifier-repos-section" title="Link to this heading"></a></h2>
 <p>The modifier repos config section is used to control which repositories should
 be searched for when looking for modifiers. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">modifier_repos</span><span class="p">:</span>
@@ -322,7 +322,7 @@ be searched for when looking for modifiers. Its format is as follows:</p>
 </div>
 </section>
 <section id="modifiers-section">
-<span id="modifiers-config"></span><h2>Modifiers Section:<a class="headerlink" href="#modifiers-section" title="Permalink to this heading"></a></h2>
+<span id="modifiers-config"></span><h2>Modifiers Section:<a class="headerlink" href="#modifiers-section" title="Link to this heading"></a></h2>
 <p>The modifiers config section is used to control which modifiers will be used on
 experiments ramble generates. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">modifiers</span><span class="p">:</span>
@@ -336,7 +336,7 @@ experiments ramble generates. Its format is as follows:</p>
 </div>
 </section>
 <section id="repos-section">
-<span id="repos-config"></span><h2>Repos Section:<a class="headerlink" href="#repos-section" title="Permalink to this heading"></a></h2>
+<span id="repos-config"></span><h2>Repos Section:<a class="headerlink" href="#repos-section" title="Link to this heading"></a></h2>
 <p>The repos config section is used to control which repositories should
 be searched for when looking for application definitions. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">repos</span><span class="p">:</span>
@@ -345,7 +345,7 @@ be searched for when looking for application definitions. Its format is as follo
 </div>
 </section>
 <section id="spack-section">
-<span id="spack-config"></span><h2>Spack Section:<a class="headerlink" href="#spack-section" title="Permalink to this heading"></a></h2>
+<span id="spack-config"></span><h2>Spack Section:<a class="headerlink" href="#spack-section" title="Link to this heading"></a></h2>
 <p>The spack config section is used to define package definitions, and software
 environments created from those packages. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
@@ -377,9 +377,9 @@ be used to construct environments with. A package is defined as software that
 spack should install for the user. These have one required attribute, and two
 optional attributes. The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute is required to be defined,
 and should be the spec passed to <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">install</span></code> on the command line for the
-package. Optionally, a package can defined a <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which
+package. Optionally, a package can define a <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which
 will be the spec used when this package is used as a compiler for another
-package. Packages can also optionally defined a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which
+package. Packages can also optionally define a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which
 is the name of another package that should be used as it’s compiler.</p>
 <p>The environments dictionary contains descriptions of spack environments that
 Ramble might generate based on the requested experiments. Environments are
@@ -405,7 +405,7 @@ should be bundled into a spack environment.</p>
 </pre></div>
 </div>
 <section id="vector-and-matrix-packages-and-environments">
-<h3>Vector and Matrix Packages and Environments:<a class="headerlink" href="#vector-and-matrix-packages-and-environments" title="Permalink to this heading"></a></h3>
+<h3>Vector and Matrix Packages and Environments:<a class="headerlink" href="#vector-and-matrix-packages-and-environments" title="Link to this heading"></a></h3>
 <p>Package and environment definitions can generate many packages and environments
 following Ramble’s
 <a class="reference internal" href="workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector</span></a> / <a class="reference internal" href="workspace_config.html#ramble-matrix-logic"><span class="std std-ref">matrix</span></a> logic.</p>
@@ -453,7 +453,7 @@ following Ramble’s
 environments, with each combination of the 2 <code class="docutils literal notranslate"><span class="pre">mpi</span></code> libraries and 3 compilers.</p>
 </section>
 <section id="external-spack-environment-support">
-<h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Permalink to this heading"></a></h3>
+<h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Link to this heading"></a></h3>
 <p><strong>NOTE</strong>: Using external Spack environments is an advanced feature.</p>
 <p>Some experiments will want to use an externally defined Spack environment
 instead of having Ramble generate its own Spack environment file. This can be
@@ -479,7 +479,7 @@ for the experiments it generates.</p>
 </section>
 </section>
 <section id="success-criteria-section">
-<span id="success-criteria-config"></span><h2>Success Criteria Section:<a class="headerlink" href="#success-criteria-section" title="Permalink to this heading"></a></h2>
+<span id="success-criteria-config"></span><h2>Success Criteria Section:<a class="headerlink" href="#success-criteria-section" title="Link to this heading"></a></h2>
 <p>The success criteria section is used to control what criteria experiment should
 use when determining if they were successful or not. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">success_criteria</span><span class="p">:</span>
@@ -493,7 +493,7 @@ use when determining if they were successful or not. Its format is as follows:</
 <a class="reference internal" href="success_criteria.html#success-criteria"><span class="std std-ref">success criteria documentation</span></a>.</p>
 </section>
 <section id="variables-section">
-<span id="variables-config"></span><h2>Variables Section:<a class="headerlink" href="#variables-section" title="Permalink to this heading"></a></h2>
+<span id="variables-config"></span><h2>Variables Section:<a class="headerlink" href="#variables-section" title="Link to this heading"></a></h2>
 <p>The variables config section is used to define variables within ramble
 experiments. These variables are used in several places within Ramble. Its
 format is as follows:</p>
@@ -520,7 +520,7 @@ another fully qualified experiment (through the <code class="docutils literal no
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

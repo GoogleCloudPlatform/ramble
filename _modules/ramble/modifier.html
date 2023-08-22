@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -138,7 +138,9 @@
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 
 
-<div class="viewcode-block" id="ModifierBase"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase">[docs]</a><span class="k">class</span> <span class="nc">ModifierBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ModifierMeta</span><span class="p">):</span>
+<div class="viewcode-block" id="ModifierBase">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase">[docs]</a>
+<span class="k">class</span> <span class="nc">ModifierBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ModifierMeta</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">uses_spack</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_builtin_name</span> <span class="o">=</span> <span class="s1">&#39;modifier_builtin::</span><span class="si">{obj_name}</span><span class="s1">::</span><span class="si">{name}</span><span class="s1">&#39;</span>
@@ -163,7 +165,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
 
-<div class="viewcode-block" id="ModifierBase.copy"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModifierBase.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deep copy a modifier instance&quot;&quot;&quot;</span>
         <span class="n">new_copy</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">_on_executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_executables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -172,7 +176,10 @@
 
         <span class="k">return</span> <span class="n">new_copy</span></div>
 
-<div class="viewcode-block" id="ModifierBase.set_usage_mode"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.set_usage_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_usage_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierBase.set_usage_mode">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.set_usage_mode">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_usage_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the usage mode for this modifier.</span>
 
 <span class="sd">        If not set, or given an empty string the modifier tries to auto-detect a mode.</span>
@@ -189,7 +196,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Using default usage mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span><span class="si">}</span><span class="s1"> on modifier </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ModifierBase.set_on_executables"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.set_on_executables">[docs]</a>    <span class="k">def</span> <span class="nf">set_on_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_executables</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierBase.set_on_executables">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.set_on_executables">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_on_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_executables</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the executables this modifier applies to.</span>
 
 <span class="sd">        If given an empty list or a value of None, the default of: &#39;*&#39; is usage.</span>
@@ -204,6 +214,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_on_executables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exec_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_on_executables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span></div>
+
 
     <span class="k">def</span> <span class="nf">_long_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">out_str</span> <span class="o">=</span> <span class="p">[]</span>
@@ -296,7 +307,9 @@
             <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_short_print</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-<div class="viewcode-block" id="ModifierBase.format_doc"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.format_doc">[docs]</a>    <span class="k">def</span> <span class="nf">format_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ModifierBase.format_doc">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.format_doc">[docs]</a>
+    <span class="k">def</span> <span class="nf">format_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wrap doc string at 72 characters and format nicely&quot;&quot;&quot;</span>
         <span class="n">indent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
@@ -310,7 +323,10 @@
             <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">)</span> <span class="o">+</span> <span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ModifierBase.modded_variables"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.modded_variables">[docs]</a>    <span class="k">def</span> <span class="nf">modded_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierBase.modded_variables">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.modded_variables">[docs]</a>
+    <span class="k">def</span> <span class="nf">modded_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
         <span class="n">mods</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_modifications</span><span class="p">:</span>
@@ -330,7 +346,10 @@
 
         <span class="k">return</span> <span class="n">mods</span></div>
 
-<div class="viewcode-block" id="ModifierBase.applies_to_executable"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.applies_to_executable">[docs]</a>    <span class="k">def</span> <span class="nf">applies_to_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierBase.applies_to_executable">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.applies_to_executable">[docs]</a>
+    <span class="k">def</span> <span class="nf">applies_to_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">):</span>
         <span class="n">apply</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">mod_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mod_prefix_builtin</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">::&#39;</span><span class="p">)</span>
@@ -344,7 +363,10 @@
 
         <span class="k">return</span> <span class="n">apply</span></div>
 
-<div class="viewcode-block" id="ModifierBase.apply_executable_modifiers"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.apply_executable_modifiers">[docs]</a>    <span class="k">def</span> <span class="nf">apply_executable_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierBase.apply_executable_modifiers">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.apply_executable_modifiers">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_executable_modifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">pre_execs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">post_execs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">exec_mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_modifiers</span><span class="p">:</span>
@@ -357,24 +379,35 @@
 
         <span class="k">return</span> <span class="n">pre_execs</span><span class="p">,</span> <span class="n">post_execs</span></div>
 
-<div class="viewcode-block" id="ModifierBase.all_env_var_modifications"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.all_env_var_modifications">[docs]</a>    <span class="k">def</span> <span class="nf">all_env_var_modifications</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierBase.all_env_var_modifications">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.all_env_var_modifications">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_env_var_modifications</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">:</span>
             <span class="k">return</span>
 
         <span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">yield</span> <span class="n">action</span><span class="p">,</span> <span class="n">conf</span></div></div>
+            <span class="k">yield</span> <span class="n">action</span><span class="p">,</span> <span class="n">conf</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ModifierError"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierError">[docs]</a><span class="k">class</span> <span class="nc">ModifierError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ModifierError">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierError">[docs]</a>
+<span class="k">class</span> <span class="nc">ModifierError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception that is raised by modifiers</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="InvalidModeError"><a class="viewcode-back" href="../../ramble.html#ramble.modifier.InvalidModeError">[docs]</a><span class="k">class</span> <span class="nc">InvalidModeError</span><span class="p">(</span><span class="n">ModifierError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InvalidModeError">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.InvalidModeError">[docs]</a>
+<span class="k">class</span> <span class="nc">InvalidModeError</span><span class="p">(</span><span class="n">ModifierError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception raised when an invalid mode is passed</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -385,7 +418,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

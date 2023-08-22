@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -154,7 +154,9 @@
 <span class="n">misc_cache</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">_misc_cache</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="fetch_cache_location"><a class="viewcode-back" href="../../ramble.html#ramble.caches.fetch_cache_location">[docs]</a><span class="k">def</span> <span class="nf">fetch_cache_location</span><span class="p">():</span>
+<div class="viewcode-block" id="fetch_cache_location">
+<a class="viewcode-back" href="../../ramble.html#ramble.caches.fetch_cache_location">[docs]</a>
+<span class="k">def</span> <span class="nf">fetch_cache_location</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filesystem cache of downloaded archives.</span>
 
 <span class="sd">    This prevents Ramble from repeatedly fetch the same files when</span>
@@ -167,16 +169,21 @@
     <span class="k">return</span> <span class="n">path</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_fetch_cache</span><span class="p">():</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">fetch_cache_location</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">fetch_strategy</span><span class="o">.</span><span class="n">FsCache</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MirrorCache"><a class="viewcode-back" href="../../ramble.html#ramble.caches.MirrorCache">[docs]</a><span class="k">class</span> <span class="nc">MirrorCache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorCache">
+<a class="viewcode-back" href="../../ramble.html#ramble.caches.MirrorCache">[docs]</a>
+<span class="k">class</span> <span class="nc">MirrorCache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MirrorCache.store"><a class="viewcode-back" href="../../ramble.html#ramble.caches.MirrorCache.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">,</span> <span class="n">relative_dest</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorCache.store">
+<a class="viewcode-back" href="../../ramble.html#ramble.caches.MirrorCache.store">[docs]</a>
+    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">,</span> <span class="n">relative_dest</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and relocate the fetcher&#39;s target into our mirror cache.&quot;&quot;&quot;</span>
 
         <span class="c1"># Note this will archive package sources even if they would not</span>
@@ -185,7 +192,10 @@
         <span class="n">mkdirp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
         <span class="n">fetcher</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MirrorCache.symlink"><a class="viewcode-back" href="../../ramble.html#ramble.caches.MirrorCache.symlink">[docs]</a>    <span class="k">def</span> <span class="nf">symlink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_ref</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorCache.symlink">
+<a class="viewcode-back" href="../../ramble.html#ramble.caches.MirrorCache.symlink">[docs]</a>
+    <span class="k">def</span> <span class="nf">symlink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_ref</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Symlink a human readable path in our mirror to the actual</span>
 <span class="sd">        storage location.&quot;&quot;&quot;</span>
 
@@ -202,7 +212,9 @@
                 <span class="c1"># to https://github.com/spack/spack/pull/13908)</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">cosmetic_path</span><span class="p">)</span>
             <span class="n">mkdirp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cosmetic_path</span><span class="p">))</span>
-            <span class="n">symlink</span><span class="p">(</span><span class="n">relative_dst</span><span class="p">,</span> <span class="n">cosmetic_path</span><span class="p">)</span></div></div>
+            <span class="n">symlink</span><span class="p">(</span><span class="n">relative_dst</span><span class="p">,</span> <span class="n">cosmetic_path</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="c1">#: Ramble&#39;s local cache for downloaded source archives</span>
@@ -217,7 +229,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

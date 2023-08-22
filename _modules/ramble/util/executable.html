@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -131,7 +131,9 @@
 <span class="kn">from</span> <span class="nn">ramble.schema.types</span> <span class="kn">import</span> <span class="n">OUTPUT_CAPTURE</span>
 
 
-<div class="viewcode-block" id="CommandExecutable"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutable">[docs]</a><span class="k">class</span> <span class="nc">CommandExecutable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="CommandExecutable">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutable">[docs]</a>
+<span class="k">class</span> <span class="nc">CommandExecutable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CommandExecutable class</span>
 <span class="sd">    This class is used to represent internal executables in Ramble.</span>
 
@@ -166,12 +168,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span> <span class="o">=</span> <span class="n">redirect</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_capture</span> <span class="o">=</span> <span class="n">output_capture</span>
 
-<div class="viewcode-block" id="CommandExecutable.copy"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutable.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CommandExecutable.copy">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutable.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Replicate a CommandExecutable instance&quot;&quot;&quot;</span>
         <span class="n">new_inst</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">,</span> <span class="n">mpi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi</span><span class="p">,</span>
                               <span class="n">redirect</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">,</span>
                               <span class="n">output_capture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_capture</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_inst</span></div>
+
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of CommandExecutable instance&quot;&quot;&quot;</span>
@@ -184,8 +189,12 @@
         <span class="k">return</span> <span class="n">self_str</span></div>
 
 
-<div class="viewcode-block" id="CommandExecutableError"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutableError">[docs]</a><span class="k">class</span> <span class="nc">CommandExecutableError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommandExecutableError">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutableError">[docs]</a>
+<span class="k">class</span> <span class="nc">CommandExecutableError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for errors when using command executable classes&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -196,7 +205,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -137,7 +137,9 @@
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 
 
-<div class="viewcode-block" id="SoftwareEnvironments"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments">[docs]</a><span class="k">class</span> <span class="nc">SoftwareEnvironments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SoftwareEnvironments">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments">[docs]</a>
+<span class="k">class</span> <span class="nc">SoftwareEnvironments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent a set of software environments</span>
 
 <span class="sd">    This class contains logic to take the dictionary representations of</span>
@@ -327,7 +329,9 @@
                                 <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Package: </span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s1">, Compiler: </span><span class="si">{</span><span class="n">comp_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                             <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;This might cause problems when installing the packages.&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SoftwareEnvironments.print_environments"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.print_environments">[docs]</a>    <span class="k">def</span> <span class="nf">print_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="SoftwareEnvironments.print_environments">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.print_environments">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Stack:&#39;</span><span class="p">))</span>
         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="s1">&#39;  Packages:&#39;</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">raw_pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_raw_packages</span><span class="p">():</span>
@@ -397,7 +401,10 @@
                 <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_env_packages</span><span class="p">(</span><span class="n">env</span><span class="p">):</span>
                     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;          - </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.get_env"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_env">[docs]</a>    <span class="k">def</span> <span class="nf">get_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.get_env">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_env">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a reference to the environment definition&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">environment_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environments</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
@@ -406,7 +413,10 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environments</span><span class="p">[</span><span class="n">environment_name</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.get_spec_string"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_spec_string">[docs]</a>    <span class="k">def</span> <span class="nf">get_spec_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.get_spec_string">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_spec_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_spec_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the full spec string given a package name&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">package_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
@@ -423,7 +433,10 @@
                 <span class="n">compiler_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; %</span><span class="si">{</span><span class="n">comp_spec</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="n">spec_string</span> <span class="o">+</span> <span class="n">compiler_str</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.get_spec"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_spec">[docs]</a>    <span class="k">def</span> <span class="nf">get_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.get_spec">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_spec">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a single spec given its name&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">package_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
@@ -432,7 +445,10 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">[</span><span class="n">package_name</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.get_env_packages"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_env_packages">[docs]</a>    <span class="k">def</span> <span class="nf">get_env_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.get_env_packages">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.get_env_packages">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_env_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all of the packages used by an environment&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">environment_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environments</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
@@ -442,6 +458,7 @@
         <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environments</span><span class="p">[</span><span class="n">environment_name</span><span class="p">]:</span>
             <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environments</span><span class="p">[</span><span class="n">environment_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]:</span>
                 <span class="k">yield</span> <span class="n">name</span></div>
+
 
     <span class="k">def</span> <span class="nf">_require_raw_package</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise an error if the raw package is not defined&quot;&quot;&quot;</span>
@@ -457,40 +474,60 @@
                 <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="n">env</span><span class="si">}</span><span class="s1"> is not defined.&#39;</span>
             <span class="p">)</span>
 
-<div class="viewcode-block" id="SoftwareEnvironments.all_packages"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_packages">[docs]</a>    <span class="k">def</span> <span class="nf">all_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SoftwareEnvironments.all_packages">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_packages">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each package name&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">pkg</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.all_raw_packages"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_raw_packages">[docs]</a>    <span class="k">def</span> <span class="nf">all_raw_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.all_raw_packages">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_raw_packages">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_raw_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each raw package name&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_packages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">pkg</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.raw_package_info"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.raw_package_info">[docs]</a>    <span class="k">def</span> <span class="nf">raw_package_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_pkg</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.raw_package_info">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.raw_package_info">[docs]</a>
+    <span class="k">def</span> <span class="nf">raw_package_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_pkg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the information for a raw package&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_raw_package</span><span class="p">(</span><span class="n">raw_pkg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_packages</span><span class="p">[</span><span class="n">raw_pkg</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.mapped_packages"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.mapped_packages">[docs]</a>    <span class="k">def</span> <span class="nf">mapped_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_pkg</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.mapped_packages">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.mapped_packages">[docs]</a>
+    <span class="k">def</span> <span class="nf">mapped_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_pkg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each package rendered from a raw package&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_raw_package</span><span class="p">(</span><span class="n">raw_pkg</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_package_map</span><span class="p">[</span><span class="n">raw_pkg</span><span class="p">]:</span>
             <span class="k">yield</span> <span class="n">pkg</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.all_environments"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_environments">[docs]</a>    <span class="k">def</span> <span class="nf">all_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.all_environments">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_environments">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each environment name&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">env</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">env</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.all_raw_environments"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_raw_environments">[docs]</a>    <span class="k">def</span> <span class="nf">all_raw_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.all_raw_environments">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.all_raw_environments">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_raw_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield raw environment names&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">env</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_environments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">env</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.raw_environment_info"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.raw_environment_info">[docs]</a>    <span class="k">def</span> <span class="nf">raw_environment_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.raw_environment_info">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.raw_environment_info">[docs]</a>
+    <span class="k">def</span> <span class="nf">raw_environment_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the information for a raw environment&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">env</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_environments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
@@ -499,16 +536,24 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_environments</span><span class="p">[</span><span class="n">env</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SoftwareEnvironments.mapped_environments"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.mapped_environments">[docs]</a>    <span class="k">def</span> <span class="nf">mapped_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_env</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SoftwareEnvironments.mapped_environments">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.mapped_environments">[docs]</a>
+    <span class="k">def</span> <span class="nf">mapped_environments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_env</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each environment rendered from a raw environment&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_raw_environment</span><span class="p">(</span><span class="n">raw_env</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">env</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_map</span><span class="p">[</span><span class="n">raw_env</span><span class="p">]:</span>
-            <span class="k">yield</span> <span class="n">env</span></div></div>
+            <span class="k">yield</span> <span class="n">env</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RambleSoftwareEnvironmentError"><a class="viewcode-back" href="../../ramble.html#ramble.software_environments.RambleSoftwareEnvironmentError">[docs]</a><span class="k">class</span> <span class="nc">RambleSoftwareEnvironmentError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleSoftwareEnvironmentError">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.RambleSoftwareEnvironmentError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleSoftwareEnvironmentError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Super class for all software environment errors&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -519,7 +564,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

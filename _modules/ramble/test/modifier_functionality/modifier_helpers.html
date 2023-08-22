@@ -11,11 +11,11 @@
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -127,7 +127,9 @@
 <span class="kn">import</span> <span class="nn">spack.util.spack_yaml</span> <span class="k">as</span> <span class="nn">syaml</span>
 
 
-<div class="viewcode-block" id="check_software_env"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.check_software_env">[docs]</a><span class="k">def</span> <span class="nf">check_software_env</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">tests</span><span class="p">):</span>
+<div class="viewcode-block" id="check_software_env">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.check_software_env">[docs]</a>
+<span class="k">def</span> <span class="nf">check_software_env</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">tests</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate software environments</span>
 
 <span class="sd">    Input arguments:</span>
@@ -148,7 +150,10 @@
             <span class="k">assert</span> <span class="n">test_content</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="check_execute_script"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.check_execute_script">[docs]</a><span class="k">def</span> <span class="nf">check_execute_script</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="n">tests</span><span class="p">):</span>
+
+<div class="viewcode-block" id="check_execute_script">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.check_execute_script">[docs]</a>
+<span class="k">def</span> <span class="nf">check_execute_script</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="n">tests</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">script_path</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -156,13 +161,19 @@
             <span class="k">assert</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">data</span></div>
 
 
-<div class="viewcode-block" id="named_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.named_modifier">[docs]</a><span class="k">def</span> <span class="nf">named_modifier</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="named_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.named_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">named_modifier</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="intel_aps_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_modifier">[docs]</a><span class="k">def</span> <span class="nf">intel_aps_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="intel_aps_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">intel_aps_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;intel-aps&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mpi&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -170,7 +181,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="intel_aps_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_answer">[docs]</a><span class="k">def</span> <span class="nf">intel_aps_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="intel_aps_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">intel_aps_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;intel-oneapi-vtune&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">)</span>
@@ -182,7 +196,10 @@
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
 
 
-<div class="viewcode-block" id="lscpu_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_modifier">[docs]</a><span class="k">def</span> <span class="nf">lscpu_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="lscpu_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">lscpu_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;lscpu&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -190,7 +207,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="lscpu_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_answer">[docs]</a><span class="k">def</span> <span class="nf">lscpu_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="lscpu_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">lscpu_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
@@ -200,7 +220,10 @@
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
 
 
-<div class="viewcode-block" id="env_var_append_paths_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier">[docs]</a><span class="k">def</span> <span class="nf">env_var_append_paths_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_append_paths_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_append_paths_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;append-env-var-mod-paths&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -208,7 +231,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="env_var_append_paths_modifier_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier_answer">[docs]</a><span class="k">def</span> <span class="nf">env_var_append_paths_modifier_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_append_paths_modifier_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_append_paths_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
@@ -218,7 +244,10 @@
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
 
 
-<div class="viewcode-block" id="env_var_append_vars_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier">[docs]</a><span class="k">def</span> <span class="nf">env_var_append_vars_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_append_vars_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_append_vars_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;append-env-var-mod-vars&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -226,7 +255,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="env_var_append_vars_modifier_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier_answer">[docs]</a><span class="k">def</span> <span class="nf">env_var_append_vars_modifier_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_append_vars_modifier_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_append_vars_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
@@ -236,7 +268,10 @@
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
 
 
-<div class="viewcode-block" id="env_var_prepend_paths_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier">[docs]</a><span class="k">def</span> <span class="nf">env_var_prepend_paths_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_prepend_paths_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_prepend_paths_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;prepend-env-var-mod-paths&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -244,7 +279,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="env_var_prepend_paths_modifier_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier_answer">[docs]</a><span class="k">def</span> <span class="nf">env_var_prepend_paths_modifier_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_prepend_paths_modifier_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_prepend_paths_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
@@ -254,7 +292,10 @@
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
 
 
-<div class="viewcode-block" id="env_var_set_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier">[docs]</a><span class="k">def</span> <span class="nf">env_var_set_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_set_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_set_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;set-env-var-mod&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -262,7 +303,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="env_var_set_modifier_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier_answer">[docs]</a><span class="k">def</span> <span class="nf">env_var_set_modifier_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_set_modifier_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_set_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
@@ -272,7 +316,10 @@
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
 
 
-<div class="viewcode-block" id="env_var_unset_modifier"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier">[docs]</a><span class="k">def</span> <span class="nf">env_var_unset_modifier</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_unset_modifier">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_unset_modifier</span><span class="p">():</span>
     <span class="n">modifier_def</span> <span class="o">=</span> <span class="n">named_modifier</span><span class="p">(</span><span class="s1">&#39;unset-env-var-mod&#39;</span><span class="p">)</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
     <span class="n">modifier_def</span><span class="p">[</span><span class="s1">&#39;on_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
@@ -280,7 +327,10 @@
     <span class="k">return</span> <span class="n">modifier_def</span></div>
 
 
-<div class="viewcode-block" id="env_var_unset_modifier_answer"><a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier_answer">[docs]</a><span class="k">def</span> <span class="nf">env_var_unset_modifier_answer</span><span class="p">():</span>
+
+<div class="viewcode-block" id="env_var_unset_modifier_answer">
+<a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier_answer">[docs]</a>
+<span class="k">def</span> <span class="nf">env_var_unset_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
@@ -288,6 +338,7 @@
         <span class="s1">&#39;unset test_var&#39;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="k">return</span> <span class="n">expected_software</span><span class="p">,</span> <span class="n">expected_strs</span></div>
+
 </pre></div>
 
            </div>
@@ -298,7 +349,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

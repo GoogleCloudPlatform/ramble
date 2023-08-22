@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -131,7 +131,9 @@
 <span class="kn">from</span> <span class="nn">ramble.util.lock</span> <span class="kn">import</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">ReadTransaction</span><span class="p">,</span> <span class="n">WriteTransaction</span>
 
 
-<div class="viewcode-block" id="FileCache"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache">[docs]</a><span class="k">class</span> <span class="nc">FileCache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="FileCache">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache">[docs]</a>
+<span class="k">class</span> <span class="nc">FileCache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class manages cached data in the filesystem.</span>
 
 <span class="sd">    - Cache files are fetched and stored by unique keys.  Keys can be relative</span>
@@ -161,7 +163,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_locks</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lock_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
 
-<div class="viewcode-block" id="FileCache.destroy"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileCache.destroy">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.destroy">[docs]</a>
+    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all files under the cache root.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
@@ -170,9 +174,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FileCache.cache_path"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.cache_path">[docs]</a>    <span class="k">def</span> <span class="nf">cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FileCache.cache_path">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.cache_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the file in the cache for a particular key.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_lock_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the file in the cache for a particular key.&quot;&quot;&quot;</span>
@@ -188,7 +196,9 @@
                                     <span class="n">default_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_timeout</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-<div class="viewcode-block" id="FileCache.init_entry"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.init_entry">[docs]</a>    <span class="k">def</span> <span class="nf">init_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="FileCache.init_entry">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.init_entry">[docs]</a>
+    <span class="k">def</span> <span class="nf">init_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure we can access a cache file. Create a lock for it if needed.</span>
 
 <span class="sd">        Return whether the cache file exists yet or not.</span>
@@ -215,7 +225,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">exists</span></div>
 
-<div class="viewcode-block" id="FileCache.read_transaction"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.read_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">read_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FileCache.read_transaction">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.read_transaction">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a read transaction on a file cache item.</span>
 
 <span class="sd">        Returns a ReadTransaction context manager and opens the cache file for</span>
@@ -229,7 +242,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">acquire</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="FileCache.write_transaction"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.write_transaction">[docs]</a>    <span class="k">def</span> <span class="nf">write_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FileCache.write_transaction">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.write_transaction">[docs]</a>
+    <span class="k">def</span> <span class="nf">write_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a write transaction on a file cache item.</span>
 
 <span class="sd">        Returns a WriteTransaction context manager that opens a temporary file</span>
@@ -269,7 +285,10 @@
         <span class="k">return</span> <span class="n">WriteTransaction</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">acquire</span><span class="o">=</span><span class="n">WriteContextManager</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FileCache.mtime"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.mtime">[docs]</a>    <span class="k">def</span> <span class="nf">mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FileCache.mtime">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.mtime">[docs]</a>
+    <span class="k">def</span> <span class="nf">mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return modification time of cache file, or 0 if it does not exist.</span>
 
 <span class="sd">        Time is in units returned by os.stat in the mtime field, which is</span>
@@ -282,18 +301,26 @@
             <span class="n">sinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">st_mtime</span></div>
 
-<div class="viewcode-block" id="FileCache.remove"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FileCache.remove">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.FileCache.remove">[docs]</a>
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="n">lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">lock</span><span class="o">.</span><span class="n">acquire_write</span><span class="p">()</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">lock</span><span class="o">.</span><span class="n">release_write</span><span class="p">()</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock_path</span><span class="p">(</span><span class="n">key</span><span class="p">))</span></div></div>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock_path</span><span class="p">(</span><span class="n">key</span><span class="p">))</span></div>
+</div>
 
 
-<div class="viewcode-block" id="CacheError"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.CacheError">[docs]</a><span class="k">class</span> <span class="nc">CacheError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CacheError">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_cache.CacheError">[docs]</a>
+<span class="k">class</span> <span class="nc">CacheError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
     <span class="k">pass</span></div>
+
 </pre></div>
 
            </div>
@@ -304,7 +331,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

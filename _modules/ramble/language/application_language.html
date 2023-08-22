@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -159,15 +159,20 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="ApplicationMeta"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.ApplicationMeta">[docs]</a><span class="k">class</span> <span class="nc">ApplicationMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">shared_language</span><span class="o">.</span><span class="n">SharedMeta</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationMeta">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.ApplicationMeta">[docs]</a>
+<span class="k">class</span> <span class="nc">ApplicationMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">shared_language</span><span class="o">.</span><span class="n">SharedMeta</span><span class="p">):</span>
     <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">_directives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span></div>
+
 
 
 <span class="n">application_directive</span> <span class="o">=</span> <span class="n">ApplicationMeta</span><span class="o">.</span><span class="n">directive</span>
 
 
-<div class="viewcode-block" id="workload"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload">[docs]</a><span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workloads&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="workload">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workloads&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">workload</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">executables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">executable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a workload to this application</span>
@@ -205,7 +210,10 @@
     <span class="k">return</span> <span class="n">_execute_workload</span></div>
 
 
-<div class="viewcode-block" id="executable"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.executable">[docs]</a><span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;executables&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="executable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.executable">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;executables&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">executable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
                <span class="n">output_capture</span><span class="o">=</span><span class="n">OUTPUT_CAPTURE</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds an executable to this application</span>
@@ -235,7 +243,10 @@
     <span class="k">return</span> <span class="n">_execute_executable</span></div>
 
 
-<div class="viewcode-block" id="input_file"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.input_file">[docs]</a><span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="input_file">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.input_file">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">input_file</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">target_dir</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{input_name}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">sha256</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds an input file definition to this application</span>
@@ -268,7 +279,10 @@
     <span class="k">return</span> <span class="n">_execute_input_file</span></div>
 
 
-<div class="viewcode-block" id="workload_variable"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload_variable">[docs]</a><span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workload_variables&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="workload_variable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload_variable">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workload_variables&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">workload_variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">workloads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a new variable to be used in experiments</span>
@@ -299,6 +313,7 @@
                 <span class="n">app</span><span class="o">.</span><span class="n">workload_variables</span><span class="p">[</span><span class="n">wl_name</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
 
     <span class="k">return</span> <span class="n">_execute_workload_variable</span></div>
+
 </pre></div>
 
            </div>
@@ -309,7 +324,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

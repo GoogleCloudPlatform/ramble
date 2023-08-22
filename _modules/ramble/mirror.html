@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -169,7 +169,9 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%-*s%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">type_</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="Mirror"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror">[docs]</a><span class="k">class</span> <span class="nc">Mirror</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Mirror">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror">[docs]</a>
+<span class="k">class</span> <span class="nc">Mirror</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a named location for storing input tarballs.</span>
 
 <span class="sd">    Mirrors have a fetch_url that indicate where and how artifacts are fetched</span>
@@ -187,13 +189,21 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_fetch_url</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_push_url</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Mirror.to_json"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Mirror.to_json">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_json">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">stream</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mirror.to_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.to_yaml">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_yaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">stream</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mirror.from_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_yaml">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Mirror.from_yaml">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_yaml">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
@@ -204,7 +214,10 @@
                 <span class="n">e</span><span class="p">,</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mirror.from_json"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Mirror.from_json">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_json">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
@@ -215,19 +228,28 @@
                 <span class="n">e</span><span class="p">,</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mirror.to_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.to_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.to_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">syaml_dict</span><span class="p">([</span>
             <span class="p">(</span><span class="s1">&#39;fetch&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;push&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">)])</span></div>
 
-<div class="viewcode-block" id="Mirror.from_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Mirror.from_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.from_dict">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">Mirror</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Mirror</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;fetch&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;push&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mirror.display"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.display">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.display">[docs]</a>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">_display_mirror_entry</span><span class="p">(</span><span class="n">max_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -235,6 +257,7 @@
                 <span class="n">max_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">)</span>
             <span class="n">_display_mirror_entry</span><span class="p">(</span>
                 <span class="n">max_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">push_url</span><span class="p">,</span> <span class="s2">&quot;push&quot;</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
@@ -266,7 +289,9 @@
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">or</span> <span class="s2">&quot;&lt;unnamed&gt;&quot;</span>
 
-<div class="viewcode-block" id="Mirror.get_profile"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_profile">[docs]</a>    <span class="k">def</span> <span class="nf">get_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+<div class="viewcode-block" id="Mirror.get_profile">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_profile">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -274,13 +299,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Mirror.set_profile"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_profile">[docs]</a>    <span class="k">def</span> <span class="nf">set_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.set_profile">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_profile">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span></div>
 
-<div class="viewcode-block" id="Mirror.get_access_pair"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_access_pair">[docs]</a>    <span class="k">def</span> <span class="nf">get_access_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.get_access_pair">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_access_pair">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_access_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_pair&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -288,13 +319,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Mirror.set_access_pair"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_access_pair">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">connection_tuple</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.set_access_pair">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_access_pair">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_access_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">connection_tuple</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;access_pair&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_tuple</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;access_pair&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_tuple</span></div>
 
-<div class="viewcode-block" id="Mirror.get_endpoint_url"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_endpoint_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.get_endpoint_url">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_endpoint_url">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;endpoint_url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -302,13 +339,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Mirror.set_endpoint_url"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_endpoint_url">[docs]</a>    <span class="k">def</span> <span class="nf">set_endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.set_endpoint_url">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_endpoint_url">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;endpoint_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;endpoint_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span></div>
 
-<div class="viewcode-block" id="Mirror.get_access_token"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">get_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.get_access_token">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.get_access_token">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_token&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -316,11 +359,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Mirror.set_access_token"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">connection_token</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Mirror.set_access_token">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.Mirror.set_access_token">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_type</span><span class="p">,</span> <span class="n">connection_token</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">url_type</span> <span class="o">==</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_token</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_url</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_token</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fetch_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -350,7 +397,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_push_url</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="MirrorCollection"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection">[docs]</a><span class="k">class</span> <span class="nc">MirrorCollection</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorCollection">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection">[docs]</a>
+<span class="k">class</span> <span class="nc">MirrorCollection</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A mapping of mirror names to mirrors.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirrors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -363,13 +413,21 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_mirrors</span>
 
-<div class="viewcode-block" id="MirrorCollection.to_json"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorCollection.to_json">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_json">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">stream</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MirrorCollection.to_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorCollection.to_yaml">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_yaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">stream</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MirrorCollection.to_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorCollection.to_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.to_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">syaml_dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">recursive</span> <span class="k">else</span> <span class="n">v</span><span class="p">))</span>
@@ -377,19 +435,28 @@
             <span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="p">))</span></div>
 
-<div class="viewcode-block" id="MirrorCollection.from_dict"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="MirrorCollection.from_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.from_dict">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MirrorCollection</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
-<div class="viewcode-block" id="MirrorCollection.display"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorCollection.display">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.display">[docs]</a>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">mirror</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">max_len</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MirrorCollection.lookup"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.lookup">[docs]</a>    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_or_url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorCollection.lookup">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorCollection.lookup">[docs]</a>
+    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_or_url</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Looks up and returns a Mirror.</span>
 
 <span class="sd">        If this MirrorCollection contains a named Mirror under the name</span>
@@ -404,11 +471,13 @@
 
         <span class="k">return</span> <span class="n">result</span></div>
 
+
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mirrors</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_determine_extension</span><span class="p">(</span><span class="n">fetcher</span><span class="p">):</span>
@@ -448,7 +517,9 @@
     <span class="k">return</span> <span class="n">ext</span>
 
 
-<div class="viewcode-block" id="MirrorReference"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorReference">[docs]</a><span class="k">class</span> <span class="nc">MirrorReference</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorReference">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorReference">[docs]</a>
+<span class="k">class</span> <span class="nc">MirrorReference</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A ``MirrorReference`` stores the relative paths where you can store a</span>
 <span class="sd">    resource in a mirror directory.</span>
 
@@ -478,7 +549,10 @@
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">cosmetic_path</span></div>
 
 
-<div class="viewcode-block" id="mirror_archive_paths"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.mirror_archive_paths">[docs]</a><span class="k">def</span> <span class="nf">mirror_archive_paths</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">per_input_ref</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mirror_archive_paths">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.mirror_archive_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror_archive_paths</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="n">per_input_ref</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a ``MirrorReference`` object which keeps track of the relative</span>
 <span class="sd">    storage path of the resource associated with the specified ``fetcher``.&quot;&quot;&quot;</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_determine_extension</span><span class="p">(</span><span class="n">fetcher</span><span class="p">)</span>
@@ -495,7 +569,10 @@
     <span class="k">return</span> <span class="n">MirrorReference</span><span class="p">(</span><span class="n">per_input_ref</span><span class="p">,</span> <span class="n">global_ref</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+
+<div class="viewcode-block" id="create">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.create">[docs]</a>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a directory to be used as a ramble mirror, and fill it with</span>
 <span class="sd">    input archives.</span>
 
@@ -544,7 +621,10 @@
     <span class="k">return</span> <span class="n">mirror_stats</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{}):</span>
+
+<div class="viewcode-block" id="add">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.add">[docs]</a>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{}):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a named mirror in the given scope&quot;&quot;&quot;</span>
     <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mirrors</span><span class="p">:</span>
@@ -560,7 +640,10 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">mirrors</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="remove"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.remove">[docs]</a><span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+
+<div class="viewcode-block" id="remove">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.remove">[docs]</a>
+<span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove the named mirror in the given scope&quot;&quot;&quot;</span>
     <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mirrors</span><span class="p">:</span>
@@ -590,7 +673,10 @@
     <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Removed mirror </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MirrorStats"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats">[docs]</a><span class="k">class</span> <span class="nc">MirrorStats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorStats">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats">[docs]</a>
+<span class="k">class</span> <span class="nc">MirrorStats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">present</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="p">{}</span>
@@ -600,9 +686,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">added_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">existing_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-<div class="viewcode-block" id="MirrorStats.next_spec"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.next_spec">[docs]</a>    <span class="k">def</span> <span class="nf">next_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorStats.next_spec">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.next_spec">[docs]</a>
+    <span class="k">def</span> <span class="nf">next_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tally_current_spec</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span> <span class="o">=</span> <span class="n">spec</span></div>
+
 
     <span class="k">def</span> <span class="nf">_tally_current_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">:</span>
@@ -614,18 +703,31 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">existing_resources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="MirrorStats.stats"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.stats">[docs]</a>    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MirrorStats.stats">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tally_current_spec</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">present</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MirrorStats.already_existed"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.already_existed">[docs]</a>    <span class="k">def</span> <span class="nf">already_existed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorStats.already_existed">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.already_existed">[docs]</a>
+    <span class="k">def</span> <span class="nf">already_existed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">present</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="MirrorStats.added"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.added">[docs]</a>    <span class="k">def</span> <span class="nf">added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorStats.added">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.added">[docs]</a>
+    <span class="k">def</span> <span class="nf">added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="MirrorStats.error"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="MirrorStats.error">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorStats.error">[docs]</a>
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_spec</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="k">def</span> <span class="nf">_add_single_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mirror_root</span><span class="p">,</span> <span class="n">mirror</span><span class="p">,</span> <span class="n">mirror_stats</span><span class="p">):</span>
@@ -655,7 +757,9 @@
         <span class="n">mirror_stats</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="push_url_from_directory"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_directory">[docs]</a><span class="k">def</span> <span class="nf">push_url_from_directory</span><span class="p">(</span><span class="n">output_directory</span><span class="p">):</span>
+<div class="viewcode-block" id="push_url_from_directory">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_directory">[docs]</a>
+<span class="k">def</span> <span class="nf">push_url_from_directory</span><span class="p">(</span><span class="n">output_directory</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a directory in the local filesystem, return the URL on</span>
 <span class="sd">    which to push resources.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -667,7 +771,10 @@
     <span class="k">return</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">push_url</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="push_url_from_mirror_name"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_mirror_name">[docs]</a><span class="k">def</span> <span class="nf">push_url_from_mirror_name</span><span class="p">(</span><span class="n">mirror_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="push_url_from_mirror_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_mirror_name">[docs]</a>
+<span class="k">def</span> <span class="nf">push_url_from_mirror_name</span><span class="p">(</span><span class="n">mirror_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a mirror name, return the URL on which to push resources.&quot;&quot;&quot;</span>
     <span class="n">mirror</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">()</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">mirror_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mirror</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&lt;unnamed&gt;&quot;</span><span class="p">:</span>
@@ -675,7 +782,10 @@
     <span class="k">return</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">push_url</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="push_url_from_mirror_url"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_mirror_url">[docs]</a><span class="k">def</span> <span class="nf">push_url_from_mirror_url</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="push_url_from_mirror_url">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.push_url_from_mirror_url">[docs]</a>
+<span class="k">def</span> <span class="nf">push_url_from_mirror_url</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a mirror URL, return the URL on which to push resources.&quot;&quot;&quot;</span>
     <span class="n">scheme</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;&lt;missing&gt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span>
     <span class="k">if</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;&lt;missing&gt;&#39;</span><span class="p">:</span>
@@ -684,11 +794,15 @@
     <span class="k">return</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">push_url</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MirrorError"><a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorError">[docs]</a><span class="k">class</span> <span class="nc">MirrorError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MirrorError">
+<a class="viewcode-back" href="../../ramble.html#ramble.mirror.MirrorError">[docs]</a>
+<span class="k">class</span> <span class="nc">MirrorError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass of all mirror-creation related errors.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">long_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MirrorError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">long_msg</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -699,7 +813,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -153,12 +153,17 @@
 <span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;description&quot;</span>
 
 
-<div class="viewcode-block" id="python_name"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.python_name">[docs]</a><span class="k">def</span> <span class="nf">python_name</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
+<div class="viewcode-block" id="python_name">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.python_name">[docs]</a>
+<span class="k">def</span> <span class="nf">python_name</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ``-`` to ``_`` in command name, to make a valid identifier.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">cmd_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="require_python_name"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.require_python_name">[docs]</a><span class="k">def</span> <span class="nf">require_python_name</span><span class="p">(</span><span class="n">pname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="require_python_name">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.require_python_name">[docs]</a>
+<span class="k">def</span> <span class="nf">require_python_name</span><span class="p">(</span><span class="n">pname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Require that the provided name is a valid python name (per</span>
 <span class="sd">    python_name()). Useful for checking parameters for function</span>
 <span class="sd">    prerequisites.&quot;&quot;&quot;</span>
@@ -166,12 +171,18 @@
         <span class="k">raise</span> <span class="n">PythonNameError</span><span class="p">(</span><span class="n">pname</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cmd_name"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.cmd_name">[docs]</a><span class="k">def</span> <span class="nf">cmd_name</span><span class="p">(</span><span class="n">python_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="cmd_name">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.cmd_name">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_name</span><span class="p">(</span><span class="n">python_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert module name (with ``_``) to command name (with ``-``).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">python_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="require_cmd_name"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.require_cmd_name">[docs]</a><span class="k">def</span> <span class="nf">require_cmd_name</span><span class="p">(</span><span class="n">cname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="require_cmd_name">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.require_cmd_name">[docs]</a>
+<span class="k">def</span> <span class="nf">require_cmd_name</span><span class="p">(</span><span class="n">cname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Require that the provided name is a valid command name (per</span>
 <span class="sd">    cmd_name()). Useful for checking parameters for function</span>
 <span class="sd">    prerequisites.</span>
@@ -180,11 +191,14 @@
         <span class="k">raise</span> <span class="n">CommandNameError</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span></div>
 
 
+
 <span class="c1">#: global, cached list of all commands -- access through all_commands()</span>
 <span class="n">_all_commands</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="all_commands"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.all_commands">[docs]</a><span class="k">def</span> <span class="nf">all_commands</span><span class="p">():</span>
+<div class="viewcode-block" id="all_commands">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.all_commands">[docs]</a>
+<span class="k">def</span> <span class="nf">all_commands</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a sorted list of all ramble commands.</span>
 
 <span class="sd">    This will list the lib/ramble/ramble/cmd directory and find the</span>
@@ -206,7 +220,10 @@
     <span class="k">return</span> <span class="n">_all_commands</span></div>
 
 
-<div class="viewcode-block" id="remove_options"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.remove_options">[docs]</a><span class="k">def</span> <span class="nf">remove_options</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="o">*</span><span class="n">options</span><span class="p">):</span>
+
+<div class="viewcode-block" id="remove_options">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.remove_options">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_options</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="o">*</span><span class="n">options</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove some options from a parser.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span>
@@ -215,7 +232,10 @@
                 <span class="k">break</span></div>
 
 
-<div class="viewcode-block" id="get_module"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.get_module">[docs]</a><span class="k">def</span> <span class="nf">get_module</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_module">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.get_module">[docs]</a>
+<span class="k">def</span> <span class="nf">get_module</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Imports the module for a particular command name and returns it.</span>
 
 <span class="sd">    Args:</span>
@@ -251,7 +271,10 @@
     <span class="k">return</span> <span class="n">module</span></div>
 
 
-<div class="viewcode-block" id="get_command"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.get_command">[docs]</a><span class="k">def</span> <span class="nf">get_command</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_command">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.get_command">[docs]</a>
+<span class="k">def</span> <span class="nf">get_command</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Imports the command function associated with cmd_name.</span>
 
 <span class="sd">    The function&#39;s name is derived from cmd_name using python_name().</span>
@@ -264,7 +287,10 @@
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">get_module</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">),</span> <span class="n">pname</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="elide_list"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.elide_list">[docs]</a><span class="k">def</span> <span class="nf">elide_list</span><span class="p">(</span><span class="n">line_list</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+
+<div class="viewcode-block" id="elide_list">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.elide_list">[docs]</a>
+<span class="k">def</span> <span class="nf">elide_list</span><span class="p">(</span><span class="n">line_list</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes a long list and limits it to a smaller number of elements,</span>
 <span class="sd">       replacing intervening elements with &#39;...&#39;.  For example::</span>
 
@@ -280,12 +306,18 @@
         <span class="k">return</span> <span class="n">line_list</span></div>
 
 
-<div class="viewcode-block" id="ramble_is_git_repo"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.ramble_is_git_repo">[docs]</a><span class="k">def</span> <span class="nf">ramble_is_git_repo</span><span class="p">():</span>
+
+<div class="viewcode-block" id="ramble_is_git_repo">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.ramble_is_git_repo">[docs]</a>
+<span class="k">def</span> <span class="nf">ramble_is_git_repo</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure that this instance of Ramble is a git clone.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">is_git_repo</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="is_git_repo"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.is_git_repo">[docs]</a><span class="k">def</span> <span class="nf">is_git_repo</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="is_git_repo">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.is_git_repo">[docs]</a>
+<span class="k">def</span> <span class="nf">is_git_repo</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="n">dotgit_path</span> <span class="o">=</span> <span class="n">join_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;.git&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dotgit_path</span><span class="p">):</span>
         <span class="c1"># we are in a regular git repo</span>
@@ -301,7 +333,10 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="PythonNameError"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.PythonNameError">[docs]</a><span class="k">class</span> <span class="nc">PythonNameError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PythonNameError">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.PythonNameError">[docs]</a>
+<span class="k">class</span> <span class="nc">PythonNameError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception class thrown for impermissible python names&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -309,7 +344,10 @@
             <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> is not a permissible Python name.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="CommandNameError"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.CommandNameError">[docs]</a><span class="k">class</span> <span class="nc">CommandNameError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommandNameError">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.CommandNameError">[docs]</a>
+<span class="k">class</span> <span class="nc">CommandNameError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception class thrown for impermissible command names&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -317,10 +355,13 @@
             <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> is not a permissible Ramble command name.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
 
 
+
 <span class="c1">########################################</span>
 <span class="c1"># argparse types for argument validation</span>
 <span class="c1">########################################</span>
-<div class="viewcode-block" id="extant_file"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.extant_file">[docs]</a><span class="k">def</span> <span class="nf">extant_file</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<div class="viewcode-block" id="extant_file">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.extant_file">[docs]</a>
+<span class="k">def</span> <span class="nf">extant_file</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Argparse type for files that exist.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -329,7 +370,10 @@
     <span class="k">return</span> <span class="n">f</span></div>
 
 
-<div class="viewcode-block" id="require_active_workspace"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.require_active_workspace">[docs]</a><span class="k">def</span> <span class="nf">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="require_active_workspace">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.require_active_workspace">[docs]</a>
+<span class="k">def</span> <span class="nf">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Used by commands to get the active workspace</span>
 
 <span class="sd">    If a workspace is not found, print an error message that says the calling</span>
@@ -354,7 +398,10 @@
             <span class="s1">&#39;    ramble -w WRKSPC </span><span class="si">%s</span><span class="s1"> ...&#39;</span> <span class="o">%</span> <span class="n">cmd_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="find_workspace"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.find_workspace">[docs]</a><span class="k">def</span> <span class="nf">find_workspace</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="find_workspace">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.find_workspace">[docs]</a>
+<span class="k">def</span> <span class="nf">find_workspace</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find active workspace from args or environment variable.</span>
 
 <span class="sd">    Check for a workspace in this order:</span>
@@ -397,7 +444,10 @@
     <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleWorkspaceError</span><span class="p">(</span><span class="s1">&#39;no workspace in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ws</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="find_workspace_path"><a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.find_workspace_path">[docs]</a><span class="k">def</span> <span class="nf">find_workspace_path</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="find_workspace_path">
+<a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.find_workspace_path">[docs]</a>
+<span class="k">def</span> <span class="nf">find_workspace_path</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find path to active workspace from args or environment variable.</span>
 
 <span class="sd">    Check for a workspace in this order:</span>
@@ -438,6 +488,7 @@
         <span class="k">return</span> <span class="n">ws</span>
 
     <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleWorkspaceError</span><span class="p">(</span><span class="s1">&#39;no workspace in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ws</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -448,7 +499,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

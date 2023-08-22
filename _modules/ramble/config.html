@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -261,7 +261,9 @@
 <span class="n">overrides_base_name</span> <span class="o">=</span> <span class="s1">&#39;overrides-&#39;</span>
 
 
-<div class="viewcode-block" id="first_existing"><a class="viewcode-back" href="../../ramble.html#ramble.config.first_existing">[docs]</a><span class="k">def</span> <span class="nf">first_existing</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+<div class="viewcode-block" id="first_existing">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.first_existing">[docs]</a>
+<span class="k">def</span> <span class="nf">first_existing</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the value of the first key in keys that is in the dictionary.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="p">)</span>
@@ -269,7 +271,10 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;None of </span><span class="si">%s</span><span class="s2"> is in dict!&quot;</span> <span class="o">%</span> <span class="n">keys</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ConfigScope"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope">[docs]</a><span class="k">class</span> <span class="nc">ConfigScope</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConfigScope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope">[docs]</a>
+<span class="k">class</span> <span class="nc">ConfigScope</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class represents a configuration scope.</span>
 
 <span class="sd">       A scope is one directory containing named configuration files.</span>
@@ -285,17 +290,23 @@
     <span class="k">def</span> <span class="nf">is_platform_dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-<div class="viewcode-block" id="ConfigScope.get_section_filename"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.get_section_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfigScope.get_section_filename">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.get_section_filename">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="n">_validate_section_name</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.yaml&quot;</span> <span class="o">%</span> <span class="n">section</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConfigScope.get_section"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.get_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConfigScope.get_section">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.get_section">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
             <span class="n">path</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section_filename</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
             <span class="n">schema</span> <span class="o">=</span> <span class="n">section_schemas</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
             <span class="n">data</span>   <span class="o">=</span> <span class="n">read_config_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span></div>
+
 
     <span class="k">def</span> <span class="nf">_write_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section_filename</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
@@ -313,15 +324,21 @@
             <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
                 <span class="s2">&quot;Error writing to config file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 
-<div class="viewcode-block" id="ConfigScope.clear"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfigScope.clear">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.clear">[docs]</a>
+    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Empty cached config information.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span></div>
+
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;ConfigScope: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SingleFileScope"><a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope">[docs]</a><span class="k">class</span> <span class="nc">SingleFileScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SingleFileScope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope">[docs]</a>
+<span class="k">class</span> <span class="nc">SingleFileScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class represents a configuration scope in a single YAML file.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">yaml_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Similar to ``ConfigScope`` but can be embedded in another schema.</span>
@@ -349,10 +366,15 @@
     <span class="k">def</span> <span class="nf">is_platform_dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="SingleFileScope.get_section_filename"><a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope.get_section_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<div class="viewcode-block" id="SingleFileScope.get_section_filename">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope.get_section_filename">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span></div>
 
-<div class="viewcode-block" id="SingleFileScope.get_section"><a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope.get_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SingleFileScope.get_section">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope.get_section">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="c1"># read raw data from the file, which looks like:</span>
         <span class="c1"># {</span>
         <span class="c1">#   &#39;config&#39;: {</span>
@@ -401,6 +423,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_write_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="n">data_to_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_data</span>
 
@@ -448,7 +471,10 @@
         <span class="k">return</span> <span class="s1">&#39;&lt;SingleFileScope: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ImmutableConfigScope"><a class="viewcode-back" href="../../ramble.html#ramble.config.ImmutableConfigScope">[docs]</a><span class="k">class</span> <span class="nc">ImmutableConfigScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImmutableConfigScope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ImmutableConfigScope">[docs]</a>
+<span class="k">class</span> <span class="nc">ImmutableConfigScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A configuration scope that cannot be written to.</span>
 
 <span class="sd">    This is used for ConfigScopes passed on the command line.</span>
@@ -461,7 +487,10 @@
         <span class="k">return</span> <span class="s1">&#39;&lt;ImmutableConfigScope: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="InternalConfigScope"><a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope">[docs]</a><span class="k">class</span> <span class="nc">InternalConfigScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InternalConfigScope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope">[docs]</a>
+<span class="k">class</span> <span class="nc">InternalConfigScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An internal configuration scope that is not persisted to a file.</span>
 
 <span class="sd">    This is for Ramble internal use so that command-line options and</span>
@@ -480,15 +509,21 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">_mark_internal</span><span class="p">(</span>
                     <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">({</span><span class="n">section</span><span class="p">:</span> <span class="n">dsec</span><span class="p">}),</span> <span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="InternalConfigScope.get_section_filename"><a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.get_section_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<div class="viewcode-block" id="InternalConfigScope.get_section_filename">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.get_section_filename">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;Cannot get filename for InternalConfigScope.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="InternalConfigScope.get_section"><a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.get_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InternalConfigScope.get_section">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.get_section">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Just reads from an internal dictionary.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span></div>
+
 
     <span class="k">def</span> <span class="nf">_write_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This only validates, as the data is already in memory.&quot;&quot;&quot;</span>
@@ -500,9 +535,12 @@
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;InternalConfigScope: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-<div class="viewcode-block" id="InternalConfigScope.clear"><a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="InternalConfigScope.clear">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.clear">[docs]</a>
+    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># no cache to clear here.</span>
         <span class="k">pass</span></div>
+
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_process_dict_keyname_overrides</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -524,6 +562,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_config_mutator</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to mark all the methods in the Configuration class</span>
 <span class="sd">    that mutate the underlying configuration. Used to clear the</span>
@@ -536,7 +575,9 @@
     <span class="k">return</span> <span class="n">_method</span>
 
 
-<div class="viewcode-block" id="Configuration"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration">[docs]</a><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Configuration">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration">[docs]</a>
+<span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A full Ramble configuration, from a hierarchy of config files.</span>
 
 <span class="sd">    This class makes it easy to add a new scope on top of an existing one.</span>
@@ -555,7 +596,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format_updates</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Configuration.push_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.push_scope">[docs]</a>    <span class="nd">@_config_mutator</span>
+<div class="viewcode-block" id="Configuration.push_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.push_scope">[docs]</a>
+    <span class="nd">@_config_mutator</span>
     <span class="k">def</span> <span class="nf">push_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a higher precedence scope to the Configuration.&quot;&quot;&quot;</span>
         <span class="n">cmd_line_scope</span> <span class="o">=</span> <span class="kc">None</span>
@@ -570,16 +613,23 @@
         <span class="k">if</span> <span class="n">cmd_line_scope</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="s1">&#39;command_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd_line_scope</span></div>
 
-<div class="viewcode-block" id="Configuration.pop_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.pop_scope">[docs]</a>    <span class="nd">@_config_mutator</span>
+
+<div class="viewcode-block" id="Configuration.pop_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.pop_scope">[docs]</a>
+    <span class="nd">@_config_mutator</span>
     <span class="k">def</span> <span class="nf">pop_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove the highest precedence scope and return it.&quot;&quot;&quot;</span>
         <span class="n">name</span><span class="p">,</span> <span class="n">scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scope</span></div>
 
-<div class="viewcode-block" id="Configuration.remove_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.remove_scope">[docs]</a>    <span class="nd">@_config_mutator</span>
+
+<div class="viewcode-block" id="Configuration.remove_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.remove_scope">[docs]</a>
+    <span class="nd">@_config_mutator</span>
     <span class="k">def</span> <span class="nf">remove_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove scope by name; has no effect when ``scope_name`` does not exist&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">scope_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">file_scopes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -588,11 +638,16 @@
                 <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="n">ConfigScope</span>
                     <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="n">SingleFileScope</span><span class="p">)]</span>
 
-<div class="viewcode-block" id="Configuration.highest_precedence_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.highest_precedence_scope">[docs]</a>    <span class="k">def</span> <span class="nf">highest_precedence_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Configuration.highest_precedence_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.highest_precedence_scope">[docs]</a>
+    <span class="k">def</span> <span class="nf">highest_precedence_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Non-internal scope with highest precedence.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_scopes</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Configuration.highest_precedence_non_platform_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.highest_precedence_non_platform_scope">[docs]</a>    <span class="k">def</span> <span class="nf">highest_precedence_non_platform_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Configuration.highest_precedence_non_platform_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.highest_precedence_non_platform_scope">[docs]</a>
+    <span class="k">def</span> <span class="nf">highest_precedence_non_platform_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Non-internal non-platform scope with highest precedence</span>
 
 <span class="sd">        Platform-specific scopes are of the form scope/platform&quot;&quot;&quot;</span>
@@ -602,7 +657,10 @@
             <span class="n">highest</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">highest</span></div>
 
-<div class="viewcode-block" id="Configuration.matching_scopes"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.matching_scopes">[docs]</a>    <span class="k">def</span> <span class="nf">matching_scopes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg_expr</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Configuration.matching_scopes">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.matching_scopes">[docs]</a>
+    <span class="k">def</span> <span class="nf">matching_scopes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg_expr</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of all scopes whose names match the provided regular expression.</span>
 
@@ -610,6 +668,7 @@
 <span class="sd">        whose names begin with `command`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">reg_expr</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span></div>
+
 
     <span class="k">def</span> <span class="nf">_validate_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure that scope is valid in this configuration.</span>
@@ -635,13 +694,18 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid config scope: &#39;</span><span class="si">%s</span><span class="s2">&#39;.  Must be one of </span><span class="si">%s</span><span class="s2">&quot;</span>
                              <span class="o">%</span> <span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
-<div class="viewcode-block" id="Configuration.get_config_filename"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get_config_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<div class="viewcode-block" id="Configuration.get_config_filename">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get_config_filename">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_config_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;For some scope and section, get the name of the configuration file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_section_filename</span><span class="p">(</span><span class="n">section</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Configuration.clear_caches"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.clear_caches">[docs]</a>    <span class="nd">@_config_mutator</span>
+
+<div class="viewcode-block" id="Configuration.clear_caches">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.clear_caches">[docs]</a>
+    <span class="nd">@_config_mutator</span>
     <span class="k">def</span> <span class="nf">clear_caches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clears the caches for configuration files,</span>
 
@@ -649,7 +713,10 @@
         <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">scope</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Configuration.update_config"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.update_config">[docs]</a>    <span class="nd">@_config_mutator</span>
+
+<div class="viewcode-block" id="Configuration.update_config">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.update_config">[docs]</a>
+    <span class="nd">@_config_mutator</span>
     <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">update_data</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the configuration file for a particular scope.</span>
 
@@ -699,7 +766,10 @@
 
         <span class="n">scope</span><span class="o">.</span><span class="n">_write_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Configuration.get_config"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Configuration.get_config">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get configuration settings for a section.</span>
 
 <span class="sd">        If ``scope`` is ``None`` or not provided, return the merged contents</span>
@@ -724,6 +794,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_config_memoized</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
+
 
     <span class="nd">@llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">memoized</span>
     <span class="k">def</span> <span class="nf">_get_config_memoized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
@@ -765,7 +836,9 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
 
-<div class="viewcode-block" id="Configuration.get"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Configuration.get">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a config section or a single value from one.</span>
 
 <span class="sd">        Accepts a path syntax that allows us to grab nested config map</span>
@@ -795,7 +868,10 @@
 
         <span class="k">return</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="Configuration.set"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.set">[docs]</a>    <span class="nd">@_config_mutator</span>
+
+<div class="viewcode-block" id="Configuration.set">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.set">[docs]</a>
+    <span class="nd">@_config_mutator</span>
     <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience function for setting single values in config files.</span>
 
@@ -836,12 +912,15 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">section_data</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate over scopes in this configuration.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">scope</span>
 
-<div class="viewcode-block" id="Configuration.print_section"><a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.print_section">[docs]</a>    <span class="k">def</span> <span class="nf">print_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">blame</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Configuration.print_section">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.print_section">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">blame</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a configuration to stdout.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
@@ -849,10 +928,14 @@
             <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span>
                 <span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">blame</span><span class="o">=</span><span class="n">blame</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Error reading configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">section</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Error reading configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">section</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="override"><a class="viewcode-back" href="../../ramble.html#ramble.config.override">[docs]</a><span class="nd">@contextmanager</span>
+
+<div class="viewcode-block" id="override">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.override">[docs]</a>
+<span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">override</span><span class="p">(</span><span class="n">path_or_scope</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple way to override config settings within a context.</span>
 
@@ -890,6 +973,7 @@
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">scope</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">remove_scope</span><span class="p">(</span><span class="n">overrides</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">scope</span> <span class="ow">is</span> <span class="n">overrides</span></div>
+
 
 
 <span class="c1">#: configuration scopes added on the command line</span>
@@ -964,7 +1048,9 @@
 <span class="n">config</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">_config</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="add_from_file"><a class="viewcode-back" href="../../ramble.html#ramble.config.add_from_file">[docs]</a><span class="k">def</span> <span class="nf">add_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="add_from_file">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.add_from_file">[docs]</a>
+<span class="k">def</span> <span class="nf">add_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add updates to a config from a filename</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Get file as config dict</span>
@@ -987,7 +1073,10 @@
             <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../ramble.html#ramble.config.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="add">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.add">[docs]</a>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add the given configuration to the specified config scope.</span>
 <span class="sd">    Add accepts a path. If you want to add from a filename, use add_from_file&quot;&quot;&quot;</span>
 
@@ -1035,12 +1124,18 @@
     <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get"><a class="viewcode-back" href="../../ramble.html#ramble.config.get">[docs]</a><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.get">[docs]</a>
+<span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Module-level wrapper for ``Configuration.get()``.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set"><a class="viewcode-back" href="../../ramble.html#ramble.config.set">[docs]</a><span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="set">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.set">[docs]</a>
+<span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function for setting single values in config files.</span>
 
 <span class="sd">    Accepts the path syntax described in ``get()``.</span>
@@ -1048,15 +1143,22 @@
     <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_default_platform_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.add_default_platform_scope">[docs]</a><span class="k">def</span> <span class="nf">add_default_platform_scope</span><span class="p">(</span><span class="n">platform</span><span class="p">):</span>
+
+<div class="viewcode-block" id="add_default_platform_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.add_default_platform_scope">[docs]</a>
+<span class="k">def</span> <span class="nf">add_default_platform_scope</span><span class="p">(</span><span class="n">platform</span><span class="p">):</span>
     <span class="n">plat_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;defaults&#39;</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
     <span class="n">plat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">configuration_paths</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">platform</span><span class="p">)</span>
     <span class="n">config</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">(</span><span class="n">plat_name</span><span class="p">,</span> <span class="n">plat_path</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="scopes"><a class="viewcode-back" href="../../ramble.html#ramble.config.scopes">[docs]</a><span class="k">def</span> <span class="nf">scopes</span><span class="p">():</span>
+
+<div class="viewcode-block" id="scopes">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.scopes">[docs]</a>
+<span class="k">def</span> <span class="nf">scopes</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to get list of configuration scopes.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">scopes</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_validate_section_name</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
@@ -1067,7 +1169,9 @@
             <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_schemas</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
 
 
-<div class="viewcode-block" id="validate"><a class="viewcode-back" href="../../ramble.html#ramble.config.validate">[docs]</a><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="validate">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.validate">[docs]</a>
+<span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate data read in from a Ramble YAML file.</span>
 
 <span class="sd">    Arguments:</span>
@@ -1105,7 +1209,10 @@
     <span class="k">return</span> <span class="n">test_data</span></div>
 
 
-<div class="viewcode-block" id="read_config_file"><a class="viewcode-back" href="../../ramble.html#ramble.config.read_config_file">[docs]</a><span class="k">def</span> <span class="nf">read_config_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="read_config_file">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.read_config_file">[docs]</a>
+<span class="k">def</span> <span class="nf">read_config_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a YAML configuration file.</span>
 
 <span class="sd">    User can provide a schema for validation. If no schema is provided,</span>
@@ -1151,6 +1258,7 @@
             <span class="s2">&quot;Error reading configuration file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_override</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test if a ramble YAML string is an override.</span>
 
@@ -1182,7 +1290,9 @@
     <span class="k">return</span> <span class="n">d</span>
 
 
-<div class="viewcode-block" id="get_valid_type"><a class="viewcode-back" href="../../ramble.html#ramble.config.get_valid_type">[docs]</a><span class="k">def</span> <span class="nf">get_valid_type</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="get_valid_type">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.get_valid_type">[docs]</a>
+<span class="k">def</span> <span class="nf">get_valid_type</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an instance of a type that will pass validation for path.</span>
 
 <span class="sd">    The instance is created by calling the constructor with no arguments.</span>
@@ -1223,7 +1333,10 @@
     <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Cannot determine valid type for path &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="merge_yaml"><a class="viewcode-back" href="../../ramble.html#ramble.config.merge_yaml">[docs]</a><span class="k">def</span> <span class="nf">merge_yaml</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+
+<div class="viewcode-block" id="merge_yaml">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.merge_yaml">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_yaml</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merges source into dest; entries in source take precedence over dest.</span>
 
 <span class="sd">    This routine may modify dest and should be assigned to dest, in</span>
@@ -1284,11 +1397,14 @@
     <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
 
 
+
 <span class="c1">#</span>
 <span class="c1"># Process a path argument to config.set() that may contain overrides (&#39;::&#39; or</span>
 <span class="c1"># trailing &#39;:&#39;)</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="process_config_path"><a class="viewcode-back" href="../../ramble.html#ramble.config.process_config_path">[docs]</a><span class="k">def</span> <span class="nf">process_config_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="process_config_path">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.process_config_path">[docs]</a>
+<span class="k">def</span> <span class="nf">process_config_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">syaml</span><span class="o">.</span><span class="n">rambleYAMLError</span><span class="p">(</span><span class="s2">&quot;Illegal leading `:&#39; in path `</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span>
@@ -1309,10 +1425,13 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
+
 <span class="c1">#</span>
 <span class="c1"># Settings for commands that modify configuration</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="default_modify_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.default_modify_scope">[docs]</a><span class="k">def</span> <span class="nf">default_modify_scope</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s1">&#39;config&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="default_modify_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.default_modify_scope">[docs]</a>
+<span class="k">def</span> <span class="nf">default_modify_scope</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s1">&#39;config&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the config scope that commands should modify by default.</span>
 
 <span class="sd">    Commands that modify configuration by default modify the *highest*</span>
@@ -1331,12 +1450,16 @@
             <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">highest_precedence_non_platform_scope</span><span class="p">()</span><span class="o">.</span><span class="n">name</span></div>
 
 
-<div class="viewcode-block" id="default_list_scope"><a class="viewcode-back" href="../../ramble.html#ramble.config.default_list_scope">[docs]</a><span class="k">def</span> <span class="nf">default_list_scope</span><span class="p">():</span>
+
+<div class="viewcode-block" id="default_list_scope">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.default_list_scope">[docs]</a>
+<span class="k">def</span> <span class="nf">default_list_scope</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the config scope that is listed by default.</span>
 
 <span class="sd">    Commands that list configuration list *all* scopes (merged) by default.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="kc">None</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_update_in_memory</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
@@ -1357,7 +1480,9 @@
     <span class="k">return</span> <span class="n">changed</span>
 
 
-<div class="viewcode-block" id="ensure_latest_format_fn"><a class="viewcode-back" href="../../ramble.html#ramble.config.ensure_latest_format_fn">[docs]</a><span class="k">def</span> <span class="nf">ensure_latest_format_fn</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+<div class="viewcode-block" id="ensure_latest_format_fn">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ensure_latest_format_fn">[docs]</a>
+<span class="k">def</span> <span class="nf">ensure_latest_format_fn</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a function that takes as input a dictionary read from</span>
 <span class="sd">    a configuration file and update it to the latest format.</span>
 
@@ -1374,7 +1499,10 @@
     <span class="k">return</span> <span class="n">update_fn</span></div>
 
 
-<div class="viewcode-block" id="use_configuration"><a class="viewcode-back" href="../../ramble.html#ramble.config.use_configuration">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+
+<div class="viewcode-block" id="use_configuration">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.use_configuration">[docs]</a>
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span> <span class="nf">use_configuration</span><span class="p">(</span><span class="o">*</span><span class="n">scopes_or_paths</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the configuration scopes passed as arguments within the</span>
 <span class="sd">    context manager.</span>
@@ -1405,6 +1533,7 @@
         <span class="n">config</span> <span class="o">=</span> <span class="n">saved_config</span></div>
 
 
+
 <span class="nd">@llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">memoized</span>
 <span class="k">def</span> <span class="nf">_config_from</span><span class="p">(</span><span class="n">scopes_or_paths</span><span class="p">):</span>
     <span class="n">scopes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1424,19 +1553,30 @@
     <span class="k">return</span> <span class="n">configuration</span>
 
 
-<div class="viewcode-block" id="ConfigError"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigError">[docs]</a><span class="k">class</span> <span class="nc">ConfigError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfigError">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigError">[docs]</a>
+<span class="k">class</span> <span class="nc">ConfigError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass for all ramble config related errors.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ConfigSectionError"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigSectionError">[docs]</a><span class="k">class</span> <span class="nc">ConfigSectionError</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConfigSectionError">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigSectionError">[docs]</a>
+<span class="k">class</span> <span class="nc">ConfigSectionError</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error for referring to a bad config section name in a configuration.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ConfigFileError"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigFileError">[docs]</a><span class="k">class</span> <span class="nc">ConfigFileError</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConfigFileError">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigFileError">[docs]</a>
+<span class="k">class</span> <span class="nc">ConfigFileError</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Issue reading or accessing a configuration file.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ConfigFormatError"><a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigFormatError">[docs]</a><span class="k">class</span> <span class="nc">ConfigFormatError</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConfigFormatError">
+<a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigFormatError">[docs]</a>
+<span class="k">class</span> <span class="nc">ConfigFormatError</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a configuration format does not match its schema.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validation_error</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1507,6 +1647,7 @@
 
         <span class="c1"># give up and return None if nothing worked</span>
         <span class="k">return</span> <span class="kc">None</span></div>
+
 </pre></div>
 
            </div>
@@ -1517,7 +1658,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

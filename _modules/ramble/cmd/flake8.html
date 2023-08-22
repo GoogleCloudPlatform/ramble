@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -143,7 +143,9 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
 
-<div class="viewcode-block" id="is_application"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.is_application">[docs]</a><span class="k">def</span> <span class="nf">is_application</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<div class="viewcode-block" id="is_application">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.is_application">[docs]</a>
+<span class="k">def</span> <span class="nf">is_application</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether flake8 should consider a file as a core file or a application.</span>
 
 <span class="sd">    We run flake8 with different exceptions for the core and for</span>
@@ -151,6 +153,7 @@
 <span class="sd">    into applications.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;var/ramble/repos/&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;docs/tutorial/examples&#39;</span> <span class="ow">in</span> <span class="n">f</span></div>
+
 
 
 <span class="c1">#: List of directories to exclude from checks.</span>
@@ -214,7 +217,9 @@
     <span class="k">for</span> <span class="n">file_pattern</span><span class="p">,</span> <span class="n">error_dict</span> <span class="ow">in</span> <span class="n">pattern_exemptions</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="changed_files"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.changed_files">[docs]</a><span class="k">def</span> <span class="nf">changed_files</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">untracked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">all_files</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="changed_files">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.changed_files">[docs]</a>
+<span class="k">def</span> <span class="nf">changed_files</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">untracked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">all_files</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get list of changed files in the Ramble repository.&quot;&quot;&quot;</span>
 
     <span class="n">git</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -261,7 +266,10 @@
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">changed</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_pattern_exemptions"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.add_pattern_exemptions">[docs]</a><span class="k">def</span> <span class="nf">add_pattern_exemptions</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">codes</span><span class="p">):</span>
+
+<div class="viewcode-block" id="add_pattern_exemptions">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.add_pattern_exemptions">[docs]</a>
+<span class="k">def</span> <span class="nf">add_pattern_exemptions</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">codes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a flake8 exemption to a line.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">line</span>
@@ -297,7 +305,10 @@
     <span class="k">return</span> <span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div>
 
 
-<div class="viewcode-block" id="filter_file"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.filter_file">[docs]</a><span class="k">def</span> <span class="nf">filter_file</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="filter_file">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.filter_file">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_file</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a single file through all the patterns in pattern_exemptions.&quot;&quot;&quot;</span>
 
     <span class="c1"># Prior to Python 3.8, `noqa: F811` needed to be placed on the `@when` line</span>
@@ -341,7 +352,10 @@
                     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="s1">&#39;--base&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;select base branch for collecting list of modified files&quot;</span><span class="p">)</span>
@@ -365,7 +379,10 @@
         <span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;specific files to check&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="flake8"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.flake8">[docs]</a><span class="k">def</span> <span class="nf">flake8</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="flake8">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.flake8.flake8">[docs]</a>
+<span class="k">def</span> <span class="nf">flake8</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">flake8_cmd</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;flake8&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">flake8_cmd</span><span class="p">)</span>
 
@@ -481,6 +498,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Temporary files are in: &#39;</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -491,7 +509,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

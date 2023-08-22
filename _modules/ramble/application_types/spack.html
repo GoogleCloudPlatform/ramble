@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -137,15 +137,23 @@
 <span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
 
 
-<div class="viewcode-block" id="section_title"><a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.section_title">[docs]</a><span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<div class="viewcode-block" id="section_title">
+<a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.section_title">[docs]</a>
+<span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">header_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
 
 
-<div class="viewcode-block" id="subsection_title"><a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.subsection_title">[docs]</a><span class="k">def</span> <span class="nf">subsection_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+
+<div class="viewcode-block" id="subsection_title">
+<a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.subsection_title">[docs]</a>
+<span class="k">def</span> <span class="nf">subsection_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">level1_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
 
 
-<div class="viewcode-block" id="SpackApplication"><a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication">[docs]</a><span class="k">class</span> <span class="nc">SpackApplication</span><span class="p">(</span><span class="n">ApplicationBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackApplication">
+<a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication">[docs]</a>
+<span class="k">class</span> <span class="nc">SpackApplication</span><span class="p">(</span><span class="n">ApplicationBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialized class for applications that are installed from spack.</span>
 
 <span class="sd">    This class can be used to set up an application that will be installed</span>
@@ -493,18 +501,28 @@
     <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_activate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_deactivate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpackApplication.spack_source"><a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_source">[docs]</a>    <span class="k">def</span> <span class="nf">spack_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SpackApplication.spack_source">
+<a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_source">[docs]</a>
+    <span class="k">def</span> <span class="nf">spack_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_source_command</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SpackApplication.spack_activate"><a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_activate">[docs]</a>    <span class="k">def</span> <span class="nf">spack_activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackApplication.spack_activate">
+<a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_activate">[docs]</a>
+    <span class="k">def</span> <span class="nf">spack_activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{spack_env}</span><span class="s1">&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
         <span class="n">cmds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_activate_command</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">cmds</span></div>
 
-<div class="viewcode-block" id="SpackApplication.spack_deactivate"><a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">spack_deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_deactivate_command</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="SpackApplication.spack_deactivate">
+<a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_deactivate">[docs]</a>
+    <span class="k">def</span> <span class="nf">spack_deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_deactivate_command</span><span class="p">()</span></div>
+</div>
+
 </pre></div>
 
            </div>
@@ -515,7 +533,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

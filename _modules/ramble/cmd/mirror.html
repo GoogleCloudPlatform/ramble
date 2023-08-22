@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -141,7 +141,9 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;no_checksum&#39;</span><span class="p">])</span>
 
     <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span>
@@ -206,18 +208,27 @@
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to read from&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mirror_add"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_add">[docs]</a><span class="k">def</span> <span class="nf">mirror_add</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mirror_add">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_add">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror_add</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a mirror to Ramble.&quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mirror_remove"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_remove">[docs]</a><span class="k">def</span> <span class="nf">mirror_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mirror_remove">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_remove">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove a mirror by name.&quot;&quot;&quot;</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mirror_set_url"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_set_url">[docs]</a><span class="k">def</span> <span class="nf">mirror_set_url</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mirror_set_url">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_set_url">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror_set_url</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Change the URL of a mirror.&quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
     <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
@@ -266,7 +277,10 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;No changes made to mirror </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mirror_list"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_list">[docs]</a><span class="k">def</span> <span class="nf">mirror_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mirror_list">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_list">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print out available mirrors to the console.&quot;&quot;&quot;</span>
 
     <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
@@ -275,6 +289,7 @@
         <span class="k">return</span>
 
     <span class="n">mirrors</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_read_specs_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
@@ -292,7 +307,9 @@
     <span class="k">return</span> <span class="n">specs</span>
 
 
-<div class="viewcode-block" id="mirror_destroy"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_destroy">[docs]</a><span class="k">def</span> <span class="nf">mirror_destroy</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="mirror_destroy">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror_destroy">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror_destroy</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a url, recursively delete everything under it.&quot;&quot;&quot;</span>
     <span class="n">mirror_url</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -305,7 +322,10 @@
     <span class="n">web_util</span><span class="o">.</span><span class="n">remove_url</span><span class="p">(</span><span class="n">mirror_url</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mirror"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror">[docs]</a><span class="k">def</span> <span class="nf">mirror</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mirror">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror">[docs]</a>
+<span class="k">def</span> <span class="nf">mirror</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">action</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;destroy&#39;</span><span class="p">:</span> <span class="n">mirror_destroy</span><span class="p">,</span>
               <span class="s1">&#39;add&#39;</span><span class="p">:</span> <span class="n">mirror_add</span><span class="p">,</span>
               <span class="s1">&#39;remove&#39;</span><span class="p">:</span> <span class="n">mirror_remove</span><span class="p">,</span>
@@ -317,6 +337,7 @@
         <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;config:checksum&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;command_line&#39;</span><span class="p">)</span>
 
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">mirror_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -327,7 +348,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

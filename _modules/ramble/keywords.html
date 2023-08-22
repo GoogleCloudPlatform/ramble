@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -130,7 +130,9 @@
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 
 
-<div class="viewcode-block" id="Keywords"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords">[docs]</a><span class="k">class</span> <span class="nc">Keywords</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Keywords">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords">[docs]</a>
+<span class="k">class</span> <span class="nc">Keywords</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent known ramble keywords.</span>
 
 <span class="sd">    Each keyword can have a type. Valid types are in the class level</span>
@@ -184,33 +186,47 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Keywords.is_valid"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_valid">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Keywords.is_valid">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_valid">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is valid as a known keyword&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Keywords.is_reserved"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_reserved">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Keywords.is_reserved">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_reserved">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_reserved</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is reserved&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span></div>
 
-<div class="viewcode-block" id="Keywords.is_optional"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_optional">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Keywords.is_optional">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_optional">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_optional</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is optional&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">optional</span></div>
 
-<div class="viewcode-block" id="Keywords.is_required"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_required">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Keywords.is_required">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_required">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_required</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is required&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">required</span></div>
 
-<div class="viewcode-block" id="Keywords.check_reserved_keys"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.check_reserved_keys">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Keywords.check_reserved_keys">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.check_reserved_keys">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_reserved_keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">definitions</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check a dictionary of variable definitions for reserved keywords&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">definitions</span><span class="p">:</span>
@@ -221,7 +237,10 @@
                 <span class="k">raise</span> <span class="n">RambleKeywordError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keyword &quot;</span><span class="si">{</span><span class="n">definition</span><span class="si">}</span><span class="s1">&quot; has been defined, &#39;</span> <span class="o">+</span>
                                          <span class="s1">&#39;but is reserved by ramble.&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Keywords.check_required_keys"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.check_required_keys">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Keywords.check_required_keys">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.check_required_keys">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_required_keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">definitions</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check a dictionary of variable definitions for all required keywords&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">definitions</span><span class="p">:</span>
@@ -240,14 +259,19 @@
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required_set</span><span class="p">:</span>
                 <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Required key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; is not defined&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">RambleKeywordError</span><span class="p">(</span><span class="s1">&#39;One or more required keys &#39;</span> <span class="o">+</span>
-                                     <span class="s1">&#39;are not defined within an experiment.&#39;</span><span class="p">)</span></div></div>
+                                     <span class="s1">&#39;are not defined within an experiment.&#39;</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="n">keywords</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">Keywords</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="RambleKeywordError"><a class="viewcode-back" href="../../ramble.html#ramble.keywords.RambleKeywordError">[docs]</a><span class="k">class</span> <span class="nc">RambleKeywordError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+<div class="viewcode-block" id="RambleKeywordError">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.RambleKeywordError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleKeywordError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass for all errors to do with Ramble Keywords&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -258,7 +282,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -130,7 +130,9 @@
 <span class="kn">from</span> <span class="nn">spack.util.environment</span> <span class="kn">import</span> <span class="n">EnvironmentModifications</span>
 
 
-<div class="viewcode-block" id="activate_header"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.activate_header">[docs]</a><span class="k">def</span> <span class="nf">activate_header</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">shell</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="activate_header">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.activate_header">[docs]</a>
+<span class="k">def</span> <span class="nf">activate_header</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">shell</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1"># Construct the commands to run</span>
     <span class="n">cmds</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span> <span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;csh&#39;</span><span class="p">:</span>
@@ -175,7 +177,10 @@
     <span class="k">return</span> <span class="n">cmds</span></div>
 
 
-<div class="viewcode-block" id="deactivate_header"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.deactivate_header">[docs]</a><span class="k">def</span> <span class="nf">deactivate_header</span><span class="p">(</span><span class="n">shell</span><span class="p">):</span>
+
+<div class="viewcode-block" id="deactivate_header">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.deactivate_header">[docs]</a>
+<span class="k">def</span> <span class="nf">deactivate_header</span><span class="p">(</span><span class="n">shell</span><span class="p">):</span>
     <span class="n">cmds</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span> <span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;csh&#39;</span><span class="p">:</span>
         <span class="n">cmds</span> <span class="o">+=</span> <span class="s1">&#39;unsetenv </span><span class="si">%s</span><span class="s1">;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">ramble_workspace_var</span><span class="p">)</span>
@@ -209,7 +214,10 @@
     <span class="k">return</span> <span class="n">cmds</span></div>
 
 
-<div class="viewcode-block" id="activate"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.activate">[docs]</a><span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
+
+<div class="viewcode-block" id="activate">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.activate">[docs]</a>
+<span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Activate an environment and append environment modifications</span>
 
@@ -241,7 +249,10 @@
     <span class="k">return</span> <span class="n">env_mods</span></div>
 
 
-<div class="viewcode-block" id="deactivate"><a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.deactivate">[docs]</a><span class="k">def</span> <span class="nf">deactivate</span><span class="p">():</span>
+
+<div class="viewcode-block" id="deactivate">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.shell.deactivate">[docs]</a>
+<span class="k">def</span> <span class="nf">deactivate</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Deactivate an environment and collect corresponding environment modifications.</span>
 
@@ -262,6 +273,7 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">env_mods</span></div>
+
 </pre></div>
 
            </div>
@@ -272,7 +284,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

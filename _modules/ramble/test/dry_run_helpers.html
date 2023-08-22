@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -129,7 +129,9 @@
 <span class="n">SCOPES</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;SCOPES&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;workspace&#39;</span><span class="p">,</span> <span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="s1">&#39;workload&#39;</span><span class="p">,</span> <span class="s1">&#39;experiment&#39;</span><span class="p">])</span>
 
 
-<div class="viewcode-block" id="dry_run_config"><a class="viewcode-back" href="../../../ramble.test.html#ramble.test.dry_run_helpers.dry_run_config">[docs]</a><span class="k">def</span> <span class="nf">dry_run_config</span><span class="p">(</span><span class="n">section_name</span><span class="p">,</span> <span class="n">injections</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span>
+<div class="viewcode-block" id="dry_run_config">
+<a class="viewcode-back" href="../../../ramble.test.html#ramble.test.dry_run_helpers.dry_run_config">[docs]</a>
+<span class="k">def</span> <span class="nf">dry_run_config</span><span class="p">(</span><span class="n">section_name</span><span class="p">,</span> <span class="n">injections</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span>
                    <span class="n">app_name</span><span class="p">,</span> <span class="n">wl_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a new configuration with modifiers injected</span>
 
@@ -193,6 +195,7 @@
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">syaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">ramble_dict</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">f</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -203,7 +206,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

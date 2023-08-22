@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -139,7 +139,9 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup the repo command parser.</span>
 
 <span class="sd">    The repo command helps manage Ramble repositories, which are</span>
@@ -201,7 +203,10 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">remove_parser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;repo_type&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="repo_create"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_create">[docs]</a><span class="k">def</span> <span class="nf">repo_create</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="repo_create">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_create">[docs]</a>
+<span class="k">def</span> <span class="nf">repo_create</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new repository.&quot;&quot;&quot;</span>
     <span class="n">obj_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
     <span class="n">subdir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">subdirectory</span>
@@ -216,7 +221,10 @@
             <span class="sa">f</span><span class="s1">&#39;ramble repo -t </span><span class="si">{</span><span class="n">obj_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> add </span><span class="si">{</span><span class="n">full_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repo_add"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_add">[docs]</a><span class="k">def</span> <span class="nf">repo_add</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="repo_add">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_add">[docs]</a>
+<span class="k">def</span> <span class="nf">repo_add</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a repository to Ramble&#39;s configuration.&quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">path</span>
     <span class="n">obj_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
@@ -249,7 +257,10 @@
     <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="n">obj_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> repo with namespace &#39;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repo_remove"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_remove">[docs]</a><span class="k">def</span> <span class="nf">repo_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="repo_remove">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_remove">[docs]</a>
+<span class="k">def</span> <span class="nf">repo_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove a repository from Ramble&#39;s configuration.&quot;&quot;&quot;</span>
     <span class="n">obj_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
     <span class="n">type_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">obj_type</span><span class="p">]</span>
@@ -283,7 +294,10 @@
     <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">obj_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> repository with path or namespace: </span><span class="si">{</span><span class="n">namespace_or_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repo_list"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_list">[docs]</a><span class="k">def</span> <span class="nf">repo_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="repo_list">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo_list">[docs]</a>
+<span class="k">def</span> <span class="nf">repo_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Show registered repositories and their namespaces.&quot;&quot;&quot;</span>
     <span class="n">obj_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
     <span class="n">type_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">obj_type</span><span class="p">]</span>
@@ -310,7 +324,10 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">root</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="repo"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo">[docs]</a><span class="k">def</span> <span class="nf">repo</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="repo">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.repo.repo">[docs]</a>
+<span class="k">def</span> <span class="nf">repo</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">action</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;create&#39;</span><span class="p">:</span> <span class="n">repo_create</span><span class="p">,</span>
               <span class="s1">&#39;list&#39;</span><span class="p">:</span> <span class="n">repo_list</span><span class="p">,</span>
               <span class="s1">&#39;add&#39;</span><span class="p">:</span> <span class="n">repo_add</span><span class="p">,</span>
@@ -321,6 +338,7 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repository type &#39;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&#39; is not valid.&quot;</span><span class="p">)</span>
 
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">repo_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -331,7 +349,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

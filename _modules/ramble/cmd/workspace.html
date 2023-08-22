@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -173,7 +173,9 @@
 <span class="p">]</span>
 
 
-<div class="viewcode-block" id="workspace_activate_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_activate_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_activate_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="workspace_activate_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_activate_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_activate_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the current workspace&quot;&quot;&quot;</span>
     <span class="n">shells</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
     <span class="n">shells</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -205,7 +207,10 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;name of workspace to activate&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create_temp_workspace_directory"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.create_temp_workspace_directory">[docs]</a><span class="k">def</span> <span class="nf">create_temp_workspace_directory</span><span class="p">():</span>
+
+<div class="viewcode-block" id="create_temp_workspace_directory">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.create_temp_workspace_directory">[docs]</a>
+<span class="k">def</span> <span class="nf">create_temp_workspace_directory</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the path of a temporary directory in which to</span>
 <span class="sd">    create a workspace</span>
@@ -213,7 +218,10 @@
     <span class="k">return</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ramble-&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_activate"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_activate">[docs]</a><span class="k">def</span> <span class="nf">workspace_activate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_activate">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_activate">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_activate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">activate_workspace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">dir</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">temp</span><span class="p">:</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;ramble workspace activate requires a workspace name, directory, or --temp&#39;</span><span class="p">)</span>
 
@@ -269,7 +277,10 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmds</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_deactivate_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_deactivate_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_deactivate_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_deactivate_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_deactivate_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_deactivate_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;deactivate any active workspace in the shell&quot;&quot;&quot;</span>
     <span class="n">shells</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
     <span class="n">shells</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -286,7 +297,10 @@
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print bat commands to activate the environment&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_deactivate"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_deactivate">[docs]</a><span class="k">def</span> <span class="nf">workspace_deactivate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_deactivate">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_deactivate">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_deactivate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">shell</span><span class="p">:</span>
         <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">shell_init_instructions</span><span class="p">(</span>
             <span class="s2">&quot;ramble workspace deactivate&quot;</span><span class="p">,</span>
@@ -309,7 +323,10 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmds</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_create_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_create_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_create_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_create_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_create_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_create_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;create a new workspace&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;create_workspace&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;wrkspc&#39;</span><span class="p">,</span>
@@ -325,9 +342,13 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;create a workspace in a specific directory&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_create"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_create">[docs]</a><span class="k">def</span> <span class="nf">workspace_create</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_create">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_create">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_create</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">_workspace_create</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">create_workspace</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dir</span><span class="p">,</span>
                       <span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">template_execute</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_workspace_create</span><span class="p">(</span><span class="n">name_or_path</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -373,7 +394,9 @@
     <span class="k">return</span> <span class="n">workspace</span>
 
 
-<div class="viewcode-block" id="workspace_remove_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_remove_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_remove_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="workspace_remove_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_remove_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_remove_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;remove an existing workspace&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;rm_wrkspc&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;wrkspc&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
@@ -381,7 +404,10 @@
     <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;yes_to_all&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="workspace_remove"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_remove">[docs]</a><span class="k">def</span> <span class="nf">workspace_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_remove">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_remove">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove a *named* workspace.</span>
 
 <span class="sd">    This removes an environment managed by Ramble. Directory workspaces</span>
@@ -412,19 +438,28 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Successfully removed workspace &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">workspace</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_concretize_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_concretize_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_concretize_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_concretize_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_concretize_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_concretize_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Concretize a workspace&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="workspace_concretize"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_concretize">[docs]</a><span class="k">def</span> <span class="nf">workspace_concretize</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_concretize">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_concretize">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_concretize</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace concretize&#39;</span><span class="p">)</span>
 
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Concretizing workspace&#39;</span><span class="p">)</span>
     <span class="n">ws</span><span class="o">.</span><span class="n">concretize</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="workspace_setup_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_setup_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_setup_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_setup_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_setup_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_setup_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup a workspace&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--dry-run&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span>
@@ -434,7 +469,10 @@
              <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_setup"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_setup">[docs]</a><span class="k">def</span> <span class="nf">workspace_setup</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_setup">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_setup">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_setup</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace setup&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
@@ -445,7 +483,10 @@
         <span class="n">ws</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">(</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_analyze_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_analyze_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_analyze_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_analyze_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_analyze_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_analyze_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Analyze a workspace&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--formats&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;output_formats&#39;</span><span class="p">,</span>
@@ -470,7 +511,10 @@
         <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_analyze"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_analyze">[docs]</a><span class="k">def</span> <span class="nf">workspace_analyze</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_analyze">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_analyze">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_analyze</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace analyze&#39;</span><span class="p">)</span>
     <span class="n">ws</span><span class="o">.</span><span class="n">always_print_foms</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">always_print_foms</span>
 
@@ -484,14 +528,20 @@
         <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">upload_results</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">results</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_info_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_info_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_info_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_info_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_info_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_info_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about a workspace&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;level of verbosity. Add flags to &#39;</span> <span class="o">+</span>
                                 <span class="s1">&#39;increase description of workspace&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_info"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_info">[docs]</a><span class="k">def</span> <span class="nf">workspace_info</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_info">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_info">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_info</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace info&#39;</span><span class="p">)</span>
 
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Workspace: &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ws</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -588,17 +638,23 @@
     <span class="n">software_environments</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">SoftwareEnvironments</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
     <span class="n">software_environments</span><span class="o">.</span><span class="n">print_environments</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span></div>
 
+
 <span class="c1">#</span>
 <span class="c1"># workspace list</span>
 <span class="c1">#</span>
 
 
-<div class="viewcode-block" id="workspace_list_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_list_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_list_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="workspace_list_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_list_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_list_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;list available workspaces&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="workspace_list"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_list">[docs]</a><span class="k">def</span> <span class="nf">workspace_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_list">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_list">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">names</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">all_workspace_names</span><span class="p">()</span>
 
     <span class="n">color_names</span> <span class="o">=</span> <span class="p">[]</span>
@@ -617,7 +673,10 @@
     <span class="n">colify</span><span class="p">(</span><span class="n">color_names</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_edit_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_edit_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_edit_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_edit_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_edit_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_edit_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;edit workspace config or template&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--config_only&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;config_only&#39;</span><span class="p">,</span>
@@ -636,7 +695,10 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print the file name that would be edited&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_edit"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_edit">[docs]</a><span class="k">def</span> <span class="nf">workspace_edit</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_edit">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_edit">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_edit</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ramble_ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">find_workspace_path</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ramble_ws</span><span class="p">:</span>
@@ -660,7 +722,10 @@
         <span class="n">editor</span><span class="p">(</span><span class="o">*</span><span class="n">edit_files</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_archive_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_archive_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_archive_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_archive_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_archive_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_archive_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;archive current workspace state&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--tar-archive&#39;</span><span class="p">,</span> <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
@@ -673,14 +738,20 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;URL to upload tar archive into. Does nothing if `-t` is not specified.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_archive"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_archive">[docs]</a><span class="k">def</span> <span class="nf">workspace_archive</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_archive">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_archive">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_archive</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace archive&#39;</span><span class="p">)</span>
 
     <span class="n">ws</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">create_tar</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">tar_archive</span><span class="p">,</span>
                <span class="n">archive_url</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">upload_url</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_mirror_setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_mirror_setup_parser">[docs]</a><span class="k">def</span> <span class="nf">workspace_mirror_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_mirror_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_mirror_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_mirror_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;mirror current workspace state&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;mirror_path&#39;</span><span class="p">,</span>
@@ -695,7 +766,10 @@
              <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace_mirror"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_mirror">[docs]</a><span class="k">def</span> <span class="nf">workspace_mirror</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace_mirror">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_mirror">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_mirror</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace archive&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
@@ -705,11 +779,14 @@
     <span class="n">ws</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">(</span><span class="s1">&#39;mirror&#39;</span><span class="p">)</span></div>
 
 
+
 <span class="c1">#: Dictionary mapping subcommand names and aliases to functions</span>
 <span class="n">subcommand_functions</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span>
                                   <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;workspace_command&#39;</span><span class="p">)</span>
 
@@ -734,10 +811,14 @@
         <span class="n">setup_parser_cmd</span><span class="p">(</span><span class="n">subsubparser</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workspace"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace">[docs]</a><span class="k">def</span> <span class="nf">workspace</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="workspace">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Look for a function called environment_&lt;name&gt; and call it.&quot;&quot;&quot;</span>
     <span class="n">action</span> <span class="o">=</span> <span class="n">subcommand_functions</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">workspace_command</span><span class="p">]</span>
     <span class="n">action</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -748,7 +829,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

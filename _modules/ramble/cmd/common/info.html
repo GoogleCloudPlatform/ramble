@@ -11,11 +11,11 @@
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -134,25 +134,37 @@
 <span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
 
 
-<div class="viewcode-block" id="setup_info_parser"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.setup_info_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_info_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_info_parser">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.setup_info_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_info_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
     <span class="n">obj_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;singular&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;singular&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> name&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="section_title"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.section_title">[docs]</a><span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+
+<div class="viewcode-block" id="section_title">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.section_title">[docs]</a>
+<span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">header_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
 
 
-<div class="viewcode-block" id="print_text_info"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.print_text_info">[docs]</a><span class="k">def</span> <span class="nf">print_text_info</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+
+<div class="viewcode-block" id="print_text_info">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.print_text_info">[docs]</a>
+<span class="k">def</span> <span class="nf">print_text_info</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="n">obj</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s1">&#39;long&#39;</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="print_info"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.print_info">[docs]</a><span class="k">def</span> <span class="nf">print_info</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="print_info">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.print_info">[docs]</a>
+<span class="k">def</span> <span class="nf">print_info</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
     <span class="n">obj_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
     <span class="n">obj_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">obj_def</span><span class="p">[</span><span class="s1">&#39;singular&#39;</span><span class="p">])</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
     <span class="n">print_text_info</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -163,7 +175,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

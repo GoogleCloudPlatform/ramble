@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e259d695"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -115,7 +115,7 @@
            <div itemprop="articleBody">
              
   <section id="ramble-mirrors">
-<span id="mirror-config"></span><h1>Ramble Mirrors<a class="headerlink" href="#ramble-mirrors" title="Permalink to this heading"></a></h1>
+<span id="mirror-config"></span><h1>Ramble Mirrors<a class="headerlink" href="#ramble-mirrors" title="Link to this heading"></a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">setup</span></code> command can take a long time (or fail)
 to run when an application’s input files are large or internet access
 to input file URLs is slow or restricted. Since the setup command runs
@@ -142,7 +142,7 @@ The <code class="docutils literal notranslate"><span class="pre">spack</span> <s
 are also documented via <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">mirror</span> <span class="pre">-h</span></code>. Likewise, short descriptions of
 <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">mirror</span></code> commands can be found via <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">mirror</span> <span class="pre">-h</span></code>.</p>
 <section id="creating-ramble-mirrors">
-<h2>Creating Ramble Mirrors<a class="headerlink" href="#creating-ramble-mirrors" title="Permalink to this heading"></a></h2>
+<h2>Creating Ramble Mirrors<a class="headerlink" href="#creating-ramble-mirrors" title="Link to this heading"></a></h2>
 <p>In an activated named or anonymous workspace (specified via the <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">-d</span></code> argument), write
 a configuration for any applications and application experiment workloads you want to create
 a mirror for.</p>
@@ -156,7 +156,7 @@ indicates that it is an optional argument. The path must be located on the local
 filesystem.</p>
 </section>
 <section id="mirror-structure">
-<h2>Mirror Structure<a class="headerlink" href="#mirror-structure" title="Permalink to this heading"></a></h2>
+<h2>Mirror Structure<a class="headerlink" href="#mirror-structure" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">create</span></code> creates ramble and spack mirrors with a structure
 similar to the following, which uses a mirror of wrfv3 as an example:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span>workspace
@@ -201,7 +201,7 @@ configuration and create a multi-application mirror in a single run.</p>
 <p>Once your mirrors are created locally, you can copy them to any fileserver close to the intended installation.</p>
 </section>
 <section id="using-created-mirrors">
-<span id="id1"></span><h2>Using Created Mirrors<a class="headerlink" href="#using-created-mirrors" title="Permalink to this heading"></a></h2>
+<span id="id1"></span><h2>Using Created Mirrors<a class="headerlink" href="#using-created-mirrors" title="Link to this heading"></a></h2>
 <p>If you have copied the directories into, for example <code class="docutils literal notranslate"><span class="pre">URLBASE</span></code>, with
 inputs and software subdirectories under <code class="docutils literal notranslate"><span class="pre">URLBASE</span></code>, you could use them as follows:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>mirror<span class="w"> </span>add<span class="w"> </span>--scope<span class="o">=[</span>site,user<span class="o">]</span><span class="w"> </span>URLBASE/inputs
@@ -221,7 +221,7 @@ inputs and software subdirectories under <code class="docutils literal notransla
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

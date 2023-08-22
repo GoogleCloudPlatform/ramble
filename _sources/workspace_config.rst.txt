@@ -715,6 +715,32 @@ When using spack applications, Ramble also generates the following variables:
   ``<software_spec_name>`` is set to the name of the package as defined in the
   ``spack:packages`` dictionary.
 
+As an example:
+
+.. code-block:: yaml
+
+    ramble:
+      spack:
+        packages:
+          grm:
+            spack_spec: gromacs@2023.1
+        environments:
+          grm_env:
+            packages:
+            - grm
+
+Defines a software environment named ``grm_env``. The default environment used
+has the same name as the application the experiment is generated from. In
+experiments which use this ``grm_env`` environment, a variable is defined
+named: ``gromacs``, as that is the package named defined by the ``spack_spec``
+attribute of the ``grm`` package definition. This variable contains the path to
+the installation location for the ``gromacs`` package.
+
+**NOTE**: Package installation location variables are only generated when
+actually performing the setup of a workspace. When a ``--dry-run`` is
+performed, these paths are not populated.
+
+
 -----------------
 Spack Dictionary:
 -----------------

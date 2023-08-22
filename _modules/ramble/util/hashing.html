@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -127,7 +127,9 @@
 <span class="kn">import</span> <span class="nn">spack.util.spack_json</span> <span class="k">as</span> <span class="nn">sjson</span>
 
 
-<div class="viewcode-block" id="hash_file"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_file">[docs]</a><span class="k">def</span> <span class="nf">hash_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<div class="viewcode-block" id="hash_file">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_file">[docs]</a>
+<span class="k">def</span> <span class="nf">hash_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
     <span class="n">file_hash</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="nb">bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -135,11 +137,17 @@
     <span class="k">return</span> <span class="n">file_hash</span></div>
 
 
-<div class="viewcode-block" id="hash_string"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_string">[docs]</a><span class="k">def</span> <span class="nf">hash_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hash_string">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_string">[docs]</a>
+<span class="k">def</span> <span class="nf">hash_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="hash_json"><a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_json">[docs]</a><span class="k">def</span> <span class="nf">hash_json</span><span class="p">(</span><span class="n">in_json</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hash_json">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_json">[docs]</a>
+<span class="k">def</span> <span class="nf">hash_json</span><span class="p">(</span><span class="n">in_json</span><span class="p">):</span>
     <span class="n">_json_dump_args</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
         <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">),</span>
@@ -150,6 +158,7 @@
     <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">_json_dump_args</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">json_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
 </pre></div>
 
            </div>
@@ -160,7 +169,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

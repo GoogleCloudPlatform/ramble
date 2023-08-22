@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -140,7 +140,9 @@
 <span class="kn">import</span> <span class="nn">ramble.util.matrices</span>
 
 
-<div class="viewcode-block" id="ExperimentSet"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet">[docs]</a><span class="k">class</span> <span class="nc">ExperimentSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ExperimentSet">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet">[docs]</a>
+<span class="k">class</span> <span class="nc">ExperimentSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent a full set of experiments</span>
 
 <span class="sd">    This class contains logic to take sets of variable definitions and generate</span>
@@ -225,7 +227,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_base_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">,</span>
                           <span class="n">Expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">application_name</span><span class="p">))</span>
 
-<div class="viewcode-block" id="ExperimentSet.read_config_vars"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.read_config_vars">[docs]</a>    <span class="k">def</span> <span class="nf">read_config_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<div class="viewcode-block" id="ExperimentSet.read_config_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.read_config_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_config_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
         <span class="n">site_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_config_vars</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
         <span class="n">site_env_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_config_env_vars</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
         <span class="n">site_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">global_conf</span><span class="o">.</span><span class="n">name</span>
@@ -238,27 +242,40 @@
                           <span class="kc">None</span><span class="p">,</span>
                           <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.get_config_vars"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_config_vars">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.get_config_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_config_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_config_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">namespace</span><span class="o">.</span><span class="n">variables</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">:</span>
             <span class="n">site_vars</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">site_vars</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.get_config_env_vars"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_config_env_vars">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.get_config_env_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_config_env_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_config_env_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">namespace</span><span class="o">.</span><span class="n">env_var</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">:</span>
             <span class="n">site_env_vars</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">env_var</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">site_env_vars</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.set_base_var"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_base_var">[docs]</a>    <span class="k">def</span> <span class="nf">set_base_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.set_base_var">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_base_var">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_base_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a base variable definition&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">base</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.set_required_var"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_required_var">[docs]</a>    <span class="k">def</span> <span class="nf">set_required_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.set_required_var">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_required_var">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_required_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a required variable definition&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">required</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
 
     <span class="k">def</span> <span class="nf">_set_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">env_variables</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span>
                      <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chained_experiments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">modifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -276,7 +293,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_chained_experiments</span><span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="n">chained_experiments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifiers</span><span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="n">modifiers</span>
 
-<div class="viewcode-block" id="ExperimentSet.set_application_context"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_application_context">[docs]</a>    <span class="k">def</span> <span class="nf">set_application_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_name</span><span class="p">,</span>
+<div class="viewcode-block" id="ExperimentSet.set_application_context">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_application_context">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_application_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_name</span><span class="p">,</span>
                                 <span class="n">application_variables</span><span class="p">,</span>
                                 <span class="n">application_env_variables</span><span class="p">,</span>
                                 <span class="n">application_internals</span><span class="p">,</span>
@@ -298,7 +317,10 @@
                           <span class="n">application_chained_experiments</span><span class="p">,</span>
                           <span class="n">application_modifiers</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.set_workload_context"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_workload_context">[docs]</a>    <span class="k">def</span> <span class="nf">set_workload_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workload_name</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExperimentSet.set_workload_context">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_workload_context">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_workload_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workload_name</span><span class="p">,</span>
                              <span class="n">workload_variables</span><span class="p">,</span>
                              <span class="n">workload_env_variables</span><span class="p">,</span>
                              <span class="n">workload_internals</span><span class="p">,</span>
@@ -321,7 +343,10 @@
                           <span class="n">workload_chained_experiments</span><span class="p">,</span>
                           <span class="n">workload_modifiers</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.set_experiment_context"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_experiment_context">[docs]</a>    <span class="k">def</span> <span class="nf">set_experiment_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_name_template</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExperimentSet.set_experiment_context">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.set_experiment_context">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_experiment_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_name_template</span><span class="p">,</span>
                                <span class="n">experiment_variables</span><span class="p">,</span>
                                <span class="n">experiment_env_variables</span><span class="p">,</span>
                                <span class="n">experiment_zips</span><span class="p">,</span>
@@ -351,6 +376,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_zips</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">experiment</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment_zips</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_matrices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">experiment</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment_matrices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ingest_experiments</span><span class="p">()</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -613,14 +639,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">app_inst</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">experiment_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">experiment_namespace</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExperimentSet.build_experiment_chains"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.build_experiment_chains">[docs]</a>    <span class="k">def</span> <span class="nf">build_experiment_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExperimentSet.build_experiment_chains">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.build_experiment_chains">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_experiment_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">base_experiments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">experiment</span> <span class="ow">in</span> <span class="n">base_experiments</span><span class="p">:</span>
             <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment</span><span class="p">]</span>
             <span class="n">instance</span><span class="o">.</span><span class="n">create_experiment_chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_workspace</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.all_experiments"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.all_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">all_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.all_experiments">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.all_experiments">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all experiments in this set&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span>
@@ -628,28 +659,40 @@
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.add_chained_experiment"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.add_chained_experiment">[docs]</a>    <span class="k">def</span> <span class="nf">add_chained_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.add_chained_experiment">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.add_chained_experiment">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_chained_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">RambleExperimentSetError</span><span class="p">(</span><span class="s1">&#39;Cannot add already defined chained &#39;</span> <span class="o">+</span>
                                            <span class="sa">f</span><span class="s1">&#39;experiment </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> to this experiment set.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chained_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.search_primary_experiments"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.search_primary_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">search_primary_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.search_primary_experiments">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.search_primary_experiments">[docs]</a>
+    <span class="k">def</span> <span class="nf">search_primary_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Search primary experiments using a glob syntax.</span>
 
 <span class="sd">        NOTE: This does not search experiments defined in an experiment chain</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_order</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.get_experiment"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_experiment">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.get_experiment">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_experiment">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">experiment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">experiment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">[</span><span class="n">experiment</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ExperimentSet.get_var_from_experiment"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_var_from_experiment">[docs]</a>    <span class="k">def</span> <span class="nf">get_var_from_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentSet.get_var_from_experiment">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.get_var_from_experiment">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_var_from_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Lookup a variable in a given experiment</span>
 
 <span class="sd">        Does not error if invalid values are passed in, to allow @ symbol to</span>
@@ -665,15 +708,23 @@
 
         <span class="n">exp_app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">exp_app</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">exp_app</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RambleExperimentSetError"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.RambleExperimentSetError">[docs]</a><span class="k">class</span> <span class="nc">RambleExperimentSetError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleExperimentSetError">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.RambleExperimentSetError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleExperimentSetError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Super class for all experiment set errors&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="RambleVariableDefinitionError"><a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.RambleVariableDefinitionError">[docs]</a><span class="k">class</span> <span class="nc">RambleVariableDefinitionError</span><span class="p">(</span><span class="n">RambleExperimentSetError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleVariableDefinitionError">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.RambleVariableDefinitionError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleVariableDefinitionError</span><span class="p">(</span><span class="n">RambleExperimentSetError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error when a ramble variable definition is invalid&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -684,7 +735,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e259d695"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -136,12 +136,12 @@
            <div itemprop="articleBody">
              
   <section id="ramble-workspace">
-<span id="workspace"></span><h1>Ramble Workspace<a class="headerlink" href="#ramble-workspace" title="Permalink to this heading"></a></h1>
+<span id="workspace"></span><h1>Ramble Workspace<a class="headerlink" href="#ramble-workspace" title="Link to this heading"></a></h1>
 <p>In Ramble, a workspace is a self contained directory representing a set of
 experiments that should be executed. This document describes overall aspects of
 workspaces, and how to use them.</p>
 <section id="creating-workspaces">
-<h2>Creating Workspaces<a class="headerlink" href="#creating-workspaces" title="Permalink to this heading"></a></h2>
+<h2>Creating Workspaces<a class="headerlink" href="#creating-workspaces" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">create</span></code> command can be used to create workspaces.</p>
 <p>Workspaces are created with a standard structure, and some basic configuration
 files that the user can modify to control the exact behavior of the experiments
@@ -150,7 +150,7 @@ within the workspace.</p>
 * anonymous workspaces
 * named workspaces</p>
 <section id="named-workspace">
-<h3>Named Workspace<a class="headerlink" href="#named-workspace" title="Permalink to this heading"></a></h3>
+<h3>Named Workspace<a class="headerlink" href="#named-workspace" title="Link to this heading"></a></h3>
 <p>By default, Ramble creates named workspaces, which are workspaces which Ramble
 will manage. To create a named workspace, use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>&lt;name_of_workspace&gt;
@@ -165,7 +165,7 @@ change the default location for creating workspaces to
 </div>
 </section>
 <section id="anonymous-workspace">
-<h3>Anonymous Workspace<a class="headerlink" href="#anonymous-workspace" title="Permalink to this heading"></a></h3>
+<h3>Anonymous Workspace<a class="headerlink" href="#anonymous-workspace" title="Link to this heading"></a></h3>
 <p>Anonymous workspaces are workspaces that Ramble will not manage and will live
 in a specified directory. To create an anonymous workspace, use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>-d<span class="w"> </span>&lt;path_to_workspace&gt;
@@ -174,7 +174,7 @@ in a specified directory. To create an anonymous workspace, use:</p>
 </section>
 </section>
 <section id="workspace-structure">
-<span id="id1"></span><h2>Workspace Structure<a class="headerlink" href="#workspace-structure" title="Permalink to this heading"></a></h2>
+<span id="id1"></span><h2>Workspace Structure<a class="headerlink" href="#workspace-structure" title="Link to this heading"></a></h2>
 <p>Ramble creates workspaces using the following structure by default:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span>workspace
 <span class="go">| - configs/</span>
@@ -202,7 +202,7 @@ workspace. These are rendered into each experiment (with the extension
 omitted). This allows control over the script format to execute an experiment.</p>
 </section>
 <section id="activating-a-workspace">
-<h2>Activating a Workspace<a class="headerlink" href="#activating-a-workspace" title="Permalink to this heading"></a></h2>
+<h2>Activating a Workspace<a class="headerlink" href="#activating-a-workspace" title="Link to this heading"></a></h2>
 <p>Several Ramble commands require an activated workspace to function properly. A workspace can be activated in a few different ways:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>&lt;name_or_path&gt;
 </pre></div>
@@ -218,7 +218,7 @@ omitted). This allows control over the script format to execute an experiment.</
 <p>will activate a workspace for the specific command.</p>
 </section>
 <section id="printing-workspace-information">
-<h2>Printing Workspace Information<a class="headerlink" href="#printing-workspace-information" title="Permalink to this heading"></a></h2>
+<h2>Printing Workspace Information<a class="headerlink" href="#printing-workspace-information" title="Link to this heading"></a></h2>
 <p>In order to see an overview of what experiments a workspace contains, one can
 use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
@@ -232,7 +232,7 @@ use:</p>
 where they come from.</p>
 </section>
 <section id="concretizing-a-workspace">
-<h2>Concretizing a Workspace<a class="headerlink" href="#concretizing-a-workspace" title="Permalink to this heading"></a></h2>
+<h2>Concretizing a Workspace<a class="headerlink" href="#concretizing-a-workspace" title="Link to this heading"></a></h2>
 <p>The software definitions in a workspace need to be concretized before the
 workspace can be set up. To have Ramble pull software definitions from the
 appliaction definition files, one can use:</p>
@@ -241,7 +241,7 @@ appliaction definition files, one can use:</p>
 </div>
 </section>
 <section id="setting-up-a-workspace">
-<span id="workspace-setup"></span><h2>Setting up a Workspace<a class="headerlink" href="#setting-up-a-workspace" title="Permalink to this heading"></a></h2>
+<span id="workspace-setup"></span><h2>Setting up a Workspace<a class="headerlink" href="#setting-up-a-workspace" title="Link to this heading"></a></h2>
 <p>To make Ramble fully configure a workspace, one can use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
 </pre></div>
@@ -254,9 +254,10 @@ appliaction definition files, one can use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
 </pre></div>
 </div>
-<p>Which will create experiments, but it won’t download or install anything.</p>
+<p>Which will create experiments, but it won’t download anything, or execute any
+package manager commands.</p>
 <section id="software-environments">
-<h3>Software Environments<a class="headerlink" href="#software-environments" title="Permalink to this heading"></a></h3>
+<h3>Software Environments<a class="headerlink" href="#software-environments" title="Link to this heading"></a></h3>
 <p>When setting up a workspace, Ramble will install software defined by the
 workspace configuration file. Ramble uses external package mangers to perform
 the installation and generate software environments for each experiment.</p>
@@ -284,7 +285,7 @@ it generates.</p>
 <p>These can be used to modify the behavior of Spack environments generated by Ramble.</p>
 </section>
 <section id="workspace-invetory-and-hash">
-<h3>Workspace Invetory and Hash<a class="headerlink" href="#workspace-invetory-and-hash" title="Permalink to this heading"></a></h3>
+<h3>Workspace Invetory and Hash<a class="headerlink" href="#workspace-invetory-and-hash" title="Link to this heading"></a></h3>
 <p>Setting up a workspace will create inventory files that can be used to identify
 which aspects of experiments or workspaces change between different
 invocations.</p>
@@ -375,14 +376,14 @@ workspace is the hash of its inventory file. All hashes are sha256.</p>
 </section>
 </section>
 <section id="executing-a-workspace">
-<h2>Executing a Workspace<a class="headerlink" href="#executing-a-workspace" title="Permalink to this heading"></a></h2>
+<h2>Executing a Workspace<a class="headerlink" href="#executing-a-workspace" title="Link to this heading"></a></h2>
 <p>Once a workspace is set up, the experiments inside it can be executed using:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>on
 </pre></div>
 </div>
 </section>
 <section id="analyzing-a-workspace">
-<h2>Analyzing a Workspace<a class="headerlink" href="#analyzing-a-workspace" title="Permalink to this heading"></a></h2>
+<h2>Analyzing a Workspace<a class="headerlink" href="#analyzing-a-workspace" title="Link to this heading"></a></h2>
 <p>After the experiments inside a workspace are complete, they can be analyzed using:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
 </pre></div>
@@ -403,7 +404,7 @@ however more back-ends can be implemented. To upload data, one can use:</p>
 of <a class="reference internal" href="configuration_files.html#config-yaml"><span class="std std-ref">Ramble’s config file</span></a>.</p>
 </section>
 <section id="archiving-a-workspace">
-<h2>Archiving a Workspace<a class="headerlink" href="#archiving-a-workspace" title="Permalink to this heading"></a></h2>
+<h2>Archiving a Workspace<a class="headerlink" href="#archiving-a-workspace" title="Link to this heading"></a></h2>
 <p>A workspace can be archived to either:
 * Share with other people
 * Keep for future reproduction</p>
@@ -441,7 +442,7 @@ of <a class="reference internal" href="configuration_files.html#config-yaml"><sp
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

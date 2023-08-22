@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -146,7 +146,9 @@
 <span class="n">package_name_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*(?P&lt;package_name&gt;[\w][\w-]+).*&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SpackRunner"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner">[docs]</a><span class="k">class</span> <span class="nc">SpackRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SpackRunner">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner">[docs]</a>
+<span class="k">class</span> <span class="nc">SpackRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runner for executing several spack commands</span>
 
 <span class="sd">    The SpackRunner class is primarily used to manage spack environments</span>
@@ -218,7 +220,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configs_applied</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="SpackRunner.get_version"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SpackRunner.get_version">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_version">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get spack&#39;s version&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">ramble.main</span> <span class="kn">import</span> <span class="n">get_git_hash</span>
         <span class="kn">import</span> <span class="nn">importlib.util</span>
@@ -240,25 +244,37 @@
 
         <span class="k">return</span> <span class="n">spack_version</span></div>
 
-<div class="viewcode-block" id="SpackRunner.set_dry_run"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_dry_run">[docs]</a>    <span class="k">def</span> <span class="nf">set_dry_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.set_dry_run">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_dry_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_dry_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the dry_run state of this spack runner</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="n">dry_run</span></div>
 
-<div class="viewcode-block" id="SpackRunner.set_compiler_config_dir"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_compiler_config_dir">[docs]</a>    <span class="k">def</span> <span class="nf">set_compiler_config_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.set_compiler_config_dir">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_compiler_config_dir">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_compiler_config_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the config path to use when installing compilers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compiler_config_dir</span> <span class="o">=</span> <span class="n">path</span></div>
 
-<div class="viewcode-block" id="SpackRunner.set_env"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.set_env">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_env">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_path</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Path </span><span class="si">{</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is not a spack environment&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">env_path</span></div>
 
-<div class="viewcode-block" id="SpackRunner.generate_source_command"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_source_command">[docs]</a>    <span class="k">def</span> <span class="nf">generate_source_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.generate_source_command">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_source_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_source_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to source spack into an environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -267,7 +283,10 @@
 
         <span class="k">return</span> <span class="n">commands</span></div>
 
-<div class="viewcode-block" id="SpackRunner.generate_activate_command"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_activate_command">[docs]</a>    <span class="k">def</span> <span class="nf">generate_activate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.generate_activate_command">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_activate_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_activate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to activate a spack environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -278,7 +297,10 @@
 
         <span class="k">return</span> <span class="n">commands</span></div>
 
-<div class="viewcode-block" id="SpackRunner.generate_deactivate_command"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_deactivate_command">[docs]</a>    <span class="k">def</span> <span class="nf">generate_deactivate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.generate_deactivate_command">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_deactivate_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_deactivate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to deactivate a spack environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -290,7 +312,10 @@
 
         <span class="k">return</span> <span class="n">commands</span></div>
 
-<div class="viewcode-block" id="SpackRunner.configure_env"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.configure_env">[docs]</a>    <span class="k">def</span> <span class="nf">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.configure_env">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.configure_env">[docs]</a>
+    <span class="k">def</span> <span class="nf">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configured the spack environment path for subsequent spack commands</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -298,13 +323,19 @@
         <span class="c1"># Ensure subsequent commands use the created env now.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">path</span></div>
 
-<div class="viewcode-block" id="SpackRunner.add_config"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_config">[docs]</a>    <span class="k">def</span> <span class="nf">add_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.add_config">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a config option to this spack environment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpackRunner.create_env"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.create_env">[docs]</a>    <span class="k">def</span> <span class="nf">create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.create_env">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.create_env">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensure a spack environment is created, and set the path to it within</span>
 <span class="sd">        this runner.</span>
@@ -324,7 +355,10 @@
         <span class="c1"># Ensure subsequent commands use the created env now.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">path</span></div>
 
-<div class="viewcode-block" id="SpackRunner.load_compiler"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.load_compiler">[docs]</a>    <span class="k">def</span> <span class="nf">load_compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.load_compiler">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.load_compiler">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add commands to load a package to the executable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -352,6 +386,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_load_compiler_shell</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">shell_flag</span><span class="p">,</span> <span class="n">regex</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_load_compiler_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">shell_flag</span><span class="p">,</span> <span class="n">regex</span><span class="p">):</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s1">&#39;load&#39;</span><span class="p">,</span>
@@ -370,7 +405,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpackRunner.install_compiler"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.install_compiler">[docs]</a>    <span class="k">def</span> <span class="nf">install_compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<div class="viewcode-block" id="SpackRunner.install_compiler">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.install_compiler">[docs]</a>
+    <span class="k">def</span> <span class="nf">install_compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensure a compiler is installed, before using it to install packages</span>
 <span class="sd">        within an environment.</span>
@@ -422,7 +459,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpackRunner.activate"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.activate">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.activate">[docs]</a>
+    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensure the spack environment is active in subsequent commands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -436,7 +476,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="SpackRunner.deactivate"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.deactivate">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.deactivate">[docs]</a>
+    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensure the spack environment is not active in subsequent commands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -448,6 +491,7 @@
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="o">.</span><span class="n">default_env</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span></div>
 
+
     <span class="k">def</span> <span class="nf">_check_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s1">&#39;Environment runner has no &#39;</span> <span class="o">+</span>
@@ -457,7 +501,9 @@
             <span class="k">raise</span> <span class="n">NoActiveEnvironmentError</span><span class="p">(</span><span class="s1">&#39;Runner has no active &#39;</span> <span class="o">+</span>
                                            <span class="s1">&#39;environment to work with.&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpackRunner.add_spec"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_spec">[docs]</a>    <span class="k">def</span> <span class="nf">add_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<div class="viewcode-block" id="SpackRunner.add_spec">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_spec">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a spec to the spack environment.</span>
 
@@ -468,7 +514,10 @@
         <span class="k">if</span> <span class="n">spec</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpackRunner.added_packages"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.added_packages">[docs]</a>    <span class="k">def</span> <span class="nf">added_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.added_packages">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.added_packages">[docs]</a>
+    <span class="k">def</span> <span class="nf">added_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of base package names that are added to an environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -487,7 +536,10 @@
 
         <span class="k">return</span> <span class="n">pkg_names</span></div>
 
-<div class="viewcode-block" id="SpackRunner.add_include_file"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_include_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_include_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_file</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.add_include_file">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_include_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_include_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add an include file to this spack environment.</span>
 
@@ -499,7 +551,10 @@
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allowed_config_files</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">includes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">include_file</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpackRunner.apply_configs"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.apply_configs">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.apply_configs">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.apply_configs">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add all defined configs to the environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -523,7 +578,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">configs_applied</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="SpackRunner.copy_from_external_env"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.copy_from_external_env">[docs]</a>    <span class="k">def</span> <span class="nf">copy_from_external_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_name_or_path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.copy_from_external_env">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.copy_from_external_env">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy_from_external_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_name_or_path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy an external spack environment file into the generated environment.</span>
 
@@ -572,7 +630,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="n">found_lock</span></div>
 
-<div class="viewcode-block" id="SpackRunner.generate_env_file"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_env_file">[docs]</a>    <span class="k">def</span> <span class="nf">generate_env_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.generate_env_file">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_env_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_env_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a spack environment file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -619,7 +680,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_configs</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SpackRunner.concretize"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.concretize">[docs]</a>    <span class="k">def</span> <span class="nf">concretize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.concretize">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.concretize">[docs]</a>
+    <span class="k">def</span> <span class="nf">concretize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Concretize a spack environment.</span>
 
@@ -644,7 +708,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="SpackRunner.inventory_hash"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.inventory_hash">[docs]</a>    <span class="k">def</span> <span class="nf">inventory_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.inventory_hash">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.inventory_hash">[docs]</a>
+    <span class="k">def</span> <span class="nf">inventory_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a hash of the spack.lock file for ramble inventory purposes</span>
 
@@ -662,7 +729,10 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">spack_hash</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">spack_hash</span></div>
 
-<div class="viewcode-block" id="SpackRunner.install"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.install">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.install">[docs]</a>
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Install spack packages that have been added to an environment.</span>
 
@@ -687,7 +757,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">installed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="SpackRunner.get_package_path"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_package_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_package_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_spec</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.get_package_path">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_package_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_package_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the installation directory for a package&quot;&quot;&quot;</span>
         <span class="n">loc_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">]</span>
         <span class="n">loc_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
@@ -707,7 +780,10 @@
             <span class="n">location</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;dry-run&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpackRunner.mirror_environment"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.mirror_environment">[docs]</a>    <span class="k">def</span> <span class="nf">mirror_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SpackRunner.mirror_environment">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.mirror_environment">[docs]</a>
+    <span class="k">def</span> <span class="nf">mirror_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a spack mirror from the activated environment&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
@@ -729,26 +805,40 @@
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> added</span>
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> failed to fetch.&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;DRY-RUN: would run </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="o">.</span><span class="n">command</span><span class="p">)</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;         with args: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="RunnerError"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.RunnerError">[docs]</a><span class="k">class</span> <span class="nc">RunnerError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunnerError">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.RunnerError">[docs]</a>
+<span class="k">class</span> <span class="nc">RunnerError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a problem occurs with a spack environment&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="NoPathRunnerError"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.NoPathRunnerError">[docs]</a><span class="k">class</span> <span class="nc">NoPathRunnerError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NoPathRunnerError">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.NoPathRunnerError">[docs]</a>
+<span class="k">class</span> <span class="nc">NoPathRunnerError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a runner is used that does not have a path set&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="NoActiveEnvironmentError"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.NoActiveEnvironmentError">[docs]</a><span class="k">class</span> <span class="nc">NoActiveEnvironmentError</span><span class="p">(</span><span class="n">RunnerError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NoActiveEnvironmentError">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.NoActiveEnvironmentError">[docs]</a>
+<span class="k">class</span> <span class="nc">NoActiveEnvironmentError</span><span class="p">(</span><span class="n">RunnerError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an environment command is executed without an active</span>
 <span class="sd">    environment.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="InvalidExternalEnvironment"><a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.InvalidExternalEnvironment">[docs]</a><span class="k">class</span> <span class="nc">InvalidExternalEnvironment</span><span class="p">(</span><span class="n">RunnerError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InvalidExternalEnvironment">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.InvalidExternalEnvironment">[docs]</a>
+<span class="k">class</span> <span class="nc">InvalidExternalEnvironment</span><span class="p">(</span><span class="n">RunnerError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an invalid external spack environment is passed in&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -759,7 +849,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

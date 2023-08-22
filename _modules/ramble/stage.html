@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -160,7 +160,9 @@
 <span class="n">_input_subdir</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span>
 
 
-<div class="viewcode-block" id="create_stage_root"><a class="viewcode-back" href="../../ramble.html#ramble.stage.create_stage_root">[docs]</a><span class="k">def</span> <span class="nf">create_stage_root</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="create_stage_root">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.create_stage_root">[docs]</a>
+<span class="k">def</span> <span class="nf">create_stage_root</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create the stage root directory and ensure appropriate access perms.&quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
@@ -225,6 +227,7 @@
         <span class="n">mkdirp</span><span class="p">(</span><span class="n">input_subdir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_first_accessible_path</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the first path that is accessible, creating it if necessary.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
@@ -287,7 +290,9 @@
         <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
 
 
-<div class="viewcode-block" id="InputStage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage">[docs]</a><span class="k">class</span> <span class="nc">InputStage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="InputStage">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage">[docs]</a>
+<span class="k">class</span> <span class="nc">InputStage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages a stage directory for containing input files.</span>
 
 <span class="sd">    A Stage object is a context manager that handles a directory where</span>
@@ -447,8 +452,11 @@
         <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
 
-<div class="viewcode-block" id="InputStage.set_subdir"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.set_subdir">[docs]</a>    <span class="k">def</span> <span class="nf">set_subdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subdir_name</span><span class="p">):</span>
+<div class="viewcode-block" id="InputStage.set_subdir">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.set_subdir">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_subdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subdir_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_subdir</span> <span class="o">=</span> <span class="n">subdir_name</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">expected_archive_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -500,7 +508,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the well-known source directory path.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_subdir</span><span class="p">)</span>
 
-<div class="viewcode-block" id="InputStage.fetch"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="InputStage.fetch">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.fetch">[docs]</a>
+    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves the code or archive</span>
 
 <span class="sd">        Args:</span>
@@ -596,7 +606,10 @@
 
         <span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="InputStage.steal_source"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.steal_source">[docs]</a>    <span class="k">def</span> <span class="nf">steal_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.steal_source">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.steal_source">[docs]</a>
+    <span class="k">def</span> <span class="nf">steal_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy the source_path directory in its entirety to directory dest</span>
 
 <span class="sd">        This operation creates/fetches/expands the stage if it is not already,</span>
@@ -631,7 +644,10 @@
         <span class="c1"># remove leftover stage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="InputStage.check"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.check">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.check">[docs]</a>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the downloaded archive against a checksum digest.</span>
 <span class="sd">           No-op if this stage checks code out of a repository.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="ow">and</span> \
@@ -645,11 +661,17 @@
         <span class="k">elif</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:checksum&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">check</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="InputStage.cache_local"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_local">[docs]</a>    <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.cache_local">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_local">[docs]</a>
+    <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">fetch_cache</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="InputStage.cache_mirror"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_mirror">[docs]</a>    <span class="k">def</span> <span class="nf">cache_mirror</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.cache_mirror">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_mirror">[docs]</a>
+    <span class="k">def</span> <span class="nf">cache_mirror</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mirror</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a fetch if the resource is not already cached</span>
 
 <span class="sd">        Arguments:</span>
@@ -690,7 +712,10 @@
 
         <span class="n">mirror</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="InputStage.expand_archive"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.expand_archive">[docs]</a>    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.expand_archive">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.expand_archive">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Changes to the stage directory and attempt to expand the downloaded</span>
 <span class="sd">        archive.  Fail if the stage is not set up or if the archive is not yet</span>
 <span class="sd">        downloaded.&quot;&quot;&quot;</span>
@@ -700,13 +725,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Already staged </span><span class="si">{0}</span><span class="s1"> in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="InputStage.restage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.restage">[docs]</a>    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.restage">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.restage">[docs]</a>
+    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes the expanded archive path if it exists, then re-expands</span>
 <span class="sd">           the archive.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="InputStage.create"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.create">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures the top-level (config:build_stage) directory exists.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -721,7 +752,10 @@
         <span class="n">ensure_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="InputStage.destroy"><a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InputStage.destroy">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.destroy">[docs]</a>
+    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes this stage directory.&quot;&quot;&quot;</span>
         <span class="n">remove_linked_tree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
@@ -733,23 +767,33 @@
             <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
 
         <span class="c1"># mark as destroyed</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">False</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ResourceStage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage">[docs]</a><span class="k">class</span> <span class="nc">ResourceStage</span><span class="p">(</span><span class="n">InputStage</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ResourceStage">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage">[docs]</a>
+<span class="k">class</span> <span class="nc">ResourceStage</span><span class="p">(</span><span class="n">InputStage</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">resource</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ResourceStage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root_stage</span> <span class="o">=</span> <span class="n">root</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
 
-<div class="viewcode-block" id="ResourceStage.restage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage.restage">[docs]</a>    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceStage.restage">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage.restage">[docs]</a>
+    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ResourceStage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">restage</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_root_stage</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ResourceStage.expand_archive"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage.expand_archive">[docs]</a>    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ResourceStage.expand_archive">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.ResourceStage.expand_archive">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ResourceStage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">expand_archive</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_root_stage</span><span class="p">()</span></div>
+
 
     <span class="k">def</span> <span class="nf">_add_to_root_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -798,7 +842,10 @@
                     <span class="n">install</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="StageComposite"><a class="viewcode-back" href="../../ramble.html#ramble.stage.StageComposite">[docs]</a><span class="k">class</span> <span class="nc">StageComposite</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">Composite</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StageComposite">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.StageComposite">[docs]</a>
+<span class="k">class</span> <span class="nc">StageComposite</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">Composite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Composite for Stage type objects. The first item in this composite is</span>
 <span class="sd">    considered to be the root workload, and operations that return a value are</span>
 <span class="sd">    forwarded to it.&quot;&quot;&quot;</span>
@@ -842,7 +889,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">archive_file</span></div>
 
 
-<div class="viewcode-block" id="DIYStage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage">[docs]</a><span class="k">class</span> <span class="nc">DIYStage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DIYStage">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage">[docs]</a>
+<span class="k">class</span> <span class="nc">DIYStage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple class that allows any directory to be a ramble input stage.</span>
 <span class="sd">    Consequently, it does not expect or require that the source path adhere to</span>
@@ -871,42 +921,69 @@
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="DIYStage.fetch"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DIYStage.fetch">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.fetch">[docs]</a>
+    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No need to fetch for DIY.&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DIYStage.check"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DIYStage.check">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.check">[docs]</a>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No checksum needed for DIY.&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DIYStage.expand_archive"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.expand_archive">[docs]</a>    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DIYStage.expand_archive">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.expand_archive">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Using source directory: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">))</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True since the source_path must exist.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="DIYStage.restage"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.restage">[docs]</a>    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DIYStage.restage">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.restage">[docs]</a>
+    <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">RestageError</span><span class="p">(</span><span class="s2">&quot;Cannot restage a DIY stage.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DIYStage.create"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DIYStage.create">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="DIYStage.destroy"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DIYStage.destroy">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.destroy">[docs]</a>
+    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># No need to destroy DIY stage.</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="DIYStage.cache_local"><a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.cache_local">[docs]</a>    <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sources for DIY stages are not cached&#39;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="DIYStage.cache_local">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.cache_local">[docs]</a>
+    <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sources for DIY stages are not cached&#39;</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ensure_access"><a class="viewcode-back" href="../../ramble.html#ramble.stage.ensure_access">[docs]</a><span class="k">def</span> <span class="nf">ensure_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ensure_access">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.ensure_access">[docs]</a>
+<span class="k">def</span> <span class="nf">ensure_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure we can access a directory and die with an error if we can&#39;t.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">can_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Insufficient permissions for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span></div>
 
 
+
 <span class="c1"># TODO (dwj): Need to add checksums for inputs.</span>
-<div class="viewcode-block" id="get_checksums_for_versions"><a class="viewcode-back" href="../../ramble.html#ramble.stage.get_checksums_for_versions">[docs]</a><span class="k">def</span> <span class="nf">get_checksums_for_versions</span><span class="p">(</span>
+<div class="viewcode-block" id="get_checksums_for_versions">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.get_checksums_for_versions">[docs]</a>
+<span class="k">def</span> <span class="nf">get_checksums_for_versions</span><span class="p">(</span>
         <span class="n">url_dict</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">first_stage_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_stage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">fetch_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches and checksums archives from URLs.</span>
@@ -1007,20 +1084,33 @@
     <span class="k">return</span> <span class="n">version_lines</span></div>
 
 
-<div class="viewcode-block" id="StageError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.StageError">[docs]</a><span class="k">class</span> <span class="nc">StageError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StageError">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.StageError">[docs]</a>
+<span class="k">class</span> <span class="nc">StageError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Superclass for all errors encountered during staging.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="StagePathError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.StagePathError">[docs]</a><span class="k">class</span> <span class="nc">StagePathError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StagePathError">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.StagePathError">[docs]</a>
+<span class="k">class</span> <span class="nc">StagePathError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Error encountered with stage path.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="RestageError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.RestageError">[docs]</a><span class="k">class</span> <span class="nc">RestageError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RestageError">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.RestageError">[docs]</a>
+<span class="k">class</span> <span class="nc">RestageError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Error encountered during restaging.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="VersionFetchError"><a class="viewcode-back" href="../../ramble.html#ramble.stage.VersionFetchError">[docs]</a><span class="k">class</span> <span class="nc">VersionFetchError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="VersionFetchError">
+<a class="viewcode-back" href="../../ramble.html#ramble.stage.VersionFetchError">[docs]</a>
+<span class="k">class</span> <span class="nc">VersionFetchError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we can&#39;t determine a URL to fetch an input.&quot;&quot;&quot;</span></div>
+
 
 
 <span class="c1"># Keep this in namespace for convenience</span>
@@ -1035,7 +1125,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -147,16 +147,21 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="SharedMeta"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.SharedMeta">[docs]</a><span class="k">class</span> <span class="nc">SharedMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveMeta</span><span class="p">):</span>
+<div class="viewcode-block" id="SharedMeta">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.SharedMeta">[docs]</a>
+<span class="k">class</span> <span class="nc">SharedMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveMeta</span><span class="p">):</span>
     <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">_directives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span></div>
+
 
 
 <span class="c1"># shared_directive = ramble.language.language_base.DirectiveMeta.directive</span>
 <span class="n">shared_directive</span> <span class="o">=</span> <span class="n">SharedMeta</span><span class="o">.</span><span class="n">directive</span>
 
 
-<div class="viewcode-block" id="archive_pattern"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.archive_pattern">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;archive_patterns&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="archive_pattern">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.archive_pattern">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;archive_patterns&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">archive_pattern</span><span class="p">(</span><span class="n">pattern</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a file pattern to be archived in addition to figure of merit logs</span>
 
@@ -174,7 +179,10 @@
     <span class="k">return</span> <span class="n">_execute_archive_pattern</span></div>
 
 
-<div class="viewcode-block" id="figure_of_merit_context"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.figure_of_merit_context">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;figure_of_merit_contexts&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="figure_of_merit_context">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.figure_of_merit_context">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;figure_of_merit_contexts&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">figure_of_merit_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">regex</span><span class="p">,</span> <span class="n">output_format</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a context for figures of merit</span>
 
@@ -197,7 +205,10 @@
     <span class="k">return</span> <span class="n">_execute_figure_of_merit_context</span></div>
 
 
-<div class="viewcode-block" id="figure_of_merit"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.figure_of_merit">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;figures_of_merit&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="figure_of_merit">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.figure_of_merit">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;figures_of_merit&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">figure_of_merit</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fom_regex</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                     <span class="n">contexts</span><span class="o">=</span><span class="p">[]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a figure of merit to track for this object</span>
@@ -224,7 +235,10 @@
     <span class="k">return</span> <span class="n">_execute_figure_of_merit</span></div>
 
 
-<div class="viewcode-block" id="default_compiler"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.default_compiler">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;default_compilers&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="default_compiler">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.default_compiler">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;default_compilers&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">default_compiler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">spack_spec</span><span class="p">,</span> <span class="n">compiler_spec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines the default compiler that will be used with this object</span>
 
@@ -243,7 +257,10 @@
     <span class="k">return</span> <span class="n">_execute_default_compiler</span></div>
 
 
-<div class="viewcode-block" id="software_spec"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.software_spec">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;software_specs&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="software_spec">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.software_spec">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;software_specs&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">software_spec</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">spack_spec</span><span class="p">,</span> <span class="n">compiler_spec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a new software spec needed for this object.</span>
 
@@ -270,7 +287,10 @@
     <span class="k">return</span> <span class="n">_execute_software_spec</span></div>
 
 
-<div class="viewcode-block" id="package_manager_config"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.package_manager_config">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;package_manager_configs&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="package_manager_config">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.package_manager_config">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;package_manager_configs&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">package_manager_config</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a config option to set within a package manager</span>
 
@@ -285,7 +305,10 @@
     <span class="k">return</span> <span class="n">_execute_package_manager_config</span></div>
 
 
-<div class="viewcode-block" id="required_package"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.required_package">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;required_packages&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="required_package">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.required_package">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;required_packages&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">required_package</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a new spack package that is required for this object</span>
 <span class="sd">    to function properly.</span>
@@ -297,7 +320,10 @@
     <span class="k">return</span> <span class="n">_execute_required_package</span></div>
 
 
-<div class="viewcode-block" id="success_criteria"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.success_criteria">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;success_criteria&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="success_criteria">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.success_criteria">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;success_criteria&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">success_criteria</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
                      <span class="n">fom_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fom_context</span><span class="o">=</span><span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a success criteria used by experiments of this object</span>
@@ -338,7 +364,10 @@
     <span class="k">return</span> <span class="n">_execute_success_criteria</span></div>
 
 
-<div class="viewcode-block" id="register_builtin"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.register_builtin">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;builtins&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="register_builtin">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.register_builtin">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;builtins&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">register_builtin</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">injection_method</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a builtin</span>
 
@@ -398,7 +427,10 @@
     <span class="k">return</span> <span class="n">_store_builtin</span></div>
 
 
-<div class="viewcode-block" id="maintainers"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.maintainers">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+
+<div class="viewcode-block" id="maintainers">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.maintainers">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
 <span class="k">def</span> <span class="nf">maintainers</span><span class="p">(</span><span class="o">*</span><span class="n">names</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a new maintainer directive, to specify maintainers in a declarative way.</span>
 
@@ -414,7 +446,10 @@
     <span class="k">return</span> <span class="n">_execute_maintainer</span></div>
 
 
-<div class="viewcode-block" id="tags"><a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.tags">[docs]</a><span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+
+<div class="viewcode-block" id="tags">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.tags">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
 <span class="k">def</span> <span class="nf">tags</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a new tag directive, to specify tags in a declarative way.</span>
 
@@ -428,6 +463,7 @@
         <span class="n">obj</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tags_from_base</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">))))</span>
 
     <span class="k">return</span> <span class="n">_execute_tag</span></div>
+
 </pre></div>
 
            </div>
@@ -438,7 +474,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

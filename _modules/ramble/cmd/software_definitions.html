@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -156,19 +156,30 @@
 <span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
 
 
-<div class="viewcode-block" id="section_title"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.section_title">[docs]</a><span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<div class="viewcode-block" id="section_title">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.section_title">[docs]</a>
+<span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">header_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
 
 
-<div class="viewcode-block" id="nested_1"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.nested_1">[docs]</a><span class="k">def</span> <span class="nf">nested_1</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nested_1">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.nested_1">[docs]</a>
+<span class="k">def</span> <span class="nf">nested_1</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">level1_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
 
 
-<div class="viewcode-block" id="nested_2"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.nested_2">[docs]</a><span class="k">def</span> <span class="nf">nested_2</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nested_2">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.nested_2">[docs]</a>
+<span class="k">def</span> <span class="nf">nested_2</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">level2_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
 
 
-<div class="viewcode-block" id="collect_definitions"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.collect_definitions">[docs]</a><span class="k">def</span> <span class="nf">collect_definitions</span><span class="p">():</span>
+
+<div class="viewcode-block" id="collect_definitions">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.collect_definitions">[docs]</a>
+<span class="k">def</span> <span class="nf">collect_definitions</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build software definition data structures</span>
 
 <span class="sd">    Iterate over all defined objects and extract their software definitions.</span>
@@ -213,7 +224,10 @@
                                     <span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="n">spec_def</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_namespace</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="print_summary"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_summary">[docs]</a><span class="k">def</span> <span class="nf">print_summary</span><span class="p">():</span>
+
+<div class="viewcode-block" id="print_summary">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_summary">[docs]</a>
+<span class="k">def</span> <span class="nf">print_summary</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a summary of all software definitions&quot;&quot;&quot;</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Summary:&#39;</span><span class="p">))</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -226,7 +240,10 @@
         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="count_conflicts"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.count_conflicts">[docs]</a><span class="k">def</span> <span class="nf">count_conflicts</span><span class="p">():</span>
+
+<div class="viewcode-block" id="count_conflicts">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.count_conflicts">[docs]</a>
+<span class="k">def</span> <span class="nf">count_conflicts</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate over conflicts and count how many were detected&quot;&quot;&quot;</span>
     <span class="n">num_conflicts</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">conflicts</span><span class="p">:</span>
@@ -234,7 +251,10 @@
     <span class="k">return</span> <span class="n">num_conflicts</span></div>
 
 
-<div class="viewcode-block" id="print_conflicts"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_conflicts">[docs]</a><span class="k">def</span> <span class="nf">print_conflicts</span><span class="p">():</span>
+
+<div class="viewcode-block" id="print_conflicts">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_conflicts">[docs]</a>
+<span class="k">def</span> <span class="nf">print_conflicts</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print conflict information, if any exist&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conflicts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Definition Conflicts:&#39;</span><span class="p">))</span>
@@ -255,7 +275,10 @@
         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;No Conflicts Detected&#39;</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup the parser for software-definitions&quot;&quot;&quot;</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--summary&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print summary of software definitions&#39;</span><span class="p">)</span>
@@ -267,7 +290,10 @@
                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;if conflicts are found, exit code is number of conflicts&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="software_definitions"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.software_definitions">[docs]</a><span class="k">def</span> <span class="nf">software_definitions</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="software_definitions">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.software_definitions">[docs]</a>
+<span class="k">def</span> <span class="nf">software_definitions</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform software-definitions actions&quot;&quot;&quot;</span>
     <span class="n">collect_definitions</span><span class="p">()</span>
 
@@ -281,6 +307,7 @@
         <span class="n">num_conflicts</span> <span class="o">=</span> <span class="n">count_conflicts</span><span class="p">()</span>
         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_conflicts</span><span class="si">}</span><span class="s1"> conflicts detected.&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">num_conflicts</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -291,7 +318,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

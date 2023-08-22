@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e259d695"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -127,13 +127,13 @@
            <div itemprop="articleBody">
              
   <section id="success-criteria">
-<span id="id1"></span><h1>Success Criteria<a class="headerlink" href="#success-criteria" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Success Criteria<a class="headerlink" href="#success-criteria" title="Link to this heading"></a></h1>
 <p>Ramble supports various methods of defining success criteria, which mark
 experiments as successfully completed, or failed when analyzing a workspace.</p>
 <p>This document describes the supported functionality, and how to use success
 criteria in general.</p>
 <section id="types-of-success-criteria">
-<h2>Types of Success Criteria<a class="headerlink" href="#types-of-success-criteria" title="Permalink to this heading"></a></h2>
+<h2>Types of Success Criteria<a class="headerlink" href="#types-of-success-criteria" title="Link to this heading"></a></h2>
 <p>Success criteria can be defined in two places:
 * An application.py file
 * A <a class="reference internal" href="workspace_config.html#workspace-config"><span class="std std-ref">ramble.yaml workspace config file</span></a></p>
@@ -150,7 +150,7 @@ workspace configuration file. But it will describe general aspects of success
 criteria that can apply to either definition.</p>
 </section>
 <section id="defining-success-criteria">
-<h2>Defining Success Criteria<a class="headerlink" href="#defining-success-criteria" title="Permalink to this heading"></a></h2>
+<h2>Defining Success Criteria<a class="headerlink" href="#defining-success-criteria" title="Link to this heading"></a></h2>
 <p>Success criteria defined in a workspace config file are all merged together,
 following the logic for optional sections in the workspace config file.</p>
 <p>A block of success criteria is defined as a list of independent criteria that
@@ -168,7 +168,7 @@ criteria returns false, the experiment is marked as <code class="docutils litera
 <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span></code>.</p>
 </section>
 <section id="success-criteria-modes">
-<h2>Success Criteria Modes<a class="headerlink" href="#success-criteria-modes" title="Permalink to this heading"></a></h2>
+<h2>Success Criteria Modes<a class="headerlink" href="#success-criteria-modes" title="Link to this heading"></a></h2>
 <p>Each success criteria has a mode. Currently, there are three supported modes.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">'application_function'</span></code></p></li>
@@ -177,7 +177,7 @@ criteria returns false, the experiment is marked as <code class="docutils litera
 </ul>
 <p>We will cover each of these supported modes in more detail below.</p>
 <section id="mode-application-function">
-<h3>Mode: Application Function<a class="headerlink" href="#mode-application-function" title="Permalink to this heading"></a></h3>
+<h3>Mode: Application Function<a class="headerlink" href="#mode-application-function" title="Link to this heading"></a></h3>
 <p>A success criteria with <code class="docutils literal notranslate"><span class="pre">mode='application_function'</span></code> will use an
 application.py’s defined <code class="docutils literal notranslate"><span class="pre">evaluate_success</span></code> function to test for experiment
 success. This hook allows an application developer to perform more complicated
@@ -187,7 +187,7 @@ default to all experiments. The base <code class="docutils literal notranslate">
 returns <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </section>
 <section id="mode-fom-comparison">
-<h3>Mode: FOM Comparison<a class="headerlink" href="#mode-fom-comparison" title="Permalink to this heading"></a></h3>
+<h3>Mode: FOM Comparison<a class="headerlink" href="#mode-fom-comparison" title="Link to this heading"></a></h3>
 <p>Success criteria with <code class="docutils literal notranslate"><span class="pre">mode='fom_comparison'</span></code> allow experiments to define
 complex mathematical logic to evaluate success of an experiment. Defining
 these criteria within a workspace configuration file is as follows:</p>
@@ -218,7 +218,7 @@ experiment. Additionally, an extra <code class="docutils literal notranslate"><s
 the value of the FOM as extracted from the output.</p>
 </section>
 <section id="mode-string">
-<h3>Mode: String<a class="headerlink" href="#mode-string" title="Permalink to this heading"></a></h3>
+<h3>Mode: String<a class="headerlink" href="#mode-string" title="Link to this heading"></a></h3>
 <p>Success criteria with <code class="docutils literal notranslate"><span class="pre">mode='string'</span></code> allow experiments to define expected
 string regular expression matching. This criteria mode is useful if an
 application prints a string whenever it successfully completes. Defining these
@@ -256,7 +256,7 @@ is not found, then the criteria is marked as failed.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

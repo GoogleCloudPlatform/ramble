@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -144,12 +144,17 @@
 <span class="n">formatter</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="ExpansionDict"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionDict">[docs]</a><span class="k">class</span> <span class="nc">ExpansionDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="ExpansionDict">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionDict">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpansionDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__missing__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span></div>
 
 
-<div class="viewcode-block" id="Expander"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander">[docs]</a><span class="k">class</span> <span class="nc">Expander</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Expander">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander">[docs]</a>
+<span class="k">class</span> <span class="nc">Expander</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class that will track and expand keyword arguments</span>
 
 <span class="sd">    This class will track variables and their definitions, to allow for</span>
@@ -282,7 +287,9 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span>
 
-<div class="viewcode-block" id="Expander.expand_lists"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_lists">[docs]</a>    <span class="k">def</span> <span class="nf">expand_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+<div class="viewcode-block" id="Expander.expand_lists">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_lists">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Expand a variable into a list if possible</span>
 
 <span class="sd">        If expanding a variable would generate a list, this function will</span>
@@ -308,7 +315,10 @@
         <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">var</span></div>
 
-<div class="viewcode-block" id="Expander.expand_var_name"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var_name">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Expander.expand_var_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a variable name to an expansion string, and expand it</span>
 
 <span class="sd">        Take a variable name (var) and convert it to an expansion string by</span>
@@ -325,7 +335,10 @@
                                <span class="n">extra_vars</span><span class="o">=</span><span class="n">extra_vars</span><span class="p">,</span>
                                <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Expander.expand_var"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Expander.expand_var">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform expansion of a string</span>
 
 <span class="sd">        Expand a string by building up a dict of all</span>
@@ -362,11 +375,15 @@
 
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Expander.expansion_str"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expansion_str">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Expander.expansion_str">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expansion_str">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">expansion_str</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
         <span class="n">l_delimiter</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span>
         <span class="n">r_delimiter</span> <span class="o">=</span> <span class="s1">&#39;}&#39;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">l_delimiter</span><span class="si">}{</span><span class="n">in_str</span><span class="si">}{</span><span class="n">r_delimiter</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
 
     <span class="k">def</span> <span class="nf">_all_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator for all keyword arguments in a string</span>
@@ -471,7 +488,9 @@
 
         <span class="k">return</span> <span class="n">in_str</span>
 
-<div class="viewcode-block" id="Expander.eval_math"><a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.eval_math">[docs]</a>    <span class="k">def</span> <span class="nf">eval_math</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<div class="viewcode-block" id="Expander.eval_math">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.eval_math">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_math</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate math from parsing the AST</span>
 
 <span class="sd">        Does not assume a specific type of operands.</span>
@@ -500,6 +519,7 @@
             <span class="n">node_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">MathEvaluationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported math AST node </span><span class="si">{</span><span class="n">node_type</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                                       <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="vm">__dict__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
 
     <span class="c1"># Ast logic helper methods</span>
     <span class="k">def</span> <span class="nf">__raise_syntax_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
@@ -646,30 +666,49 @@
             <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported unary operator&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ExpanderError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpanderError">[docs]</a><span class="k">class</span> <span class="nc">ExpanderError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExpanderError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpanderError">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpanderError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an error happens within an expander&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="MathEvaluationError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.MathEvaluationError">[docs]</a><span class="k">class</span> <span class="nc">MathEvaluationError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MathEvaluationError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.MathEvaluationError">[docs]</a>
+<span class="k">class</span> <span class="nc">MathEvaluationError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an error happens while evaluating math during</span>
 <span class="sd">    expansion</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="RambleSyntaxError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.RambleSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RambleSyntaxError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleSyntaxError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.RambleSyntaxError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleSyntaxError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a syntax error happens within variable definitions&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ApplicationNotDefinedError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ApplicationNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">ApplicationNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ApplicationNotDefinedError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ApplicationNotDefinedError">[docs]</a>
+<span class="k">class</span> <span class="nc">ApplicationNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an application is not defined properly&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="WorkloadNotDefinedError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.WorkloadNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">WorkloadNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="WorkloadNotDefinedError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.WorkloadNotDefinedError">[docs]</a>
+<span class="k">class</span> <span class="nc">WorkloadNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a workload is not defined properly&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ExperimentNotDefinedError"><a class="viewcode-back" href="../../ramble.html#ramble.expander.ExperimentNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">ExperimentNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExperimentNotDefinedError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExperimentNotDefinedError">[docs]</a>
+<span class="k">class</span> <span class="nc">ExperimentNotDefinedError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an experiment is not defined properly&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -680,7 +719,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

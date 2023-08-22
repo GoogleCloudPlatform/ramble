@@ -12,11 +12,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e259d695"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -155,7 +155,7 @@
            <div itemprop="articleBody">
              
   <section id="workspace-configuration-file">
-<span id="workspace-config"></span><h1>Workspace Configuration File<a class="headerlink" href="#workspace-configuration-file" title="Permalink to this heading"></a></h1>
+<span id="workspace-config"></span><h1>Workspace Configuration File<a class="headerlink" href="#workspace-configuration-file" title="Link to this heading"></a></h1>
 <p>Ramble workspaces are controlled through their configuration files. Each
 workspace has a configuration file stored at <code class="docutils literal notranslate"><span class="pre">$workspace/configs/ramble.yaml</span></code>.</p>
 <p>This document will describe the syntax for writing a workspace configuration file.</p>
@@ -169,7 +169,7 @@ workspace has a configuration file stored at <code class="docutils literal notra
 <p>Each of these dictionaries is used to control different aspects of the Ramble
 workspace.</p>
 <section id="ramble-dictionary">
-<h2>Ramble Dictionary:<a class="headerlink" href="#ramble-dictionary" title="Permalink to this heading"></a></h2>
+<h2>Ramble Dictionary:<a class="headerlink" href="#ramble-dictionary" title="Link to this heading"></a></h2>
 <p>The ramble dictionary is used to control the experiments a workspace is
 responsible for configuring, executing, analyzing, and archiving.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -196,7 +196,7 @@ workload (as seen by <code class="docutils literal notranslate"><span class="pre
 <p>The name <code class="docutils literal notranslate"><span class="pre">variables</span></code> defines arbitrary variables, and will be explained in
 <a class="reference internal" href="#variable-dictionaries"><span class="std std-ref">Variable Dictionaries:</span></a>.</p>
 <section id="experiment-names">
-<span id="id1"></span><h3>Experiment Names:<a class="headerlink" href="#experiment-names" title="Permalink to this heading"></a></h3>
+<span id="id1"></span><h3>Experiment Names:<a class="headerlink" href="#experiment-names" title="Link to this heading"></a></h3>
 <p>While the names of applications and workloads are defined by the application
 definition file, experiment names are more arbitrary. Experiment names are
 string, and can take variables for expansion.</p>
@@ -220,7 +220,7 @@ string, and can take variables for expansion.</p>
 or ramble will throw an error.</p>
 </section>
 <section id="variable-dictionaries">
-<span id="id2"></span><h3>Variable Dictionaries:<a class="headerlink" href="#variable-dictionaries" title="Permalink to this heading"></a></h3>
+<span id="id2"></span><h3>Variable Dictionaries:<a class="headerlink" href="#variable-dictionaries" title="Link to this heading"></a></h3>
 <p>Within a variable dictionary, arbitrary variables can be defined. Defined
 variables apply to all experiments within their scope.</p>
 <p>These variables can be referred to within the YAML file, or template files
@@ -254,7 +254,7 @@ experiment. This experiment will also include definitions for
 <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, and <code class="docutils literal notranslate"><span class="pre">n_threads</span></code>.</p>
 </section>
 <section id="list-variables">
-<span id="ramble-vector-logic"></span><h3>List Variables:<a class="headerlink" href="#list-variables" title="Permalink to this heading"></a></h3>
+<span id="ramble-vector-logic"></span><h3>List Variables:<a class="headerlink" href="#list-variables" title="Link to this heading"></a></h3>
 <p>Variables can be defined as a list of values as well (again, following the same
 math and variable expansion syntax as defined above).</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -307,7 +307,7 @@ to create a list. With this functionality, the example above could be re-written
 </div>
 </section>
 <section id="variable-matrices">
-<span id="ramble-matrix-logic"></span><h3>Variable Matrices:<a class="headerlink" href="#variable-matrices" title="Permalink to this heading"></a></h3>
+<span id="ramble-matrix-logic"></span><h3>Variable Matrices:<a class="headerlink" href="#variable-matrices" title="Link to this heading"></a></h3>
 <p>In addition to allowing variables, Ramble’s config file has a special syntax for define variable matrices.</p>
 <p>Matrices consume list variables, and generate a matrix of variables with it.
 Each independent matrix performs the cross product of any list variables it
@@ -370,7 +370,7 @@ there would be 4 experiments, each defined by a unique
 <code class="docutils literal notranslate"><span class="pre">(processes_per_node,</span> <span class="pre">partition,</span> <span class="pre">n_nodes)</span></code> tuple.</p>
 </section>
 <section id="explicit-variable-zips">
-<span id="ramble-explicit-zips"></span><h3>Explicit Variable Zips:<a class="headerlink" href="#explicit-variable-zips" title="Permalink to this heading"></a></h3>
+<span id="ramble-explicit-zips"></span><h3>Explicit Variable Zips:<a class="headerlink" href="#explicit-variable-zips" title="Link to this heading"></a></h3>
 <p>Ramble’s workspace config contains syntax for defining explicit variable zips.
 These zips are named grouping of variables that are related and should be
 iterated over together when generating experiments.</p>
@@ -409,7 +409,7 @@ consumed by matrices just as list variables would be.</p>
 the zip of <code class="docutils literal notranslate"><span class="pre">partition</span></code> and <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>.</p>
 </section>
 <section id="experiment-exclusion">
-<span id="ramble-experiment-exclusion"></span><h3>Experiment Exclusion:<a class="headerlink" href="#experiment-exclusion" title="Permalink to this heading"></a></h3>
+<span id="ramble-experiment-exclusion"></span><h3>Experiment Exclusion:<a class="headerlink" href="#experiment-exclusion" title="Link to this heading"></a></h3>
 <p>When writing a workspace configuration file, experiments can be explicitly
 excluded from the generated set using an <code class="docutils literal notranslate"><span class="pre">exclude</span></code> block inside the
 experiment definition. This block contains definitions of <code class="docutils literal notranslate"><span class="pre">variables</span></code>,
@@ -428,7 +428,7 @@ Within any single <code class="docutils literal notranslate"><span class="pre">w
 <code class="docutils literal notranslate"><span class="pre">and</span></code> and <code class="docutils literal notranslate"><span class="pre">or</span></code> operators as well.</p>
 </section>
 <section id="environment-variable-control">
-<h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Permalink to this heading"></a></h3>
+<h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Link to this heading"></a></h3>
 <p>Environment variables can be controlled using an
 <a class="reference internal" href="configuration_files.html#env-vars-config"><span class="std std-ref">env_var config section</span></a>,
 defined at the appropriate level of the workspace config.</p>
@@ -458,7 +458,7 @@ defined at the appropriate level of the workspace config.</p>
 </div>
 </section>
 <section id="templatized-workloads">
-<h3>Templatized Workloads:<a class="headerlink" href="#templatized-workloads" title="Permalink to this heading"></a></h3>
+<h3>Templatized Workloads:<a class="headerlink" href="#templatized-workloads" title="Link to this heading"></a></h3>
 <p>As previously shown, variables can be defined using lists or matrices. In addition to
 controlling several aspects of experiments, list and matrix variables can be used to
 replicate an experiment across workloads.</p>
@@ -481,7 +481,7 @@ can be used to define the name of the workloads, except those reserved by
 Ramble. These can be seen in the reserved variables section below.</p>
 </section>
 <section id="cross-experiment-variable-references">
-<h3>Cross Experiment Variable References:<a class="headerlink" href="#cross-experiment-variable-references" title="Permalink to this heading"></a></h3>
+<h3>Cross Experiment Variable References:<a class="headerlink" href="#cross-experiment-variable-references" title="Link to this heading"></a></h3>
 <p>Variables can be defined to pull the value of a variable out of a different
 experiment. This is particularly useful when an experiment needs the path to
 something ramble automatically generates in a different experiment.</p>
@@ -515,7 +515,7 @@ defined in the experiment <code class="docutils literal notranslate"><span class
 will set <code class="docutils literal notranslate"><span class="pre">test_value</span></code> to <code class="docutils literal notranslate"><span class="pre">'exp1_value'</span></code>.</p>
 </section>
 <section id="experiment-modifiers">
-<h3>Experiment Modifiers:<a class="headerlink" href="#experiment-modifiers" title="Permalink to this heading"></a></h3>
+<h3>Experiment Modifiers:<a class="headerlink" href="#experiment-modifiers" title="Link to this heading"></a></h3>
 <p>In addition to containing application definitions, Ramble also provides
 experiment modifiers. Experiment modifiers encapsulate several aspects of a
 standard modification to an experiment, such as prepending a binary with a tool
@@ -563,14 +563,14 @@ will match all executables. Modifier classes can (and should) be implemented to
 only act on the correct executable types (i.e. executables with <code class="docutils literal notranslate"><span class="pre">use_mpi=true</span></code>).</p>
 </section>
 <section id="controlling-internals">
-<h3>Controlling Internals:<a class="headerlink" href="#controlling-internals" title="Permalink to this heading"></a></h3>
+<h3>Controlling Internals:<a class="headerlink" href="#controlling-internals" title="Link to this heading"></a></h3>
 <p>Within a workspace config, an internals dictionary can be used to control
 several internal aspects of the application, workload, and experiment.</p>
 <p>This config section is defined in the
 <a class="reference internal" href="configuration_files.html#internals-config"><span class="std std-ref">internals config section</span></a>.</p>
 <p>Below are examples of using this within a workspace config file.</p>
 <section id="custom-executables">
-<h4>Custom Executables:<a class="headerlink" href="#custom-executables" title="Permalink to this heading"></a></h4>
+<h4>Custom Executables:<a class="headerlink" href="#custom-executables" title="Link to this heading"></a></h4>
 <p>Custom executables can be created within the internals dictionary. Below is an
 example, showing how to create a <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> executable at the application level.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -591,7 +591,7 @@ the command <code class="docutils literal notranslate"><span class="pre">lscpu</
 important to note that this only creates the executable, and does not use it.</p>
 </section>
 <section id="controlling-executable-order">
-<h4>Controlling Executable Order:<a class="headerlink" href="#controlling-executable-order" title="Permalink to this heading"></a></h4>
+<h4>Controlling Executable Order:<a class="headerlink" href="#controlling-executable-order" title="Link to this heading"></a></h4>
 <p>The internals dictionary allows the ability to control the order pre-defined
 executables (or custom executables) are pieced together to build an experiment.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -618,11 +618,11 @@ expansion.</p>
 </section>
 </section>
 <section id="reserved-variables">
-<h3>Reserved Variables:<a class="headerlink" href="#reserved-variables" title="Permalink to this heading"></a></h3>
+<h3>Reserved Variables:<a class="headerlink" href="#reserved-variables" title="Link to this heading"></a></h3>
 <p>There are several reserved, auto-generated, and required variables for Ramble
 to function properly. This section will describe them.</p>
 <section id="required-variables">
-<h4>Required Variables:<a class="headerlink" href="#required-variables" title="Permalink to this heading"></a></h4>
+<h4>Required Variables:<a class="headerlink" href="#required-variables" title="Link to this heading"></a></h4>
 <p>Ramble requires the following variables to be defined:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> - Defines the number of MPI ranks to use. If not explicitly set,
@@ -637,7 +637,7 @@ not explicitly set, is defined as: <code class="docutils literal notranslate"><s
 </ul>
 </section>
 <section id="generated-variables">
-<h4>Generated Variables:<a class="headerlink" href="#generated-variables" title="Permalink to this heading"></a></h4>
+<h4>Generated Variables:<a class="headerlink" href="#generated-variables" title="Link to this heading"></a></h4>
 <p>Ramble automatically generates definitions for the following varialbes:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">application_name</span></code> - Set to the name of the application</p></li>
@@ -673,7 +673,7 @@ absolute path to: <code class="docutils literal notranslate"><span class="pre">{
 </ul>
 </section>
 <section id="spack-specific-generated-variables">
-<h4>Spack Specific Generated Variables:<a class="headerlink" href="#spack-specific-generated-variables" title="Permalink to this heading"></a></h4>
+<h4>Spack Specific Generated Variables:<a class="headerlink" href="#spack-specific-generated-variables" title="Link to this heading"></a></h4>
 <p>When using spack applications, Ramble also generates the following variables:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> - Set to the equivalent of <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">location</span> <span class="pre">-i</span>
@@ -681,11 +681,32 @@ absolute path to: <code class="docutils literal notranslate"><span class="pre">{
 <code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> is set to the name of the package as defined in the
 <code class="docutils literal notranslate"><span class="pre">spack:packages</span></code> dictionary.</p></li>
 </ul>
+<p>As an example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">grm</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2023.1</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">grm_env</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grm</span>
+</pre></div>
+</div>
+<p>Defines a software environment named <code class="docutils literal notranslate"><span class="pre">grm_env</span></code>. The default environment used
+has the same name as the application the experiment is generated from. In
+experiments which use this <code class="docutils literal notranslate"><span class="pre">grm_env</span></code> environment, a variable is defined
+named: <code class="docutils literal notranslate"><span class="pre">gromacs</span></code>, as that is the package named defined by the <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code>
+attribute of the <code class="docutils literal notranslate"><span class="pre">grm</span></code> package definition. This variable contains the path to
+the installation location for the <code class="docutils literal notranslate"><span class="pre">gromacs</span></code> package.</p>
+<p><strong>NOTE</strong>: Package installation location variables are only generated when
+actually performing the setup of a workspace. When a <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> is
+performed, these paths are not populated.</p>
 </section>
 </section>
 </section>
 <section id="spack-dictionary">
-<h2>Spack Dictionary:<a class="headerlink" href="#spack-dictionary" title="Permalink to this heading"></a></h2>
+<h2>Spack Dictionary:<a class="headerlink" href="#spack-dictionary" title="Link to this heading"></a></h2>
 <p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">spack:</span></code> dictionary controls the software
 stack installation that ramble performs. This configuration section is defined
 in the <a class="reference internal" href="configuration_files.html#spack-config"><span class="std std-ref">Spack section</span></a> documentation.
@@ -700,14 +721,14 @@ Additionally, spack packages can be marked as required through the
 <code class="docutils literal notranslate"><span class="pre">required_package</span></code> directive.</p>
 </section>
 <section id="controlling-mpi-libraries-and-batch-systems">
-<h2>Controlling MPI Libraries and Batch Systems:<a class="headerlink" href="#controlling-mpi-libraries-and-batch-systems" title="Permalink to this heading"></a></h2>
+<h2>Controlling MPI Libraries and Batch Systems:<a class="headerlink" href="#controlling-mpi-libraries-and-batch-systems" title="Link to this heading"></a></h2>
 <p>Some workspaces might be configured with the goal of exploring the performance
 of different MPI libraries (e.g. MPICH vs. Open MPI), or of performing the same
 experiment in multiple batch schedulers (e.g. SLURM, PBS Pro, and Flux).</p>
 <p>This section will show how to perform these experiments within a workspace
 configuration file.</p>
 <section id="mpi-command-control">
-<h3>MPI Command Control:<a class="headerlink" href="#mpi-command-control" title="Permalink to this heading"></a></h3>
+<h3>MPI Command Control:<a class="headerlink" href="#mpi-command-control" title="Link to this heading"></a></h3>
 <p>When writing a ramble configuration file to perform the same experiment with
 different MPI libraries, the MPI section within the Ramble dictionary is
 insufficient for changing the flags used based on the MPI library used.</p>
@@ -763,7 +784,7 @@ zipped together, giving each experiment a tuple of: <code class="docutils litera
 corresponding Gromacs spec.</p>
 </section>
 <section id="batch-system-control">
-<h3>Batch System Control:<a class="headerlink" href="#batch-system-control" title="Permalink to this heading"></a></h3>
+<h3>Batch System Control:<a class="headerlink" href="#batch-system-control" title="Link to this heading"></a></h3>
 <p>Similar to the previously describe MPI command control, experiments can use
 different batch systems by overriding the <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> variable.</p>
 <p>Below is an example configuration file showing how the <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code>
@@ -813,7 +834,7 @@ scripts to each of the batch systems.</p>
 </section>
 </section>
 <section id="experiment-chains">
-<h2>Experiment Chains:<a class="headerlink" href="#experiment-chains" title="Permalink to this heading"></a></h2>
+<h2>Experiment Chains:<a class="headerlink" href="#experiment-chains" title="Link to this heading"></a></h2>
 <p>Multiple experiments can be executed within the same context by a process known
 as chaining, this allows multiple experiments (potentially from multiple
 applications) to be executed in the same context and is useful for many
@@ -824,7 +845,7 @@ these is simply defining the experiment chain, and the second is defining
 experiments which are only intended to be used when chained into another
 experiment, known as template experiments.</p>
 <section id="defining-experiment-chains">
-<h3>Defining Experiment Chains:<a class="headerlink" href="#defining-experiment-chains" title="Permalink to this heading"></a></h3>
+<h3>Defining Experiment Chains:<a class="headerlink" href="#defining-experiment-chains" title="Link to this heading"></a></h3>
 <p>The following example shows how to specify a chain of experiments:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
@@ -887,7 +908,7 @@ that does not have <code class="docutils literal notranslate"><span class="pre">
 definition of variables from the chained experiment if needed.</p>
 </section>
 <section id="suppressing-experiments">
-<h3>Suppressing Experiments:<a class="headerlink" href="#suppressing-experiments" title="Permalink to this heading"></a></h3>
+<h3>Suppressing Experiments:<a class="headerlink" href="#suppressing-experiments" title="Link to this heading"></a></h3>
 <p>The below example shows how to suppress generation of an experiment, by marking
 it as a template.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -926,7 +947,7 @@ being used as a stand-alone experiment, but it will still be generated and used
 when it’s chained into other experiments.</p>
 </section>
 <section id="defining-chains-of-chains">
-<h3>Defining Chains of Chains:<a class="headerlink" href="#defining-chains-of-chains" title="Permalink to this heading"></a></h3>
+<h3>Defining Chains of Chains:<a class="headerlink" href="#defining-chains-of-chains" title="Link to this heading"></a></h3>
 <p>Ramble supports the ability to define chains of experiment chains. This allows
 an experiment to automatically implicitly include all of the experiments chained
 into the explicitly chained experiment.</p>
@@ -987,7 +1008,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

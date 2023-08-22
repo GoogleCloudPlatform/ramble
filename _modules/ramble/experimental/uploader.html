@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -134,9 +134,13 @@
 <span class="n">default_node_type_val</span> <span class="o">=</span> <span class="s2">&quot;Not Specified&quot;</span>
 
 
-<div class="viewcode-block" id="Uploader"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader">[docs]</a><span class="k">class</span> <span class="nc">Uploader</span><span class="p">():</span>
+<div class="viewcode-block" id="Uploader">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader">[docs]</a>
+<span class="k">class</span> <span class="nc">Uploader</span><span class="p">():</span>
     <span class="c1"># TODO: should the class store the base uri?</span>
-<div class="viewcode-block" id="Uploader.perform_upload"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader.perform_upload">[docs]</a>    <span class="k">def</span> <span class="nf">perform_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Uploader.perform_upload">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader.perform_upload">[docs]</a>
+    <span class="k">def</span> <span class="nf">perform_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="c1"># TODO: move content checking to __init__ ?</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -144,10 +148,14 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> requires %</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> argument.&quot;</span><span class="p">)</span>
-        <span class="k">pass</span></div></div>
+        <span class="k">pass</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Experiment"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment">[docs]</a><span class="k">class</span> <span class="nc">Experiment</span><span class="p">():</span>
+
+<div class="viewcode-block" id="Experiment">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment">[docs]</a>
+<span class="k">class</span> <span class="nc">Experiment</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representation of experiment data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -182,7 +190,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generate_hash</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Experiment.generate_hash"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment.generate_hash">[docs]</a>    <span class="k">def</span> <span class="nf">generate_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Experiment.generate_hash">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment.generate_hash">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Avoid regenerating a hash when possible</span>
         <span class="c1"># (The hash of an object must never change during its lifetime..)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -193,10 +203,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
 
-<div class="viewcode-block" id="Experiment.get_hash"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment.get_hash">[docs]</a>    <span class="k">def</span> <span class="nf">get_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Experiment.get_hash">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment.get_hash">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_hash</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Experiment.to_json"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Experiment.to_json">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment.to_json">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1"># deep copy so the assignment below doesn&#39;t affect the foms array</span>
         <span class="kn">import</span> <span class="nn">copy</span>
@@ -204,10 +220,14 @@
 
         <span class="n">j</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foms</span><span class="p">)</span>
         <span class="n">j</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">j</span></div></div>
+        <span class="k">return</span> <span class="n">j</span></div>
+</div>
 
 
-<div class="viewcode-block" id="determine_node_type"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.determine_node_type">[docs]</a><span class="k">def</span> <span class="nf">determine_node_type</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">contexts</span><span class="p">):</span>
+
+<div class="viewcode-block" id="determine_node_type">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.determine_node_type">[docs]</a>
+<span class="k">def</span> <span class="nf">determine_node_type</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">contexts</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract node type from available FOMS.</span>
 
@@ -228,7 +248,10 @@
             <span class="k">continue</span></div>
 
 
-<div class="viewcode-block" id="upload_results"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.upload_results">[docs]</a><span class="k">def</span> <span class="nf">upload_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+
+<div class="viewcode-block" id="upload_results">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.upload_results">[docs]</a>
+<span class="k">def</span> <span class="nf">upload_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload&#39;</span><span class="p">):</span>
         <span class="c1"># Read upload type and push it there</span>
         <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload:type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;BigQuery&#39;</span><span class="p">:</span>  <span class="c1"># TODO: enum?</span>
@@ -253,7 +276,10 @@
         <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Missing correct config:upload parameters&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="format_data"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.format_data">[docs]</a><span class="k">def</span> <span class="nf">format_data</span><span class="p">(</span><span class="n">data_in</span><span class="p">):</span>
+
+<div class="viewcode-block" id="format_data">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.format_data">[docs]</a>
+<span class="k">def</span> <span class="nf">format_data</span><span class="p">(</span><span class="n">data_in</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Goal: convert results to a more searchable and decomposed format for insertion</span>
 <span class="sd">    into data store (etc)</span>
@@ -308,14 +334,19 @@
     <span class="k">return</span> <span class="n">results</span></div>
 
 
-<div class="viewcode-block" id="BigQueryUploader"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader">[docs]</a><span class="k">class</span> <span class="nc">BigQueryUploader</span><span class="p">(</span><span class="n">Uploader</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BigQueryUploader">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader">[docs]</a>
+<span class="k">class</span> <span class="nc">BigQueryUploader</span><span class="p">(</span><span class="n">Uploader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to handle upload of FOMs to BigQuery</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="BigQueryUploader.chunked_upload"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.chunked_upload">[docs]</a>    <span class="k">def</span> <span class="nf">chunked_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="BigQueryUploader.chunked_upload">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.chunked_upload">[docs]</a>
+    <span class="k">def</span> <span class="nf">chunked_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
         <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
@@ -343,7 +374,10 @@
                 <span class="k">return</span> <span class="n">error</span>
         <span class="k">return</span> <span class="n">error</span></div>
 
-<div class="viewcode-block" id="BigQueryUploader.insert_data"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.insert_data">[docs]</a>    <span class="k">def</span> <span class="nf">insert_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="BigQueryUploader.insert_data">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.insert_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">insert_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="c1"># It is expected that the user will create these tables outside of this</span>
         <span class="c1"># tooling</span>
@@ -379,13 +413,17 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Encountered errors while inserting rows: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="BigQueryUploader.perform_upload"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.perform_upload">[docs]</a>    <span class="k">def</span> <span class="nf">perform_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BigQueryUploader.perform_upload">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.perform_upload">[docs]</a>
+    <span class="k">def</span> <span class="nf">perform_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">perform_upload</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
 
         <span class="c1"># import spack.util.spack_json as sjson</span>
         <span class="c1"># json_str = sjson.dump(results)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">insert_data</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></div>
+
 
     <span class="c1"># def get_max_current_id(uri, table):</span>
         <span class="c1"># TODO: Generating an id based on the max in use id is dangerous, and</span>
@@ -397,12 +435,16 @@
         <span class="c1"># results = query_job.result()  # Waits for job to complete.</span>
         <span class="c1"># return results[0]</span>
 
-<div class="viewcode-block" id="BigQueryUploader.get_experiment_id"><a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.get_experiment_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_id</span><span class="p">(</span><span class="n">experiment</span><span class="p">):</span>
+<div class="viewcode-block" id="BigQueryUploader.get_experiment_id">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.get_experiment_id">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_experiment_id</span><span class="p">(</span><span class="n">experiment</span><span class="p">):</span>
         <span class="c1"># get_max_current_id(...) # Warning: dangerous..</span>
 
         <span class="c1"># This should be stable per machine/python version, but is not</span>
         <span class="c1"># guaranteed to be globally stable</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+</div>
+
 </pre></div>
 
            </div>
@@ -413,7 +455,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

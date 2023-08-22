@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -209,7 +209,9 @@
 <span class="n">ramble_ld_library_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="set_working_dir"><a class="viewcode-back" href="../../ramble.html#ramble.main.set_working_dir">[docs]</a><span class="k">def</span> <span class="nf">set_working_dir</span><span class="p">():</span>
+<div class="viewcode-block" id="set_working_dir">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.set_working_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">set_working_dir</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Change the working directory to getcwd, or ramble prefix if no cwd.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">ramble_working_dir</span>
     <span class="k">try</span><span class="p">:</span>
@@ -219,13 +221,19 @@
         <span class="n">ramble_working_dir</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span></div>
 
 
-<div class="viewcode-block" id="add_all_commands"><a class="viewcode-back" href="../../ramble.html#ramble.main.add_all_commands">[docs]</a><span class="k">def</span> <span class="nf">add_all_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="add_all_commands">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.add_all_commands">[docs]</a>
+<span class="k">def</span> <span class="nf">add_all_commands</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add all ramble subcommands to the parser.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">all_commands</span><span class="p">():</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_version"><a class="viewcode-back" href="../../ramble.html#ramble.main.get_version">[docs]</a><span class="k">def</span> <span class="nf">get_version</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_version">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.get_version">[docs]</a>
+<span class="k">def</span> <span class="nf">get_version</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a descriptive version of this instance of Ramble.</span>
 
 <span class="sd">    Outputs &#39;&lt;PEP440 version&gt; (&lt;git commit sha&gt;)&#39;.</span>
@@ -241,7 +249,10 @@
     <span class="k">return</span> <span class="n">version</span></div>
 
 
-<div class="viewcode-block" id="get_git_hash"><a class="viewcode-back" href="../../ramble.html#ramble.main.get_git_hash">[docs]</a><span class="k">def</span> <span class="nf">get_git_hash</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_git_hash">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.get_git_hash">[docs]</a>
+<span class="k">def</span> <span class="nf">get_git_hash</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get get hash from a path</span>
 
 <span class="sd">    Outputs &#39;&lt;git commit sha&gt;&#39;.</span>
@@ -270,7 +281,10 @@
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="index_commands"><a class="viewcode-back" href="../../ramble.html#ramble.main.index_commands">[docs]</a><span class="k">def</span> <span class="nf">index_commands</span><span class="p">():</span>
+
+<div class="viewcode-block" id="index_commands">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.index_commands">[docs]</a>
+<span class="k">def</span> <span class="nf">index_commands</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;create an index of commands by section for this help level&quot;&quot;&quot;</span>
     <span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">all_commands</span><span class="p">():</span>
@@ -294,7 +308,10 @@
     <span class="k">return</span> <span class="n">index</span></div>
 
 
-<div class="viewcode-block" id="RambleHelpFormatter"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleHelpFormatter">[docs]</a><span class="k">class</span> <span class="nc">RambleHelpFormatter</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawTextHelpFormatter</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleHelpFormatter">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleHelpFormatter">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleHelpFormatter</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawTextHelpFormatter</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_format_actions_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Formatter with more concise usage strings.&quot;&quot;&quot;</span>
         <span class="n">usage</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
@@ -311,13 +328,21 @@
             <span class="n">usage</span> <span class="o">=</span> <span class="s1">&#39;[-</span><span class="si">%s</span><span class="s1">] </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chars</span><span class="p">,</span> <span class="n">usage</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">usage</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
-<div class="viewcode-block" id="RambleHelpFormatter.add_arguments"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleHelpFormatter.add_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+<div class="viewcode-block" id="RambleHelpFormatter.add_arguments">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleHelpFormatter.add_arguments">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
         <span class="n">actions</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">actions</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;option_strings&#39;</span><span class="p">))</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RambleHelpFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RambleHelpFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RambleArgumentParser"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser">[docs]</a><span class="k">class</span> <span class="nc">RambleArgumentParser</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">):</span>
-<div class="viewcode-block" id="RambleArgumentParser.format_help_sections"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.format_help_sections">[docs]</a>    <span class="k">def</span> <span class="nf">format_help_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleArgumentParser">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleArgumentParser</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">):</span>
+<div class="viewcode-block" id="RambleArgumentParser.format_help_sections">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.format_help_sections">[docs]</a>
+    <span class="k">def</span> <span class="nf">format_help_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format help on sections for a particular verbosity level.</span>
 
 <span class="sd">        Args:</span>
@@ -423,7 +448,10 @@
         <span class="c1"># determine help from format above</span>
         <span class="k">return</span> <span class="n">formatter</span><span class="o">.</span><span class="n">format_help</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RambleArgumentParser.add_subparsers"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.add_subparsers">[docs]</a>    <span class="k">def</span> <span class="nf">add_subparsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleArgumentParser.add_subparsers">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.add_subparsers">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_subparsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure that sensible defaults are propagated to subparsers&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;metavar&#39;</span><span class="p">,</span> <span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">)</span>
 
@@ -446,7 +474,10 @@
         <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span> <span class="o">=</span> <span class="n">add_parser</span>
         <span class="k">return</span> <span class="n">sp</span></div>
 
-<div class="viewcode-block" id="RambleArgumentParser.add_command"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.add_command">[docs]</a>    <span class="k">def</span> <span class="nf">add_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleArgumentParser.add_command">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.add_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one subcommand to this parser.&quot;&quot;&quot;</span>
         <span class="c1"># lazily initialize any subparsers</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;subparsers&#39;</span><span class="p">):</span>
@@ -471,7 +502,10 @@
         <span class="c1"># return the callable function for the command</span>
         <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">get_command</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RambleArgumentParser.format_help"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.format_help">[docs]</a>    <span class="k">def</span> <span class="nf">format_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleArgumentParser.format_help">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleArgumentParser.format_help">[docs]</a>
+    <span class="k">def</span> <span class="nf">format_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prog</span> <span class="o">==</span> <span class="s1">&#39;ramble&#39;</span><span class="p">:</span>
             <span class="c1"># use format_help_sections for the main ramble parser, but not</span>
             <span class="c1"># for subparsers</span>
@@ -479,6 +513,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># in subparsers, self.prog is, e.g., &#39;ramble list&#39;</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RambleArgumentParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">format_help</span><span class="p">()</span></div>
+
 
     <span class="k">def</span> <span class="nf">_check_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># converted value must be one of the choices (if specified)</span>
@@ -490,7 +525,10 @@
             <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentError</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="make_argument_parser"><a class="viewcode-back" href="../../ramble.html#ramble.main.make_argument_parser">[docs]</a><span class="k">def</span> <span class="nf">make_argument_parser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="make_argument_parser">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.make_argument_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">make_argument_parser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an basic argument parser without any subcommands added.&quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">RambleArgumentParser</span><span class="p">(</span>
         <span class="n">formatter_class</span><span class="o">=</span><span class="n">RambleHelpFormatter</span><span class="p">,</span> <span class="n">add_help</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -588,12 +626,18 @@
     <span class="k">return</span> <span class="n">parser</span></div>
 
 
-<div class="viewcode-block" id="send_warning_to_tty"><a class="viewcode-back" href="../../ramble.html#ramble.main.send_warning_to_tty">[docs]</a><span class="k">def</span> <span class="nf">send_warning_to_tty</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="send_warning_to_tty">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.send_warning_to_tty">[docs]</a>
+<span class="k">def</span> <span class="nf">send_warning_to_tty</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Redirects messages to tty.warn.&quot;&quot;&quot;</span>
     <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="setup_main_options"><a class="viewcode-back" href="../../ramble.html#ramble.main.setup_main_options">[docs]</a><span class="k">def</span> <span class="nf">setup_main_options</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="setup_main_options">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.setup_main_options">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_main_options</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure ramble globals based on the basic options.&quot;&quot;&quot;</span>
     <span class="c1"># Assign a custom function to show warnings</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">showwarning</span> <span class="o">=</span> <span class="n">send_warning_to_tty</span>
@@ -649,7 +693,10 @@
     <span class="n">color</span><span class="o">.</span><span class="n">set_color_when</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">color</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="allows_unknown_args"><a class="viewcode-back" href="../../ramble.html#ramble.main.allows_unknown_args">[docs]</a><span class="k">def</span> <span class="nf">allows_unknown_args</span><span class="p">(</span><span class="n">command</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allows_unknown_args">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.allows_unknown_args">[docs]</a>
+<span class="k">def</span> <span class="nf">allows_unknown_args</span><span class="p">(</span><span class="n">command</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements really simple argument injection for unknown arguments.</span>
 
 <span class="sd">    Commands may add an optional argument called &quot;unknown args&quot; to</span>
@@ -660,6 +707,7 @@
     <span class="n">varnames</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;__code__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">co_varnames</span>
     <span class="n">argcount</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;__code__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">co_argcount</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">argcount</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">varnames</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;unknown_args&#39;</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_invoke_command</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
@@ -675,7 +723,9 @@
     <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">return_val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">return_val</span>
 
 
-<div class="viewcode-block" id="RambleCommand"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleCommand">[docs]</a><span class="k">class</span> <span class="nc">RambleCommand</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="RambleCommand">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleCommand">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleCommand</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Callable object that invokes a ramble command (for testing).</span>
 
 <span class="sd">    Example usage::</span>
@@ -766,6 +816,7 @@
                     <span class="n">tty</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ln</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;==&gt; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_profile_wrapper</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">cProfile</span>
 
@@ -799,7 +850,9 @@
         <span class="n">stats</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="n">nlines</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="print_setup_info"><a class="viewcode-back" href="../../ramble.html#ramble.main.print_setup_info">[docs]</a><span class="k">def</span> <span class="nf">print_setup_info</span><span class="p">(</span><span class="o">*</span><span class="n">info</span><span class="p">):</span>
+<div class="viewcode-block" id="print_setup_info">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.print_setup_info">[docs]</a>
+<span class="k">def</span> <span class="nf">print_setup_info</span><span class="p">(</span><span class="o">*</span><span class="n">info</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print basic information needed by setup-env.[c]sh.</span>
 
 <span class="sd">    Args:</span>
@@ -818,6 +871,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;set </span><span class="si">%s</span><span class="s2"> = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;shell must be sh or csh&#39;</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -944,7 +998,9 @@
         <span class="k">return</span> <span class="n">finish_parse_and_run</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">,</span> <span class="n">workspace_format_error</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="finish_parse_and_run"><a class="viewcode-back" href="../../ramble.html#ramble.main.finish_parse_and_run">[docs]</a><span class="k">def</span> <span class="nf">finish_parse_and_run</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">,</span> <span class="n">workspace_format_error</span><span class="p">):</span>
+<div class="viewcode-block" id="finish_parse_and_run">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.finish_parse_and_run">[docs]</a>
+<span class="k">def</span> <span class="nf">finish_parse_and_run</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">,</span> <span class="n">workspace_format_error</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finish parsing after we know the command to run.&quot;&quot;&quot;</span>
     <span class="c1"># add the found command to the parser and re-run then re-parse</span>
     <span class="n">command</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
@@ -978,7 +1034,10 @@
         <span class="k">return</span> <span class="n">_invoke_command</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../ramble.html#ramble.main.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the entry point for the Ramble command.</span>
 
 <span class="sd">    ``main()`` itself is just an error handler -- it handles errors for</span>
@@ -1020,8 +1079,12 @@
         <span class="k">return</span> <span class="mi">3</span></div>
 
 
-<div class="viewcode-block" id="RambleCommandError"><a class="viewcode-back" href="../../ramble.html#ramble.main.RambleCommandError">[docs]</a><span class="k">class</span> <span class="nc">RambleCommandError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleCommandError">
+<a class="viewcode-back" href="../../ramble.html#ramble.main.RambleCommandError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleCommandError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when RambleCommand execution fails.&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -1032,7 +1095,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

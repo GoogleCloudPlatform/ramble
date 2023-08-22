@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -142,7 +142,9 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">scopes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scopes</span><span class="p">()</span>
     <span class="n">scopes_metavar</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scopes_metavar</span>
 
@@ -217,6 +219,7 @@
     <span class="n">revert</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;section&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;section to update&#39;</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_get_scope_and_section</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract config scope and section from arguments.&quot;&quot;&quot;</span>
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Args = </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -243,7 +246,9 @@
     <span class="k">return</span> <span class="n">scope</span><span class="p">,</span> <span class="n">section</span>
 
 
-<div class="viewcode-block" id="config_get"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_get">[docs]</a><span class="k">def</span> <span class="nf">config_get</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="config_get">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_get">[docs]</a>
+<span class="k">def</span> <span class="nf">config_get</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dump merged YAML configuration for a specific section.</span>
 
 <span class="sd">    With no arguments and an active workspace, print the contents of</span>
@@ -267,12 +272,18 @@
                 <span class="s1">&#39;or an active workspace.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="config_blame"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_blame">[docs]</a><span class="k">def</span> <span class="nf">config_blame</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="config_blame">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_blame">[docs]</a>
+<span class="k">def</span> <span class="nf">config_blame</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print out line-by-line blame of merged YAML.&quot;&quot;&quot;</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">section</span><span class="p">,</span> <span class="n">blame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="config_edit"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_edit">[docs]</a><span class="k">def</span> <span class="nf">config_edit</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="config_edit">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_edit">[docs]</a>
+<span class="k">def</span> <span class="nf">config_edit</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Edit the configuration file for a specific scope and config section.</span>
 
 <span class="sd">    With no arguments and an active workspace, edit the ramble.yaml for</span>
@@ -300,7 +311,10 @@
         <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">editor</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="config_list"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_list">[docs]</a><span class="k">def</span> <span class="nf">config_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="config_list">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_list">[docs]</a>
+<span class="k">def</span> <span class="nf">config_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;List the possible configuration sections.</span>
 
 <span class="sd">    Used primarily for shell tab completion scripts.</span>
@@ -308,7 +322,10 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">section_schemas</span><span class="p">)))</span></div>
 
 
-<div class="viewcode-block" id="config_add"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_add">[docs]</a><span class="k">def</span> <span class="nf">config_add</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="config_add">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_add">[docs]</a>
+<span class="k">def</span> <span class="nf">config_add</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add the given configuration to the specified config scope</span>
 
 <span class="sd">    This is a stateful operation that edits the config files.&quot;&quot;&quot;</span>
@@ -326,7 +343,10 @@
         <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="config_remove"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_remove">[docs]</a><span class="k">def</span> <span class="nf">config_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="config_remove">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_remove">[docs]</a>
+<span class="k">def</span> <span class="nf">config_remove</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove the given configuration from the specified config scope</span>
 
 <span class="sd">    This is a stateful operation that edits the config files.&quot;&quot;&quot;</span>
@@ -354,13 +374,16 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">existing</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_can_update_config_file</span><span class="p">(</span><span class="n">scope_dir</span><span class="p">,</span> <span class="n">cfg_file</span><span class="p">):</span>
     <span class="n">dir_ok</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">can_write_to_dir</span><span class="p">(</span><span class="n">scope_dir</span><span class="p">)</span>
     <span class="n">cfg_ok</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">can_access</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dir_ok</span> <span class="ow">and</span> <span class="n">cfg_ok</span>
 
 
-<div class="viewcode-block" id="config_update"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_update">[docs]</a><span class="k">def</span> <span class="nf">config_update</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="config_update">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_update">[docs]</a>
+<span class="k">def</span> <span class="nf">config_update</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="c1"># Read the configuration files</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">section</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
     <span class="n">updates</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format_updates</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">section</span><span class="p">]</span>
@@ -439,6 +462,7 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">,</span> <span class="n">bkp_file</span><span class="p">))</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_can_revert_update</span><span class="p">(</span><span class="n">scope_dir</span><span class="p">,</span> <span class="n">cfg_file</span><span class="p">,</span> <span class="n">bkp_file</span><span class="p">):</span>
     <span class="n">dir_ok</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">can_write_to_dir</span><span class="p">(</span><span class="n">scope_dir</span><span class="p">)</span>
     <span class="n">cfg_ok</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">)</span> <span class="ow">or</span> <span class="n">fs</span><span class="o">.</span><span class="n">can_access</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">)</span>
@@ -446,7 +470,9 @@
     <span class="k">return</span> <span class="n">dir_ok</span> <span class="ow">and</span> <span class="n">cfg_ok</span> <span class="ow">and</span> <span class="n">bkp_ok</span>
 
 
-<div class="viewcode-block" id="config_revert"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_revert">[docs]</a><span class="k">def</span> <span class="nf">config_revert</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="config_revert">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config_revert">[docs]</a>
+<span class="k">def</span> <span class="nf">config_revert</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">scopes</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">scope</span> <span class="k">else</span> <span class="p">[</span>
         <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">file_scopes</span>
     <span class="p">]</span>
@@ -502,7 +528,10 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="config"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config">[docs]</a><span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="config">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.config.config">[docs]</a>
+<span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">action</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;get&#39;</span><span class="p">:</span> <span class="n">config_get</span><span class="p">,</span>
         <span class="s1">&#39;blame&#39;</span><span class="p">:</span> <span class="n">config_blame</span><span class="p">,</span>
@@ -515,6 +544,7 @@
         <span class="s1">&#39;revert&#39;</span><span class="p">:</span> <span class="n">config_revert</span>
     <span class="p">}</span>
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">config_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -525,7 +555,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

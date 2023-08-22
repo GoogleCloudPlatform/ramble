@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -145,7 +145,9 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;-H&#39;</span><span class="p">,</span> <span class="s1">&#39;--pytest-help&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show full pytest help, with advanced options&quot;</span><span class="p">)</span>
@@ -186,7 +188,10 @@
         <span class="s1">&#39;pytest_args&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;arguments for pytest&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="do_list"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.do_list">[docs]</a><span class="k">def</span> <span class="nf">do_list</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="do_list">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.do_list">[docs]</a>
+<span class="k">def</span> <span class="nf">do_list</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a lists of tests than what pytest offers.&quot;&quot;&quot;</span>
     <span class="c1"># Run test collection and get the tree out.</span>
     <span class="n">old_output</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
@@ -259,7 +264,10 @@
         <span class="n">colify</span><span class="p">(</span><span class="n">all_functions</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_back_pytest_args"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.add_back_pytest_args">[docs]</a><span class="k">def</span> <span class="nf">add_back_pytest_args</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="add_back_pytest_args">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.add_back_pytest_args">[docs]</a>
+<span class="k">def</span> <span class="nf">add_back_pytest_args</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add parsed pytest args, unknown args, and remainder together.</span>
 
 <span class="sd">    We add some basic pytest arguments to the Ramble parser to ensure that</span>
@@ -273,7 +281,10 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="unit_test"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.unit_test">[docs]</a><span class="k">def</span> <span class="nf">unit_test</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="unit_test">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.unit_test">[docs]</a>
+<span class="k">def</span> <span class="nf">unit_test</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">pytest_help</span><span class="p">:</span>
         <span class="c1"># make the pytest.main help output more accurate</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ramble test&#39;</span>
@@ -306,6 +317,7 @@
                 <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">pytest_args</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
                 <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;Pytest python module not found. Ensure requirements.txt are installed.&#39;</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -316,7 +328,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

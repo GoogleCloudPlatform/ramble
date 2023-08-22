@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -133,7 +133,9 @@
 <span class="kn">import</span> <span class="nn">ramble.util.matrices</span>
 
 
-<div class="viewcode-block" id="RenderGroup"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup">[docs]</a><span class="k">class</span> <span class="nc">RenderGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="RenderGroup">
+<a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup">[docs]</a>
+<span class="k">class</span> <span class="nc">RenderGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">_obj_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">,</span> <span class="s1">&#39;package&#39;</span><span class="p">,</span> <span class="s1">&#39;environment&#39;</span><span class="p">]</span>
     <span class="n">_actions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude&#39;</span><span class="p">]</span>
 
@@ -168,7 +170,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">zips</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="RenderGroup.copy_contents"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.copy_contents">[docs]</a>    <span class="k">def</span> <span class="nf">copy_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_group</span><span class="p">):</span>
+<div class="viewcode-block" id="RenderGroup.copy_contents">
+<a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.copy_contents">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_group</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy contents of in_group into self&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
@@ -180,7 +184,10 @@
         <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RenderGroup.from_dict"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_template</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RenderGroup.from_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.from_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_template</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract RenderGroup definitions from a dictionary</span>
 
 <span class="sd">        Dictionaries should follow the below format:</span>
@@ -217,11 +224,17 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">extracted</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="k">return</span> <span class="n">extracted</span></div></div>
+        <span class="k">return</span> <span class="n">extracted</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Renderer"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer">[docs]</a><span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<div class="viewcode-block" id="Renderer.render_objects"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Renderer">
+<a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer">[docs]</a>
+<span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Renderer.render_objects">
+<a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>
+    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render objects based on the input variables and matrices</span>
 
 <span class="sd">        Internally collects all matrix and vector variables.</span>
@@ -486,11 +499,16 @@
                         <span class="n">keep_object</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="n">keep_object</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">object_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div></div>
+                <span class="k">yield</span> <span class="n">object_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RambleRendererError"><a class="viewcode-back" href="../../ramble.html#ramble.renderer.RambleRendererError">[docs]</a><span class="k">class</span> <span class="nc">RambleRendererError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RambleRendererError">
+<a class="viewcode-back" href="../../ramble.html#ramble.renderer.RambleRendererError">[docs]</a>
+<span class="k">class</span> <span class="nc">RambleRendererError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for all renderer errors&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -501,7 +519,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

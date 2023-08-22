@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -244,17 +244,25 @@
 <span class="c1">#####################################</span>
 
 
-<div class="viewcode-block" id="all_object_names"><a class="viewcode-back" href="../../ramble.html#ramble.repository.all_object_names">[docs]</a><span class="k">def</span> <span class="nf">all_object_names</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
+<div class="viewcode-block" id="all_object_names">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.all_object_names">[docs]</a>
+<span class="k">def</span> <span class="nf">all_object_names</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience wrapper around ``ramble.repository.all_object_names()``.&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">return</span> <span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get"><a class="viewcode-back" href="../../ramble.html#ramble.repository.get">[docs]</a><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.get">[docs]</a>
+<span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience wrapper around ``ramble.repository.get()``.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_path"><a class="viewcode-back" href="../../ramble.html#ramble.repository.set_path">[docs]</a><span class="k">def</span> <span class="nf">set_path</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="set_path">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.set_path">[docs]</a>
+<span class="k">def</span> <span class="nf">set_path</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the path singleton to a specific value.</span>
 
 <span class="sd">    Overwrite ``path`` and register it as an importer in</span>
@@ -270,7 +278,10 @@
     <span class="k">return</span> <span class="n">append</span></div>
 
 
-<div class="viewcode-block" id="additional_repository"><a class="viewcode-back" href="../../ramble.html#ramble.repository.additional_repository">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+
+<div class="viewcode-block" id="additional_repository">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.additional_repository">[docs]</a>
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span> <span class="nf">additional_repository</span><span class="p">(</span><span class="n">repository</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds temporarily a repository to the default one.</span>
 
@@ -282,7 +293,10 @@
     <span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="use_repositories"><a class="viewcode-back" href="../../ramble.html#ramble.repository.use_repositories">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+
+<div class="viewcode-block" id="use_repositories">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.use_repositories">[docs]</a>
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span> <span class="nf">use_repositories</span><span class="p">(</span><span class="o">*</span><span class="n">paths_and_repos</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the repositories passed as arguments within the context manager.</span>
 
@@ -310,7 +324,10 @@
     <span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved</span></div>
 
 
-<div class="viewcode-block" id="autospec"><a class="viewcode-back" href="../../ramble.html#ramble.repository.autospec">[docs]</a><span class="k">def</span> <span class="nf">autospec</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+
+<div class="viewcode-block" id="autospec">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.autospec">[docs]</a>
+<span class="k">def</span> <span class="nf">autospec</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that automatically converts the first argument of a</span>
 <span class="sd">    function to a Spec.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -322,7 +339,10 @@
     <span class="k">return</span> <span class="n">converter</span></div>
 
 
-<div class="viewcode-block" id="ObjectNamespace"><a class="viewcode-back" href="../../ramble.html#ramble.repository.ObjectNamespace">[docs]</a><span class="k">class</span> <span class="nc">ObjectNamespace</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ObjectNamespace">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.ObjectNamespace">[docs]</a>
+<span class="k">class</span> <span class="nc">ObjectNamespace</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Allow lazy loading of modules.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
@@ -340,7 +360,10 @@
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="FastObjectChecker"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FastObjectChecker">[docs]</a><span class="k">class</span> <span class="nc">FastObjectChecker</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FastObjectChecker">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.FastObjectChecker">[docs]</a>
+<span class="k">class</span> <span class="nc">FastObjectChecker</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache that maps object names to the stats obtained on the</span>
 <span class="sd">    &#39;.py&#39; files associated with them.</span>
 
@@ -364,10 +387,13 @@
         <span class="c1">#: Reference to the appropriate entry in the global cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objects_to_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="n">objects_path</span><span class="p">]</span>
 
-<div class="viewcode-block" id="FastObjectChecker.invalidate"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FastObjectChecker.invalidate">[docs]</a>    <span class="k">def</span> <span class="nf">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FastObjectChecker.invalidate">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.FastObjectChecker.invalidate">[docs]</a>
+    <span class="k">def</span> <span class="nf">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Regenerate cache for this checker.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">objects_path</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_new_cache</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objects_to_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">objects_path</span><span class="p">]</span></div>
+
 
     <span class="k">def</span> <span class="nf">_create_new_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new cache for objects in a repo.</span>
@@ -421,9 +447,12 @@
 
         <span class="k">return</span> <span class="n">cache</span>
 
-<div class="viewcode-block" id="FastObjectChecker.last_mtime"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FastObjectChecker.last_mtime">[docs]</a>    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FastObjectChecker.last_mtime">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.FastObjectChecker.last_mtime">[docs]</a>
+    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
             <span class="n">sinfo</span><span class="o">.</span><span class="n">st_mtime</span> <span class="k">for</span> <span class="n">sinfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objects_to_stats</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objects_to_stats</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
@@ -435,17 +464,25 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_objects_to_stats</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="TagIndex"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex">[docs]</a><span class="k">class</span> <span class="nc">TagIndex</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TagIndex">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex">[docs]</a>
+<span class="k">class</span> <span class="nc">TagIndex</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps tags to list of applications.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="n">object_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TagIndex.to_json"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+<div class="viewcode-block" id="TagIndex.to_json">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.to_json">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
         <span class="n">sjson</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">},</span> <span class="n">stream</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TagIndex.from_json"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="TagIndex.from_json">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.from_json">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">sjson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
 
@@ -456,6 +493,7 @@
 
         <span class="k">return</span> <span class="n">r</span></div>
 
+
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
@@ -465,7 +503,9 @@
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TagIndex.update_object"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.update_object">[docs]</a>    <span class="k">def</span> <span class="nf">update_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+<div class="viewcode-block" id="TagIndex.update_object">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndex.update_object">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates an object in the tag index.</span>
 
 <span class="sd">        Args:</span>
@@ -483,27 +523,39 @@
         <span class="c1"># Add it again under the appropriate tags</span>
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="p">[]):</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tag_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Indexer"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Indexer">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer">[docs]</a>
+<span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Indexer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adaptor for indexes that need to be generated when repos are updated.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="n">object_type</span>
 
-<div class="viewcode-block" id="Indexer.create"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Indexer.create">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Indexer.set_object_type"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.set_object_type">[docs]</a>    <span class="k">def</span> <span class="nf">set_object_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Indexer.set_object_type">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.set_object_type">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_object_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="n">object_type</span></div>
+
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an empty index and return it.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Indexer.needs_update"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.needs_update">[docs]</a>    <span class="k">def</span> <span class="nf">needs_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg</span><span class="p">):</span>
+<div class="viewcode-block" id="Indexer.needs_update">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.needs_update">[docs]</a>
+    <span class="k">def</span> <span class="nf">needs_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether an update is needed when the application file hasn&#39;t changed.</span>
 
 <span class="sd">        Returns:</span>
@@ -519,35 +571,60 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Indexer.read"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.read">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+
+<div class="viewcode-block" id="Indexer.read">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.read">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read this index from a provided file object.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="Indexer.update"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.update">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+
+<div class="viewcode-block" id="Indexer.update">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.update">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_fullname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the index in memory with information about an object.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="Indexer.write"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.write">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+
+<div class="viewcode-block" id="Indexer.write">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Indexer.write">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the index to a file object.&quot;&quot;&quot;</span></div></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the index to a file object.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="TagIndexer"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer">[docs]</a><span class="k">class</span> <span class="nc">TagIndexer</span><span class="p">(</span><span class="n">Indexer</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TagIndexer">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer">[docs]</a>
+<span class="k">class</span> <span class="nc">TagIndexer</span><span class="p">(</span><span class="n">Indexer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lifecycle methods for a TagIndex on a Repo.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TagIndex</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TagIndexer.read"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+<div class="viewcode-block" id="TagIndexer.read">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.read">[docs]</a>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">TagIndex</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TagIndexer.update"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_fullname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TagIndexer.update">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_fullname</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">update_object</span><span class="p">(</span><span class="n">obj_fullname</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TagIndexer.write"><a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="TagIndexer.write">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.TagIndexer.write">[docs]</a>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RepoIndex"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoIndex">[docs]</a><span class="k">class</span> <span class="nc">RepoIndex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoIndex">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoIndex">[docs]</a>
+<span class="k">class</span> <span class="nc">RepoIndex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Container class that manages a set of Indexers for a Repo.</span>
 
 <span class="sd">    This class is responsible for checking objects in a repository for</span>
@@ -571,7 +648,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">indexes</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="RepoIndex.add_indexer"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoIndex.add_indexer">[docs]</a>    <span class="k">def</span> <span class="nf">add_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexer</span><span class="p">):</span>
+<div class="viewcode-block" id="RepoIndex.add_indexer">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoIndex.add_indexer">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexer</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an indexer to the repo index.</span>
 
 <span class="sd">        Arguments:</span>
@@ -582,6 +661,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">indexer</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the index with the specified name, reindexing if needed.&quot;&quot;&quot;</span>
@@ -641,7 +721,10 @@
         <span class="k">return</span> <span class="n">indexer</span><span class="o">.</span><span class="n">index</span></div>
 
 
-<div class="viewcode-block" id="RepoPath"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath">[docs]</a><span class="k">class</span> <span class="nc">RepoPath</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath">[docs]</a>
+<span class="k">class</span> <span class="nc">RepoPath</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A RepoPath is a list of repos that function as one.</span>
 
 <span class="sd">    It functions exactly like a Repo, but it operates on the combined</span>
@@ -673,7 +756,9 @@
                          <span class="s2">&quot;To remove the bad repository, run this command:&quot;</span><span class="p">,</span>
                          <span class="s2">&quot;    ramble repo rm </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">repo</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RepoPath.put_first"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.put_first">[docs]</a>    <span class="k">def</span> <span class="nf">put_first</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+<div class="viewcode-block" id="RepoPath.put_first">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.put_first">[docs]</a>
+    <span class="k">def</span> <span class="nf">put_first</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add repo first in the search path.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">RepoPath</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repos</span><span class="p">):</span>
@@ -683,7 +768,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span></div>
 
-<div class="viewcode-block" id="RepoPath.put_last"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.put_last">[docs]</a>    <span class="k">def</span> <span class="nf">put_last</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.put_last">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.put_last">[docs]</a>
+    <span class="k">def</span> <span class="nf">put_last</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add repo last in the search path.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">RepoPath</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
@@ -696,16 +784,25 @@
         <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span></div>
 
-<div class="viewcode-block" id="RepoPath.remove"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.remove">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.remove">[docs]</a>
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a repo from the search path.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.get_full_namespace"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_full_namespace">[docs]</a>    <span class="k">def</span> <span class="nf">get_full_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.get_full_namespace">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_full_namespace">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_full_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the full namespace of a repository, given its relative one.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_namespace</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
-<div class="viewcode-block" id="RepoPath.get_repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_repo">[docs]</a>    <span class="k">def</span> <span class="nf">get_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">NOT_PROVIDED</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.get_repo">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_repo">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">NOT_PROVIDED</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a repository by namespace.</span>
 
 <span class="sd">        Arguments:</span>
@@ -728,11 +825,17 @@
             <span class="k">return</span> <span class="n">default</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_namespace</span><span class="p">[</span><span class="n">full_namespace</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="RepoPath.first_repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.first_repo">[docs]</a>    <span class="k">def</span> <span class="nf">first_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.first_repo">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.first_repo">[docs]</a>
+    <span class="k">def</span> <span class="nf">first_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the first repo in precedence order.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span> <span class="k">else</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="RepoPath.all_object_names"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_object_names">[docs]</a>    <span class="k">def</span> <span class="nf">all_object_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.all_object_names">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_object_names">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_object_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all unique object names in all repositories.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_object_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">all_objs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -743,21 +846,33 @@
                                             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_object_names</span></div>
 
-<div class="viewcode-block" id="RepoPath.objects_with_tags"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.objects_with_tags">[docs]</a>    <span class="k">def</span> <span class="nf">objects_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.objects_with_tags">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.objects_with_tags">[docs]</a>
+    <span class="k">def</span> <span class="nf">objects_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">objects_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">tags</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.all_objects"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_objects">[docs]</a>    <span class="k">def</span> <span class="nf">all_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.all_objects">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_objects">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">():</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.all_object_classes"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_object_classes">[docs]</a>    <span class="k">def</span> <span class="nf">all_object_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.all_object_classes">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.all_object_classes">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_object_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">():</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_obj_class</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.find_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.find_module">[docs]</a>    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.find_module">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.find_module">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements precedence for overlaid namespaces.</span>
 
 <span class="sd">        Loop checks each namespace in self.repos for objects, and</span>
@@ -783,7 +898,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="RepoPath.load_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.load_module">[docs]</a>    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.load_module">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.load_module">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles loading container namespaces when necessary.</span>
 
 <span class="sd">        See ``Repo`` for how actual object modules are loaded.</span>
@@ -799,11 +917,17 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
         <span class="k">return</span> <span class="n">module</span></div>
 
-<div class="viewcode-block" id="RepoPath.last_mtime"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.last_mtime">[docs]</a>    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.last_mtime">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.last_mtime">[docs]</a>
+    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Time a object file in this repo was last updated.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">()</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.repo_for_obj"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.repo_for_obj">[docs]</a>    <span class="k">def</span> <span class="nf">repo_for_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.repo_for_obj">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.repo_for_obj">[docs]</a>
+    <span class="k">def</span> <span class="nf">repo_for_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Given a spec, get the repository for its object.&quot;&quot;&quot;</span>
         <span class="c1"># We don&#39;t @_autospec this function b/c it&#39;s called very frequently</span>
         <span class="c1"># and we want to avoid parsing str&#39;s into Specs unnecessarily.</span>
@@ -836,16 +960,25 @@
         <span class="c1"># that can operate on objects that don&#39;t exist yet.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_repo</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RepoPath.get"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get">[docs]</a>    <span class="nd">@autospec</span>
+
+<div class="viewcode-block" id="RepoPath.get">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get">[docs]</a>
+    <span class="nd">@autospec</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the object associated with the supplied spec.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.get_obj_class"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_obj_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_obj_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.get_obj_class">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.get_obj_class">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_obj_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find a class for the spec&#39;s object and return the class object.&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span><span class="o">.</span><span class="n">get_obj_class</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.dump_provenance"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.dump_provenance">[docs]</a>    <span class="nd">@autospec</span>
+
+<div class="viewcode-block" id="RepoPath.dump_provenance">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.dump_provenance">[docs]</a>
+    <span class="nd">@autospec</span>
     <span class="k">def</span> <span class="nf">dump_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dump provenance information for a spec to a particular path.</span>
 
@@ -854,20 +987,30 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="n">dump_provenance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.dirname_for_object_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.dirname_for_object_name">[docs]</a>    <span class="k">def</span> <span class="nf">dirname_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.dirname_for_object_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.dirname_for_object_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">dirname_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span><span class="o">.</span><span class="n">dirname_for_object_name</span><span class="p">(</span>
             <span class="n">obj_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.filename_for_object_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.filename_for_object_name">[docs]</a>    <span class="k">def</span> <span class="nf">filename_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.filename_for_object_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.filename_for_object_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">filename_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span><span class="o">.</span><span class="n">filename_for_object_name</span><span class="p">(</span>
             <span class="n">obj_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepoPath.exists"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepoPath.exists">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoPath.exists">[docs]</a>
+    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether object with the give name exists in the path&#39;s repos.</span>
 
 <span class="sd">        Note that virtual objects do not &quot;exist&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repos</span><span class="p">)</span></div>
+
 
     <span class="c1"># TODO: DWJ - Maybe we don&#39;t need this? Are we going to have virtual</span>
     <span class="c1">#             objects</span>
@@ -892,7 +1035,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo">[docs]</a><span class="k">class</span> <span class="nc">Repo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo">[docs]</a>
+<span class="k">class</span> <span class="nc">Repo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a object repository in the filesystem.</span>
 
 <span class="sd">    Each object repository must have a top-level configuration file</span>
@@ -1000,7 +1146,9 @@
             <span class="c1"># but keep track of the parent in this loop</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="n">module</span>
 
-<div class="viewcode-block" id="Repo.real_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.real_name">[docs]</a>    <span class="k">def</span> <span class="nf">real_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">import_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Repo.real_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.real_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">real_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">import_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow users to import Ramble objects using Python identifiers.</span>
 
 <span class="sd">        A python identifier might map to many different Ramble object</span>
@@ -1025,12 +1173,18 @@
                 <span class="k">return</span> <span class="n">name</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Repo.is_prefix"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.is_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">is_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.is_prefix">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.is_prefix">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;True if fullname is a prefix of this Repo&#39;s namespace.&quot;&quot;&quot;</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)]</span> <span class="o">==</span> <span class="n">parts</span></div>
 
-<div class="viewcode-block" id="Repo.find_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.find_module">[docs]</a>    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.find_module">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.find_module">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Python find_module import hook.</span>
 
 <span class="sd">        Returns this Repo if it can load the module; None if not.</span>
@@ -1045,7 +1199,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Repo.load_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.load_module">[docs]</a>    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.load_module">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.load_module">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Python importer load hook.</span>
 
 <span class="sd">        Tries to load the module; raises an ImportError if it can&#39;t.</span>
@@ -1076,6 +1233,7 @@
 
         <span class="k">return</span> <span class="n">module</span></div>
 
+
     <span class="k">def</span> <span class="nf">_read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check for a YAML config file in this db&#39;s root directory.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1093,7 +1251,9 @@
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Error reading </span><span class="si">%s</span><span class="s2"> when opening </span><span class="si">%s</span><span class="s2">&quot;</span>
                     <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Repo.get"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.get">[docs]</a>    <span class="nd">@autospec</span>
+<div class="viewcode-block" id="Repo.get">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.get">[docs]</a>
+    <span class="nd">@autospec</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the object associated with the supplied spec.&quot;&quot;&quot;</span>
         <span class="c1"># NOTE: we only check whether the object is None here, not whether</span>
@@ -1122,7 +1282,10 @@
                 <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
             <span class="k">raise</span> <span class="n">FailedConstructorError</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">fullname</span><span class="p">,</span> <span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="Repo.dump_provenance"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.dump_provenance">[docs]</a>    <span class="nd">@autospec</span>
+
+<div class="viewcode-block" id="Repo.dump_provenance">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.dump_provenance">[docs]</a>
+    <span class="nd">@autospec</span>
     <span class="k">def</span> <span class="nf">dump_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dump provenance information for a spec to a particular path.</span>
 
@@ -1137,9 +1300,13 @@
         <span class="c1"># Install the object&#39;s .py file itself.</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_for_object_name</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repo.purge"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.purge">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.purge">[docs]</a>
+    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear entire object instance cache.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instances</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1154,12 +1321,17 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Index of tags and which objects they&#39;re defined on.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Repo.dirname_for_object_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.dirname_for_object_name">[docs]</a>    <span class="k">def</span> <span class="nf">dirname_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Repo.dirname_for_object_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.dirname_for_object_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">dirname_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the directory name for a particular object.  This is the</span>
 <span class="sd">           directory that contains its object.py file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects_path</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repo.filename_for_object_name"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.filename_for_object_name">[docs]</a>    <span class="k">def</span> <span class="nf">filename_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.filename_for_object_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.filename_for_object_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">filename_for_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the filename for the module we should load for a particular</span>
 <span class="sd">           object.  objects for a Repo live in</span>
 <span class="sd">           ``$root/&lt;object_name&gt;/&lt;object_type&gt;.py``</span>
@@ -1171,6 +1343,7 @@
         <span class="n">obj_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirname_for_object_name</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">obj_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_file_name</span><span class="p">)</span></div>
 
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_obj_checker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_object_checker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1180,12 +1353,17 @@
                                   <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_object_checker</span>
 
-<div class="viewcode-block" id="Repo.all_object_names"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_object_names">[docs]</a>    <span class="k">def</span> <span class="nf">all_object_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Repo.all_object_names">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_object_names">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_object_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sorted list of all object names in the Repo.&quot;&quot;&quot;</span>
         <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj_checker</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">names</span></div>
 
-<div class="viewcode-block" id="Repo.objects_with_tags"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.objects_with_tags">[docs]</a>    <span class="k">def</span> <span class="nf">objects_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.objects_with_tags">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.objects_with_tags">[docs]</a>
+    <span class="k">def</span> <span class="nf">objects_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tags</span><span class="p">):</span>
         <span class="n">v</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">())</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_index</span>
 
@@ -1195,7 +1373,10 @@
 
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repo.all_objects"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_objects">[docs]</a>    <span class="k">def</span> <span class="nf">all_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.all_objects">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_objects">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all objects in the repository.</span>
 
 <span class="sd">        Use this with care, because loading objects is slow.</span>
@@ -1204,7 +1385,10 @@
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">():</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repo.all_object_classes"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_object_classes">[docs]</a>    <span class="k">def</span> <span class="nf">all_object_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.all_object_classes">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.all_object_classes">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_object_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all object *classes* in the repository.</span>
 
 <span class="sd">        Use this with care, because loading objects is slow.</span>
@@ -1212,7 +1396,10 @@
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">():</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_obj_class</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repo.exists"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.exists">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.exists">[docs]</a>
+    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether a object with the supplied name exists.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">obj_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -1225,9 +1412,13 @@
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_for_object_name</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repo.last_mtime"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.last_mtime">[docs]</a>    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Repo.last_mtime">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.last_mtime">[docs]</a>
+    <span class="k">def</span> <span class="nf">last_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Time a object file in this repo was last updated.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_checker</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">()</span></div>
+
 
     <span class="k">def</span> <span class="nf">_get_obj_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a module for a particular object.</span>
@@ -1269,7 +1460,9 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">[</span><span class="n">obj_name</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Repo.get_obj_class"><a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.get_obj_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_obj_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Repo.get_obj_class">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.Repo.get_obj_class">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_obj_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the class for the object out of its module.</span>
 
 <span class="sd">        First loads (or fetches from cache) a module for the</span>
@@ -1291,6 +1484,7 @@
 
         <span class="k">return</span> <span class="bp">cls</span></div>
 
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;[Repo &#39;</span><span class="si">%s</span><span class="s2">&#39; at &#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
 
@@ -1301,7 +1495,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">obj_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create_repo"><a class="viewcode-back" href="../../ramble.html#ramble.repository.create_repo">[docs]</a><span class="k">def</span> <span class="nf">create_repo</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+
+<div class="viewcode-block" id="create_repo">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.create_repo">[docs]</a>
+<span class="k">def</span> <span class="nf">create_repo</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">subdir</span><span class="o">=</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">default_type</span><span class="p">][</span><span class="s1">&#39;dir_name&#39;</span><span class="p">],</span>
                 <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new repository in root with the specified namespace.</span>
@@ -1364,7 +1561,10 @@
     <span class="k">return</span> <span class="n">full_path</span><span class="p">,</span> <span class="n">namespace</span></div>
 
 
-<div class="viewcode-block" id="create_or_construct"><a class="viewcode-back" href="../../ramble.html#ramble.repository.create_or_construct">[docs]</a><span class="k">def</span> <span class="nf">create_or_construct</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="create_or_construct">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.create_or_construct">[docs]</a>
+<span class="k">def</span> <span class="nf">create_or_construct</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a repository, or just return a Repo if it already exists.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -1372,7 +1572,10 @@
     <span class="k">return</span> <span class="n">Repo</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../ramble.html#ramble.repository.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="create">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.create">[docs]</a>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a RepoPath from a configuration object.</span>
 
 <span class="sd">    Args:</span>
@@ -1385,7 +1588,10 @@
     <span class="k">return</span> <span class="n">RepoPath</span><span class="p">(</span><span class="o">*</span><span class="n">repo_dirs</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="RepositoryNamespace"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespace">[docs]</a><span class="k">class</span> <span class="nc">RepositoryNamespace</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepositoryNamespace">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespace">[docs]</a>
+<span class="k">class</span> <span class="nc">RepositoryNamespace</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow lazy loading of modules.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
@@ -1407,6 +1613,7 @@
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 
+
 <span class="k">class</span> <span class="nc">_PrependFileLoader</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">machinery</span><span class="o">.</span><span class="n">SourceFileLoader</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">prepend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">_PrependFileLoader</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -1426,7 +1633,9 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepend</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">data</span>
 
 
-<div class="viewcode-block" id="RepoLoader"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoLoader">[docs]</a><span class="k">class</span> <span class="nc">RepoLoader</span><span class="p">(</span><span class="n">_PrependFileLoader</span><span class="p">):</span>
+<div class="viewcode-block" id="RepoLoader">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoLoader">[docs]</a>
+<span class="k">class</span> <span class="nc">RepoLoader</span><span class="p">(</span><span class="n">_PrependFileLoader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads a Python module associated with a object in specific repository&quot;&quot;&quot;</span>
 
     <span class="c1">#: Code in ``_object_prepend`` is prepended to imported objects.</span>
@@ -1442,15 +1651,27 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="RepositoryNamespaceLoader"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespaceLoader">[docs]</a><span class="k">class</span> <span class="nc">RepositoryNamespaceLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<div class="viewcode-block" id="RepositoryNamespaceLoader.create_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespaceLoader.create_module">[docs]</a>    <span class="k">def</span> <span class="nf">create_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RepositoryNamespaceLoader">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespaceLoader">[docs]</a>
+<span class="k">class</span> <span class="nc">RepositoryNamespaceLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="RepositoryNamespaceLoader.create_module">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespaceLoader.create_module">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">RepositoryNamespace</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RepositoryNamespaceLoader.exec_module"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespaceLoader.exec_module">[docs]</a>    <span class="k">def</span> <span class="nf">exec_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
-        <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span></div></div>
+
+<div class="viewcode-block" id="RepositoryNamespaceLoader.exec_module">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepositoryNamespaceLoader.exec_module">[docs]</a>
+    <span class="k">def</span> <span class="nf">exec_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ReposFinder"><a class="viewcode-back" href="../../ramble.html#ramble.repository.ReposFinder">[docs]</a><span class="k">class</span> <span class="nc">ReposFinder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ReposFinder">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.ReposFinder">[docs]</a>
+<span class="k">class</span> <span class="nc">ReposFinder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MetaPathFinder class that loads a Python module corresponding to an object</span>
 
 <span class="sd">    Return a loader based on the inspection of the current global repository list.</span>
@@ -1459,7 +1680,9 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="n">object_type</span>
 
-<div class="viewcode-block" id="ReposFinder.find_spec"><a class="viewcode-back" href="../../ramble.html#ramble.repository.ReposFinder.find_spec">[docs]</a>    <span class="k">def</span> <span class="nf">find_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">python_path</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReposFinder.find_spec">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.ReposFinder.find_spec">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">python_path</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># &quot;target&quot; is not None only when calling importlib.reload()</span>
         <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;cannot reload module &quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullname</span><span class="p">))</span>
@@ -1473,7 +1696,10 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_loader</span><span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReposFinder.compute_loader"><a class="viewcode-back" href="../../ramble.html#ramble.repository.ReposFinder.compute_loader">[docs]</a>    <span class="k">def</span> <span class="nf">compute_loader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ReposFinder.compute_loader">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.ReposFinder.compute_loader">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_loader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
         <span class="c1"># namespaces are added to repo, and object modules are leaves.</span>
         <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">module_name</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
 
@@ -1496,7 +1722,9 @@
         <span class="k">if</span> <span class="n">paths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">by_namespace</span><span class="o">.</span><span class="n">is_prefix</span><span class="p">(</span><span class="n">fullname</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">RepositoryNamespaceLoader</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
 
 
 <span class="c1"># Add the finder to sys.meta_path</span>
@@ -1504,31 +1732,51 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">REPOS_FINDER</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="RepoError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoError">[docs]</a><span class="k">class</span> <span class="nc">RepoError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
+<div class="viewcode-block" id="RepoError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.RepoError">[docs]</a>
+<span class="k">class</span> <span class="nc">RepoError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass for repository-related errors.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="NoRepoConfiguredError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.NoRepoConfiguredError">[docs]</a><span class="k">class</span> <span class="nc">NoRepoConfiguredError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NoRepoConfiguredError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.NoRepoConfiguredError">[docs]</a>
+<span class="k">class</span> <span class="nc">NoRepoConfiguredError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there are no repositories configured.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="InvalidNamespaceError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.InvalidNamespaceError">[docs]</a><span class="k">class</span> <span class="nc">InvalidNamespaceError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InvalidNamespaceError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.InvalidNamespaceError">[docs]</a>
+<span class="k">class</span> <span class="nc">InvalidNamespaceError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an invalid namespace is encountered.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="BadRepoError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.BadRepoError">[docs]</a><span class="k">class</span> <span class="nc">BadRepoError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BadRepoError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.BadRepoError">[docs]</a>
+<span class="k">class</span> <span class="nc">BadRepoError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when repo layout is invalid.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="UnknownEntityError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownEntityError">[docs]</a><span class="k">class</span> <span class="nc">UnknownEntityError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnknownEntityError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownEntityError">[docs]</a>
+<span class="k">class</span> <span class="nc">UnknownEntityError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter a object ramble doesn&#39;t have.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="IndexError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.IndexError">[docs]</a><span class="k">class</span> <span class="nc">IndexError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="IndexError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.IndexError">[docs]</a>
+<span class="k">class</span> <span class="nc">IndexError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there&#39;s an error with an index.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="UnknownObjectError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownObjectError">[docs]</a><span class="k">class</span> <span class="nc">UnknownObjectError</span><span class="p">(</span><span class="n">UnknownEntityError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnknownObjectError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownObjectError">[docs]</a>
+<span class="k">class</span> <span class="nc">UnknownObjectError</span><span class="p">(</span><span class="n">UnknownEntityError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter an object ramble doesn&#39;t have.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;Object&#39;</span><span class="p">):</span>
@@ -1554,7 +1802,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span></div>
 
 
-<div class="viewcode-block" id="UnknownNamespaceError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownNamespaceError">[docs]</a><span class="k">class</span> <span class="nc">UnknownNamespaceError</span><span class="p">(</span><span class="n">UnknownEntityError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnknownNamespaceError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.UnknownNamespaceError">[docs]</a>
+<span class="k">class</span> <span class="nc">UnknownNamespaceError</span><span class="p">(</span><span class="n">UnknownEntityError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter an unknown namespace&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
@@ -1562,7 +1813,10 @@
             <span class="s2">&quot;Unknown namespace: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">namespace</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="FailedConstructorError"><a class="viewcode-back" href="../../ramble.html#ramble.repository.FailedConstructorError">[docs]</a><span class="k">class</span> <span class="nc">FailedConstructorError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FailedConstructorError">
+<a class="viewcode-back" href="../../ramble.html#ramble.repository.FailedConstructorError">[docs]</a>
+<span class="k">class</span> <span class="nc">FailedConstructorError</span><span class="p">(</span><span class="n">RepoError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an object&#39;s class constructor fails.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1572,6 +1826,7 @@
             <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">exc_obj</span><span class="p">))</span> <span class="o">+</span>
             <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_tb</span><span class="p">(</span><span class="n">exc_tb</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span></div>
+
 </pre></div>
 
            </div>
@@ -1582,7 +1837,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

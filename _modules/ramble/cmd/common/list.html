@@ -11,11 +11,11 @@
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -149,13 +149,18 @@
 <span class="n">formatters</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<div class="viewcode-block" id="formatter"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.formatter">[docs]</a><span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="formatter">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.formatter">[docs]</a>
+<span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator used to register formatters&quot;&quot;&quot;</span>
     <span class="n">formatters</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
     <span class="k">return</span> <span class="n">func</span></div>
 
 
-<div class="viewcode-block" id="filter_by_name"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.filter_by_name">[docs]</a><span class="k">def</span> <span class="nf">filter_by_name</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="filter_by_name">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.filter_by_name">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_by_name</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filters the sequence of objects according to user prescriptions</span>
 
@@ -194,7 +199,10 @@
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="name_only"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.name_only">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="name_only">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.name_only">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">name_only</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
     <span class="n">obj_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
     <span class="n">indent</span> <span class="o">=</span> <span class="mi">0</span>
@@ -203,7 +211,10 @@
     <span class="n">colify</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="github_url"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.github_url">[docs]</a><span class="k">def</span> <span class="nf">github_url</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="github_url">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.github_url">[docs]</a>
+<span class="k">def</span> <span class="nf">github_url</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Link to an object file on github.&quot;&quot;&quot;</span>
     <span class="n">obj_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
     <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/&#39;</span> <span class="o">+</span> \
@@ -213,7 +224,10 @@
     <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rows_for_ncols"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.rows_for_ncols">[docs]</a><span class="k">def</span> <span class="nf">rows_for_ncols</span><span class="p">(</span><span class="n">elts</span><span class="p">,</span> <span class="n">ncols</span><span class="p">):</span>
+
+<div class="viewcode-block" id="rows_for_ncols">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.rows_for_ncols">[docs]</a>
+<span class="k">def</span> <span class="nf">rows_for_ncols</span><span class="p">(</span><span class="n">elts</span><span class="p">,</span> <span class="n">ncols</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print out rows in a table with ncols of elts laid out vertically.&quot;&quot;&quot;</span>
     <span class="n">clen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elts</span><span class="p">)</span> <span class="o">/</span> <span class="n">ncols</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">clen</span><span class="p">):</span>
@@ -224,7 +238,10 @@
         <span class="k">yield</span> <span class="n">row</span></div>
 
 
-<div class="viewcode-block" id="version_json"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.version_json">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="version_json">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.version_json">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">version_json</span><span class="p">(</span><span class="n">obj_names</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print all objects with their latest versions.&quot;&quot;&quot;</span>
     <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">obj_names</span><span class="p">]</span>
@@ -243,7 +260,10 @@
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="html"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.html">[docs]</a><span class="nd">@formatter</span>
+
+<div class="viewcode-block" id="html">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.html">[docs]</a>
+<span class="nd">@formatter</span>
 <span class="k">def</span> <span class="nf">html</span><span class="p">(</span><span class="n">obj_names</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print out information on all objects in Sphinx HTML.</span>
 
@@ -339,7 +359,10 @@
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/div&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="setup_list_parser"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.setup_list_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_list_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="setup_list_parser">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.setup_list_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_list_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
     <span class="n">object_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
 
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -358,7 +381,10 @@
     <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="perform_list"><a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.perform_list">[docs]</a><span class="k">def</span> <span class="nf">perform_list</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="perform_list">
+<a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.perform_list">[docs]</a>
+<span class="k">def</span> <span class="nf">perform_list</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
     <span class="c1"># retrieve the formatter to use from args</span>
     <span class="n">formatter</span> <span class="o">=</span> <span class="n">formatters</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">]</span>
 
@@ -389,6 +415,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Print to stdout</span>
         <span class="n">formatter</span><span class="p">(</span><span class="n">sorted_objects</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">object_type</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -399,7 +426,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 

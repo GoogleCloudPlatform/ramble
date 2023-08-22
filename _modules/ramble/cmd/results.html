@@ -11,11 +11,11 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -133,7 +133,9 @@
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;short&quot;</span>
 
 
-<div class="viewcode-block" id="setup_parser"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.setup_parser">[docs]</a><span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span>
                                   <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;results_command&#39;</span><span class="p">)</span>
 
@@ -143,7 +145,10 @@
         <span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path of file to upload&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="results_upload"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.results_upload">[docs]</a><span class="k">def</span> <span class="nf">results_upload</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="results_upload">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.results_upload">[docs]</a>
+<span class="k">def</span> <span class="nf">results_upload</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Imports Ramble experiment results from JSON file and uploads them as</span>
 <span class="sd">    specified in the upload block of Ramble&#39;s config file.&quot;&quot;&quot;</span>
     <span class="n">imported_results</span> <span class="o">=</span> <span class="n">import_results_file</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
@@ -151,7 +156,10 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">upload_results</span><span class="p">(</span><span class="n">imported_results</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="import_results_file"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.import_results_file">[docs]</a><span class="k">def</span> <span class="nf">import_results_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+
+<div class="viewcode-block" id="import_results_file">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.import_results_file">[docs]</a>
+<span class="k">def</span> <span class="nf">import_results_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Import Ramble experiment results from a JSON file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -172,9 +180,13 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Error parsing file: Invalid JSON formatting.&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="results"><a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.results">[docs]</a><span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+
+<div class="viewcode-block" id="results">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.results.results">[docs]</a>
+<span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">action</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;upload&#39;</span><span class="p">:</span> <span class="n">results_upload</span><span class="p">}</span>
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">results_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -185,7 +197,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 17, 2023.
+      <span class="lastupdated">Last updated on Aug 22, 2023.
       </span></p>
   </div>
 
