@@ -316,6 +316,8 @@ def workspace_setup_setup_parser(subparser):
              'all scripts. Prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
 
+    arguments.add_common_arguments(subparser, ['phases'])
+
 
 def workspace_setup(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace setup')
@@ -325,7 +327,7 @@ def workspace_setup(args):
 
     tty.debug('Setting up workspace')
     with ws.write_transaction():
-        ws.run_pipeline('setup')
+        ws.run_pipeline('setup', args.phases)
 
 
 def workspace_analyze_setup_parser(subparser):
@@ -351,6 +353,8 @@ def workspace_analyze_setup_parser(subparser):
         action='store_true',
         help='Control if figures of merit are printed even if an experiment fails',
         required=False)
+
+    arguments.add_common_arguments(subparser, ['phases'])
 
 
 def workspace_analyze(args):
@@ -397,6 +401,7 @@ def workspace_info(args):
     # We built a "print_experiment_set" to access the scopes of variables for each
     # experiment, rather than having merged scopes as we do in the base experiment_set.
     # The base experiment_set is used to list *all* experiments.
+    all_pipelines = {}
     color.cprint('')
     color.cprint(rucolor.section_title('Experiments:'))
     for app, workloads, app_vars, app_env_vars, app_internals, app_template, app_chained_exps, \
@@ -446,6 +451,14 @@ def workspace_info(args):
 
                 for exp_name, _ in print_experiment_set.all_experiments():
                     app_inst = experiment_set.get_experiment(exp_name)
+
+                    # Aggregate pipeline phases
+                    for pipeline in app_inst._pipelines:
+                        if pipeline not in all_pipelines:
+                            all_pipelines[pipeline] = set()
+                        for phase in app_inst.get_pipeline_phases(pipeline):
+                            all_pipelines[pipeline].add(phase)
+
                     if app_inst.is_template:
                         color.cprint(rucolor.nested_3('      Template Experiment: ') + exp_name)
                     else:
@@ -465,6 +478,11 @@ def workspace_info(args):
 
                         app_inst.print_internals(indent=var_indent)
                         app_inst.print_chain_order(indent=var_indent)
+
+    for pipeline in sorted(all_pipelines.keys()):
+        color.cprint('')
+        color.cprint(rucolor.section_title(f'Phases for {pipeline} pipeline:'))
+        colify(all_pipelines[pipeline], indent=4)
 
     # Print software stack information
     color.cprint('')
@@ -555,6 +573,8 @@ def workspace_archive_setup_parser(subparser):
         default=None,
         help='URL to upload tar archive into. Does nothing if `-t` is not specified.')
 
+    arguments.add_common_arguments(subparser, ['phases'])
+
 
 def workspace_archive(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace archive')
@@ -576,6 +596,8 @@ def workspace_mirror_setup_parser(subparser):
         help='perform a dry run. Creates spack environments, ' +
              'prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
+
+    arguments.add_common_arguments(subparser, ['phases'])
 
 
 def workspace_mirror(args):

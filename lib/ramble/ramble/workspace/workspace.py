@@ -1215,7 +1215,7 @@ class Workspace(object):
         self._input_mirror_cache = ramble.caches.MirrorCache(self._input_mirror_path)
         self._software_mirror_cache = ramble.caches.MirrorCache(self._software_mirror_path)
 
-    def run_pipeline(self, pipeline):
+    def run_pipeline(self, pipeline, phases='*'):
         all_experiments_file = None
         experiment_set = ramble.experiment_set.ExperimentSet(self)
         self.software_environments = \
@@ -1244,7 +1244,7 @@ class Workspace(object):
 
         for exp, app_inst in experiment_set.all_experiments():
             tty.msg(f'    Configuring experiment {exp}')
-            for phase in app_inst.get_pipeline_phases(pipeline):
+            for phase in app_inst.get_pipeline_phases(pipeline, phases):
                 app_inst.run_phase(phase, self)
 
         if pipeline == 'setup':

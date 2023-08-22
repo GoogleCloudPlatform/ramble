@@ -86,6 +86,18 @@ def repo_type():
 
 
 @arg
+def phases():
+    return Args(
+        '--phases', dest='phases',
+        nargs='+',
+        default=['*'],
+        help='select phases to execute when performing setup. ' +
+             'Phase names support globbing',
+        required=False
+    )
+
+
+@arg
 def no_checksum():
     return Args(
         '-n', '--no-checksum', action='store_true', default=False,
