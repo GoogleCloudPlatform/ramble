@@ -94,7 +94,7 @@ class SoftwareEnvironments(object):
         if namespace.packages in self.spack_dict:
             for pkg_template, pkg_info in self.spack_dict[namespace.packages].items():
                 self._raw_packages[pkg_template] = pkg_info
-                self._package_map[pkg_template] = []
+                self._package_map[pkg_template] = {}
                 pkg_group = ramble.renderer.RenderGroup('package', 'create')
                 pkg_group.variables.update(workspace_vars)
                 pkg_group.from_dict(pkg_template, pkg_info)
@@ -127,7 +127,7 @@ class SoftwareEnvironments(object):
                         continue
 
                     self._packages[final_name] = {}
-                    self._package_map[pkg_template].append(final_name)
+                    self._package_map[pkg_template].update({final_name: None})
 
                     spack_spec = expander.expand_var(pkg_info['spack_spec'],
                                                      extra_vars=rendered_vars)
@@ -149,7 +149,7 @@ class SoftwareEnvironments(object):
                 env_group.variables.update(workspace_vars)
                 env_group.from_dict(env_template, env_info)
                 self._raw_environments[env_template] = env_info
-                self._environment_map[env_template] = []
+                self._environment_map[env_template] = {}
 
                 env_group.variables['environment_name'] = env_template
 
@@ -179,7 +179,7 @@ class SoftwareEnvironments(object):
                     if final_name in exclude_envs:
                         continue
 
-                    self._environment_map[env_template].append(final_name)
+                    self._environment_map[env_template].update({final_name: None})
 
                     self._environments[final_name] = {}
 
@@ -361,7 +361,7 @@ class SoftwareEnvironments(object):
         """Yield each package rendered from a raw package"""
         self._require_raw_package(raw_pkg)
 
-        for pkg in self._package_map[raw_pkg]:
+        for pkg in self._package_map[raw_pkg].keys():
             yield pkg
 
     def all_environments(self):
@@ -387,7 +387,7 @@ class SoftwareEnvironments(object):
         """Yield each environment rendered from a raw environment"""
         self._require_raw_environment(raw_env)
 
-        for env in self._environment_map[raw_env]:
+        for env in self._environment_map[raw_env].keys():
             yield env
 
 
