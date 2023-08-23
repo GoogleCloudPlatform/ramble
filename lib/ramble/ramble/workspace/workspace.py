@@ -26,6 +26,7 @@ import ramble.error
 import ramble.repository
 import ramble.spack_runner
 import ramble.experiment_set
+import ramble.context
 import ramble.util.web
 import ramble.fetch_strategy
 import ramble.util.install_cache
@@ -743,32 +744,14 @@ class Workspace(object):
 
         experiment_set.set_base_var('experiments_file', self.all_experiments_path)
 
-        for app, workloads, app_vars, app_env_vars, app_ints, app_template, \
-                app_chained_exps, app_mods in self.all_applications():
-            experiment_set.set_application_context(app, app_vars, app_env_vars, app_ints,
-                                                   app_template, app_chained_exps, app_mods)
+        for workloads, application_context in self.all_applications():
+            experiment_set.set_application_context(application_context)
 
-            for workload, experiments, workload_vars, workload_env_vars, workload_ints, \
-                    workload_template, workload_chained_exps, workload_mods \
-                    in self.all_workloads(workloads):
-                experiment_set.set_workload_context(workload, workload_vars,
-                                                    workload_env_vars, workload_ints,
-                                                    workload_template, workload_chained_exps,
-                                                    workload_mods)
+            for experiments, workload_context in self.all_workloads(workloads):
+                experiment_set.set_workload_context(workload_context)
 
-                for experiment, _, exp_vars, exp_env_vars, exp_zips, exp_matrices, exp_ints, \
-                        exp_template, exp_chained_exps, exp_mods, exp_exclude \
-                        in self.all_experiments(experiments):
-                    experiment_set.set_experiment_context(experiment,
-                                                          exp_vars,
-                                                          exp_env_vars,
-                                                          exp_zips,
-                                                          exp_matrices,
-                                                          exp_ints,
-                                                          exp_template,
-                                                          exp_chained_exps,
-                                                          exp_mods,
-                                                          exp_exclude)
+                for _, experiment_context in self.all_experiments(experiments):
+                    experiment_set.set_experiment_context(experiment_context)
 
         experiment_set.build_experiment_chains()
 
@@ -777,8 +760,8 @@ class Workspace(object):
     def all_applications(self):
         """Iterator over applications
 
-        Returns application, variables
-        where variables are the platform level variables that
+        Returns application, context
+        where context contains the platform level variables that
         should be applied.
         """
 
@@ -789,37 +772,11 @@ class Workspace(object):
         app_dict = ramble.config.config.get_config('applications')
 
         for application, contents in app_dict.items():
-            application_vars = None
-            application_env_vars = None
-            application_internals = None
-            application_template = False
-            application_chained_experiments = None
-            application_modifiers = None
-
-            if namespace.variables in contents:
-                application_vars = contents[namespace.variables]
-
-            if namespace.env_var in contents:
-                application_env_vars = contents[namespace.env_var]
-
-            if namespace.internals in contents:
-                application_internals = contents[namespace.internals]
-
-            if namespace.template in contents:
-                application_template = contents[namespace.template]
-
-            if namespace.chained_experiments in contents:
-                application_chained_experiments = contents[namespace.chained_experiments]
-
-            if namespace.modifiers in contents:
-                application_modifiers = contents[namespace.modifiers]
+            application_context = ramble.context.create_context_from_dict(application, contents)
 
             self.extract_success_criteria('application', contents)
 
-            yield application, contents, application_vars, \
-                application_env_vars, application_internals, \
-                application_template, application_chained_experiments, \
-                application_modifiers
+            yield contents, application_context
 
         tty.debug('  Iterating over configs in directories...')
         # Iterate over applications defined in application directories
@@ -831,43 +788,17 @@ class Workspace(object):
                         % app_conf)
             app_dict = config[namespace.application]
             for application, contents in app_dict.items():
-                application_vars = None
-                application_env_vars = None
-                application_internals = None
-                application_template = False
-                application_chained_experiments = None
-                application_modifiers = None
-
-                if namespace.variables in contents:
-                    application_vars = \
-                        contents[namespace.variables]
-
-                if namespace.env_var in contents:
-                    application_env_vars = contents[namespace.env_var]
-
-                if namespace.internals in contents:
-                    application_internals = contents[namespace.internals]
-
-                if namespace.template in contents:
-                    application_template = contents[namespace.template]
-
-                if namespace.chained_experiments in contents:
-                    application_chained_experiments = contents[namespace.chained_experiments]
-
-                if namespace.modifiers in contents:
-                    application_modifiers = contents[namespace.modifiers]
+                application_context = \
+                    ramble.context.create_context_from_dict(application, contents)
 
                 self.extract_success_criteria('application', contents)
-                yield application, contents, application_vars, \
-                    application_env_vars, application_internals, \
-                    application_template, application_chained_experiments, \
-                    application_modifiers
+                yield contents, application_context
 
     def all_workloads(self, application):
         """Iterator over workloads in an application dict
 
-        Returns workload, variables
-        where variables are the application level variables that
+        Returns workload, context
+        where context contains the application level variables that
         should be applied.
         """
 
@@ -878,36 +809,17 @@ class Workspace(object):
         workloads = application[namespace.workload]
 
         for workload, contents in workloads.items():
-            workload_variables = None
-            workload_env_vars = None
-            workload_internals = None
-            workload_template = False
-            workload_chained_experiments = None
-            workload_modifiers = None
-            if namespace.variables in contents:
-                workload_variables = contents[namespace.variables]
-            if namespace.env_var in contents:
-                workload_env_vars = contents[namespace.env_var]
-            if namespace.internals in contents:
-                workload_internals = contents[namespace.internals]
-            if namespace.template in contents:
-                workload_template = contents[namespace.template]
-            if namespace.chained_experiments in contents:
-                workload_chained_experiments = contents[namespace.chained_experiments]
-            if namespace.modifiers in contents:
-                workload_modifiers = contents[namespace.modifiers]
+            workload_context = ramble.context.create_context_from_dict(workload, contents)
+
             self.extract_success_criteria('workload', contents)
 
-            yield workload, contents, workload_variables, \
-                workload_env_vars, workload_internals, \
-                workload_template, workload_chained_experiments, \
-                workload_modifiers
+            yield contents, workload_context
 
     def all_experiments(self, workload):
         """Iterator over experiments in a workload dict
 
-        Returns experiment, variables, and matrix/matrices
-        Where variables are the workload level variables that
+        Returns experiment, context
+        Where context contains the workload level variables that
         should be applied.
         """
 
@@ -917,50 +829,11 @@ class Workspace(object):
 
         experiments = workload[namespace.experiment]
         for experiment, contents in experiments.items():
-
-            experiment_vars = syaml.syaml_dict()
-            experiment_env_vars = None
-            experiment_internals = None
-            experiment_template = False
-            experiment_chained_experiments = None
-            experiment_modifiers = None
-            experiment_zips = None
-            experiment_exclude = None
-
-            if namespace.variables in contents:
-                experiment_vars = contents[namespace.variables]
-
-            if namespace.env_var in contents:
-                experiment_env_vars = contents[namespace.env_var]
-
-            if namespace.internals in contents:
-                experiment_internals = contents[namespace.internals]
-
-            if namespace.template in contents:
-                experiment_template = contents[namespace.template]
-
-            if namespace.chained_experiments in contents:
-                experiment_chained_experiments = contents[namespace.chained_experiments]
-
-            if namespace.modifiers in contents:
-                experiment_modifiers = contents[namespace.modifiers]
-
-            if namespace.exclude in contents:
-                experiment_exclude = contents[namespace.exclude]
+            experiment_context = ramble.context.create_context_from_dict(experiment, contents)
 
             self.extract_success_criteria('experiment', contents)
 
-            if namespace.zips in contents:
-                experiment_zips = contents[namespace.zips]
-
-            matrices = ramble.util.matrices.extract_matrices('experiment creation',
-                                                             experiment,
-                                                             contents)
-
-            yield experiment, contents, experiment_vars, \
-                experiment_env_vars, experiment_zips, matrices, experiment_internals, \
-                experiment_template, experiment_chained_experiments, \
-                experiment_modifiers, experiment_exclude
+            yield contents, experiment_context
 
     def external_spack_env(self, env_name):
         env_context = self.software_environments.get_env(env_name)
