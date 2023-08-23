@@ -57,6 +57,14 @@ ramble.config module
    :undoc-members:
    :show-inheritance:
 
+ramble.context module
+---------------------
+
+.. automodule:: ramble.context
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.error module
 -------------------
 
