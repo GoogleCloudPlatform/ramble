@@ -127,7 +127,7 @@ class Expander(object):
     @property
     def env_path(self):
         if not self._env_path:
-            var = self.expansion_str(self._keywords.spack_env)
+            var = self.expansion_str(self._keywords.env_path)
             self._env_path = self.expand_var(var)
 
         return self._env_path

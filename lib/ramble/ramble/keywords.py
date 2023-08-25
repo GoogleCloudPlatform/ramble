@@ -47,7 +47,7 @@ class Keywords(object):
         'log_file': key_type.reserved,
         'err_file': key_type.reserved,
         'command': key_type.reserved,
-        'spack_env': key_type.reserved,
+        'env_path': key_type.reserved,
         'input_name': key_type.reserved,
 
         'spec_name': key_type.optional,

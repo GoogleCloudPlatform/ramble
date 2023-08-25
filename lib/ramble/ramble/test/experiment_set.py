@@ -762,7 +762,7 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
 
 
 @pytest.mark.parametrize('var', [
-    'command', 'spack_env'
+    'command', 'env_path'
 ])
 def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var, capsys):
     workspace('create', 'test')
@@ -792,7 +792,7 @@ def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var
 
 
 @pytest.mark.parametrize('var', [
-    'command', 'spack_env'
+    'command', 'env_path'
 ])
 def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var, capsys):
     workspace('create', 'test')
@@ -830,7 +830,7 @@ def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var, c
 
 
 @pytest.mark.parametrize('var', [
-    'command', 'spack_env'
+    'command', 'env_path'
 ])
 def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var, capsys):
     workspace('create', 'test')

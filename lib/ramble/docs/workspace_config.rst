@@ -689,7 +689,7 @@ Ramble automatically generates definitions for the following varialbes:
   ``$workspace_root/inputs/{application_name}``
 * ``workload_input_dir`` - Absolute path to
   ``$workspace_root/inputs/{application_name}/{workload_name}``
-* ``spack_env`` - Absolute path to
+* ``env_path`` - Absolute path to
   ``$workspace_root/software/{env_name}.{workload_name}``
 * ``log_dir`` - Absolute path to ``$workspace_root/logs``
 * ``log_file`` - Absolute path to
