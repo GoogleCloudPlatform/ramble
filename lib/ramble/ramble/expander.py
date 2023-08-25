@@ -60,6 +60,7 @@ class Expander(object):
         self._workload_namespace = None
         self._experiment_namespace = None
         self._env_namespace = None
+        self._env_path = None
 
         self._application_input_dir = None
         self._workload_input_dir = None
@@ -122,6 +123,14 @@ class Expander(object):
             self._env_namespace = self.expand_var(var)
 
         return self._env_namespace
+
+    @property
+    def env_path(self):
+        if not self._env_path:
+            var = self.expansion_str(self._keywords.spack_env)
+            self._env_path = self.expand_var(var)
+
+        return self._env_path
 
     @property
     def application_input_dir(self):

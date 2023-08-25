@@ -14,7 +14,6 @@ import llnl.util.tty as tty
 from ramble.language.shared_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
-from ramble.keywords import Keywords
 
 header_color = '@*b'
 level1_color = '@*g'
@@ -93,12 +92,11 @@ class SpackApplication(ApplicationBase):
         """Install compilers an application uses"""
 
         # See if we cached this already, and if so return
-        namespace = self.expander.env_namespace
-        if not namespace:
-            raise ApplicationError('Ramble env_namespace is set to None.')
-        spec_name = namespace.split('.')[0]
+        env_path = self.expander.env_path
+        if not env_path:
+            raise ApplicationError('Ramble env_path is set to None.')
 
-        cache_tupl = ('spack-compilers', spec_name)
+        cache_tupl = ('spack-compilers', env_path)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
@@ -129,11 +127,11 @@ class SpackApplication(ApplicationBase):
         """
 
         # See if we cached this already, and if so return
-        namespace = self.expander.env_namespace
-        if not namespace:
-            raise ApplicationError('Ramble env_namespace is set to None.')
+        env_path = self.expander.env_path
+        if not env_path:
+            raise ApplicationError('Ramble env_path is set to None.')
 
-        cache_tupl = ('spack-env', namespace)
+        cache_tupl = ('spack-env', env_path)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
@@ -200,11 +198,9 @@ class SpackApplication(ApplicationBase):
         """
 
         # See if we cached this already, and if so return
-        env_path_or_name = self.expander.expand_var(
-            self.expander.expansion_str(Keywords.env_name)
-        )
+        env_path = self.expander.env_path
 
-        cache_tupl = ('concretize-env', env_path_or_name)
+        cache_tupl = ('concretize-env', env_path)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
@@ -228,11 +224,9 @@ class SpackApplication(ApplicationBase):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
-        env_path_or_name = self.expander.expand_var(
-            self.expander.expansion_str(Keywords.env_name)
-        )
+        env_path = self.expander.env_path
 
-        cache_tupl = ('spack-install', env_path_or_name)
+        cache_tupl = ('spack-install', env_path)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
@@ -241,7 +235,7 @@ class SpackApplication(ApplicationBase):
 
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
-            self.spack_runner.set_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.set_env(env_path)
 
             self.spack_runner.activate()
             self.spack_runner.install()
@@ -268,7 +262,7 @@ class SpackApplication(ApplicationBase):
         """
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
-            self.spack_runner.set_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.set_env(self.expander.env_path)
 
             self.spack_runner.activate()
 
@@ -288,11 +282,11 @@ class SpackApplication(ApplicationBase):
         import re
 
         # See if we cached this already, and if so return
-        namespace = self.expander.env_namespace
-        if not namespace:
-            raise ApplicationError('Ramble env_namespace is set to None.')
+        env_path = self.expander.env_path
+        if not env_path:
+            raise ApplicationError('Ramble env_path is set to None.')
 
-        cache_tupl = ('spack-mirror', namespace)
+        cache_tupl = ('spack-mirror', env_path)
         if workspace.check_cache(cache_tupl):
             tty.debug('{} already in cache.'.format(cache_tupl))
             return
@@ -301,7 +295,7 @@ class SpackApplication(ApplicationBase):
 
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
-            self.spack_runner.set_env(self.expander.expand_var('{spack_env}'))
+            self.spack_runner.set_env(env_path)
 
             self.spack_runner.activate()
 
