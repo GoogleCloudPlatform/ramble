@@ -331,7 +331,7 @@ class ExperimentSet(object):
         rendered_experiments = set()
         for experiment_vars in \
                 renderer.render_objects(render_group, exclude_where=exclude_where):
-            experiment_vars[self.keywords.spack_env] = \
+            experiment_vars[self.keywords.env_path] = \
                 os.path.join(self._workspace.software_dir,
                              Expander.expansion_str(self.keywords.env_name) + '.' +
                              Expander.expansion_str(self.keywords.workload_name))
