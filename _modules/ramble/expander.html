@@ -248,7 +248,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">env_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">spack_env</span><span class="p">)</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span>

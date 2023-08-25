@@ -438,6 +438,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.check_reserved_keys"><code class="docutils literal notranslate"><span class="pre">Keywords.check_reserved_keys()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.command"><code class="docutils literal notranslate"><span class="pre">Keywords.command</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.env_name"><code class="docutils literal notranslate"><span class="pre">Keywords.env_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.env_path"><code class="docutils literal notranslate"><span class="pre">Keywords.env_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.err_file"><code class="docutils literal notranslate"><span class="pre">Keywords.err_file</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.experiment_name"><code class="docutils literal notranslate"><span class="pre">Keywords.experiment_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.experiment_run_dir"><code class="docutils literal notranslate"><span class="pre">Keywords.experiment_run_dir</span></code></a></li>
@@ -457,7 +458,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.n_ranks"><code class="docutils literal notranslate"><span class="pre">Keywords.n_ranks</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.n_threads"><code class="docutils literal notranslate"><span class="pre">Keywords.n_threads</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.processes_per_node"><code class="docutils literal notranslate"><span class="pre">Keywords.processes_per_node</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.spack_env"><code class="docutils literal notranslate"><span class="pre">Keywords.spack_env</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.spec_name"><code class="docutils literal notranslate"><span class="pre">Keywords.spec_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.workload_input_dir"><code class="docutils literal notranslate"><span class="pre">Keywords.workload_input_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.workload_name"><code class="docutils literal notranslate"><span class="pre">Keywords.workload_name</span></code></a></li>
@@ -4485,6 +4485,11 @@ but it might not be possible always.</p></li>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.keywords.Keywords.env_path">
+<span class="sig-name descname"><span class="pre">env_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'env_path'</span></em><a class="headerlink" href="#ramble.keywords.Keywords.env_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.keywords.Keywords.err_file">
 <span class="sig-name descname"><span class="pre">err_file</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'err_file'</span></em><a class="headerlink" href="#ramble.keywords.Keywords.err_file" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -4541,7 +4546,7 @@ but it might not be possible always.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.keywords.Keywords.keys">
-<span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'application_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'batch_submit':</span> <span class="pre">type.required,</span> <span class="pre">'command':</span> <span class="pre">type.reserved,</span> <span class="pre">'env_name':</span> <span class="pre">type.optional,</span> <span class="pre">'err_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_template_name':</span> <span class="pre">type.required,</span> <span class="pre">'input_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'license_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'mpi_command':</span> <span class="pre">type.required,</span> <span class="pre">'n_nodes':</span> <span class="pre">type.required,</span> <span class="pre">'n_ranks':</span> <span class="pre">type.required,</span> <span class="pre">'n_threads':</span> <span class="pre">type.required,</span> <span class="pre">'processes_per_node':</span> <span class="pre">type.required,</span> <span class="pre">'spack_env':</span> <span class="pre">type.reserved,</span> <span class="pre">'spec_name':</span> <span class="pre">type.optional,</span> <span class="pre">'workload_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_run_dir':</span> <span class="pre">type.reserved}</span></em><a class="headerlink" href="#ramble.keywords.Keywords.keys" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'application_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'application_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'batch_submit':</span> <span class="pre">type.required,</span> <span class="pre">'command':</span> <span class="pre">type.reserved,</span> <span class="pre">'env_name':</span> <span class="pre">type.optional,</span> <span class="pre">'env_path':</span> <span class="pre">type.reserved,</span> <span class="pre">'err_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_run_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'experiment_template_name':</span> <span class="pre">type.required,</span> <span class="pre">'input_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'license_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'log_file':</span> <span class="pre">type.reserved,</span> <span class="pre">'mpi_command':</span> <span class="pre">type.required,</span> <span class="pre">'n_nodes':</span> <span class="pre">type.required,</span> <span class="pre">'n_ranks':</span> <span class="pre">type.required,</span> <span class="pre">'n_threads':</span> <span class="pre">type.required,</span> <span class="pre">'processes_per_node':</span> <span class="pre">type.required,</span> <span class="pre">'spec_name':</span> <span class="pre">type.optional,</span> <span class="pre">'workload_input_dir':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_name':</span> <span class="pre">type.reserved,</span> <span class="pre">'workload_run_dir':</span> <span class="pre">type.reserved}</span></em><a class="headerlink" href="#ramble.keywords.Keywords.keys" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -4582,11 +4587,6 @@ but it might not be possible always.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.keywords.Keywords.processes_per_node">
 <span class="sig-name descname"><span class="pre">processes_per_node</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'processes_per_node'</span></em><a class="headerlink" href="#ramble.keywords.Keywords.processes_per_node" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.keywords.Keywords.spack_env">
-<span class="sig-name descname"><span class="pre">spack_env</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'spack_env'</span></em><a class="headerlink" href="#ramble.keywords.Keywords.spack_env" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
