@@ -181,6 +181,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_workload_namespace</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_namespace</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_application_input_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workload_input_dir</span> <span class="o">=</span> <span class="kc">None</span>
@@ -243,6 +244,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_namespace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">env_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">spack_env</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_path</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_input_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -719,7 +728,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 23, 2023.
+      <span class="lastupdated">Last updated on Aug 25, 2023.
       </span></p>
   </div>
 
