@@ -56,6 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-sections">Configuration Sections:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-scopes">Configuration Scopes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#application-section">Application Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#config-section">Config Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#environment-variables-section">Environment Variables Section:</a></li>
@@ -163,6 +164,51 @@ does not cover the <a class="reference internal" href="workspace_config.html#wor
 </ul>
 <p>Each of these config sections has a defined schema contained in
 <code class="docutils literal notranslate"><span class="pre">lib/ramble/ramble/schemas</span></code>.</p>
+</section>
+<section id="configuration-scopes">
+<span id="id1"></span><h2>Configuration Scopes<a class="headerlink" href="#configuration-scopes" title="Link to this heading"></a></h2>
+<p>Ramble provides several configuration scopes, which are used to denote
+precedence of configuration options. In precedence order (from lowest to
+highest) Ramble contains the following scopes:</p>
+<p>(1) <strong>default</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(prefix)/etc/ramble/defaults/</span></code>. These are the
+default settings provided with Ramble. Users should generally not modify these
+settings, and instead use a higher precedence configuration scope. These
+defaults will change from version to version of Ramble.
+(2) <strong>system</strong>: Store in <code class="docutils literal notranslate"><span class="pre">/etc/ramble/</span></code>. These are Ramble settings for an
+entire machine. These settings are typically managed by a systems
+administrator, or something with root access on the machine. Settings defined
+in this scope override settings in the <strong>default</strong> scope.
+(3) <strong>site</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(prefix)/etc/ramble/</span></code>. Settings here only affect
+<em>this instance</em> of Ramble, and they override both the <strong>default</strong> and
+<strong>system</strong> scopes.
+(4) <strong>user</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">~/.ramble/</span></code>. Settings here only affect a specific
+user, and override <strong>default</strong>, <strong>system</strong>, and <strong>site</strong> scopes.
+(5) <strong>custom</strong>: Stored in a custom directory, specified by <code class="docutils literal notranslate"><span class="pre">--config-scope</span></code>.
+If multiple scopes are listed on the command line, they are ordered from lowest
+to highest precedence. Settings here override all previously defined scoped.
+(6) <strong>workspace configs dir</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(workspace_root)/configs</span></code>
+generally as a <code class="docutils literal notranslate"><span class="pre">&lt;config_section&gt;.yaml</span></code> file (i.e. <code class="docutils literal notranslate"><span class="pre">variables.yaml</span></code>). These
+settings apply to a specific workspace, and override all previous configuration
+scopes.
+(7) <strong>workspace configuration file</strong>: Stored in
+<code class="docutils literal notranslate"><span class="pre">$(workspace_root)/configs/ramble.yaml</span></code>. Configuration scopes defined within
+this config file override all previously defined configuration scopes.
+(8) <strong>command line</strong>: Configuration options defined on the command line take
+precedence over all other scopes.</p>
+<p>Each configuration directory may contain several configuration files, such as
+<code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">variables.yaml</span></code>, or <code class="docutils literal notranslate"><span class="pre">modifiers.yaml</span></code>. When configurations
+conflict, settings from higher-precedence (higher number in the above list)
+scopes override lower-precedence settings.</p>
+<p>In order to determine what settings will be used in a given context:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>config<span class="w"> </span>blame<span class="w"> </span>&lt;section&gt;
+</pre></div>
+</div>
+<p>Will provide a listing of the configuration options within a given
+configuration section, and where the setting is being derived from. Issuing
+this command with an active workspace will include configuration sections
+defined within a workspace scope.</p>
+<p>Ramble’s merging logic closely follows <cite>Spack’s configuration scope logic
+&lt;https://spack.readthedocs.io/en/latest/configuration.html#configuration-scopes&gt;</cite>.</p>
 </section>
 <section id="application-section">
 <span id="application-config"></span><h2>Application Section:<a class="headerlink" href="#application-section" title="Link to this heading"></a></h2>
@@ -520,7 +566,7 @@ another fully qualified experiment (through the <code class="docutils literal no
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 25, 2023.
+      <span class="lastupdated">Last updated on Aug 28, 2023.
       </span></p>
   </div>
 
