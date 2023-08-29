@@ -119,7 +119,7 @@ def test_env_install(tmpdir, capsys):
         sr.install()
 
         captured = capsys.readouterr()
-        assert "with args: ['install'" in captured.out
+        assert 'spack install' in captured.out
 
         sr.deactivate()
 
@@ -173,24 +173,32 @@ def test_default_concretize_flags(tmpdir, capsys):
 
         sr.concretize()
         captured = capsys.readouterr()
-        assert "with args: ['concretize', '--reuse']" in captured.out
+        assert 'spack concretize' in captured.out
+        assert "with args: ['--reuse']" in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
 
-def test_config_concretize_flags(tmpdir, capsys):
+@pytest.mark.parametrize(
+    'attr,value,expected_str',
+    [
+        ('flags', '-f --fresh', "'-f', '--fresh'"),
+        ('prefix', 'time', 'would run time')
+    ]
+)
+def test_config_concretize_attribute(tmpdir, capsys, attr, value, expected_str):
     try:
         env_path = tmpdir.join('spack-env')
-        sr = ramble.spack_runner.SpackRunner(dry_run=True)
-        sr.create_env(env_path)
-        sr.activate()
-        sr.add_spec('zlib')
+        with ramble.config.override('config:spack', {'concretize': {attr: value}}):
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            sr.create_env(env_path)
+            sr.activate()
+            sr.add_spec('zlib')
 
-        with ramble.config.override('config:spack_flags', {'concretize': '-f --fresh'}):
             sr.concretize()
             captured = capsys.readouterr()
 
-            assert "with args: ['concretize', '-f', '--fresh']" in captured.out
+            assert expected_str in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
@@ -207,35 +215,38 @@ def test_default_install_flags(tmpdir, capsys):
         sr.install()
         captured = capsys.readouterr()
 
-        install_flags = ramble.config.config.get('config:spack_flags:install')
-        expected_str = "with args: ['install'"
+        install_flags = ramble.config.config.get('config:spack:install:flags')
+        expected_str = "with args: ["
+        str_args = []
         for flag in install_flags.split():
-            expected_str += f", '{flag}'"
-        expected_str += "]"
+            str_args.append(f"'{flag}'")
+        expected_str += ','.join(str_args) + ']'
 
-        assert expected_str in captured.out
+        assert 'spack install' in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
 
-def test_config_install_flags(tmpdir, capsys):
+@pytest.mark.parametrize(
+    'attr,value,expected_str',
+    [
+        ('flags', '--fresh --keep-prefix', "'--fresh', '--keep-prefix'"),
+        ('prefix', 'time', 'would run time'),
+    ]
+)
+def test_config_install_attribute(tmpdir, capsys, attr, value, expected_str):
     try:
         env_path = tmpdir.join('spack-env')
-        sr = ramble.spack_runner.SpackRunner(dry_run=True)
-        sr.create_env(env_path)
-        sr.activate()
-        sr.add_spec('zlib')
-        sr.concretize()
+        with ramble.config.override('config:spack',
+                                    {'install': {attr: value}}):
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            sr.create_env(env_path)
+            sr.activate()
+            sr.add_spec('zlib')
+            sr.concretize()
 
-        with ramble.config.override('config:spack_flags', {'install': '--fresh --keep-prefix'}):
             sr.install()
             captured = capsys.readouterr()
-
-            install_flags = ramble.config.config.get('config:spack_flags:install')
-            expected_str = "with args: ['install'"
-            for flag in install_flags.split():
-                expected_str += f", '{flag}'"
-            expected_str += "]"
 
             assert expected_str in captured.out
     except ramble.spack_runner.RunnerError as e:
@@ -305,7 +316,8 @@ packages:
             f.write(compilers_config)
 
         config_path = os.getcwd()
-        with ramble.config.override('config:spack_flags', {'global_args': f'-C {config_path}'}):
+        with ramble.config.override('config:spack',
+                                    {'global': {'flags': f'-C {config_path}'}}):
             try:
                 sr = ramble.spack_runner.SpackRunner(dry_run=True)
                 sr.create_env(os.getcwd())

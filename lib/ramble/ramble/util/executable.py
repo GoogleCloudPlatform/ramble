@@ -7,12 +7,53 @@
 # except according to those terms.
 
 import six
+import shlex
 
 import llnl.util.tty as tty  # noqa: F401
 
 import ramble.error
 
 from ramble.schema.types import OUTPUT_CAPTURE
+
+import spack.util.executable
+from spack.util.path import system_path_filter
+
+
+class PrefixedExecutable(spack.util.executable.Executable):
+    """A version of spack.util.executable.Executable that allows command prefixes to be added"""
+
+    @system_path_filter
+    def add_default_prefix(self, prefix):
+        """Add a prefixed arg / cmd to the command"""
+        if prefix is not None:
+            for part in reversed(shlex.split(prefix)):
+                self.exe.insert(0, part)
+
+    def copy(self):
+        from copy import deepcopy
+        new_exec = deepcopy(self)
+        new_exec.returncode = None
+        return new_exec
+
+
+def which(*args, **kwargs):
+    """Finds an executable in the path like command-line which.
+
+    If given multiple executables, returns the first one that is found.
+    If no executables are found, returns None.
+
+    Parameters:
+        *args (str): One or more executables to search for
+
+    Keyword Arguments:
+        path (list or str): The path to search. Defaults to ``PATH``
+        required (bool): If set to True, raise an error if executable not found
+
+    Returns:
+        Executable: The first executable that is found in the path
+    """
+    exe = spack.util.executable.which_string(*args, **kwargs)
+    return PrefixedExecutable(exe) if exe else None
 
 
 class CommandExecutable(object):

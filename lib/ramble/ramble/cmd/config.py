@@ -9,6 +9,7 @@
 import collections
 import os
 import shutil
+from typing import List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -246,7 +247,14 @@ def _can_update_config_file(scope_dir, cfg_file):
 def config_update(args):
     # Read the configuration files
     ramble.config.config.get_config(args.section, scope=args.scope)
-    updates = ramble.config.config.format_updates[args.section]
+    updates: List[ramble.config.ConfigScope] = list(
+        filter(
+            lambda s: not isinstance(
+                s, (ramble.config.InternalConfigScope, ramble.config.ImmutableConfigScope)
+            ),
+            ramble.config.config.format_updates[args.section],
+        )
+    )
 
     cannot_overwrite, skip_system_scope = [], False
     for scope in updates:

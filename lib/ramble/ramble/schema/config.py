@@ -26,27 +26,71 @@ properties['config']['shell'] = {
     'enum': ['sh', 'bash', 'csh', 'tcsh', 'fish']
 }
 
-properties['config']['spack_flags'] = {
+properties['config']['spack'] = {
     'type': 'object',
     'default': {
-        'install': '--reuse',
-        'concretize': '--reuse'
-    },
-    'properties': {
         'install': {
-            'type': 'string',
-            'default': '--reuse'
+            'flags': '--reuse'
         },
         'concretize': {
-            'type': 'string',
-            'default': '--reuse'
-        },
-        'global_args': {
-            'type': 'string',
-            'default': ''
+            'flags': '--reuse'
         }
     },
+    'properties': {
+        'global': {
+            'type': 'object',
+            'default': {
+                'flags': ''
+            },
+            'properties': {
+                'flags': {
+                    'type': 'string',
+                    'default': ''
+                }
+            },
+            'additionalProperties': False,
+        },
+        'install': {
+            'type': 'object',
+            'default': {
+                'flags': '--reuse',
+                'prefix': '',
+            },
+            'properties': {
+                'flags': {
+                    'type': 'string',
+                    'default': '--reuse',
+                },
+                'prefix': {
+                    'type': 'string',
+                    'default': ''
+                }
+            },
+            'additionalProperties': False
+        },
+        'concretize': {
+            'type': 'object',
+            'default': {
+                'flags': '--reuse',
+                'prefix': '',
+            },
+            'properties': {
+                'flags': {
+                    'type': 'string',
+                    'default': '--reuse',
+                },
+                'prefix': {
+                    'type': 'string',
+                    'default': ''
+                }
+            },
+            'additionalProperties': False
+        },
+    },
     'additionalProperties': False,
+}
+
+properties['config']['spack']['flags'] = {
 }
 
 properties['config']['input_cache'] = {
@@ -97,5 +141,27 @@ def update(data):
     # There are no currently deprecated properties.
     # This is a stub to allow deprecated properties to be removed later, once
     # they exist.
+
+    # Convert `spack_flags` to `spack:command_flags`
+
+    spack_flags = data.get('spack_flags', None)
+    if isinstance(spack_flags, dict):
+        if data.get('spack', None) is None:
+            data['spack'] = {'flags': {}}
+
+        global_args = spack_flags.get('global_args', None)
+        if global_args is not None:
+            data['spack']['global'] = {'flags': global_args}
+
+        install_flags = spack_flags.get('install', None)
+        if install_flags is not None:
+            data['spack']['install'] = {'flags': install_flags}
+
+        concretize_flags = spack_flags.get('concretize', None)
+        if concretize_flags is not None:
+            data['spack']['concretize'] = {'flags': concretize_flags}
+
+        del data['spack_flags']
+        changed = True
 
     return changed
