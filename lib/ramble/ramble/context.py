@@ -132,11 +132,10 @@ def create_context_from_dict(context_name, in_dict):
     if namespace.zips in in_dict:
         new_context.zips = in_dict[namespace.zips]
 
-    if namespace.matrices in in_dict:
-        new_context.matrices = in_dict[namespace.matrices]
-    else:
-        new_context.matrices = ramble.util.matrices.extract_matrices('experiment creation',
-                                                                     context_name,
-                                                                     in_dict)
+    new_context.matrices = ramble.util.matrices.extract_matrices(
+        'experiment creation',
+        context_name,
+        in_dict
+    )
 
     return new_context

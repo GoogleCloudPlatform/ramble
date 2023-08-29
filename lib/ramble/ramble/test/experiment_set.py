@@ -425,6 +425,70 @@ def test_multi_matrix_experiments(mutable_mock_workspace_path):
         assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
 
 
+def test_full_experiments_from_dict(mutable_mock_workspace_path):
+    workspace('create', 'test')
+
+    assert 'test' in workspace('list')
+
+    with ramble.workspace.read('test') as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        app_dict = {
+            'variables': {
+                'n_ranks': '{processes_per_node}*{n_nodes}',
+                'mpi_command': '',
+                'batch_submit': ''
+            }
+        }
+
+        wl_dict = {
+            'variables': {
+                'partition': ['p1', 'p2'],
+                'processes_per_node': ['2', '4']
+            }
+        }
+
+        exp_dict = {
+            'variables': {
+                'n_nodes': ['2', '3'],
+                'ids': ['1', '2', '3', '4']
+            },
+            'zips': {
+                'part_conf': [
+                    'partition',
+                    'processes_per_node'
+                ]
+            },
+            'matrices': [
+                {
+                    'mat_name': [
+                        'part_conf',
+                        'n_nodes'
+                    ]
+                }
+            ],
+            'matrix': [
+                'ids'
+            ]
+        }
+
+        appContext = ramble.context.create_context_from_dict('basic', app_dict)
+        wlContext = ramble.context.create_context_from_dict('test_wl', wl_dict)
+        expContext = ramble.context.create_context_from_dict(
+            'test_{n_ranks}_{processes_per_node}_{ids}',
+            exp_dict
+        )
+
+        exp_set.set_application_context(appContext)
+        exp_set.set_workload_context(wlContext)
+        exp_set.set_experiment_context(expContext)
+
+        assert 'basic.test_wl.test_4_2_1' in exp_set.experiments.keys()
+        assert 'basic.test_wl.test_6_2_2' in exp_set.experiments.keys()
+        assert 'basic.test_wl.test_8_4_3' in exp_set.experiments.keys()
+        assert 'basic.test_wl.test_12_4_4' in exp_set.experiments.keys()
+
+
 def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
     workspace('create', 'test')
 
