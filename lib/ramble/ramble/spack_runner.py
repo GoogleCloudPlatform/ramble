@@ -299,9 +299,13 @@ class SpackRunner(object):
             comp_info_args.extend(['-C', self.env_path])
         comp_info_args.extend(['compiler', 'info', spec])
 
+        if not self.dry_run:
+            self.exe(*self.compiler_find_args)
+
         try:
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
             tty.msg(f'{spec} is already an available compiler')
+            return
         except ProcessError:
 
             args = []
