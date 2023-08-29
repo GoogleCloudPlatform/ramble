@@ -452,9 +452,13 @@
             <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">])</span>
         <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">spec</span><span class="p">])</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exe</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">comp_info_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s1"> is already an available compiler&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="k">except</span> <span class="n">ProcessError</span><span class="p">:</span>
 
             <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
