@@ -300,7 +300,7 @@ class SpackRunner(object):
         comp_info_args.extend(['compiler', 'info', spec])
 
         if not self.dry_run:
-            self.exe(*self.compiler_find_args)
+            self.spack(*self.compiler_find_args)
 
         try:
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
