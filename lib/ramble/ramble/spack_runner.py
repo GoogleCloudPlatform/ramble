@@ -267,7 +267,7 @@ class SpackRunner(object):
                                                env_var.group('val'))
                     self.installer.add_default_env(env_var.group('var'),
                                                    env_var.group('val'))
-                    self.concertizer.add_default_env(env_var.group('var'),
+                    self.concretizer.add_default_env(env_var.group('var'),
                                                      env_var.group('val'))
         else:
             self._dry_run_print(self.spack, args)
