@@ -153,10 +153,13 @@ The current default configuration is as follows:
 
     config:
       shell: ''
-      spack_flags:
-        install: '--reuse'
-        concretize: '--reuse'
-        global_args: ''
+      spack:
+        install:
+          flags: '--reuse'
+        concretize:
+            flags: '--reuse'
+        global
+            flags: ''
       input_cache: '$ramble/var/ramble/cache'
       workspace_dirs: '$ramble/var/ramble/workspaces'
       upload:

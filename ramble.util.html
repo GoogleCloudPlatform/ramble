@@ -330,6 +330,49 @@ name.</p>
 <p>Class for errors when using command executable classes</p>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.executable.PrefixedExecutable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.executable.</span></span><span class="sig-name descname"><span class="pre">PrefixedExecutable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#PrefixedExecutable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.PrefixedExecutable" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Executable</span></code></p>
+<p>A version of spack.util.executable.Executable that allows command prefixes to be added</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.executable.PrefixedExecutable.add_default_prefix">
+<span class="sig-name descname"><span class="pre">add_default_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#PrefixedExecutable.add_default_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.PrefixedExecutable.add_default_prefix" title="Link to this definition"></a></dt>
+<dd><p>Add a prefixed arg / cmd to the command</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.executable.PrefixedExecutable.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#PrefixedExecutable.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.PrefixedExecutable.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.executable.which">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.executable.</span></span><span class="sig-name descname"><span class="pre">which</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/executable.html#which"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.executable.which" title="Link to this definition"></a></dt>
+<dd><p>Finds an executable in the path like command-line which.</p>
+<p>If given multiple executables, returns the first one that is found.
+If no executables are found, returns None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*args</strong> (<em>str</em>) – One or more executables to search for</p>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>path</strong> (<em>list</em><em> or </em><em>str</em>) – The path to search. Defaults to <code class="docutils literal notranslate"><span class="pre">PATH</span></code></p></li>
+<li><p><strong>required</strong> (<em>bool</em>) – If set to True, raise an error if executable not found</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The first executable that is found in the path</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Executable</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-ramble.util.file_cache">
 <span id="ramble-util-file-cache-module"></span><h2>ramble.util.file_cache module<a class="headerlink" href="#module-ramble.util.file_cache" title="Link to this heading"></a></h2>
@@ -814,7 +857,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 28, 2023.
+      <span class="lastupdated">Last updated on Aug 29, 2023.
       </span></p>
   </div>
 

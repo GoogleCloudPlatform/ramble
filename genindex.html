@@ -200,6 +200,8 @@
 </li>
       <li><a href="ramble.html#ramble.config.add_default_platform_scope">add_default_platform_scope() (in module ramble.config)</a>
 </li>
+      <li><a href="ramble.util.html#ramble.util.executable.PrefixedExecutable.add_default_prefix">add_default_prefix() (ramble.util.executable.PrefixedExecutable method)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.license.LicenseError.add_error">add_error() (ramble.cmd.license.LicenseError method)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.add_expand_vars">add_expand_vars() (ramble.application.ApplicationBase method)</a>
@@ -306,14 +308,14 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.all_template_paths">(in module ramble.workspace.workspace)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.all_templates">all_templates() (ramble.workspace.Workspace method)</a>
 
       <ul>
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.all_templates">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.all_workloads">all_workloads() (ramble.workspace.Workspace method)</a>
 
       <ul>
@@ -680,6 +682,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.spack_runner.SpackRunner.concretize_config_name">concretize_config_name (ramble.spack_runner.SpackRunner attribute)</a>
+</li>
       <li><a href="ramble.html#ramble.config.config">config (in module ramble.config)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.config.config">config() (in module ramble.cmd.config)</a>
@@ -764,6 +768,8 @@
         <li><a href="ramble.html#ramble.spec.Spec.copy">(ramble.spec.Spec method)</a>
 </li>
         <li><a href="ramble.util.html#ramble.util.executable.CommandExecutable.copy">(ramble.util.executable.CommandExecutable method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.executable.PrefixedExecutable.copy">(ramble.util.executable.PrefixedExecutable method)</a>
 </li>
       </ul></li>
       <li><a href="ramble.html#ramble.renderer.RenderGroup.copy_contents">copy_contents() (ramble.renderer.RenderGroup method)</a>
@@ -1066,6 +1072,8 @@
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executable_modifiers">(ramble.modifier_types.spack.SpackModifier attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication">ExecutableApplication (class in ramble.application_types.executable)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.executables">executables (ramble.application.ApplicationBase attribute)</a>
@@ -1075,19 +1083,11 @@
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.executables">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
-        <li><a href="ramble.html#ramble.modifier.ModifierBase.executables">(ramble.modifier.ModifierBase attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executables">(ramble.modifier_types.basic.BasicModifier attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executables">(ramble.modifier_types.spack.SpackModifier attribute)</a>
-</li>
         <li><a href="ramble.html#ramble.namespace.namespace.executables">(ramble.namespace.namespace attribute)</a>
 </li>
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.executables">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.exists">exists() (in module ramble.workspace)</a>
 
       <ul>
@@ -1584,7 +1584,7 @@
 </li>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.list.github_url">github_url() (in module ramble.cmd.common.list)</a>
 </li>
-      <li><a href="ramble.html#ramble.spack_runner.SpackRunner.global_arg_config_name">global_arg_config_name (ramble.spack_runner.SpackRunner attribute)</a>
+      <li><a href="ramble.html#ramble.spack_runner.SpackRunner.global_config_name">global_config_name (ramble.spack_runner.SpackRunner attribute)</a>
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.GoFetchStrategy.go">go (ramble.fetch_strategy.GoFetchStrategy property)</a>
 </li>
@@ -1677,12 +1677,6 @@
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.inputs">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
-        <li><a href="ramble.html#ramble.modifier.ModifierBase.inputs">(ramble.modifier.ModifierBase attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs">(ramble.modifier_types.basic.BasicModifier attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs">(ramble.modifier_types.spack.SpackModifier attribute)</a>
-</li>
       </ul></li>
       <li><a href="ramble.html#ramble.stage.InputStage">InputStage (class in ramble.stage)</a>
 </li>
@@ -1692,18 +1686,20 @@
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.install_compiler">install_compiler() (ramble.spack_runner.SpackRunner method)</a>
 </li>
+      <li><a href="ramble.html#ramble.spack_runner.SpackRunner.install_config_name">install_config_name (ramble.spack_runner.SpackRunner attribute)</a>
+</li>
       <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_answer">intel_aps_answer() (in module ramble.test.modifier_functionality.modifier_helpers)</a>
 </li>
       <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_modifier">intel_aps_modifier() (in module ramble.test.modifier_functionality.modifier_helpers)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.internal">internal (ramble.workspace.Workspace property)</a>
 
       <ul>
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.internal">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.config.InternalConfigScope">InternalConfigScope (class in ramble.config)</a>
 </li>
       <li><a href="ramble.html#ramble.namespace.namespace.internals">internals (ramble.namespace.namespace attribute)</a>
@@ -2473,6 +2469,8 @@
 </li>
       <li><a href="ramble.html#ramble.paths.prefix">prefix (in module ramble.paths)</a>
 </li>
+      <li><a href="ramble.util.html#ramble.util.executable.PrefixedExecutable">PrefixedExecutable (class in ramble.util.executable)</a>
+</li>
       <li><a href="ramble.workspace.html#ramble.workspace.workspace.prepare_config_scope">prepare_config_scope() (in module ramble.workspace.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.commands.prepend_header">prepend_header() (in module ramble.cmd.commands)</a>
@@ -2487,10 +2485,10 @@
 </li>
       <li><a href="ramble.html#ramble.error.RambleError.print_context">print_context() (ramble.error.RambleError method)</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.print_environments">print_environments() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.print_environments">print_environments() (ramble.software_environments.SoftwareEnvironments method)</a>
+</li>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.info.print_info">print_info() (in module ramble.cmd.common.info)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.print_internals">print_internals() (ramble.application.ApplicationBase method)</a>
@@ -4205,6 +4203,8 @@
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.where">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.util.html#ramble.util.executable.which">which() (in module ramble.util.executable)</a>
+</li>
       <li><a href="ramble.html#ramble.namespace.namespace.workload">workload (ramble.namespace.namespace attribute)</a>
 
       <ul>
@@ -4252,12 +4252,6 @@
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workload_variables">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
-        <li><a href="ramble.html#ramble.modifier.ModifierBase.workload_variables">(ramble.modifier.ModifierBase attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workload_variables">(ramble.modifier_types.basic.BasicModifier attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workload_variables">(ramble.modifier_types.spack.SpackModifier attribute)</a>
-</li>
       </ul></li>
       <li><a href="ramble.html#ramble.expander.WorkloadNotDefinedError">WorkloadNotDefinedError</a>
 </li>
@@ -4267,12 +4261,6 @@
         <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.workloads">(ramble.application_types.executable.ExecutableApplication attribute)</a>
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workloads">(ramble.application_types.spack.SpackApplication attribute)</a>
-</li>
-        <li><a href="ramble.html#ramble.modifier.ModifierBase.workloads">(ramble.modifier.ModifierBase attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workloads">(ramble.modifier_types.basic.BasicModifier attribute)</a>
-</li>
-        <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workloads">(ramble.modifier_types.spack.SpackModifier attribute)</a>
 </li>
       </ul></li>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace">Workspace (class in ramble.workspace)</a>
@@ -4295,14 +4283,14 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_archive">workspace_archive() (in module ramble.cmd.workspace)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.workspace.workspace_archive_path">workspace_archive_path (in module ramble.workspace.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_archive_setup_parser">workspace_archive_setup_parser() (in module ramble.cmd.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_concretize">workspace_concretize() (in module ramble.cmd.workspace)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_concretize_setup_parser">workspace_concretize_setup_parser() (in module ramble.cmd.workspace)</a>
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.workspace.workspace_config_path">workspace_config_path (in module ramble.workspace.workspace)</a>
@@ -4422,7 +4410,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 28, 2023.
+      <span class="lastupdated">Last updated on Aug 29, 2023.
       </span></p>
   </div>
 
