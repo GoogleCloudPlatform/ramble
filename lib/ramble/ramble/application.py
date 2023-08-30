@@ -20,6 +20,7 @@ from typing import List
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
+import llnl.util.tty.log
 from llnl.util.tty.colify import colified
 
 import spack.util.executable
@@ -105,6 +106,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.license_path = ''
         self.license_file = ''
         self.license_inc_name = 'license.inc'
+
+        self.logger = llnl.util.tty.log.log_output(echo=False, debug=tty.debug_level())
 
     def copy(self):
         """Deep copy an application instance"""
@@ -278,6 +281,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
+
+    def experiment_log_file(self, logs_dir):
+        """Returns an experiment log file path for the given logs directory"""
+        return os.path.join(
+            logs_dir,
+            self.expander.experiment_namespace) + \
+            '.out'
 
     def get_pipeline_phases(self, pipeline, phase_filters=['*']):
         if pipeline not in self._pipelines:

@@ -113,12 +113,14 @@ class SpackApplication(ApplicationBase):
             for pkg_name in workspace.software_environments.get_env_packages(app_context):
                 pkg_spec = workspace.software_environments.get_spec(pkg_name)
                 if 'compiler' in pkg_spec:
-                    tty.debug(f'Trying to install compiler: {pkg_spec["compiler"]}')
+                    tty.msg('Installing compilers')
+                    tty.debug(f'Compilers: {pkg_spec["compiler"]}')
                     comp_spec = workspace.software_environments.get_spec(pkg_spec['compiler'])
                     self.spack_runner.install_compiler(comp_spec['spack_spec'])
 
         except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
+            with self.logger.force_echo():
+                tty.die(e)
 
     def _software_create_env(self, workspace):
         """Create the spack environment for this experiment
@@ -126,6 +128,8 @@ class SpackApplication(ApplicationBase):
         Extract all specs this experiment uses, and write the spack environment
         file for it.
         """
+
+        tty.msg('Creating Spack environment')
 
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -178,23 +182,26 @@ class SpackApplication(ApplicationBase):
             added_packages = set(self.spack_runner.added_packages())
             for pkg in self.required_packages.keys():
                 if pkg not in added_packages:
-                    tty.die(f'Software spec {pkg} is not defined '
-                            f'in environment {env_context}, but is required '
-                            f'to by the {self.name} application '
-                            'definition')
+                    with self.logger.force_echo():
+                        tty.die(f'Software spec {pkg} is not defined '
+                                f'in environment {env_context}, but is required '
+                                f'to by the {self.name} application '
+                                'definition')
 
             for mod_inst in self._modifier_instances:
                 for pkg in mod_inst.required_packages.keys():
                     if pkg not in added_packages:
-                        tty.die(f'Software spec {pkg} is not defined '
-                                f'in environment {env_context}, but is required '
-                                f'to by the {mod_inst.name} modifier '
-                                'definition')
+                        with self.logger.force_echo():
+                            tty.die(f'Software spec {pkg} is not defined '
+                                    f'in environment {env_context}, but is required '
+                                    f'to by the {mod_inst.name} modifier '
+                                    'definition')
 
             self.spack_runner.deactivate()
 
         except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
+            with self.logger.force_echo():
+                tty.die(e)
 
     def _software_configure(self, workspace):
         """Concretize the spack environment for this experiment
@@ -202,6 +209,8 @@ class SpackApplication(ApplicationBase):
         Perform spack's concretize step on the software environment generated
         for  this experiment.
         """
+
+        tty.msg('Concretizing Spack environment')
 
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -224,7 +233,8 @@ class SpackApplication(ApplicationBase):
                 self.spack_runner.concretize()
 
         except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
+            with self.logger.force_echo():
+                tty.die(e)
 
     def _software_install(self, workspace):
         """Install application's software using spack"""
@@ -243,10 +253,13 @@ class SpackApplication(ApplicationBase):
             self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.set_env(env_path)
 
+            tty.msg('Installing software')
+
             self.spack_runner.activate()
             self.spack_runner.install()
         except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
+            with self.logger.force_echo():
+                tty.die(e)
 
     def _define_package_paths(self, workspace):
         """Define variables containing the path to all spack packages
@@ -266,6 +279,9 @@ class SpackApplication(ApplicationBase):
         Would define a variable `wrf` that contains the installation path of
         wrf@4.2.2
         """
+
+        tty.msg('Defining Spack variables')
+
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.set_env(self.expander.env_path)
@@ -281,11 +297,14 @@ class SpackApplication(ApplicationBase):
                 self.variables[spack_pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
+            with self.logger.force_echo():
+                tty.die(e)
 
     def _mirror_software(self, workspace):
         """Mirror software source for this experiment using spack"""
         import re
+
+        tty.msg('Mirroring software')
 
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -305,7 +324,8 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            mirror_output = self.spack_runner.mirror_environment(workspace._software_mirror_path)
+            mirror_output = self.spack_runner \
+                                .mirror_environment(workspace._software_mirror_path)
 
             present = 0
             added = 0
@@ -339,7 +359,8 @@ class SpackApplication(ApplicationBase):
                 workspace._software_mirror_stats.errors.add(i)
 
         except ramble.spack_runner.RunnerError as e:
-            tty.die(e)
+            with self.logger.force_echo():
+                tty.die(e)
 
     def _write_inventory(self, workspace):
         """Add software environment information to hash inventory"""

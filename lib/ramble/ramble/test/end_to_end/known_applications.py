@@ -25,7 +25,7 @@ workspace = RambleCommand('workspace')
 
 
 @pytest.mark.long
-def test_known_applications(application):
+def test_known_applications(application, capsys):
     info_cmd = RambleCommand('info')
 
     workload_regex = re.compile(r'Workload: (?P<wl_name>.*)')

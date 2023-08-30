@@ -7,11 +7,13 @@
 # except according to those terms.
 
 import os
+import glob
 
 import pytest
 
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
+from ramble.test.dry_run_helpers import dry_run_config, search_files_for_string, SCOPES
 import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
+
 import ramble.workspace
 from ramble.main import RambleCommand
 
@@ -53,11 +55,12 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
         ws1._re_read()
 
         workspace('concretize', global_args=['-D', ws1.root])
-        output = workspace('setup', '--dry-run', global_args=['-D', ws1.root])
+        workspace('setup', '--dry-run', global_args=['-D', ws1.root])
+        out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
         expected_str = "with args: ['--reuse', 'mod_compiler@1.1 target=x86_64']"
 
-        assert expected_str in output
+        assert search_files_for_string(out_files, expected_str)
 
         # Test software directories
         software_base_dir = ws1.software_dir
