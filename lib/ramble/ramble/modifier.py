@@ -43,6 +43,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
         self._file_path = file_path
         self._on_executables = ['*']
+        self.expander = None
         self._usage_mode = None
 
         self._verbosity = 'short'
@@ -88,6 +89,11 @@ class ModifierBase(object, metaclass=ModifierMeta):
                 self._on_executables.append(exec_name)
         else:
             self._on_executables = ['*']
+
+    def inherit_from_application(self, app):
+        self.expander = app.expander.copy()
+        modded_vars = self.modded_variables(app)
+        self.expander._variables.update(modded_vars)
 
     def _long_print(self):
         out_str = []
@@ -247,6 +253,29 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
         for action, conf in self.env_var_modifications[self._usage_mode].items():
             yield action, conf
+
+    def run_phase_hook(self, workspace, hook_name):
+        """Run a modifier hook.
+
+        Hooks are internal functions named _{hook_name}.
+
+        This is a wrapper to extract the hook function, and execute it
+        properly.
+        """
+
+        hook_func_name = f'_{hook_name}'
+        if hasattr(self, hook_func_name):
+            phase_func = getattr(self, hook_func_name)
+
+            phase_func(workspace)
+
+    def _prepare_analysis(self, workspace):
+        """Hook to perform analysis that a modifier defines.
+
+        This function allows modifier definitions to inject their own
+        processing to output files, before FOMs are extracted.
+        """
+        pass
 
 
 class ModifierError(RambleError):

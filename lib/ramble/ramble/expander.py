@@ -70,6 +70,9 @@ class Expander(object):
         self._workload_run_dir = None
         self._experiment_run_dir = None
 
+    def copy(self):
+        return Expander(self._variables.copy(), self._experiment_set)
+
     @property
     def application_name(self):
         if not self._application_name:

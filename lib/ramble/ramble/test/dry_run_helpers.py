@@ -14,7 +14,7 @@ SCOPES = Enum('SCOPES', ['workspace', 'application', 'workload', 'experiment'])
 
 
 def dry_run_config(section_name, injections, config_path,
-                   app_name, wl_name):
+                   app_name, wl_name, batch_cmd='batch_submit'):
     """Creates a new configuration with modifiers injected
 
     Input argument injections is a list of tuples. Each tuple has two
@@ -43,7 +43,7 @@ def dry_run_config(section_name, injections, config_path,
 
     ws_var_dict = test_dict['variables']
     ws_var_dict['mpi_command'] = 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    ws_var_dict['batch_submit'] = 'batch_submit {execute_experiment}'
+    ws_var_dict['batch_submit'] = f'{batch_cmd} {{execute_experiment}}'
     ws_var_dict['processes_per_node'] = '16'
     ws_var_dict['n_ranks'] = '{processes_per_node}*{n_nodes}'
     ws_var_dict['n_threads'] = '1'

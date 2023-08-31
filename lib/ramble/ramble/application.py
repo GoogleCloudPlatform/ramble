@@ -66,7 +66,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
         self._setup_phases = ['license_includes']
-        self._analyze_phases = ['analyze_experiments']
+        self._analyze_phases = ['prepare_analysis', 'analyze_experiments']
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
 
@@ -366,6 +366,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, f'_{phase}'):
             tty.verbose('    Executing phase ' + phase)
+            for mod_inst in self._modifier_instances:
+                mod_inst.run_phase_hook(workspace, phase)
             phase_func = getattr(self, f'_{phase}')
             phase_func(workspace)
 
@@ -535,6 +537,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if not self.modifiers:
             return
 
+        if len(self._modifier_instances) > 0:
+            return
+
         mod_type = ramble.repository.ObjectTypes.modifiers
 
         for mod in self.modifiers:
@@ -549,6 +554,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 mod_inst.set_usage_mode(mod['mode'])
             else:
                 mod_inst.set_usage_mode(None)
+
+            mod_inst.inherit_from_application(self)
 
             self._modifier_instances.append(mod_inst)
 
@@ -1002,6 +1009,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for file in glob.glob(exp_pattern):
                 shutil.copy(file, archive_experiment_dir)
 
+    def _prepare_analysis(self, workspace):
+        """Prepapre experiment for analysis extraction
+
+        This function performs any actions that are necessary before the
+        figures of merit, and success criteria can be properly extracted.
+
+        This function can be overridden at the application level to perform
+        application specific processing of the output.
+        """
+        pass
+
     def _analyze_experiments(self, workspace):
         """Perform experiment analysis.
 
@@ -1178,6 +1196,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             ('application_definition', self.success_criteria),
         ]
 
+        tty.debug(f' Number of modifiers are: {len(self._modifier_instances)}')
         for mod in self._modifier_instances:
             success_lists.append(('modifier_definition', mod.success_criteria))
 
