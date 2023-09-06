@@ -258,6 +258,30 @@ class Expander(object):
 
         return str(expanded).lstrip()
 
+    def compute_logical(self, in_str, extra_vars=None):
+        """Compute the logical value by evaluating math contained in a string
+
+        Args:
+            in_str: String representing logical math that should be evaluated
+            extra_vars: Variable definitions to use with highest precedence
+
+        Returns:
+            boolean: True or False, based on the evaluation of in_str
+        """
+
+        evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
+
+        if not isinstance(evaluated, six.string_types):
+            tty.die('Logical compute failed to return a string')
+
+        if evaluated == 'True':
+            return True
+        elif evaluated == 'False':
+            return False
+        else:
+            tty.die(f'When evaluating {in_str}, compute_logical returned a non-boolean '
+                    f'string: "{evaluated}"')
+
     @staticmethod
     def expansion_str(in_str):
         l_delimiter = '{'

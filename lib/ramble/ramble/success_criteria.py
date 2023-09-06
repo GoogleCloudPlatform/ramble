@@ -175,11 +175,8 @@ class SuccessCriteria(object):
                     }
 
                     comparison_tested = True
-                    expanded = app_inst.expander.expand_var(self.formula,
-                                                            extra_vars=comparison_vars)
-                    tty.debug(f'   Expanded: {expanded}')
-                    if expanded != 'True':
-                        result = False
+                    result = app_inst.expander.compute_logical(self.formula,
+                                                               extra_vars=comparison_vars)
 
             # If fom doesn't match any fom names, fail the comparison
             if not comparison_tested:
