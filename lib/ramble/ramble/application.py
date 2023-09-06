@@ -57,6 +57,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _builtin_required_key = 'required'
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
+    _status_file_name = 'ramble_status.json'
     _pipelines = ['analyze', 'archive', 'mirror', 'setup']
 
     #: Lists of strings which contains GitHub usernames of attributes.
@@ -67,7 +68,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
         self._setup_phases = ['license_includes']
-        self._analyze_phases = ['prepare_analysis', 'analyze_experiments']
+        self._analyze_phases = ['prepare_analysis', 'analyze_experiments', 'write_status']
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
 
@@ -896,6 +897,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         experiment_script = workspace.experiments_script
         experiment_script.write(self.expander.expand_var('{batch_submit}\n'))
+        self.set_status(status='UNKNOWN')
 
     def _clean_hash_variables(self, workspace, variables):
         """Cleanup variables to hash before computing the hash
@@ -1297,6 +1299,46 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         'format': format_str
                     }
         return files, contexts, foms
+
+    def read_status(self):
+        """Read status from an experiment's status file, if possible.
+
+        Set this experiment's status based on the status file in the experiment
+        run directory, if it exists. If it doesn't exist, set its status to
+        UNKNOWN
+        """
+        status_path = os.path.join(
+            self.expander.expand_var_name(keywords.experiment_run_dir),
+            self._status_file_name
+        )
+
+        if os.path.isfile(status_path):
+            with open(status_path, 'r') as f:
+                status_data = spack.util.spack_json.load(f)
+            self.variables[keywords.experiment_status] = \
+                status_data[keywords.experiment_status]
+        else:
+            self.variables[keywords.experiment_status] = \
+                'UNKNOWN'
+
+    def set_status(self, status='UNKNOWN'):
+        """Set the status of this experiment"""
+        self.variables[keywords.experiment_status] = status
+
+    def _write_status(self, workspace):
+        """Phase to write an experiment's ramble_status.json file"""
+
+        status_data = {}
+        status_data[keywords.experiment_status] = \
+            self.expander.expand_var_name(keywords.experiment_status)
+
+        status_path = os.path.join(
+            self.expander.expand_var_name(keywords.experiment_run_dir),
+            self._status_file_name
+        )
+
+        with open(status_path, 'w+') as f:
+            spack.util.spack_json.dump(status_data, f)
 
     register_builtin('env_vars', required=True)
 

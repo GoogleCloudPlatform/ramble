@@ -43,6 +43,7 @@ class Keywords(object):
         'license_input_dir': key_type.reserved,
         'experiment_name': key_type.reserved,
         'experiment_run_dir': key_type.reserved,
+        'experiment_status': key_type.reserved,
         'log_dir': key_type.reserved,
         'log_file': key_type.reserved,
         'err_file': key_type.reserved,

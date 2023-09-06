@@ -56,6 +56,7 @@ class SpackApplication(ApplicationBase):
             'get_inputs',
             'make_experiments',
             'write_inventory',
+            'write_status'
         ]
 
         self._mirror_phases = [

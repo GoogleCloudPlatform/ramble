@@ -378,6 +378,7 @@ class ExperimentSet(object):
             app_inst.set_template(final_context.is_template)
             app_inst.set_chained_experiments(final_context.chained_experiments)
             app_inst.set_modifiers(final_context.modifiers)
+            app_inst.read_status()
             self.experiments[experiment_namespace] = app_inst
             self.experiment_order.append(experiment_namespace)
 

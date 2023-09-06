@@ -25,6 +25,7 @@ class ExecutableApplication(ApplicationBase):
             'get_inputs',
             'make_experiments',
             'write_inventory',
+            'write_status'
         ]
 
         self.application_class = 'ExecutableApplication'
