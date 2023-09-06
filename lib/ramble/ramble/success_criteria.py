@@ -58,7 +58,7 @@ class ScopedCriteriaList(object):
         self.validate_scope(scope)
         exists = self.find_criteria(name)
         if exists:
-            tty.die(f'Criteria {name} is not unique.')
+            tty.die(f'Success criteria {name} is not unique.')
 
         self.criteria[scope].append(SuccessCriteria(name, mode, *args, **kwargs))
 
