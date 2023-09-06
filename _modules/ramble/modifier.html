@@ -161,6 +161,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span> <span class="o">=</span> <span class="n">file_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_executables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
@@ -214,6 +215,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_on_executables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exec_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_on_executables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ModifierBase.inherit_from_application">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.inherit_from_application">[docs]</a>
+    <span class="k">def</span> <span class="nf">inherit_from_application</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">modded_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modded_variables</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">modded_vars</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_long_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -388,7 +397,33 @@
 
         <span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">action</span><span class="p">,</span> <span class="n">conf</span></div>
-</div>
+
+
+<div class="viewcode-block" id="ModifierBase.run_phase_hook">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.run_phase_hook">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_phase_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">hook_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a modifier hook.</span>
+
+<span class="sd">        Hooks are internal functions named _{hook_name}.</span>
+
+<span class="sd">        This is a wrapper to extract the hook function, and execute it</span>
+<span class="sd">        properly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">hook_func_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">hook_name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook_func_name</span><span class="p">):</span>
+            <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook_func_name</span><span class="p">)</span>
+
+            <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_prepare_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook to perform analysis that a modifier defines.</span>
+
+<span class="sd">        This function allows modifier definitions to inject their own</span>
+<span class="sd">        processing to output files, before FOMs are extracted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
 
 
 
@@ -418,7 +453,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 29, 2023.
+      <span class="lastupdated">Last updated on Sep 06, 2023.
       </span></p>
   </div>
 

@@ -184,7 +184,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;license_includes&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;prepare_analysis&#39;</span><span class="p">,</span> <span class="s1">&#39;analyze_experiments&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_archive_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;archive_experiments&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mirror_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mirror_inputs&#39;</span><span class="p">]</span>
 
@@ -522,6 +522,8 @@
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s1">&#39;    Executing phase &#39;</span> <span class="o">+</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+                <span class="n">mod_inst</span><span class="o">.</span><span class="n">run_phase_hook</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
             <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span></div>
 
@@ -697,6 +699,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">modifiers</span><span class="p">:</span>
             <span class="k">return</span>
 
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="n">mod_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">modifiers</span>
 
         <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modifiers</span><span class="p">:</span>
@@ -711,6 +716,8 @@
                 <span class="n">mod_inst</span><span class="o">.</span><span class="n">set_usage_mode</span><span class="p">(</span><span class="n">mod</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mod_inst</span><span class="o">.</span><span class="n">set_usage_mode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+            <span class="n">mod_inst</span><span class="o">.</span><span class="n">inherit_from_application</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="p">)</span></div>
 
@@ -1168,6 +1175,17 @@
             <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">exp_pattern</span><span class="p">):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">archive_experiment_dir</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_prepare_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepapre experiment for analysis extraction</span>
+
+<span class="sd">        This function performs any actions that are necessary before the</span>
+<span class="sd">        figures of merit, and success criteria can be properly extracted.</span>
+
+<span class="sd">        This function can be overridden at the application level to perform</span>
+<span class="sd">        application specific processing of the output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
     <span class="k">def</span> <span class="nf">_analyze_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform experiment analysis.</span>
 
@@ -1344,6 +1362,7 @@
             <span class="p">(</span><span class="s1">&#39;application_definition&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_criteria</span><span class="p">),</span>
         <span class="p">]</span>
 
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Number of modifiers are: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
             <span class="n">success_lists</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;modifier_definition&#39;</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="n">success_criteria</span><span class="p">))</span>
 
@@ -1530,7 +1549,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 29, 2023.
+      <span class="lastupdated">Last updated on Sep 06, 2023.
       </span></p>
   </div>
 

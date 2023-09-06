@@ -181,7 +181,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="n">exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_criteria</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exists</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Criteria </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> is not unique.&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> is not unique.&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">[</span><span class="n">scope</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SuccessCriteria</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
@@ -355,7 +355,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 29, 2023.
+      <span class="lastupdated">Last updated on Sep 06, 2023.
       </span></p>
   </div>
 

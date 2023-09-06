@@ -46,6 +46,14 @@ ramble.test.modifier\_functionality.modifier\_helpers module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.modifier\_functionality.modifier\_prepare\_analysis module
+----------------------------------------------------------------------
+
+.. automodule:: ramble.test.modifier_functionality.modifier_prepare_analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.modifier\_functionality.multi\_modifier\_dry\_run module
 --------------------------------------------------------------------
 

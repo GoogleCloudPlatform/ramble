@@ -191,6 +191,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
 
+<div class="viewcode-block" id="Expander.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Expander</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span><span class="p">)</span></div>
+
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_name</span><span class="p">:</span>
@@ -728,7 +734,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Aug 29, 2023.
+      <span class="lastupdated">Last updated on Sep 06, 2023.
       </span></p>
   </div>
 
