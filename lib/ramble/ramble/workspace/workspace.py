@@ -11,16 +11,13 @@ import contextlib
 import copy
 import re
 import shutil
-import stat
 import datetime
-from tqdm import tqdm
 
 import six
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 import llnl.util.tty.log as log
-from llnl.util.tty.color import cprint
 
 import ramble.config
 import ramble.paths
@@ -446,8 +443,8 @@ class Workspace(object):
     can be performed.
     """
 
-    _inventory_file_name = 'ramble_inventory.json'
-    _hash_file_name = 'workspace_hash.sha256'
+    inventory_file_name = 'ramble_inventory.json'
+    hash_file_name = 'workspace_hash.sha256'
 
     def __init__(self, root, dry_run=False):
         tty.debug('In workspace init. Root = {}'.format(root))
@@ -459,13 +456,13 @@ class Workspace(object):
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
         self._templates = {}
         self._auxiliary_software_files = {}
-        self._software_mirror_path = None
-        self._input_mirror_path = None
-        self._mirror_existed = None
-        self._software_mirror_stats = None
-        self._input_mirror_stats = None
-        self._input_mirror_cache = None
-        self._software_mirror_cache = None
+        self.software_mirror_path = None
+        self.input_mirror_path = None
+        self.mirror_existed = None
+        self.software_mirror_stats = None
+        self.input_mirror_stats = None
+        self.input_mirror_cache = None
+        self.software_mirror_cache = None
         self._software_environments = None
         self.hash_inventory = {
             'experiments': [],
@@ -516,7 +513,7 @@ class Workspace(object):
         #  }
         self.application_configs = {}
 
-        self._experiment_script = None
+        self.experiments_script = None
 
         self._read()
 
@@ -958,7 +955,7 @@ class Workspace(object):
             res['workspace_hash'] = self.workspace_hash
         else:
             try:
-                with open(os.path.join(self.root, self._hash_file_name)) as f:
+                with open(os.path.join(self.root, self.hash_file_name)) as f:
                     res['workspace_hash'] = f.readline().rstrip()
             except OSError:
                 res['workspace_hash'] = "Unknown.."
@@ -1000,7 +997,7 @@ class Workspace(object):
 
         results_written = []
 
-        dt = self._date_string()
+        dt = self.date_string()
         inner_delim = '.'
         filename_base = 'results' + inner_delim + dt
         latest_base = 'results' + inner_delim + 'latest'
@@ -1076,11 +1073,11 @@ class Workspace(object):
 
     def create_mirror(self, mirror_root):
         parsed_url = url_util.parse(mirror_root)
-        self._mirror_path = url_util.local_file_path(parsed_url)
-        self._mirror_existed = web_util.url_exists(self._mirror_path)
-        self._input_mirror_path = os.path.join(self._mirror_path, 'inputs')
-        self._software_mirror_path = os.path.join(self._mirror_path, 'software')
-        mirror_dirs = [self._mirror_path, self._input_mirror_path, self._software_mirror_path]
+        self.mirror_path = url_util.local_file_path(parsed_url)
+        self.mirror_existed = web_util.url_exists(self.mirror_path)
+        self.input_mirror_path = os.path.join(self.mirror_path, 'inputs')
+        self.software_mirror_path = os.path.join(self.mirror_path, 'software')
+        mirror_dirs = [self.mirror_path, self.input_mirror_path, self.software_mirror_path]
         for subdir in mirror_dirs:
             if not os.path.isdir(subdir):
                 try:
@@ -1089,146 +1086,10 @@ class Workspace(object):
                     raise ramble.mirror.MirrorError(
                         "Cannot create directory '%s':" % subdir, str(e))
 
-        self._software_mirror_stats = MirrorStats()
-        self._input_mirror_stats = MirrorStats()
-        self._input_mirror_cache = ramble.caches.MirrorCache(self._input_mirror_path)
-        self._software_mirror_cache = ramble.caches.MirrorCache(self._software_mirror_path)
-
-    def run_pipeline(self, pipeline, phases='*'):
-        # Set up logging to redirect most Spack text to a log file instead of stdout
-        # All prints will be redirected unless inside a self.logger.force_echo() block
-        # or when dry_run is TRUE, which will echo all output to screen.
-
-        # Check that the workspace log directory exists
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
-
-        # Set up a log file for the overall pipeline, excluding experiments
-        dt = self._date_string()
-        inner_delim = '.'
-        pipeline_log_base = pipeline + inner_delim + dt
-        pipeline_log_file = pipeline_log_base + '.out'
-        pipeline_log_path = os.path.join(self.log_dir, pipeline_log_file)
-        pipeline_log_stream = open(pipeline_log_path, 'a+')
-
-        # Set up a directory to contain a log for each experiment
-        self.experiment_log_dir = os.path.join(self.log_dir, pipeline_log_base)
-        if not os.path.exists(self.experiment_log_dir):
-            os.makedirs(self.experiment_log_dir)
-
-        with self.logger(pipeline_log_stream, echo=self.dry_run):
-            with self.logger.force_echo():
-                tty.msg('Streaming details to log:')
-                tty.msg(f'  {pipeline_log_path}')
-                if self.dry_run:
-                    cprint('@*g{      -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN --}')
-
-            all_experiments_file = None
-            experiment_set = ramble.experiment_set.ExperimentSet(self)
-            self.software_environments = \
-                ramble.software_environments.SoftwareEnvironments(self)
-
-            if not self.is_concretized():
-                error_message = 'Cannot run %s in a ' % pipeline + \
-                                'non-conretized workspace\n' + \
-                                'Run `ramble workspace concretize` on this ' + \
-                                'workspace first.\n' + \
-                                'Then ensure its spack configuration is ' + \
-                                'properly configured.'
-                with self.logger.force_echo():
-                    tty.die(error_message)
-
-            workspace_success = {
-                namespace.success: ramble.config.config.get_config(namespace.success)
-            }
-            self.extract_success_criteria('workspace', workspace_success)
-
-            if pipeline == 'setup':
-                all_experiments_file = open(self.all_experiments_path, 'w+')
-                all_experiments_file.write('#!/bin/sh\n')
-                self._experiment_script = all_experiments_file
-
-            experiment_set = self.build_experiment_set()
-
-            experiment_count = len(experiment_set.experiments) + \
-                len(experiment_set.chained_experiments)
-            with self.logger.force_echo():
-                tty.msg(f'  Working on {experiment_count} experiments:')
-
-        for exp, app_inst, count in experiment_set.all_experiments():
-            # Set up an experiment logger and a log file for each experiment
-            exp_log_path = app_inst.experiment_log_file(self.experiment_log_dir)
-            exp_log_stream = open(exp_log_path, 'a+')
-
-            # Print the experiment details and send to the pipeline logger
-            with self.logger(echo=True):
-                tty.msg(f'    Experiment {count}:',
-                        f'        name: {exp}',
-                        f'        log file: {exp_log_path}')
-
-            # The tqdm progress bar needs to remain outside of a logger block to work
-            for phase in tqdm(app_inst.get_pipeline_phases(pipeline, phases),
-                              position=0, leave=False):
-                # Send all output from run_phase to the experiment log file
-                with app_inst.logger(exp_log_stream):
-                    app_inst.run_phase(phase, self)
-
-            exp_log_stream.close()
-
-        with self.logger(echo=self.dry_run):
-            if pipeline == 'setup':
-                for exp, app_inst, count in sorted(experiment_set.all_experiments()):
-                    if not app_inst.is_template:
-                        self.hash_inventory['experiments'].append(
-                            {
-                                'name': exp,
-                                'digest': app_inst.experiment_hash,
-                                'contents': app_inst.hash_inventory
-                            }
-                        )
-
-                self.workspace_hash = ramble.util.hashing.hash_json(self.hash_inventory)
-
-                with open(os.path.join(self.root, self._inventory_file_name), 'w+') as f:
-                    sjson.dump(self.hash_inventory, f)
-
-                with open(os.path.join(self.root, self._hash_file_name), 'w+') as f:
-                    f.write(self.workspace_hash + '\n')
-
-                all_experiments_file.close()
-
-                all_experiments_path = os.path.join(self.root,
-                                                    workspace_all_experiments_file)
-                os.chmod(all_experiments_path, stat.S_IRWXU | stat.S_IRWXG
-                         | stat.S_IROTH | stat.S_IXOTH)
-            elif pipeline == 'mirror':
-                verb = "updated" if self._mirror_existed else "created"
-                with self.logger.force_echo():
-                    tty.msg(
-                        "Successfully %s spack software in %s" % (verb, self._mirror_path),
-                        "Archive stats:",
-                        "  %-4d already present"  % len(self._software_mirror_stats.present),
-                        "  %-4d added"            % len(self._software_mirror_stats.new),
-                        "  %-4d failed to fetch." % len(self._software_mirror_stats.errors))
-
-                    tty.msg(
-                        "Successfully %s inputs in %s" % (verb, self._mirror_path),
-                        "Archive stats:",
-                        "  %-4d already present"  % len(self._input_mirror_stats.present),
-                        "  %-4d added"            % len(self._input_mirror_stats.new),
-                        "  %-4d failed to fetch." % len(self._input_mirror_stats.errors))
-
-                    if self._input_mirror_stats.errors:
-                        tty.error("Failed downloads:")
-                        tty.colify(s.cformat("{name}")
-                                   for s in list(self._input_mirror_stats.errors))
-                        tty.die('Mirroring has errors.')
-
-        pipeline_log_stream.close()
-
-    @property
-    def experiments_script(self):
-        return self._experiment_script
+        self.software_mirror_stats = MirrorStats()
+        self.input_mirror_stats = MirrorStats()
+        self.input_mirror_cache = ramble.caches.MirrorCache(self.input_mirror_path)
+        self.software_mirror_cache = ramble.caches.MirrorCache(self.software_mirror_path)
 
     @property
     def latest_archive_path(self):
@@ -1254,80 +1115,7 @@ class Workspace(object):
 
         return None
 
-    def archive(self, create_tar=True, archive_url=None):
-        """Archive current configuration, and experiment state.
-
-        Create an archive of the current configuration of this workspace, and
-        the state of the experiments.
-
-        Experiment state includes any rendered templates, along with any
-        results files that figures of merit would be extracted from.
-
-        None of the input, or output files aside from these are archived.
-        However, the archive should useful to perform the following actions:
-
-        - Re-extract figures of merit based on previous experiments
-        - Regenerate experiments, using the archived configuration.
-
-        If an archive url is configured for ramble at config:archive_url this
-        will automatically upload tar archives to that location.
-
-        NOTE: If the current configuration differs from the one used to create
-        the experiments that are being set up, it's possible that the
-        configuration cannot regenerate the same experiments.
-        """
-
-        import py
-        import glob
-
-        date_str = self._date_string()
-
-        # Use the basename from the path as the name of the workspace.
-        # If we use `self.name` we get the path multiple times.
-        archive_name = '%s-archive-%s' % (os.path.basename(self.path), date_str)
-
-        archive_path = os.path.join(self.archive_dir, archive_name)
-        fs.mkdirp(archive_path)
-
-        # Copy current configs
-        archive_configs = os.path.join(self.latest_archive_path, workspace_config_path)
-        fs.mkdirp(archive_configs)
-        for root, dirs, files in os.walk(self.config_dir):
-            for name in files:
-                src = os.path.join(self.config_dir, root, name)
-                dest = src.replace(self.config_dir, archive_configs)
-                fs.mkdirp(os.path.dirname(dest))
-                shutil.copyfile(src, dest)
-
-        # Copy current software spack.yamls
-        archive_software = os.path.join(self.latest_archive_path, workspace_software_path)
-        fs.mkdirp(archive_software)
-        for file in glob.glob(os.path.join(self.software_dir, '*', 'spack.yaml')):
-            dest = file.replace(self.software_dir, archive_software)
-            fs.mkdirp(os.path.dirname(dest))
-            shutil.copyfile(file, dest)
-
-        self.run_pipeline('archive')
-
-        if create_tar:
-            tar = which('tar', required=True)
-            with py.path.local(self.archive_dir).as_cwd():
-                tar('-czf', archive_name + '.tar.gz', archive_name)
-
-            archive_url = archive_url if archive_url else ramble.config.get('config:archive_url')
-            archive_url = archive_url.rstrip('/') if archive_url else None
-
-            tty.debug('Archive url: %s' % archive_url)
-
-            if archive_url:
-                tar_path = self.latest_archive_path + '.tar.gz'
-                remote_tar_path = archive_url + '/' + self.latest_archive + '.tar.gz'
-                fetcher = ramble.fetch_strategy.URLFetchStrategy(tar_path)
-                fetcher.stage = ramble.stage.DIYStage(self.latest_archive_path)
-                fetcher.stage.archive_file = tar_path
-                fetcher.archive(remote_tar_path)
-
-    def _date_string(self):
+    def date_string(self):
         now = datetime.datetime.now()
         return now.strftime("%Y-%m-%d_%H.%M.%S")
 

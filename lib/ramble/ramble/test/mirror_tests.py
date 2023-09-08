@@ -18,6 +18,8 @@ from llnl.util.filesystem import resolve_link_target_relative_to_the_link
 import ramble.mirror
 import ramble.repository
 import ramble.workspace
+import ramble.pipeline
+import ramble.filters
 
 import spack.util.executable
 
@@ -132,6 +134,11 @@ ramble:
     archive_dir = tmpdir_factory.mktemp('mock-archives-dir')
     mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
 
+    pipeline_type = ramble.pipeline.pipelines.mirror
+
+    mirror_pipeline_cls = ramble.pipeline.pipeline_class(pipeline_type)
+    filters = ramble.filters.Filters()
+
     with archive_dir.as_cwd():
         app_type = ramble.repository.ObjectTypes.applications
         app_class = ramble.repository.paths[app_type].get_obj_class(app_name)('test')
@@ -147,7 +154,9 @@ ramble:
             with open(config_path, 'w+') as f:
                 f.write(test_config)
             workspace._re_read()
-            workspace.create_mirror(str(mirror_dir))
-            workspace.run_pipeline('mirror')
+            mirror_pipeline = mirror_pipeline_cls(workspace,
+                                                  filters,
+                                                  mirror_path=str(mirror_dir))
+            mirror_pipeline.run()
 
         check_mirror(str(mirror_dir), app_name, app_class)

@@ -18,6 +18,8 @@ from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
 from ramble.test.dry_run_helpers import search_files_for_string
 import ramble.config
+import ramble.filters
+import ramble.pipeline
 
 import spack.util.spack_yaml as syaml
 
@@ -464,6 +466,9 @@ def test_setup_nothing():
     ws_name = 'test'
     workspace('create', ws_name)
     assert ws_name in workspace('list')
+    pipeline_type = ramble.pipeline.pipelines.setup
+    pipeline_cls = ramble.pipeline.pipeline_class(pipeline_type)
+    filters = ramble.filters.Filters()
 
     with ramble.workspace.read(ws_name) as ws:
         add_basic(ws)
@@ -472,7 +477,8 @@ def test_setup_nothing():
         ws.concretize()
         assert ws.is_concretized()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = pipeline_cls(ws, filters)
+        setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
 
 
@@ -498,6 +504,11 @@ def test_analyze_nothing():
     ws_name = 'test'
     workspace('create', ws_name)
     assert ws_name in workspace('list')
+    setup_type = ramble.pipeline.pipelines.setup
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+    analyze_type = ramble.pipeline.pipelines.analyze
+    analyze_cls = ramble.pipeline.pipeline_class(analyze_type)
+    filters = ramble.filters.Filters()
 
     with ramble.workspace.read(ws_name) as ws:
         add_basic(ws)
@@ -506,10 +517,12 @@ def test_analyze_nothing():
         ws.concretize()
         assert ws.is_concretized()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
 
-        ws.run_pipeline('analyze')
+        analyze_pipeline = analyze_cls(ws, filters)
+        analyze_pipeline.run()
         check_results(ws)
 
 

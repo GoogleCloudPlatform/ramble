@@ -63,9 +63,9 @@ ramble:
         workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
         assert os.path.exists(os.path.join(ws.root,
-                                           ramble.workspace.Workspace._inventory_file_name))
+                                           ramble.workspace.Workspace.inventory_file_name))
         assert os.path.exists(os.path.join(ws.root,
-                                           ramble.workspace.Workspace._hash_file_name))
+                                           ramble.workspace.Workspace.hash_file_name))
         assert os.path.exists(
             os.path.join(ws.experiment_dir,
                          'basic',

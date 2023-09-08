@@ -401,6 +401,51 @@ class ExperimentSet(object):
             yield exp, inst, count
             count += 1
 
+    def num_experiments(self):
+        """Return the number of total experiments in this set"""
+        return len(self.experiments.items()) + len(self.chained_experiments.items())
+
+    def num_filtered_experiments(self, filters):
+        """Return the number of filtered experiments in this set"""
+
+        count = 0
+        for _, _, count in self.filtered_experiments(filters):
+            pass
+
+        return count
+
+    def filtered_experiments(self, filters):
+        """Return a filtered set of all experiments based on a logical expression
+
+        Exclusion takes overrides inclusion. If conflicting filters are
+        provided which both include, and exclude the same experiment, the
+        experiment will be excluded.
+
+        Args:
+            expression: A logical expression to evaluate, with each experiment
+        Yields:
+            exp: The name of the experiment, if expression results in True
+            inst: An application instance representing the experiment
+        """
+
+        count = 1
+        for exp, inst, _ in self.all_experiments():
+            active = True
+
+            if filters.include_where:
+                for expression in filters.include_where:
+                    if not inst.expander.compute_logical(expression):
+                        active = False
+
+            if filters.exclude_where:
+                for expression in filters.exclude_where:
+                    if inst.expander.compute_logical(expression):
+                        active = False
+
+            if active:
+                yield exp, inst, count
+            count += 1
+
     def add_chained_experiment(self, name, instance):
         if name in self.chained_experiments.keys():
             raise RambleExperimentSetError('Cannot add already defined chained ' +

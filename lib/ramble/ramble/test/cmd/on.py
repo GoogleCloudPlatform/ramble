@@ -12,6 +12,8 @@ import pytest
 
 import ramble.workspace
 import ramble.test.cmd.workspace
+import ramble.pipeline
+import ramble.filters
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
@@ -45,6 +47,10 @@ def test_execute_nothing(mutable_mock_workspace_path):
     workspace('create', ws_name)
     assert ws_name in workspace('list')
 
+    pipeline_type = ramble.pipeline.pipelines.setup
+    pipeline_class = ramble.pipeline.pipeline_class(pipeline_type)
+    filters = ramble.filters.Filters()
+
     with ramble.workspace.read(ws_name) as ws:
         ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
@@ -52,7 +58,8 @@ def test_execute_nothing(mutable_mock_workspace_path):
         ws.concretize()
         assert ws.is_concretized()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = pipeline_class(ws, filters)
+        setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
 
         ws.run_experiments()

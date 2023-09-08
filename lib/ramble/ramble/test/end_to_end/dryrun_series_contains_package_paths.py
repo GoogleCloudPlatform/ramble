@@ -10,6 +10,8 @@ import os
 
 import pytest
 
+import ramble.filters
+import ramble.pipeline
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
@@ -54,6 +56,10 @@ ramble:
         - zlib
 """
 
+    setup_type = ramble.pipeline.pipelines.setup
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+    filters = ramble.filters.Filters()
+
     workspace_name = 'test_dryrun_series_contains_package_paths'
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
@@ -66,7 +72,8 @@ ramble:
         ws.dry_run = True
         ws._re_read()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
 
         for test in ['test_1', 'test_2']:
             script = os.path.join(ws.experiment_dir, 'zlib', 'ensure_installed',

@@ -793,12 +793,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for input_file, input_conf in self._input_fetchers.items():
             mirror_paths = ramble.mirror.mirror_archive_paths(
                 input_conf['fetcher'], os.path.join(self.name, input_file))
-            fetch_dir = os.path.join(workspace._input_mirror_path, self.name)
+            fetch_dir = os.path.join(workspace.input_mirror_path, self.name)
             fs.mkdirp(fetch_dir)
             stage = ramble.stage.InputStage(input_conf['fetcher'], name=input_conf['namespace'],
                                             path=fetch_dir, mirror_paths=mirror_paths, lock=False)
 
-            stage.cache_mirror(workspace._input_mirror_cache, workspace._input_mirror_stats)
+            stage.cache_mirror(workspace.input_mirror_cache, workspace.input_mirror_stats)
 
     def _get_inputs(self, workspace):
         """Download application inputs

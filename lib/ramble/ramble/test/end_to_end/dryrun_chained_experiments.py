@@ -14,6 +14,8 @@ import pytest
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
 
+import ramble.filters
+import ramble.pipeline
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
@@ -109,6 +111,14 @@ ramble:
   14 100 1.5 1.0 2.0
 """
 
+    setup_type = ramble.pipeline.pipelines.setup
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+
+    analyze_type = ramble.pipeline.pipelines.analyze
+    analyze_cls = ramble.pipeline.pipeline_class(analyze_type)
+
+    filters = ramble.filters.Filters()
+
     workspace_name = 'test_dryrun_chained_experiments'
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
@@ -121,7 +131,8 @@ ramble:
         ws.dry_run = True
         ws._re_read()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
 
         template_dir = os.path.join(ws.experiment_dir, 'intel-mpi-benchmarks')
         assert not os.path.exists(template_dir)
@@ -173,8 +184,8 @@ ramble:
         with open(output_path_3, 'w+') as f:
             f.write(mock_output_data)
 
-        ws.run_pipeline('analyze')
-        ws.dump_results(output_formats=['json', 'yaml'])
+        analyze_pipeline = analyze_cls(ws, filters, output_formats=['json', 'yaml'])
+        analyze_pipeline.run()
 
         base_name = r'gromacs.water_bare.parent_test'
         collective_name = r'intel-mpi-benchmarks.collective.collective_chain'
