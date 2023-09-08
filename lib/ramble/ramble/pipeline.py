@@ -56,6 +56,48 @@ class Pipeline(object):
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
         self.workspace.software_environments = self._software_environments
 
+    def _construct_hash(self):
+        """Hash all of the experiments, construct workspace inventory"""
+        for exp, app_inst, _ in self._experiment_set.all_experiments():
+            app_inst.populate_inventory(self.workspace,
+                                        force_compute=self.force_inventory,
+                                        require_exist=self.require_inventory)
+
+        workspace_inventory = os.path.join(self.workspace.root,
+                                           self.workspace.inventory_file_name)
+        workspace_hash_file = os.path.join(self.workspace.root,
+                                           self.workspace.hash_file_name)
+
+        files_exist = os.path.exists(workspace_inventory) and \
+            os.path.exists(workspace_hash_file)
+
+        if not self.force_inventory and files_exist:
+            with open(workspace_inventory, 'r') as f:
+                self.workspace.hash_inventory = sjson.load(f)
+
+            self.workspace.workspace_hash = \
+                ramble.util.hashing.hash_json(self.workspace.hash_inventory)
+        else:
+            for exp, app_inst, _ in sorted(self._experiment_set.all_experiments()):
+                if not app_inst.is_template:
+                    self.workspace.hash_inventory['experiments'].append(
+                        {
+                            'name': exp,
+                            'digest': app_inst.experiment_hash,
+                            'contents': app_inst.hash_inventory
+                        }
+                    )
+
+            self.workspace.workspace_hash = \
+                ramble.util.hashing.hash_json(self.workspace.hash_inventory)
+            with open(os.path.join(self.workspace.root,
+                                   self.workspace.inventory_file_name), 'w+') as f:
+                sjson.dump(self.workspace.hash_inventory, f)
+
+            with open(os.path.join(self.workspace.root,
+                                   self.workspace.hash_file_name), 'w+') as f:
+                f.write(self.workspace.workspace_hash + '\n')
+
     def _validate(self):
         """Perform validation that this pipeline can be executed"""
         if not self.workspace.is_concretized():
@@ -131,7 +173,12 @@ class AnalyzePipeline(Pipeline):
         super().__init__(workspace, filters)
         self.action_string = 'Analyzing'
         self.output_formats = output_formats
+        self.require_inventory = True
         self.upload_results = upload
+
+    def _prepare(self):
+        super()._construct_hash()
+        super()._prepare()
 
     def _complete(self):
         self.workspace.dump_results(output_formats=self.output_formats)
@@ -155,6 +202,8 @@ class ArchivePipeline(Pipeline):
 
     def _prepare(self):
         import glob
+        super()._construct_hash()
+        super()._prepare()
 
         date_str = self.workspace.date_string()
 
@@ -217,6 +266,7 @@ class MirrorPipeline(Pipeline):
         self.mirror_path = mirror_path
 
     def _prepare(self):
+        super()._prepare()
         self.workspace.create_mirror(self.mirror_path)
 
     def _complete(self):
@@ -254,30 +304,13 @@ class SetupPipeline(Pipeline):
         self.action_string = 'Setting up'
 
     def _prepare(self):
+        super()._prepare()
         experiment_file = open(self.workspace.all_experiments_path, 'w+')
         experiment_file.write('#!/bin/sh\n')
         self.workspace.experiments_script = experiment_file
 
     def _complete(self):
-        for exp, app_inst in sorted(self._experiment_set.all_experiments()):
-            if not app_inst.is_template:
-                self.workspace.hash_inventory['experiments'].append(
-                    {
-                        'name': exp,
-                        'digest': app_inst.experiment_hash,
-                        'contents': app_inst.hash_inventory
-                    }
-                )
-        self.workspace.workspace_hash = \
-            ramble.util.hashing.hash_json(self.workspace.hash_inventory)
-        with open(os.path.join(self.workspace.root,
-                               self.workspace.inventory_file_name), 'w+') as f:
-            sjson.dump(self.workspace.hash_inventory, f)
-
-        with open(os.path.join(self.workspace.root,
-                               self.workspace.hash_file_name), 'w+') as f:
-            f.write(self.workspace.workspace_hash + '\n')
-
+        super()._construct_hash()
         self.workspace.experiments_script.close()
         experiment_file_path = os.path.join(self.workspace.root,
                                             self.workspace.all_experiments_path)
