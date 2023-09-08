@@ -1173,8 +1173,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         tty.debug('fom_vals = %s' % fom_values)
         results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
         if success:
+            self.set_status(status='SUCCESS')
             results['RAMBLE_STATUS'] = 'SUCCESS'
         else:
+            self.set_status(status='FAILED')
             results['RAMBLE_STATUS'] = 'FAILED'
 
         if success or workspace.always_print_foms:
