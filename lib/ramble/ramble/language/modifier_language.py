@@ -167,26 +167,26 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
                                                                         'modes',
                                                                         'env_var_modification')
 
-        for set_mode in all_modes:
-            if set_mode not in mod.env_var_modifications:
-                mod.env_var_modifications[mode] = {}
+        for mode_name in all_modes:
+            if mode_name not in mod.env_var_modifications:
+                mod.env_var_modifications[mode_name] = {}
 
         # Set requires a dict, everything else requires a list.
         if method == 'set':
-            for set_mode in all_modes:
-                if method not in mod.env_var_modifications[mode]:
-                    mod.env_var_modifications[mode][method] = {}
-                mod.env_var_modifications[mode][method][name] = modification
+            for mode_name in all_modes:
+                if method not in mod.env_var_modifications[mode_name]:
+                    mod.env_var_modifications[mode_name][method] = {}
+                mod.env_var_modifications[mode_name][method][name] = modification
             return
 
-        for set_mode in all_modes:
-            if method not in mod.env_var_modifications[mode]:
-                mod.env_var_modifications[mode][method] = []
+        for mode_name in all_modes:
+            if method not in mod.env_var_modifications[mode_name]:
+                mod.env_var_modifications[mode_name][method] = []
 
         # If unset, exit early
         if method == 'unset':
-            for set_mode in all_modes:
-                mod.env_var_modifications[mode][method].append(name)
+            for mode_name in all_modes:
+                mod.env_var_modifications[mode_name][method].append(name)
             return
 
         append_dict = {}
@@ -202,7 +202,7 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
         append_dict[append_name] = {}
         append_dict[append_name][name] = modification
 
-        for set_mode in all_modes:
-            mod.env_var_modifications[mode][method].append(append_dict.copy())
+        for mode_name in all_modes:
+            mod.env_var_modifications[mode_name][method].append(append_dict.copy())
 
     return _env_var_modification
