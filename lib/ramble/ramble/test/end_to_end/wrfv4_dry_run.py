@@ -223,7 +223,7 @@ licenses:
             # Create fake figures of merit.
             with open(os.path.join(exp_dir, 'rsl.out.0000'), 'w+') as f:
                 for i in range(1, 6):
-                    f.write(f'Timing for main {i}{i}.{i}\n')
+                    f.write(f'Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n')
                 f.write('wrf: SUCCESS COMPLETE WRF\n')
 
             # Create files that match archive patterns
@@ -257,10 +257,10 @@ licenses:
         for text_result in text_results_files:
             with open(text_result, 'r') as f:
                 data = f.read()
-                assert 'Average Timestep Time = 3.3 s' in data
-                assert 'Cumulative Timestep Time = 16.5 s' in data
-                assert 'Minimum Timestep Time = 1.1 s' in data
-                assert 'Maximum Timestep Time = 5.5 s' in data
+                assert 'Average Timestep Time = 33.3 s' in data
+                assert 'Cumulative Timestep Time = 166.5 s' in data
+                assert 'Minimum Timestep Time = 11.1 s' in data
+                assert 'Maximum Timestep Time = 55.5 s' in data
                 assert 'Avg. Max Ratio Time = 0.6' in data
                 assert 'Number of timesteps = 5' in data
 
