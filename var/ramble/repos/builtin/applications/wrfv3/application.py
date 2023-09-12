@@ -99,7 +99,7 @@ class Wrfv3(SpackApplication):
                                            'rsl.out.*'))
 
         if file_list:
-            timing_regex = re.compile(r'Timing for main.*(?P<main_time>[0-9]+\.[0-9]*).*')
+            timing_regex = re.compile(r'Timing for main.*:\s+(?P<main_time>[0-9]+\.[0-9]*).*')
             avg_time = 0.0
             min_time = float('inf')
             max_time = float('-inf')
