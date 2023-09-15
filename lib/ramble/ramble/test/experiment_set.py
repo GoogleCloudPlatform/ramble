@@ -582,7 +582,7 @@ def test_experiment_names_match(mutable_mock_workspace_path):
         assert 'basic.test_wl.series1_4_2' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_12_4' in exp_set.experiments.keys()
 
-        for exp, app in exp_set.all_experiments():
+        for exp, app, _ in exp_set.all_experiments():
             assert exp == app.expander.expand_var('{experiment_namespace}')
 
 

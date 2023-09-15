@@ -15,6 +15,7 @@ import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import search_files_for_string
 
 
 # everything here uses the mock_workspace_path
@@ -128,8 +129,12 @@ licenses:
 
         ws1._re_read()
 
-        output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz" in output
+        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+        out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+        assert search_files_for_string(
+            out_files, 'Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz') # noqa
 
         # Test software directories
         software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
@@ -242,8 +247,7 @@ licenses:
             f.write("Dummy data...")
         os.symlink(tmp_results_file, simlink_results_file)
 
-        output = workspace('analyze', '-f', 'text',
-                           'json', 'yaml', global_args=['-w', workspace_name])
+        workspace('analyze', '-f', 'text', 'json', 'yaml', global_args=['-w', workspace_name])
 
         text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
         json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
@@ -264,7 +268,7 @@ licenses:
                 assert 'Avg. Max Ratio Time = 0.6' in data
                 assert 'Number of timesteps = 5' in data
 
-        output = workspace('archive', global_args=['-w', workspace_name])
+        workspace('archive', global_args=['-w', workspace_name])
 
         assert ws1.latest_archive
         assert os.path.exists(ws1.latest_archive_path)

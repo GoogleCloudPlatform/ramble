@@ -390,11 +390,15 @@ class ExperimentSet(object):
 
     def all_experiments(self):
         """Iterator over all experiments in this set"""
+        count = 1
+
         for exp, inst in self.experiments.items():
-            yield exp, inst
+            yield exp, inst, count
+            count += 1
 
         for exp, inst in self.chained_experiments.items():
-            yield exp, inst
+            yield exp, inst, count
+            count += 1
 
     def add_chained_experiment(self, name, instance):
         if name in self.chained_experiments.keys():

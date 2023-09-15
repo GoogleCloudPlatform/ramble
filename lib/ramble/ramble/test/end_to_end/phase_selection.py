@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import glob
 
 import pytest
 
@@ -14,6 +15,7 @@ import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import search_files_for_string
 
 
 # everything here uses the mock_workspace_path
@@ -144,7 +146,10 @@ licenses:
         assert "Phases for archive pipeline:" in output
         assert "Phases for mirror pipeline:" in output
 
-        output = workspace('setup', '--phases', 'get_*', 'make_*', '--dry-run',
+        workspace('setup', '--phases', 'get_*', 'make_*', '--dry-run',
                            global_args=['-v', '-w', workspace_name])
-        assert 'Executing phase get_inputs' in output
-        assert 'Executing phase make_experiments' in output
+
+        out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+        assert search_files_for_string(out_files, 'Executing phase get_inputs')
+        assert search_files_for_string(out_files, 'Executing phase make_experiments')

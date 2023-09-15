@@ -77,3 +77,11 @@ def dry_run_config(section_name, injections, config_path,
 
     with open(config_path, 'w+') as f:
         syaml.dump(ramble_dict, stream=f)
+
+
+def search_files_for_string(file_list, string):
+    for file in file_list:
+        with open(file) as f:
+            if string in f.read():
+                return True
+    return False

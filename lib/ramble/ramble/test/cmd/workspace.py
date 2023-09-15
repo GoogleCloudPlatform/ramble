@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import glob
 
 import pytest
 
@@ -15,6 +16,7 @@ import llnl.util.filesystem as fs
 import ramble.workspace
 from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
+from ramble.test.dry_run_helpers import search_files_for_string
 import ramble.config
 
 import spack.util.spack_yaml as syaml
@@ -669,9 +671,11 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-    assert "Would download file:///tmp/test_file.log" in output
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(ws1.root, 'experiments',
                                        'basic', 'test_wl',
                                        'test_experiment',
@@ -740,9 +744,11 @@ ramble:
     for exp in expected_experiments:
         assert exp in output
 
-    output = workspace('setup', '--dry-run', global_args=workspace_flags)
+    workspace('setup', '--dry-run', global_args=workspace_flags)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
 
     exp_base = os.path.join(ws1.experiment_dir, 'basic', 'test_wl')
     for exp in expected_experiments:
@@ -794,6 +800,7 @@ ramble:
     output = workspace('setup', '--dry-run',
                        global_args=workspace_flags,
                        fail_on_error=False)
+
     assert "Length mismatch in vector variables in " + \
         "experiment exp_series_{idx}_{n_nodes}_{cells}_{processes_per_node}" in output
 
@@ -1075,12 +1082,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1094,7 +1102,7 @@ ramble:
         f = open(new_file, 'w+')
         f.close()
 
-    output = workspace('archive', global_args=['-w', workspace_name])
+    workspace('archive', global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1149,12 +1157,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1168,7 +1177,7 @@ ramble:
         f = open(new_file, 'w+')
         f.close()
 
-    output = workspace('archive', '-t', global_args=['-w', workspace_name])
+    workspace('archive', '-t', global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1225,12 +1234,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1247,8 +1257,8 @@ ramble:
     remote_archive_path = os.path.join(ws1.root, 'archive_backup')
     fs.mkdirp(remote_archive_path)
 
-    output = workspace('archive', '-t', '-u', 'file://' + remote_archive_path,
-                       global_args=['-w', workspace_name])
+    workspace('archive', '-t', '-u', 'file://' + remote_archive_path,
+              global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1307,12 +1317,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1332,7 +1343,7 @@ ramble:
     config('add', 'config:archive_url:%s/' % remote_archive_path,
            global_args=['-w', workspace_name])
 
-    output = workspace('archive', '-t', global_args=['-w', workspace_name])
+    workspace('archive', '-t', global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1381,9 +1392,11 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-    assert "Would download file:///tmp/test_file.log" in output
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(ws1.root, 'experiments',
                                        'basic', 'test_wl',
                                        'test_experiment',

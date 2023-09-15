@@ -13,11 +13,14 @@ import re
 import shutil
 import stat
 import datetime
+from tqdm import tqdm
 
 import six
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
+import llnl.util.tty.log as log
+from llnl.util.tty.color import cprint
 
 import ramble.config
 import ramble.paths
@@ -517,6 +520,9 @@ class Workspace(object):
 
         self._read()
 
+        # Create a logger to redirect certain prints from screen to log file
+        self.logger = log.log_output(echo=False, debug=tty.debug_level())
+
     def _re_read(self):
         """Reinitialize the workspace object if it has been written (this
            may not be true if the workspace was just created in this running
@@ -868,7 +874,7 @@ class Workspace(object):
 
         experiment_set = self.build_experiment_set()
 
-        for exp, app_inst in experiment_set.all_experiments():
+        for exp, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.Keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
@@ -1089,82 +1095,136 @@ class Workspace(object):
         self._software_mirror_cache = ramble.caches.MirrorCache(self._software_mirror_path)
 
     def run_pipeline(self, pipeline, phases='*'):
-        all_experiments_file = None
-        experiment_set = ramble.experiment_set.ExperimentSet(self)
-        self.software_environments = \
-            ramble.software_environments.SoftwareEnvironments(self)
+        # Set up logging to redirect most Spack text to a log file instead of stdout
+        # All prints will be redirected unless inside a self.logger.force_echo() block
+        # or when dry_run is TRUE, which will echo all output to screen.
 
-        if not self.is_concretized():
-            error_message = 'Cannot run %s in a ' % pipeline + \
-                            'non-conretized workspace\n' + \
-                            'Run `ramble workspace concretize` on this ' + \
-                            'workspace first.\n' + \
-                            'Then ensure its spack configuration is ' + \
-                            'properly configured.'
-            tty.die(error_message)
+        # Check that the workspace log directory exists
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
 
-        workspace_success = {
-            namespace.success: ramble.config.config.get_config(namespace.success)
-        }
-        self.extract_success_criteria('workspace', workspace_success)
+        # Set up a log file for the overall pipeline, excluding experiments
+        dt = self._date_string()
+        inner_delim = '.'
+        pipeline_log_base = pipeline + inner_delim + dt
+        pipeline_log_file = pipeline_log_base + '.out'
+        pipeline_log_path = os.path.join(self.log_dir, pipeline_log_file)
+        pipeline_log_stream = open(pipeline_log_path, 'a+')
 
-        if pipeline == 'setup':
-            all_experiments_file = open(self.all_experiments_path, 'w+')
-            all_experiments_file.write('#!/bin/sh\n')
-            self._experiment_script = all_experiments_file
+        # Set up a directory to contain a log for each experiment
+        self.experiment_log_dir = os.path.join(self.log_dir, pipeline_log_base)
+        if not os.path.exists(self.experiment_log_dir):
+            os.makedirs(self.experiment_log_dir)
 
-        experiment_set = self.build_experiment_set()
+        with self.logger(pipeline_log_stream, echo=self.dry_run):
+            with self.logger.force_echo():
+                tty.msg('Streaming details to log:')
+                tty.msg(f'  {pipeline_log_path}')
+                if self.dry_run:
+                    cprint('@*g{      -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN --}')
 
-        for exp, app_inst in experiment_set.all_experiments():
-            tty.msg(f'    Configuring experiment {exp}')
-            for phase in app_inst.get_pipeline_phases(pipeline, phases):
-                app_inst.run_phase(phase, self)
+            all_experiments_file = None
+            experiment_set = ramble.experiment_set.ExperimentSet(self)
+            self.software_environments = \
+                ramble.software_environments.SoftwareEnvironments(self)
 
-        if pipeline == 'setup':
-            for exp, app_inst in sorted(experiment_set.all_experiments()):
-                if not app_inst.is_template:
-                    self.hash_inventory['experiments'].append(
-                        {
-                            'name': exp,
-                            'digest': app_inst.experiment_hash,
-                            'contents': app_inst.hash_inventory
-                        }
-                    )
+            if not self.is_concretized():
+                error_message = 'Cannot run %s in a ' % pipeline + \
+                                'non-conretized workspace\n' + \
+                                'Run `ramble workspace concretize` on this ' + \
+                                'workspace first.\n' + \
+                                'Then ensure its spack configuration is ' + \
+                                'properly configured.'
+                with self.logger.force_echo():
+                    tty.die(error_message)
 
-            self.workspace_hash = ramble.util.hashing.hash_json(self.hash_inventory)
+            workspace_success = {
+                namespace.success: ramble.config.config.get_config(namespace.success)
+            }
+            self.extract_success_criteria('workspace', workspace_success)
 
-            with open(os.path.join(self.root, self._inventory_file_name), 'w+') as f:
-                sjson.dump(self.hash_inventory, f)
+            if pipeline == 'setup':
+                all_experiments_file = open(self.all_experiments_path, 'w+')
+                all_experiments_file.write('#!/bin/sh\n')
+                self._experiment_script = all_experiments_file
 
-            with open(os.path.join(self.root, self._hash_file_name), 'w+') as f:
-                f.write(self.workspace_hash + '\n')
+            experiment_set = self.build_experiment_set()
 
-            all_experiments_file.close()
+            experiment_count = len(experiment_set.experiments) + \
+                len(experiment_set.chained_experiments)
+            with self.logger.force_echo():
+                tty.msg(f'  Working on {experiment_count} experiments:')
 
-            all_experiments_path = os.path.join(self.root,
-                                                workspace_all_experiments_file)
-            os.chmod(all_experiments_path, stat.S_IRWXU | stat.S_IRWXG
-                     | stat.S_IROTH | stat.S_IXOTH)
-        elif pipeline == 'mirror':
-            verb = "updated" if self._mirror_existed else "created"
-            tty.msg(
-                "Successfully %s spack software in %s" % (verb, self._mirror_path),
-                "Archive stats:",
-                "  %-4d already present"  % len(self._software_mirror_stats.present),
-                "  %-4d added"            % len(self._software_mirror_stats.new),
-                "  %-4d failed to fetch." % len(self._software_mirror_stats.errors))
+        for exp, app_inst, count in experiment_set.all_experiments():
+            # Set up an experiment logger and a log file for each experiment
+            exp_log_path = app_inst.experiment_log_file(self.experiment_log_dir)
+            exp_log_stream = open(exp_log_path, 'a+')
 
-            tty.msg(
-                "Successfully %s inputs in %s" % (verb, self._mirror_path),
-                "Archive stats:",
-                "  %-4d already present"  % len(self._input_mirror_stats.present),
-                "  %-4d added"            % len(self._input_mirror_stats.new),
-                "  %-4d failed to fetch." % len(self._input_mirror_stats.errors))
+            # Print the experiment details and send to the pipeline logger
+            with self.logger(echo=True):
+                tty.msg(f'    Experiment {count}:',
+                        f'        name: {exp}',
+                        f'        log file: {exp_log_path}')
 
-            if self._input_mirror_stats.errors:
-                tty.error("Failed downloads:")
-                tty.colify(s.cformat("{name}") for s in list(self._input_mirror_stats.errors))
-                tty.die('Mirroring has errors.')
+            # The tqdm progress bar needs to remain outside of a logger block to work
+            for phase in tqdm(app_inst.get_pipeline_phases(pipeline, phases),
+                              position=0, leave=False):
+                # Send all output from run_phase to the experiment log file
+                with app_inst.logger(exp_log_stream):
+                    app_inst.run_phase(phase, self)
+
+            exp_log_stream.close()
+
+        with self.logger(echo=self.dry_run):
+            if pipeline == 'setup':
+                for exp, app_inst, count in sorted(experiment_set.all_experiments()):
+                    if not app_inst.is_template:
+                        self.hash_inventory['experiments'].append(
+                            {
+                                'name': exp,
+                                'digest': app_inst.experiment_hash,
+                                'contents': app_inst.hash_inventory
+                            }
+                        )
+
+                self.workspace_hash = ramble.util.hashing.hash_json(self.hash_inventory)
+
+                with open(os.path.join(self.root, self._inventory_file_name), 'w+') as f:
+                    sjson.dump(self.hash_inventory, f)
+
+                with open(os.path.join(self.root, self._hash_file_name), 'w+') as f:
+                    f.write(self.workspace_hash + '\n')
+
+                all_experiments_file.close()
+
+                all_experiments_path = os.path.join(self.root,
+                                                    workspace_all_experiments_file)
+                os.chmod(all_experiments_path, stat.S_IRWXU | stat.S_IRWXG
+                         | stat.S_IROTH | stat.S_IXOTH)
+            elif pipeline == 'mirror':
+                verb = "updated" if self._mirror_existed else "created"
+                with self.logger.force_echo():
+                    tty.msg(
+                        "Successfully %s spack software in %s" % (verb, self._mirror_path),
+                        "Archive stats:",
+                        "  %-4d already present"  % len(self._software_mirror_stats.present),
+                        "  %-4d added"            % len(self._software_mirror_stats.new),
+                        "  %-4d failed to fetch." % len(self._software_mirror_stats.errors))
+
+                    tty.msg(
+                        "Successfully %s inputs in %s" % (verb, self._mirror_path),
+                        "Archive stats:",
+                        "  %-4d already present"  % len(self._input_mirror_stats.present),
+                        "  %-4d added"            % len(self._input_mirror_stats.new),
+                        "  %-4d failed to fetch." % len(self._input_mirror_stats.errors))
+
+                    if self._input_mirror_stats.errors:
+                        tty.error("Failed downloads:")
+                        tty.colify(s.cformat("{name}")
+                                   for s in list(self._input_mirror_stats.errors))
+                        tty.die('Mirroring has errors.')
+
+        pipeline_log_stream.close()
 
     @property
     def experiments_script(self):

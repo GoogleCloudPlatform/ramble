@@ -430,7 +430,7 @@ def workspace_info(args):
                 header_base = rucolor.nested_4('Variables from')
                 config_vars = ramble.config.config.get('config:variables')
 
-                for exp_name, _ in print_experiment_set.all_experiments():
+                for exp_name, _, _ in print_experiment_set.all_experiments():
                     app_inst = experiment_set.get_experiment(exp_name)
 
                     # Aggregate pipeline phases
