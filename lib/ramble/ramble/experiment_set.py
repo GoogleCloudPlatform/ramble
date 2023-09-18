@@ -378,6 +378,7 @@ class ExperimentSet(object):
             app_inst.set_template(final_context.is_template)
             app_inst.set_chained_experiments(final_context.chained_experiments)
             app_inst.set_modifiers(final_context.modifiers)
+            app_inst.read_status()
             self.experiments[experiment_namespace] = app_inst
             self.experiment_order.append(experiment_namespace)
 
@@ -399,6 +400,45 @@ class ExperimentSet(object):
         for exp, inst in self.chained_experiments.items():
             yield exp, inst, count
             count += 1
+
+    def num_experiments(self):
+        """Return the number of total experiments in this set"""
+        return len(self.experiments.items()) + len(self.chained_experiments.items())
+
+    def num_filtered_experiments(self, filters):
+        """Return the number of filtered experiments in this set"""
+
+        return sum(1 for _ in self.filtered_experiments(filters))
+
+    def filtered_experiments(self, filters):
+        """Return a filtered set of all experiments based on a logical expression
+
+        Exclusion takes overrides inclusion. If conflicting filters are
+        provided which both include, and exclude the same experiment, the
+        experiment will be excluded.
+
+        Args:
+            expression: A logical expression to evaluate, with each experiment
+        Yields:
+            exp: The name of the experiment, if expression results in True
+            inst: An application instance representing the experiment
+        """
+
+        for exp, inst, idx in self.all_experiments():
+            active = True
+
+            if filters.include_where:
+                for expression in filters.include_where:
+                    if not inst.expander.evaluate_predicate(expression):
+                        active = False
+
+            if filters.exclude_where:
+                for expression in filters.exclude_where:
+                    if inst.expander.evaluate_predicate(expression):
+                        active = False
+
+            if active:
+                yield exp, inst, idx
 
     def add_chained_experiment(self, name, instance):
         if name in self.chained_experiments.keys():

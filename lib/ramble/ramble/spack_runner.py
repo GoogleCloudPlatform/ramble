@@ -27,6 +27,8 @@ import ramble.config
 import ramble.error
 import ramble.util.hashing
 
+import spack.util.spack_json as sjson
+
 spack_namespace = 'spack'
 
 package_name_regex = re.compile(r"\s*(?P<package_name>[\w][\w-]+).*")
@@ -150,9 +152,11 @@ class SpackRunner(object):
         """
         self.compiler_config_dir = path
 
-    def set_env(self, env_path):
-        if not os.path.isdir(env_path) or not os.path.exists(os.path.join(env_path, 'spack.yaml')):
-            tty.die(f'Path {env_path} is not a spack environment')
+    def set_env(self, env_path, require_exists=True):
+        if require_exists:
+            if not os.path.isdir(env_path) or \
+                    not os.path.exists(os.path.join(env_path, 'spack.yaml')):
+                tty.die(f'Path {env_path} is not a spack environment')
 
         self.env_path = env_path
 
@@ -490,12 +494,8 @@ class SpackRunner(object):
 
         self.concretized = found_lock
 
-    def generate_env_file(self):
-        """
-        Generate a spack environment file
-        """
-        self._check_active()
-
+    def _env_file_dict(self):
+        """Construct a dictionary with the env file contents in it"""
         env_file = syaml.syaml_dict()
         env_file[spack_namespace] = syaml.syaml_dict()
         env_file[spack_namespace]['concretizer'] = syaml.syaml_dict()
@@ -505,6 +505,16 @@ class SpackRunner(object):
         env_file[spack_namespace]['specs'].extend(self.env_contents)
 
         env_file[spack_namespace]['include'] = self.includes
+
+        return env_file
+
+    def generate_env_file(self):
+        """
+        Generate a spack environment file
+        """
+        self._check_active()
+
+        env_file = self._env_file_dict()
 
         spack_env_file = os.path.join(self.env_path, 'spack.yaml')
         spack_lock_file = os.path.join(self.env_path, 'spack.lock')
@@ -564,7 +574,7 @@ class SpackRunner(object):
 
         self.concretized = True
 
-    def inventory_hash(self):
+    def inventory_hash(self, require_exist=False):
         """
         Create a hash of the spack.lock file for ramble inventory purposes
 
@@ -573,13 +583,29 @@ class SpackRunner(object):
         self._check_active()
 
         spack_file = os.path.join(self.env_path, 'spack.lock')
-        if self.dry_run:
-            spack_file = os.path.join(self.env_path, 'spack.yaml')
+        lock_exists = os.path.exists(spack_file)
+        contents_to_hash = None
 
-        spack_hash = ramble.util.hashing.hash_file(spack_file)
-        hash_path = os.path.join(self.env_path, 'ramble.hash')
-        with open(hash_path, 'w+') as f:
-            f.write(spack_hash)
+        if not self.dry_run:
+            if not lock_exists and require_exist:
+                tty.die('spack.lock file does not exist in environment'
+                        f'{self.env_path}\n'
+                        'Make sure your workspace is fully setup with\n'
+                        '    ramble workspace setup')
+            elif lock_exists:
+                with open(spack_file, 'r') as f:
+                    contents_to_hash = sjson.load(f)
+
+        if self.dry_run or not lock_exists:
+            contents_to_hash = self._env_file_dict()
+
+        spack_hash = ramble.util.hashing.hash_json(contents_to_hash)
+
+        if not self.dry_run:
+            hash_path = os.path.join(self.env_path, 'ramble.hash')
+            with open(hash_path, 'w+') as f:
+                f.write(spack_hash)
+
         return spack_hash
 
     def install(self):

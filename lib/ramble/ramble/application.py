@@ -57,6 +57,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _builtin_required_key = 'required'
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
+    _status_file_name = 'ramble_status.json'
     _pipelines = ['analyze', 'archive', 'mirror', 'setup']
 
     #: Lists of strings which contains GitHub usernames of attributes.
@@ -67,7 +68,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
         self._setup_phases = ['license_includes']
-        self._analyze_phases = ['prepare_analysis', 'analyze_experiments']
+        self._analyze_phases = ['prepare_analysis', 'analyze_experiments', 'write_status']
         self._archive_phases = ['archive_experiments']
         self._mirror_phases = ['mirror_inputs']
 
@@ -792,12 +793,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for input_file, input_conf in self._input_fetchers.items():
             mirror_paths = ramble.mirror.mirror_archive_paths(
                 input_conf['fetcher'], os.path.join(self.name, input_file))
-            fetch_dir = os.path.join(workspace._input_mirror_path, self.name)
+            fetch_dir = os.path.join(workspace.input_mirror_path, self.name)
             fs.mkdirp(fetch_dir)
             stage = ramble.stage.InputStage(input_conf['fetcher'], name=input_conf['namespace'],
                                             path=fetch_dir, mirror_paths=mirror_paths, lock=False)
 
-            stage.cache_mirror(workspace._input_mirror_cache, workspace._input_mirror_stats)
+            stage.cache_mirror(workspace.input_mirror_cache, workspace.input_mirror_stats)
 
     def _get_inputs(self, workspace):
         """Download application inputs
@@ -896,6 +897,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         experiment_script = workspace.experiments_script
         experiment_script.write(self.expander.expand_var('{batch_submit}\n'))
+        self.set_status(status='UNKNOWN')
 
     def _clean_hash_variables(self, workspace, variables):
         """Cleanup variables to hash before computing the hash
@@ -913,6 +915,79 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if isinstance(variables[var], six.string_types):
                 variables[var] = variables[var].replace(workspace.root + os.path.sep, '')
 
+    def populate_inventory(self, workspace, force_compute=False, require_exist=False):
+        """Populate this experiment's hash inventory
+
+        If an inventory file exists, read it first.
+        If it does not exist, compute it using the internal information.
+
+        If force_compute is set to true, always compute and never read.
+
+        Args:
+            force_compute: Boolean that allows forces the inventory to be computed instead of read
+                           Used in pipelines that should create the inventory, instead of
+                           consuming it.
+        """
+
+        experiment_run_dir = self.expander.experiment_run_dir
+        inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
+
+        if os.path.exists(inventory_file) and not force_compute:
+            with open(inventory_file, 'r') as f:
+                self.hash_inventory = spack.util.spack_json.load(f)
+
+        else:
+            # Clean up variables before hashing
+            vars_to_hash = self.variables.copy()
+            self._clean_hash_variables(workspace, vars_to_hash)
+
+            # Build inventory of attributes
+            attributes_to_hash = [
+                ('variables', vars_to_hash),
+                ('modifiers', self.modifiers),
+                ('chained_experiments', self.chained_experiments),
+                ('internals', self.internals),
+                ('env_vars', self._env_variable_sets),
+            ]
+
+            for attr, attr_dict in attributes_to_hash:
+                self.hash_inventory['attributes'].append(
+                    {
+                        'name': attr,
+                        'digest': ramble.util.hashing.hash_json(attr_dict),
+                    }
+                )
+
+            # Build inventory of workspace templates
+            for template_name, template_conf in workspace.all_templates():
+                self.hash_inventory['templates'].append(
+                    {
+                        'name': template_name,
+                        'digest': template_conf['digest'],
+                    }
+                )
+
+            # Build inventory of inputs
+            self._inputs_and_fetchers(self.expander.workload_name)
+
+            for input_file, input_conf in self._input_fetchers.items():
+                if input_conf['fetcher'].digest:
+                    self.hash_inventory['inputs'].append(
+                        {
+                            'name': input_conf['input_name'],
+                            'digest': input_conf['fetcher'].digest
+                        }
+                    )
+                else:
+                    self.hash_inventory['inputs'].append(
+                        {
+                            'name': input_conf['input_name'],
+                            'digest': ramble.util.hashing.hash_string(input_conf['fetcher'].url),
+                        }
+                    )
+
+        self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
+
     def _write_inventory(self, workspace):
         """Build and write an inventory of an experiment
 
@@ -923,59 +998,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         experiment_run_dir = self.expander.experiment_run_dir
         inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
 
-        # Clean up variables before hashing
-        vars_to_hash = self.variables.copy()
-        self._clean_hash_variables(workspace, vars_to_hash)
-
-        # Build inventory of attributes
-        attributes_to_hash = [
-            ('variables', vars_to_hash),
-            ('modifiers', self.modifiers),
-            ('chained_experiments', self.chained_experiments),
-            ('internals', self.internals),
-            ('env_vars', self._env_variable_sets),
-        ]
-
-        for attr, attr_dict in attributes_to_hash:
-            self.hash_inventory['attributes'].append(
-                {
-                    'name': attr,
-                    'digest': ramble.util.hashing.hash_json(attr_dict),
-                }
-            )
-
-        # Build inventory of workspace templates
-        for template_name, template_conf in workspace.all_templates():
-            self.hash_inventory['templates'].append(
-                {
-                    'name': template_name,
-                    'digest': template_conf['digest'],
-                }
-            )
-
-        # Build inventory of inputs
-        self._inputs_and_fetchers(self.expander.workload_name)
-
-        for input_file, input_conf in self._input_fetchers.items():
-            if input_conf['fetcher'].digest:
-                self.hash_inventory['inputs'].append(
-                    {
-                        'name': input_conf['input_name'],
-                        'digest': input_conf['fetcher'].digest
-                    }
-                )
-            else:
-                self.hash_inventory['inputs'].append(
-                    {
-                        'name': input_conf['input_name'],
-                        'digest': ramble.util.hashing.hash_string(input_conf['fetcher'].url),
-                    }
-                )
-
         with open(inventory_file, 'w+') as f:
             spack.util.spack_json.dump(self.hash_inventory, f)
-
-        self.experiment_hash = ramble.util.hashing.hash_file(inventory_file)
 
     def _archive_experiments(self, workspace):
         """Archive an experiment directory
@@ -1149,8 +1173,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         tty.debug('fom_vals = %s' % fom_values)
         results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
         if success:
+            self.set_status(status='SUCCESS')
             results['RAMBLE_STATUS'] = 'SUCCESS'
         else:
+            self.set_status(status='FAILED')
             results['RAMBLE_STATUS'] = 'FAILED'
 
         if success or workspace.always_print_foms:
@@ -1297,6 +1323,49 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         'format': format_str
                     }
         return files, contexts, foms
+
+    def read_status(self):
+        """Read status from an experiment's status file, if possible.
+
+        Set this experiment's status based on the status file in the experiment
+        run directory, if it exists. If it doesn't exist, set its status to
+        UNKNOWN
+        """
+        status_path = os.path.join(
+            self.expander.expand_var_name(keywords.experiment_run_dir),
+            self._status_file_name
+        )
+
+        if os.path.isfile(status_path):
+            with open(status_path, 'r') as f:
+                status_data = spack.util.spack_json.load(f)
+            self.variables[keywords.experiment_status] = \
+                status_data[keywords.experiment_status]
+        else:
+            self.variables[keywords.experiment_status] = \
+                'UNKNOWN'
+
+    def set_status(self, status='UNKNOWN'):
+        """Set the status of this experiment"""
+        self.variables[keywords.experiment_status] = status
+
+    def _write_status(self, workspace):
+        """Phase to write an experiment's ramble_status.json file"""
+
+        status_data = {}
+        status_data[keywords.experiment_status] = \
+            self.expander.expand_var_name(keywords.experiment_status)
+
+        exp_dir = self.expander.expand_var_name(keywords.experiment_run_dir)
+
+        status_path = os.path.join(
+            exp_dir,
+            self._status_file_name
+        )
+
+        if os.path.exists(exp_dir):
+            with open(status_path, 'w+') as f:
+                spack.util.spack_json.dump(status_data, f)
 
     register_builtin('env_vars', required=True)
 

@@ -98,6 +98,28 @@ def phases():
 
 
 @arg
+def where():
+    return Args(
+        '--where', dest='where',
+        nargs='+',
+        action='append',
+        help='inclusive filter on experiments where the provided logical statement is True',
+        required=False
+    )
+
+
+@arg
+def exclude_where():
+    return Args(
+        '--exclude-where', dest='exclude_where',
+        nargs='+',
+        action='append',
+        help='exclusive filter experiments where the provided logical statement is True',
+        required=False
+    )
+
+
+@arg
 def no_checksum():
     return Args(
         '-n', '--no-checksum', action='store_true', default=False,

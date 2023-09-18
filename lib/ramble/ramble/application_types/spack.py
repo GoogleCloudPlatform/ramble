@@ -56,11 +56,12 @@ class SpackApplication(ApplicationBase):
             'get_inputs',
             'make_experiments',
             'write_inventory',
+            'write_status'
         ]
 
         self._mirror_phases = [
             'mirror_inputs',
-            'create_software_env',
+            'software_create_env',
             'mirror_software'
         ]
 
@@ -324,8 +325,7 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            mirror_output = self.spack_runner \
-                                .mirror_environment(workspace._software_mirror_path)
+            mirror_output = self.spack_runner.mirror_environment(workspace.software_mirror_path)
 
             present = 0
             added = 0
@@ -346,33 +346,38 @@ class SpackApplication(ApplicationBase):
             if failed_match:
                 failed = int(failed_match.group('num'))
 
-            added_start = len(workspace._software_mirror_stats.new)
+            added_start = len(workspace.software_mirror_stats.new)
             for i in range(added_start, added_start + added):
-                workspace._software_mirror_stats.new[i] = i
+                workspace.software_mirror_stats.new[i] = i
 
-            present_start = len(workspace._software_mirror_stats.present)
+            present_start = len(workspace.software_mirror_stats.present)
             for i in range(present_start, present_start + present):
-                workspace._software_mirror_stats.present[i] = i
+                workspace.software_mirror_stats.present[i] = i
 
-            error_start = len(workspace._software_mirror_stats.errors)
+            error_start = len(workspace.software_mirror_stats.errors)
             for i in range(error_start, error_start + failed):
-                workspace._software_mirror_stats.errors.add(i)
+                workspace.software_mirror_stats.errors.add(i)
 
         except ramble.spack_runner.RunnerError as e:
             with self.logger.force_echo():
                 tty.die(e)
 
-    def _write_inventory(self, workspace):
+    def populate_inventory(self, workspace, force_compute=False, require_exist=False):
         """Add software environment information to hash inventory"""
 
+        env_path = self.expander.env_path
+        self.spack_runner.set_dry_run(workspace.dry_run)
+        self.spack_runner.set_env(env_path, require_exists=False)
+        self.spack_runner.activate()
         self.hash_inventory['software'].append(
             {
                 'name': self.spack_runner.env_path.replace(workspace.root + os.path.sep, ''),
-                'digest': self.spack_runner.inventory_hash()
+                'digest': self.spack_runner.inventory_hash(require_exist)
             }
         )
+        self.spack_runner.deactivate()
 
-        super()._write_inventory(workspace)
+        super().populate_inventory(workspace, force_compute, require_exist)
 
     def _clean_hash_variables(self, workspace, variables):
         """Perform spack specific cleanup of variables before hashing"""

@@ -27,6 +27,8 @@ import ramble.workspace
 import ramble.workspace.shell
 import ramble.experiment_set
 import ramble.context
+import ramble.pipeline
+import ramble.filters
 import ramble.experimental.uploader
 import ramble.software_environments
 import ramble.util.colors as rucolor
@@ -317,18 +319,28 @@ def workspace_setup_setup_parser(subparser):
              'all scripts. Prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
 
-    arguments.add_common_arguments(subparser, ['phases'])
+    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
 
 
 def workspace_setup(args):
+    current_pipeline = ramble.pipeline.pipelines.setup
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace setup')
 
     if args.dry_run:
         ws.dry_run = True
 
+    filters = ramble.filters.Filters(
+        phase_filters=args.phases,
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where
+    )
+
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+
     tty.debug('Setting up workspace')
     with ws.write_transaction():
-        ws.run_pipeline('setup', args.phases)
+        pipeline = pipeline_cls(ws, filters)
+        pipeline.run()
 
 
 def workspace_analyze_setup_parser(subparser):
@@ -355,21 +367,29 @@ def workspace_analyze_setup_parser(subparser):
         help='Control if figures of merit are printed even if an experiment fails',
         required=False)
 
-    arguments.add_common_arguments(subparser, ['phases'])
+    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
 
 
 def workspace_analyze(args):
+    current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
     ws.always_print_foms = args.always_print_foms
 
+    filters = ramble.filters.Filters(
+        phase_filters=args.phases,
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where
+    )
+
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+
     tty.debug('Analyzing workspace')
     with ws.write_transaction():
-        ws.run_pipeline('analyze')
-        ws.dump_results(output_formats=args.output_formats)
-
-    # FIXME: this will fire the analyze logic of twice currently
-    if args.upload:
-        ramble.experimental.uploader.upload_results(ws.results)
+        pipeline = pipeline_cls(ws,
+                                filters,
+                                output_formats=args.output_formats,
+                                upload=args.upload)
+        pipeline.run()
 
 
 def workspace_info_setup_parser(subparser):
@@ -556,14 +576,25 @@ def workspace_archive_setup_parser(subparser):
         default=None,
         help='URL to upload tar archive into. Does nothing if `-t` is not specified.')
 
-    arguments.add_common_arguments(subparser, ['phases'])
+    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
 
 
 def workspace_archive(args):
+    current_pipeline = ramble.pipeline.pipelines.archive
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace archive')
 
-    ws.archive(create_tar=args.tar_archive,
-               archive_url=args.upload_url)
+    filters = ramble.filters.Filters(
+        phase_filters=args.phases,
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where
+    )
+
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+    pipeline = pipeline_cls(ws,
+                            filters,
+                            create_tar=args.tar_archive,
+                            upload_url=args.upload_url)
+    pipeline.run()
 
 
 def workspace_mirror_setup_parser(subparser):
@@ -571,6 +602,7 @@ def workspace_mirror_setup_parser(subparser):
     subparser.add_argument(
         '-d', dest='mirror_path',
         default=None,
+        required=True,
         help='Path to create mirror in.')
 
     subparser.add_argument(
@@ -580,17 +612,25 @@ def workspace_mirror_setup_parser(subparser):
              'prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
 
-    arguments.add_common_arguments(subparser, ['phases'])
+    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
 
 
 def workspace_mirror(args):
+    current_pipeline = ramble.pipeline.pipelines.mirror
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace archive')
 
     if args.dry_run:
         ws.dry_run = True
 
-    ws.create_mirror(args.mirror_path)
-    ws.run_pipeline('mirror')
+    filters = ramble.filters.Filters(
+        phase_filters=args.phases,
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where
+    )
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+
+    pipeline = pipeline_cls(ws, filters, mirror_path=args.mirror_path)
+    pipeline.run()
 
 
 #: Dictionary mapping subcommand names and aliases to functions

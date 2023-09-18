@@ -65,6 +65,6 @@ steps:
     id: ramble-unit-tests
     entrypoint: /bin/bash
 
-timeout: 600s
+timeout: 900s
 options:
   machineType: N1_HIGHCPU_8

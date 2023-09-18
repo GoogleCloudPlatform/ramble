@@ -11,6 +11,8 @@ import glob
 
 import pytest
 
+import ramble.filters
+import ramble.pipeline
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
@@ -64,6 +66,10 @@ ramble:
         - intel
 """
 
+    setup_type = ramble.pipeline.pipelines.setup
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+    filters = ramble.filters.Filters()
+
     workspace_name = 'test_unused_compilers_are_skipped'
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
@@ -76,7 +82,8 @@ ramble:
         ws.dry_run = True
         ws._re_read()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
 
         required_compiler_str = "gcc@8.5.0"
         unused_gcc9_str = "gcc@9.3.0"

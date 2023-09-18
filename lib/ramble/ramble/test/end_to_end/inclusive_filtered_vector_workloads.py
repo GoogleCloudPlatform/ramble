@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.application
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
@@ -24,9 +23,7 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 workspace = RambleCommand('workspace')
 
 
-def test_workspace_setup_creates_inventory(mutable_config,
-                                           mutable_mock_workspace_path,
-                                           mock_applications):
+def test_inclusive_filtered_vector_workloads(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
   variables:
@@ -36,22 +33,20 @@ ramble:
     processes_per_node: '16'
     n_threads: '1'
   applications:
-    basic:
+    hostname:
       workloads:
-        test_wl:
+        '{application_workload}':
           experiments:
             simple_test:
               variables:
+                application_workload: ['parallel' ,'serial', 'local']
                 n_nodes: 1
-              env_vars:
-                set:
-                  MY_VAR: 'TEST'
   spack:
     concretized: true
     packages: {}
     environments: {}
 """
-    workspace_name = 'test_workspace_setup_creates_inventory'
+    workspace_name = 'test_inclusive_filtered_vector_workloads'
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -60,16 +55,23 @@ ramble:
         with open(config_path, 'w+') as f:
             f.write(test_config)
         ws._re_read()
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-        assert os.path.exists(os.path.join(ws.root,
-                                           ramble.workspace.Workspace.inventory_file_name))
-        assert os.path.exists(os.path.join(ws.root,
-                                           ramble.workspace.Workspace.hash_file_name))
-        assert os.path.exists(
-            os.path.join(ws.experiment_dir,
-                         'basic',
-                         'test_wl',
-                         'simple_test',
-                         ramble.application.ApplicationBase._inventory_file_name)
-        )
+        workspace('setup', '--dry-run', '--where', '"{workload_name}" == "serial"',
+                  global_args=['-w', workspace_name])
+        workspace('analyze', '--where', '"{workload_name}" == "serial"',
+                  global_args=['-w', workspace_name])
+        workspace('archive', '--where', '"{workload_name}" == "serial"',
+                  global_args=['-w', workspace_name])
+
+        experiment_root = ws.experiment_dir
+        expected_workloads = ['serial']
+        for workload in expected_workloads:
+            exp1_dir = os.path.join(experiment_root, 'hostname', workload, 'simple_test')
+            exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+            assert os.path.isfile(exp1_script)
+
+        not_expected_workloads = ['parallel', 'local']
+        for workload in not_expected_workloads:
+            exp1_dir = os.path.join(experiment_root, 'hostname', workload, 'simple_test')
+            exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+            assert not os.path.isfile(exp1_script)

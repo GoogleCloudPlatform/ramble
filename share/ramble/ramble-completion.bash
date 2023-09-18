@@ -645,7 +645,7 @@ _ramble_workspace_activate() {
 }
 
 _ramble_workspace_archive() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --upload-url -u --phases"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --upload-url -u --phases --where --exclude-where"
 }
 
 _ramble_workspace_deactivate() {
@@ -666,11 +666,11 @@ _ramble_workspace_concretize() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run --phases"
+    RAMBLE_COMPREPLY="-h --help --dry-run --phases --where --exclude-where"
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --phases"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --phases --where --exclude-where"
 }
 
 _ramble_workspace_info() {
@@ -682,7 +682,7 @@ _ramble_workspace_edit() {
 }
 
 _ramble_workspace_mirror() {
-    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases"
+    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --where --exclude-where"
 }
 
 _ramble_workspace_list() {
