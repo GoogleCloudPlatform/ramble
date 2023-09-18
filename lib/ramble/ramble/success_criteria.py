@@ -175,8 +175,8 @@ class SuccessCriteria(object):
                     }
 
                     comparison_tested = True
-                    result = app_inst.expander.compute_logical(self.formula,
-                                                               extra_vars=comparison_vars)
+                    result = app_inst.expander.evaluate_predicate(self.formula,
+                                                                  extra_vars=comparison_vars)
 
             # If fom doesn't match any fom names, fail the comparison
             if not comparison_tested:

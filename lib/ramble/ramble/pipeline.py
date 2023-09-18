@@ -183,7 +183,6 @@ class AnalyzePipeline(Pipeline):
     def _complete(self):
         self.workspace.dump_results(output_formats=self.output_formats)
 
-        # FIXME: this will fire the analyze logic of twice currently
         if self.upload_results:
             ramble.experimental.upload.upload_results(self.workspace.results)
 
@@ -329,7 +328,7 @@ _pipeline_map = {
 
 
 def pipeline_class(name):
-    """Factory for constructing a pipeline instance from its name"""
+    """Factory for determining a pipeline class from its name"""
 
     if name not in _pipeline_map.keys():
         tty.die(f'Pipeline {name} is not valid.\n'

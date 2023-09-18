@@ -258,11 +258,11 @@ class Expander(object):
 
         return str(expanded).lstrip()
 
-    def compute_logical(self, in_str, extra_vars=None):
-        """Compute the logical value by evaluating math contained in a string
+    def evaluate_predicate(self, in_str, extra_vars=None):
+        """Evaluate a predicate by expanding and evaluating math contained in a string
 
         Args:
-            in_str: String representing logical math that should be evaluated
+            in_str: String representing predicate that should be evaluated
             extra_vars: Variable definitions to use with highest precedence
 
         Returns:
@@ -279,7 +279,7 @@ class Expander(object):
         elif evaluated == 'False':
             return False
         else:
-            tty.die(f'When evaluating {in_str}, compute_logical returned a non-boolean '
+            tty.die(f'When evaluating {in_str}, evaluate_predicate returned a non-boolean '
                     f'string: "{evaluated}"')
 
     @staticmethod

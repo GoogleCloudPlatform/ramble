@@ -408,11 +408,7 @@ class ExperimentSet(object):
     def num_filtered_experiments(self, filters):
         """Return the number of filtered experiments in this set"""
 
-        count = 0
-        for _, _, count in self.filtered_experiments(filters):
-            pass
-
-        return count
+        return sum(1 for _ in self.filtered_experiments(filters))
 
     def filtered_experiments(self, filters):
         """Return a filtered set of all experiments based on a logical expression
@@ -428,23 +424,21 @@ class ExperimentSet(object):
             inst: An application instance representing the experiment
         """
 
-        count = 1
-        for exp, inst, _ in self.all_experiments():
+        for exp, inst, idx in self.all_experiments():
             active = True
 
             if filters.include_where:
                 for expression in filters.include_where:
-                    if not inst.expander.compute_logical(expression):
+                    if not inst.expander.evaluate_predicate(expression):
                         active = False
 
             if filters.exclude_where:
                 for expression in filters.exclude_where:
-                    if inst.expander.compute_logical(expression):
+                    if inst.expander.evaluate_predicate(expression):
                         active = False
 
             if active:
-                yield exp, inst, count
-            count += 1
+                yield exp, inst, idx
 
     def add_chained_experiment(self, name, instance):
         if name in self.chained_experiments.keys():
