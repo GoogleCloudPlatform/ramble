@@ -54,6 +54,14 @@ ramble.test.end\_to\_end.env\_var\_builtin module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.exclusive\_filtered\_vector\_workloads module
+----------------------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.exclusive_filtered_vector_workloads
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.expanded\_fom\_dry\_run module
 -------------------------------------------------------
 
@@ -74,6 +82,14 @@ ramble.test.end\_to\_end.explicit\_zips module
 ----------------------------------------------
 
 .. automodule:: ramble.test.end_to_end.explicit_zips
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.test.end\_to\_end.inclusive\_filtered\_vector\_workloads module
+----------------------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.inclusive_filtered_vector_workloads
    :members:
    :undoc-members:
    :show-inheritance:

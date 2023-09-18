@@ -6,6 +6,14 @@ ramble.test.workspace\_hashing namespace
 Submodules
 ----------
 
+ramble.test.workspace\_hashing.unsetup\_workspace\_cannot\_analyze module
+-------------------------------------------------------------------------
+
+.. automodule:: ramble.test.workspace_hashing.unsetup_workspace_cannot_analyze
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.workspace\_hashing.workspace\_name\_does\_not\_change\_hash module
 ------------------------------------------------------------------------------
 

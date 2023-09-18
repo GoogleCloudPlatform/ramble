@@ -97,6 +97,14 @@ ramble.fetch\_strategy module
    :undoc-members:
    :show-inheritance:
 
+ramble.filters module
+---------------------
+
+.. automodule:: ramble.filters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.keywords module
 ----------------------
 
@@ -149,6 +157,14 @@ ramble.paths module
 -------------------
 
 .. automodule:: ramble.paths
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.pipeline module
+----------------------
+
+.. automodule:: ramble.pipeline
    :members:
    :undoc-members:
    :show-inheritance:

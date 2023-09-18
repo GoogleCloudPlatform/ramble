@@ -210,6 +210,42 @@ The ``--phases`` argument supports wildcard matching, i.e.:
 Would execute all phases that have then ``_experiments`` suffix.
 
 ^^^^^^^^^^^^^^^^^^^^^
+Filtering Experiments
+^^^^^^^^^^^^^^^^^^^^^
+
+Several of the workspace commands support filtering the experiments they should
+act on. This can be performed using the ``--where`` argument for inclusive
+filtering, or the ``--exclude-where`` argument for exclusive filtering. These
+arguments take a string representing a logical expression, which can use
+variables the experiment would define. If the logical expression evaluates to
+true, the experiment will be included or excluded for action (respectively).
+
+As an example:
+
+.. code-block:: console
+
+   $ ramble workspace setup --where '"{n_ranks}" < 500'
+
+Will only setup experiments that have less than 500 ranks, and:
+
+.. code-block:: console
+
+    $ ramble workspace setup --exclude-shere '"{application_name}" == "hostname"'
+
+Will exclude all experiments from the ``hostname`` application.
+
+The commands that accept these filters are:
+
+.. code-block:: console
+
+    $ ramble workspace analyze
+    $ ramble workspace archive
+    $ ramble workspace mirror
+    $ ramble workspace setup
+
+**NOTE:** The exclusive filter takes precedence over the inclusive filter.
+
+^^^^^^^^^^^^^^^^^^^^^
 Software Environments
 ^^^^^^^^^^^^^^^^^^^^^
 

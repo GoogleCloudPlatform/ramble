@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.cmd.software_definitions &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-results">ramble results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../cmd.html">ramble.cmd</a></li>
+      <li class="breadcrumb-item active">ramble.cmd.software_definitions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.cmd.software_definitions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">llnl.util.tty.colify</span> <span class="kn">import</span> <span class="n">colify</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty.color</span> <span class="k">as</span> <span class="nn">color</span>
+
+<span class="kn">import</span> <span class="nn">ramble.repository</span>
+<span class="kn">import</span> <span class="nn">ramble.software_environments</span>
+
+<span class="kn">from</span> <span class="nn">ramble.util.spec_utils</span> <span class="kn">import</span> <span class="n">specs_equiv</span>
+
+
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;inspect software definitions in object definitions&quot;</span>
+<span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;developer&quot;</span>
+<span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
+
+<span class="n">definitions</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">conflicts</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">used_by</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">specs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;spack_spec&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s1">&#39;compiler_spec&#39;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+<span class="n">spec_headers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;spack_spec&#39;</span><span class="p">:</span> <span class="s1">&#39;Software Packages&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;compiler_spec&#39;</span><span class="p">:</span> <span class="s1">&#39;Compiler Definitions&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
+<span class="n">level1_color</span> <span class="o">=</span> <span class="s1">&#39;@*g&#39;</span>
+<span class="n">level2_color</span> <span class="o">=</span> <span class="s1">&#39;@*r&#39;</span>
+<span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
+
+
+<div class="viewcode-block" id="section_title">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.section_title">[docs]</a>
+<span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">header_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
+
+
+
+<div class="viewcode-block" id="nested_1">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.nested_1">[docs]</a>
+<span class="k">def</span> <span class="nf">nested_1</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">level1_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
+
+
+
+<div class="viewcode-block" id="nested_2">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.nested_2">[docs]</a>
+<span class="k">def</span> <span class="nf">nested_2</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">level2_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
+
+
+
+<div class="viewcode-block" id="collect_definitions">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.collect_definitions">[docs]</a>
+<span class="k">def</span> <span class="nf">collect_definitions</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build software definition data structures</span>
+
+<span class="sd">    Iterate over all defined objects and extract their software definitions.</span>
+<span class="sd">    Built maps representing which objects use a given software definition, and</span>
+<span class="sd">    where detected conflicts have occurred.</span>
+
+<span class="sd">    The maps are global to this module, and reused in other internal methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">top_level_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default_compilers&#39;</span><span class="p">,</span> <span class="s1">&#39;software_specs&#39;</span><span class="p">]</span>
+
+    <span class="n">types_to_print</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">applications</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">object_type</span> <span class="ow">in</span> <span class="n">types_to_print</span><span class="p">:</span>
+        <span class="n">obj_path</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">obj_inst</span> <span class="ow">in</span> <span class="n">obj_path</span><span class="o">.</span><span class="n">all_objects</span><span class="p">():</span>
+            <span class="n">obj_repo</span> <span class="o">=</span> <span class="n">obj_path</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">obj_inst</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="n">obj_namespace</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj_repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">obj_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+
+            <span class="k">for</span> <span class="n">top_level_attr</span> <span class="ow">in</span> <span class="n">top_level_attrs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">top_level_attr</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_def</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">top_level_attr</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">pkg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">definitions</span><span class="p">:</span>
+                            <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_def</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                            <span class="n">used_by</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj_namespace</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">],</span> <span class="n">pkg_def</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">pkg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conflicts</span><span class="p">:</span>
+                                    <span class="n">conflicts</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                                <span class="n">conflicts</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_namespace</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">used_by</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_namespace</span><span class="p">)</span>
+
+                        <span class="k">for</span> <span class="n">spec_name</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">in</span> <span class="n">pkg_def</span><span class="p">:</span>
+                                <span class="n">spec_def</span> <span class="o">=</span> <span class="n">pkg_def</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]</span>
+                                <span class="k">if</span> <span class="n">spec_def</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">spec_def</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]:</span>
+                                        <span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="n">spec_def</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                                    <span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="n">spec_def</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_namespace</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="print_summary">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_summary">[docs]</a>
+<span class="k">def</span> <span class="nf">print_summary</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a summary of all software definitions&quot;&quot;&quot;</span>
+    <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Summary:&#39;</span><span class="p">))</span>
+    <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">spec_name</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">nested_1</span><span class="p">(</span><span class="n">spec_headers</span><span class="p">[</span><span class="n">spec_name</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">spec_def</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]:</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">nested_2</span><span class="p">(</span><span class="s2">&quot;Spec:&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">spec_def</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">In object:&#39;</span><span class="p">)</span>
+            <span class="n">colify</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="n">spec_def</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="count_conflicts">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.count_conflicts">[docs]</a>
+<span class="k">def</span> <span class="nf">count_conflicts</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate over conflicts and count how many were detected&quot;&quot;&quot;</span>
+    <span class="n">num_conflicts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">conflicts</span><span class="p">:</span>
+        <span class="n">num_conflicts</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conflicts</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">num_conflicts</span></div>
+
+
+
+<div class="viewcode-block" id="print_conflicts">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_conflicts">[docs]</a>
+<span class="k">def</span> <span class="nf">print_conflicts</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print conflict information, if any exist&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conflicts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Definition Conflicts:&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">conflicts</span><span class="p">:</span>
+
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nested_1</span><span class="p">(</span><span class="s2">&quot;Package&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Defined as:&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]:</span>
+                    <span class="n">attr_def</span> <span class="o">=</span> <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">attr_def</span><span class="p">:</span>
+                        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">attr_def</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">In objects:&#39;</span><span class="p">)</span>
+            <span class="n">colify</span><span class="p">(</span><span class="n">used_by</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Conflicts with objects:&#39;</span><span class="p">)</span>
+            <span class="n">colify</span><span class="p">(</span><span class="n">conflicts</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;No Conflicts Detected&#39;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup the parser for software-definitions&quot;&quot;&quot;</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--summary&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print summary of software definitions&#39;</span><span class="p">)</span>
+
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--conflicts&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print summary of conflicting definitions&#39;</span><span class="p">)</span>
+
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--error-on-conflict&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;if conflicts are found, exit code is number of conflicts&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="software_definitions">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.software_definitions">[docs]</a>
+<span class="k">def</span> <span class="nf">software_definitions</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform software-definitions actions&quot;&quot;&quot;</span>
+    <span class="n">collect_definitions</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">summary</span><span class="p">:</span>
+        <span class="n">print_summary</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">conflicts</span><span class="p">:</span>
+        <span class="n">print_conflicts</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">error_on_conflict</span><span class="p">:</span>
+        <span class="n">num_conflicts</span> <span class="o">=</span> <span class="n">count_conflicts</span><span class="p">()</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_conflicts</span><span class="si">}</span><span class="s1"> conflicts detected.&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">num_conflicts</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Sep 18, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
