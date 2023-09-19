@@ -108,7 +108,39 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.license_file = ''
         self.license_inc_name = 'license.inc'
 
-        self.logger = llnl.util.tty.log.log_output(echo=False, debug=tty.debug_level())
+        self.close_logger()
+
+    def construct_logger(self, logs_dir):
+        """Create and cache logger for this application instance
+
+
+        Using the input argument, logs_dir, construct a log path for this
+        application instance. Using that path, construct a logger instance that
+        will redirect output into that location.
+
+        When called multiple times, closes previously opened loggers, and
+        creates a new one each time.
+
+        Args:
+            logs_dir: Base directory for logs to exist in.
+        Returns:
+            log_path: Absolute path to log file that logger is writing to
+            logger: Logger instance to control writing
+        """
+        if hasattr(self, 'logger') and self.logger is not None:
+            self.close_logger()
+
+        log_path = self.experiment_log_file(logs_dir)
+        self.logger_file = log_path
+        self.logger = llnl.util.tty.log.log_output(log_path,
+                                                   echo=False,
+                                                   debug=tty.debug_level())
+
+    def close_logger(self):
+        """Close and destroy logger instances"""
+
+        self.logger_file = None
+        self.logger = None
 
     def copy(self):
         """Deep copy an application instance"""
@@ -376,7 +408,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             return
 
         if hasattr(self, f'_{phase}'):
-            tty.verbose('    Executing phase ' + phase)
+            tty.msg(f'  Executing phase {phase}')
             for mod_inst in self._modifier_instances:
                 mod_inst.run_phase_hook(workspace, phase)
             phase_func = getattr(self, f'_{phase}')
