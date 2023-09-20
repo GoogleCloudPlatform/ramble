@@ -5,4 +5,3 @@ google-api-core # for gcs fetch error .execptions
 coverage
 pre-commit
 google-cloud-bigquery
-tqdm # for workspace progress bar

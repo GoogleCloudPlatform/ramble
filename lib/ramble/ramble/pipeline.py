@@ -116,17 +116,23 @@ class Pipeline(object):
 
     def _execute(self):
         """Hook for executing the pipeline"""
-        for exp, app_inst, count in self._experiment_set.filtered_experiments(self.filters):
+        num_exps = self._experiment_set.num_filtered_experiments(self.filters)
+        count = 1
+        for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             exp_log_path = app_inst.experiment_log_file(self.log_dir)
-            exp_log_stream = open(exp_log_path, 'a+')
+            app_inst.construct_logger(self.log_dir)
 
-            tty.msg(f'    Experiment {count}:',
-                    f'        name: {exp}',
-                    f'        log file: {exp_log_path}')
+            tty.msg(f'Experiment {idx} ({count}/{num_exps}):')
+            tty.msg(f'    name: {exp}')
+            tty.msg(f'    log file: {app_inst.logger_file}')
 
-            for phase in app_inst.get_pipeline_phases(self.name, self.filters.phases):
-                with app_inst.logger(exp_log_stream):
+            phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
+
+            with app_inst.logger(exp_log_path, echo=False, debug=tty.debug_level()):
+                for phase in phase_list:
                     app_inst.run_phase(phase, self.workspace)
+            app_inst.close_logger()
+            count += 1
 
     def _complete(self):
         """Hook for performing pipeline actions after execution is complete"""
@@ -134,8 +140,6 @@ class Pipeline(object):
 
     def run(self):
         """Run the full pipeline"""
-        self.log_stream = open(self.log_path, 'a+')
-
         tty.msg('Streaming details to log:')
         tty.msg(f'  {self.log_path}')
         if self.workspace.dry_run:
@@ -146,16 +150,14 @@ class Pipeline(object):
         tty.msg(f'  {self.action_string} {experiment_count} out of '
                 f'{experiment_total} experiments:')
 
-        with self.workspace.logger(self.log_stream, echo=self.workspace.dry_run):
+        with self.workspace.logger(self.log_path, echo=self.workspace.dry_run):
             self._validate()
             self._prepare()
 
         self._execute()
 
-        with self.workspace.logger(self.log_stream, echo=self.workspace.dry_run):
+        with self.workspace.logger(self.log_path, echo=self.workspace.dry_run):
             self._complete()
-
-        self.log_stream.close()
 
 
 class AnalyzePipeline(Pipeline):
