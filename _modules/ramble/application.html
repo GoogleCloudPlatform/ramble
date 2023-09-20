@@ -226,7 +226,45 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">license_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span> <span class="o">=</span> <span class="s1">&#39;license.inc&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">tty</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">log_output</span><span class="p">(</span><span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">tty</span><span class="o">.</span><span class="n">debug_level</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_logger</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ApplicationBase.construct_logger">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.construct_logger">[docs]</a>
+    <span class="k">def</span> <span class="nf">construct_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create and cache logger for this application instance</span>
+
+
+<span class="sd">        Using the input argument, logs_dir, construct a log path for this</span>
+<span class="sd">        application instance. Using that path, construct a logger instance that</span>
+<span class="sd">        will redirect output into that location.</span>
+
+<span class="sd">        When called multiple times, closes previously opened loggers, and</span>
+<span class="sd">        creates a new one each time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logs_dir: Base directory for logs to exist in.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            log_path: Absolute path to log file that logger is writing to</span>
+<span class="sd">            logger: Logger instance to control writing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;logger&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_logger</span><span class="p">()</span>
+
+        <span class="n">log_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_log_file</span><span class="p">(</span><span class="n">logs_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger_file</span> <span class="o">=</span> <span class="n">log_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">tty</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">log_output</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span>
+                                                   <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                   <span class="n">debug</span><span class="o">=</span><span class="n">tty</span><span class="o">.</span><span class="n">debug_level</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ApplicationBase.close_logger">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.close_logger">[docs]</a>
+    <span class="k">def</span> <span class="nf">close_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close and destroy logger instances&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 
 <div class="viewcode-block" id="ApplicationBase.copy">
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.copy">[docs]</a>
@@ -535,7 +573,7 @@
             <span class="k">return</span>
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s1">&#39;    Executing phase &#39;</span> <span class="o">+</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Executing phase </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
                 <span class="n">mod_inst</span><span class="o">.</span><span class="n">run_phase_hook</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
             <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1640,7 +1678,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 18, 2023.
+      <span class="lastupdated">Last updated on Sep 20, 2023.
       </span></p>
   </div>
 

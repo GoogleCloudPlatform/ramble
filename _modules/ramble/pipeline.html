@@ -234,17 +234,23 @@
 
     <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook for executing the pipeline&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">app_inst</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span><span class="o">.</span><span class="n">filtered_experiments</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">):</span>
+        <span class="n">num_exps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span><span class="o">.</span><span class="n">num_filtered_experiments</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">app_inst</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span><span class="o">.</span><span class="n">filtered_experiments</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">):</span>
             <span class="n">exp_log_path</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">experiment_log_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span>
-            <span class="n">exp_log_stream</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">exp_log_path</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">)</span>
+            <span class="n">app_inst</span><span class="o">.</span><span class="n">construct_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span>
 
-            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Experiment </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s1">&#39;        name: </span><span class="si">{</span><span class="n">exp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s1">&#39;        log file: </span><span class="si">{</span><span class="n">exp_log_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Experiment </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">num_exps</span><span class="si">}</span><span class="s1">):&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    name: </span><span class="si">{</span><span class="n">exp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    log file: </span><span class="si">{</span><span class="n">app_inst</span><span class="o">.</span><span class="n">logger_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">get_pipeline_phases</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">phases</span><span class="p">):</span>
-                <span class="k">with</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="n">exp_log_stream</span><span class="p">):</span>
+            <span class="n">phase_list</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">get_pipeline_phases</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">phases</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="n">exp_log_path</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">tty</span><span class="o">.</span><span class="n">debug_level</span><span class="p">()):</span>
+                <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">phase_list</span><span class="p">:</span>
                     <span class="n">app_inst</span><span class="o">.</span><span class="n">run_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="p">)</span>
+            <span class="n">app_inst</span><span class="o">.</span><span class="n">close_logger</span><span class="p">()</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook for performing pipeline actions after execution is complete&quot;&quot;&quot;</span>
@@ -254,8 +260,6 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.pipeline.Pipeline.run">[docs]</a>
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the full pipeline&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_path</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">)</span>
-
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Streaming details to log:&#39;</span><span class="p">)</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
@@ -266,16 +270,14 @@
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">action_string</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">experiment_count</span><span class="si">}</span><span class="s1"> out of &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">experiment_total</span><span class="si">}</span><span class="s1"> experiments:&#39;</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_path</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span><span class="p">()</span>
 
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_complete</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_path</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_complete</span><span class="p">()</span></div>
 </div>
 
 
@@ -482,7 +484,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 18, 2023.
+      <span class="lastupdated">Last updated on Sep 20, 2023.
       </span></p>
   </div>
 
