@@ -404,6 +404,11 @@ class Expander(object):
             return self._ast_constant(node)
         elif isinstance(node, ast.Name):
             return self._ast_name(node)
+        # TODO: Remove when we drop support for 3.6
+        # DEPRECATED: Remove due to python 3.8
+        # See: https://docs.python.org/3/library/ast.html#node-classes
+        elif isinstance(node, ast.Str):
+            return node.s
         elif isinstance(node, ast.Attribute):
             return self._ast_attr(node)
         elif isinstance(node, ast.Compare):
