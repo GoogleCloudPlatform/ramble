@@ -43,6 +43,14 @@ class IntelAps(SpackModifier):
         pre_exec = []
         post_exec = []
         if executable.mpi:
+            pre_exec.append(
+                CommandExecutable(f'load-aps-{executable_name}',
+                                  template=['spack load intel-oneapi-vtune'])
+            )
+            post_exec.append(
+                CommandExecutable(f'unload-aps-{executable_name}',
+                                  template=['spack unload intel-oneapi-vtune'])
+            )
             post_exec.append(
                 CommandExecutable(f'gen-aps-{executable_name}',
                                   template=['echo "APS Results for executable {executable_name}"',
