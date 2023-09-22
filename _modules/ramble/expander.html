@@ -545,6 +545,11 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_constant</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_name</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="c1"># TODO: Remove when we drop support for 3.6</span>
+        <span class="c1"># DEPRECATED: Remove due to python 3.8</span>
+        <span class="c1"># See: https://docs.python.org/3/library/ast.html#node-classes</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">s</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_attr</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Compare</span><span class="p">):</span>
