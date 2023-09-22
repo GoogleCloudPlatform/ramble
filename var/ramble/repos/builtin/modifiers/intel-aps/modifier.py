@@ -99,3 +99,9 @@ class IntelAps(SpackModifier):
                     units='s', log_file='{log_file}', contexts=['APS Executable'])
     figure_of_merit('Disk I/O Percent', fom_regex=disk_io_regex, group_name='percent',
                     units='%', log_file='{log_file}', contexts=['APS Executable'])
+
+    mpi_func_regex = r'\s*(?P<func_name>MPI_\S+):\s+(?P<time>[0-9\.]+) s\s+(?P<perc>[0-9\.]+)% of Elapsed Time'
+    figure_of_merit('{func_name} Time', fom_regex=mpi_func_regex, group_name='time',
+                    units='s', log_file='{log_file}', contexts=['APS Executable'])
+    figure_of_merit('{func_name} Percent', fom_regex=mpi_func_regex, group_name='perc',
+                    units='%', log_file='{log_file}', contexts=['APS Executable'])
