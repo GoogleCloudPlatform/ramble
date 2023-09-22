@@ -186,7 +186,7 @@ class AnalyzePipeline(Pipeline):
         self.workspace.dump_results(output_formats=self.output_formats)
 
         if self.upload_results:
-            ramble.experimental.upload.upload_results(self.workspace.results)
+            ramble.experimental.uploader.upload_results(self.workspace.results)
 
 
 class ArchivePipeline(Pipeline):
