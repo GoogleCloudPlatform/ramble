@@ -159,7 +159,8 @@ class SuccessCriteria(object):
             comparison_tested = False
             result = True
 
-            contexts = fnmatch.filter(fom_values.keys(), self.fom_context)
+            contexts = fnmatch.filter(fom_values.keys(),
+                                      app_inst.expander.expand_var(self.fom_context))
             # If fom context doesn't exist, fail the comparison
             if not contexts:
                 tty.debug(f'When checking success criteria "{self.name}" FOM '
@@ -167,7 +168,8 @@ class SuccessCriteria(object):
                 return False
 
             for context in contexts:
-                fom_names = fnmatch.filter(fom_values[context].keys(), self.fom_name)
+                fom_names = fnmatch.filter(fom_values[context].keys(),
+                                           app_inst.expander.expand_var(self.fom_name))
 
                 for fom_name in fom_names:
                     comparison_vars = {
