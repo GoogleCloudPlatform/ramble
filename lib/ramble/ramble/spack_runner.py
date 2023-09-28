@@ -588,7 +588,7 @@ class SpackRunner(object):
 
         if not self.dry_run:
             if not lock_exists and require_exist:
-                tty.die('spack.lock file does not exist in environment'
+                tty.die('spack.lock file does not exist in environment '
                         f'{self.env_path}\n'
                         'Make sure your workspace is fully setup with\n'
                         '    ramble workspace setup')
