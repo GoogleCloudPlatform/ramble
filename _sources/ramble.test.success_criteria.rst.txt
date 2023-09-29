@@ -45,3 +45,11 @@ ramble.test.success\_criteria.success\_modifiers module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.test.success\_criteria.success\_variable\_fom\_comparison module
+-----------------------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.success_variable_fom_comparison
+   :members:
+   :undoc-members:
+   :show-inheritance:
