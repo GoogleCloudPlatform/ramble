@@ -310,6 +310,14 @@ def workspace_concretize(args):
     ws.concretize()
 
 
+def workspace_run_pipeline(args, pipeline):
+    if args.include_phase_dependencies:
+        with ramble.config.override('config:include_phase_dependencies', True):
+            pipeline.run()
+    else:
+        pipeline.run()
+
+
 def workspace_setup_setup_parser(subparser):
     """Setup a workspace"""
     subparser.add_argument(
@@ -319,7 +327,8 @@ def workspace_setup_setup_parser(subparser):
              'all scripts. Prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
 
-    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
+                                               'where', 'exclude_where'])
 
 
 def workspace_setup(args):
@@ -338,9 +347,10 @@ def workspace_setup(args):
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     tty.debug('Setting up workspace')
+    pipeline = pipeline_cls(ws, filters)
+
     with ws.write_transaction():
-        pipeline = pipeline_cls(ws, filters)
-        pipeline.run()
+        workspace_run_pipeline(args, pipeline)
 
 
 def workspace_analyze_setup_parser(subparser):
@@ -367,7 +377,8 @@ def workspace_analyze_setup_parser(subparser):
         help='Control if figures of merit are printed even if an experiment fails',
         required=False)
 
-    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
+                                               'where', 'exclude_where'])
 
 
 def workspace_analyze(args):
@@ -384,12 +395,13 @@ def workspace_analyze(args):
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     tty.debug('Analyzing workspace')
+    pipeline = pipeline_cls(ws,
+                            filters,
+                            output_formats=args.output_formats,
+                            upload=args.upload)
+
     with ws.write_transaction():
-        pipeline = pipeline_cls(ws,
-                                filters,
-                                output_formats=args.output_formats,
-                                upload=args.upload)
-        pipeline.run()
+        workspace_run_pipeline(args, pipeline)
 
 
 def workspace_info_setup_parser(subparser):
@@ -576,7 +588,8 @@ def workspace_archive_setup_parser(subparser):
         default=None,
         help='URL to upload tar archive into. Does nothing if `-t` is not specified.')
 
-    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
+                                               'where', 'exclude_where'])
 
 
 def workspace_archive(args):
@@ -594,7 +607,8 @@ def workspace_archive(args):
                             filters,
                             create_tar=args.tar_archive,
                             upload_url=args.upload_url)
-    pipeline.run()
+
+    workspace_run_pipeline(args, pipeline)
 
 
 def workspace_mirror_setup_parser(subparser):
@@ -612,7 +626,8 @@ def workspace_mirror_setup_parser(subparser):
              'prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
 
-    arguments.add_common_arguments(subparser, ['phases', 'where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
+                                               'where', 'exclude_where'])
 
 
 def workspace_mirror(args):
@@ -630,6 +645,8 @@ def workspace_mirror(args):
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     pipeline = pipeline_cls(ws, filters, mirror_path=args.mirror_path)
+
+    workspace_run_pipeline(args, pipeline)
     pipeline.run()
 
 

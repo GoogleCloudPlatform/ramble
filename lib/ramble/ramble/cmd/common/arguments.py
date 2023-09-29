@@ -98,6 +98,18 @@ def phases():
 
 
 @arg
+def include_phase_dependencies():
+    return Args(
+        '--include-phase-dependencies',
+        dest='include_phase_dependencies',
+        action='store_true',
+        help='if set, phase dependencies are automatically added to '
+             'the list of executed phases',
+        required=False
+    )
+
+
+@arg
 def where():
     return Args(
         '--where', dest='where',

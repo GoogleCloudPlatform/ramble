@@ -22,6 +22,7 @@ config:
   shell: sh
   input_cache: $ramble/var/ramble/cache
   workspace_dirs: $ramble/var/ramble/workspaces
+  include_phase_dependencies: false
   spack:
     install:
       flags: --reuse

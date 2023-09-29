@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import ramble.language.language_base
+from ramble.language.language_base import DirectiveError
 import ramble.language.shared_language
 from ramble.schema.types import OUTPUT_CAPTURE
 import ramble.language.language_helpers
@@ -183,3 +184,48 @@ def workload_variable(name, default, description, values=None, workload=None,
                 app.workload_variables[wl_name][name]['values'] = values
 
     return _execute_workload_variable
+
+
+@application_directive('phase_definitions')
+def register_phase(name, pipeline=None, depends_on=[]):
+    """Register a phase
+
+    Phases are portions of a pipeline that will execute when
+    executing a full pipeline.
+
+    Registering a phase allows an application to know what the phases
+    dependencies are, to ensure the execution order is correct.
+
+    If called multiple times, the dependencies are combined together. Only one
+    instance of a phase will show up in the resulting dependency list for a phase.
+
+    Args:
+    - name: The name of the phase. Phases are functions named '_<phase>'.
+    - pipeline: The name of the pipeline this phase should be registered into.
+    - depends_on: A list of phase names this phase depends on
+    """
+
+    def _execute_register_phase(app):
+        if pipeline not in app._pipelines:
+            raise DirectiveError('Directive register_phase was '
+                                 f'given an invalid pipeline "{pipeline}"\n'
+                                 'Available pipelines are: '
+                                 f' {app._pipelines}')
+
+        if not isinstance(depends_on, list):
+            raise DirectiveError('Directive register_phase was '
+                                 'given an invalid type for '
+                                 'the depends_on attribute in application '
+                                 f'{app.name}')
+
+        if pipeline not in app.phase_definitions:
+            app.phase_definitions[pipeline] = {}
+
+        if name not in app.phase_definitions[pipeline]:
+            app.phase_definitions[pipeline][name] = []
+
+        for dep in depends_on:
+            if dep not in app.phase_definitions[pipeline][name]:
+                app.phase_definitions[pipeline][name].append(dep)
+
+    return _execute_register_phase

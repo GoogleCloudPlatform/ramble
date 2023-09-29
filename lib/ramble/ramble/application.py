@@ -43,7 +43,7 @@ import ramble.util.env
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
-from ramble.language.application_language import ApplicationMeta
+from ramble.language.application_language import ApplicationMeta, register_phase
 from ramble.language.shared_language import register_builtin
 from ramble.error import RambleError
 
@@ -67,10 +67,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def __init__(self, file_path):
         super().__init__()
-        self._setup_phases = ['license_includes']
-        self._analyze_phases = ['prepare_analysis', 'analyze_experiments', 'write_status']
-        self._archive_phases = ['archive_experiments']
-        self._mirror_phases = ['mirror_inputs']
 
         self._vars_are_expanded = False
         self.expander = None
@@ -109,6 +105,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.license_inc_name = 'license.inc'
 
         self.close_logger()
+        self.build_phase_order()
 
     def construct_logger(self, logs_dir):
         """Create and cache logger for this application instance
@@ -153,6 +150,54 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         new_copy.set_chained_experiments(None)
 
         return new_copy
+
+    def build_phase_order(self):
+        for pipeline in self._pipelines:
+            pipeline_phases = []
+
+            # Detect cycles
+            for phase in self.phase_definitions[pipeline].keys():
+
+                phase_stack = [phase]
+                phases_touched = set()
+                while phase_stack:
+                    cur_phase = phase_stack.pop()
+
+                    if cur_phase in phases_touched:
+                        raise PhaseCycleDetectedError(
+                            'Cycle detected when ordering phases in '
+                            f'application {self.name}\n'
+                            f'Phase {phase} ultimately depends on itself.'
+                        )
+
+                    for dep_phase in self.phase_definitions[pipeline][cur_phase]:
+                        if dep_phase not in self.phase_definitions[pipeline].keys():
+                            raise InvalidPhaseError(f'In application {self.name}, phase '
+                                                    f'{dep_phase} is a dependency of '
+                                                    f'phase {phase} but is not defined.')
+                        phase_stack.append(dep_phase)
+
+            phases_to_add = [phase for phase in self.phase_definitions[pipeline].keys()]
+
+            while phases_to_add:
+                cur_phase = phases_to_add.pop(0)
+
+                earliest_idx = 0
+                for dep_phase in self.phase_definitions[pipeline][cur_phase]:
+                    if dep_phase not in pipeline_phases:
+                        earliest_idx = None
+                        break
+                    else:
+                        earliest_idx = max(earliest_idx, pipeline_phases.index(dep_phase) + 1)
+
+                if earliest_idx is None:
+                    phases_to_add.append(cur_phase)
+                elif earliest_idx == 0 or earliest_idx == len(pipeline_phases):
+                    pipeline_phases.append(cur_phase)
+                else:
+                    pipeline_phases.insert(earliest_idx, cur_phase)
+
+            setattr(self, f'_{pipeline}_phases', pipeline_phases)
 
     def _inject_required_builtins(self):
         required_builtins = []
@@ -327,16 +372,27 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             tty.die(f'Requested pipeline {pipeline} is not valid.\n',
                     f'\tAvailable pipelinese are {self._pipelines}')
 
-        phases = []
+        phases = set()
         if hasattr(self, f'_{pipeline}_phases'):
             for phase in getattr(self, f'_{pipeline}_phases'):
                 for phase_filter in phase_filters:
                     if fnmatch.fnmatch(phase, phase_filter):
-                        phases.append(phase)
+                        phases.add(phase)
         else:
             tty.die(f'Pipeline {pipeline} is not defined in application {self.name}')
 
-        return phases
+        include_phase_deps = ramble.config.get('config:include_phase_dependencies')
+        if include_phase_deps:
+            phases_for_deps = list(phases)
+            while phases_for_deps:
+                cur_phase = phases_for_deps.pop(0)
+                for dep_phase in self.phase_definitions[pipeline][cur_phase]:
+                    if dep_phase not in phases:
+                        phases_for_deps.append(dep_phase)
+                        phases.add(dep_phase)
+
+        return [phase for phase in getattr(self, f'_{pipeline}_phases')
+                if phase in phases]
 
     def _short_print(self):
         return [self.name]
@@ -815,6 +871,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                      }
         self._input_fetchers = inputs
 
+    register_phase('mirror_inputs', pipeline='mirror')
+
     def _mirror_inputs(self, workspace):
         """Mirror application inputs
 
@@ -831,6 +889,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                             path=fetch_dir, mirror_paths=mirror_paths, lock=False)
 
             stage.cache_mirror(workspace.input_mirror_cache, workspace.input_mirror_stats)
+
+    register_phase('get_inputs', pipeline='setup')
 
     def _get_inputs(self, workspace):
         """Download application inputs
@@ -882,6 +942,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         fs.mkdirp(self.license_path)
 
+    register_phase('license_includes', pipeline='setup')
+
     def _license_includes(self, workspace):
         tty.debug("Writing License Includes")
         self._prepare_license_path(workspace)
@@ -906,6 +968,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         for cmd in env_cmds:
                             if cmd:
                                 f.write(cmd + '\n')
+
+    register_phase('make_experiments', pipeline='setup', depends_on=['get_inputs'])
 
     def _make_experiments(self, workspace):
         """Create experiment directories
@@ -1020,6 +1084,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
 
+    register_phase('write_inventory', pipeline='setup', depends_on=['make_experiments'])
+
     def _write_inventory(self, workspace):
         """Build and write an inventory of an experiment
 
@@ -1032,6 +1098,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         with open(inventory_file, 'w+') as f:
             spack.util.spack_json.dump(self.hash_inventory, f)
+
+    register_phase('archive_experiments', pipeline='archive')
 
     def _archive_experiments(self, workspace):
         """Archive an experiment directory
@@ -1075,6 +1143,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for file in glob.glob(exp_pattern):
                 shutil.copy(file, archive_experiment_dir)
 
+    register_phase('prepare_analysis', pipeline='analyze')
+
     def _prepare_analysis(self, workspace):
         """Prepapre experiment for analysis extraction
 
@@ -1085,6 +1155,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         application specific processing of the output.
         """
         pass
+
+    register_phase('analyze_experiments', pipeline='analyze', depends_on=['prepare_analysis'])
 
     def _analyze_experiments(self, workspace):
         """Perform experiment analysis.
@@ -1381,6 +1453,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Set the status of this experiment"""
         self.variables[keywords.experiment_status] = status
 
+    register_phase('write_status', pipeline='analyze', depends_on=['analyze_experiments'])
+    register_phase('write_status', pipeline='setup', depends_on=['make_experiments'])
+
     def _write_status(self, workspace):
         """Phase to write an experiment's ramble_status.json file"""
 
@@ -1455,6 +1530,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 class ApplicationError(RambleError):
     """
     Exception that is raised by applications
+    """
+
+
+class PhaseCycleDetectedError(ApplicationError):
+    """
+    Exception raised when a cycle is detected while ordering phases
+    """
+
+
+class InvalidPhaseError(ApplicationError):
+    """
+    Exception raised when a phase is used but not defined
     """
 
 
