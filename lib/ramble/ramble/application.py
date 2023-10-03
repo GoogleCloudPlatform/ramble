@@ -985,6 +985,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for template_name, template_conf in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
+            tty.msg(f'Writing template {template_name} to {expand_path}')
 
             with open(expand_path, 'w+') as f:
                 f.write(self.expander.expand_var(template_conf['contents']))
