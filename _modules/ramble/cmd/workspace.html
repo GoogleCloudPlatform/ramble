@@ -460,6 +460,17 @@
 
 
 
+<div class="viewcode-block" id="workspace_run_pipeline">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_run_pipeline">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">include_phase_dependencies</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">override</span><span class="p">(</span><span class="s1">&#39;config:include_phase_dependencies&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+
 <div class="viewcode-block" id="workspace_setup_setup_parser">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_setup_setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">workspace_setup_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
@@ -471,7 +482,8 @@
              <span class="s1">&#39;all scripts. Prints commands that would be executed &#39;</span> <span class="o">+</span>
              <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span>
 
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;include_phase_dependencies&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
 
 
 
@@ -493,9 +505,10 @@
     <span class="n">pipeline_cls</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipeline_class</span><span class="p">(</span><span class="n">current_pipeline</span><span class="p">)</span>
 
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Setting up workspace&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline_cls</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
+
     <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">():</span>
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline_cls</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
-        <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+        <span class="n">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span></div>
 
 
 
@@ -525,7 +538,8 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Control if figures of merit are printed even if an experiment fails&#39;</span><span class="p">,</span>
         <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;include_phase_dependencies&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
 
 
 
@@ -545,12 +559,13 @@
     <span class="n">pipeline_cls</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipeline_class</span><span class="p">(</span><span class="n">current_pipeline</span><span class="p">)</span>
 
     <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Analyzing workspace&#39;</span><span class="p">)</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline_cls</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span>
+                            <span class="n">filters</span><span class="p">,</span>
+                            <span class="n">output_formats</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_formats</span><span class="p">,</span>
+                            <span class="n">upload</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">upload</span><span class="p">)</span>
+
     <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">():</span>
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline_cls</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span>
-                                <span class="n">filters</span><span class="p">,</span>
-                                <span class="n">output_formats</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_formats</span><span class="p">,</span>
-                                <span class="n">upload</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">upload</span><span class="p">)</span>
-        <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+        <span class="n">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span></div>
 
 
 
@@ -758,7 +773,8 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;URL to upload tar archive into. Does nothing if `-t` is not specified.&#39;</span><span class="p">)</span>
 
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;include_phase_dependencies&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
 
 
 
@@ -779,7 +795,8 @@
                             <span class="n">filters</span><span class="p">,</span>
                             <span class="n">create_tar</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">tar_archive</span><span class="p">,</span>
                             <span class="n">upload_url</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">upload_url</span><span class="p">)</span>
-    <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+    <span class="n">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span></div>
 
 
 
@@ -800,7 +817,8 @@
              <span class="s1">&#39;prints commands that would be executed &#39;</span> <span class="o">+</span>
              <span class="s1">&#39;for installation, and files that would be downloaded.&#39;</span><span class="p">)</span>
 
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span> <span class="s1">&#39;include_phase_dependencies&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
 
 
 
@@ -821,6 +839,8 @@
     <span class="n">pipeline_cls</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipeline_class</span><span class="p">(</span><span class="n">current_pipeline</span><span class="p">)</span>
 
     <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline_cls</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">mirror_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mirror_path</span><span class="p">)</span>
+
+    <span class="n">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span>
     <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
 
 
@@ -874,7 +894,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

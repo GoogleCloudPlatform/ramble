@@ -159,7 +159,7 @@
 <span class="kn">from</span> <span class="nn">ramble.keywords</span> <span class="kn">import</span> <span class="n">keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span>
+<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span><span class="p">,</span> <span class="n">register_phase</span>
 <span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
@@ -185,10 +185,6 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;license_includes&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;prepare_analysis&#39;</span><span class="p">,</span> <span class="s1">&#39;analyze_experiments&#39;</span><span class="p">,</span> <span class="s1">&#39;write_status&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_archive_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;archive_experiments&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mirror_phases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mirror_inputs&#39;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="kc">None</span>
@@ -227,6 +223,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span> <span class="o">=</span> <span class="s1">&#39;license.inc&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">close_logger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_phase_order</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ApplicationBase.construct_logger">
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.construct_logger">[docs]</a>
@@ -279,6 +276,57 @@
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_chained_experiments</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_copy</span></div>
+
+
+<div class="viewcode-block" id="ApplicationBase.build_phase_order">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.build_phase_order">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_phase_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">pipeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipelines</span><span class="p">:</span>
+            <span class="n">pipeline_phases</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Detect cycles</span>
+            <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+                <span class="n">phase_stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">phase</span><span class="p">]</span>
+                <span class="n">phases_touched</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">while</span> <span class="n">phase_stack</span><span class="p">:</span>
+                    <span class="n">cur_phase</span> <span class="o">=</span> <span class="n">phase_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="n">cur_phase</span> <span class="ow">in</span> <span class="n">phases_touched</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">PhaseCycleDetectedError</span><span class="p">(</span>
+                            <span class="s1">&#39;Cycle detected when ordering phases in &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;application </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;Phase </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1"> ultimately depends on itself.&#39;</span>
+                        <span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">dep_phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">cur_phase</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">dep_phase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="k">raise</span> <span class="n">InvalidPhaseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In application </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">, phase &#39;</span>
+                                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dep_phase</span><span class="si">}</span><span class="s1"> is a dependency of &#39;</span>
+                                                    <span class="sa">f</span><span class="s1">&#39;phase </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1"> but is not defined.&#39;</span><span class="p">)</span>
+                        <span class="n">phase_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dep_phase</span><span class="p">)</span>
+
+            <span class="n">phases_to_add</span> <span class="o">=</span> <span class="p">[</span><span class="n">phase</span> <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+            <span class="k">while</span> <span class="n">phases_to_add</span><span class="p">:</span>
+                <span class="n">cur_phase</span> <span class="o">=</span> <span class="n">phases_to_add</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">earliest_idx</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">dep_phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">cur_phase</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">dep_phase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pipeline_phases</span><span class="p">:</span>
+                        <span class="n">earliest_idx</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">earliest_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">earliest_idx</span><span class="p">,</span> <span class="n">pipeline_phases</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dep_phase</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">earliest_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">phases_to_add</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_phase</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">earliest_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">earliest_idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">pipeline_phases</span><span class="p">):</span>
+                    <span class="n">pipeline_phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_phase</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pipeline_phases</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">earliest_idx</span><span class="p">,</span> <span class="n">cur_phase</span><span class="p">)</span>
+
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">_phases&#39;</span><span class="p">,</span> <span class="n">pipeline_phases</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_inject_required_builtins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -477,16 +525,27 @@
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Requested pipeline </span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1"> is not valid.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Available pipelinese are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pipelines</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">phases</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">phases</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">_phases&#39;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">_phases&#39;</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">phase_filter</span> <span class="ow">in</span> <span class="n">phase_filters</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">phase_filter</span><span class="p">):</span>
-                        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
+                        <span class="n">phases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pipeline </span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1"> is not defined in application </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">phases</span></div>
+        <span class="n">include_phase_deps</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:include_phase_dependencies&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_phase_deps</span><span class="p">:</span>
+            <span class="n">phases_for_deps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">phases_for_deps</span><span class="p">:</span>
+                <span class="n">cur_phase</span> <span class="o">=</span> <span class="n">phases_for_deps</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">dep_phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">cur_phase</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">dep_phase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">:</span>
+                        <span class="n">phases_for_deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dep_phase</span><span class="p">)</span>
+                        <span class="n">phases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dep_phase</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">phase</span> <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">_phases&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">]</span></div>
 
 
     <span class="k">def</span> <span class="nf">_short_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -990,6 +1049,8 @@
                                      <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="n">inputs</span>
 
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;mirror_inputs&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_mirror_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mirror application inputs</span>
 
@@ -1006,6 +1067,8 @@
                                             <span class="n">path</span><span class="o">=</span><span class="n">fetch_dir</span><span class="p">,</span> <span class="n">mirror_paths</span><span class="o">=</span><span class="n">mirror_paths</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
             <span class="n">stage</span><span class="o">.</span><span class="n">cache_mirror</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">input_mirror_cache</span><span class="p">,</span> <span class="n">workspace</span><span class="o">.</span><span class="n">input_mirror_stats</span><span class="p">)</span>
+
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Download application inputs</span>
@@ -1057,6 +1120,8 @@
 
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">license_path</span><span class="p">)</span>
 
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;license_includes&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_license_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Writing License Includes&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_license_path</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
@@ -1081,6 +1146,8 @@
                         <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">env_cmds</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">cmd</span><span class="p">:</span>
                                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;get_inputs&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_make_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create experiment directories</span>
@@ -1198,6 +1265,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">)</span></div>
 
 
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;write_inventory&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">])</span>
+
     <span class="k">def</span> <span class="nf">_write_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and write an inventory of an experiment</span>
 
@@ -1210,6 +1279,8 @@
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inventory_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spack_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;archive_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;archive&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_archive_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Archive an experiment directory</span>
@@ -1253,6 +1324,8 @@
             <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">exp_pattern</span><span class="p">):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">archive_experiment_dir</span><span class="p">)</span>
 
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;prepare_analysis&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;analyze&#39;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_prepare_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepapre experiment for analysis extraction</span>
 
@@ -1263,6 +1336,8 @@
 <span class="sd">        application specific processing of the output.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
+
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;analyze&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prepare_analysis&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_analyze_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform experiment analysis.</span>
@@ -1565,6 +1640,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_status</span><span class="p">]</span> <span class="o">=</span> <span class="n">status</span></div>
 
 
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;write_status&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;analyze&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;write_status&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">])</span>
+
     <span class="k">def</span> <span class="nf">_write_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Phase to write an experiment&#39;s ramble_status.json file&quot;&quot;&quot;</span>
 
@@ -1652,6 +1730,24 @@
 
 
 
+<div class="viewcode-block" id="PhaseCycleDetectedError">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.PhaseCycleDetectedError">[docs]</a>
+<span class="k">class</span> <span class="nc">PhaseCycleDetectedError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception raised when a cycle is detected while ordering phases</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="InvalidPhaseError">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.InvalidPhaseError">[docs]</a>
+<span class="k">class</span> <span class="nc">InvalidPhaseError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception raised when a phase is used but not defined</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="ChainCycleDetectedError">
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ChainCycleDetectedError">[docs]</a>
 <span class="k">class</span> <span class="nc">ChainCycleDetectedError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
@@ -1678,7 +1774,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

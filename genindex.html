@@ -516,6 +516,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.application.ApplicationBase.build_modifier_instances">build_modifier_instances() (ramble.application.ApplicationBase method)</a>
 </li>
+      <li><a href="ramble.html#ramble.application.ApplicationBase.build_phase_order">build_phase_order() (ramble.application.ApplicationBase method)</a>
+</li>
       <li><a href="ramble.html#ramble.modifier.ModifierBase.builtin_group">builtin_group (ramble.modifier.ModifierBase attribute)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.builtins">builtins (ramble.application.ApplicationBase attribute)</a>
@@ -1750,6 +1752,8 @@
 </li>
       <li><a href="ramble.html#ramble.repository.InvalidNamespaceError">InvalidNamespaceError</a>
 </li>
+      <li><a href="ramble.html#ramble.application.InvalidPhaseError">InvalidPhaseError</a>
+</li>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.inventory_file_name">inventory_file_name (ramble.workspace.Workspace attribute)</a>
 
       <ul>
@@ -2517,6 +2521,16 @@
         <li><a href="ramble.experimental.html#ramble.experimental.uploader.Uploader.perform_upload">(ramble.experimental.uploader.Uploader method)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.application.ApplicationBase.phase_definitions">phase_definitions (ramble.application.ApplicationBase attribute)</a>
+
+      <ul>
+        <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.phase_definitions">(ramble.application_types.executable.ExecutableApplication attribute)</a>
+</li>
+        <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.phase_definitions">(ramble.application_types.spack.SpackApplication attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="ramble.html#ramble.application.PhaseCycleDetectedError">PhaseCycleDetectedError</a>
+</li>
       <li><a href="ramble.html#ramble.pipeline.Pipeline">Pipeline (class in ramble.pipeline)</a>
 </li>
       <li><a href="ramble.html#ramble.pipeline.pipeline_class">pipeline_class() (in module ramble.pipeline)</a>
@@ -2545,12 +2559,12 @@
 </li>
       <li><a href="ramble.util.imp.html#ramble.util.imp.imp_importer.prepend_open">prepend_open() (in module ramble.util.imp.imp_importer)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.util.imp.html#ramble.util.imp.importlib_importer.PrependFileLoader">PrependFileLoader (class in ramble.util.imp.importlib_importer)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.print_chain_order">print_chain_order() (ramble.application.ApplicationBase method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.print_conflicts">print_conflicts() (in module ramble.cmd.software_definitions)</a>
 </li>
       <li><a href="ramble.html#ramble.error.RambleError.print_context">print_context() (ramble.error.RambleError method)</a>
@@ -3211,8 +3225,6 @@
         <li><a href="ramble.test.html#module-ramble.test.application_inheritance">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.cmd
 
@@ -3220,6 +3232,8 @@
         <li><a href="ramble.test.cmd.html#module-ramble.test.cmd">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.cmd.debug
 
@@ -3520,6 +3534,8 @@
       <li><a href="ramble.html#ramble.repository.Repo.real_name">real_name() (ramble.repository.Repo method)</a>
 </li>
       <li><a href="ramble.language.html#ramble.language.shared_language.register_builtin">register_builtin() (in module ramble.language.shared_language)</a>
+</li>
+      <li><a href="ramble.language.html#ramble.language.application_language.register_phase">register_phase() (in module ramble.language.application_language)</a>
 </li>
       <li><a href="ramble.html#ramble.mirror.remove">remove() (in module ramble.mirror)</a>
 
@@ -4419,6 +4435,8 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_remove_setup_parser">workspace_remove_setup_parser() (in module ramble.cmd.workspace)</a>
 </li>
+      <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_run_pipeline">workspace_run_pipeline() (in module ramble.cmd.workspace)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_setup">workspace_setup() (in module ramble.cmd.workspace)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.workspace.workspace_setup_setup_parser">workspace_setup_setup_parser() (in module ramble.cmd.workspace)</a>
@@ -4500,7 +4518,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

@@ -226,6 +226,22 @@ file name.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.register_phase">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">register_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#register_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.register_phase" title="Link to this definition"></a></dt>
+<dd><p>Register a phase</p>
+<p>Phases are portions of a pipeline that will execute when
+executing a full pipeline.</p>
+<p>Registering a phase allows an application to know what the phases
+dependencies are, to ensure the execution order is correct.</p>
+<p>If called multiple times, the dependencies are combined together. Only one
+instance of a phase will show up in the resulting dependency list for a phase.</p>
+<p>Args:
+- name: The name of the phase. Phases are functions named ‘_&lt;phase&gt;’.
+- pipeline: The name of the pipeline this phase should be registered into.
+- depends_on: A list of phase names this phase depends on</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.workload">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">workload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#workload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.workload" title="Link to this definition"></a></dt>
 <dd><p>Adds a workload to this application</p>
@@ -655,7 +671,7 @@ in. Accepts globbing.</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

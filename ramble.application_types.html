@@ -235,6 +235,11 @@ which should already be on the platform.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.phase_definitions">
+<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">['prepare_analysis'],</span> <span class="pre">'prepare_analysis':</span> <span class="pre">[],</span> <span class="pre">'write_status':</span> <span class="pre">['analyze_experiments']},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">[]},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">[]},</span> <span class="pre">'setup':</span> <span class="pre">{'get_inputs':</span> <span class="pre">[],</span> <span class="pre">'license_includes':</span> <span class="pre">[],</span> <span class="pre">'make_experiments':</span> <span class="pre">['get_inputs'],</span> <span class="pre">'write_inventory':</span> <span class="pre">['make_experiments'],</span> <span class="pre">'write_status':</span> <span class="pre">['make_experiments']}}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.phase_definitions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.required_packages">
 <span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.required_packages" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -332,6 +337,11 @@ via spack.</p>
 <span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.package_manager_configs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.phase_definitions">
+<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">['prepare_analysis'],</span> <span class="pre">'prepare_analysis':</span> <span class="pre">[],</span> <span class="pre">'write_status':</span> <span class="pre">['analyze_experiments']},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">[]},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">[],</span> <span class="pre">'mirror_software':</span> <span class="pre">['software_create_env'],</span> <span class="pre">'software_create_env':</span> <span class="pre">[]},</span> <span class="pre">'setup':</span> <span class="pre">{'define_package_paths':</span> <span class="pre">['software_install'],</span> <span class="pre">'get_inputs':</span> <span class="pre">[],</span> <span class="pre">'license_includes':</span> <span class="pre">[],</span> <span class="pre">'make_experiments':</span> <span class="pre">['get_inputs',</span> <span class="pre">'define_package_paths'],</span> <span class="pre">'software_configure':</span> <span class="pre">['software_create_env',</span> <span class="pre">'software_install_requested_compilers'],</span> <span class="pre">'software_create_env':</span> <span class="pre">[],</span> <span class="pre">'software_install':</span> <span class="pre">['software_configure'],</span> <span class="pre">'software_install_requested_compilers':</span> <span class="pre">['software_create_env'],</span> <span class="pre">'write_inventory':</span> <span class="pre">['make_experiments'],</span> <span class="pre">'write_status':</span> <span class="pre">['make_experiments']}}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.phase_definitions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.populate_inventory">
 <span class="sig-name descname"><span class="pre">populate_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_exist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#SpackApplication.populate_inventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.populate_inventory" title="Link to this definition"></a></dt>
@@ -415,7 +425,7 @@ via spack.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

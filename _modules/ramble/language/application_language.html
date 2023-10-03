@@ -123,6 +123,7 @@
 <span class="c1"># except according to those terms.</span>
 
 <span class="kn">import</span> <span class="nn">ramble.language.language_base</span>
+<span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
 <span class="kn">import</span> <span class="nn">ramble.language.shared_language</span>
 <span class="kn">from</span> <span class="nn">ramble.schema.types</span> <span class="kn">import</span> <span class="n">OUTPUT_CAPTURE</span>
 <span class="kn">import</span> <span class="nn">ramble.language.language_helpers</span>
@@ -314,6 +315,54 @@
 
     <span class="k">return</span> <span class="n">_execute_workload_variable</span></div>
 
+
+
+<div class="viewcode-block" id="register_phase">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.register_phase">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;phase_definitions&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">register_phase</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a phase</span>
+
+<span class="sd">    Phases are portions of a pipeline that will execute when</span>
+<span class="sd">    executing a full pipeline.</span>
+
+<span class="sd">    Registering a phase allows an application to know what the phases</span>
+<span class="sd">    dependencies are, to ensure the execution order is correct.</span>
+
+<span class="sd">    If called multiple times, the dependencies are combined together. Only one</span>
+<span class="sd">    instance of a phase will show up in the resulting dependency list for a phase.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - name: The name of the phase. Phases are functions named &#39;_&lt;phase&gt;&#39;.</span>
+<span class="sd">    - pipeline: The name of the pipeline this phase should be registered into.</span>
+<span class="sd">    - depends_on: A list of phase names this phase depends on</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_register_phase</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">_pipelines</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;Directive register_phase was &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;given an invalid pipeline &quot;</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="s1">&#39;Available pipelines are: &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">_pipelines</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">depends_on</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;Directive register_phase was &#39;</span>
+                                 <span class="s1">&#39;given an invalid type for &#39;</span>
+                                 <span class="s1">&#39;the depends_on attribute in application &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">depends_on</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_execute_register_phase</span></div>
+
 </pre></div>
 
            </div>
@@ -324,7 +373,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

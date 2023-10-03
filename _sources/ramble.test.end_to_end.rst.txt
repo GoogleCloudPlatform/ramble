@@ -142,6 +142,14 @@ ramble.test.end\_to\_end.phase\_selection module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.phase\_selection\_with\_dependencies module
+--------------------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.phase_selection_with_dependencies
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.shared\_context module
 -----------------------------------------------
 

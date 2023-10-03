@@ -74,6 +74,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.add_expand_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.add_expand_vars()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.archive_patterns"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.archive_patterns</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.build_modifier_instances"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.build_modifier_instances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.build_phase_order"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.build_phase_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.builtins"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.builtins</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.close_logger"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.close_logger()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.construct_logger"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.construct_logger()</span></code></a></li>
@@ -95,6 +96,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.modes"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.name"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_configs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.populate_inventory"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.populate_inventory()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.print_chain_order"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.print_chain_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.print_internals"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.print_internals()</span></code></a></li>
@@ -121,6 +123,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.ApplicationError"><code class="docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.ChainCycleDetectedError"><code class="docutils literal notranslate"><span class="pre">ChainCycleDetectedError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.InvalidChainError"><code class="docutils literal notranslate"><span class="pre">InvalidChainError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.InvalidPhaseError"><code class="docutils literal notranslate"><span class="pre">InvalidPhaseError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.PhaseCycleDetectedError"><code class="docutils literal notranslate"><span class="pre">PhaseCycleDetectedError</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.caches">ramble.caches module</a><ul>
@@ -1080,6 +1084,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.inputs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.modes"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_configs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.required_packages"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.software_specs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.success_criteria"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.success_criteria</span></code></a></li>
@@ -1103,6 +1108,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.inputs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.modes"><code class="docutils literal notranslate"><span class="pre">SpackApplication.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.package_manager_configs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.phase_definitions"><code class="docutils literal notranslate"><span class="pre">SpackApplication.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.populate_inventory"><code class="docutils literal notranslate"><span class="pre">SpackApplication.populate_inventory()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.required_packages"><code class="docutils literal notranslate"><span class="pre">SpackApplication.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.software_specs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.software_specs</span></code></a></li>
@@ -1355,6 +1361,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.workspace.workspace_mirror_setup_parser"><code class="docutils literal notranslate"><span class="pre">workspace_mirror_setup_parser()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.workspace.workspace_remove"><code class="docutils literal notranslate"><span class="pre">workspace_remove()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.workspace.workspace_remove_setup_parser"><code class="docutils literal notranslate"><span class="pre">workspace_remove_setup_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.workspace.workspace_run_pipeline"><code class="docutils literal notranslate"><span class="pre">workspace_run_pipeline()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.workspace.workspace_setup"><code class="docutils literal notranslate"><span class="pre">workspace_setup()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.workspace.workspace_setup_setup_parser"><code class="docutils literal notranslate"><span class="pre">workspace_setup_setup_parser()</span></code></a></li>
 </ul>
@@ -1394,6 +1401,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.ApplicationMeta"><code class="docutils literal notranslate"><span class="pre">ApplicationMeta</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.executable"><code class="docutils literal notranslate"><span class="pre">executable()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.input_file"><code class="docutils literal notranslate"><span class="pre">input_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.register_phase"><code class="docutils literal notranslate"><span class="pre">register_phase()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload"><code class="docutils literal notranslate"><span class="pre">workload()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload_variable"><code class="docutils literal notranslate"><span class="pre">workload_variable()</span></code></a></li>
 </ul>
@@ -1602,6 +1610,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-package-manager-config-module">ramble.test.end_to_end.package_manager_config module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-passthrough-variables-module">ramble.test.end_to_end.passthrough_variables module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-phase-selection-module">ramble.test.end_to_end.phase_selection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-phase-selection-with-dependencies-module">ramble.test.end_to_end.phase_selection_with_dependencies module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-shared-context-module">ramble.test.end_to_end.shared_context module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-test-configvar-dry-run-module">ramble.test.end_to_end.test_configvar_dry_run module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.end_to_end.html#ramble-test-end-to-end-unused-compilers-are-skipped-module">ramble.test.end_to_end.unused_compilers_are_skipped module</a></li>
@@ -2107,6 +2116,11 @@ This method defines these variables, including:
 application instance</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.build_phase_order">
+<span class="sig-name descname"><span class="pre">build_phase_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.build_phase_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.build_phase_order" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.builtins">
 <span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'builtin::env_vars':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'env_vars',</span> <span class="pre">'required':</span> <span class="pre">True}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.builtins" title="Link to this definition"></a></dt>
@@ -2241,6 +2255,11 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.package_manager_configs">
 <span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.package_manager_configs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.phase_definitions">
+<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">['prepare_analysis'],</span> <span class="pre">'prepare_analysis':</span> <span class="pre">[],</span> <span class="pre">'write_status':</span> <span class="pre">['analyze_experiments']},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">[]},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">[]},</span> <span class="pre">'setup':</span> <span class="pre">{'get_inputs':</span> <span class="pre">[],</span> <span class="pre">'license_includes':</span> <span class="pre">[],</span> <span class="pre">'make_experiments':</span> <span class="pre">['get_inputs'],</span> <span class="pre">'write_inventory':</span> <span class="pre">['make_experiments'],</span> <span class="pre">'write_status':</span> <span class="pre">['make_experiments']}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.phase_definitions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2393,6 +2412,20 @@ UNKNOWN</p>
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">InvalidChainError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#InvalidChainError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.InvalidChainError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.application.ApplicationError" title="ramble.application.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></p>
 <p>Exception raised when a invalid chained experiment is defined</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.application.InvalidPhaseError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">InvalidPhaseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#InvalidPhaseError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.InvalidPhaseError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.application.ApplicationError" title="ramble.application.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></p>
+<p>Exception raised when a phase is used but not defined</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.application.PhaseCycleDetectedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">PhaseCycleDetectedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#PhaseCycleDetectedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.PhaseCycleDetectedError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.application.ApplicationError" title="ramble.application.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></p>
+<p>Exception raised when a cycle is detected while ordering phases</p>
 </dd></dl>
 
 </section>
@@ -7526,7 +7559,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

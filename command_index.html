@@ -1278,7 +1278,8 @@
 <section id="ramble-workspace-archive">
 <span id="id45"></span><h2>ramble workspace archive<a class="headerlink" href="#ramble-workspace-archive" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL] [--phases PHASES [PHASES ...]]</span>
-<span class="go">                     [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
+<span class="go">                     [--include-phase-dependencies] [--where WHERE [WHERE ...]]</span>
+<span class="go">                     [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1290,6 +1291,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">--upload-url</span> <span class="pre">UPLOAD_URL,</span> <span class="pre">-u</span> <span class="pre">UPLOAD_URL</span></code></dt><dd><p>URL to upload tar archive into. Does nothing if <cite>-t</cite> is not specified.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--include-phase-dependencies</span></code></dt><dd><p>if set, phase dependencies are automatically added to the list of executed phases</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--where</span> <span class="pre">WHERE</span> <span class="pre">[WHERE</span> <span class="pre">...]</span></code></dt><dd><p>inclusive filter on experiments where the provided logical statement is True</p>
 </dd>
@@ -1355,8 +1358,8 @@
 </section>
 <section id="ramble-workspace-setup">
 <span id="id49"></span><h2>ramble workspace setup<a class="headerlink" href="#ramble-workspace-setup" title="Link to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace setup [-h] [--dry-run] [--phases PHASES [PHASES ...]] [--where WHERE [WHERE ...]]</span>
-<span class="go">                   [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace setup [-h] [--dry-run] [--phases PHASES [PHASES ...]] [--include-phase-dependencies]</span>
+<span class="go">                   [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1366,6 +1369,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">--dry-run</span></code></dt><dd><p>perform a dry run. Sets up directories and generates all scripts. Prints commands that would be executed for installation, and files that would be downloaded.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--include-phase-dependencies</span></code></dt><dd><p>if set, phase dependencies are automatically added to the list of executed phases</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--where</span> <span class="pre">WHERE</span> <span class="pre">[WHERE</span> <span class="pre">...]</span></code></dt><dd><p>inclusive filter on experiments where the provided logical statement is True</p>
 </dd>
@@ -1377,7 +1382,7 @@
 <section id="ramble-workspace-analyze">
 <span id="id50"></span><h2>ramble workspace analyze<a class="headerlink" href="#ramble-workspace-analyze" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]] [--always-print-foms]</span>
-<span class="go">                     [--phases PHASES [PHASES ...]] [--where WHERE [WHERE ...]]</span>
+<span class="go">                     [--phases PHASES [PHASES ...]] [--include-phase-dependencies] [--where WHERE [WHERE ...]]</span>
 <span class="go">                     [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
 </pre></div>
 </div>
@@ -1392,6 +1397,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">--always-print-foms</span></code></dt><dd><p>Control if figures of merit are printed even if an experiment fails</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--include-phase-dependencies</span></code></dt><dd><p>if set, phase dependencies are automatically added to the list of executed phases</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--where</span> <span class="pre">WHERE</span> <span class="pre">[WHERE</span> <span class="pre">...]</span></code></dt><dd><p>inclusive filter on experiments where the provided logical statement is True</p>
 </dd>
@@ -1434,8 +1441,8 @@
 </section>
 <section id="ramble-workspace-mirror">
 <span id="id53"></span><h2>ramble workspace mirror<a class="headerlink" href="#ramble-workspace-mirror" title="Link to this heading"></a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace mirror [-h] -d MIRROR_PATH [--dry-run] [--phases PHASES [PHASES ...]] [--where WHERE [WHERE ...]]</span>
-<span class="go">                    [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace mirror [-h] -d MIRROR_PATH [--dry-run] [--phases PHASES [PHASES ...]] [--include-phase-dependencies]</span>
+<span class="go">                    [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
 </pre></div>
 </div>
 <p><strong>Optional arguments</strong></p>
@@ -1447,6 +1454,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">--dry-run</span></code></dt><dd><p>perform a dry run. Creates spack environments, prints commands that would be executed for installation, and files that would be downloaded.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--phases</span> <span class="pre">PHASES</span> <span class="pre">[PHASES</span> <span class="pre">...]</span></code></dt><dd><p>select phases to execute when performing setup. Phase names support globbing</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--include-phase-dependencies</span></code></dt><dd><p>if set, phase dependencies are automatically added to the list of executed phases</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--where</span> <span class="pre">WHERE</span> <span class="pre">[WHERE</span> <span class="pre">...]</span></code></dt><dd><p>inclusive filter on experiments where the provided logical statement is True</p>
 </dd>
@@ -1499,7 +1508,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Sep 29, 2023.
+      <span class="lastupdated">Last updated on Oct 03, 2023.
       </span></p>
   </div>
 

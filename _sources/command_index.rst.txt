@@ -1457,7 +1457,8 @@ ramble workspace archive
 .. code-block:: console
 
     ramble workspace archive [-h] [--tar-archive] [--upload-url UPLOAD_URL] [--phases PHASES [PHASES ...]]
-                         [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
+                         [--include-phase-dependencies] [--where WHERE [WHERE ...]]
+                         [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
 
 
 **Optional arguments**
@@ -1473,6 +1474,9 @@ ramble workspace archive
 
 ``--phases PHASES [PHASES ...]``
   select phases to execute when performing setup. Phase names support globbing
+
+``--include-phase-dependencies``
+  if set, phase dependencies are automatically added to the list of executed phases
 
 ``--where WHERE [WHERE ...]``
   inclusive filter on experiments where the provided logical statement is True
@@ -1571,8 +1575,8 @@ ramble workspace setup
 
 .. code-block:: console
 
-    ramble workspace setup [-h] [--dry-run] [--phases PHASES [PHASES ...]] [--where WHERE [WHERE ...]]
-                       [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
+    ramble workspace setup [-h] [--dry-run] [--phases PHASES [PHASES ...]] [--include-phase-dependencies]
+                       [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
 
 
 **Optional arguments**
@@ -1585,6 +1589,9 @@ ramble workspace setup
 
 ``--phases PHASES [PHASES ...]``
   select phases to execute when performing setup. Phase names support globbing
+
+``--include-phase-dependencies``
+  if set, phase dependencies are automatically added to the list of executed phases
 
 ``--where WHERE [WHERE ...]``
   inclusive filter on experiments where the provided logical statement is True
@@ -1603,7 +1610,7 @@ ramble workspace analyze
 .. code-block:: console
 
     ramble workspace analyze [-hu] [-f OUTPUT_FORMATS [OUTPUT_FORMATS ...]] [--always-print-foms]
-                         [--phases PHASES [PHASES ...]] [--where WHERE [WHERE ...]]
+                         [--phases PHASES [PHASES ...]] [--include-phase-dependencies] [--where WHERE [WHERE ...]]
                          [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
 
 
@@ -1623,6 +1630,9 @@ ramble workspace analyze
 
 ``--phases PHASES [PHASES ...]``
   select phases to execute when performing setup. Phase names support globbing
+
+``--include-phase-dependencies``
+  if set, phase dependencies are automatically added to the list of executed phases
 
 ``--where WHERE [WHERE ...]``
   inclusive filter on experiments where the provided logical statement is True
@@ -1688,8 +1698,8 @@ ramble workspace mirror
 
 .. code-block:: console
 
-    ramble workspace mirror [-h] -d MIRROR_PATH [--dry-run] [--phases PHASES [PHASES ...]] [--where WHERE [WHERE ...]]
-                        [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
+    ramble workspace mirror [-h] -d MIRROR_PATH [--dry-run] [--phases PHASES [PHASES ...]] [--include-phase-dependencies]
+                        [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
 
 
 **Optional arguments**
@@ -1705,6 +1715,9 @@ ramble workspace mirror
 
 ``--phases PHASES [PHASES ...]``
   select phases to execute when performing setup. Phase names support globbing
+
+``--include-phase-dependencies``
+  if set, phase dependencies are automatically added to the list of executed phases
 
 ``--where WHERE [WHERE ...]``
   inclusive filter on experiments where the provided logical statement is True
