@@ -11,6 +11,7 @@ import six
 
 import llnl.util.tty as tty
 
+from ramble.language.application_language import register_phase
 from ramble.language.shared_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
@@ -44,26 +45,11 @@ class SpackApplication(ApplicationBase):
                     ('software_specs', 'Software Specs')]
     _spec_keys = ['spack_spec', 'compiler_spec', 'compiler']
 
+    register_phase('make_experiments', pipeline='setup',
+                   depends_on=['define_package_paths'])
+
     def __init__(self, file_path):
         super().__init__(file_path)
-
-        self._setup_phases += [
-            'software_create_env',
-            'software_install_requested_compilers',
-            'software_configure',
-            'software_install',
-            'define_package_paths',
-            'get_inputs',
-            'make_experiments',
-            'write_inventory',
-            'write_status'
-        ]
-
-        self._mirror_phases = [
-            'mirror_inputs',
-            'software_create_env',
-            'mirror_software'
-        ]
 
         self.spack_runner = ramble.spack_runner.SpackRunner()
         self.application_class = 'SpackApplication'
@@ -89,6 +75,9 @@ class SpackApplication(ApplicationBase):
                                                               info[key].replace('@', '@@')))
 
         return ''.join(out_str)
+
+    register_phase('software_install_requested_compilers', pipeline='setup',
+                   depends_on=['software_create_env'])
 
     def _software_install_requested_compilers(self, workspace):
         """Install compilers an application uses"""
@@ -122,6 +111,9 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             with self.logger.force_echo():
                 tty.die(e)
+
+    register_phase('software_create_env', pipeline='mirror')
+    register_phase('software_create_env', pipeline='setup')
 
     def _software_create_env(self, workspace):
         """Create the spack environment for this experiment
@@ -204,6 +196,9 @@ class SpackApplication(ApplicationBase):
             with self.logger.force_echo():
                 tty.die(e)
 
+    register_phase('software_configure', pipeline='setup',
+                   depends_on=['software_create_env', 'software_install_requested_compilers'])
+
     def _software_configure(self, workspace):
         """Concretize the spack environment for this experiment
 
@@ -237,6 +232,9 @@ class SpackApplication(ApplicationBase):
             with self.logger.force_echo():
                 tty.die(e)
 
+    register_phase('software_install', pipeline='setup',
+                   depends_on=['software_configure'])
+
     def _software_install(self, workspace):
         """Install application's software using spack"""
 
@@ -261,6 +259,9 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             with self.logger.force_echo():
                 tty.die(e)
+
+    register_phase('define_package_paths', pipeline='setup',
+                   depends_on=['software_install'])
 
     def _define_package_paths(self, workspace):
         """Define variables containing the path to all spack packages
@@ -300,6 +301,8 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             with self.logger.force_echo():
                 tty.die(e)
+
+    register_phase('mirror_software', pipeline='mirror', depends_on=['software_create_env'])
 
     def _mirror_software(self, workspace):
         """Mirror software source for this experiment using spack"""

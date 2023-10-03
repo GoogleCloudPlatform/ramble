@@ -21,11 +21,4 @@ class ExecutableApplication(ApplicationBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
-        self._setup_phases += [
-            'get_inputs',
-            'make_experiments',
-            'write_inventory',
-            'write_status'
-        ]
-
         self.application_class = 'ExecutableApplication'
