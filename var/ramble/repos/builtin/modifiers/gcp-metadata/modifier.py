@@ -22,6 +22,8 @@ class GcpMetadata(BasicModifier):
     maintainers('rfbgo')
 
     mode('standard', description='Standard execution mode')
+    default_mode('standard')
+
     variable_modification('log', '{experiment_run_dir}/gcp-metadata.log', method='set', modes=['standard'])
     archive_pattern('{log}')
 

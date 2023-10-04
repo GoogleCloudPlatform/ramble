@@ -23,6 +23,7 @@ class IntelAps(SpackModifier):
     maintainers('douglasjacobsen')
 
     mode('mpi', description='Mode for collecting mpi statistics')
+    default_mode('mpi')
 
     variable_modification('aps_log_dir', 'aps_{executable_name}_results_dir',
                           method='set', modes=['mpi'])
