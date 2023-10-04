@@ -157,6 +157,24 @@
 
 
 
+<div class="viewcode-block" id="default_mode">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.default_mode">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;default_modes&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">default_mode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a default mode for this modifier.</span>
+
+<span class="sd">    The default mode will be used if modifier mode is not specified in an experiment.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_default_mode</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;default_mode directive given an invalid mode for modifier &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">. Valid modes are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">default_mode</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">return</span> <span class="n">_execute_default_mode</span></div>
+
+
+
 <div class="viewcode-block" id="variable_modification">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.variable_modification">[docs]</a>
 <span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;variable_modifications&#39;</span><span class="p">)</span>
