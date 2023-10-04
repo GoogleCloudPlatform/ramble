@@ -35,6 +35,21 @@ def mode(name, description, **kwargs):
     return _execute_mode
 
 
+@modifier_directive('default_modes')
+def default_mode(name, **kwargs):
+    """Define a default mode for this modifier.
+
+    The default mode will be used if modifier mode is not specified in an experiment."""
+
+    def _execute_default_mode(mod):
+        if name not in mod.modes:
+            raise DirectiveError(f'default_mode directive given an invalid mode for modifier '
+                                 f'{mod.name}. Valid modes are {str(list(mod.modes.keys()))}')
+        mod.default_mode = name
+
+    return _execute_default_mode
+
+
 @modifier_directive('variable_modifications')
 def variable_modification(name, modification, method='set', mode=None, modes=None, **kwargs):
     """Define a new variable modification for a mode in this modifier.

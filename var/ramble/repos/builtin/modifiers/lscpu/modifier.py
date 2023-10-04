@@ -23,6 +23,7 @@ class Lscpu(BasicModifier):
     maintainers('douglasjacobsen')
 
     mode('standard', description='Standard execution mode for lscpu')
+    default_mode('standard')
 
     variable_modification('lscpu_log', '{experiment_run_dir}/lscpu_output.log', method='set', modes=['standard'])
 

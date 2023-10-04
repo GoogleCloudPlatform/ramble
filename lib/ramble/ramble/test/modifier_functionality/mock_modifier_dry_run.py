@@ -41,7 +41,7 @@ def test_gromacs_dry_run_mock_mods(mutable_mock_workspace_path,
     ]
 
     expected_failures = {
-        'multiple-modes': {'error': InvalidModeError, 'msg': 'Cannot auto determine'},
+        'multiple-modes-no-default': {'error': InvalidModeError, 'msg': 'Cannot auto determine'},
         'invalid-builtin-injection': {'error': DirectiveError,
                                       'msg': 'has an invalid injection method of'},
     }
