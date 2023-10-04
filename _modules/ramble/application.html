@@ -1679,10 +1679,11 @@
             <span class="n">license_conf</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;licenses&#39;</span><span class="p">,</span>
                                                            <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">license_conf</span><span class="p">:</span>
-                <span class="n">app_licenses</span> <span class="o">=</span> <span class="n">license_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">app_licenses</span><span class="p">:</span>
-                    <span class="c1"># Append logic to source file which contains the exports</span>
-                    <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. </span><span class="se">{{</span><span class="s2">license_input_dir</span><span class="se">}}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">license_conf</span><span class="p">:</span>
+                    <span class="n">app_licenses</span> <span class="o">=</span> <span class="n">license_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">app_licenses</span><span class="p">:</span>
+                        <span class="c1"># Append logic to source file which contains the exports</span>
+                        <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. </span><span class="se">{{</span><span class="s2">license_input_dir</span><span class="se">}}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Process environment variable actions</span>
         <span class="k">for</span> <span class="n">env_var_set</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variable_sets</span><span class="p">:</span>
@@ -1774,7 +1775,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 03, 2023.
+      <span class="lastupdated">Last updated on Oct 04, 2023.
       </span></p>
   </div>
 
