@@ -54,6 +54,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="ramble.html">ramble package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-ramble">What is Ramble?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#system-requirements">System Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#shell-support">Shell Support</a></li>
@@ -137,22 +138,52 @@
              
   <section id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="what-is-ramble">
+<h2>What is Ramble?<a class="headerlink" href="#what-is-ramble" title="Link to this heading"></a></h2>
+<p>Ramble stands for Reproducible And Measurable Benchmarks in a Layered Environment.</p>
+<p>Ramble is a multi-platform experimentation framework to increase exploration
+productivity and improve reproducibility. Ramble is capable of driving software
+installation, acquiring input files, configuring experiments, and extracting results.
+It works on Linux, macOS, and many supercomputers.</p>
+<p>Ramble can be used to configure a variety of experiments for applications. These
+can include anything from:</p>
+<ul class="simple">
+<li><p>Scientific parameter sweeps</p></li>
+<li><p>Performance focused scalaing studies</p></li>
+<li><p>Compiler flag sweeps</p></li>
+</ul>
+</section>
 <section id="system-requirements">
 <h2>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading"></a></h2>
-<p>Ramble’s dependencies are listed within the top level
-requirements.txt file.</p>
-<p>In addition to the listed python dependencies, Ramble depends on
-spack for some application definition files.</p>
-<p>Please see Spack’s <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html">documentation</a> for getting spack installed.</p>
+<p>Ramble requires Python 3.6.8 or greater. Some applications also require
+<a class="reference external" href="https://spack.io/about/#install-spack">Spack</a>, which is used for managing
+binaries and their dependencies.</p>
+<p>Ramble’s Python dependencies are listed within the top level requirements.txt
+file.</p>
+<p>For Ramble developers, pytest and flake8 are required for linting and performing
+unit tests.</p>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>Installing ramble is easy. You can clone it from the
-<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble">github repository</a> using this command:</p>
+<p>There are two ways to install Ramble. The first, and recommended, approach is to
+clone its <a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble">github repository</a>.
+This can be done with:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>-c<span class="w"> </span>feature.manyFiles<span class="o">=</span><span class="nb">true</span><span class="w"> </span>https://github.com/GoogleCloudPlatform/ramble.git
 </pre></div>
 </div>
-<p>This will create a directory called <code class="docutils literal notranslate"><span class="pre">ramble</span></code>.</p>
+<p>By default, this will checkout the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch, which is the most
+up-to-date version of Ramble. Several tags, as well as the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch
+(which contains the latest tag) can provide a more stable exeperience.</p>
+<p>The second approach is to download one of the releases from
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/releases">Ramble’s releases page</a></p>
+<p>Once Ramble is available on your system, its python dependencies can be
+installed using the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file included in the root of Ramble’s
+source directory.</p>
+<p>To install this, you can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>However, the exact command will depend on your environment.</p>
 <section id="shell-support">
 <h3>Shell Support<a class="headerlink" href="#shell-support" title="Link to this heading"></a></h3>
 <p>Once you have cloned Ramble, we recommend sourcing the appropriate script for your shell:</p>
@@ -347,7 +378,7 @@ extracted figures of merit.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 04, 2023.
+      <span class="lastupdated">Last updated on Oct 05, 2023.
       </span></p>
   </div>
 

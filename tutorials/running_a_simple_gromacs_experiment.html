@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1) Running A Simple GROMACS Experiment &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mirrors" href="mirrors.html" />
+    <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1) Running A Simple GROMACS Experiment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#available-applications">Available Applications</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#what-s-in-an-application">What’s in an application?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-experiments">Configuring experiments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-and-activate-a-workspace">Create and Activate a Workspace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configure-the-workspace">Configure the Workspace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#setting-up-the-experiments">Setting Up the Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#executing-experiments">Executing Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#analyzing-experiments">Analyzing Experiments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html">ramble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-attributes">ramble attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-clean">ramble clean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-commands">ramble commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-config">ramble config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-debug">ramble debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-edit">ramble edit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-flake8">ramble flake8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-help">ramble help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-info">ramble info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-license">ramble license</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-list">ramble list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-mirror">ramble mirror</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-mods">ramble mods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-on">ramble on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-repo">ramble repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-results">ramble results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-unit-test">ramble unit-test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command_index.html#ramble-workspace">ramble workspace</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">1) Running A Simple GROMACS Experiment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/running_a_simple_gromacs_experiment.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="running-a-simple-gromacs-experiment">
+<span id="running-an-experiment-tutorial"></span><h1>1) Running A Simple GROMACS Experiment<a class="headerlink" href="#running-a-simple-gromacs-experiment" title="Link to this heading"></a></h1>
+<p>This tutorial will provide a basic introduction to navigating Ramble and running
+experiments. In this tutorial, you will set up and run a benchmark simulation
+using <a class="reference external" href="https://www.gromacs.org/">GROMACS</a>, a free and open-source application
+for molecular dynamics.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>To install Ramble, see the <a class="reference internal" href="../getting_started.html"><span class="doc">Getting Started</span></a> guide.</p>
+</section>
+<section id="available-applications">
+<h2>Available Applications<a class="headerlink" href="#available-applications" title="Link to this heading"></a></h2>
+<p>Once Ramble is installed, viewing the available application definitions is as
+simple as executing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">list</span></code> command also takes a query string, which can be used to
+filter available application definitions. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list<span class="w"> </span>hp*
+</pre></div>
+</div>
+<p>might output the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; 3 applications</span>
+<span class="go">hpcc  hpcg  hpl</span>
+</pre></div>
+</div>
+<p>Additionally, applications can be filtered by their tags, e.g.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list<span class="w"> </span>-t<span class="w"> </span>molecular-dynamics
+<span class="go">==&gt; 4 applications</span>
+<span class="go">gromacs  hmmer  lammps  namd</span>
+</pre></div>
+</div>
+<p>The available tags (and their mappings to applications) can be listed using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>attributes<span class="w"> </span>--all<span class="w"> </span>--tags
+</pre></div>
+</div>
+<section id="what-s-in-an-application">
+<h3>What’s in an application?<a class="headerlink" href="#what-s-in-an-application" title="Link to this heading"></a></h3>
+<p>Knowing what applications are available is only part of how you interact
+with Ramble. Each application contains one or more workloads, all of which can
+contain their own variables to control their behavior. The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">info</span></code>
+command can be used to get more information about a specific application
+definition. As an example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>gromacs
+</pre></div>
+</div>
+<p>Will print the workloads and variables the <code class="docutils literal notranslate"><span class="pre">GROMACS</span></code> application definition contains.</p>
+</section>
+</section>
+<section id="configuring-experiments">
+<h2>Configuring experiments<a class="headerlink" href="#configuring-experiments" title="Link to this heading"></a></h2>
+<section id="create-and-activate-a-workspace">
+<h3>Create and Activate a Workspace<a class="headerlink" href="#create-and-activate-a-workspace" title="Link to this heading"></a></h3>
+<p>Before you can configure your GROMACS experiments, you’ll need to set up a
+workspace. You can call this workspace <code class="docutils literal notranslate"><span class="pre">basic_gromacs</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>basic_gromacs
+</pre></div>
+</div>
+<p>This will create a workspace for you in:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs
+</pre></div>
+</div>
+<p>Now you can activate the workspace and view its default configuration.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>basic_gromacs
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">info</span></code> command after editing configuration
+files to see how ramble would use the changes you made.</p>
+</section>
+<section id="configure-the-workspace">
+<h3>Configure the Workspace<a class="headerlink" href="#configure-the-workspace" title="Link to this heading"></a></h3>
+<p>Within the workspace directory, ramble creates a directory named <code class="docutils literal notranslate"><span class="pre">configs</span></code>.
+This directory contains generated configuration and template files. Each of
+these files can be edited to configure the workspace, and examples will be
+provided below.</p>
+<p>The available files are:
+* <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> This file describes all aspects of the workspace. This
+includes the software stack, the experiments, and all variables.
+* <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> This file is a template shell script that will be
+rendered to execute each of the experiments that ramble generates.</p>
+<p>You can edit these files directly or with the command <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">edit</span></code>.</p>
+<p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
+for your experiments. For this tutorial, replace the default yaml text with the
+contents of <code class="docutils literal notranslate"><span class="pre">$ramble_root/examples/basic_gromacs_config.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span><span class="w"> </span><span class="c1"># Application name</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">water_gmx50</span><span class="p">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
+<span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
+<span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
+<span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+</pre></div>
+</div>
+<p>Note that specifying compilers that Spack doesn’t have installed may take a while.
+To see available compilers, use <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compilers</span></code> or see <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers">Spack documentation</a>
+for more information.</p>
+<p>The second file you should edit is the <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> template file.
+This file contains a template script that will be rendered into an execution
+script for each generated experiment. You can feel free to edit it as you need
+to for your given system, but for this tutorial the default value will work.</p>
+</section>
+<section id="setting-up-the-experiments">
+<h3>Setting Up the Experiments<a class="headerlink" href="#setting-up-the-experiments" title="Link to this heading"></a></h3>
+<p>Now that the workspace is configured correctly, you can set up the experiments
+in the active workspace using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+</pre></div>
+</div>
+<p>This command will create experiment directories, download and expand input files,
+and install the required software stack (and generate spack environments for
+each workload).</p>
+<p>It can take a bit to run depending on if you need to build new software and how
+long the input files take to download. If you’d like to see what will be installed,
+you can do a dry run of the setup using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+<p>For each setup run, a set of logs will be created at:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/<span class="nv">$workspace_root</span>/logs
+</pre></div>
+</div>
+<p>Each run will have its own primary log, along with a folder containing a log for each
+experiment that is being configured.</p>
+</section>
+<section id="executing-experiments">
+<h3>Executing Experiments<a class="headerlink" href="#executing-experiments" title="Link to this heading"></a></h3>
+<p>After the workspace is set up, its experiments can be executed. The two methods
+to run the experiments are:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"> $ </span>ramble<span class="w"> </span>on
+<span class="go">or;</span>
+<span class="gp"> $ </span>./all_experiments
+</pre></div>
+</div>
+</section>
+<section id="analyzing-experiments">
+<h3>Analyzing Experiments<a class="headerlink" href="#analyzing-experiments" title="Link to this heading"></a></h3>
+<p>Once the experiments within a workspace are complete, the experiments can be
+analyzed. This is done through:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Core Time: CPU time (in seconds) spent on the benchmark calculations</p></li>
+<li><p>Wall Time: Elapsed real time (in seconds) spent on the benchmark calculations</p></li>
+<li><p>Percent Core Time: Core Time / Wall Time</p></li>
+<li><p>Nanosecs per day: Nanoseconds of simulation per day at the speed achieved</p></li>
+<li><p>Hours per nanosec: Hours required to calculate 1 nanosecond of simulation at
+the speed achieved</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mirrors.html" class="btn btn-neutral float-right" title="Mirrors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Oct 05, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
