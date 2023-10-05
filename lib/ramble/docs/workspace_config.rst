@@ -672,7 +672,7 @@ Ramble requires the following variables to be defined:
 Generated Variables:
 """"""""""""""""""""
 
-Ramble automatically generates definitions for the following varialbes:
+Ramble automatically generates definitions for the following variables:
 
 * ``application_name`` - Set to the name of the application
 * ``workload_name`` - Set to the name of the workload within the application

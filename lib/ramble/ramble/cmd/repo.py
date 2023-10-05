@@ -180,7 +180,7 @@ def repo_list(args):
             continue
 
     if sys.stdout.isatty():
-        msg = f"{len(repos)} {obj_type.name} repositor"
+        msg = f"{len(repos)} {obj_type.name} repository"
         msg += "y." if len(repos) == 1 else "ies."
         tty.msg(msg)
 
