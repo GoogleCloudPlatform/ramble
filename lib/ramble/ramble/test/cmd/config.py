@@ -196,7 +196,7 @@ success_criteria:
   file: '{log_file}'"""
 
 
-def test_merged_appliactions_section(mock_low_high_config):
+def test_merged_applications_section(mock_low_high_config):
     low_path = mock_low_high_config.scopes['low'].path
     high_path = mock_low_high_config.scopes['high'].path
 

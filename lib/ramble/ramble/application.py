@@ -1205,6 +1205,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             with open(file, 'r') as f:
                 for line in f.readlines():
+                    tty.debug(f'Line: {line}')
 
                     for criteria in file_conf['success_criteria']:
                         tty.debug('Looking for criteria %s' % criteria)
@@ -1230,6 +1231,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                 fom_values[context_name] = {}
 
                     for fom in file_conf['foms']:
+                        tty.debug(f'  Testing for fom {fom}')
                         fom_conf = foms[fom]
                         fom_match = fom_conf['regex'].match(line)
 

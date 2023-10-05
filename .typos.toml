@@ -1,11 +1,20 @@
-# do not check external or spack
-[files]
-extend-exclude = [
-  "lib/ramble/llnl/*",
-  "lib/ramble/spack/*",
-  "lib/ramble/external/*",
+[default]
+extend-ignore-identifiers-re = [
+    # *sigh* this just isn't worth the cost of fixing
+    "AttributeID.*Supress.*",
 ]
 
+[default.extend-identifiers]
+# *sigh* this just isn't worth the cost of fixing
+AttributeIDSupressMenu = "AttributeIDSupressMenu"
+
+
 [default.extend-words]
-cachable = "cachable"
+fom = "fom"
+foms = "foms"
 FO = "FO"
+FOM = "FOM"
+FOMs = "FOMs"
+namd = "namd"
+cachable = "cachable"
+clen = "clen"
