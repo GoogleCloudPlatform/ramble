@@ -35,6 +35,12 @@ class ExpansionDelimiter(object):
     right = '}'
 
 
+class VformatDelimiter(object):
+    """Class representing the delimiters for the string.Formatter class"""
+    left = '{'
+    right = '}'
+
+
 class ExpansionNode(object):
     """Class representing a node in a ramble expansion graph"""
 
@@ -145,7 +151,10 @@ class ExpansionNode(object):
                     kw_dict = {'value': self.value}
                     format_str = f'value:{kw_parts[1]}'
                     try:
-                        self.value = formatter.vformat('{' + format_str + '}', [], kw_dict)
+                        self.value = formatter.vformat(VformatDelimiter.left +
+                                                       format_str +
+                                                       VformatDelimiter.right,
+                                                       [], kw_dict)
                         required_passthrough = False
                     except ValueError:
                         self.value += f':{kw_parts[1]}'
@@ -428,7 +437,7 @@ class Expander(object):
                                after expansion
         """
 
-        # tty.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
+        tty.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
         expansions = self._variables
         if extra_vars:
             expansions = self._variables.copy()
@@ -443,7 +452,7 @@ class Expander(object):
                 raise RambleSyntaxError(f'Encountered a passthrough error while expanding {var}\n'
                                         f'{e}')
 
-        # tty.debug(f'END OF EXPAND_VAR STACK {value}')
+        tty.debug(f'END OF EXPAND_VAR STACK {value}')
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):
@@ -472,9 +481,7 @@ class Expander(object):
 
     @staticmethod
     def expansion_str(in_str):
-        l_delimiter = '{'
-        r_delimiter = '}'
-        return f'{l_delimiter}{in_str}{r_delimiter}'
+        return f'{ExpansionDelimiter.left}{in_str}{ExpansionDelimiter.right}'
 
     def _partial_expand(self, expansion_vars, in_str, allow_passthrough=True):
         """Perform expansion of a string with some variables
@@ -491,13 +498,11 @@ class Expander(object):
 
         if isinstance(in_str, six.string_types):
             str_graph = ExpansionGraph(in_str)
-            # tty.debug('  Walking expansion graph')
             for node in str_graph.walk():
                 node.define_value(expansion_vars,
                                   allow_passthrough=allow_passthrough,
                                   expansion_func=self._partial_expand,
                                   evaluation_func=self.perform_math_eval)
-                # tty.debug(f'    {node}')
 
             return str(str_graph.root.value)
 
