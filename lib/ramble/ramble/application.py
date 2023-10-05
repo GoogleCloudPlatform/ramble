@@ -58,7 +58,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
-    _pipelines = ['analyze', 'archive', 'mirror', 'setup']
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache'] # TODO: why do we repeat this in so many places
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.
@@ -1490,10 +1490,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             license_conf = ramble.config.config.get_config('licenses',
                                                            scope=scope)
             if license_conf:
-                app_licenses = license_conf[self.name]
-                if app_licenses:
-                    # Append logic to source file which contains the exports
-                    command.append(f". {{license_input_dir}}/{self.license_inc_name}")
+                if self.name in license_conf:
+                    app_licenses = license_conf[self.name]
+                    if app_licenses:
+                        # Append logic to source file which contains the exports
+                        command.append(f". {{license_input_dir}}/{self.license_inc_name}")
 
         # Process environment variable actions
         for env_var_set in self._env_variable_sets:

@@ -676,6 +676,36 @@ class SpackRunner(object):
   %-4d added
   %-4d failed to fetch.""" % (0, 0, 0)
 
+    def get_env_hash_list(self):
+        self._check_active()
+        args = [
+            'find',
+            '--format',
+            '/{hash}'
+        ]
+        output = self.spack(*args, output=str).strip()
+        return output
+
+    def push_to_spack_cache(self, spack_cache_path):
+        """Push packages for a given env to the spack cache"""
+        self._check_active()
+
+        hash_list = self.get_env_hash_list()
+
+        args = [
+            "buildcache",
+            "push",
+            "-a",  # TODO: remove this, it's just here for testing
+            spack_cache_path,
+            hash_list
+        ]
+
+        if not self.dry_run:
+            return self.spack(*args, output=str).strip()
+        else:
+            self._dry_run_print(self.spack, args)
+            return
+
     def _dry_run_print(self, executable, args):
         tty.msg('DRY-RUN: would run %s' % executable)
         tty.msg('         with args: %s' % args)

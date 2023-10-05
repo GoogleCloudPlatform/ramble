@@ -319,13 +319,33 @@ class SetupPipeline(Pipeline):
                  | stat.S_IROTH | stat.S_IXOTH)
 
 
-pipelines = Enum('pipelines', ['analyze', 'archive', 'mirror', 'setup'])
+class PushToCachePipeline(Pipeline):
+    """Class for the pushtocache pipeline"""
+
+    name = 'pushtocache'
+
+    def __init__(self, workspace, filters, spack_cache_path=None):
+        super().__init__(workspace, filters)
+        self.action_string = 'Pushing to Spack Cache'
+        self.spack_cache_path = spack_cache_path
+
+    def _prepare(self):
+        super()._prepare()
+        self.workspace.spack_cache_path = self.spack_cache_path
+
+    def _complete(self):
+        tty.msg('Pushed envs to spack cache %s' % self.spack_cache_path)
+
+
+# TODO: should this use the classes `.name`?
+pipelines = Enum('pipelines', ['analyze', 'archive', 'mirror', 'setup', 'pushtocache'])
 
 _pipeline_map = {
     pipelines.analyze: AnalyzePipeline,
     pipelines.archive: ArchivePipeline,
     pipelines.mirror: MirrorPipeline,
-    pipelines.setup: SetupPipeline
+    pipelines.setup: SetupPipeline,
+    pipelines.pushtocache: PushToCachePipeline
 }
 
 
