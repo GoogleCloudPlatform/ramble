@@ -19,5 +19,5 @@ various features.
     :maxdepth: 1
     :caption: Tutorials
 
-    tutorials/general_usage
+    tutorials/running_a_simple_gromacs_experiment
     tutorials/mirrors
