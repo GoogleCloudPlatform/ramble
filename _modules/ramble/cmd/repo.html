@@ -311,7 +311,7 @@
             <span class="k">continue</span>
 
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">repos</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">obj_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> repositor&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">repos</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">obj_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> repository&quot;</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;y.&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repos</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;ies.&quot;</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
