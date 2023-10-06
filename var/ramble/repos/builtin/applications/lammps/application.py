@@ -145,6 +145,29 @@ class Lammps(SpackApplication):
                           description='Additional execution flags for lammps',
                           workloads=[workload_name])
 
-    figure_of_merit('Nanoseconds per day', fom_regex=r'Performance.* (?P<nspd>[0-9\.]+) (ns|tau)/day', group_name='nspd', units='ns/day')
-    figure_of_merit('Hours per nanosecond', fom_regex=r'Performance.* (?P<hpns>[0-9\.]+) hours/ns', group_name='hpns', units='timesteps/s')
-    figure_of_merit('Timesteps per second', fom_regex=r'Performance.* (?P<tsps>[0-9\.]+) timesteps/s', group_name='tsps', units='hours/ns')
+    intel_test_path = os.path.join('{lammps-stage}', 'examples', 'reaxff', 'HNS')
+    executable('copy-contents',
+               template=[
+                   'cp {input_path}/* {experiment_run_dir}/.',
+                   'cp {input_file} input.txt'
+               ], use_mpi=False)
+
+    workload('hns-reaxff', executables=['copy-contents', 'set-timesteps', 'execute'],
+             inputs=['lammps-stage'])
+
+    workload_variable('input_file', default='in.reaxc.hns',
+                      description='hns-reaxff input file name',
+                      workloads=['hns-reaxff'])
+    workload_variable('input_path', default=os.path.join(f'{intel_test_path}'),
+                      description='Path to input directory for hns-reaxff workload',
+                      workloads=['hns-reaxff'])
+    workload_variable('lammps_flags', default='',
+                      description='Additional execution flags for lammps',
+                      workloads=['hns-reaxff'])
+
+    success_criteria('walltime', mode='string', match='\s*Total wall time', file='{log_file}')
+
+    figure_of_merit('Total wall time', fom_regex=r'Total wall time.*\s+(?P<walltime>[0-9:]+)', group_name='walltime', units='')
+    figure_of_merit('Nanoseconds per day', fom_regex=r'Performance.*\s+(?P<nspd>[0-9\.]+) (ns|tau)/day', group_name='nspd', units='ns/day')
+    figure_of_merit('Hours per nanosecond', fom_regex=r'Performance.*\s+(?P<hpns>[0-9\.]+) hours/ns', group_name='hpns', units='timesteps/s')
+    figure_of_merit('Timesteps per second', fom_regex=r'Performance.*\s+(?P<tsps>[0-9\.]+) timesteps/s', group_name='tsps', units='hours/ns')
