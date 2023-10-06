@@ -124,6 +124,20 @@ For help with sub-commands, the ``-h`` flag can be used:
 
    $ ramble <subcommand> -h
 
+^^^^^^^^^^^^^^^^
+Debugging Ramble
+^^^^^^^^^^^^^^^^
+
+When an issue occurs while running Ramble, it can be useful to get additionally
+debugging information. To enable the debugging mode in Ramble, you can use the
+`-d` global option, as follows:
+
+.. code-block:: console
+
+    $ ramble -d <subcommand>
+    or;
+    $ ramble --debug <subcommand>
+
 ---------------------
 Defined Applications
 ---------------------
