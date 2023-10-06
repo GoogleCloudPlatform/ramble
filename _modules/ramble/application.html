@@ -1454,7 +1454,11 @@
         <span class="n">exp_ns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">exp_ns</span><span class="p">}</span>
 
-        <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">fom_values</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">fom_values</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fom</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s1">&#39;origin_type&#39;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">and</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;origin_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;application&#39;</span><span class="p">:</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">success</span> <span class="o">=</span> <span class="n">success</span> <span class="ow">and</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">passed</span><span class="p">()</span>
 
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;fom_vals = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fom_values</span><span class="p">)</span>
