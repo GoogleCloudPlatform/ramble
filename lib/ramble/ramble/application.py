@@ -1273,7 +1273,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         exp_ns = self.expander.experiment_namespace
         results = {'name': exp_ns}
 
-        success = True if fom_values else False
+        success = False
+        for fom in fom_values.values():
+            for value in fom.values():
+                if 'origin_type' in value and value['origin_type'] == 'application':
+                    success = True
         success = success and criteria_list.passed()
 
         tty.debug('fom_vals = %s' % fom_values)
