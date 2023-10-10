@@ -141,7 +141,234 @@
     <span class="n">ast</span><span class="o">.</span><span class="n">And</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Or</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span>
 <span class="p">}</span>
 
+
 <span class="n">formatter</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="ExpansionDelimiter">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionDelimiter">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpansionDelimiter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing the delimiters for ramble expansion strings&quot;&quot;&quot;</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="s1">&#39;}&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="VformatDelimiter">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.VformatDelimiter">[docs]</a>
+<span class="k">class</span> <span class="nc">VformatDelimiter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing the delimiters for the string.Formatter class&quot;&quot;&quot;</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="s1">&#39;}&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="ExpansionNode">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionNode">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpansionNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a node in a ramble expansion graph&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_idx</span><span class="p">,</span> <span class="n">right_idx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;   Node:&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Indices: (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Num Children: (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Contents: &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Value: &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Is root: &quot;</span><span class="si">{</span><span class="bp">self</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExpansionNode.relative_indices">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionNode.relative_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">relative_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_to</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute node indices relative to another node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            relative_to (node): node to shift current node&#39;s indices relative to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (tuple) indices of shifted match set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">-</span> <span class="n">relative_to</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">-</span> <span class="n">relative_to</span><span class="o">.</span><span class="n">left</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExpansionNode.add_children">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionNode.add_children">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add children to this node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            children (node, or list): nodes to adds as children of self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">children</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">children</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExpansionNode.define_value">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionNode.define_value">[docs]</a>
+    <span class="k">def</span> <span class="nf">define_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expansion_dict</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">expansion_func</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">evaluation_func</span><span class="o">=</span><span class="nb">eval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define the value for this node.</span>
+
+<span class="sd">        Construct the value of self. This builds up a string representation of</span>
+<span class="sd">        self, and performs evaluation and formatting of the resulting string.</span>
+<span class="sd">        This includes extracting the values of the children nodes, and</span>
+<span class="sd">        replacing their values in the proper positions in self&#39;s string.</span>
+
+<span class="sd">        Stores the resulting value in self.value</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            expansion_dict (dict): variable definitions to use for expanding</span>
+<span class="sd">            detected matches</span>
+<span class="sd">            allow_passthrough (bool): if true, expansion is allowed to fail. if</span>
+<span class="sd">            false, failed expansion raises an error.</span>
+<span class="sd">            expansion_func (func): function to use for expansion of nested</span>
+<span class="sd">            variable definitions</span>
+<span class="sd">            evaluation_func (func): function to use for evaluating math of strings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">last_idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">child_indices</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">relative_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">last_idx</span><span class="p">:</span><span class="n">child_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                <span class="n">last_idx</span> <span class="o">=</span> <span class="n">child_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">last_idx</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">):</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">last_idx</span><span class="p">:])</span>
+
+            <span class="k">if</span> <span class="bp">self</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+                <span class="n">replaced_contents</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+
+                <span class="c1"># Special case &#39;{}&#39;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">replaced_contents</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
+                    <span class="k">return</span>
+
+                <span class="n">format_kw</span> <span class="o">=</span> <span class="n">replaced_contents</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">kw_parts</span> <span class="o">=</span> <span class="n">format_kw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                <span class="n">required_passthrough</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="k">if</span> <span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">expansion_dict</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">expansion_func</span><span class="p">(</span><span class="n">expansion_dict</span><span class="p">,</span>
+                                                <span class="n">expansion_dict</span><span class="p">[</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                                                <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">required_passthrough</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="c1"># Evaluation should go here</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">old_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">evaluation_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">old_value</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                        <span class="n">required_passthrough</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="c1"># If we had a format spec, add it</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kw_parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">kw_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+                    <span class="n">format_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;value:</span><span class="si">{</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">vformat</span><span class="p">(</span><span class="n">VformatDelimiter</span><span class="o">.</span><span class="n">left</span> <span class="o">+</span>
+                                                       <span class="n">format_str</span> <span class="o">+</span>
+                                                       <span class="n">VformatDelimiter</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
+                                                       <span class="p">[],</span> <span class="n">kw_dict</span><span class="p">)</span>
+                        <span class="n">required_passthrough</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;:</span><span class="si">{</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;:</span><span class="si">{</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+
+                <span class="k">if</span> <span class="n">required_passthrough</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="se">}}</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
+                        <span class="n">raise_passthrough_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">replaced_contents</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">evaluation_func</span><span class="p">(</span><span class="n">replaced_contents</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">replaced_contents</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExpansionGraph">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionGraph">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpansionGraph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a graph of ExpansionNodes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str</span> <span class="o">=</span> <span class="n">in_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ExpansionNode</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_str</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">in_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+
+        <span class="n">opened</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">ExpansionDelimiter</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+                <span class="n">opened</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="n">ExpansionDelimiter</span><span class="o">.</span><span class="n">right</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opened</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">left_idx</span> <span class="o">=</span> <span class="n">opened</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">right_idx</span> <span class="o">=</span> <span class="n">i</span>
+
+                <span class="n">cur_match</span> <span class="o">=</span> <span class="n">ExpansionNode</span><span class="p">(</span><span class="n">left_idx</span><span class="p">,</span> <span class="n">right_idx</span><span class="p">)</span>
+                <span class="n">cur_match</span><span class="o">.</span><span class="n">add_children</span><span class="p">(</span><span class="n">children</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+                <span class="n">cur_match</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="n">left_idx</span><span class="p">:</span><span class="n">right_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Define contents</span>
+                <span class="n">cur_match</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opened</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_match</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">add_children</span><span class="p">(</span><span class="n">cur_match</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opened</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">add_children</span><span class="p">(</span><span class="n">children</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+<div class="viewcode-block" id="ExpansionGraph.walk">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionGraph.walk">[docs]</a>
+    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a DFS walk of the nodes in the graph</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            in_node (ExpansionNode): node to begin the walk from, if not set uses self.root</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            (ExpansionNode): nodes following a DFS traversal of the graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur_node</span> <span class="o">=</span> <span class="n">in_node</span>
+        <span class="k">if</span> <span class="n">cur_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cur_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">cur_node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">in_node</span><span class="o">=</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">cur_node</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Processing string: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">node</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="ExpansionDict">
@@ -366,29 +593,23 @@
 <span class="sd">                               after expansion</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;BEGINNING OF EXPAND_VAR STACK ON </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
         <span class="k">if</span> <span class="n">extra_vars</span><span class="p">:</span>
             <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">expansions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_vars</span><span class="p">)</span>
 
-        <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansions</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">),</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansions</span><span class="p">,</span>
+                                         <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">),</span>
+                                         <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">RamblePassthroughError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Encountered a passthrough error while expanding </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_expanded</span><span class="p">(</span><span class="n">expanded</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">math_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">expanded</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
-                <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-                <span class="n">expanded</span> <span class="o">=</span> <span class="n">evaluated</span>
-            <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
-                <span class="k">pass</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Passthrough expansion not allowed.&#39;</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;    Variable definitions are: {str(self._variables)}&#39;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">ExpanderError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expander was unable to fully expand &quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&quot;, &#39;</span>
-                                <span class="s1">&#39;and is not allowed to passthrough undefined variables.&#39;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span></div>
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;END OF EXPAND_VAR STACK </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
 
 
 <div class="viewcode-block" id="Expander.evaluate_predicate">
@@ -422,37 +643,8 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expansion_str">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">expansion_str</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
-        <span class="n">l_delimiter</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span>
-        <span class="n">r_delimiter</span> <span class="o">=</span> <span class="s1">&#39;}&#39;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">l_delimiter</span><span class="si">}{</span><span class="n">in_str</span><span class="si">}{</span><span class="n">r_delimiter</span><span class="si">}</span><span class="s1">&#39;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ExpansionDelimiter</span><span class="o">.</span><span class="n">left</span><span class="si">}{</span><span class="n">in_str</span><span class="si">}{</span><span class="n">ExpansionDelimiter</span><span class="o">.</span><span class="n">right</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
-
-    <span class="k">def</span> <span class="nf">_all_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator for all keyword arguments in a string</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            in_str (string): Input string to detect keywords from</span>
-
-<span class="sd">        Yields:</span>
-<span class="sd">          Each keyword argument in in_str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">keyword</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                    <span class="k">yield</span> <span class="n">keyword</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">_fully_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if a string is fully expanded</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            in_str (string): Input string to test as expanded</span>
-
-<span class="sd">        Returns boolean. True if `in_str` contains no keywords, false if a</span>
-<span class="sd">        keyword is detected.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_partial_expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expansion_vars</span><span class="p">,</span> <span class="n">in_str</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform expansion of a string with some variables</span>
@@ -467,68 +659,41 @@
 <span class="sd">          in_str (str): Expanded version of input string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">exp_dict</span> <span class="o">=</span> <span class="n">ExpansionDict</span><span class="p">()</span>
-        <span class="n">exp_positional</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">formatter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>
-                <span class="n">kw</span> <span class="o">=</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">kw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">expansion_vars</span><span class="p">:</span>
-                        <span class="n">exp_dict</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansion_vars</span><span class="p">,</span>
-                                                            <span class="n">expansion_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">])</span>
-                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">exp_positional</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">str_graph</span> <span class="o">=</span> <span class="n">ExpansionGraph</span><span class="p">(</span><span class="n">in_str</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">str_graph</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">define_value</span><span class="p">(</span><span class="n">expansion_vars</span><span class="p">,</span>
+                                  <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">,</span>
+                                  <span class="n">expansion_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">,</span>
+                                  <span class="n">evaluation_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perform_math_eval</span><span class="p">)</span>
 
-            <span class="n">passthrough_vars</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">kw</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">exp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_expanded</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">math_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
-                        <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-                        <span class="n">exp_dict</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">evaluated</span>
-                    <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
-                        <span class="k">pass</span>
-                <span class="k">elif</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
-                    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion stack errors: attempted to expand &quot;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s1">&quot; = &quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keywords</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-                        <span class="n">passthrough_vars</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">kw</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
-            <span class="n">exp_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">passthrough_vars</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">str_graph</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">formatter</span><span class="o">.</span><span class="n">vformat</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">exp_positional</span><span class="p">,</span> <span class="n">exp_dict</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">allow_passthrough</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">in_str</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">in_str</span><span class="p">)</span>
 
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Index error when parsing:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">in_str</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="s1">&#39;Error occurred while parsing an expansion string.&#39;</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Invalid variable name encountered&#39;</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="s1">&#39;Expansion failed on:</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                        <span class="s1">&#39;Which contains an invalid variable name&#39;</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">in_str</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;JSON/YAML dict syntax should not be manually escaped.&#39;</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   </span><span class="si">{}</span><span class="s1"> will be automatically escaped&#39;</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   {{}} raises a syntax error&#39;</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="s1">&#39;Expansion failed on:</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                        <span class="s1">&#39;JSON/YAML dict syntax should not be manually escaped&#39;</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error encountered while trying to expand variable </span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion dict was: </span><span class="si">{</span><span class="n">exp_dict</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion failed on variable </span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                                        <span class="s1">&#39;Variable names cannot contain decimals.&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="Expander.perform_math_eval">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.perform_math_eval">[docs]</a>
+    <span class="k">def</span> <span class="nf">perform_math_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt to evaluate in_str</span>
 
-        <span class="k">return</span> <span class="n">in_str</span>
+<span class="sd">        Args:</span>
+<span class="sd">            in_str (str): string representing math to attempt to evaluate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str) either the evaluation of in_str (if successful) or in_str</span>
+<span class="sd">            unmodified (if unsuccessful)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">math_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
+            <span class="n">out_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out_str</span>
+        <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   Math input is: &quot;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">in_str</span></div>
+
 
 <div class="viewcode-block" id="Expander.eval_math">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.eval_math">[docs]</a>
@@ -714,6 +879,20 @@
 
 
 
+<div class="viewcode-block" id="raise_passthrough_error">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.raise_passthrough_error">[docs]</a>
+<span class="k">def</span> <span class="nf">raise_passthrough_error</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">out_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise an error when passthrough is disabled but variables are not all expanded&quot;&quot;&quot;</span>
+
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expansion stack errors: attempted to expand &#39;</span>
+              <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  As: </span><span class="si">{</span><span class="n">out_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">RamblePassthroughError</span><span class="p">(</span><span class="s1">&#39;Error Stack:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;Input: &quot;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;Output: &quot;</span><span class="si">{</span><span class="n">out_str</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="ExpanderError">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpanderError">[docs]</a>
 <span class="k">class</span> <span class="nc">ExpanderError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
@@ -734,6 +913,13 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.RambleSyntaxError">[docs]</a>
 <span class="k">class</span> <span class="nc">RambleSyntaxError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a syntax error happens within variable definitions&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RamblePassthroughError">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.RamblePassthroughError">[docs]</a>
+<span class="k">class</span> <span class="nc">RamblePassthroughError</span><span class="p">(</span><span class="n">ExpanderError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when passthrough is disabled and variables fail to expand&quot;&quot;&quot;</span></div>
 
 
 

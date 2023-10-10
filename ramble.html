@@ -246,6 +246,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_namespace</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.experiment_run_dir"><code class="docutils literal notranslate"><span class="pre">Expander.experiment_run_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.license_input_dir"><code class="docutils literal notranslate"><span class="pre">Expander.license_input_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.perform_math_eval"><code class="docutils literal notranslate"><span class="pre">Expander.perform_math_eval()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.workload_input_dir"><code class="docutils literal notranslate"><span class="pre">Expander.workload_input_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.workload_name"><code class="docutils literal notranslate"><span class="pre">Expander.workload_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.workload_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.workload_namespace</span></code></a></li>
@@ -253,11 +254,33 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ExpanderError"><code class="docutils literal notranslate"><span class="pre">ExpanderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ExpansionDelimiter"><code class="docutils literal notranslate"><span class="pre">ExpansionDelimiter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.ExpansionDelimiter.left"><code class="docutils literal notranslate"><span class="pre">ExpansionDelimiter.left</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.ExpansionDelimiter.right"><code class="docutils literal notranslate"><span class="pre">ExpansionDelimiter.right</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ExpansionDict"><code class="docutils literal notranslate"><span class="pre">ExpansionDict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ExpansionGraph"><code class="docutils literal notranslate"><span class="pre">ExpansionGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.ExpansionGraph.walk"><code class="docutils literal notranslate"><span class="pre">ExpansionGraph.walk()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ExpansionNode"><code class="docutils literal notranslate"><span class="pre">ExpansionNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.ExpansionNode.add_children"><code class="docutils literal notranslate"><span class="pre">ExpansionNode.add_children()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.ExpansionNode.define_value"><code class="docutils literal notranslate"><span class="pre">ExpansionNode.define_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.ExpansionNode.relative_indices"><code class="docutils literal notranslate"><span class="pre">ExpansionNode.relative_indices()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ExperimentNotDefinedError"><code class="docutils literal notranslate"><span class="pre">ExperimentNotDefinedError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.MathEvaluationError"><code class="docutils literal notranslate"><span class="pre">MathEvaluationError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.expander.RamblePassthroughError"><code class="docutils literal notranslate"><span class="pre">RamblePassthroughError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.RambleSyntaxError"><code class="docutils literal notranslate"><span class="pre">RambleSyntaxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.expander.VformatDelimiter"><code class="docutils literal notranslate"><span class="pre">VformatDelimiter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.VformatDelimiter.left"><code class="docutils literal notranslate"><span class="pre">VformatDelimiter.left</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.VformatDelimiter.right"><code class="docutils literal notranslate"><span class="pre">VformatDelimiter.right</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.WorkloadNotDefinedError"><code class="docutils literal notranslate"><span class="pre">WorkloadNotDefinedError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.expander.raise_passthrough_error"><code class="docutils literal notranslate"><span class="pre">raise_passthrough_error()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.experiment_set">ramble.experiment_set module</a><ul>
@@ -3233,6 +3256,21 @@ after expansion</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">license_input_dir</span></span><a class="headerlink" href="#ramble.expander.Expander.license_input_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.Expander.perform_math_eval">
+<span class="sig-name descname"><span class="pre">perform_math_eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#Expander.perform_math_eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.Expander.perform_math_eval" title="Link to this definition"></a></dt>
+<dd><p>Attempt to evaluate in_str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>in_str</strong> (<em>str</em>) – string representing math to attempt to evaluate</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str) either the evaluation of in_str (if successful) or in_str
+unmodified (if unsuccessful)</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="ramble.expander.Expander.workload_input_dir">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">workload_input_dir</span></span><a class="headerlink" href="#ramble.expander.Expander.workload_input_dir" title="Link to this definition"></a></dt>
@@ -3263,9 +3301,104 @@ after expansion</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionDelimiter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">ExpansionDelimiter</span></span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionDelimiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionDelimiter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing the delimiters for ramble expansion strings</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionDelimiter.left">
+<span class="sig-name descname"><span class="pre">left</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{'</span></em><a class="headerlink" href="#ramble.expander.ExpansionDelimiter.left" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionDelimiter.right">
+<span class="sig-name descname"><span class="pre">right</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'}'</span></em><a class="headerlink" href="#ramble.expander.ExpansionDelimiter.right" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="ramble.expander.ExpansionDict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">ExpansionDict</span></span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionDict" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">ExpansionGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionGraph" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing a graph of ExpansionNodes</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionGraph.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionGraph.walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionGraph.walk" title="Link to this definition"></a></dt>
+<dd><p>Perform a DFS walk of the nodes in the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>in_node</strong> (<a class="reference internal" href="#ramble.expander.ExpansionNode" title="ramble.expander.ExpansionNode"><em>ExpansionNode</em></a>) – node to begin the walk from, if not set uses self.root</p>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>(ExpansionNode)</em> – nodes following a DFS traversal of the graph</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">ExpansionNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionNode" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing a node in a ramble expansion graph</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionNode.add_children">
+<span class="sig-name descname"><span class="pre">add_children</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionNode.add_children"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionNode.add_children" title="Link to this definition"></a></dt>
+<dd><p>Add children to this node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>children</strong> (<em>node</em><em>, or </em><em>list</em>) – nodes to adds as children of self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionNode.define_value">
+<span class="sig-name descname"><span class="pre">define_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expansion_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_passthrough=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expansion_func=&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_func=&lt;built-in</span> <span class="pre">function</span> <span class="pre">eval&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionNode.define_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionNode.define_value" title="Link to this definition"></a></dt>
+<dd><p>Define the value for this node.</p>
+<p>Construct the value of self. This builds up a string representation of
+self, and performs evaluation and formatting of the resulting string.
+This includes extracting the values of the children nodes, and
+replacing their values in the proper positions in self’s string.</p>
+<p>Stores the resulting value in self.value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expansion_dict</strong> (<em>dict</em>) – variable definitions to use for expanding</p></li>
+<li><p><strong>matches</strong> (<em>detected</em>) – </p></li>
+<li><p><strong>allow_passthrough</strong> (<em>bool</em>) – if true, expansion is allowed to fail. if</p></li>
+<li><p><strong>false</strong> – </p></li>
+<li><p><strong>error.</strong> (<em>failed expansion raises an</em>) – </p></li>
+<li><p><strong>expansion_func</strong> (<em>func</em>) – function to use for expansion of nested</p></li>
+<li><p><strong>definitions</strong> (<em>variable</em>) – </p></li>
+<li><p><strong>evaluation_func</strong> (<em>func</em>) – function to use for evaluating math of strings</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.ExpansionNode.relative_indices">
+<span class="sig-name descname"><span class="pre">relative_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relative_to</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#ExpansionNode.relative_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.ExpansionNode.relative_indices" title="Link to this definition"></a></dt>
+<dd><p>Compute node indices relative to another node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>relative_to</strong> (<em>node</em>) – node to shift current node’s indices relative to</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(tuple) indices of shifted match set</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py exception">
@@ -3284,10 +3417,34 @@ expansion</p>
 </dd></dl>
 
 <dl class="py exception">
+<dt class="sig sig-object py" id="ramble.expander.RamblePassthroughError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">RamblePassthroughError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#RamblePassthroughError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.RamblePassthroughError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.expander.ExpanderError" title="ramble.expander.ExpanderError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpanderError</span></code></a></p>
+<p>Raised when passthrough is disabled and variables fail to expand</p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="ramble.expander.RambleSyntaxError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">RambleSyntaxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#RambleSyntaxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.RambleSyntaxError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.expander.ExpanderError" title="ramble.expander.ExpanderError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpanderError</span></code></a></p>
 <p>Raised when a syntax error happens within variable definitions</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.expander.VformatDelimiter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">VformatDelimiter</span></span><a class="reference internal" href="_modules/ramble/expander.html#VformatDelimiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.VformatDelimiter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing the delimiters for the string.Formatter class</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.expander.VformatDelimiter.left">
+<span class="sig-name descname"><span class="pre">left</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{'</span></em><a class="headerlink" href="#ramble.expander.VformatDelimiter.left" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.expander.VformatDelimiter.right">
+<span class="sig-name descname"><span class="pre">right</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'}'</span></em><a class="headerlink" href="#ramble.expander.VformatDelimiter.right" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py exception">
@@ -3295,6 +3452,12 @@ expansion</p>
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">WorkloadNotDefinedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#WorkloadNotDefinedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.WorkloadNotDefinedError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.expander.ExpanderError" title="ramble.expander.ExpanderError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpanderError</span></code></a></p>
 <p>Raised when a workload is not defined properly</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.expander.raise_passthrough_error">
+<span class="sig-prename descclassname"><span class="pre">ramble.expander.</span></span><span class="sig-name descname"><span class="pre">raise_passthrough_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#raise_passthrough_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.raise_passthrough_error" title="Link to this definition"></a></dt>
+<dd><p>Raise an error when passthrough is disabled but variables are not all expanded</p>
 </dd></dl>
 
 </section>
