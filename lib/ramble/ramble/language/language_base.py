@@ -44,6 +44,8 @@ class DirectiveMeta(type):
     # Set of all known directives
     _directive_names = set()
     _directives_to_be_executed = []
+    _directive_functions = {}
+    _directive_classes = {}
 
     def __new__(cls, name, bases, attr_dict):
         # Initialize the attribute containing the list of directives
@@ -90,6 +92,18 @@ class DirectiveMeta(type):
             # with the directives
             for d in DirectiveMeta._directive_names:
                 setattr(cls, d, {})
+
+            directive_attrs = {
+                '_directive_functions': {},
+                '_directive_classes': {}
+            }
+
+            for attr in directive_attrs.keys():
+                if hasattr(DirectiveMeta, attr):
+                    directive_attrs[attr].update(getattr(DirectiveMeta, attr))
+
+            for attr in directive_attrs.keys():
+                setattr(cls, attr, directive_attrs[attr])
 
             # Lazily execute directives
             for directive in cls._directives_to_be_executed:
@@ -196,6 +210,9 @@ class DirectiveMeta(type):
                 # wrapped function returns same result as original so
                 # that we can nest directives
                 return result
+
+            DirectiveMeta._directive_classes[decorated_function.__name__] = cls
+            DirectiveMeta._directive_functions[decorated_function.__name__] = decorated_function
 
             return _wrapper
 
