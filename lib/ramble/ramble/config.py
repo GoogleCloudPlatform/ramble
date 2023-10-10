@@ -1336,14 +1336,17 @@ class ConfigFormatError(ConfigError):
 
         self.filename = filename  # record this for ruamel.yaml
 
-        # construct location
+        # construct the location and retrieve the line that caused the error
         location = '<unknown file>'
         if filename:
-            location = '%s' % filename
+            location = f'{filename}'
         if line is not None:
-            location += ':%d' % line
+            location += f':{line}'
+            with open(filename, 'r') as file:
+                lines = file.readlines()
+                location += f'\n{lines[mark.line]}'
 
-        message = '%s: %s' % (location, validation_error.message)
+        message = f'{location}\n{validation_error}'
         super(ConfigError, self).__init__(message)
 
     def _get_mark(self, validation_error, data):
