@@ -103,8 +103,8 @@ class ModifierBase(object, metaclass=ModifierMeta):
         """
         if mode:
             self._usage_mode = mode
-        elif hasattr(self, 'default_mode'):
-            self._usage_mode = self.default_mode
+        elif hasattr(self, '_default_usage_mode'):
+            self._usage_mode = self._default_usage_mode
             tty.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
         else:
             if len(self.modes) > 1 or len(self.modes) == 0:
