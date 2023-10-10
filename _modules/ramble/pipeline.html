@@ -453,7 +453,10 @@
 
 
 
-<span class="n">pipelines</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;pipelines&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;analyze&#39;</span><span class="p">,</span> <span class="s1">&#39;archive&#39;</span><span class="p">,</span> <span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="s1">&#39;setup&#39;</span><span class="p">])</span>
+<span class="n">pipelines</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;pipelines&#39;</span><span class="p">,</span>
+                 <span class="p">[</span><span class="n">AnalyzePipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ArchivePipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">MirrorPipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                  <span class="n">SetupPipeline</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                 <span class="p">)</span>
 
 <span class="n">_pipeline_map</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">pipelines</span><span class="o">.</span><span class="n">analyze</span><span class="p">:</span> <span class="n">AnalyzePipeline</span><span class="p">,</span>
