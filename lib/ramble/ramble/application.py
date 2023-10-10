@@ -58,7 +58,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
-    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache'] # TODO: why do we repeat this in so many places
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache']
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.

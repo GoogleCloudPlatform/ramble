@@ -49,6 +49,7 @@ class SpackRunner(object):
 
     global_config_name = 'config:spack:global'
     install_config_name = 'config:spack:install'
+    pushtocache_config_name = 'config:spack:pushtocache'
     concretize_config_name = 'config:spack:concretize'
 
     env_create_args = [
@@ -699,10 +700,16 @@ class SpackRunner(object):
         args = [
             "buildcache",
             "push",
-            "-a",  # TODO: remove this, it's just here for testing
             spack_cache_path,
             hash_list
         ]
+
+        user_flags = ramble.config.get(f'{self.pushtocache_config_name}:flags')
+
+        args = []
+
+        if user_flags is not None:
+            args.extend(shlex.split(user_flags))
 
         if not self.dry_run:
             return self.spack(*args, output=str).strip()
