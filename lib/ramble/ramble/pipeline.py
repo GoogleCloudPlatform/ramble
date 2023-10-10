@@ -48,9 +48,18 @@ class Pipeline(object):
         log_file = f'{self.name}.{dt}.out'
         self.log_dir = os.path.join(self.workspace.log_dir,
                                     f'{self.name}.{dt}')
+        self.log_dir_latest = os.path.join(self.workspace.log_dir,
+                                           f'{self.name}.latest')
         self.log_path = os.path.join(self.workspace.log_dir,
                                      log_file)
+        self.log_path_latest = os.path.join(self.workspace.log_dir,
+                                            f'{self.name}.latest.out')
+
         fs.mkdirp(self.log_dir)
+
+        # Create simlinks to give known paths
+        self.simlink_log(self.log_dir, self.log_dir_latest)
+        self.simlink_log(self.log_path, self.log_path_latest)
 
         self._experiment_set = workspace.build_experiment_set()
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
@@ -158,6 +167,15 @@ class Pipeline(object):
 
         with self.workspace.logger(self.log_path, echo=self.workspace.dry_run):
             self._complete()
+
+    def simlink_log(self, base, link):
+        """
+        Create simlink of log file to give a known and predictable path
+        """
+        if os.path.islink(link):
+            os.unlink(link)
+
+        os.symlink(base, link)
 
 
 class AnalyzePipeline(Pipeline):
