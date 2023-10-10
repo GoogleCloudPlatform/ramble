@@ -690,6 +690,10 @@ class SpackRunner(object):
         """Push packages for a given env to the spack cache"""
         self._check_active()
 
+        if self.pushed_to_cache:
+            tty.msg(f'Environment {self.env_path} already pushed. Skipping...')
+            return
+
         hash_list = self.get_env_hash_list()
 
         args = [
@@ -705,6 +709,8 @@ class SpackRunner(object):
         else:
             self._dry_run_print(self.spack, args)
             return
+
+        self.pushed_to_cache = True
 
     def _dry_run_print(self, executable, args):
         tty.msg('DRY-RUN: would run %s' % executable)
