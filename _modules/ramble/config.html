@@ -1592,14 +1592,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>  <span class="c1"># record this for ruamel.yaml</span>
 
-        <span class="c1"># construct location</span>
+        <span class="c1"># construct the location and retrieve the line that caused the error</span>
         <span class="n">location</span> <span class="o">=</span> <span class="s1">&#39;&lt;unknown file&gt;&#39;</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">location</span> <span class="o">+=</span> <span class="s1">&#39;:</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">line</span>
+            <span class="n">location</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;:</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="n">location</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">lines</span><span class="p">[</span><span class="n">mark</span><span class="o">.</span><span class="n">line</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
 
-        <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">validation_error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">validation_error</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_mark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validation_error</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
