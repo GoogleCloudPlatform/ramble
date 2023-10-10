@@ -319,7 +319,10 @@ class SetupPipeline(Pipeline):
                  | stat.S_IROTH | stat.S_IXOTH)
 
 
-pipelines = Enum('pipelines', [AnalyzePipeline.name, ArchivePipeline.name, MirrorPipeline.name, SetupPipeline.name])
+pipelines = Enum('pipelines',
+                 [AnalyzePipeline.name, ArchivePipeline.name, MirrorPipeline.name,
+                  SetupPipeline.name]
+                 )
 
 _pipeline_map = {
     pipelines.analyze: AnalyzePipeline,
