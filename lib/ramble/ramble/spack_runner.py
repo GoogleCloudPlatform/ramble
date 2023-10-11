@@ -49,7 +49,7 @@ class SpackRunner(object):
 
     global_config_name = 'config:spack:global'
     install_config_name = 'config:spack:install'
-    pushtocache_config_name = 'config:spack:pushtocache'
+    buildcache_config_name = 'config:spack:buildcache'
     concretize_config_name = 'config:spack:concretize'
 
     env_create_args = [
@@ -98,6 +98,7 @@ class SpackRunner(object):
 
         self.concretized = False
         self.installed = False
+        self.pushed_to_cache = False
         self.hash = None
         self.env_path = None
         self.active = False
@@ -684,7 +685,7 @@ class SpackRunner(object):
             '--format',
             '/{hash}'
         ]
-        output = self.spack(*args, output=str).strip()
+        output = self.spack(*args, output=str).strip().replace('\n', ' ')
         return output
 
     def push_to_spack_cache(self, spack_cache_path):
@@ -699,17 +700,18 @@ class SpackRunner(object):
 
         args = [
             "buildcache",
-            "push",
-            spack_cache_path,
-            hash_list
+            "push"
         ]
+        user_flags = ramble.config.get(f'{self.buildcache_config_name}:flags')
 
-        user_flags = ramble.config.get(f'{self.pushtocache_config_name}:flags')
-
-        args = []
+        tty.debug("Running with user flags: {}".format(user_flags))
 
         if user_flags is not None:
             args.extend(shlex.split(user_flags))
+
+        args.extend( [ spack_cache_path, hash_list ] )
+
+        self.pushed_to_cache = True
 
         if not self.dry_run:
             return self.spack(*args, output=str).strip()
@@ -717,7 +719,6 @@ class SpackRunner(object):
             self._dry_run_print(self.spack, args)
             return
 
-        self.pushed_to_cache = True
 
     def _dry_run_print(self, executable, args):
         tty.msg('DRY-RUN: would run %s' % executable)

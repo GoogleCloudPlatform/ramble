@@ -312,7 +312,8 @@ def workspace_concretize(args):
 
 
 def workspace_run_pipeline(args, pipeline):
-    if args.include_phase_dependencies:
+    include_phase_dependencies = getattr(args, 'include_phase_dependencies', None)
+    if include_phase_dependencies:
         with ramble.config.override('config:include_phase_dependencies', True):
             pipeline.run()
     else:
@@ -409,9 +410,8 @@ def workspace_pushtocache(args):
     current_pipeline = ramble.pipeline.pipelines.pushtocache
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace pushtocache')
 
-    # TODO: this is repeated for pipelines, can we DRY it?
     filters = ramble.filters.Filters(
-        phase_filters=args.phases,
+        phase_filters='*',
         include_where_filters=args.where,
         exclude_where_filters=args.exclude_where
     )
@@ -432,8 +432,7 @@ def workspace_pushtocache_setup_parser(subparser):
         required=True,
         help='Path to spack cache.')
 
-    arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
-                                               'where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['where', 'exclude_where'])
 
 
 def workspace_info_setup_parser(subparser):
