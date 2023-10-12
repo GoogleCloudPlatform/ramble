@@ -156,7 +156,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             pipeline_phases = []
 
             if pipeline not in self.phase_definitions:
-                self.phase_definitions[pipeline] = []
+                self.phase_definitions[pipeline] = {}
 
             # Detect cycles
             for phase in self.phase_definitions[pipeline].keys():

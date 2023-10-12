@@ -696,14 +696,13 @@ class SpackRunner(object):
         if user_flags is not None:
             args.extend(shlex.split(user_flags))
 
-        args.extend( [ spack_cache_path, hash_list ] )
+        args.extend([spack_cache_path, hash_list])
 
         if not self.dry_run:
             return self.spack(*args, output=str).strip()
         else:
             self._dry_run_print(self.spack, args)
             return
-
 
     def _dry_run_print(self, executable, args):
         tty.msg('DRY-RUN: would run %s' % executable)
