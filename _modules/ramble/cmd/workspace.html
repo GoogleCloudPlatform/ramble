@@ -849,6 +849,15 @@
 <span class="n">subcommand_functions</span> <span class="o">=</span> <span class="p">{}</span>
 
 
+<div class="viewcode-block" id="sanitize_arg_name">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.sanitize_arg_name">[docs]</a>
+<span class="k">def</span> <span class="nf">sanitize_arg_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow function names to be remaped (eg `-` to `_`) &quot;&quot;&quot;</span>
+    <span class="n">formatted_name</span> <span class="o">=</span> <span class="n">base_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">formatted_name</span></div>
+
+
+
 <div class="viewcode-block" id="setup_parser">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
@@ -862,13 +871,14 @@
             <span class="n">aliases</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># add commands to subcommands dict</span>
-        <span class="n">function_name</span> <span class="o">=</span> <span class="s1">&#39;workspace_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+        <span class="n">function_name</span> <span class="o">=</span> <span class="n">sanitize_arg_name</span><span class="p">(</span><span class="s1">&#39;workspace_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
         <span class="n">function</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">function_name</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="n">aliases</span><span class="p">:</span>
             <span class="n">subcommand_functions</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">function</span>
 
         <span class="c1"># make a subparser and run the command&#39;s setup function on it</span>
-        <span class="n">setup_parser_cmd_name</span> <span class="o">=</span> <span class="s1">&#39;workspace_</span><span class="si">%s</span><span class="s1">_setup_parser&#39;</span> <span class="o">%</span> <span class="n">name</span>
+        <span class="n">setup_parser_cmd_name</span> <span class="o">=</span> <span class="n">sanitize_arg_name</span><span class="p">(</span><span class="s1">&#39;workspace_</span><span class="si">%s</span><span class="s1">_setup_parser&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">setup_parser_cmd</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">setup_parser_cmd_name</span><span class="p">]</span>
 
         <span class="n">subsubparser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
