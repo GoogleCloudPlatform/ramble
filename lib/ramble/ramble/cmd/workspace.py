@@ -51,7 +51,7 @@ subcommands = [
     'concretize',
     'setup',
     'analyze',
-    'pushtocache',
+    'push-to-cache',
     'info',
     'edit',
     'mirror',
@@ -406,7 +406,7 @@ def workspace_analyze(args):
         workspace_run_pipeline(args, pipeline)
 
 
-def workspace_pushtocache(args):
+def workspace_push_to_cache(args):
     current_pipeline = ramble.pipeline.pipelines.pushtocache
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace pushtocache')
 
@@ -423,7 +423,7 @@ def workspace_pushtocache(args):
     pipeline.run()
 
 
-def workspace_pushtocache_setup_parser(subparser):
+def workspace_push_to_cache_setup_parser(subparser):
     """push workspace envs to a given spack buildcache"""
 
     subparser.add_argument(
