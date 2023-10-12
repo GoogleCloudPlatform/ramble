@@ -988,6 +988,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for template_name, template_conf in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
+            tty.msg(f'Writing template {template_name} to {expand_path}')
 
             with open(expand_path, 'w+') as f:
                 f.write(self.expander.expand_var(template_conf['contents']))
@@ -1208,6 +1209,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             with open(file, 'r') as f:
                 for line in f.readlines():
+                    tty.debug(f'Line: {line}')
 
                     for criteria in file_conf['success_criteria']:
                         tty.debug('Looking for criteria %s' % criteria)
@@ -1233,6 +1235,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                 fom_values[context_name] = {}
 
                     for fom in file_conf['foms']:
+                        tty.debug(f'  Testing for fom {fom}')
                         fom_conf = foms[fom]
                         fom_match = fom_conf['regex'].match(line)
 
@@ -1274,7 +1277,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         exp_ns = self.expander.experiment_namespace
         results = {'name': exp_ns}
 
-        success = True if fom_values else False
+        success = False
+        for fom in fom_values.values():
+            for value in fom.values():
+                if 'origin_type' in value and value['origin_type'] == 'application':
+                    success = True
         success = success and criteria_list.passed()
 
         tty.debug('fom_vals = %s' % fom_values)

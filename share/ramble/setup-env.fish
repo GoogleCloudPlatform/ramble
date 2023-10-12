@@ -246,7 +246,7 @@ end
 
 
 
-function match_flag -d "checks all combinations of flags ocurring inside of a string"
+function match_flag -d "checks all combinations of flags occurring inside of a string"
 
     # Remove leading and trailing spaces -- but we need to insert a "guard" (x)
     # so that eg. `string trim -h` doesn't trigger the help string for `string trim`

@@ -321,7 +321,7 @@ experiments ramble generates. Its format is as follows:
 
     modifiers:
     - name: <modifier_name>
-      mode: <mode_for_modifier> # Optional if modifier only has one mode
+      mode: <mode_for_modifier> # Optional if modifier only has one mode or if default_mode is set
       on_executable: # Defaults to '*', follows glob syntax
       - list of
       - executables to apply

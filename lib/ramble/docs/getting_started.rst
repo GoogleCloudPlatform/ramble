@@ -12,32 +12,68 @@
 Getting Started
 ===============
 
+----------------
+What is Ramble?
+----------------
+
+Ramble stands for Reproducible And Measurable Benchmarks in a Layered Environment.
+
+Ramble is a multi-platform experimentation framework to increase exploration
+productivity and improve reproducibility. Ramble is capable of driving software
+installation, acquiring input files, configuring experiments, and extracting results.
+It works on Linux, macOS, and many supercomputers.
+
+Ramble can be used to configure a variety of experiments for applications. These
+can include anything from:
+
+* Scientific parameter sweeps
+* Performance focused scalaing studies
+* Compiler flag sweeps
+
 --------------------
 System Requirements
 --------------------
 
-Ramble's dependencies are listed within the top level
-requirements.txt file.
+Ramble requires Python 3.6.8 or greater. Some applications also require
+`Spack <https://spack.io/about/#install-spack>`_, which is used for managing
+binaries and their dependencies.
 
-In addition to the listed python dependencies, Ramble depends on
-spack for some application definition files.
+Ramble's Python dependencies are listed within the top level requirements.txt
+file.
 
-Please see Spack's `documentation <https://spack.readthedocs.io/en/latest/getting_started.html>`_ for getting spack installed.
-
+For Ramble developers, pytest and flake8 are required for linting and performing
+unit tests.
 
 -------------
 Installation
 -------------
 
-Installing ramble is easy. You can clone it from the
-`github repository <https://github.com/GoogleCloudPlatform/ramble>`_ using this command:
+There are two ways to install Ramble. The first, and recommended, approach is to
+clone its `github repository <https://github.com/GoogleCloudPlatform/ramble>`_.
+This can be done with:
 
 .. code-block:: console
 
-   $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
+    $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
 
+By default, this will checkout the ``develop`` branch, which is the most
+up-to-date version of Ramble. Several tags, as well as the ``main`` branch
+(which contains the latest tag) can provide a more stable exeperience.
 
-This will create a directory called ``ramble``.
+The second approach is to download one of the releases from
+`Ramble's releases page <https://github.com/GoogleCloudPlatform/ramble/releases>`_
+
+Once Ramble is available on your system, its python dependencies can be
+installed using the ``requirements.txt`` file included in the root of Ramble's
+source directory.
+
+To install this, you can use:
+
+.. code-block:: console
+
+    $ pip install -r requirements.txt
+
+However, the exact command will depend on your environment.
 
 ^^^^^^^^^^^^^^
 Shell Support
@@ -71,10 +107,10 @@ sourcing time, ensuring future invocations of the ``ramble`` command will
 continue to use the same consistent python version regardless of changes in the
 environment.
 
-
 -------------
 Command Help
 -------------
+
 To get information on the available commands, you can execute:
 
 .. code-block:: console
@@ -85,9 +121,22 @@ To get information on the available commands, you can execute:
 For help with sub-commands, the ``-h`` flag can be used:
 
 .. code-block:: console
-  
+
    $ ramble <subcommand> -h
 
+^^^^^^^^^^^^^^^^
+Debugging Ramble
+^^^^^^^^^^^^^^^^
+
+When an issue occurs while running Ramble, it can be useful to get additionally
+debugging information. To enable the debugging mode in Ramble, you can use the
+`-d` global option, as follows:
+
+.. code-block:: console
+
+    $ ramble -d <subcommand>
+    or;
+    $ ramble --debug <subcommand>
 
 ---------------------
 Defined Applications
@@ -234,7 +283,7 @@ After the workspace is set up, its experiments can be executed. The two methods
 to run the experiments are:
 
 .. code-block:: console
-   
+
     $ ramble on
    or;
     $ ./all_experiments
@@ -252,7 +301,6 @@ analyzed. This is done through:
 
 This creates a ``results`` file in the root of the workspace that contains
 extracted figures of merit.
-
 
 ^^^^^^^^^^^^^^^^^^^^^^
 Archiving A Workspace

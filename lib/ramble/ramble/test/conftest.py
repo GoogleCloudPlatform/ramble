@@ -95,7 +95,7 @@ def working_env():
     yield
     # os.environ = saved_env doesn't work
     # it causes module_parsing::test_module_function to fail
-    # when it's run after any test using this fixutre
+    # when it's run after any test using this fixture
     os.environ.clear()
     os.environ.update(saved_env)
 

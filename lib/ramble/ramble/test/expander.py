@@ -43,10 +43,14 @@ def exp_dict():
         ('{processes_per_node}', '2'),
         ('{n_nodes}*{processes_per_node}', '4'),
         ('2**4', '16'),
-        ('((((16-10+2)/4)**2)*4)', '16.0'),
+        ('{((((16-10+2)/4)**2)*4)}', '16.0'),
         ('gromacs +blas', 'gromacs +blas'),
         ('range(0, 5)', '[0, 1, 2, 3, 4]'),
+        ('{decimal.06.var}', 'foo'),
         ('{}', '{}'),
+        ('{{n_ranks}+2}', '6'),
+        ('{{n_ranks}*{var{processes_per_node}}:05d}', '00012'),
+        ('{{n_ranks}-1}', '3'),
     ]
 )
 def test_expansions(input, output):
@@ -74,24 +78,6 @@ def test_expand_var_name(input, output):
     expander = ramble.expander.Expander(expansion_vars, None)
 
     assert expander.expand_var_name(input) == output
-
-
-@pytest.mark.parametrize(
-    'input,expected_error,error_string',
-    [
-        ('{decimal.06.var}',
-         ramble.expander.RambleSyntaxError,
-         'Variable names cannot contain decimals'),
-    ]
-)
-def test_failed_expansions(input, expected_error, error_string):
-    expansion_vars = exp_dict()
-
-    expander = ramble.expander.Expander(expansion_vars, None)
-
-    with pytest.raises(expected_error) as e:
-        expander.expand_var(input)
-        assert error_string in e
 
 
 def test_expansion_namespaces():

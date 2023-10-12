@@ -9,9 +9,9 @@
 from ramble.modkit import *  # noqa: F403
 
 
-class MultipleModes(BasicModifier):
-    """Define modifier with no variable modifications"""
-    name = "multiple-modes"
+class MultipleModesNoDefault(BasicModifier):
+    """Define modifier with multiple modes and no default mode"""
+    name = "multiple-modes-no-default"
 
     tags('test')
 
