@@ -96,14 +96,12 @@ class SpackRunner(object):
                                           'share', 'spack', script)
 
         self.concretized = False
-        self.installed = False
         self.hash = None
         self.env_path = None
         self.active = False
         self.compilers = []
         self.includes = []
         self.dry_run = dry_run
-        self.concretized = False
         self.compiler_config_dir = None
         self.configs = []
         self.configs_applied = False
@@ -616,10 +614,6 @@ class SpackRunner(object):
         """
         self._check_active()
 
-        if self.installed:
-            tty.msg(f'Environment {self.env_path} is already installed. Skipping installation...')
-            return
-
         install_flags = ramble.config.get(f'{self.install_config_name}:flags')
 
         args = []
@@ -631,8 +625,6 @@ class SpackRunner(object):
             self.installer(*args)
         else:
             self._dry_run_print(self.installer, args)
-
-        self.installed = True
 
     def get_package_path(self, package_spec):
         """Return the installation directory for a package"""
