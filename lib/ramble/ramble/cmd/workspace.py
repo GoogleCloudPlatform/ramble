@@ -685,6 +685,12 @@ def workspace_mirror(args):
 subcommand_functions = {}
 
 
+def sanitize_arg_name(base_name):
+    """Allow function names to be remaped (eg `-` to `_`) """
+    formatted_name = base_name.replace('-', '_')
+    return formatted_name
+
+
 def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar='SUBCOMMAND',
                                   dest='workspace_command')
@@ -696,13 +702,14 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = 'workspace_%s' % name
+        function_name = sanitize_arg_name('workspace_%s' % name)
+
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = 'workspace_%s_setup_parser' % name
+        setup_parser_cmd_name = sanitize_arg_name('workspace_%s_setup_parser' % name)
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(
