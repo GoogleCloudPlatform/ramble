@@ -368,11 +368,17 @@ class SpackApplication(ApplicationBase):
     register_phase('push_to_spack_cache', pipeline='pushtocache', depends_on=[])
 
     def _push_to_spack_cache(self, workspace):
-        try:
-            # TODO: this is a lot of repeated stuff, can we DRY with out pipelines?
-            self.spack_runner.set_dry_run(workspace.dry_run)
 
-            env_path = self.expander.env_path
+        env_path = self.expander.env_path
+        cache_tupl = ('push-to-cache', env_path)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already pushed, skipping'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.set_env(env_path)
             self.spack_runner.activate()
 
