@@ -125,6 +125,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-concretize">ramble workspace concretize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-setup">ramble workspace setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-analyze">ramble workspace analyze</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-push-to-cache">ramble workspace push-to-cache</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-info">ramble workspace info</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-edit">ramble workspace edit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspace-mirror">ramble workspace mirror</a></li>
@@ -1226,14 +1227,15 @@
 <li><p><a class="reference internal" href="#ramble-workspace-activate"><span class="std std-ref">workspace activate</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-workspace-archive"><span class="std std-ref">workspace archive</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-workspace-deactivate"><span class="std std-ref">workspace deactivate</span></a></p></li>
+<li><p><a class="reference internal" href="#ramble-workspace-create"><span class="std std-ref">workspace create</span></a></p></li>
 </ul>
 </td><td><ul class="simple">
-<li><p><a class="reference internal" href="#ramble-workspace-create"><span class="std std-ref">workspace create</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-workspace-concretize"><span class="std std-ref">workspace concretize</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-workspace-setup"><span class="std std-ref">workspace setup</span></a></p></li>
+<li><p><a class="reference internal" href="#ramble-workspace-analyze"><span class="std std-ref">workspace analyze</span></a></p></li>
 </ul>
 </td><td><ul class="simple">
-<li><p><a class="reference internal" href="#ramble-workspace-analyze"><span class="std std-ref">workspace analyze</span></a></p></li>
+<li><p><a class="reference internal" href="#ramble-workspace-push-to-cache"><span class="std std-ref">workspace push-to-cache</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-workspace-info"><span class="std std-ref">workspace info</span></a></p></li>
 <li><p><a class="reference internal" href="#ramble-workspace-edit"><span class="std std-ref">workspace edit</span></a></p></li>
 </ul>
@@ -1407,8 +1409,27 @@
 </dl>
 <hr class="docutils" />
 </section>
+<section id="ramble-workspace-push-to-cache">
+<span id="id51"></span><h2>ramble workspace push-to-cache<a class="headerlink" href="#ramble-workspace-push-to-cache" title="Link to this heading"></a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace push-to-cache [-h] -d CACHE_PATH [--where WHERE [WHERE ...]]</span>
+<span class="go">                           [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
+</pre></div>
+</div>
+<p><strong>Optional arguments</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code></dt><dd><p>show this help message and exit</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-d</span> <span class="pre">CACHE_PATH</span></code></dt><dd><p>Path to spack cache.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--where</span> <span class="pre">WHERE</span> <span class="pre">[WHERE</span> <span class="pre">...]</span></code></dt><dd><p>inclusive filter on experiments where the provided logical statement is True</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--exclude-where</span> <span class="pre">EXCLUDE_WHERE</span> <span class="pre">[EXCLUDE_WHERE</span> <span class="pre">...]</span></code></dt><dd><p>exclusive filter experiments where the provided logical statement is True</p>
+</dd>
+</dl>
+<hr class="docutils" />
+</section>
 <section id="ramble-workspace-info">
-<span id="id51"></span><h2>ramble workspace info<a class="headerlink" href="#ramble-workspace-info" title="Link to this heading"></a></h2>
+<span id="id52"></span><h2>ramble workspace info<a class="headerlink" href="#ramble-workspace-info" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace info [-hv]</span>
 </pre></div>
 </div>
@@ -1422,7 +1443,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-edit">
-<span id="id52"></span><h2>ramble workspace edit<a class="headerlink" href="#ramble-workspace-edit" title="Link to this heading"></a></h2>
+<span id="id53"></span><h2>ramble workspace edit<a class="headerlink" href="#ramble-workspace-edit" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace edit [-hctp]</span>
 </pre></div>
 </div>
@@ -1440,7 +1461,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-mirror">
-<span id="id53"></span><h2>ramble workspace mirror<a class="headerlink" href="#ramble-workspace-mirror" title="Link to this heading"></a></h2>
+<span id="id54"></span><h2>ramble workspace mirror<a class="headerlink" href="#ramble-workspace-mirror" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace mirror [-h] -d MIRROR_PATH [--dry-run] [--phases PHASES [PHASES ...]] [--include-phase-dependencies]</span>
 <span class="go">                    [--where WHERE [WHERE ...]] [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]</span>
 </pre></div>
@@ -1465,7 +1486,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-list">
-<span id="id54"></span><h2>ramble workspace list<a class="headerlink" href="#ramble-workspace-list" title="Link to this heading"></a></h2>
+<span id="id55"></span><h2>ramble workspace list<a class="headerlink" href="#ramble-workspace-list" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace list [-h]</span>
 </pre></div>
 </div>
@@ -1477,7 +1498,7 @@
 <hr class="docutils" />
 </section>
 <section id="ramble-workspace-remove">
-<span id="id55"></span><h2>ramble workspace remove<a class="headerlink" href="#ramble-workspace-remove" title="Link to this heading"></a></h2>
+<span id="id56"></span><h2>ramble workspace remove<a class="headerlink" href="#ramble-workspace-remove" title="Link to this heading"></a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace remove [-hy] wrkspc [wrkspc ...]</span>
 </pre></div>
 </div>

@@ -167,6 +167,7 @@
 
     <span class="n">global_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:global&#39;</span>
     <span class="n">install_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:install&#39;</span>
+    <span class="n">buildcache_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:buildcache&#39;</span>
     <span class="n">concretize_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:concretize&#39;</span>
 
     <span class="n">env_create_args</span> <span class="o">=</span> <span class="p">[</span>
@@ -859,6 +860,47 @@
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> already present</span>
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> added</span>
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> failed to fetch.&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpackRunner.get_env_hash_list">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_env_hash_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_env_hash_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;find&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--format&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/</span><span class="si">{hash}</span><span class="s1">&#39;</span>
+        <span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="SpackRunner.push_to_spack_cache">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.push_to_spack_cache">[docs]</a>
+    <span class="k">def</span> <span class="nf">push_to_spack_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spack_cache_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Push packages for a given env to the spack cache&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
+
+        <span class="n">hash_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_env_hash_list</span><span class="p">()</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;buildcache&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;push&quot;</span>
+        <span class="p">]</span>
+        <span class="n">user_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buildcache_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+
+        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running with user flags: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user_flags</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">user_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">user_flags</span><span class="p">))</span>
+
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">spack_cache_path</span><span class="p">,</span> <span class="n">hash_list</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="k">return</span></div>
 
 
     <span class="k">def</span> <span class="nf">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>

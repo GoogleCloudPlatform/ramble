@@ -1395,6 +1395,7 @@ manage experiment workspaces
    * :ref:`workspace concretize <ramble-workspace-concretize>`
    * :ref:`workspace setup <ramble-workspace-setup>`
    * :ref:`workspace analyze <ramble-workspace-analyze>`
+   * :ref:`workspace push-to-cache <ramble-workspace-push-to-cache>`
    * :ref:`workspace info <ramble-workspace-info>`
    * :ref:`workspace edit <ramble-workspace-edit>`
    * :ref:`workspace mirror <ramble-workspace-mirror>`
@@ -1633,6 +1634,34 @@ ramble workspace analyze
 
 ``--include-phase-dependencies``
   if set, phase dependencies are automatically added to the list of executed phases
+
+``--where WHERE [WHERE ...]``
+  inclusive filter on experiments where the provided logical statement is True
+
+``--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]``
+  exclusive filter experiments where the provided logical statement is True
+
+
+----
+
+.. _ramble-workspace-push-to-cache:
+
+ramble workspace push-to-cache
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: console
+
+    ramble workspace push-to-cache [-h] -d CACHE_PATH [--where WHERE [WHERE ...]]
+                               [--exclude-where EXCLUDE_WHERE [EXCLUDE_WHERE ...]]
+
+
+**Optional arguments**
+
+``-h, --help``
+  show this help message and exit
+
+``-d CACHE_PATH``
+  Path to spack cache.
 
 ``--where WHERE [WHERE ...]``
   inclusive filter on experiments where the provided logical statement is True

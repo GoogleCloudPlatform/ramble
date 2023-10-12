@@ -474,16 +474,38 @@
 
 
 
+<div class="viewcode-block" id="PushToCachePipeline">
+<a class="viewcode-back" href="../../ramble.html#ramble.pipeline.PushToCachePipeline">[docs]</a>
+<span class="k">class</span> <span class="nc">PushToCachePipeline</span><span class="p">(</span><span class="n">Pipeline</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for the pushtocache pipeline&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;pushtocache&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">spack_cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_string</span> <span class="o">=</span> <span class="s1">&#39;Pushing to Spack Cache&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spack_cache_path</span> <span class="o">=</span> <span class="n">spack_cache_path</span>
+
+    <span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_prepare</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">spack_cache_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_cache_path</span>
+
+    <span class="k">def</span> <span class="nf">_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Pushed envs to spack cache </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_cache_path</span><span class="p">)</span></div>
+
+
+
 <span class="n">pipelines</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;pipelines&#39;</span><span class="p">,</span>
                  <span class="p">[</span><span class="n">AnalyzePipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ArchivePipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">MirrorPipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                  <span class="n">SetupPipeline</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                  <span class="n">SetupPipeline</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">PushToCachePipeline</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
                  <span class="p">)</span>
 
 <span class="n">_pipeline_map</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">pipelines</span><span class="o">.</span><span class="n">analyze</span><span class="p">:</span> <span class="n">AnalyzePipeline</span><span class="p">,</span>
     <span class="n">pipelines</span><span class="o">.</span><span class="n">archive</span><span class="p">:</span> <span class="n">ArchivePipeline</span><span class="p">,</span>
     <span class="n">pipelines</span><span class="o">.</span><span class="n">mirror</span><span class="p">:</span> <span class="n">MirrorPipeline</span><span class="p">,</span>
-    <span class="n">pipelines</span><span class="o">.</span><span class="n">setup</span><span class="p">:</span> <span class="n">SetupPipeline</span>
+    <span class="n">pipelines</span><span class="o">.</span><span class="n">setup</span><span class="p">:</span> <span class="n">SetupPipeline</span><span class="p">,</span>
+    <span class="n">pipelines</span><span class="o">.</span><span class="n">pushtocache</span><span class="p">:</span> <span class="n">PushToCachePipeline</span>
 <span class="p">}</span>
 
 

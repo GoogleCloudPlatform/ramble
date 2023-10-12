@@ -168,6 +168,7 @@
     <span class="s1">&#39;concretize&#39;</span><span class="p">,</span>
     <span class="s1">&#39;setup&#39;</span><span class="p">,</span>
     <span class="s1">&#39;analyze&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;push-to-cache&#39;</span><span class="p">,</span>
     <span class="s1">&#39;info&#39;</span><span class="p">,</span>
     <span class="s1">&#39;edit&#39;</span><span class="p">,</span>
     <span class="s1">&#39;mirror&#39;</span><span class="p">,</span>
@@ -463,7 +464,8 @@
 <div class="viewcode-block" id="workspace_run_pipeline">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_run_pipeline">[docs]</a>
 <span class="k">def</span> <span class="nf">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">include_phase_dependencies</span><span class="p">:</span>
+    <span class="n">include_phase_dependencies</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;include_phase_dependencies&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">include_phase_dependencies</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">override</span><span class="p">(</span><span class="s1">&#39;config:include_phase_dependencies&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
             <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
@@ -566,6 +568,41 @@
 
     <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">():</span>
         <span class="n">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="workspace_push_to_cache">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_push_to_cache">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_push_to_cache</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">current_pipeline</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">pushtocache</span>
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">require_active_workspace</span><span class="p">(</span><span class="n">cmd_name</span><span class="o">=</span><span class="s1">&#39;workspace pushtocache&#39;</span><span class="p">)</span>
+
+    <span class="n">filters</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">Filters</span><span class="p">(</span>
+        <span class="n">phase_filters</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="n">include_where_filters</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
+        <span class="n">exclude_where_filters</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">exclude_where</span>
+    <span class="p">)</span>
+    <span class="n">pipeline_cls</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipeline_class</span><span class="p">(</span><span class="n">current_pipeline</span><span class="p">)</span>
+
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline_cls</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">spack_cache_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cache_path</span><span class="p">)</span>
+
+    <span class="n">workspace_run_pipeline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="workspace_push_to_cache_setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.workspace.workspace_push_to_cache_setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">workspace_push_to_cache_setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;push workspace envs to a given spack buildcache&quot;&quot;&quot;</span>
+
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;cache_path&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to spack cache.&#39;</span><span class="p">)</span>
+
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_where&#39;</span><span class="p">])</span></div>
 
 
 
