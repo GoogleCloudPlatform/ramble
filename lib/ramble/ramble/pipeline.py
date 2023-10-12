@@ -354,10 +354,10 @@ class PushToCachePipeline(Pipeline):
     def _complete(self):
         tty.msg('Pushed envs to spack cache %s' % self.spack_cache_path)
 
-        
+
 pipelines = Enum('pipelines',
                  [AnalyzePipeline.name, ArchivePipeline.name, MirrorPipeline.name,
-                  SetupPipeline.name]
+                  SetupPipeline.name, PushToCachePipeline.name]
                  )
 
 _pipeline_map = {
