@@ -58,7 +58,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
-    _pipelines = ['analyze', 'archive', 'mirror', 'setup']
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache']
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.
@@ -154,6 +154,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def build_phase_order(self):
         for pipeline in self._pipelines:
             pipeline_phases = []
+
+            if pipeline not in self.phase_definitions:
+                self.phase_definitions[pipeline] = {}
 
             # Detect cycles
             for phase in self.phase_definitions[pipeline].keys():

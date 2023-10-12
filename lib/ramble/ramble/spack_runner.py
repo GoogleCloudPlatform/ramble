@@ -49,6 +49,7 @@ class SpackRunner(object):
 
     global_config_name = 'config:spack:global'
     install_config_name = 'config:spack:install'
+    buildcache_config_name = 'config:spack:buildcache'
     concretize_config_name = 'config:spack:concretize'
 
     env_create_args = [
@@ -667,6 +668,41 @@ class SpackRunner(object):
   %-4d already present
   %-4d added
   %-4d failed to fetch.""" % (0, 0, 0)
+
+    def get_env_hash_list(self):
+        self._check_active()
+        args = [
+            'find',
+            '--format',
+            '/{hash}'
+        ]
+        output = self.spack(*args, output=str).strip().replace('\n', ' ')
+        return output
+
+    def push_to_spack_cache(self, spack_cache_path):
+        """Push packages for a given env to the spack cache"""
+        self._check_active()
+
+        hash_list = self.get_env_hash_list()
+
+        args = [
+            "buildcache",
+            "push"
+        ]
+        user_flags = ramble.config.get(f'{self.buildcache_config_name}:flags')
+
+        tty.debug("Running with user flags: {}".format(user_flags))
+
+        if user_flags is not None:
+            args.extend(shlex.split(user_flags))
+
+        args.extend([spack_cache_path, hash_list])
+
+        if not self.dry_run:
+            return self.spack(*args, output=str).strip()
+        else:
+            self._dry_run_print(self.spack, args)
+            return
 
     def _dry_run_print(self, executable, args):
         tty.msg('DRY-RUN: would run %s' % executable)

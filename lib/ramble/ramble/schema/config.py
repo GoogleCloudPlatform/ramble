@@ -86,6 +86,24 @@ properties['config']['spack'] = {
             },
             'additionalProperties': False
         },
+        'buildcache': {
+            'type': 'object',
+            'default': {
+                'flags': '',
+                'prefix': '',
+            },
+            'properties': {
+                'flags': {
+                    'type': 'string',
+                    'default': '',
+                },
+                'prefix': {
+                    'type': 'string',
+                    'default': ''
+                }
+            },
+            'additionalProperties': False
+        },
     },
     'additionalProperties': False,
 }

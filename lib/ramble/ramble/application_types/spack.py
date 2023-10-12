@@ -365,6 +365,30 @@ class SpackApplication(ApplicationBase):
             with self.logger.force_echo():
                 tty.die(e)
 
+    register_phase('push_to_spack_cache', pipeline='pushtocache', depends_on=[])
+
+    def _push_to_spack_cache(self, workspace):
+
+        env_path = self.expander.env_path
+        cache_tupl = ('push-to-cache', env_path)
+        if workspace.check_cache(cache_tupl):
+            tty.debug('{} already pushed, skipping'.format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.set_env(env_path)
+            self.spack_runner.activate()
+
+            self.spack_runner.push_to_spack_cache(workspace.spack_cache_path)
+
+            self.spack_runner.deactivate()
+        except ramble.spack_runner.RunnerError as e:
+            with self.logger.force_echo():
+                tty.die(e)
+
     def populate_inventory(self, workspace, force_compute=False, require_exist=False):
         """Add software environment information to hash inventory"""
 

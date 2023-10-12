@@ -51,6 +51,7 @@ subcommands = [
     'concretize',
     'setup',
     'analyze',
+    'push-to-cache',
     'info',
     'edit',
     'mirror',
@@ -311,7 +312,8 @@ def workspace_concretize(args):
 
 
 def workspace_run_pipeline(args, pipeline):
-    if args.include_phase_dependencies:
+    include_phase_dependencies = getattr(args, 'include_phase_dependencies', None)
+    if include_phase_dependencies:
         with ramble.config.override('config:include_phase_dependencies', True):
             pipeline.run()
     else:
@@ -402,6 +404,35 @@ def workspace_analyze(args):
 
     with ws.write_transaction():
         workspace_run_pipeline(args, pipeline)
+
+
+def workspace_push_to_cache(args):
+    current_pipeline = ramble.pipeline.pipelines.pushtocache
+    ws = ramble.cmd.require_active_workspace(cmd_name='workspace pushtocache')
+
+    filters = ramble.filters.Filters(
+        phase_filters='*',
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where
+    )
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+
+    pipeline = pipeline_cls(ws, filters, spack_cache_path=args.cache_path)
+
+    workspace_run_pipeline(args, pipeline)
+    pipeline.run()
+
+
+def workspace_push_to_cache_setup_parser(subparser):
+    """push workspace envs to a given spack buildcache"""
+
+    subparser.add_argument(
+        '-d', dest='cache_path',
+        default=None,
+        required=True,
+        help='Path to spack cache.')
+
+    arguments.add_common_arguments(subparser, ['where', 'exclude_where'])
 
 
 def workspace_info_setup_parser(subparser):
