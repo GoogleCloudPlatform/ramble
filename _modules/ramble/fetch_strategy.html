@@ -555,6 +555,12 @@
             <span class="n">save_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">save_filename</span>
         <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Fetching </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
 
+        <span class="c1"># Check if we&#39;re about to try and open a broken simlink, and if so</span>
+        <span class="c1"># remove that file to avoid a bad situation where a file &quot;exists&quot; but</span>
+        <span class="c1"># cannot be opened (warning: this is not atomic)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_file</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span>
+
         <span class="c1"># Run urllib but grab the mime type from the http headers</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -2178,7 +2184,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 12, 2023.
+      <span class="lastupdated">Last updated on Oct 13, 2023.
       </span></p>
   </div>
 
