@@ -377,6 +377,12 @@ class URLFetchStrategy(FetchStrategy):
             save_file = self.stage.save_filename
         tty.msg('Fetching {0}'.format(url))
 
+        # Check if we're about to try and open a broken simlink, and if so
+        # remove that file to avoid a bad situation where a file "exists" but
+        # cannot be opened (warning: this is not atomic)
+        if os.path.islink(save_file) and not os.path.exists(save_file):
+            os.unlink(save_file)
+
         # Run urllib but grab the mime type from the http headers
         try:
             url, headers, response = ramble.util.web.read_from_url(url)
