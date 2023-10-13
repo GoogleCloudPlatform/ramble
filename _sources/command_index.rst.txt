@@ -1239,7 +1239,7 @@ namespace_or_path
 ramble results
 --------------
 
-take actions on experiment results
+import experiment results from file
 
 .. code-block:: console
 
