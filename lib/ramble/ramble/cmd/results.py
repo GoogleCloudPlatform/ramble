@@ -11,7 +11,7 @@ import json
 
 import ramble.experimental.uploader
 
-description = "take actions on experiment results"
+description = "import experiment results from file"
 section = "results"
 level = "short"
 
