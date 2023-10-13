@@ -88,7 +88,8 @@ class SoftwareEnvironments(object):
 
         workspace_vars = self._workspace.get_workspace_vars().copy()
 
-        if namespace.variables in self.spack_dict:
+        if namespace.variables in self.spack_dict and \
+                self.spack_dict[namespace.variables] is not None:
             workspace_vars.update(self.spack_dict[namespace.variables])
 
         if namespace.packages in self.spack_dict:
