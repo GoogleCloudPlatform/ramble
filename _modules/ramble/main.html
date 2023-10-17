@@ -141,6 +141,7 @@
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">import</span> <span class="nn">ruamel</span>
 
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">StringIO</span>
 
@@ -776,6 +777,7 @@
         <span class="n">fail_on_error</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fail_on_error&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># activate a workspace if one was specified on the command line</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_workspace</span><span class="p">:</span>
             <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">find_workspace</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ws</span><span class="p">:</span>
@@ -956,15 +958,15 @@
             <span class="n">ws</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">find_workspace</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ws</span><span class="p">:</span>
                 <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
+        <span class="c1"># print the context but delay this exception so that commands like</span>
+        <span class="c1"># `ramble config edit` can still work with a bad workspace.</span>
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigFormatError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># print the context but delay this exception so that commands like</span>
-            <span class="c1"># `ramble config edit` can still work with a bad workspace.</span>
             <span class="n">e</span><span class="o">.</span><span class="n">print_context</span><span class="p">()</span>
             <span class="n">workspace_format_error</span> <span class="o">=</span> <span class="n">e</span>
         <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># print the context but delay this exception so that commands like</span>
-            <span class="c1"># `ramble config edit` can still work with a bad workspace.</span>
             <span class="n">e</span><span class="o">.</span><span class="n">print_context</span><span class="p">()</span>
+            <span class="n">workspace_format_error</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="k">except</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">ParserError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">workspace_format_error</span> <span class="o">=</span> <span class="n">e</span>
 
     <span class="c1"># ------------------------------------------------------------------------</span>
@@ -1009,11 +1011,15 @@
     <span class="c1"># Now that we know what command this is and what its args are, determine</span>
     <span class="c1"># whether we can continue with a bad workspace and raise if not.</span>
     <span class="n">edit_cmds</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;workspace&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">]</span>
+    <span class="n">allowed_subcommands</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;edit&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">workspace_format_error</span><span class="p">:</span>
-        <span class="n">raise_error</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">raise_error</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">cmd_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="n">edit_cmds</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Error while reading workspace config. In some cases this can be &quot;</span> <span class="o">+</span>
+                    <span class="s2">&quot;avoided by passing `-W` to ramble&quot;</span><span class="p">)</span>
+            <span class="n">raise_error</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">subcommand</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_command&quot;</span> <span class="o">%</span> <span class="n">cmd_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">subcommand</span> <span class="o">==</span> <span class="s2">&quot;edit&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subcommand</span> <span class="ow">in</span> <span class="n">allowed_subcommands</span><span class="p">:</span>
                 <span class="n">raise_error</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
@@ -1095,7 +1101,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 13, 2023.
+      <span class="lastupdated">Last updated on Oct 17, 2023.
       </span></p>
   </div>
 
