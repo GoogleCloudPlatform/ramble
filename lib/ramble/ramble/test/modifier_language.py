@@ -26,6 +26,7 @@ func_types = enum.Enum('func_types', ['method', 'directive'])
 def generate_mod_class(base_class):
 
     class GeneratedClass(base_class):
+        _language_classes = base_class._language_classes.copy()
 
         def __init__(self, file_path):
             super().__init__(file_path)

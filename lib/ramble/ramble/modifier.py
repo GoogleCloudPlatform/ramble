@@ -20,6 +20,7 @@ from ramble.language.modifier_language import ModifierMeta
 from ramble.language.shared_language import SharedMeta, register_builtin  # noqa: F401
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
+import ramble.util.directives
 
 
 class ModifierBase(object, metaclass=ModifierMeta):
@@ -49,41 +50,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
         self._verbosity = 'short'
 
-        self._initialize_directives()
-
-    def _initialize_directives(self):
-        """Create class methods that execute directives
-
-        Wrap each directive, and inject it into this class instance as a class
-        method.
-
-        This allows:
-
-        self.<directive_name>(<directive_args>) to be called. As in:
-
-        self.archive_pattern('*.log')
-
-        Which can be called within `def __init__(self, file_path)` instead of
-        having to call `archive_pattern('*.log')` at the class definition level.
-        """
-        for directive, directive_class in self._directive_classes.items():
-            is_valid_lang = False
-            for lang_class in self._language_classes:
-                if directive_class is lang_class:
-                    is_valid_lang = True
-
-            if not hasattr(self, directive) and is_valid_lang:
-                setattr(self, directive, self.__execute_named_directive(directive))
-
-    def __execute_named_directive(self, name):
-        """Wrap a directive to simplify execution
-
-        Create a wrapper method that executes a directive, to inject the
-        `(self)` argument to simplify use of directives as class methods
-        """
-        def _execute_directive(*args, directive_name=name, **kwargs):
-            self._directive_functions[directive_name](*args, **kwargs)(self)
-        return _execute_directive
+        ramble.util.directives.define_directive_methods(self)
 
     def copy(self):
         """Deep copy a modifier instance"""
