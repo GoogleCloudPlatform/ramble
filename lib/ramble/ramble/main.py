@@ -25,6 +25,7 @@ import sys
 import traceback
 import warnings
 import jsonschema
+import ruamel
 
 from six import StringIO
 
@@ -610,6 +611,7 @@ class RambleCommand(object):
         fail_on_error = kwargs.get('fail_on_error', True)
 
         # activate a workspace if one was specified on the command line
+
         if not args.no_workspace:
             ws = ramble.cmd.find_workspace(args)
             if ws:
@@ -786,15 +788,15 @@ def _main(argv=None):
             ws = ramble.cmd.find_workspace(args)
             if ws:
                 ramble.workspace.shell.activate(ws)
+        # print the context but delay this exception so that commands like
+        # `ramble config edit` can still work with a bad workspace.
         except ramble.config.ConfigFormatError as e:
-            # print the context but delay this exception so that commands like
-            # `ramble config edit` can still work with a bad workspace.
             e.print_context()
             workspace_format_error = e
         except jsonschema.exceptions.ValidationError as e:
-            # print the context but delay this exception so that commands like
-            # `ramble config edit` can still work with a bad workspace.
             e.print_context()
+            workspace_format_error = e
+        except ruamel.yaml.parser.ParserError as e:
             workspace_format_error = e
 
     # ------------------------------------------------------------------------
@@ -837,11 +839,15 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
     edit_cmds = ["workspace", "config"]
+    allowed_subcommands = ['edit', 'list']
     if workspace_format_error:
-        raise_error = True
+        raise_error = False
         if cmd_name.strip() in edit_cmds:
+            tty.msg("Error while reading workspace config. In some cases this can be " +
+                    "avoided by passing `-W` to ramble")
+            raise_error = True
             subcommand = getattr(args, "%s_command" % cmd_name, None)
-            if subcommand == "edit":
+            if subcommand in allowed_subcommands:
                 raise_error = False
 
         if raise_error:
