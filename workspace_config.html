@@ -871,7 +871,7 @@ experiment, known as template experiments.</p>
 <span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.test_exp1</span>
 <span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
-<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;append&#39;</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;after_chain&#39;</span>
 <span class="w">                </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">                  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;2&#39;</span>
 </pre></div>
@@ -896,16 +896,20 @@ the following format:</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute can use <cite>globbing
 syntax&lt;https://docs.python.org/3/library/fnmatch.html#module-fnmatch&gt;</cite> to chain
 multiple experiments at once.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">order</span></code> keyword is optional. Valid options include:
-* <code class="docutils literal notranslate"><span class="pre">before_chain</span></code> Chained experiment is injected at the beginning of the chain
-* <code class="docutils literal notranslate"><span class="pre">before_root</span></code> Chained experiment is injected right before the root experiment in the chain
-* <code class="docutils literal notranslate"><span class="pre">after_root</span></code> Chained experiment is injected right after the root experiment in the chain
-* <code class="docutils literal notranslate"><span class="pre">after_chain</span></code> Chained experiment is injected at the end of the chain</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">order</span></code> keyword is optional. Valid options include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">before_chain</span></code> Chained experiment is injected at the beginning of the chain</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">before_root</span></code> Chained experiment is injected right before the root experiment in the chain</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">after_root</span></code> Chained experiment is injected right after the root experiment in the chain</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">after_chain</span></code> Chained experiment is injected at the end of the chain</p></li>
+</ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">root</span></code> experiment is defined as the initial experiment that started the
 chain. When examining the entire chain, the root experiment is the only one
 that does not have <code class="docutils literal notranslate"><span class="pre">chain.{idx}</span></code> in its name.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">variables</span></code> keyword is optional. It can be used to override the
 definition of variables from the chained experiment if needed.</p>
+<p>Once the experiments are defined, the final order of the chain can be viewed using
+<code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">info</span> <span class="pre">-v</span></code>.</p>
 </section>
 <section id="suppressing-experiments">
 <h3>Suppressing Experiments:<a class="headerlink" href="#suppressing-experiments" title="Link to this heading"></a></h3>
@@ -936,7 +940,7 @@ it as a template.</p>
 <span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.test_exp1</span>
 <span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
-<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;append&#39;</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;after_chain&#39;</span>
 <span class="w">                </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">                  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;2&#39;</span>
 </pre></div>
@@ -969,14 +973,15 @@ into the explicitly chained experiment.</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="nt">child_level2_experiment</span><span class="p">:</span>
 <span class="w">              </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="w">              </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 <span class="w">            </span><span class="nt">child_level1_experiment</span><span class="p">:</span>
 <span class="w">              </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 <span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.child_level2_experiment</span>
-<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;prepend&#39;</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;before_root&#39;</span>
 <span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">            </span><span class="nt">parent_experiment</span><span class="p">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
@@ -1008,7 +1013,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 17, 2023.
+      <span class="lastupdated">Last updated on Oct 18, 2023.
       </span></p>
   </div>
 

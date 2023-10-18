@@ -939,7 +939,7 @@ The following example shows how to specify a chain of experiments:
                   chained_experiments:
                   - name: hostname.serial.test_exp1
                     command: '{execute_experiment}'
-                    order: 'append'
+                    order: 'after_chain'
                     variables:
                       n_ranks: '2'
 
@@ -970,6 +970,7 @@ syntax<https://docs.python.org/3/library/fnmatch.html#module-fnmatch>` to chain
 multiple experiments at once.
 
 The ``order`` keyword is optional. Valid options include:
+
 * ``before_chain`` Chained experiment is injected at the beginning of the chain
 * ``before_root`` Chained experiment is injected right before the root experiment in the chain
 * ``after_root`` Chained experiment is injected right after the root experiment in the chain
@@ -981,6 +982,9 @@ that does not have ``chain.{idx}`` in its name.
 
 The ``variables`` keyword is optional. It can be used to override the
 definition of variables from the chained experiment if needed.
+
+Once the experiments are defined, the final order of the chain can be viewed using
+``ramble workspace info -v``.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Suppressing Experiments:
@@ -1016,7 +1020,7 @@ it as a template.
                   chained_experiments:
                   - name: hostname.serial.test_exp1
                     command: '{execute_experiment}'
-                    order: 'append'
+                    order: 'after_chain'
                     variables:
                       n_ranks: '2'
 
@@ -1054,14 +1058,15 @@ Below is an example showing how chains of chains can be defined:
               experiments:
                 child_level2_experiment:
                   template: true
-                  variables: '1'
+                  variables:
+                    n_ranks: '1'
                 child_level1_experiment:
                   template: true
                   variables:
                     n_ranks: '1'
                   chained_experiments:
                   - name: hostname.serial.child_level2_experiment
-                    order: 'prepend'
+                    order: 'before_root'
                     command: '{execute_experiment}'
                 parent_experiment:
                   variables:
