@@ -115,15 +115,15 @@ def default_config_yaml():
 # applications:
 #   variables:
 #     processes_per_node: '30'
-#   hostname:
+#   hostname: # Application name, as seen in `ramble list`
 #     variables:
 #       iterations: '5'
 #     workloads:
-#       serial:
+#       serial: # Workload name, as seen in `ramble info <app>`
 #         variables:
 #           type: 'test'
 #         experiments:
-#           single_node:
+#           single_node: # Arbitrary experiment name
 #             variables:
 #               n_ranks: '{processes_per_node}'
 
