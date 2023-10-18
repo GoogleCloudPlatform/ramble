@@ -233,15 +233,15 @@
 <span class="s2"># applications:</span>
 <span class="s2">#   variables:</span>
 <span class="s2">#     processes_per_node: &#39;30&#39;</span>
-<span class="s2">#   hostname:</span>
+<span class="s2">#   hostname: # Application name, as seen in `ramble list`</span>
 <span class="s2">#     variables:</span>
 <span class="s2">#       iterations: &#39;5&#39;</span>
 <span class="s2">#     workloads:</span>
-<span class="s2">#       serial:</span>
+<span class="s2">#       serial: # Workload name, as seen in `ramble info &lt;app&gt;`</span>
 <span class="s2">#         variables:</span>
 <span class="s2">#           type: &#39;test&#39;</span>
 <span class="s2">#         experiments:</span>
-<span class="s2">#           single_node:</span>
+<span class="s2">#           single_node: # Arbitrary experiment name</span>
 <span class="s2">#             variables:</span>
 <span class="s2">#               n_ranks: &#39;</span><span class="si">{processes_per_node}</span><span class="s2">&#39;</span>
 
