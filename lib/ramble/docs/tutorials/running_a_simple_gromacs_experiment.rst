@@ -134,13 +134,13 @@ contents of ``$ramble_root/examples/basic_gromacs_config.yaml``:
 
     ramble:
       variables:
-        processes_per_node: 16
+        processes_per_node: 1
         mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
         batch_submit: '{execute_experiment}'
       applications:
-        gromacs: # Application name
+        gromacs: # Application name, from `ramble list`
           workloads:
-            water_gmx50: # Workload name from application
+            water_gmx50: # Workload name from application, in `ramble info <app>`
               experiments:
                 pme_single_rank: # Arbitrary experiment name
                   variables:
@@ -148,21 +148,21 @@ contents of ``$ramble_root/examples/basic_gromacs_config.yaml``:
                     n_threads: '1'
                     size: '0003'
                     type: 'pme'
-                rf_single_rank:
+                rf_single_rank: # Arbitrary experiment name
                   variables:
                     n_ranks: '1'
                     n_threads: '1'
                     size: '0003'
                     type: 'rf'
-            water_bare:
+            water_bare: # Workload name from application, in `ramble info <app>`
               experiments:
-                pme_single_rank:
+                pme_single_rank: # Arbitrary experiment name
                   variables:
                     n_ranks: '1'
                     n_threads: '1'
                     size: '0003'
                     type: 'pme'
-                rf_single_rank:
+                rf_single_rank: # Arbitrary experiment name
                   variables:
                     n_ranks: '1'
                     n_threads: '1'
