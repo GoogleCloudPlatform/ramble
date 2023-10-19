@@ -25,6 +25,14 @@ ramble.util.colors module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.directives module
+-----------------------------
+
+.. automodule:: ramble.util.directives
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.editor module
 -------------------------
 

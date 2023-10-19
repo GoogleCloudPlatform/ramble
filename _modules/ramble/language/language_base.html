@@ -162,6 +162,8 @@
     <span class="c1"># Set of all known directives</span>
     <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">_directives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_directive_functions</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_directive_classes</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attr_dict</span><span class="p">):</span>
         <span class="c1"># Initialize the attribute containing the list of directives</span>
@@ -208,6 +210,18 @@
             <span class="c1"># with the directives</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directive_names</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="n">directive_attrs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;_directive_functions&#39;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s1">&#39;_directive_classes&#39;</span><span class="p">:</span> <span class="p">{}</span>
+            <span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">directive_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">DirectiveMeta</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                    <span class="n">directive_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">DirectiveMeta</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">directive_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">directive_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">])</span>
 
             <span class="c1"># Lazily execute directives</span>
             <span class="k">for</span> <span class="n">directive</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_directives_to_be_executed</span><span class="p">:</span>
@@ -317,6 +331,9 @@
                 <span class="c1"># that we can nest directives</span>
                 <span class="k">return</span> <span class="n">result</span>
 
+            <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directive_classes</span><span class="p">[</span><span class="n">decorated_function</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+            <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directive_functions</span><span class="p">[</span><span class="n">decorated_function</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">decorated_function</span>
+
             <span class="k">return</span> <span class="n">_wrapper</span>
 
         <span class="k">return</span> <span class="n">_decorator</span></div>
@@ -339,7 +356,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 18, 2023.
+      <span class="lastupdated">Last updated on Oct 19, 2023.
       </span></p>
   </div>
 

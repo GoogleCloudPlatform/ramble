@@ -67,6 +67,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.colors">ramble.util.colors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.directives">ramble.util.directives module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.editor">ramble.util.editor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.env">ramble.util.env module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.executable">ramble.util.executable module</a></li>
@@ -238,6 +239,43 @@
 <dt class="sig sig-object py" id="ramble.util.colors.section_title">
 <span class="sig-prename descclassname"><span class="pre">ramble.util.colors.</span></span><span class="sig-name descname"><span class="pre">section_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/colors.html#section_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.colors.section_title" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-ramble.util.directives">
+<span id="ramble-util-directives-module"></span><h2>ramble.util.directives module<a class="headerlink" href="#module-ramble.util.directives" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.directives.define_directive_methods">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.directives.</span></span><span class="sig-name descname"><span class="pre">define_directive_methods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/directives.html#define_directive_methods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.directives.define_directive_methods" title="Link to this definition"></a></dt>
+<dd><p>Create class methods that execute directives</p>
+<p>Wrap each directive, and inject it into this class instance as a class
+method.</p>
+<p>This allows:</p>
+<p>self.&lt;directive_name&gt;(&lt;directive_args&gt;) to be called. As in:</p>
+<p>self.archive_pattern(’<a href="#id1"><span class="problematic" id="id2">*</span></a>.log’)</p>
+<p>Which can be called within <cite>def __init__(self, file_path)</cite> instead of
+having to call <cite>archive_pattern(‘*.log’)</cite> at the class definition level.</p>
+<p>This function requires the object instance to have internal attributes:
+- ‘_directive_classes’ - Dictionary mapping a directive to the class the</p>
+<blockquote>
+<div><p>directive is defined for</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>‘_directive_functions’ - Dictionary mapping a directive to the decorated function
+that defines the directive</p></li>
+<li><p>‘_language_classes’ - A list of classes that language features should be “imported” from</p></li>
+</ul>
+<p>Both ‘_directive_classes’ and ‘_directive_functions’ are defined for all
+classes that use the DirectiveMeta meta-class.</p>
+<p>The ‘_language_classes’ attribute is defined in ApplicationBase and ModifierBase.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.directives.wrap_named_directive">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.directives.</span></span><span class="sig-name descname"><span class="pre">wrap_named_directive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/directives.html#wrap_named_directive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.directives.wrap_named_directive" title="Link to this definition"></a></dt>
+<dd><p>Wrap a directive to simplify execution</p>
+<p>Create a wrapper method that executes a directive, to inject the
+<cite>(self)</cite> argument to simplify use of directives as class methods</p>
+</dd></dl>
 
 </section>
 <section id="module-ramble.util.editor">
@@ -859,7 +897,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 18, 2023.
+      <span class="lastupdated">Last updated on Oct 19, 2023.
       </span></p>
   </div>
 

@@ -133,9 +133,10 @@
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 
 <span class="kn">from</span> <span class="nn">ramble.language.modifier_language</span> <span class="kn">import</span> <span class="n">ModifierMeta</span>
-<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">SharedMeta</span><span class="p">,</span> <span class="n">register_builtin</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
+<span class="kn">import</span> <span class="nn">ramble.util.directives</span>
 
 
 <div class="viewcode-block" id="ModifierBase">
@@ -148,6 +149,7 @@
     <span class="n">_mod_builtin_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;modifier_builtin::(?P&lt;modifier&gt;[\w-]+)::&#39;</span>
     <span class="n">_builtin_required_key</span> <span class="o">=</span> <span class="s1">&#39;required&#39;</span>
     <span class="n">builtin_group</span> <span class="o">=</span> <span class="s1">&#39;modifier&#39;</span>
+    <span class="n">_language_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ModifierMeta</span><span class="p">,</span> <span class="n">SharedMeta</span><span class="p">]</span>
 
     <span class="n">modifier_class</span> <span class="o">=</span> <span class="s1">&#39;ModifierBase&#39;</span>
 
@@ -165,6 +167,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
+
+        <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">directives</span><span class="o">.</span><span class="n">define_directive_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ModifierBase.copy">
 <a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.copy">[docs]</a>
@@ -189,8 +193,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">mode</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="o">=</span> <span class="n">mode</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;default_mode&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_default_usage_mode&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_usage_mode</span>
             <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Using default usage mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span><span class="si">}</span><span class="s1"> on modifier </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -456,7 +460,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 18, 2023.
+      <span class="lastupdated">Last updated on Oct 19, 2023.
       </span></p>
   </div>
 

@@ -155,12 +155,13 @@
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 <span class="kn">import</span> <span class="nn">ramble.util.env</span>
+<span class="kn">import</span> <span class="nn">ramble.util.directives</span>
 
 <span class="kn">from</span> <span class="nn">ramble.keywords</span> <span class="kn">import</span> <span class="n">keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
 <span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span><span class="p">,</span> <span class="n">register_phase</span>
-<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">SharedMeta</span><span class="p">,</span> <span class="n">register_builtin</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
 
@@ -177,6 +178,7 @@
     <span class="n">_inventory_file_name</span> <span class="o">=</span> <span class="s1">&#39;ramble_inventory.json&#39;</span>
     <span class="n">_status_file_name</span> <span class="o">=</span> <span class="s1">&#39;ramble_status.json&#39;</span>
     <span class="n">_pipelines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;analyze&#39;</span><span class="p">,</span> <span class="s1">&#39;archive&#39;</span><span class="p">,</span> <span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;pushtocache&#39;</span><span class="p">]</span>
+    <span class="n">_language_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ApplicationMeta</span><span class="p">,</span> <span class="n">SharedMeta</span><span class="p">]</span>
 
     <span class="c1">#: Lists of strings which contains GitHub usernames of attributes.</span>
     <span class="c1">#: Do not include @ here in order not to unnecessarily ping the users.</span>
@@ -224,6 +226,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">close_logger</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_phase_order</span><span class="p">()</span>
+
+        <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">directives</span><span class="o">.</span><span class="n">define_directive_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ApplicationBase.construct_logger">
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.construct_logger">[docs]</a>
@@ -1785,7 +1789,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 18, 2023.
+      <span class="lastupdated">Last updated on Oct 19, 2023.
       </span></p>
   </div>
 

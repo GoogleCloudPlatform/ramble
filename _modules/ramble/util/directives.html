@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ramble.language.language_helpers &mdash; Ramble 0.3.0 documentation</title>
+  <title>ramble.util.directives &mdash; Ramble 0.3.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -104,7 +104,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">ramble.language.language_helpers</li>
+      <li class="breadcrumb-item active">ramble.util.directives</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -113,7 +113,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for ramble.language.language_helpers</h1><div class="highlight"><pre>
+  <h1>Source code for ramble.util.directives</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2022-2023 Google LLC</span>
 <span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -122,77 +122,63 @@
 <span class="c1"># option. This file may not be copied, modified, or distributed</span>
 <span class="c1"># except according to those terms.</span>
 
-<span class="kn">import</span> <span class="nn">six</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
+<div class="viewcode-block" id="define_directive_methods">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.directives.define_directive_methods">[docs]</a>
+<span class="k">def</span> <span class="nf">define_directive_methods</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create class methods that execute directives</span>
 
+<span class="sd">    Wrap each directive, and inject it into this class instance as a class</span>
+<span class="sd">    method.</span>
 
-<div class="viewcode-block" id="merge_definitions">
-<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.merge_definitions">[docs]</a>
-<span class="k">def</span> <span class="nf">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge definitions of a type</span>
+<span class="sd">    This allows:</span>
 
-<span class="sd">    This method will merge two optional definitions of single_type and</span>
-<span class="sd">    multiple_type.</span>
+<span class="sd">    self.&lt;directive_name&gt;(&lt;directive_args&gt;) to be called. As in:</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        single_type: Single string for type name</span>
-<span class="sd">        multiple_type: List of strings for type names</span>
+<span class="sd">    self.archive_pattern(&#39;*.log&#39;)</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
+<span class="sd">    Which can be called within `def __init__(self, file_path)` instead of</span>
+<span class="sd">    having to call `archive_pattern(&#39;*.log&#39;)` at the class definition level.</span>
+
+<span class="sd">    This function requires the object instance to have internal attributes:</span>
+<span class="sd">    - &#39;_directive_classes&#39; - Dictionary mapping a directive to the class the</span>
+<span class="sd">      directive is defined for</span>
+<span class="sd">    - &#39;_directive_functions&#39; - Dictionary mapping a directive to the decorated function</span>
+<span class="sd">      that defines the directive</span>
+<span class="sd">    - &#39;_language_classes&#39; - A list of classes that language features should be &quot;imported&quot; from</span>
+
+<span class="sd">    Both &#39;_directive_classes&#39; and &#39;_directive_functions&#39; are defined for all</span>
+<span class="sd">    classes that use the DirectiveMeta meta-class.</span>
+
+<span class="sd">    The &#39;_language_classes&#39; attribute is defined in ApplicationBase and ModifierBase.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="s2">&quot;_directive_classes&quot;</span><span class="p">)</span> <span class="ow">or</span> \
+            <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="s2">&quot;_directive_functions&quot;</span><span class="p">):</span>
+        <span class="k">return</span>
 
-    <span class="n">all_types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">directive</span><span class="p">,</span> <span class="n">directive_class</span> <span class="ow">in</span> <span class="n">obj_inst</span><span class="o">.</span><span class="n">_directive_classes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">is_valid_lang</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="s2">&quot;_language_classes&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">lang_class</span> <span class="ow">in</span> <span class="n">obj_inst</span><span class="o">.</span><span class="n">_language_classes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">directive_class</span> <span class="ow">is</span> <span class="n">lang_class</span><span class="p">:</span>
+                    <span class="n">is_valid_lang</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">if</span> <span class="n">single_type</span><span class="p">:</span>
-        <span class="n">all_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">multiple_type</span><span class="p">:</span>
-        <span class="n">all_types</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">all_types</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">directive</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_valid_lang</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">directive</span><span class="p">,</span> <span class="n">wrap_named_directive</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">directive</span><span class="p">))</span></div>
 
 
 
-<div class="viewcode-block" id="require_definition">
-<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.require_definition">[docs]</a>
-<span class="k">def</span> <span class="nf">require_definition</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span>
-                       <span class="n">single_arg_name</span><span class="p">,</span> <span class="n">multiple_arg_name</span><span class="p">,</span>
-                       <span class="n">directive_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require at least one definition for a type in a directive</span>
+<div class="viewcode-block" id="wrap_named_directive">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.directives.wrap_named_directive">[docs]</a>
+<span class="k">def</span> <span class="nf">wrap_named_directive</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a directive to simplify execution</span>
 
-<span class="sd">    This method will validate that single_type / multiple_type are properly defined.</span>
-
-<span class="sd">    It will raise an error if at least one type is not defined, or if</span>
-<span class="sd">    either are the incorrect type.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        single_type: Single string for type name</span>
-<span class="sd">        multiple_type: List of strings for type names</span>
-<span class="sd">        single_arg_name: String name of the single_type argument in the directive</span>
-<span class="sd">        multiple_arg_name: String name of the multiple_type argument in the directive</span>
-<span class="sd">        directive_name: Name of the directive requiring a type</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
+<span class="sd">    Create a wrapper method that executes a directive, to inject the</span>
+<span class="sd">    `(self)` argument to simplify use of directives as class methods</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">single_type</span> <span class="ow">or</span> <span class="n">multiple_type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> requires at least one of &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s1"> or </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s1"> to be defined.&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> was given an invalid type &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s1"> argument. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">multiple_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> was given an invalid type &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;for the </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s1"> argument. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">_execute_directive</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">directive_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj_inst</span><span class="o">.</span><span class="n">_directive_functions</span><span class="p">[</span><span class="n">directive_name</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)(</span><span class="n">obj_inst</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_execute_directive</span></div>
 
 </pre></div>
 
