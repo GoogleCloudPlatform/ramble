@@ -39,12 +39,13 @@ import ramble.util.executable
 import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.env
+import ramble.util.directives
 
 from ramble.keywords import keywords
 from ramble.workspace import namespace
 
 from ramble.language.application_language import ApplicationMeta, register_phase
-from ramble.language.shared_language import register_builtin
+from ramble.language.shared_language import SharedMeta, register_builtin
 from ramble.error import RambleError
 
 
@@ -59,6 +60,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
     _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache']
+    _language_classes = [ApplicationMeta, SharedMeta]
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.
@@ -106,6 +108,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.close_logger()
         self.build_phase_order()
+
+        ramble.util.directives.define_directive_methods(self)
 
     def construct_logger(self, logs_dir):
         """Create and cache logger for this application instance

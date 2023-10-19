@@ -17,9 +17,10 @@ from llnl.util.tty.colify import colified
 import llnl.util.tty as tty
 
 from ramble.language.modifier_language import ModifierMeta
-from ramble.language.shared_language import register_builtin  # noqa: F401
+from ramble.language.shared_language import SharedMeta, register_builtin  # noqa: F401
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
+import ramble.util.directives
 
 
 class ModifierBase(object, metaclass=ModifierMeta):
@@ -30,6 +31,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
     _mod_builtin_regex = r'modifier_builtin::(?P<modifier>[\w-]+)::'
     _builtin_required_key = 'required'
     builtin_group = 'modifier'
+    _language_classes = [ModifierMeta, SharedMeta]
 
     modifier_class = 'ModifierBase'
 
@@ -47,6 +49,8 @@ class ModifierBase(object, metaclass=ModifierMeta):
         self._usage_mode = None
 
         self._verbosity = 'short'
+
+        ramble.util.directives.define_directive_methods(self)
 
     def copy(self):
         """Deep copy a modifier instance"""
@@ -66,8 +70,8 @@ class ModifierBase(object, metaclass=ModifierMeta):
         """
         if mode:
             self._usage_mode = mode
-        elif hasattr(self, 'default_mode'):
-            self._usage_mode = self.default_mode
+        elif hasattr(self, '_default_usage_mode'):
+            self._usage_mode = self._default_usage_mode
             tty.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
         else:
             if len(self.modes) > 1 or len(self.modes) == 0:

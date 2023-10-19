@@ -35,7 +35,7 @@ def mode(name, description, **kwargs):
     return _execute_mode
 
 
-@modifier_directive('default_modes')
+@modifier_directive(dicts=())
 def default_mode(name, **kwargs):
     """Define a default mode for this modifier.
 
@@ -45,7 +45,7 @@ def default_mode(name, **kwargs):
         if name not in mod.modes:
             raise DirectiveError(f'default_mode directive given an invalid mode for modifier '
                                  f'{mod.name}. Valid modes are {str(list(mod.modes.keys()))}')
-        mod.default_mode = name
+        mod._default_usage_mode = name
 
     return _execute_default_mode
 
