@@ -29,10 +29,10 @@ Preparation
 To begin, it can be useful to prepare a few things about the application you
 are writing a definition file for. These include:
 
-1. Instructions for compiling / installing your application
-2. A set of input files you would like to create workloads for
-3. A working set of execution commands
-4. Information about the output from the application
+#. Instructions for compiling / installing your application
+#. A set of input files you would like to create workloads for
+#. A working set of execution commands
+#. Information about the output from the application
 
 Most of these steps require some research, or up front exploration of the
 application, but are incredibly helpful in lowering the effort required to
@@ -263,6 +263,7 @@ Package Manager Directives
 Each package manager will be its own base class, but additionally there are
 directives that are intended to be package manager specific. As an example,
 there are directives for Spack defined by:
+
 * :meth:`ramble.language.shared_language.software_spec`
 * :meth:`ramble.language.shared_language.default_compiler`
 * :meth:`ramble.language.shared_language.required_package`
@@ -276,7 +277,9 @@ Usage While Developing
 
 It can be useful to test an ``application.py`` while developing it, to make
 sure it behaves as expected. This section will describe how you can interact
-with the various parts of an application definition file.
+with the various parts of an application definition file. This section will
+provide you with tips to help accelerate development and testing of an
+application development file
 
 ^^^^^^^^^^^^^^^^^^^^^^
 Generating Experiments
@@ -289,15 +292,17 @@ This includes its executables, input files, and workload variables.
 
 Once this is complete, a workspace can be configured (following
 :ref:`workspace-config`) to create experiments from the new workload. After
-setting up the workspace, requested experiments will be created following
-:ref:`workspace-structure`. In order to debug any issues with the experiments,
-you can use the dry-run option from :ref:`workspace-setup`.
+setting up the workspace, requested experiments directories will be created
+following :ref:`workspace-structure`. In order to debug any issues with the
+experiments, you can use the dry-run option from :ref:`workspace-setup`.
+Additionally, you can filter the experiments you want to setup using the
+``--where`` option, as in :ref:`filter-experiments`
 
 ^^^^^^^^^^^^^^^^^
 Analyzing Results
 ^^^^^^^^^^^^^^^^^
 
-Experimeny analysis only works once figures of merit, and success criteria are
+Experiment analysis only works once figures of merit, and success criteria are
 defined. Without these, Ramble has no information about how to extract relevant
 metrics.
 

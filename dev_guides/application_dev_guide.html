@@ -342,10 +342,12 @@ collected together. A figure of merit context can be defined using
 <h2>Package Manager Directives<a class="headerlink" href="#package-manager-directives" title="Link to this heading"></a></h2>
 <p>Each package manager will be its own base class, but additionally there are
 directives that are intended to be package manager specific. As an example,
-there are directives for Spack defined by:
-* <a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.software_spec" title="ramble.language.shared_language.software_spec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.software_spec()</span></code></a>
-* <a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.default_compiler" title="ramble.language.shared_language.default_compiler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.default_compiler()</span></code></a>
-* <a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.required_package" title="ramble.language.shared_language.required_package"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.required_package()</span></code></a></p>
+there are directives for Spack defined by:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.software_spec" title="ramble.language.shared_language.software_spec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.software_spec()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.default_compiler" title="ramble.language.shared_language.default_compiler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.default_compiler()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.required_package" title="ramble.language.shared_language.required_package"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.required_package()</span></code></a></p></li>
+</ul>
 <p>These provide Ramble with information about how Spack could install and require
 packages. For more information, see the above reference.</p>
 </section>
@@ -353,7 +355,9 @@ packages. For more information, see the above reference.</p>
 <h2>Usage While Developing<a class="headerlink" href="#usage-while-developing" title="Link to this heading"></a></h2>
 <p>It can be useful to test an <code class="docutils literal notranslate"><span class="pre">application.py</span></code> while developing it, to make
 sure it behaves as expected. This section will describe how you can interact
-with the various parts of an application definition file.</p>
+with the various parts of an application definition file. This section will
+provide you with tips to help accelerate development and testing of an
+application development file</p>
 <section id="generating-experiments">
 <h3>Generating Experiments<a class="headerlink" href="#generating-experiments" title="Link to this heading"></a></h3>
 <p>The most useful part of an application definition file is the ability to
@@ -362,13 +366,15 @@ definition needs to contain a complete definition of at least one workload.
 This includes its executables, input files, and workload variables.</p>
 <p>Once this is complete, a workspace can be configured (following
 <a class="reference internal" href="../workspace_config.html#workspace-config"><span class="std std-ref">Workspace Configuration File</span></a>) to create experiments from the new workload. After
-setting up the workspace, requested experiments will be created following
-<a class="reference internal" href="../workspace.html#workspace-structure"><span class="std std-ref">Workspace Structure</span></a>. In order to debug any issues with the experiments,
-you can use the dry-run option from <a class="reference internal" href="../workspace.html#workspace-setup"><span class="std std-ref">Setting up a Workspace</span></a>.</p>
+setting up the workspace, requested experiments directories will be created
+following <a class="reference internal" href="../workspace.html#workspace-structure"><span class="std std-ref">Workspace Structure</span></a>. In order to debug any issues with the
+experiments, you can use the dry-run option from <a class="reference internal" href="../workspace.html#workspace-setup"><span class="std std-ref">Setting up a Workspace</span></a>.
+Additionally, you can filter the experiments you want to setup using the
+<code class="docutils literal notranslate"><span class="pre">--where</span></code> option, as in <a class="reference internal" href="../workspace.html#filter-experiments"><span class="std std-ref">Filtering Experiments</span></a></p>
 </section>
 <section id="analyzing-results">
 <h3>Analyzing Results<a class="headerlink" href="#analyzing-results" title="Link to this heading"></a></h3>
-<p>Experimeny analysis only works once figures of merit, and success criteria are
+<p>Experiment analysis only works once figures of merit, and success criteria are
 defined. Without these, Ramble has no information about how to extract relevant
 metrics.</p>
 <p>Once an experiment can be executed using the <code class="docutils literal notranslate"><span class="pre">application.py</span></code> file, you can
@@ -391,7 +397,7 @@ without having to execute the experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 19, 2023.
+      <span class="lastupdated">Last updated on Oct 20, 2023.
       </span></p>
   </div>
 
