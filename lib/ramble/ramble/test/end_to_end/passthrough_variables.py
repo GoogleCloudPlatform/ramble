@@ -14,12 +14,14 @@ import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.expander import RambleSyntaxError
 
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_workspace_path')
 
+config = ramble.main.RambleCommand('config')
 workspace = RambleCommand('workspace')
 
 
@@ -74,3 +76,46 @@ ramble:
                 if undefined_regex.search(line):
                     undefined_found = True
             assert undefined_found
+
+
+def test_disable_passthrough(mutable_config, mutable_mock_workspace_path):
+    test_config = """
+ramble:
+  variables:
+   batch_submit: '{execute_experiment}'
+   processes_per_node: -1
+  applications:
+    hostname:
+      workloads:
+        parallel:
+          experiments:
+            test_exp:
+              variables:
+                mpi_command: '{undefined_var}'
+                n_ranks: '1'
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
+"""
+    workspace_name = 'test_disable_passthrough'
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+        ws._re_read()
+
+        # Unexpanded variable should be allowed to passthrough without error
+        captured = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+        assert 'Encountered a passthrough error while expanding {mpi_command}' not in captured
+
+        config('add', 'config:disable_passthrough:true')
+
+        with pytest.raises(RambleSyntaxError):
+            captured = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+            assert 'Encountered a passthrough error while expanding {mpi_command}' in captured
