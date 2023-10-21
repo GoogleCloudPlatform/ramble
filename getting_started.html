@@ -65,6 +65,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#defined-applications">Defined Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#application-workloads">Application Workloads</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-workspaces">Ramble Workspaces</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#creating-workspaces">Creating Workspaces</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#configuring-a-workspace">Configuring A Workspace</a></li>
@@ -247,6 +248,33 @@ debugging information. To enable the debugging mode in Ramble, you can use the
 </pre></div>
 </div>
 <p>will list both <code class="docutils literal notranslate"><span class="pre">wrfv3</span></code> and <code class="docutils literal notranslate"><span class="pre">wrfv4</span></code>.</p>
+<p>Available applications can be filtered using tags, e.g.:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list<span class="w"> </span>-t<span class="w"> </span>weather
+</pre></div>
+</div>
+<p>will also list both <code class="docutils literal notranslate"><span class="pre">wrfv3</span></code> and <code class="docutils literal notranslate"><span class="pre">wrfrv4</span></code>. The available tags can be seen with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>attributes<span class="w"> </span>--tags<span class="w"> </span>--all
+</pre></div>
+</div>
+</section>
+<section id="application-workloads">
+<h2>Application Workloads<a class="headerlink" href="#application-workloads" title="Link to this heading"></a></h2>
+<p>To get detailed information about an application, you can use the command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>&lt;application&gt;
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>wrfv3
+</pre></div>
+</div>
+<p>Will show that <code class="docutils literal notranslate"><span class="pre">wrfv3</span></code> has two workloads</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONUS_12km</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONUS_2p5km</span></code></p></li>
+</ul>
+<p>that experiments can be generated from. The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">info</span></code> command can also be
+used to see what variables each workload has, and potentially some suggested
+values for variables with a limited set of allowed values.</p>
 </section>
 <section id="ramble-workspaces">
 <h2>Ramble Workspaces<a class="headerlink" href="#ramble-workspaces" title="Link to this heading"></a></h2>
@@ -392,7 +420,7 @@ extracted figures of merit.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 20, 2023.
+      <span class="lastupdated">Last updated on Oct 21, 2023.
       </span></p>
   </div>
 
