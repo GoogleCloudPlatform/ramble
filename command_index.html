@@ -245,8 +245,8 @@
 <section id="ramble">
 <span id="id1"></span><h1>ramble<a class="headerlink" href="#ramble" title="Link to this heading"></a></h1>
 <p>A flexible benchmark experiment manager.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble [-hHdklLmpvV] [--color {always,never,auto}] [-c CONFIG_VARS] [-C DIR] [--timestamp] [--pdb]</span>
-<span class="go">   [-w WRKSPC | -D DIR | -W] [--use-workspace-repo] [--sorted-profile STAT] [--lines LINES] [--stacktrace]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble [-hHdklLmpvV] [--color {always,never,auto}] [-c CONFIG_VARS] [-C DIR] [--disable-passthrough] [--timestamp]</span>
+<span class="go">   [--pdb] [-w WRKSPC | -D DIR | -W] [--use-workspace-repo] [--sorted-profile STAT] [--lines LINES] [--stacktrace]</span>
 <span class="go">   [--print-shell-vars PRINT_SHELL_VARS]</span>
 <span class="go">   COMMAND ...</span>
 </pre></div>
@@ -264,6 +264,8 @@
 <dt><code class="docutils literal notranslate"><span class="pre">-C</span> <span class="pre">DIR,</span> <span class="pre">--config-scope</span> <span class="pre">DIR</span></code></dt><dd><p>add a custom configuration scope</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">-d,</span> <span class="pre">--debug</span></code></dt><dd><p>write out debug messages (more d’s for more verbosity: -d, -dd, -ddd, etc.)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--disable-passthrough</span></code></dt><dd><p>disable passthrough of expansion variables for debugging</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--timestamp</span></code></dt><dd><p>Add a timestamp to tty output</p>
 </dd>

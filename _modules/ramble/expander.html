@@ -593,6 +593,12 @@
 <span class="sd">                               after expansion</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">passthrough_setting</span> <span class="o">=</span> <span class="n">allow_passthrough</span>
+
+        <span class="c1"># If disable_passthrough is set, override allow_passthrough from caller</span>
+        <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:disable_passthrough&#39;</span><span class="p">):</span>
+            <span class="n">passthrough_setting</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;BEGINNING OF EXPAND_VAR STACK ON </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">expansions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
         <span class="k">if</span> <span class="n">extra_vars</span><span class="p">:</span>
@@ -602,9 +608,9 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">(</span><span class="n">expansions</span><span class="p">,</span>
                                          <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">),</span>
-                                         <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+                                         <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">passthrough_setting</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">RamblePassthroughError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_passthrough</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">passthrough_setting</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Encountered a passthrough error while expanding </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
                                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 

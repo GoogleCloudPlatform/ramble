@@ -35,8 +35,8 @@ A flexible benchmark experiment manager.
 
 .. code-block:: console
 
-    ramble [-hHdklLmpvV] [--color {always,never,auto}] [-c CONFIG_VARS] [-C DIR] [--timestamp] [--pdb]
-       [-w WRKSPC | -D DIR | -W] [--use-workspace-repo] [--sorted-profile STAT] [--lines LINES] [--stacktrace]
+    ramble [-hHdklLmpvV] [--color {always,never,auto}] [-c CONFIG_VARS] [-C DIR] [--disable-passthrough] [--timestamp]
+       [--pdb] [-w WRKSPC | -D DIR | -W] [--use-workspace-repo] [--sorted-profile STAT] [--lines LINES] [--stacktrace]
        [--print-shell-vars PRINT_SHELL_VARS]
        COMMAND ...
 
@@ -60,6 +60,9 @@ A flexible benchmark experiment manager.
 
 ``-d, --debug``
   write out debug messages (more d's for more verbosity: -d, -dd, -ddd, etc.)
+
+``--disable-passthrough``
+  disable passthrough of expansion variables for debugging
 
 ``--timestamp``
   Add a timestamp to tty output
