@@ -158,6 +158,43 @@ This command uses filtering to search the defined applications, e.g.:
 
 will list both ``wrfv3`` and ``wrfv4``.
 
+Available applications can be filtered using tags, e.g.:
+
+.. code-block:: console
+
+    $ ramble list -t weather
+
+will also list both ``wrfv3`` and ``wrfrv4``. The available tags can be seen with:
+
+.. code-block:: console
+
+    $ ramble attributes --tags --all
+
+---------------------
+Application Workloads
+---------------------
+
+To get detailed information about an application, you can use the command:
+
+.. code-block:: console
+
+    $ ramble info <application>
+
+For example:
+
+.. code-block:: console
+
+    $ ramble info wrfv3
+
+Will show that ``wrfv3`` has two workloads
+
+* ``CONUS_12km``
+* ``CONUS_2p5km``
+
+that experiments can be generated from. The ``ramble info`` command can also be
+used to see what variables each workload has, and potentially some suggested
+values for variables with a limited set of allowed values.
+
 ------------------
 Ramble Workspaces
 ------------------
