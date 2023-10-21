@@ -410,6 +410,9 @@ def make_argument_parser(**kwargs):
         help="write out debug messages "
              "(more d's for more verbosity: -d, -dd, -ddd, etc.)")
     parser.add_argument(
+        '--disable-passthrough', action='store_true',
+        help="disable passthrough of expansion variables for debugging")
+    parser.add_argument(
         '--timestamp', action='store_true',
         help="Add a timestamp to tty output")
     parser.add_argument(
@@ -505,6 +508,10 @@ def setup_main_options(args):
         if args.locks is False:
             spack.util.lock.check_lock_safety(ramble.paths.prefix)
         ramble.config.set('config:locks', args.locks, scope='command_line')
+
+    # override disable_passthrough configuration if passed on command line
+    if args.disable_passthrough:
+        ramble.config.set('config:disable_passthrough', True, scope='command_line')
 
     if args.mock:
         import spack.util.spack_yaml as syaml

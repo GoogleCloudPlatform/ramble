@@ -437,6 +437,12 @@ class Expander(object):
                                after expansion
         """
 
+        passthrough_setting = allow_passthrough
+
+        # If disable_passthrough is set, override allow_passthrough from caller
+        if ramble.config.get('config:disable_passthrough'):
+            passthrough_setting = False
+
         tty.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
         expansions = self._variables
         if extra_vars:
@@ -446,9 +452,9 @@ class Expander(object):
         try:
             value = self._partial_expand(expansions,
                                          str(var),
-                                         allow_passthrough=allow_passthrough).lstrip()
+                                         allow_passthrough=passthrough_setting).lstrip()
         except RamblePassthroughError as e:
-            if not allow_passthrough:
+            if not passthrough_setting:
                 raise RambleSyntaxError(f'Encountered a passthrough error while expanding {var}\n'
                                         f'{e}')
 

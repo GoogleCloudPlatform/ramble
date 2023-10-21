@@ -265,7 +265,7 @@ complete -o bashdefault -o default -F _bash_completion_ramble ramble
 _ramble() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
+        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
         RAMBLE_COMPREPLY="attributes clean commands config debug edit flake8 help info license list mirror mods on repo results software-definitions unit-test workspace"
     fi
