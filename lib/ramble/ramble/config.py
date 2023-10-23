@@ -120,6 +120,7 @@ config_defaults = {
     'config': {
         'debug': False,
         'disable_passthrough': False,
+        'disable_progress_bar': False,
         'connect_timeout': 10,
         'verify_ssl': True,
         'checksum': True,

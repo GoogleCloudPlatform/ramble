@@ -17,7 +17,16 @@ class Logger(object):
     printed to all log files instead of only one.
     """
     def __init__(self):
+        """Construct a a logger instance
+
+        A logger instance consists of a stack of logs (self.log_stack) and an
+        enabled flag.
+
+        If the enabled flag is set to False, the logger will only print to
+        screen instead of to underlying files.
+        """
         self.log_stack = []
+        self.enabled = True
 
     def add_log(self, path):
         """Add a log to the current log stack
@@ -29,9 +38,9 @@ class Logger(object):
         Args:
             path: File path for the new log file
         """
-        if isinstance(path, str):
+        if isinstance(path, str) and self.enabled:
             stream = None
-            stream = open(path, 'w+')
+            stream = open(path, 'a+')
             self.log_stack.append((path, stream))
 
     def remove_log(self):
@@ -39,8 +48,9 @@ class Logger(object):
 
         Pop the active log from the log stack, and close the log stream.
         """
-        last_log = self.log_stack.pop()
-        last_log[1].close()
+        if self.enabled:
+            last_log = self.log_stack.pop()
+            last_log[1].close()
 
     def active_log(self):
         """Return the path for the active log

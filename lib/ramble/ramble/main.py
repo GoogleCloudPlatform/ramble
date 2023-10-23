@@ -415,6 +415,13 @@ def make_argument_parser(**kwargs):
         '--disable-passthrough', action='store_true',
         help="disable passthrough of expansion variables for debugging")
     parser.add_argument(
+        '-N', '--disable-logger', action='store_true',
+        help="disable the ramble logger. All output will be printed to stdout.")
+    parser.add_argument(
+        '-P', '--disable-progress-bar', action='store_true',
+        help="disable the progress bars while setting up experiments.")
+
+    parser.add_argument(
         '--timestamp', action='store_true',
         help="Add a timestamp to tty output")
     parser.add_argument(
@@ -514,6 +521,14 @@ def setup_main_options(args):
     # override disable_passthrough configuration if passed on command line
     if args.disable_passthrough:
         ramble.config.set('config:disable_passthrough', True, scope='command_line')
+
+    if args.disable_logger:
+        ramble.config.set('config:disable_logger', True, scope='command_line')
+
+    ramble.util.logger.logger.enabled = not ramble.config.get('config:disable_logger', False)
+
+    if args.disable_progress_bar:
+        ramble.config.set('config:disable_progress_bar', True, scope='command_line')
 
     if args.mock:
         import spack.util.spack_yaml as syaml

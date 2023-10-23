@@ -32,12 +32,13 @@ from ramble.namespace import namespace
 import spack.util.spack_json as sjson
 from spack.util.executable import which
 
-try:
-    import tqdm
-except ModuleNotFoundError:
-    ramble.util.logger.logger.die(
-        'Module `tqdm` is not found. Ensure requirements.txt are installed.'
-    )
+if not ramble.config.get('config:disable_progress_bar', False):
+    try:
+        import tqdm
+    except ModuleNotFoundError:
+        ramble.util.logger.logger.die(
+            'Module `tqdm` is not found. Ensure requirements.txt are installed.'
+        )
 
 
 class Pipeline(object):
@@ -147,17 +148,23 @@ class Pipeline(object):
 
             phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
 
-            progress = tqdm.tqdm(total=len(phase_list), leave=False)
+            disable_progress = ramble.config.get('config:disable_progress_bar', False)
+            if not disable_progress:
+                progress = tqdm.tqdm(total=len(phase_list), leave=True,
+                                     ascii=' >-', bar_format='{l_bar}{bar}{elapsed_s}')
             for phase in phase_list:
-                progress.set_description(f'Processing phase {phase}')
+                if not disable_progress:
+                    progress.set_description(f'Processing phase {phase}')
                 app_inst.run_phase(phase, self.workspace)
-                progress.update()
-            progress.close()
+                if not disable_progress:
+                    progress.update()
+            if not disable_progress:
+                progress.set_description('Experiment complete')
+                progress.close()
 
             ramble.util.logger.logger.remove_log()
             ramble.util.logger.logger.all_msg(
-                '    Experiment log file closed.'
-                f'Returning to log file: {ramble.util.logger.logger.active_log()}'
+                f'  Returning to log file: {ramble.util.logger.logger.active_log()}'
             )
             count += 1
 

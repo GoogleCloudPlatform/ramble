@@ -152,6 +152,22 @@ properties['config']['upload'] = {
     }
 }
 
+properties['config']['disable_passthrough'] = {
+    'type': 'boolean',
+    'default': False
+}
+
+properties['config']['disable_progress_bar'] = {
+    'type': 'boolean',
+    'default': False
+}
+
+properties['config']['disable_logger'] = {
+    'type': 'boolean',
+    'default': False
+}
+
+
 #: Full schema with metadata
 schema = {
     '$schema': 'http://json-schema.org/schema#',
