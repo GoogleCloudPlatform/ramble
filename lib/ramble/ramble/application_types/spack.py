@@ -15,7 +15,7 @@ from ramble.language.application_language import register_phase
 from ramble.language.shared_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
-from ramble.keywords import Keywords
+import ramble.keywords
 
 header_color = '@*b'
 level1_color = '@*g'
@@ -50,6 +50,8 @@ class SpackApplication(ApplicationBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
+
+        self.keywords = ramble.keywords.keywords
 
         self.spack_runner = ramble.spack_runner.SpackRunner()
         self.application_class = 'SpackApplication'
@@ -98,7 +100,7 @@ class SpackApplication(ApplicationBase):
             self.spack_runner.set_compiler_config_dir(workspace.auxiliary_software_dir)
             self.spack_runner.set_dry_run(workspace.dry_run)
 
-            app_context = self.expander.expand_var_name(Keywords.env_name)
+            app_context = self.expander.expand_var_name(self.keywords.env_name)
 
             for pkg_name in workspace.software_environments.get_env_packages(app_context):
                 pkg_spec = workspace.software_environments.get_spec(pkg_name)
@@ -146,14 +148,14 @@ class SpackApplication(ApplicationBase):
 
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
-            self.spack_runner.create_env(self.expander.expand_var_name(Keywords.env_path))
+            self.spack_runner.create_env(self.expander.expand_var_name(self.keywords.env_path))
             self.spack_runner.activate()
 
             # Write auxiliary software files into created spack env.
             for name, contents in workspace.all_auxiliary_software_files():
                 aux_file_path = self.expander.expand_var(
                     os.path.join(
-                        self.expander.expansion_str(Keywords.env_path),
+                        self.expander.expansion_str(self.keywords.env_path),
                         f'{name}'
                     )
                 )
@@ -161,7 +163,7 @@ class SpackApplication(ApplicationBase):
                 with open(aux_file_path, 'w+') as f:
                     f.write(self.expander.expand_var(contents))
 
-            env_context = self.expander.expand_var_name(Keywords.env_name)
+            env_context = self.expander.expand_var_name(self.keywords.env_name)
             external_spack_env = workspace.external_spack_env(env_context)
             if external_spack_env:
                 self.spack_runner.copy_from_external_env(external_spack_env)
@@ -290,7 +292,7 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.activate()
 
-            app_context = self.expander.expand_var_name(Keywords.env_name)
+            app_context = self.expander.expand_var_name(self.keywords.env_name)
 
             for pkg_name in \
                     workspace.software_environments.get_env_packages(app_context):
@@ -409,7 +411,7 @@ class SpackApplication(ApplicationBase):
     def _clean_hash_variables(self, workspace, variables):
         """Perform spack specific cleanup of variables before hashing"""
 
-        self.spack_runner.configure_env(self.expander.expand_var_name(Keywords.env_path))
+        self.spack_runner.configure_env(self.expander.expand_var_name(self.keywords.env_path))
         self.spack_runner.activate()
 
         for var in variables:
@@ -435,7 +437,7 @@ class SpackApplication(ApplicationBase):
         return self.spack_runner.generate_source_command()
 
     def spack_activate(self):
-        self.spack_runner.configure_env(self.expander.expand_var_name(Keywords.env_path))
+        self.spack_runner.configure_env(self.expander.expand_var_name(self.keywords.env_path))
         self.spack_runner.activate()
         cmds = self.spack_runner.generate_activate_command()
         self.spack_runner.deactivate()

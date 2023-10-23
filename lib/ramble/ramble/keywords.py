@@ -8,16 +8,46 @@
 
 from enum import Enum
 
-import llnl.util.lang
 import llnl.util.tty as tty
 
 import ramble.error
+
+key_type = Enum('type', ['reserved', 'optional', 'required'])
+default_keys = {
+    'application_name': key_type.reserved,
+    'application_run_dir': key_type.reserved,
+    'application_input_dir': key_type.reserved,
+    'workload_name': key_type.reserved,
+    'workload_run_dir': key_type.reserved,
+    'workload_input_dir': key_type.reserved,
+    'license_input_dir': key_type.reserved,
+    'experiment_name': key_type.reserved,
+    'experiment_run_dir': key_type.reserved,
+    'experiment_status': key_type.reserved,
+    'log_dir': key_type.reserved,
+    'log_file': key_type.reserved,
+    'err_file': key_type.reserved,
+    'command': key_type.reserved,
+    'env_path': key_type.reserved,
+    'input_name': key_type.reserved,
+
+    'spec_name': key_type.optional,
+    'env_name': key_type.optional,
+
+    'n_ranks': key_type.required,
+    'n_nodes': key_type.required,
+    'processes_per_node': key_type.required,
+    'n_threads': key_type.required,
+    'batch_submit': key_type.required,
+    'mpi_command': key_type.required,
+    'experiment_template_name': key_type.required,
+}
 
 
 class Keywords(object):
     """Class to represent known ramble keywords.
 
-    Each keyword can have a type. Valid types are in the class level
+    Each keyword can have a type. Valid types are identified by the
     'key_type' variable as an enum.
 
     A map of keys, and their types is provided in the class level 'keys'
@@ -30,91 +60,57 @@ class Keywords(object):
         but it might not be possible always.
 
     """
+    def __init__(self, extra_keys={}):
+        # Merge in additional Keys:
+        self.keys = default_keys
+        self.update_keys(extra_keys)
 
-    key_type = Enum('type', ['reserved', 'optional', 'required'])
-
-    keys = {
-        'application_name': key_type.reserved,
-        'application_run_dir': key_type.reserved,
-        'application_input_dir': key_type.reserved,
-        'workload_name': key_type.reserved,
-        'workload_run_dir': key_type.reserved,
-        'workload_input_dir': key_type.reserved,
-        'license_input_dir': key_type.reserved,
-        'experiment_name': key_type.reserved,
-        'experiment_run_dir': key_type.reserved,
-        'experiment_status': key_type.reserved,
-        'log_dir': key_type.reserved,
-        'log_file': key_type.reserved,
-        'err_file': key_type.reserved,
-        'command': key_type.reserved,
-        'env_path': key_type.reserved,
-        'input_name': key_type.reserved,
-
-        'spec_name': key_type.optional,
-        'env_name': key_type.optional,
-
-        'n_ranks': key_type.required,
-        'n_nodes': key_type.required,
-        'processes_per_node': key_type.required,
-        'n_threads': key_type.required,
-        'batch_submit': key_type.required,
-        'mpi_command': key_type.required,
-        'experiment_template_name': key_type.required,
-    }
-
-    @classmethod
-    def __init__(cls):
+    def update_keys(self, extra_keys):
+        self.keys.update(extra_keys)
         # Define class attributes for all of the keys
-        for key in cls.keys.keys():
-            setattr(cls, key, key)
+        for key in self.keys.keys():
+            setattr(self, key, key)
 
-    @classmethod
-    def is_valid(cls, key):
+    def is_valid(self, key):
         """Check if a key is valid as a known keyword"""
-        return key in cls.keys.keys()
+        return key in self.keys.keys()
 
-    @classmethod
-    def is_reserved(cls, key):
+    def is_reserved(self, key):
         """Check if a key is reserved"""
-        if not cls.is_valid(key):
+        if not self.is_valid(key):
             return False
-        return cls.keys[key] == cls.key_type.reserved
+        return self.keys[key] == key_type.reserved
 
-    @classmethod
-    def is_optional(cls, key):
+    def is_optional(self, key):
         """Check if a key is optional"""
-        if not cls.is_valid(key):
+        if not self.is_valid(key):
             return False
-        return cls.keys[key] == cls.key_type.optional
+        return self.keys[key] == key_type.optional
 
-    @classmethod
-    def is_required(cls, key):
+    def is_required(self, key):
         """Check if a key is required"""
-        if not cls.is_valid(key):
+        if not self.is_valid(key):
             return False
-        return cls.keys[key] == cls.key_type.required
+        return self.keys[key] == key_type.required
 
-    @classmethod
-    def check_reserved_keys(cls, definitions):
+    def check_reserved_keys(self, definitions):
         """Check a dictionary of variable definitions for reserved keywords"""
         if not definitions:
             return
 
         for definition in definitions.keys():
-            if cls.is_reserved(definition):
+            if self.is_reserved(definition):
                 raise RambleKeywordError(f'Keyword "{definition}" has been defined, ' +
                                          'but is reserved by ramble.')
 
-    @classmethod
-    def check_required_keys(cls, definitions):
+    def check_required_keys(self, definitions):
         """Check a dictionary of variable definitions for all required keywords"""
         if not definitions:
             return
 
         required_set = set()
-        for key in cls.keys.keys():
-            if cls.is_required(key):
+        for key in self.keys.keys():
+            if self.is_required(key):
                 required_set.add(key)
 
         for definition in definitions.keys():
@@ -128,8 +124,8 @@ class Keywords(object):
                                      'are not defined within an experiment.')
 
 
-keywords = llnl.util.lang.Singleton(Keywords)
-
-
 class RambleKeywordError(ramble.error.RambleError):
     """Superclass for all errors to do with Ramble Keywords"""
+
+
+keywords = Keywords()
