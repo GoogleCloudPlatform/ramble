@@ -16,11 +16,11 @@ import re
 import sys
 import math
 
-import llnl.util.tty as tty
 from llnl.util.tty.colify import colify
 
 import ramble.repository
 import ramble.cmd.common.arguments as arguments
+import ramble.util.logger
 
 if sys.version_info > (3, 1):
     from html import escape  # novm
@@ -81,7 +81,7 @@ def name_only(objs, out, object_type):
     obj_def = ramble.repository.type_definitions[object_type]
     indent = 0
     if out.isatty():
-        tty.msg(f'{len(objs)} {obj_def["dir_name"]}')
+        ramble.util.logger.logger.msg(f'{len(objs)} {obj_def["dir_name"]}')
     colify(objs, indent=indent, output=out)
 
 
@@ -261,10 +261,10 @@ def perform_list(args, object_type):
         if os.path.exists(args.update):
             if os.path.getmtime(args.update) > \
                     ramble.repository.paths[object_type].last_mtime():
-                tty.msg('File is up to date: %s' % args.update)
+                ramble.util.logger.logger.msg(f'File is up to date: {args.update}')
                 return
 
-        tty.msg('Updating file: %s' % args.update)
+        ramble.util.logger.logger.msg(f'Updating file: {args.update}')
         with open(args.update, 'w') as f:
             formatter(sorted_objects, f, object_type)
 

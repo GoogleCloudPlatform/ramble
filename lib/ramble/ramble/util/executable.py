@@ -9,8 +9,6 @@
 import six
 import shlex
 
-import llnl.util.tty as tty  # noqa: F401
-
 import ramble.error
 
 from ramble.schema.types import OUTPUT_CAPTURE

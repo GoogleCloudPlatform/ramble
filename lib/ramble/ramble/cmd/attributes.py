@@ -11,11 +11,11 @@ from __future__ import print_function
 import argparse
 from collections import defaultdict
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
 
 import ramble.repository
+import ramble.util.logger
 
 description = "get information about object attributes"
 section = "developer"
@@ -176,7 +176,9 @@ def attributes(parser, args):
 
     if args.by_attribute:
         if not args.object_or_attr:
-            tty.die("ramble attributes --by-attribute requires an attribute or --all")
+            ramble.util.logger.logger.die(
+                "ramble attributes --by-attribute requires an attribute or --all"
+            )
 
         objects = union_values(attributes_to_objects(args.object_or_attr,
                                                      attr_name=attr_name,
@@ -186,7 +188,7 @@ def attributes(parser, args):
 
     else:
         if not args.object_or_attr:
-            tty.die("ramble attributes requires an object or --all")
+            ramble.util.logger.logger.die("ramble attributes requires an object or --all")
 
         users = union_values(objects_to_attributes(args.object_or_attr,
                                                    attr_name=attr_name,

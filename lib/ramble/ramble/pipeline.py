@@ -20,6 +20,7 @@ import ramble.config
 import ramble.experiment_set
 import ramble.software_environments
 import ramble.util.hashing
+import ramble.util.logger
 import ramble.fetch_strategy
 import ramble.stage
 import ramble.workspace
@@ -116,8 +117,7 @@ class Pipeline(object):
                             'workspace first.\n' + \
                             'Then ensure its spack configuration is ' + \
                             'properly configured.'
-            with self.workspace.logger.force_echo():
-                tty.die(error_message)
+            ramble.logger.logger.die(error_message)
 
     def _prepare(self):
         """Perform preparation for pipeline execution"""
@@ -129,18 +129,25 @@ class Pipeline(object):
         count = 1
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             exp_log_path = app_inst.experiment_log_file(self.log_dir)
-            app_inst.construct_logger(self.log_dir)
 
-            tty.msg(f'Experiment {idx} ({count}/{num_exps}):')
-            tty.msg(f'    name: {exp}')
-            tty.msg(f'    log file: {app_inst.logger_file}')
+            ramble.util.logger.logger.all_msg(f'Experiment {idx} ({count}/{num_exps}):')
+            ramble.util.logger.logger.all_msg(f'    name: {exp}')
+            ramble.util.logger.logger.all_msg(
+                f'    log file: {exp_log_path}'
+            )
+
+            ramble.util.logger.logger.add_log(exp_log_path)
 
             phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
 
-            with app_inst.logger(exp_log_path, echo=False, debug=tty.debug_level()):
-                for phase in phase_list:
-                    app_inst.run_phase(phase, self.workspace)
-            app_inst.close_logger()
+            for phase in phase_list:
+                app_inst.run_phase(phase, self.workspace)
+
+            ramble.util.logger.logger.remove_log()
+            ramble.util.logger.logger.all_msg(
+                '    Experiment log file closed.'
+                f'Returning to log file: {ramble.util.logger.logger.active_log()}'
+            )
             count += 1
 
     def _complete(self):
@@ -149,24 +156,24 @@ class Pipeline(object):
 
     def run(self):
         """Run the full pipeline"""
-        tty.msg('Streaming details to log:')
-        tty.msg(f'  {self.log_path}')
+        ramble.util.logger.logger.all_msg('Streaming details to log:')
+        ramble.util.logger.logger.all_msg(f'  {self.log_path}')
         if self.workspace.dry_run:
             cprint('@*g{      -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN --}')
 
         experiment_count = self._experiment_set.num_filtered_experiments(self.filters)
         experiment_total = self._experiment_set.num_experiments()
-        tty.msg(f'  {self.action_string} {experiment_count} out of '
-                f'{experiment_total} experiments:')
+        ramble.util.logger.logger.all_msg(
+            f'  {self.action_string} {experiment_count} out of '
+            f'{experiment_total} experiments:'
+        )
 
-        with self.workspace.logger(self.log_path, echo=self.workspace.dry_run):
-            self._validate()
-            self._prepare()
-
+        ramble.util.logger.logger.add_log(self.log_path)
+        self._validate()
+        self._prepare()
         self._execute()
-
-        with self.workspace.logger(self.log_path, echo=self.workspace.dry_run):
-            self._complete()
+        self._complete()
+        ramble.util.logger.logger.remove_log()
 
     def simlink_log(self, base, link):
         """
@@ -263,7 +270,7 @@ class ArchivePipeline(Pipeline):
                 ramble.config.get('config:archive_url')
             archive_url = archive_url.rstrip('/') if archive_url else None
 
-            tty.debug('Archive url: %s' % archive_url)
+            ramble.util.logger.logger.debug(f'Archive url: {archive_url}')
 
             if archive_url:
                 tar_path = self.workspace.latest_archive_path + '.tar.gz'
@@ -290,25 +297,26 @@ class MirrorPipeline(Pipeline):
 
     def _complete(self):
         verb = 'updated' if self.workspace.mirror_existed else 'created'
-        tty.msg(
-            "Successfully %s spack software in %s" % (verb, self.workspace.mirror_path),
+        ramble.util.logger.logger.msg(
+            f"Successfully {verb} spack software in {self.workspace.mirror_path}",
             "Archive stats:",
             "  %-4d already present"  % len(self.workspace.software_mirror_stats.present),
             "  %-4d added"            % len(self.workspace.software_mirror_stats.new),
             "  %-4d failed to fetch." % len(self.workspace.software_mirror_stats.errors))
 
-        tty.msg(
-            "Successfully %s inputs in %s" % (verb, self.workspace.mirror_path),
+        ramble.util.logger.logger.msg(
+            f"Successfully {verb} inputs in {self.workspace.mirror_path}",
             "Archive stats:",
             "  %-4d already present"  % len(self.workspace.input_mirror_stats.present),
             "  %-4d added"            % len(self.workspace.input_mirror_stats.new),
             "  %-4d failed to fetch." % len(self.workspace.input_mirror_stats.errors))
 
         if self.workspace.input_mirror_stats.errors:
-            tty.error("Failed downloads:")
-            tty.colify(s.cformat("{name}") for s in
-                       list(self.workspace.input_mirror_stats.errors))
-            tty.die('Mirroring has errors.')
+            ramble.util.logger.logger.error("Failed downloads:")
+            tty.colify((s.cformat("{name}") for s in
+                       list(self.workspace.input_mirror_stats.errors)),
+                       output=ramble.util.logger.logger.active_stream())
+            ramble.util.logger.logger.die('Mirroring has errors.')
 
 
 class SetupPipeline(Pipeline):
@@ -362,7 +370,7 @@ class PushToCachePipeline(Pipeline):
         self.workspace.spack_cache_path = self.spack_cache_path
 
     def _complete(self):
-        tty.msg('Pushed envs to spack cache %s' % self.spack_cache_path)
+        ramble.util.logger.logger.msg(f'Pushed envs to spack cache {self.spack_cache_path}')
 
 
 pipelines = Enum('pipelines',
@@ -383,7 +391,9 @@ def pipeline_class(name):
     """Factory for determining a pipeline class from its name"""
 
     if name not in _pipeline_map.keys():
-        tty.die(f'Pipeline {name} is not valid.\n'
-                f'Valid pipelines are {_pipeline_map.keys()}')
+        ramble.util.logger.logger.die(
+            f'Pipeline {name} is not valid.\n'
+            f'Valid pipelines are {_pipeline_map.keys()}'
+        )
 
     return _pipeline_map[name]

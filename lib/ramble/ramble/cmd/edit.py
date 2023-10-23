@@ -9,11 +9,10 @@
 import glob
 import os
 
-import llnl.util.tty as tty
-
 import ramble.cmd
 import ramble.paths
 import ramble.repository
+import ramble.util.logger
 
 from spack.util.editor import editor
 
@@ -42,12 +41,15 @@ def edit_application(name, repo_path, namespace):
 
     if os.path.exists(path):
         if not os.path.isfile(path):
-            tty.die("Something is wrong. '{0}' is not a file!".format(path))
+            ramble.util.logger.logger.die(f"Something is wrong. '{path}' is not a file!")
         if not os.access(path, os.R_OK):
-            tty.die("Insufficient permissions on '%s'!" % path)
+            ramble.util.logger.logger.die(f"Insufficient permissions on '{path}'!")
     else:
-        tty.die("No package for '{0}' was found.".format(name),
-                "  Use `spack create` to create a new package")
+        # TODO: Update this once a `ramble create` command exists
+        ramble.util.logger.logger.die(
+            f"No application for '{name}' was found."
+            # "  Use `ramble create` to create a new application"
+        )
 
     editor(path)
 
@@ -115,10 +117,9 @@ def edit(parser, args):
                     m += ' Please specify a suffix. Files are:\n\n'
                     for f in files:
                         m += '        ' + os.path.basename(f) + '\n'
-                    tty.die(m)
+                    ramble.util.logger.logger.die(m)
                 if not files:
-                    tty.die("No file for '{0}' was found in {1}".format(name,
-                                                                        path))
+                    ramble.util.logger.logger.die(f"No file for '{name}' was found in {path}")
                 path = files[0]  # already confirmed only one entry in files
 
         editor(path)

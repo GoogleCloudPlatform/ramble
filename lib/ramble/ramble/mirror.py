@@ -25,13 +25,13 @@ import traceback
 import ruamel.yaml.error as yaml_error
 import six
 
-import llnl.util.tty as tty
 from llnl.util.compat import Mapping
 from llnl.util.filesystem import mkdirp
 
 import ramble.config
 import ramble.error
 import ramble.fetch_strategy as fs
+import ramble.util.logger
 
 import spack.url
 import spack.util.spack_json
@@ -435,7 +435,7 @@ def add(name, url, scope, args={}):
         mirrors = syaml_dict()
 
     if name in mirrors:
-        tty.die("Mirror with name %s already exists." % name)
+        ramble.util.logger.logger.die(f"Mirror with name {name} already exists.")
 
     items = [(n, u) for n, u in mirrors.items()]
     mirror_data = url
@@ -451,7 +451,7 @@ def remove(name, scope):
         mirrors = syaml_dict()
 
     if name not in mirrors:
-        tty.die("No mirror with name %s" % name)
+        ramble.util.logger.logger.die(f"No mirror with name {name}")
 
     old_value = mirrors.pop(name)
     ramble.config.set('mirrors', mirrors, scope=scope)
@@ -470,8 +470,8 @@ def remove(name, scope):
         debug_msg.append(debug_msg_url)
         values.append(old_value)
 
-    tty.debug(" ".join(debug_msg) % tuple(values))
-    tty.msg("Removed mirror %s." % name)
+    ramble.util.logger.logger.debug(" ".join(debug_msg) % tuple(values))
+    ramble.util.logger.logger.msg(f"Removed mirror {name}.")
 
 
 class MirrorStats(object):
@@ -513,9 +513,9 @@ class MirrorStats(object):
 
 
 def _add_single_spec(spec, mirror_root, mirror, mirror_stats):
-    tty.msg("Adding inputs for application {app} to mirror".format(
-        app=spec.format("{name}")
-    ))
+    ramble.util.logger.logger.msg(
+        f"Adding inputs for application {spec.format('{name}')} to mirror"
+    )
     num_retries = 3
     while num_retries > 0:
         try:
@@ -533,7 +533,7 @@ def _add_single_spec(spec, mirror_root, mirror, mirror_stats):
         if ramble.config.get('config:debug'):
             traceback.print_exception(file=sys.stderr, *exc_tuple)
         else:
-            tty.warn(
+            ramble.util.logger.logger.warn(
                 "Error while fetching %s" % spec.cformat('{name}'),
                 getattr(exception, 'message', exception))
         mirror_stats.error()

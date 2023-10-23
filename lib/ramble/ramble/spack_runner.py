@@ -17,7 +17,6 @@ import re
 import shutil
 import shlex
 
-import llnl.util.tty as tty
 import llnl.util.filesystem as fs
 from spack.util.executable import CommandNotFoundError, ProcessError
 from ramble.util.executable import which
@@ -26,6 +25,7 @@ import spack.util.spack_yaml as syaml
 import ramble.config
 import ramble.error
 import ramble.util.hashing
+import ramble.util.logger
 
 import spack.util.spack_json as sjson
 
@@ -156,7 +156,7 @@ class SpackRunner(object):
         if require_exists:
             if not os.path.isdir(env_path) or \
                     not os.path.exists(os.path.join(env_path, 'spack.yaml')):
-                tty.die(f'Path {env_path} is not a spack environment')
+                ramble.util.logger.logger.die(f'Path {env_path} is not a spack environment')
 
         self.env_path = env_path
 
@@ -221,7 +221,10 @@ class SpackRunner(object):
         if not self.dry_run:
             if not os.path.exists(os.path.join(path, 'spack.yaml')):
                 with fs.working_dir(path):
-                    self.spack(*self.env_create_args)
+                    active_stream = ramble.util.logger.logger.active_stream()
+                    self.spack(*self.env_create_args,
+                               output=active_stream,
+                               error=active_stream)
 
         # Ensure subsequent commands use the created env now.
         self.env_path = path
@@ -262,7 +265,8 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            load_cmds = self.spack(*args, output=str).split('\n')
+            active_stream = ramble.util.logger.logger.active_stream()
+            load_cmds = self.spack(*args, output=str, error=active_stream).split('\n')
 
             for cmd in load_cmds:
                 env_var = regex.match(cmd)
@@ -303,17 +307,20 @@ class SpackRunner(object):
             comp_info_args.extend(['-C', self.env_path])
         comp_info_args.extend(['compiler', 'info', spec])
 
+        active_stream = ramble.util.logger.logger.active_stream()
         compiler_find_flags = ramble.config.get(f'{self.compiler_find_config_name}:flags')
         compiler_find_args = self.compiler_find_args.copy()
         if compiler_find_flags:
             for flag in shlex.split(compiler_find_flags):
                 compiler_find_args.append(flag)
         if not self.dry_run:
-            self.spack(*compiler_find_args)
+            self.spack(*compiler_find_args,
+                       output=active_stream,
+                       error=active_stream)
 
         try:
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
-            tty.msg(f'{spec} is already an available compiler')
+            ramble.util.logger.logger.msg(f'{spec} is already an available compiler')
             return
         except ProcessError:
 
@@ -327,14 +334,14 @@ class SpackRunner(object):
             args.append(spec)
 
             if not self.dry_run:
-                self.installer(*args)
+                self.installer(*args, output=active_stream, error=active_stream)
             else:
                 self._dry_run_print(self.installer, args)
 
             self.load_compiler(spec)
 
             if not self.dry_run:
-                self.spack(*compiler_find_args)
+                self.spack(*compiler_find_args, output=active_stream, error=active_stream)
 
                 self.compilers.append(spec)
 
@@ -407,7 +414,8 @@ class SpackRunner(object):
 
         pkg_names = []
 
-        for pkg in self.spack(*args, output=str).split('\n'):
+        active_stream = ramble.util.logger.logger.active_stream()
+        for pkg in self.spack(*args, output=str, error=active_stream).split('\n'):
             match = package_name_regex.match(pkg)
             if match:
                 pkg_names.append(match.group('package_name'))
@@ -441,10 +449,16 @@ class SpackRunner(object):
             'add'
         ]
 
+        active_stream = ramble.util.logger.logger.active_stream()
         for config in self.configs:
             args = config_args.copy()
             args.append(config)
-            self.spack(*args)
+
+            if active_stream is not None:
+                self.spack(*args, output=active_stream, error=active_stream)
+            else:
+                self.spack(*args)
+
             if self.dry_run:
                 self._dry_run_print(self.spack, args)
 
@@ -476,7 +490,9 @@ class SpackRunner(object):
         path = env_name_or_path
         if not os.path.exists(path):
             try:
-                path = self.spack(*named_location_args, output=str).strip('\n')
+                active_stream = ramble.util.logger.logger.active_stream()
+                path = self.spack(*named_location_args, output=str,
+                                  error=active_stream).strip('\n')
             # If a named environment fails, copy directly from the path
             except ProcessError:
                 raise InvalidExternalEnvironment(f'{path} is not a spack environment.')
@@ -540,11 +556,15 @@ class SpackRunner(object):
                 # If the yaml hash matches the new generated data hash...
                 if gen_env_hash == existing_env_hash:
                     self.concretized = True
-                    tty.msg(f'Environment {self.env_path} will not be regenerated.')
+                    ramble.util.logger.logger.msg(
+                        f'Environment {self.env_path} will not be regenerated.'
+                    )
                     return
 
             if not self.concretized:
-                tty.verbose(f'Removing invalid spack lock file {spack_lock_file}')
+                ramble.util.logger.logger.verbose(
+                    f'Removing invalid spack lock file {spack_lock_file}'
+                )
                 fs.force_remove(spack_lock_file)
 
         # Write spack.yaml to environment before concretizing
@@ -563,7 +583,9 @@ class SpackRunner(object):
         self._check_active()
 
         if self.concretized:
-            tty.msg(f'Environment {self.env_path} is already concretized. Skipping concretize...')
+            ramble.util.logger.logger.msg(
+                f'Environment {self.env_path} is already concretized. Skipping concretize...'
+            )
             return
 
         concretize_flags = ramble.config.get(f'{self.concretize_config_name}:flags')
@@ -573,7 +595,8 @@ class SpackRunner(object):
             args.extend(shlex.split(concretize_flags))
 
         if not self.dry_run:
-            self.concretizer(*args)
+            active_stream = ramble.util.logger.logger.active_stream()
+            self.concretizer(*args, output=active_stream, error=active_stream)
         else:
             self._dry_run_print(self.concretizer, args)
 
@@ -593,10 +616,12 @@ class SpackRunner(object):
 
         if not self.dry_run:
             if not lock_exists and require_exist:
-                tty.die('spack.lock file does not exist in environment '
-                        f'{self.env_path}\n'
-                        'Make sure your workspace is fully setup with\n'
-                        '    ramble workspace setup')
+                ramble.util.logger.logger.die(
+                    'spack.lock file does not exist in environment '
+                    f'{self.env_path}\n'
+                    'Make sure your workspace is fully setup with\n'
+                    '    ramble workspace setup'
+                )
             elif lock_exists:
                 with open(spack_file, 'r') as f:
                     contents_to_hash = sjson.load(f)
@@ -629,7 +654,8 @@ class SpackRunner(object):
             args.extend(shlex.split(install_flags))
 
         if not self.dry_run:
-            self.installer(*args)
+            active_stream = ramble.util.logger.logger.active_stream()
+            self.installer(*args, output=active_stream, error=active_stream)
         else:
             self._dry_run_print(self.installer, args)
 
@@ -642,8 +668,9 @@ class SpackRunner(object):
         name_args.extend(package_spec.split())
 
         if not self.dry_run:
-            name = self.spack(*name_args, output=str).strip()
-            location = self.spack(*loc_args, output=str).strip()
+            active_stream = ramble.util.logger.logger.active_stream()
+            name = self.spack(*name_args, output=str, error=active_stream).strip()
+            location = self.spack(*loc_args, output=str, error=active_stream).strip()
             return (name, location)
         else:
             self._dry_run_print(self.spack, name_args)
@@ -667,7 +694,8 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            return self.spack(*args, output=str).strip()
+            active_stream = ramble.util.logger.logger.active_stream()
+            return self.spack(*args, output=str, error=active_stream).strip()
         else:
             self._dry_run_print(self.spack, args)
             return """
@@ -682,7 +710,8 @@ class SpackRunner(object):
             '--format',
             '/{hash}'
         ]
-        output = self.spack(*args, output=str).strip().replace('\n', ' ')
+        active_stream = ramble.util.logger.logger.active_stream()
+        output = self.spack(*args, output=str, error=active_stream).strip().replace('\n', ' ')
         return output
 
     def push_to_spack_cache(self, spack_cache_path):
@@ -697,7 +726,7 @@ class SpackRunner(object):
         ]
         user_flags = ramble.config.get(f'{self.buildcache_config_name}:flags')
 
-        tty.debug("Running with user flags: {}".format(user_flags))
+        ramble.util.logger.logger.debug(f"Running with user flags: {user_flags}")
 
         if user_flags is not None:
             args.extend(shlex.split(user_flags))
@@ -705,14 +734,15 @@ class SpackRunner(object):
         args.extend([spack_cache_path, hash_list])
 
         if not self.dry_run:
-            return self.spack(*args, output=str).strip()
+            active_stream = ramble.util.logger.logger.active_stream()
+            return self.spack(*args, output=str, error=active_stream).strip()
         else:
             self._dry_run_print(self.spack, args)
             return
 
     def _dry_run_print(self, executable, args):
-        tty.msg('DRY-RUN: would run %s' % executable)
-        tty.msg('         with args: %s' % args)
+        ramble.util.logger.logger.msg(f'DRY-RUN: would run {executable}')
+        ramble.util.logger.logger.msg(f'         with args: {args}')
 
 
 class RunnerError(ramble.error.RambleError):

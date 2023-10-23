@@ -5,14 +5,13 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-import llnl.util.tty as tty
-
 import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.spec
 import ramble.workspace
 import ramble.mirror
 import ramble.repository
+import ramble.util.logger
 from ramble.error import RambleError
 
 import spack.util.url as url_util
@@ -108,7 +107,7 @@ def mirror_set_url(args):
         mirrors = syaml_dict()
 
     if args.name not in mirrors:
-        tty.die("No mirror found with name %s." % args.name)
+        ramble.util.logger.logger.die(f"No mirror found with name {args.name}.")
 
     entry = mirrors[args.name]
     try:
@@ -142,11 +141,11 @@ def mirror_set_url(args):
     ramble.config.set('mirrors', mirrors, scope=args.scope)
 
     if changes_made:
-        tty.msg(
+        ramble.util.logger.logger.msg(
             "Changed%s url or connection information for mirror %s." %
             ((" (push)" if args.push else ""), args.name))
     else:
-        tty.msg("No changes made to mirror %s." % args.name)
+        ramble.util.logger.logger.msg(f"No changes made to mirror {args.name}.")
 
 
 def mirror_list(args):
@@ -154,7 +153,7 @@ def mirror_list(args):
 
     mirrors = ramble.mirror.MirrorCollection(scope=args.scope)
     if not mirrors:
-        tty.msg("No mirrors configured.")
+        ramble.util.logger.logger.msg("No mirrors configured.")
         return
 
     mirrors.display()
@@ -169,9 +168,9 @@ def _read_specs_from_file(filename):
                 s.application
                 specs.append(s)
             except RambleError as e:
-                tty.debug(e)
-                tty.die("Parse error in %s, line %d:" % (filename, i + 1),
-                        ">>> " + string, str(e))
+                ramble.util.logger.logger.debug(e)
+                ramble.util.logger.logger.die("Parse error in %s, line %d:" % (filename, i + 1),
+                                              ">>> " + string, str(e))
     return specs
 
 

@@ -6,10 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
 import json
 
 import ramble.experimental.uploader
+import ramble.util.logger
 
 description = "import experiment results from file"
 section = "results"
@@ -38,21 +38,21 @@ def import_results_file(filename):
     """
     Import Ramble experiment results from a JSON file.
     """
-    tty.debug("File to import:")
-    tty.debug(filename)
+    ramble.util.logger.logger.debug("File to import:")
+    ramble.util.logger.logger.debug(filename)
 
     imported_file = open(filename)
 
     try:
-        tty.msg("Import file...")
+        ramble.util.logger.logger.msg("Import file...")
         parsed_json_file = json.load(imported_file)
         # Check if data contains an experiment
         if parsed_json_file.get('experiments'):
             return parsed_json_file
         else:
-            tty.die("Error parsing file: Does not contain valid data to upload.")
+            ramble.util.logger.logger.die("Error parsing file: Does not contain valid data to upload.")
     except ValueError:
-        tty.die("Error parsing file: Invalid JSON formatting.")
+        ramble.util.logger.logger.die("Error parsing file: Invalid JSON formatting.")
 
 
 def results(parser, args):

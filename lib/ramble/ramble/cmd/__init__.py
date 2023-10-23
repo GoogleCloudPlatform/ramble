@@ -13,7 +13,6 @@ import re
 import argparse
 import ruamel.yaml as yaml
 
-import llnl.util.tty as tty
 from llnl.util.lang import attr_setdefault
 from llnl.util.filesystem import join_path
 
@@ -21,6 +20,7 @@ import ramble.config
 import ramble.error
 import ramble.paths
 import ramble.workspace
+import ramble.util.logger
 
 import spack.extensions
 import spack.util.string
@@ -109,7 +109,7 @@ def get_module(cmd_name):
     require_cmd_name(cmd_name)
     pname = python_name(cmd_name)
 
-    tty.debug('Getting module for command {}'.format(cmd_name))
+    ramble.util.logger.logger.debug(f'Getting module for command {cmd_name}')
 
     try:
         # Try to import the command from the built-in directory
@@ -117,7 +117,7 @@ def get_module(cmd_name):
         module = __import__(module_name,
                             fromlist=[pname, SETUP_PARSER, DESCRIPTION],
                             level=0)
-        tty.debug('Imported {0} from built-in commands'.format(pname))
+        ramble.util.logger.logger.debug(f'Imported {pname} from built-in commands')
     except ImportError:
         try:
             module = spack.extensions.get_module(cmd_name)
@@ -129,8 +129,9 @@ def get_module(cmd_name):
     attr_setdefault(module, DESCRIPTION, "")
 
     if not hasattr(module, pname):
-        tty.die("Command module %s (%s) must define function '%s'." %
-                (module.__name__, module.__file__, pname))
+        ramble.util.logger.logger.die(
+            f"Command module {module.__name__} (module.__file__) must define function '{pname}'."
+        )
 
     return module
 
@@ -230,12 +231,12 @@ def require_active_workspace(cmd_name):
     if ws:
         return ws
     else:
-        tty.die(
-            '`ramble %s` requires a workspace' % cmd_name,
+        ramble.util.logger.logger.die(
+            f'`ramble {cmd_name}` requires a workspace',
             'activate a workspace first:',
             '    ramble workspace activate WRKSPC',
             'or use:',
-            '    ramble -w WRKSPC %s ...' % cmd_name)
+            f'    ramble -w WRKSPC {cmd_name} ...')
 
 
 def find_workspace(args):

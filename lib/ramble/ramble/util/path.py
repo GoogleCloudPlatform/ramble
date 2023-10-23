@@ -16,10 +16,10 @@ import getpass
 import subprocess
 import tempfile
 
-import llnl.util.tty as tty
 from llnl.util.lang import memoized
 
 import ramble.paths
+import ramble.util.logger
 
 
 __all__ = [
@@ -59,8 +59,8 @@ def get_system_path_max():
         proc_output = str(path_max_proc.communicate()[0].decode())
         sys_max_path_length = int(proc_output)
     except (ValueError, subprocess.CalledProcessError, OSError):
-        tty.msg('Unable to find system max path length, using: {0}'.format(
-            sys_max_path_length))
+        ramble.util.logger.logger.msg('Unable to find system max path length, using: {0}'.format(
+                                      sys_max_path_length))
 
     return sys_max_path_length
 

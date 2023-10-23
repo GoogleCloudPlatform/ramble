@@ -35,12 +35,12 @@ import six
 import ruamel.yaml as yaml
 
 import llnl.util.lang
-import llnl.util.tty as tty
 import llnl.util.filesystem as fs
 
 import ramble.caches
 import ramble.config
 import ramble.spec
+import ramble.util.logger
 import ramble.util.path
 import ramble.util.naming as nm
 
@@ -273,9 +273,11 @@ class FastObjectChecker(Mapping):
                 if not obj_name.startswith('.') and not any(
                     obj_name == obj_info['config'] for obj_info in type_definitions.values()
                 ):
-                    tty.warn(f'Skipping {self.object_type} '
-                             f'at {obj_dir}. "{obj_name}" is not '
-                             'a valid Ramble module name.')
+                    ramble.util.logger.logger.warn(
+                        f'Skipping {self.object_type} '
+                        f'at {obj_dir}. "{obj_name}" is not '
+                        'a valid Ramble module name.'
+                    )
                 continue
 
             # Construct the file name from the directory
@@ -291,7 +293,9 @@ class FastObjectChecker(Mapping):
                     # No application.py file here.
                     continue
                 elif e.errno == errno.EACCES:
-                    tty.warn(f"Can't read {self.object_type} file {obj_file}.")
+                    ramble.util.logger.logger.warn(
+                        f"Can't read {self.object_type} file {obj_file}."
+                    )
                     continue
                 raise e
 
@@ -552,10 +556,12 @@ class RepoPath(object):
                     repo = Repo(repo, object_type=object_type)
                 self.put_last(repo)
             except RepoError as e:
-                tty.warn("Failed to initialize repository: '%s'." % repo,
-                         e.message,
-                         "To remove the bad repository, run this command:",
-                         "    ramble repo rm %s" % repo)
+                ramble.util.logger.logger.warn(
+                    "Failed to initialize repository: '%s'." % repo,
+                    e.message,
+                    "To remove the bad repository, run this command:",
+                    "    ramble repo rm %s" % repo
+                )
 
     def put_first(self, repo):
         """Add repo first in the search path."""
@@ -691,7 +697,7 @@ class RepoPath(object):
         """Given a spec, get the repository for its object."""
         # We don't @_autospec this function b/c it's called very frequently
         # and we want to avoid parsing str's into Specs unnecessarily.
-        tty.debug('Getting repo for obj %s' % spec)
+        ramble.util.logger.logger.debug(f'Getting repo for obj {spec}')
         namespace = None
         if isinstance(spec, ramble.spec.Spec):
             namespace = spec.namespace
@@ -700,7 +706,7 @@ class RepoPath(object):
             # handle strings directly for speed instead of @_autospec'ing
             namespace, _, name = spec.rpartition('.')
 
-        tty.debug(' Name and namespace = %s - %s' % (namespace, name))
+        ramble.util.logger.logger.debug(f' Name and namespace = {namespace} - {name}')
         # If the spec already has a namespace, then return the
         # corresponding repo if we know about it.
         if namespace:
@@ -712,7 +718,7 @@ class RepoPath(object):
         # If there's no namespace, search in the RepoPath.
         for repo in self.repos:
             if name in repo:
-                tty.debug('Found repo...')
+                ramble.util.logger.logger.debug('Found repo...')
                 return repo
 
         # If the object isn't in any repo, return the one with
@@ -968,14 +974,16 @@ class Repo(object):
 
                 if (not yaml_data or 'repo' not in yaml_data or
                         not isinstance(yaml_data['repo'], dict)):
-                    tty.die("Invalid %s in repository %s" % (
-                        self.config_name, self.root))
+                    ramble.util.logger.logger.die(
+                        f"Invalid {self.config_name} in repository {self.root}"
+                    )
 
                 return yaml_data['repo']
 
         except IOError:
-            tty.die("Error reading %s when opening %s"
-                    % (self.config_file, self.root))
+            ramble.util.logger.logger.die(
+                f"Error reading {self.config_file} when opening {self.root}"
+            )
 
     @autospec
     def get(self, spec):
@@ -984,7 +992,7 @@ class Repo(object):
         # it actually exists, because we have to load it anyway, and that ends
         # up checking for existence. We avoid constructing
         # FastObjectChecker, which will stat all objects.
-        tty.debug('Getting obj %s from repo' % spec)
+        ramble.util.logger.logger.debug(f'Getting obj {spec} from repo')
         if spec.name is None:
             raise UnknownObjectError(None, self)
 
@@ -998,7 +1006,7 @@ class Repo(object):
             # pass these through as their error messages will be fine.
             raise
         except Exception as e:
-            tty.debug(e)
+            ramble.util.logger.logger.debug(e)
 
             # Make sure other errors in constructors hit the error
             # handler by wrapping them
@@ -1129,10 +1137,10 @@ class Repo(object):
                 raise UnknownObjectError(obj_name, self)
 
             if not os.path.isfile(file_path):
-                tty.die("Something's wrong. '%s' is not a file!" % file_path)
+                ramble.util.logger.logger.die(f"Something's wrong. '{file_path}' is not a file!")
 
             if not os.access(file_path, os.R_OK):
-                tty.die("Cannot read '%s'!" % file_path)
+                ramble.util.logger.logger.die(f"Cannot read '{file_path}'!")
 
             # e.g., ramble.app.builtin.mpich
             fullname = "%s.%s" % (self.full_namespace, obj_name)
@@ -1166,12 +1174,12 @@ class Repo(object):
                                         % (self.namespace, namespace))
 
         class_name = nm.mod_to_class(obj_name)
-        tty.debug(' Class name = %s' % class_name)
+        ramble.util.logger.logger.debug(f' Class name = {class_name}')
         module = self._get_obj_module(obj_name)
 
         cls = getattr(module, class_name)
         if not inspect.isclass(cls):
-            tty.die("%s.%s is not a class" % (obj_name, class_name))
+            ramble.util.logger.logger.die(f"{obj_name}.{class_name} is not a class")
 
         return cls
 

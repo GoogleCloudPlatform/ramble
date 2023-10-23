@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as color
 
 import ramble.repository
@@ -17,6 +16,7 @@ import ramble.renderer
 import ramble.expander
 from ramble.namespace import namespace
 
+import ramble.util.logger
 import ramble.util.matrices
 import ramble.util.colors as rucolor
 
@@ -72,13 +72,13 @@ class SoftwareEnvironments(object):
                 namespace.environments in self.spack_dict:
             conf_type = 'v2'
 
-        tty.debug(f'Detected config type of: {conf_type}')
+        ramble.util.logger.logger.debug(f'Detected config type of: {conf_type}')
 
         return conf_type
 
     def _v2_setup(self):
         """Process a v2 `spack:` dictionary in the workspace configuration."""
-        tty.debug('Performing v2 software setup.')
+        ramble.util.logger.logger.debug('Performing v2 software setup.')
 
         pkg_renderer = ramble.renderer.Renderer()
         env_renderer = ramble.renderer.Renderer()
@@ -205,11 +205,17 @@ class SoftwareEnvironments(object):
                             if 'compiler' in pkg_info and pkg_info['compiler'] in env_packages:
                                 pkgs_with_compiler.append((pkg_name, pkg_info['compiler']))
                         if pkgs_with_compiler:
-                            tty.warn(f'Environment {final_name} contains packages and their '
-                                     'compilers in the package list. These include:')
+                            ramble.util.logger.logger.warn(
+                                f'Environment {final_name} contains packages and their '
+                                'compilers in the package list. These include:'
+                            )
                             for pkg_name, comp_name in pkgs_with_compiler:
-                                tty.warn(f'    Package: {pkg_name}, Compiler: {comp_name}')
-                            tty.warn('This might cause problems when installing the packages.')
+                                ramble.util.logger.logger.warn(
+                                    f'    Package: {pkg_name}, Compiler: {comp_name}'
+                                )
+                            ramble.util.logger.logger.warn(
+                                'This might cause problems when installing the packages.'
+                            )
 
     def print_environments(self, verbosity=0):
         color.cprint(rucolor.section_title('Software Stack:'))

@@ -9,7 +9,6 @@
 import os
 import six
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as clr
 
 import ramble.repository
@@ -76,7 +75,7 @@ class SpecParser(spack.parse.Parser):
                 directly into. This is used to avoid construction of a
                 superfluous Spec object in the Spec constructor.
         """
-        tty.debug('Starting parser with spec %s' % (initial_spec))
+        ramble.util.logger.logger.debug('Starting parser with spec %s' % (initial_spec))
         super(SpecParser, self).__init__(_lexer)
         self.previous = None
         self._initial = initial_spec
