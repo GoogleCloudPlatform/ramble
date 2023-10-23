@@ -32,6 +32,13 @@ from ramble.namespace import namespace
 import spack.util.spack_json as sjson
 from spack.util.executable import which
 
+try:
+    import tqdm
+except ModuleNotFoundError:
+    ramble.util.logger.logger.die(
+        'Module `tqdm` is not found. Ensure requirements.txt are installed.'
+    )
+
 
 class Pipeline(object):
     """Base Class for all pipeline objects"""
@@ -140,8 +147,12 @@ class Pipeline(object):
 
             phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
 
+            progress = tqdm.tqdm(total=len(phase_list), leave=False)
             for phase in phase_list:
+                progress.set_description(f'Processing phase {phase}')
                 app_inst.run_phase(phase, self.workspace)
+                progress.update()
+            progress.close()
 
             ramble.util.logger.logger.remove_log()
             ramble.util.logger.logger.all_msg(
