@@ -150,11 +150,15 @@ class Pipeline(object):
 
             disable_progress = ramble.config.get('config:disable_progress_bar', False)
             if not disable_progress:
-                progress = tqdm.tqdm(total=len(phase_list), leave=True,
-                                     ascii=' >-', bar_format='{l_bar}{bar}{elapsed_s}')
-            for phase in phase_list:
+                progress = tqdm.tqdm(total=len(phase_list),
+                                     leave=True,
+                                     ascii=' >=',
+                                     bar_format='{l_bar}{bar}| Elapsed (s): {elapsed_s}')
+            for phase_idx, phase in enumerate(phase_list):
                 if not disable_progress:
-                    progress.set_description(f'Processing phase {phase}')
+                    progress.set_description(
+                        f'Processing phase {phase} ({phase_idx}/{len(phase_list)})'
+                    )
                 app_inst.run_phase(phase, self.workspace)
                 if not disable_progress:
                     progress.update()
