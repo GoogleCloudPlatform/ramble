@@ -124,10 +124,40 @@
 
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
-<span class="kn">import</span> <span class="nn">llnl.util.lang</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 
 <span class="kn">import</span> <span class="nn">ramble.error</span>
+
+<span class="n">key_type</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;reserved&#39;</span><span class="p">,</span> <span class="s1">&#39;optional&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">])</span>
+<span class="n">default_keys</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;application_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;application_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;application_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;workload_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;workload_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;workload_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;license_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;experiment_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;experiment_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;experiment_status&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;log_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;log_file&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;err_file&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;env_path&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;input_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+
+    <span class="s1">&#39;spec_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span>
+    <span class="s1">&#39;env_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span>
+
+    <span class="s1">&#39;n_ranks&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;n_nodes&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;processes_per_node&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;n_threads&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;batch_submit&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;mpi_command&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;experiment_template_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="Keywords">
@@ -135,7 +165,7 @@
 <span class="k">class</span> <span class="nc">Keywords</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent known ramble keywords.</span>
 
-<span class="sd">    Each keyword can have a type. Valid types are in the class level</span>
+<span class="sd">    Each keyword can have a type. Valid types are identified by the</span>
 <span class="sd">    &#39;key_type&#39; variable as an enum.</span>
 
 <span class="sd">    A map of keys, and their types is provided in the class level &#39;keys&#39;</span>
@@ -148,108 +178,77 @@
 <span class="sd">        but it might not be possible always.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_keys</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="c1"># Merge in additional Keys:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">default_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_keys</span><span class="p">(</span><span class="n">extra_keys</span><span class="p">)</span>
 
-    <span class="n">key_type</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;reserved&#39;</span><span class="p">,</span> <span class="s1">&#39;optional&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">])</span>
-
-    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;application_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;application_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;application_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;workload_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;workload_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;workload_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;license_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;experiment_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;experiment_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;experiment_status&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;log_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;log_file&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;err_file&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;env_path&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-        <span class="s1">&#39;input_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-
-        <span class="s1">&#39;spec_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span>
-        <span class="s1">&#39;env_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span>
-
-        <span class="s1">&#39;n_ranks&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-        <span class="s1">&#39;n_nodes&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-        <span class="s1">&#39;processes_per_node&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-        <span class="s1">&#39;n_threads&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-        <span class="s1">&#39;batch_submit&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-        <span class="s1">&#39;mpi_command&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-        <span class="s1">&#39;experiment_template_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="p">}</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<div class="viewcode-block" id="Keywords.update_keys">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.update_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_keys</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_keys</span><span class="p">)</span>
         <span class="c1"># Define class attributes for all of the keys</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="Keywords.is_valid">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_valid">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is valid as a known keyword&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Keywords.is_reserved">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_reserved">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_reserved</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_reserved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is reserved&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span></div>
 
 
 <div class="viewcode-block" id="Keywords.is_optional">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_optional">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_optional</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_optional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is optional&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">optional</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span></div>
 
 
 <div class="viewcode-block" id="Keywords.is_required">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_required">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_required</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is required&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">required</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span></div>
 
 
 <div class="viewcode-block" id="Keywords.check_reserved_keys">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.check_reserved_keys">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">check_reserved_keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">definitions</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_reserved_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definitions</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check a dictionary of variable definitions for reserved keywords&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">definitions</span><span class="p">:</span>
             <span class="k">return</span>
 
         <span class="k">for</span> <span class="n">definition</span> <span class="ow">in</span> <span class="n">definitions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_reserved</span><span class="p">(</span><span class="n">definition</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_reserved</span><span class="p">(</span><span class="n">definition</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">RambleKeywordError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keyword &quot;</span><span class="si">{</span><span class="n">definition</span><span class="si">}</span><span class="s1">&quot; has been defined, &#39;</span> <span class="o">+</span>
                                          <span class="s1">&#39;but is reserved by ramble.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Keywords.check_required_keys">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.check_required_keys">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">check_required_keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">definitions</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_required_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definitions</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check a dictionary of variable definitions for all required keywords&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">definitions</span><span class="p">:</span>
             <span class="k">return</span>
 
         <span class="n">required_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_required</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_required</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
                 <span class="n">required_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">definition</span> <span class="ow">in</span> <span class="n">definitions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -265,14 +264,14 @@
 
 
 
-<span class="n">keywords</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">Keywords</span><span class="p">)</span>
-
-
 <div class="viewcode-block" id="RambleKeywordError">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.RambleKeywordError">[docs]</a>
 <span class="k">class</span> <span class="nc">RambleKeywordError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Superclass for all errors to do with Ramble Keywords&quot;&quot;&quot;</span></div>
 
+
+
+<span class="n">keywords</span> <span class="o">=</span> <span class="n">Keywords</span><span class="p">()</span>
 </pre></div>
 
            </div>
@@ -283,7 +282,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 21, 2023.
+      <span class="lastupdated">Last updated on Oct 24, 2023.
       </span></p>
   </div>
 

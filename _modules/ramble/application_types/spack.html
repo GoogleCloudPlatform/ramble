@@ -131,7 +131,7 @@
 <span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>
 <span class="kn">from</span> <span class="nn">ramble.application</span> <span class="kn">import</span> <span class="n">ApplicationBase</span><span class="p">,</span> <span class="n">ApplicationError</span>
 <span class="kn">import</span> <span class="nn">ramble.spack_runner</span>
-<span class="kn">from</span> <span class="nn">ramble.keywords</span> <span class="kn">import</span> <span class="n">Keywords</span>
+<span class="kn">import</span> <span class="nn">ramble.keywords</span>
 
 <span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
 <span class="n">level1_color</span> <span class="o">=</span> <span class="s1">&#39;@*g&#39;</span>
@@ -174,6 +174,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">SpackRunner</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">application_class</span> <span class="o">=</span> <span class="s1">&#39;SpackApplication&#39;</span>
@@ -222,7 +224,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_compiler_config_dir</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">auxiliary_software_dir</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
 
-            <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+            <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_env_packages</span><span class="p">(</span><span class="n">app_context</span><span class="p">):</span>
                 <span class="n">pkg_spec</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_spec</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
@@ -270,14 +272,14 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">create_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">create_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
 
             <span class="c1"># Write auxiliary software files into created spack env.</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">contents</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_auxiliary_software_files</span><span class="p">():</span>
                 <span class="n">aux_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">),</span>
                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
@@ -285,7 +287,7 @@
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">aux_file_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">contents</span><span class="p">))</span>
 
-            <span class="n">env_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+            <span class="n">env_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
             <span class="n">external_spack_env</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">external_spack_env</span><span class="p">(</span><span class="n">env_context</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">external_spack_env</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">copy_from_external_env</span><span class="p">(</span><span class="n">external_spack_env</span><span class="p">)</span>
@@ -414,7 +416,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
 
-            <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+            <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> \
                     <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_env_packages</span><span class="p">(</span><span class="n">app_context</span><span class="p">):</span>
@@ -536,7 +538,7 @@
     <span class="k">def</span> <span class="nf">_clean_hash_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform spack specific cleanup of variables before hashing&quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
@@ -567,7 +569,7 @@
 <div class="viewcode-block" id="SpackApplication.spack_activate">
 <a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_activate">[docs]</a>
     <span class="k">def</span> <span class="nf">spack_activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">Keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">configure_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
         <span class="n">cmds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_activate_command</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
@@ -590,7 +592,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 21, 2023.
+      <span class="lastupdated">Last updated on Oct 24, 2023.
       </span></p>
   </div>
 
