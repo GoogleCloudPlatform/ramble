@@ -247,10 +247,10 @@ class Expander(object):
 
     Additionally, math will be evaluated as part of expansion.
     """
-
-    _keywords = ramble.keywords.keywords
-
     def __init__(self, variables, experiment_set):
+
+        self._keywords = ramble.keywords.keywords
+
         self._variables = variables
 
         self._experiment_set = experiment_set

@@ -41,9 +41,8 @@ class ExperimentSet(object):
                                   'application', 'workload', 'experiment',
                                   'required'])
 
-    keywords = ramble.keywords.keywords
-
     def __init__(self, workspace):
+        self.keywords = ramble.keywords.keywords
         """Create experiment set class"""
         self.experiments = {}
         self.experiment_order = []

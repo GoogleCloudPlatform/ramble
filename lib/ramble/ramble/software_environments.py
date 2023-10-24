@@ -28,11 +28,10 @@ class SoftwareEnvironments(object):
     software environments, and unify their format.
     """
 
-    keywords = ramble.keywords.keywords
-
     supported_confs = ['v2']
 
     def __init__(self, workspace):
+        self.keywords = ramble.keywords.keywords
 
         self._raw_packages = {}
         self._packages = {}

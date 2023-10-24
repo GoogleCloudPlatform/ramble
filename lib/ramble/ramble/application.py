@@ -40,8 +40,8 @@ import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.env
 import ramble.util.directives
+import ramble.keywords
 
-from ramble.keywords import keywords
 from ramble.workspace import namespace
 
 from ramble.language.application_language import ApplicationMeta, register_phase
@@ -69,6 +69,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def __init__(self, file_path):
         super().__init__()
+
+        self.keywords = ramble.keywords.keywords
 
         self._vars_are_expanded = False
         self.expander = None
@@ -507,7 +509,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 chain_stack.append((exp_name, exp))
 
         parent_run_dir = self.expander.expand_var(
-            self.expander.expansion_str(keywords.experiment_run_dir)
+            self.expander.expansion_str(self.keywords.experiment_run_dir)
         )
 
         # Continue until the stack is empty
@@ -568,7 +570,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     self.chain_append.insert(0, new_name)
                 elif order == 'after_chain':
                     self.chain_append.append(new_name)
-                self.chain_commands[new_name] = cur_exp_def[keywords.command]
+                self.chain_commands[new_name] = cur_exp_def[self.keywords.command]
 
                 # Skip editing the new instance if the base_inst doesn't work
                 # This happens if the originating command is `workspace info`
@@ -583,14 +585,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             new_inst.variables[var] = val
 
                     new_inst.expander._experiment_namespace = new_name
-                    new_inst.variables[keywords.experiment_run_dir] = new_run_dir
-                    new_inst.variables[keywords.experiment_name] = new_name
+                    new_inst.variables[self.keywords.experiment_run_dir] = new_run_dir
+                    new_inst.variables[self.keywords.experiment_name] = new_name
 
                     # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)
-                    chain_cmd = new_inst.expander.expand_var(cur_exp_def[keywords.command])
+                    chain_cmd = new_inst.expander.expand_var(cur_exp_def[self.keywords.command])
                     self.chain_commands[new_name] = chain_cmd
-                    cur_exp_def[keywords.command] = chain_cmd
+                    cur_exp_def[self.keywords.command] = chain_cmd
                     self.experiment_set.add_chained_experiment(new_name, new_inst)
 
                 chain_idx += 1
@@ -665,6 +667,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             self._modifier_instances.append(mod_inst)
 
+            # Add this modifiers required variables for validation
+            self.keywords.update_keys(mod_inst.required_vars)
+
+        # Validate the new modifiers variables exist
+        # (note: the base ramble variables are checked earlier too)
+        self.keywords.check_required_keys(self.variables)
+
     def _get_executables(self):
         """Return executables for add_expand_vars"""
 
@@ -689,9 +698,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._inputs_and_fetchers(self.expander.workload_name)
 
         for input_file, input_conf in self._input_fetchers.items():
-            input_vars = {keywords.input_name: input_conf['input_name']}
+            input_vars = {self.keywords.input_name: input_conf['input_name']}
             if not input_conf['expand']:
-                input_vars[keywords.input_name] = input_file
+                input_vars[self.keywords.input_name] = input_file
             input_path = os.path.join(self.expander.workload_input_dir,
                                       self.expander.expand_var(input_conf['target_dir'],
                                                                extra_vars=input_vars))
@@ -910,7 +919,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for input_file, input_conf in self._input_fetchers.items():
             if not workspace.dry_run:
-                input_vars = {keywords.input_name: input_conf['input_name']}
+                input_vars = {self.keywords.input_name: input_conf['input_name']}
                 input_namespace = workload_namespace + '.' + input_file
                 input_path = self.expander.expand_var(input_conf['target_dir'],
                                                       extra_vars=input_vars)
@@ -1188,14 +1197,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         def format_context(context_match, context_format):
 
-            keywords = {}
+            context_val = {}
             if isinstance(context_format, six.string_types):
                 for group in string.Formatter().parse(context_format):
                     if group[1]:
-                        keywords[group[1]] = context_match[group[1]]
+                        context_val[group[1]] = context_match[group[1]]
 
             context_string = context_format.replace('{', '').replace('}', '') \
-                + ' = ' + context_format.format(**keywords)
+                + ' = ' + context_format.format(**context_val)
             return context_string
 
         fom_values = {}
@@ -1450,22 +1459,22 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         UNKNOWN
         """
         status_path = os.path.join(
-            self.expander.expand_var_name(keywords.experiment_run_dir),
+            self.expander.expand_var_name(self.keywords.experiment_run_dir),
             self._status_file_name
         )
 
         if os.path.isfile(status_path):
             with open(status_path, 'r') as f:
                 status_data = spack.util.spack_json.load(f)
-            self.variables[keywords.experiment_status] = \
-                status_data[keywords.experiment_status]
+            self.variables[self.keywords.experiment_status] = \
+                status_data[self.keywords.experiment_status]
         else:
-            self.variables[keywords.experiment_status] = \
+            self.variables[self.keywords.experiment_status] = \
                 'UNKNOWN'
 
     def set_status(self, status='UNKNOWN'):
         """Set the status of this experiment"""
-        self.variables[keywords.experiment_status] = status
+        self.variables[self.keywords.experiment_status] = status
 
     register_phase('write_status', pipeline='analyze', depends_on=['analyze_experiments'])
     register_phase('write_status', pipeline='setup', depends_on=['make_experiments'])
@@ -1474,10 +1483,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Phase to write an experiment's ramble_status.json file"""
 
         status_data = {}
-        status_data[keywords.experiment_status] = \
-            self.expander.expand_var_name(keywords.experiment_status)
+        status_data[self.keywords.experiment_status] = \
+            self.expander.expand_var_name(self.keywords.experiment_status)
 
-        exp_dir = self.expander.expand_var_name(keywords.experiment_run_dir)
+        exp_dir = self.expander.expand_var_name(self.keywords.experiment_run_dir)
 
         status_path = os.path.join(
             exp_dir,

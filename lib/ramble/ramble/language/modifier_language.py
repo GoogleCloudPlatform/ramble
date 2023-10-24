@@ -221,3 +221,17 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
             mod.env_var_modifications[mode_name][method].append(append_dict.copy())
 
     return _env_var_modification
+
+
+@modifier_directive('required_vars')
+def required_variable(var: str):
+    """Mark a var as being required
+
+    Args:
+        var: Value to mark as required
+    """
+
+    def _mark_required_var(mod):
+        mod.required_vars[var] = ramble.keywords.key_type.required
+
+    return _mark_required_var
