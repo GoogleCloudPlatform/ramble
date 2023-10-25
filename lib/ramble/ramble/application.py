@@ -1188,7 +1188,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             # Start with no active contexts in a file.
             active_contexts = {}
-            ramble.util.logger.logger.debug('Reading log file: %s' % file)
+            ramble.util.logger.logger.debug(f'Reading log file: {file}')
 
             with open(file, 'r') as f:
                 for line in f.readlines():

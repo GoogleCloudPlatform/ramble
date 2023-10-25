@@ -130,7 +130,7 @@ def get_module(cmd_name):
 
     if not hasattr(module, pname):
         ramble.util.logger.logger.die(
-            f"Command module {module.__name__} (module.__file__) must define function '{pname}'."
+            f"Command module {module.__name__} ({module.__file__}) must define function '{pname}'."
         )
 
     return module

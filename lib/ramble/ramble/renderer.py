@@ -189,7 +189,7 @@ class Renderer(object):
                         length_mismatch = True
                         ramble.util.logger.logger.die(f'Variable {var_name} in zip {zip_group}\n'
                                                       f'has a length of {cur_len} which differs '
-                                                      f'from\nthe current max of '
+                                                      'from the current max of '
                                                       f'{cur_zip["length"]}')
 
                 # Print length information in error case

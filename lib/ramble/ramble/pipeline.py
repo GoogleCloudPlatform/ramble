@@ -125,7 +125,7 @@ class Pipeline(object):
                             'workspace first.\n' + \
                             'Then ensure its spack configuration is ' + \
                             'properly configured.'
-            ramble.logger.logger.die(error_message)
+            ramble.util.logger.logger.die(error_message)
 
     def _prepare(self):
         """Perform preparation for pipeline execution"""

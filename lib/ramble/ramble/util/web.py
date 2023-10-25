@@ -267,7 +267,7 @@ def _debug_print_delete_results(result):
             ramble.util.logger.logger.debug(f'Deleted {d["Key"]}')
     if 'Errors' in result:
         for e in result['Errors']:
-            ramble.util.logger.logger.debug('Failed to delete {e["Key"]} ({e["Message"]})')
+            ramble.util.logger.logger.debug(f'Failed to delete {e["Key"]} ({e["Message"]})')
 
 
 def remove_url(url, recursive=False):

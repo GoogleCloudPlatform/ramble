@@ -274,8 +274,8 @@ def config_update(args):
             if scope.name == 'system':
                 skip_system_scope = True
                 msg = ('Not enough permissions to write to "system" scope. '
-                       'Skipping update at that location [cfg={0}]')
-                ramble.util.logger.logger.warn(msg.format(cfg_file))
+                       f'Skipping update at that location [cfg={cfg_file}]')
+                ramble.util.logger.logger.warn(msg)
                 continue
             cannot_overwrite.append((scope, cfg_file))
 
