@@ -329,6 +329,11 @@ class SetupPipeline(Pipeline):
         self.workspace.experiments_script = experiment_file
 
     def _complete(self):
+        # Check if the selected phases require the inventory is successful
+        if "write_inventory" in self.filters.phases or \
+           "*" in self.filters.phases:
+            self.require_inventory = True
+
         try:
             super()._construct_hash()
         except FileNotFoundError as e:
