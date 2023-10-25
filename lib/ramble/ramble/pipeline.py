@@ -319,7 +319,7 @@ class SetupPipeline(Pipeline):
     def __init__(self, workspace, filters):
         super().__init__(workspace, filters)
         self.force_inventory = True
-        self.require_inventory = True
+        self.require_inventory = False
         self.action_string = 'Setting up'
 
     def _prepare(self):
@@ -329,7 +329,12 @@ class SetupPipeline(Pipeline):
         self.workspace.experiments_script = experiment_file
 
     def _complete(self):
-        super()._construct_hash()
+        try:
+            super()._construct_hash()
+        except FileNotFoundError as e:
+            tty.warn("Unable to construct workspace hash due to missing file")
+            tty.warn(e)
+
         self.workspace.experiments_script.close()
         experiment_file_path = os.path.join(self.workspace.root,
                                             self.workspace.all_experiments_path)
