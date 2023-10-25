@@ -34,15 +34,16 @@ class Hmmer(SpackApplication):
 
     software_spec('hmmer', spack_spec='hmmer@3.3.2', compiler='gcc9')
 
+    # This would ideally not use the current_relase, as the package will need to be manually updated per release
     input_file('Pfam_A',
                url='http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz',
-               sha256='48ec2d1123c84046b00279eae1fb3d5be1b578e6221453f329d16954c89d0d35',
+               sha256='8779125bd2ed533886c559a5808903800f5c262798e5b086d276c2b829566b3a',
                description='The Pfam database is a large collection of protein families, ' +
                'each represented by multiple sequence alignments and hidden Markov models (HMMs).')
 
     input_file('uniprot_sprot_fasta',
                url='https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz',
-               sha256='cab2d5a0f2bedd1923e675ccaebb5ad58c559024509e3208b074abf355d8a347',
+               sha256='b0cacbf62fbf02f410dfd5e7963099762e53ed9f6fb123ba655583a9f7f0adab',
                description='Uniprot Swiss Prot fasta search input')
 
     executable('execute',
