@@ -15,7 +15,7 @@ import ramble.caches
 import ramble.config
 import ramble.repository
 import ramble.stage
-import ramble.util.logger
+from ramble.util.logger import logger
 from ramble.paths import lib_path, var_path
 
 description = "remove temporary files and/or downloaded archives"
@@ -52,24 +52,24 @@ def clean(parser, args):
         args.downloads = True
 
     if args.downloads:
-        ramble.util.logger.logger.msg('Removing cached downloads')
+        logger.msg('Removing cached downloads')
         ramble.caches.fetch_cache.destroy()
 
     if args.misc_cache:
-        ramble.util.logger.logger.msg('Removing cached information on repositories')
+        logger.msg('Removing cached information on repositories')
         ramble.caches.misc_cache.destroy()
 
     if args.python_cache:
-        ramble.util.logger.logger.msg('Removing python cache files')
+        logger.msg('Removing python cache files')
         for directory in [lib_path, var_path]:
             for root, dirs, files in os.walk(directory):
                 for f in files:
                     if f.endswith('.pyc') or f.endswith('.pyo'):
                         fname = os.path.join(root, f)
-                        ramble.util.logger.logger.debug(f'Removing {fname}')
+                        logger.debug(f'Removing {fname}')
                         os.remove(fname)
                 for d in dirs:
                     if d == '__pycache__':
                         dname = os.path.join(root, d)
-                        ramble.util.logger.logger.debug(f'Removing {dname}')
+                        logger.debug(f'Removing {dname}')
                         shutil.rmtree(dname)

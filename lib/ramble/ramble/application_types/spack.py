@@ -14,7 +14,7 @@ from ramble.language.shared_language import register_builtin
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
 import ramble.keywords
-import ramble.util.logger
+from ramble.util.logger import logger
 
 header_color = '@*b'
 level1_color = '@*g'
@@ -90,7 +90,7 @@ class SpackApplication(ApplicationBase):
 
         cache_tupl = ('spack-compilers', env_path)
         if workspace.check_cache(cache_tupl):
-            ramble.util.logger.logger.debug('{} already in cache.'.format(cache_tupl))
+            logger.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -104,13 +104,13 @@ class SpackApplication(ApplicationBase):
             for pkg_name in workspace.software_environments.get_env_packages(app_context):
                 pkg_spec = workspace.software_environments.get_spec(pkg_name)
                 if 'compiler' in pkg_spec:
-                    ramble.util.logger.logger.msg('Installing compilers')
-                    ramble.util.logger.logger.debug(f'Compilers: {pkg_spec["compiler"]}')
+                    logger.msg('Installing compilers')
+                    logger.debug(f'Compilers: {pkg_spec["compiler"]}')
                     comp_spec = workspace.software_environments.get_spec(pkg_spec['compiler'])
                     self.spack_runner.install_compiler(comp_spec['spack_spec'])
 
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     register_phase('software_create_env', pipeline='mirror')
     register_phase('software_create_env', pipeline='setup')
@@ -122,7 +122,7 @@ class SpackApplication(ApplicationBase):
         file for it.
         """
 
-        ramble.util.logger.logger.msg('Creating Spack environment')
+        logger.msg('Creating Spack environment')
 
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -131,7 +131,7 @@ class SpackApplication(ApplicationBase):
 
         cache_tupl = ('spack-env', env_path)
         if workspace.check_cache(cache_tupl):
-            ramble.util.logger.logger.debug('{} already in cache.'.format(cache_tupl))
+            logger.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -175,23 +175,23 @@ class SpackApplication(ApplicationBase):
             added_packages = set(self.spack_runner.added_packages())
             for pkg in self.required_packages.keys():
                 if pkg not in added_packages:
-                    ramble.util.logger.logger.die(f'Software spec {pkg} is not defined '
-                                                  f'in environment {env_context}, but is '
-                                                  f'required by the {self.name} application '
-                                                  'definition')
+                    logger.die(f'Software spec {pkg} is not defined '
+                               f'in environment {env_context}, but is '
+                               f'required by the {self.name} application '
+                               'definition')
 
             for mod_inst in self._modifier_instances:
                 for pkg in mod_inst.required_packages.keys():
                     if pkg not in added_packages:
-                        ramble.util.logger.logger.die(f'Software spec {pkg} is not defined '
-                                                      f'in environment {env_context}, but is '
-                                                      f'required by the {mod_inst.name} modifier '
-                                                      'definition')
+                        logger.die(f'Software spec {pkg} is not defined '
+                                   f'in environment {env_context}, but is '
+                                   f'required by the {mod_inst.name} modifier '
+                                   'definition')
 
             self.spack_runner.deactivate()
 
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     register_phase('software_configure', pipeline='setup',
                    depends_on=['software_create_env', 'software_install_requested_compilers'])
@@ -203,14 +203,14 @@ class SpackApplication(ApplicationBase):
         for  this experiment.
         """
 
-        ramble.util.logger.logger.msg('Concretizing Spack environment')
+        logger.msg('Concretizing Spack environment')
 
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
 
         cache_tupl = ('concretize-env', env_path)
         if workspace.check_cache(cache_tupl):
-            ramble.util.logger.logger.debug('{} already in cache.'.format(cache_tupl))
+            logger.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -226,7 +226,7 @@ class SpackApplication(ApplicationBase):
                 self.spack_runner.concretize()
 
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     register_phase('software_install', pipeline='setup',
                    depends_on=['software_configure'])
@@ -239,7 +239,7 @@ class SpackApplication(ApplicationBase):
 
         cache_tupl = ('spack-install', env_path)
         if workspace.check_cache(cache_tupl):
-            ramble.util.logger.logger.debug('{} already in cache.'.format(cache_tupl))
+            logger.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -248,12 +248,12 @@ class SpackApplication(ApplicationBase):
             self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.set_env(env_path)
 
-            ramble.util.logger.logger.msg('Installing software')
+            logger.msg('Installing software')
 
             self.spack_runner.activate()
             self.spack_runner.install()
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     register_phase('define_package_paths', pipeline='setup',
                    depends_on=['software_install'])
@@ -277,7 +277,7 @@ class SpackApplication(ApplicationBase):
         wrf@4.2.2
         """
 
-        ramble.util.logger.logger.msg('Defining Spack variables')
+        logger.msg('Defining Spack variables')
 
         try:
             self.spack_runner.set_dry_run(workspace.dry_run)
@@ -294,7 +294,7 @@ class SpackApplication(ApplicationBase):
                 self.variables[spack_pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     register_phase('mirror_software', pipeline='mirror', depends_on=['software_create_env'])
 
@@ -302,7 +302,7 @@ class SpackApplication(ApplicationBase):
         """Mirror software source for this experiment using spack"""
         import re
 
-        ramble.util.logger.logger.msg('Mirroring software')
+        logger.msg('Mirroring software')
 
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -311,7 +311,7 @@ class SpackApplication(ApplicationBase):
 
         cache_tupl = ('spack-mirror', env_path)
         if workspace.check_cache(cache_tupl):
-            ramble.util.logger.logger.debug('{} already in cache.'.format(cache_tupl))
+            logger.debug('{} already in cache.'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -356,7 +356,7 @@ class SpackApplication(ApplicationBase):
                 workspace.software_mirror_stats.errors.add(i)
 
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     register_phase('push_to_spack_cache', pipeline='pushtocache', depends_on=[])
 
@@ -365,7 +365,7 @@ class SpackApplication(ApplicationBase):
         env_path = self.expander.env_path
         cache_tupl = ('push-to-cache', env_path)
         if workspace.check_cache(cache_tupl):
-            ramble.util.logger.logger.debug('{} already pushed, skipping'.format(cache_tupl))
+            logger.debug('{} already pushed, skipping'.format(cache_tupl))
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -379,7 +379,7 @@ class SpackApplication(ApplicationBase):
 
             self.spack_runner.deactivate()
         except ramble.spack_runner.RunnerError as e:
-            ramble.util.logger.logger.die(e)
+            logger.die(e)
 
     def populate_inventory(self, workspace, force_compute=False, require_exist=False):
         """Add software environment information to hash inventory"""

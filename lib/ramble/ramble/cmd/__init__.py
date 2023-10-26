@@ -20,7 +20,7 @@ import ramble.config
 import ramble.error
 import ramble.paths
 import ramble.workspace
-import ramble.util.logger
+from ramble.util.logger import logger
 
 import spack.extensions
 import spack.util.string
@@ -109,7 +109,7 @@ def get_module(cmd_name):
     require_cmd_name(cmd_name)
     pname = python_name(cmd_name)
 
-    ramble.util.logger.logger.debug(f'Getting module for command {cmd_name}')
+    logger.debug(f'Getting module for command {cmd_name}')
 
     try:
         # Try to import the command from the built-in directory
@@ -117,7 +117,7 @@ def get_module(cmd_name):
         module = __import__(module_name,
                             fromlist=[pname, SETUP_PARSER, DESCRIPTION],
                             level=0)
-        ramble.util.logger.logger.debug(f'Imported {pname} from built-in commands')
+        logger.debug(f'Imported {pname} from built-in commands')
     except ImportError:
         try:
             module = spack.extensions.get_module(cmd_name)
@@ -129,7 +129,7 @@ def get_module(cmd_name):
     attr_setdefault(module, DESCRIPTION, "")
 
     if not hasattr(module, pname):
-        ramble.util.logger.logger.die(
+        logger.die(
             f"Command module {module.__name__} ({module.__file__}) must define function '{pname}'."
         )
 
@@ -231,7 +231,7 @@ def require_active_workspace(cmd_name):
     if ws:
         return ws
     else:
-        ramble.util.logger.logger.die(
+        logger.die(
             f'`ramble {cmd_name}` requires a workspace',
             'activate a workspace first:',
             '    ramble workspace activate WRKSPC',

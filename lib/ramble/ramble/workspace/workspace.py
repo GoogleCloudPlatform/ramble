@@ -52,7 +52,7 @@ import ramble.util.hashing
 from ramble.namespace import namespace
 import ramble.util.matrices
 import ramble.util.env
-import ramble.util.logger
+from ramble.util.logger import logger
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = 'RAMBLE_WORKSPACE'
@@ -180,7 +180,7 @@ def valid_workspace_name(name):
 
 def validate_workspace_name(name):
     if not valid_workspace_name(name):
-        ramble.util.logger.logger.debug(f'Validation failed for {name}')
+        logger.debug(f'Validation failed for {name}')
         raise ValueError((
             "'%s': names must start with a letter, and only contain "
             "letters, numbers, _, and -.") % name)
@@ -207,7 +207,7 @@ def activate(ws):
     # below.
     prepare_config_scope(ws)
 
-    ramble.util.logger.logger.debug(f"Using workspace '{ws.root}'")
+    logger.debug(f"Using workspace '{ws.root}'")
 
     # Do this last, because setting up the config must succeed first.
     _active_workspace = ws
@@ -220,7 +220,7 @@ def deactivate():
     if not _active_workspace:
         return
 
-    ramble.util.logger.logger.debug(f"Deactivated workspace '{_active_workspace.root}'")
+    logger.debug(f"Deactivated workspace '{_active_workspace.root}'")
 
     deactivate_config_scope(_active_workspace)
 
@@ -277,7 +277,7 @@ def get_workspace_path():
     path_in_config = ramble.config.get('config:workspace_dirs')
     if not path_in_config:
         # command above should have worked, so if it doesn't, error out:
-        ramble.util.logger.logger.die('No config:workspace_dirs setting found in configuration!')
+        logger.die('No config:workspace_dirs setting found in configuration!')
 
     wspath = ramble.util.path.canonicalize_path(str(path_in_config))
     return wspath
@@ -391,7 +391,7 @@ def get_workspace(args, cmd_name, required=False):
         (Workspace): if there is an arg or active workspace
     """
 
-    ramble.util.logger.logger.debug('In get_workspace()')
+    logger.debug('In get_workspace()')
 
     workspace = getattr(args, 'workspace', None)
     if workspace:
@@ -407,7 +407,7 @@ def get_workspace(args, cmd_name, required=False):
         return _active_workspace
     # elif not required:
     else:
-        ramble.util.logger.logger.die(
+        logger.die(
             f'`ramble {cmd_name}` requires a workspace',
             'activate a workspace first:',
             '    ramble workspace activate WRKSPC',
@@ -448,7 +448,7 @@ class Workspace(object):
     hash_file_name = 'workspace_hash.sha256'
 
     def __init__(self, root, dry_run=False):
-        ramble.util.logger.logger.debug(f'In workspace init. Root = {root}')
+        logger.debug(f'In workspace init. Root = {root}')
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
@@ -636,25 +636,17 @@ class Workspace(object):
         deprecated_sections = []
 
         if len(deprecated_sections) > 0:
-            ramble.util.logger.logger.warn(
-                'Your workspace configuration contains deprecated sections:'
-            )
+            logger.warn('Your workspace configuration contains deprecated sections:')
             for section in deprecated_sections:
-                ramble.util.logger.logger.warn(f'     {section}')
-            ramble.util.logger.logger.warn(
-                'Please see the current workspace documentation and update'
-            )
-            ramble.util.logger.logger.warn(
-                'to ensure your workspace continues to function properly'
-            )
+                logger.warn(f'     {section}')
+            logger.warn('Please see the current workspace documentation and update')
+            logger.warn('to ensure your workspace continues to function properly')
 
         if len(error_sections) > 0:
-            ramble.util.logger.logger.warn(
-                'Your workspace configuration contains invalid sections:'
-            )
+            logger.warn('Your workspace configuration contains invalid sections:')
             for section in deprecated_sections:
-                ramble.util.logger.logger.warn(f'     {section}')
-            ramble.util.logger.logger.die('Please update to the latest format.')
+                logger.warn(f'     {section}')
+            logger.die('Please update to the latest format.')
 
     def _read_yaml(self, config, f, raw_yaml=None):
         if raw_yaml:
@@ -728,9 +720,9 @@ class Workspace(object):
         self.success_list.flush_scope(scope)
 
         if namespace.success in contents:
-            ramble.util.logger.logger.debug(' ---- Found success in %s' % scope)
+            logger.debug(' ---- Found success in %s' % scope)
             for conf in contents[namespace.success]:
-                ramble.util.logger.logger.debug(' ---- Adding criteria %s' % conf['name'])
+                logger.debug(' ---- Adding criteria %s' % conf['name'])
                 self.success_list.add_criteria(scope, **conf)
 
     def all_specs(self):
@@ -778,7 +770,7 @@ class Workspace(object):
         """
 
         ws_dict = self._get_workspace_dict()
-        ramble.util.logger.logger.debug(f' With ws dict: {ws_dict}')
+        logger.debug(f' With ws dict: {ws_dict}')
 
         # Iterate over applications in ramble.yaml first
         app_dict = ramble.config.config.get_config('applications')
@@ -790,13 +782,13 @@ class Workspace(object):
 
             yield contents, application_context
 
-        ramble.util.logger.logger.debug('  Iterating over configs in directories...')
+        logger.debug('  Iterating over configs in directories...')
         # Iterate over applications defined in application directories
         # files after the ramble.yaml file is complete
         for app_conf in self.application_configs:
             config = self._get_application_dict_config(app_conf)
             if namespace.application not in config:
-                ramble.util.logger.logger.msg(f'No applications in config file {app_conf}')
+                logger.msg(f'No applications in config file {app_conf}')
             app_dict = config[namespace.application]
             for application, contents in app_dict.items():
                 application_context = \
@@ -814,7 +806,7 @@ class Workspace(object):
         """
 
         if namespace.workload not in application:
-            ramble.util.logger.logger.msg('No workloads in application')
+            logger.msg('No workloads in application')
             return
 
         workloads = application[namespace.workload]
@@ -835,7 +827,7 @@ class Workspace(object):
         """
 
         if namespace.experiment not in workload:
-            ramble.util.logger.logger.msg('No experiments in workload')
+            logger.msg('No experiments in workload')
             return
 
         experiments = workload[namespace.experiment]
@@ -906,8 +898,8 @@ class Workspace(object):
                                 f'compiler:{info["compiler"]}'
                             ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
                     elif not specs_equiv(info, packages_dict[comp]):
-                        ramble.util.logger.logger.debug(f'  Spec 1: {str(info)}')
-                        ramble.util.logger.logger.debug(f'  Spec 2: {str(packages_dict[comp])}')
+                        logger.debug(f'  Spec 1: {str(info)}')
+                        logger.debug(f'  Spec 2: {str(packages_dict[comp])}')
                         raise RambleConflictingDefinitionError(
                             f'Compiler {comp} defined in multiple conflicting ways'
                         )
@@ -916,7 +908,7 @@ class Workspace(object):
                 environments_dict[env_name] = syaml.syaml_dict()
                 environments_dict[env_name][namespace.packages] = []
 
-            ramble.util.logger.logger.debug(f'Trying to define packages for {env_name}')
+            logger.debug(f'Trying to define packages for {env_name}')
             app_packages = environments_dict[env_name][namespace.packages]
 
             software_dicts = [app_inst.software_specs]
@@ -925,7 +917,7 @@ class Workspace(object):
 
             for software_dict in software_dicts:
                 for spec_name, info in software_dict.items():
-                    ramble.util.logger.logger.debug(f'    Found spec: {spec_name}')
+                    logger.debug(f'    Found spec: {spec_name}')
                     if spec_name not in packages_dict:
                         packages_dict[spec_name] = syaml.syaml_dict()
                         packages_dict[spec_name]['spack_spec'] = info['spack_spec']
@@ -935,10 +927,8 @@ class Workspace(object):
                             packages_dict[spec_name]['compiler'] = info['compiler']
 
                     elif not specs_equiv(info, packages_dict[spec_name]):
-                        ramble.util.logger.logger.debug(f'  Spec 1: {str(info)}')
-                        ramble.util.logger.logger.debug(
-                            f'  Spec 2: {str(packages_dict[spec_name])}'
-                        )
+                        logger.debug(f'  Spec 1: {str(info)}')
+                        logger.debug(f'  Spec 2: {str(packages_dict[spec_name])}')
                         raise RambleConflictingDefinitionError(
                             f'Package {spec_name} defined in multiple conflicting ways'
                         )
@@ -1043,7 +1033,7 @@ class Workspace(object):
                                                              fom['units'])
                                     f.write('    %s\n' % (output.strip()))
                 else:
-                    ramble.util.logger.logger.msg('No results to write')
+                    logger.msg('No results to write')
 
             self.simlink_result(filename_base, latest_base, file_extension)
 
@@ -1064,11 +1054,11 @@ class Workspace(object):
             self.simlink_result(filename_base, latest_base, file_extension)
 
         if not results_written:
-            ramble.util.logger.logger.die('Results were not written.')
+            logger.die('Results were not written.')
 
-        ramble.util.logger.logger.msg('Results are written to:')
+        logger.msg('Results are written to:')
         for out_file in results_written:
-            ramble.util.logger.logger.msg('  %s' % out_file)
+            logger.msg(f'  {out_file}')
 
         return filename_base
 
@@ -1270,7 +1260,7 @@ class Workspace(object):
         if missing:
             msg = 'Detected {0} missing include path(s):'.format(len(missing))
             msg += '\n   {0}'.format('\n   '.join(missing))
-            ramble.util.logger.logger.die('{0}\nPlease correct and try again.'.format(msg))
+            logger.die(f'{msg}\nPlease correct and try again.')
 
         return scopes
 
@@ -1345,8 +1335,8 @@ class Workspace(object):
 
     def get_applications(self):
         """Get the dictionary of applications"""
-        ramble.util.logger.logger.debug('Getting app dict.')
-        ramble.util.logger.logger.debug(f' {self._get_workspace_dict()}')
+        logger.debug('Getting app dict.')
+        logger.debug(f' {self._get_workspace_dict()}')
         workspace_dict = self._get_workspace_dict()
         if namespace.application not in workspace_dict[namespace.ramble]:
             workspace_dict[namespace.ramble][namespace.application] = \

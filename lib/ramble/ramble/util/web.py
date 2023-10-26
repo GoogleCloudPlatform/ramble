@@ -28,13 +28,13 @@ from llnl.util.filesystem import mkdirp, rename
 
 import spack
 import ramble.config
-import ramble.util.logger
 import spack.error
 import spack.url
 import spack.util.crypto
 import spack.util.gcs as gcs_util
 import spack.util.s3 as s3_util
 import spack.util.url as url_util
+from ramble.util.logger import logger
 from spack.util.compression import ALLOWED_ARCHIVE_TYPES
 from spack.util.path import convert_to_posix_path
 
@@ -81,7 +81,7 @@ def uses_ssl(parsed_url):
             return True
 
     elif parsed_url.scheme == 'gs':
-        ramble.util.logger.logger.debug("(uses_ssl) GCS Blob is https")
+        logger.debug("(uses_ssl) GCS Blob is https")
         return True
 
     return False
@@ -156,7 +156,7 @@ def read_from_url(url, accept_content_type=None):
             not content_type.startswith(accept_content_type)))
 
     if reject_content_type:
-        ramble.util.logger.logger.debug("ignoring page {0}{1}{2}".format(
+        logger.debug("ignoring page {0}{1}{2}".format(
             url,
             " with content type " if content_type is not None else "",
             content_type or ""))
@@ -167,8 +167,8 @@ def read_from_url(url, accept_content_type=None):
 
 
 def warn_no_ssl_cert_checking():
-    ramble.util.logger.logger.warn("Ramble will not check SSL certificates. You need to update "
-                                   "your Python to enable certificate verification.")
+    logger.warn("Ramble will not check SSL certificates. You need to update "
+                "your Python to enable certificate verification.")
 
 
 def push_to_url(
@@ -183,7 +183,7 @@ def push_to_url(
         warn_no_ssl_cert_checking()
 
     remote_file_path = url_util.local_file_path(remote_url)
-    ramble.util.logger.logger.debug(f'Trying to backup file to: {remote_file_path}')
+    logger.debug(f'Trying to backup file to: {remote_file_path}')
     if remote_file_path is not None:
         mkdirp(os.path.dirname(remote_file_path))
         if keep_original:
@@ -264,10 +264,10 @@ def url_exists(url):
 def _debug_print_delete_results(result):
     if 'Deleted' in result:
         for d in result['Deleted']:
-            ramble.util.logger.logger.debug(f'Deleted {d["Key"]}')
+            logger.debug(f'Deleted {d["Key"]}')
     if 'Errors' in result:
         for e in result['Errors']:
-            ramble.util.logger.logger.debug(f'Failed to delete {e["Key"]} ({e["Message"]})')
+            logger.debug(f'Failed to delete {e["Key"]} ({e["Message"]})')
 
 
 def remove_url(url, recursive=False):
@@ -481,13 +481,13 @@ def spider(root_urls, depth=0, concurrency=32):
                     _visited.add(abs_link)
 
         except URLError as e:
-            ramble.util.logger.logger.debug(str(e))
+            logger.debug(str(e))
 
             if hasattr(e, 'reason') and isinstance(e.reason, ssl.SSLError):
-                ramble.util.logger.logger.warn("Ramble was unable to fetch url list due to a "
-                                               "certificate verification problem. You can try "
-                                               "running ramble -k, which will not check SSL "
-                                               "certificates. Use this at your own risk.")
+                logger.warn("Ramble was unable to fetch url list due to a "
+                            "certificate verification problem. You can try "
+                            "running ramble -k, which will not check SSL "
+                            "certificates. Use this at your own risk.")
 
         except HTMLParseError as e:
             # This error indicates that Python's HTML parser sucks.
@@ -497,16 +497,16 @@ def spider(root_urls, depth=0, concurrency=32):
             if sys.version_info[:3] < (2, 7, 3):
                 msg += " Use Python 2.7.3 or newer for better HTML parsing."
 
-            ramble.util.logger.logger.warn(msg, url, "HTMLParseError: " + str(e))
+            logger.warn(msg, url, "HTMLParseError: " + str(e))
 
         except Exception as e:
             # Other types of errors are completely ignored,
             # except in debug mode
-            ramble.util.logger.logger.debug(f"Error in _spider: {type(e)}:{str(e)}",
-                                            traceback.format_exc())
+            logger.debug(f"Error in _spider: {type(e)}:{str(e)}",
+                         traceback.format_exc())
 
         finally:
-            ramble.util.logger.logger.debug("SPIDER: [url={0}]".format(url))
+            logger.debug("SPIDER: [url={0}]".format(url))
 
         return pages, links, subcalls
 
@@ -527,7 +527,7 @@ def spider(root_urls, depth=0, concurrency=32):
     tp = multiprocessing.pool.ThreadPool(processes=concurrency)
     try:
         while current_depth <= depth:
-            ramble.util.logger.logger.debug(
+            logger.debug(
                 "SPIDER: [depth={0}, max_depth={1}, urls={2}]".format(
                     current_depth, depth, len(spider_args)
                 )

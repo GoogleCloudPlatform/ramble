@@ -42,7 +42,7 @@ import ramble.workspace
 import ramble.workspace.shell
 import ramble.paths
 import ramble.repository
-import ramble.util.logger
+from ramble.util.logger import logger
 import spack.util.debug
 import spack.util.environment
 import spack.util.path
@@ -166,9 +166,7 @@ def index_commands():
         for p in required_command_properties:
             prop = getattr(cmd_module, p, None)
             if not prop:
-                ramble.util.logger.logger.die(
-                    f"Command doesn't define a property '{p}': {command}"
-                )
+                logger.die(f"Command doesn't define a property '{p}': {command}")
 
         # add commands to lists for their level and higher levels
         for level in reversed(levels):
@@ -487,7 +485,7 @@ def make_argument_parser(**kwargs):
 
 def send_warning_to_tty(message, *args):
     """Redirects messages to ramble.util.logger.logger.warn."""
-    ramble.util.logger.logger.warn(message)
+    logger.warn(message)
 
 
 def setup_main_options(args):
@@ -525,7 +523,7 @@ def setup_main_options(args):
     if args.disable_logger:
         ramble.config.set('config:disable_logger', True, scope='command_line')
 
-    ramble.util.logger.logger.enabled = not ramble.config.get('config:disable_logger', False)
+    logger.enabled = not ramble.config.get('config:disable_logger', False)
 
     if args.disable_progress_bar:
         ramble.config.set('config:disable_progress_bar', True, scope='command_line')
@@ -547,9 +545,7 @@ def setup_main_options(args):
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:
-        ramble.util.logger.logger.warn(
-            "You asked for --insecure. Will NOT check SSL certificates."
-        )
+        logger.warn("You asked for --insecure. Will NOT check SSL certificates.")
         ramble.config.set('config:verify_ssl', False, scope='command_line')
 
     # Use the ramble config command to handle parsing the config strings
@@ -579,9 +575,7 @@ def _invoke_command(command, parser, args, unknown_args):
         return_val = command(parser, args, unknown_args)
     else:
         if unknown_args:
-            ramble.util.logger.logger.die(
-                f'unrecognized arguments: {" ".join(unknown_args)}'
-            )
+            logger.die(f'unrecognized arguments: {" ".join(unknown_args)}')
         return_val = command(parser, args)
 
     # Allow commands to return and error code if they want
@@ -657,7 +651,7 @@ class RambleCommand(object):
             self.returncode = e.code
 
         except BaseException as e:
-            ramble.util.logger.logger.debug(e)
+            logger.debug(e)
             self.error = e
             if fail_on_error:
                 self._log_command_output(out)
@@ -677,7 +671,7 @@ class RambleCommand(object):
             fmt = self.command_name + ': {0}'
             for ln in out.getvalue().split('\n'):
                 if len(ln) > 0:
-                    ramble.util.logger.logger.verbose(fmt.format(ln.replace('==> ', '')))
+                    logger.verbose(fmt.format(ln.replace('==> ', '')))
 
 
 def _profile_wrapper(command, parser, args, unknown_args):
@@ -687,7 +681,7 @@ def _profile_wrapper(command, parser, args, unknown_args):
         nlines = int(args.lines)
     except ValueError:
         if args.lines != 'all':
-            ramble.util.logger.logger.die(f'Invalid number for --lines: {args.lines}')
+            logger.die(f'Invalid number for --lines: {args.lines}')
         nlines = -1
 
     # allow comma-separated list of fields
@@ -696,7 +690,7 @@ def _profile_wrapper(command, parser, args, unknown_args):
         sortby = args.sorted_profile.split(',')
         for stat in sortby:
             if stat not in stat_names:
-                ramble.util.logger.logger.die(f"Invalid sort field: {stat}")
+                logger.die(f"Invalid sort field: {stat}")
 
     try:
         # make a profiler and run the code.
@@ -731,7 +725,7 @@ def print_setup_info(*info):
         elif shell == 'csh':
             print("set %s = '%s'" % (var, value))
         else:
-            ramble.util.logger.logger.die('shell must be sh or csh')
+            logger.die('shell must be sh or csh')
 
 
 def _main(argv=None):
@@ -871,7 +865,7 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     if workspace_format_error:
         raise_error = False
         if cmd_name.strip() in edit_cmds:
-            ramble.util.logger.logger.msg(
+            logger.msg(
                 "Error while reading workspace config. In some cases this can be " +
                 "avoided by passing `-W` to ramble"
             )
@@ -915,14 +909,14 @@ def main(argv=None):
         return _main(argv)
 
     except RambleError as e:
-        ramble.util.logger.logger.debug(e)
+        logger.debug(e)
         e.die()  # gracefully die on any RambleErrors
 
     except KeyboardInterrupt:
         if ramble.config.get('config:debug'):
             raise
         sys.stderr.write('\n')
-        ramble.util.logger.logger.error("Keyboard interrupt.")
+        logger.error("Keyboard interrupt.")
         if sys.version_info >= (3, 5):
             return signal.SIGINT.value
         else:
@@ -936,7 +930,7 @@ def main(argv=None):
     except Exception as e:
         if ramble.config.get('config:debug'):
             raise
-        ramble.util.logger.logger.error(e)
+        logger.error(e)
         return 3
 
 

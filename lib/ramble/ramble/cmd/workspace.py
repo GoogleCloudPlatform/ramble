@@ -32,7 +32,7 @@ import ramble.filters
 import ramble.experimental.uploader
 import ramble.software_environments
 import ramble.util.colors as rucolor
-import ramble.util.logger
+from ramble.util.logger import logger
 
 if sys.version_info >= (3, 3):
     from collections.abc import Sequence  # novm noqa: F401
@@ -103,7 +103,7 @@ def create_temp_workspace_directory():
 
 def workspace_activate(args):
     if not args.activate_workspace and not args.dir and not args.temp:
-        ramble.util.logger.logger.die(
+        logger.die(
             'ramble workspace activate requires a workspace name, directory, or --temp'
         )
 
@@ -133,7 +133,7 @@ def workspace_activate(args):
         short_name = os.path.basename(workspace_path)
 
     else:
-        ramble.util.logger.logger.die(f"No such workspace: '{workspace_name_or_dir}'")
+        logger.die(f"No such workspace: '{workspace_name_or_dir}'")
 
     workspace_prompt = '[%s]' % short_name
 
@@ -186,14 +186,14 @@ def workspace_deactivate(args):
 
     # Error out when -w, -W, -D flags are given, cause they are ambiguous.
     if args.workspace or args.no_workspace or args.workspace_dir:
-        ramble.util.logger.logger.die(
+        logger.die(
             'Calling ramble workspace deactivate with --workspace,'
             ' --workspace-dir, and --no-workspace '
             'is ambiguous'
         )
 
     if ramble.workspace.active_workspace() is None:
-        ramble.util.logger.logger.die('No workspace is currently active.')
+        logger.die('No workspace is currently active.')
 
     cmds = ramble.workspace.shell.deactivate_header(args.shell)
     env_mods = ramble.workspace.shell.deactivate()
@@ -240,15 +240,15 @@ def _workspace_create(name_or_path, dir=False,
     if dir:
         workspace = ramble.workspace.Workspace(name_or_path)
         workspace.write()
-        ramble.util.logger.logger.msg(f"Created workspace in {workspace.path}")
-        ramble.util.logger.logger.msg("You can activate this workspace with:")
-        ramble.util.logger.logger.msg(f"  ramble workspace activate {workspace.path}")
+        logger.msg(f"Created workspace in {workspace.path}")
+        logger.msg("You can activate this workspace with:")
+        logger.msg(f"  ramble workspace activate {workspace.path}")
     else:
         workspace = ramble.workspace.create(name_or_path)
         workspace.write()
-        ramble.util.logger.logger.msg(f"Created workspace in {name_or_path}")
-        ramble.util.logger.logger.msg("You can activate this workspace with:")
-        ramble.util.logger.logger.msg(f"  ramble workspace activate {name_or_path}")
+        logger.msg(f"Created workspace in {name_or_path}")
+        logger.msg("You can activate this workspace with:")
+        logger.msg(f"  ramble workspace activate {name_or_path}")
 
     if config:
         with open(config, 'r') as f:
@@ -284,7 +284,7 @@ def workspace_remove(args):
         workspace = ramble.workspace.read(workspace_name)
         read_workspaces.append(workspace)
 
-    ramble.util.logger.logger.debug(f'Removal args: {args}')
+    logger.debug(f'Removal args: {args}')
 
     if not args.yes_to_all:
         answer = tty.get_yes_or_no(
@@ -293,16 +293,16 @@ def workspace_remove(args):
                 string.comma_and(args.rm_wrkspc)),
             default=False)
         if not answer:
-            ramble.util.logger.logger.die("Will not remove any workspaces")
+            logger.die("Will not remove any workspaces")
 
     for workspace in read_workspaces:
         if workspace.active:
-            ramble.util.logger.logger.die(
+            logger.die(
                 f"Workspace {workspace.name} can't be removed while activated."
             )
 
         workspace.destroy()
-        ramble.util.logger.logger.msg(f"Successfully removed workspace '{workspace.name}'")
+        logger.msg(f"Successfully removed workspace '{workspace.name}'")
 
 
 def workspace_concretize_setup_parser(subparser):
@@ -313,7 +313,7 @@ def workspace_concretize_setup_parser(subparser):
 def workspace_concretize(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace concretize')
 
-    ramble.util.logger.logger.debug('Concretizing workspace')
+    logger.debug('Concretizing workspace')
     ws.concretize()
 
 
@@ -354,7 +354,7 @@ def workspace_setup(args):
 
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
-    ramble.util.logger.logger.debug('Setting up workspace')
+    logger.debug('Setting up workspace')
     pipeline = pipeline_cls(ws, filters)
 
     with ws.write_transaction():
@@ -402,7 +402,7 @@ def workspace_analyze(args):
 
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
-    ramble.util.logger.logger.debug('Analyzing workspace')
+    logger.debug('Analyzing workspace')
     pipeline = pipeline_cls(ws,
                             filters,
                             output_formats=args.output_formats,
@@ -563,9 +563,9 @@ def workspace_list(args):
     # say how many there are if writing to a tty
     if sys.stdout.isatty():
         if not names:
-            ramble.util.logger.logger.msg('No workspaces')
+            logger.msg('No workspaces')
         else:
-            ramble.util.logger.logger.msg(f'{len(names)} workspaces')
+            logger.msg(f'{len(names)} workspaces')
 
     colify(color_names, indent=4)
 
@@ -593,7 +593,7 @@ def workspace_edit(args):
     ramble_ws = ramble.cmd.find_workspace_path(args)
 
     if not ramble_ws:
-        ramble.util.logger.logger.die(
+        logger.die(
             'ramble workspace edit requires either a command '
             'line workspace or an active workspace'
         )

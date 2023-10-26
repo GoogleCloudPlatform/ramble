@@ -9,7 +9,7 @@
 import json
 
 import ramble.experimental.uploader
-import ramble.util.logger
+from ramble.util.logger import logger
 
 description = "import experiment results from file"
 section = "results"
@@ -38,21 +38,21 @@ def import_results_file(filename):
     """
     Import Ramble experiment results from a JSON file.
     """
-    ramble.util.logger.logger.debug("File to import:")
-    ramble.util.logger.logger.debug(filename)
+    logger.debug("File to import:")
+    logger.debug(filename)
 
     imported_file = open(filename)
 
     try:
-        ramble.util.logger.logger.msg("Import file...")
+        logger.msg("Import file...")
         parsed_json_file = json.load(imported_file)
         # Check if data contains an experiment
         if parsed_json_file.get('experiments'):
             return parsed_json_file
         else:
-            ramble.util.logger.logger.die("Error parsing file: Does not contain valid data to upload.")
+            logger.die("Error parsing file: Does not contain valid data to upload.")
     except ValueError:
-        ramble.util.logger.logger.die("Error parsing file: Invalid JSON formatting.")
+        logger.die("Error parsing file: Invalid JSON formatting.")
 
 
 def results(parser, args):

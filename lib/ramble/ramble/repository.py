@@ -40,9 +40,9 @@ import llnl.util.filesystem as fs
 import ramble.caches
 import ramble.config
 import ramble.spec
-import ramble.util.logger
 import ramble.util.path
 import ramble.util.naming as nm
+from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
 import ramble.util.imp
@@ -273,7 +273,7 @@ class FastObjectChecker(Mapping):
                 if not obj_name.startswith('.') and not any(
                     obj_name == obj_info['config'] for obj_info in type_definitions.values()
                 ):
-                    ramble.util.logger.logger.warn(
+                    logger.warn(
                         f'Skipping {self.object_type} '
                         f'at {obj_dir}. "{obj_name}" is not '
                         'a valid Ramble module name.'
@@ -293,7 +293,7 @@ class FastObjectChecker(Mapping):
                     # No application.py file here.
                     continue
                 elif e.errno == errno.EACCES:
-                    ramble.util.logger.logger.warn(
+                    logger.warn(
                         f"Can't read {self.object_type} file {obj_file}."
                     )
                     continue
@@ -556,7 +556,7 @@ class RepoPath(object):
                     repo = Repo(repo, object_type=object_type)
                 self.put_last(repo)
             except RepoError as e:
-                ramble.util.logger.logger.warn(
+                logger.warn(
                     "Failed to initialize repository: '%s'." % repo,
                     e.message,
                     "To remove the bad repository, run this command:",
@@ -697,7 +697,7 @@ class RepoPath(object):
         """Given a spec, get the repository for its object."""
         # We don't @_autospec this function b/c it's called very frequently
         # and we want to avoid parsing str's into Specs unnecessarily.
-        ramble.util.logger.logger.debug(f'Getting repo for obj {spec}')
+        logger.debug(f'Getting repo for obj {spec}')
         namespace = None
         if isinstance(spec, ramble.spec.Spec):
             namespace = spec.namespace
@@ -706,7 +706,7 @@ class RepoPath(object):
             # handle strings directly for speed instead of @_autospec'ing
             namespace, _, name = spec.rpartition('.')
 
-        ramble.util.logger.logger.debug(f' Name and namespace = {namespace} - {name}')
+        logger.debug(f' Name and namespace = {namespace} - {name}')
         # If the spec already has a namespace, then return the
         # corresponding repo if we know about it.
         if namespace:
@@ -718,7 +718,7 @@ class RepoPath(object):
         # If there's no namespace, search in the RepoPath.
         for repo in self.repos:
             if name in repo:
-                ramble.util.logger.logger.debug('Found repo...')
+                logger.debug('Found repo...')
                 return repo
 
         # If the object isn't in any repo, return the one with
@@ -974,14 +974,12 @@ class Repo(object):
 
                 if (not yaml_data or 'repo' not in yaml_data or
                         not isinstance(yaml_data['repo'], dict)):
-                    ramble.util.logger.logger.die(
-                        f"Invalid {self.config_name} in repository {self.root}"
-                    )
+                    logger.die(f"Invalid {self.config_name} in repository {self.root}")
 
                 return yaml_data['repo']
 
         except IOError:
-            ramble.util.logger.logger.die(
+            logger.die(
                 f"Error reading {self.config_file} when opening {self.root}"
             )
 
@@ -992,7 +990,7 @@ class Repo(object):
         # it actually exists, because we have to load it anyway, and that ends
         # up checking for existence. We avoid constructing
         # FastObjectChecker, which will stat all objects.
-        ramble.util.logger.logger.debug(f'Getting obj {spec} from repo')
+        logger.debug(f'Getting obj {spec} from repo')
         if spec.name is None:
             raise UnknownObjectError(None, self)
 
@@ -1006,7 +1004,7 @@ class Repo(object):
             # pass these through as their error messages will be fine.
             raise
         except Exception as e:
-            ramble.util.logger.logger.debug(e)
+            logger.debug(e)
 
             # Make sure other errors in constructors hit the error
             # handler by wrapping them
@@ -1137,10 +1135,10 @@ class Repo(object):
                 raise UnknownObjectError(obj_name, self)
 
             if not os.path.isfile(file_path):
-                ramble.util.logger.logger.die(f"Something's wrong. '{file_path}' is not a file!")
+                logger.die(f"Something's wrong. '{file_path}' is not a file!")
 
             if not os.access(file_path, os.R_OK):
-                ramble.util.logger.logger.die(f"Cannot read '{file_path}'!")
+                logger.die(f"Cannot read '{file_path}'!")
 
             # e.g., ramble.app.builtin.mpich
             fullname = "%s.%s" % (self.full_namespace, obj_name)
@@ -1174,12 +1172,12 @@ class Repo(object):
                                         % (self.namespace, namespace))
 
         class_name = nm.mod_to_class(obj_name)
-        ramble.util.logger.logger.debug(f' Class name = {class_name}')
+        logger.debug(f' Class name = {class_name}')
         module = self._get_obj_module(obj_name)
 
         cls = getattr(module, class_name)
         if not inspect.isclass(cls):
-            ramble.util.logger.logger.die(f"{obj_name}.{class_name} is not a class")
+            logger.die(f"{obj_name}.{class_name} is not a class")
 
         return cls
 

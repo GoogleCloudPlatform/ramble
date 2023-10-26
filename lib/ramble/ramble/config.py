@@ -67,7 +67,7 @@ import ramble.schema.success_criteria
 import ramble.schema.variables
 
 from ramble.error import RambleError
-import ramble.util.logger
+from ramble.util.logger import logger
 
 # Hacked yaml for configuration files preserves line numbers.
 import spack.util.spack_yaml as syaml
@@ -1015,7 +1015,7 @@ def read_config_file(filename, schema=None):
         raise ConfigFileError("Config file is not readable: %s" % filename)
 
     try:
-        ramble.util.logger.logger.debug(f"Reading config file {filename}")
+        logger.debug(f"Reading config file {filename}")
         with open(filename) as f:
             data = syaml.load_config(f)
 

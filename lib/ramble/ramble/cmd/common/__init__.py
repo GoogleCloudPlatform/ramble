@@ -9,7 +9,7 @@
 import llnl.util.tty.color as color
 
 import ramble.paths
-import ramble.util.logger
+from ramble.util.logger import logger
 
 
 def shell_init_instructions(cmd, equivalent):
@@ -49,4 +49,4 @@ def shell_init_instructions(cmd, equivalent):
         msg += ["  " + equivalent]
 
     msg += ['']
-    ramble.util.logger.logger.error(*msg)
+    logger.error(*msg)

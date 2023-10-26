@@ -9,7 +9,7 @@
 import re
 import fnmatch
 
-import ramble.util.logger
+from ramble.util.logger import logger
 
 
 class ScopedCriteriaList(object):
@@ -51,14 +51,14 @@ class ScopedCriteriaList(object):
 
     def validate_scope(self, scope):
         if scope not in self._valid_scopes:
-            ramble.util.logger.logger.die(f'Success scope {scope} is not valid. '
-                                          f'Possible scopes are: {self._valid_scopes}')
+            logger.die(f'Success scope {scope} is not valid. '
+                       f'Possible scopes are: {self._valid_scopes}')
 
     def add_criteria(self, scope, name, mode, *args, **kwargs):
         self.validate_scope(scope)
         exists = self.find_criteria(name)
         if exists:
-            ramble.util.logger.logger.die(f'Success criteria {name} is not unique.')
+            logger.die(f'Success criteria {name} is not unique.')
 
         self.criteria[scope].append(SuccessCriteria(name, mode, *args, **kwargs))
 
@@ -70,10 +70,10 @@ class ScopedCriteriaList(object):
         self.validate_scope(scope)
 
         for scope in self._flush_scopes[scope]:
-            ramble.util.logger.logger.debug(' Flushing scope: %s' % scope)
-            ramble.util.logger.logger.debug('    It contained:')
+            logger.debug(f' Flushing scope: {scope}')
+            logger.debug('    It contained:')
             for crit in self.criteria[scope]:
-                ramble.util.logger.logger.debug('      %s' % crit.name)
+                logger.debug(f'      {crit.name}')
             del self.criteria[scope]
             self.criteria[scope] = []
 
@@ -111,7 +111,7 @@ class SuccessCriteria(object):
                  fom_name=None, fom_context='null', formula=None):
         self.name = name
         if mode not in self._valid_modes:
-            ramble.util.logger.logger.die(
+            logger.die(
                 f'{mode} is not valid. Possible modes are: {self._valid_modes}'
             )
 
@@ -125,22 +125,22 @@ class SuccessCriteria(object):
 
         if mode == 'string':
             if match is None:
-                ramble.util.logger.logger.die(f'Success criteria with mode="{mode}" '
-                                              'require a "match" attribute.')
+                logger.die(f'Success criteria with mode="{mode}" '
+                           'require a "match" attribute.')
 
             self.match = re.compile(match)
             self.file = file
 
         elif mode == 'fom_comparison':
             if formula is None or fom_name is None:
-                ramble.util.logger.logger.die(f'Success criteria with mode="{mode}" '
-                                              'require a "fom_name" and "formula" attribute.')
+                logger.die(f'Success criteria with mode="{mode}" '
+                           'require a "fom_name" and "formula" attribute.')
             self.formula = formula
             self.fom_name = fom_name
             self.fom_context = fom_context
 
     def passed(self, test=None, app_inst=None, fom_values=None):
-        ramble.util.logger.logger.debug(f'Testing criteria {self.name} mode = {self.mode}')
+        logger.debug(f'Testing criteria {self.name} mode = {self.mode}')
         if self.mode == 'string':
             match_obj = self.match.match(test)
             if match_obj:
@@ -151,12 +151,12 @@ class SuccessCriteria(object):
                 return func()
         elif self.mode == 'fom_comparison':
             if fom_values is None:
-                ramble.util.logger.logger.die(f'Success criteria of mode="{self.mode}" requires '
-                                              'defined fom_values attribute in "passed" function.')
+                logger.die(f'Success criteria of mode="{self.mode}" requires '
+                           'defined fom_values attribute in "passed" function.')
 
             if app_inst is None:
-                ramble.util.logger.logger.die(f'Success criteria of mode="{self.mode}" requires '
-                                              'defined app_inst attribute in "passed" function.')
+                logger.die(f'Success criteria of mode="{self.mode}" requires '
+                           'defined app_inst attribute in "passed" function.')
 
             comparison_tested = False
             result = True
@@ -165,7 +165,7 @@ class SuccessCriteria(object):
                                       app_inst.expander.expand_var(self.fom_context))
             # If fom context doesn't exist, fail the comparison
             if not contexts:
-                ramble.util.logger.logger.debug(
+                logger.debug(
                     f'When checking success criteria "{self.name}" FOM '
                     f'context "{self.fom_context}" matches no contexts.'
                 )
@@ -186,7 +186,7 @@ class SuccessCriteria(object):
 
             # If fom doesn't match any fom names, fail the comparison
             if not comparison_tested:
-                ramble.util.logger.logger.debug(
+                logger.debug(
                     f'When checking success criteria "{self.name}" FOM '
                     f'"{self.fom_name}" did not match any FOMs.'
                 )
@@ -196,7 +196,7 @@ class SuccessCriteria(object):
         return False
 
     def mark_found(self):
-        ramble.util.logger.logger.debug(f'   {self.name} was matched!')
+        logger.debug(f'   {self.name} was matched!')
         self.found = True
 
     def reset_found(self):

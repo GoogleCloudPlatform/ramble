@@ -9,7 +9,7 @@
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
-import ramble.util.logger
+from ramble.util.logger import logger
 
 
 """This module contains directives directives that are shared between multiple object types
@@ -207,9 +207,7 @@ def success_criteria(name, mode, match=None, file='{log_file}',
     def _execute_success_criteria(obj):
         valid_modes = ramble.success_criteria.SuccessCriteria._valid_modes
         if mode not in valid_modes:
-            ramble.util.logger.logger.die(
-                f'Mode {mode} is not valid. Valid values are {valid_modes}'
-            )
+            logger.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
 
         obj.success_criteria[name] = {
             'mode': mode,

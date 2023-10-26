@@ -19,7 +19,7 @@ import os
 import shlex
 
 import ramble.config
-import ramble.util.logger
+from ramble.util.logger import logger
 from spack.util.executable import which_string
 
 
@@ -94,7 +94,7 @@ def editor(*args, **kwargs):
             # Show variable we were trying to use, if it's from one
             if var:
                 exe = '$%s (%s)' % (var, exe)
-            ramble.util.logger.logger.warn(f'Could not execute {exe} due to error: {e}')
+            logger.warn(f'Could not execute {exe} due to error: {e}')
             return False
 
     def try_env_var(var):
@@ -108,7 +108,7 @@ def editor(*args, **kwargs):
 
         exe, editor_args = _find_exe_from_env_var(var)
         if not exe:
-            ramble.util.logger.logger.warn(f'${var} is not an executable: {os.environ[var]}')
+            logger.warn(f'${var} is not an executable: {os.environ[var]}')
             return False
 
         full_args = editor_args + list(args)

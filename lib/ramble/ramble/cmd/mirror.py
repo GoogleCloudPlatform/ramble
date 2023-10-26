@@ -11,7 +11,7 @@ import ramble.spec
 import ramble.workspace
 import ramble.mirror
 import ramble.repository
-import ramble.util.logger
+from ramble.util.logger import logger
 from ramble.error import RambleError
 
 import spack.util.url as url_util
@@ -107,7 +107,7 @@ def mirror_set_url(args):
         mirrors = syaml_dict()
 
     if args.name not in mirrors:
-        ramble.util.logger.logger.die(f"No mirror found with name {args.name}.")
+        logger.die(f"No mirror found with name {args.name}.")
 
     entry = mirrors[args.name]
     try:
@@ -141,11 +141,11 @@ def mirror_set_url(args):
     ramble.config.set('mirrors', mirrors, scope=args.scope)
 
     if changes_made:
-        ramble.util.logger.logger.msg(
+        logger.msg(
             "Changed%s url or connection information for mirror %s." %
             ((" (push)" if args.push else ""), args.name))
     else:
-        ramble.util.logger.logger.msg(f"No changes made to mirror {args.name}.")
+        logger.msg(f"No changes made to mirror {args.name}.")
 
 
 def mirror_list(args):
@@ -153,7 +153,7 @@ def mirror_list(args):
 
     mirrors = ramble.mirror.MirrorCollection(scope=args.scope)
     if not mirrors:
-        ramble.util.logger.logger.msg("No mirrors configured.")
+        logger.msg("No mirrors configured.")
         return
 
     mirrors.display()
@@ -168,9 +168,9 @@ def _read_specs_from_file(filename):
                 s.application
                 specs.append(s)
             except RambleError as e:
-                ramble.util.logger.logger.debug(e)
-                ramble.util.logger.logger.die("Parse error in %s, line %d:" % (filename, i + 1),
-                                              ">>> " + string, str(e))
+                logger.debug(e)
+                logger.die("Parse error in %s, line %d:" % (filename, i + 1),
+                           ">>> " + string, str(e))
     return specs
 
 

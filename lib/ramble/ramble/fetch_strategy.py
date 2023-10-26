@@ -49,7 +49,7 @@ from spack.util.string import comma_and, quote
 from spack.version import Version, ver
 
 import ramble.config
-import ramble.util.logger
+from ramble.util.logger import logger
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
 all_strategies = []
@@ -62,8 +62,8 @@ CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE = (
 
 
 def warn_content_type_mismatch(subject, content_type='HTML'):
-    ramble.util.logger.logger.warn(CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE.format(
-                                   subject=subject, content_type=content_type))
+    logger.warn(CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE.format(
+        subject=subject, content_type=content_type))
 
 
 def _needs_stage(fun):
@@ -279,7 +279,7 @@ class URLFetchStrategy(FetchStrategy):
             try:
                 self._curl = which('curl', required=True)
             except CommandNotFoundError as exc:
-                ramble.util.logger.logger.error(str(exc))
+                logger.error(str(exc))
         return self._curl
 
     def source_id(self):
@@ -311,7 +311,7 @@ class URLFetchStrategy(FetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            ramble.util.logger.logger.debug('Already downloaded {0}'.format(self.archive_file))
+            logger.debug('Already downloaded {0}'.format(self.archive_file))
             return
 
         url = None
@@ -329,13 +329,13 @@ class URLFetchStrategy(FetchStrategy):
                 errors.append(str(e))
 
         for msg in errors:
-            ramble.util.logger.logger.debug(msg)
+            logger.debug(msg)
 
         if not self.archive_file:
             raise FailedDownloadError(url)
 
     def _existing_url(self, url):
-        ramble.util.logger.logger.debug('Checking existence of {0}'.format(url))
+        logger.debug('Checking existence of {0}'.format(url))
 
         if ramble.config.get('config:url_fetch_method') == 'curl':
             curl = self.curl
@@ -376,7 +376,7 @@ class URLFetchStrategy(FetchStrategy):
         save_file = None
         if self.stage.save_filename:
             save_file = self.stage.save_filename
-        ramble.util.logger.logger.msg('Fetching {0}'.format(url))
+        logger.msg('Fetching {0}'.format(url))
 
         # Check if we're about to try and open a broken simlink, and if so
         # remove that file to avoid a bad situation where a file "exists" but
@@ -409,7 +409,7 @@ class URLFetchStrategy(FetchStrategy):
         if self.stage.save_filename:
             save_file = self.stage.save_filename
             partial_file = self.stage.save_filename + '.part'
-        ramble.util.logger.logger.msg('Fetching {0}'.format(url))
+        logger.msg('Fetching {0}'.format(url))
         if partial_file:
             save_args = ['-C',
                          '-',  # continue partial downloads
@@ -509,8 +509,8 @@ class URLFetchStrategy(FetchStrategy):
     @_needs_stage
     def expand(self):
         if not self.expand_archive:
-            ramble.util.logger.logger.debug('Staging unexpanded archive {0} in {1}'
-                                            .format(self.archive_file, self.stage.source_path))
+            logger.debug(f'Staging unexpanded archive {self.archive_file} '
+                         f'in {self.stage.source_path}')
             if not self.stage.expanded:
                 mkdirp(self.stage.source_path)
             dest = os.path.join(self.stage.source_path,
@@ -518,7 +518,7 @@ class URLFetchStrategy(FetchStrategy):
             shutil.move(self.archive_file, dest)
             return
 
-        ramble.util.logger.logger.debug('Staging archive: {0}'.format(self.archive_file))
+        logger.debug(f'Staging archive: {self.archive_file}')
 
         if not self.archive_file:
             raise NoArchiveFileError(
@@ -529,7 +529,7 @@ class URLFetchStrategy(FetchStrategy):
             self.extension = extension(self.archive_file)
 
         if self.stage.expanded:
-            ramble.util.logger.logger.debug('Source already staged to %s' % self.stage.source_path)
+            logger.debug(f'Source already staged to {self.stage.source_path}')
             return
 
         decompress = decompressor_for(self.archive_file, self.extension)
@@ -663,7 +663,7 @@ class CacheURLFetchStrategy(URLFetchStrategy):
                 raise
 
         # Notify the user how we fetched.
-        ramble.util.logger.logger.msg('Using cached archive: {0}'.format(path))
+        logger.msg(f'Using cached archive: {path}')
 
 
 class VCSFetchStrategy(FetchStrategy):
@@ -693,14 +693,11 @@ class VCSFetchStrategy(FetchStrategy):
 
     @_needs_stage
     def check(self):
-        ramble.util.logger.logger.debug('No checksum needed when fetching with {0}'
-                                        .format(self.url_attr))
+        logger.debug(f'No checksum needed when fetching with {self.url_attr}')
 
     @_needs_stage
     def expand(self):
-        ramble.util.logger.logger.debug(
-            f"Source fetched with {self.url_attr} is already expanded."
-        )
+        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
 
     @_needs_stage
     def archive(self, destination, **kwargs):
@@ -773,7 +770,7 @@ class GoFetchStrategy(VCSFetchStrategy):
 
     @_needs_stage
     def fetch(self):
-        ramble.util.logger.logger.debug(f'Getting go resource: {self.url}')
+        logger.debug(f'Getting go resource: {self.url}')
 
         with working_dir(self.stage.path):
             try:
@@ -789,9 +786,7 @@ class GoFetchStrategy(VCSFetchStrategy):
 
     @_needs_stage
     def expand(self):
-        ramble.util.logger.logger.debug(
-            f"Source fetched with {self.url_attr} is already expanded."
-        )
+        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
 
         # Move the directory to the well-known stage source path
         repo_root = _ensure_one_stage_entry(self.stage.path)
@@ -906,7 +901,7 @@ class GitFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            ramble.util.logger.logger.debug(f'Already fetched {self.stage.source_path}')
+            logger.debug(f'Already fetched {self.stage.source_path}')
             return
 
         self.clone(commit=self.commit, branch=self.branch, tag=self.tag)
@@ -928,7 +923,7 @@ class GitFetchStrategy(VCSFetchStrategy):
         """
         # Default to spack source path
         dest = dest or self.stage.source_path
-        ramble.util.logger.logger.debug(f'Cloning git repository: {self._repo_info()}')
+        logger.debug(f'Cloning git repository: {self._repo_info()}')
 
         git = self.git
         debug = ramble.config.get('config:debug')
@@ -1126,10 +1121,10 @@ class CvsFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            ramble.util.logger.logger.debug('Already fetched {self.stage.source_path}')
+            logger.debug('Already fetched {self.stage.source_path}')
             return
 
-        ramble.util.logger.logger.debug('Checking out CVS repository: {self.url}')
+        logger.debug('Checking out CVS repository: {self.url}')
 
         with temp_cwd():
             url, module = self.url.split('%module=')
@@ -1220,10 +1215,10 @@ class SvnFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            ramble.util.logger.logger.debug('Already fetched {self.stage.source_path}')
+            logger.debug(f'Already fetched {self.stage.source_path}')
             return
 
-        ramble.util.logger.logger.debug('Checking out subversion repository: {self.url}')
+        logger.debug(f'Checking out subversion repository: {self.url}')
 
         args = ['checkout', '--force', '--quiet']
         if self.revision:
@@ -1330,13 +1325,13 @@ class HgFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            ramble.util.logger.logger.debug(f'Already fetched {self.stage.source_path}')
+            logger.debug(f'Already fetched {self.stage.source_path}')
             return
 
         args = []
         if self.revision:
             args.append('at revision %s' % self.revision)
-        ramble.util.logger.logger.debug(f'Cloning mercurial repository: {self.url} {args}')
+        logger.debug(f'Cloning mercurial repository: {self.url} {args}')
 
         args = ['clone']
 
@@ -1392,7 +1387,7 @@ class S3FetchStrategy(URLFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            ramble.util.logger.logger.debug(f'Already downloaded {self.archive_file}')
+            logger.debug(f'Already downloaded {self.archive_file}')
             return
 
         parsed_url = url_util.parse(self.url)
@@ -1400,7 +1395,7 @@ class S3FetchStrategy(URLFetchStrategy):
             raise FetchError(
                 'S3FetchStrategy can only fetch from s3:// urls.')
 
-        ramble.util.logger.logger.debug(f'Fetching {self.url}')
+        logger.debug(f'Fetching {self.url}')
 
         basename = os.path.basename(parsed_url.path)
 
@@ -1441,7 +1436,7 @@ class GCSFetchStrategy(URLFetchStrategy):
     def fetch(self):
         import ramble.util.web as web_util
         if self.archive_file:
-            ramble.util.logger.logger.debug(f'Already downloaded {self.archive_file}')
+            logger.debug(f'Already downloaded {self.archive_file}')
             return
 
         parsed_url = url_util.parse(self.url)
@@ -1449,7 +1444,7 @@ class GCSFetchStrategy(URLFetchStrategy):
             raise FetchError(
                 'GCSFetchStrategy can only fetch from gs:// urls.')
 
-        ramble.util.logger.logger.debug(f'Fetching {self.url}')
+        logger.debug(f'Fetching {self.url}')
 
         basename = os.path.basename(parsed_url.path)
 
@@ -1707,13 +1702,13 @@ def from_list_url(pkg):
                 return URLFetchStrategy(url_from_list, checksum,
                                         fetch_options=pkg.fetch_options)
             except KeyError as e:
-                ramble.util.logger.logger.debug(e)
-                ramble.util.logger.logger.msg(f"Cannot find version {pkg.version} in url_list")
+                logger.debug(e)
+                logger.msg(f"Cannot find version {pkg.version} in url_list")
 
         except BaseException as e:
             # TODO: Don't catch BaseException here! Be more specific.
-            ramble.util.logger.logger.debug(e)
-            ramble.util.logger.logger.msg("Could not determine url from list_url.")
+            logger.debug(e)
+            logger.msg("Could not determine url from list_url.")
 
 
 class FsCache(object):

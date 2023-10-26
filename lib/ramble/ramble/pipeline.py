@@ -20,7 +20,6 @@ import ramble.config
 import ramble.experiment_set
 import ramble.software_environments
 import ramble.util.hashing
-import ramble.util.logger
 import ramble.fetch_strategy
 import ramble.stage
 import ramble.workspace
@@ -28,6 +27,7 @@ import ramble.workspace
 import ramble.experimental.uploader
 
 from ramble.namespace import namespace
+from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
 from spack.util.executable import which
@@ -36,9 +36,7 @@ if not ramble.config.get('config:disable_progress_bar', False):
     try:
         import tqdm
     except ModuleNotFoundError:
-        ramble.util.logger.logger.die(
-            'Module `tqdm` is not found. Ensure requirements.txt are installed.'
-        )
+        logger.die('Module `tqdm` is not found. Ensure requirements.txt are installed.')
 
 
 class Pipeline(object):
@@ -125,7 +123,7 @@ class Pipeline(object):
                             'workspace first.\n' + \
                             'Then ensure its spack configuration is ' + \
                             'properly configured.'
-            ramble.util.logger.logger.die(error_message)
+            logger.die(error_message)
 
     def _prepare(self):
         """Perform preparation for pipeline execution"""
@@ -138,13 +136,11 @@ class Pipeline(object):
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             exp_log_path = app_inst.experiment_log_file(self.log_dir)
 
-            ramble.util.logger.logger.all_msg(f'Experiment {idx} ({count}/{num_exps}):')
-            ramble.util.logger.logger.all_msg(f'    name: {exp}')
-            ramble.util.logger.logger.all_msg(
-                f'    log file: {exp_log_path}'
-            )
+            logger.all_msg(f'Experiment {idx} ({count}/{num_exps}):')
+            logger.all_msg(f'    name: {exp}')
+            logger.all_msg(f'    log file: {exp_log_path}')
 
-            ramble.util.logger.logger.add_log(exp_log_path)
+            logger.add_log(exp_log_path)
 
             phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
 
@@ -166,10 +162,8 @@ class Pipeline(object):
                 progress.set_description('Experiment complete')
                 progress.close()
 
-            ramble.util.logger.logger.remove_log()
-            ramble.util.logger.logger.all_msg(
-                f'  Returning to log file: {ramble.util.logger.logger.active_log()}'
-            )
+            logger.remove_log()
+            logger.all_msg(f'  Returning to log file: {logger.active_log()}')
             count += 1
 
     def _complete(self):
@@ -178,24 +172,24 @@ class Pipeline(object):
 
     def run(self):
         """Run the full pipeline"""
-        ramble.util.logger.logger.all_msg('Streaming details to log:')
-        ramble.util.logger.logger.all_msg(f'  {self.log_path}')
+        logger.all_msg('Streaming details to log:')
+        logger.all_msg(f'  {self.log_path}')
         if self.workspace.dry_run:
             cprint('@*g{      -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN --}')
 
         experiment_count = self._experiment_set.num_filtered_experiments(self.filters)
         experiment_total = self._experiment_set.num_experiments()
-        ramble.util.logger.logger.all_msg(
+        logger.all_msg(
             f'  {self.action_string} {experiment_count} out of '
             f'{experiment_total} experiments:'
         )
 
-        ramble.util.logger.logger.add_log(self.log_path)
+        logger.add_log(self.log_path)
         self._validate()
         self._prepare()
         self._execute()
         self._complete()
-        ramble.util.logger.logger.remove_log()
+        logger.remove_log()
 
     def simlink_log(self, base, link):
         """
@@ -292,7 +286,7 @@ class ArchivePipeline(Pipeline):
                 ramble.config.get('config:archive_url')
             archive_url = archive_url.rstrip('/') if archive_url else None
 
-            ramble.util.logger.logger.debug(f'Archive url: {archive_url}')
+            logger.debug(f'Archive url: {archive_url}')
 
             if archive_url:
                 tar_path = self.workspace.latest_archive_path + '.tar.gz'
@@ -319,14 +313,14 @@ class MirrorPipeline(Pipeline):
 
     def _complete(self):
         verb = 'updated' if self.workspace.mirror_existed else 'created'
-        ramble.util.logger.logger.msg(
+        logger.msg(
             f"Successfully {verb} spack software in {self.workspace.mirror_path}",
             "Archive stats:",
             "  %-4d already present"  % len(self.workspace.software_mirror_stats.present),
             "  %-4d added"            % len(self.workspace.software_mirror_stats.new),
             "  %-4d failed to fetch." % len(self.workspace.software_mirror_stats.errors))
 
-        ramble.util.logger.logger.msg(
+        logger.msg(
             f"Successfully {verb} inputs in {self.workspace.mirror_path}",
             "Archive stats:",
             "  %-4d already present"  % len(self.workspace.input_mirror_stats.present),
@@ -334,11 +328,11 @@ class MirrorPipeline(Pipeline):
             "  %-4d failed to fetch." % len(self.workspace.input_mirror_stats.errors))
 
         if self.workspace.input_mirror_stats.errors:
-            ramble.util.logger.logger.error("Failed downloads:")
+            logger.error("Failed downloads:")
             tty.colify((s.cformat("{name}") for s in
                        list(self.workspace.input_mirror_stats.errors)),
-                       output=ramble.util.logger.logger.active_stream())
-            ramble.util.logger.logger.die('Mirroring has errors.')
+                       output=logger.active_stream())
+            logger.die('Mirroring has errors.')
 
 
 class SetupPipeline(Pipeline):
@@ -392,7 +386,7 @@ class PushToCachePipeline(Pipeline):
         self.workspace.spack_cache_path = self.spack_cache_path
 
     def _complete(self):
-        ramble.util.logger.logger.msg(f'Pushed envs to spack cache {self.spack_cache_path}')
+        logger.msg(f'Pushed envs to spack cache {self.spack_cache_path}')
 
 
 pipelines = Enum('pipelines',
@@ -413,7 +407,7 @@ def pipeline_class(name):
     """Factory for determining a pipeline class from its name"""
 
     if name not in _pipeline_map.keys():
-        ramble.util.logger.logger.die(
+        logger.die(
             f'Pipeline {name} is not valid.\n'
             f'Valid pipelines are {_pipeline_map.keys()}'
         )

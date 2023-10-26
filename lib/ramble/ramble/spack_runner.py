@@ -25,7 +25,7 @@ import spack.util.spack_yaml as syaml
 import ramble.config
 import ramble.error
 import ramble.util.hashing
-import ramble.util.logger
+from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
 
@@ -156,7 +156,7 @@ class SpackRunner(object):
         if require_exists:
             if not os.path.isdir(env_path) or \
                     not os.path.exists(os.path.join(env_path, 'spack.yaml')):
-                ramble.util.logger.logger.die(f'Path {env_path} is not a spack environment')
+                logger.die(f'Path {env_path} is not a spack environment')
 
         self.env_path = env_path
 
@@ -221,7 +221,7 @@ class SpackRunner(object):
         if not self.dry_run:
             if not os.path.exists(os.path.join(path, 'spack.yaml')):
                 with fs.working_dir(path):
-                    active_stream = ramble.util.logger.logger.active_stream()
+                    active_stream = logger.active_stream()
                     self.spack(*self.env_create_args,
                                output=active_stream,
                                error=active_stream)
@@ -265,7 +265,7 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            active_stream = ramble.util.logger.logger.active_stream()
+            active_stream = logger.active_stream()
             load_cmds = self.spack(*args, output=str, error=active_stream).split('\n')
 
             for cmd in load_cmds:
@@ -307,7 +307,7 @@ class SpackRunner(object):
             comp_info_args.extend(['-C', self.env_path])
         comp_info_args.extend(['compiler', 'info', spec])
 
-        active_stream = ramble.util.logger.logger.active_stream()
+        active_stream = logger.active_stream()
         compiler_find_flags = ramble.config.get(f'{self.compiler_find_config_name}:flags')
         compiler_find_args = self.compiler_find_args.copy()
         if compiler_find_flags:
@@ -320,7 +320,7 @@ class SpackRunner(object):
 
         try:
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
-            ramble.util.logger.logger.msg(f'{spec} is already an available compiler')
+            logger.msg(f'{spec} is already an available compiler')
             return
         except ProcessError:
 
@@ -414,7 +414,7 @@ class SpackRunner(object):
 
         pkg_names = []
 
-        active_stream = ramble.util.logger.logger.active_stream()
+        active_stream = logger.active_stream()
         for pkg in self.spack(*args, output=str, error=active_stream).split('\n'):
             match = package_name_regex.match(pkg)
             if match:
@@ -449,7 +449,7 @@ class SpackRunner(object):
             'add'
         ]
 
-        active_stream = ramble.util.logger.logger.active_stream()
+        active_stream = logger.active_stream()
         for config in self.configs:
             args = config_args.copy()
             args.append(config)
@@ -490,7 +490,7 @@ class SpackRunner(object):
         path = env_name_or_path
         if not os.path.exists(path):
             try:
-                active_stream = ramble.util.logger.logger.active_stream()
+                active_stream = logger.active_stream()
                 path = self.spack(*named_location_args, output=str,
                                   error=active_stream).strip('\n')
             # If a named environment fails, copy directly from the path
@@ -556,15 +556,11 @@ class SpackRunner(object):
                 # If the yaml hash matches the new generated data hash...
                 if gen_env_hash == existing_env_hash:
                     self.concretized = True
-                    ramble.util.logger.logger.msg(
-                        f'Environment {self.env_path} will not be regenerated.'
-                    )
+                    logger.msg(f'Environment {self.env_path} will not be regenerated.')
                     return
 
             if not self.concretized:
-                ramble.util.logger.logger.verbose(
-                    f'Removing invalid spack lock file {spack_lock_file}'
-                )
+                logger.verbose(f'Removing invalid spack lock file {spack_lock_file}')
                 fs.force_remove(spack_lock_file)
 
         # Write spack.yaml to environment before concretizing
@@ -583,7 +579,7 @@ class SpackRunner(object):
         self._check_active()
 
         if self.concretized:
-            ramble.util.logger.logger.msg(
+            logger.msg(
                 f'Environment {self.env_path} is already concretized. Skipping concretize...'
             )
             return
@@ -595,7 +591,7 @@ class SpackRunner(object):
             args.extend(shlex.split(concretize_flags))
 
         if not self.dry_run:
-            active_stream = ramble.util.logger.logger.active_stream()
+            active_stream = logger.active_stream()
             self.concretizer(*args, output=active_stream, error=active_stream)
         else:
             self._dry_run_print(self.concretizer, args)
@@ -616,7 +612,7 @@ class SpackRunner(object):
 
         if not self.dry_run:
             if not lock_exists and require_exist:
-                ramble.util.logger.logger.die(
+                logger.die(
                     'spack.lock file does not exist in environment '
                     f'{self.env_path}\n'
                     'Make sure your workspace is fully setup with\n'
@@ -654,7 +650,7 @@ class SpackRunner(object):
             args.extend(shlex.split(install_flags))
 
         if not self.dry_run:
-            active_stream = ramble.util.logger.logger.active_stream()
+            active_stream = logger.active_stream()
             self.installer(*args, output=active_stream, error=active_stream)
         else:
             self._dry_run_print(self.installer, args)
@@ -668,7 +664,7 @@ class SpackRunner(object):
         name_args.extend(package_spec.split())
 
         if not self.dry_run:
-            active_stream = ramble.util.logger.logger.active_stream()
+            active_stream = logger.active_stream()
             name = self.spack(*name_args, output=str, error=active_stream).strip()
             location = self.spack(*loc_args, output=str, error=active_stream).strip()
             return (name, location)
@@ -694,7 +690,7 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            active_stream = ramble.util.logger.logger.active_stream()
+            active_stream = logger.active_stream()
             return self.spack(*args, output=str, error=active_stream).strip()
         else:
             self._dry_run_print(self.spack, args)
@@ -710,7 +706,7 @@ class SpackRunner(object):
             '--format',
             '/{hash}'
         ]
-        active_stream = ramble.util.logger.logger.active_stream()
+        active_stream = logger.active_stream()
         output = self.spack(*args, output=str, error=active_stream).strip().replace('\n', ' ')
         return output
 
@@ -726,7 +722,7 @@ class SpackRunner(object):
         ]
         user_flags = ramble.config.get(f'{self.buildcache_config_name}:flags')
 
-        ramble.util.logger.logger.debug(f"Running with user flags: {user_flags}")
+        logger.debug(f"Running with user flags: {user_flags}")
 
         if user_flags is not None:
             args.extend(shlex.split(user_flags))
@@ -734,15 +730,15 @@ class SpackRunner(object):
         args.extend([spack_cache_path, hash_list])
 
         if not self.dry_run:
-            active_stream = ramble.util.logger.logger.active_stream()
+            active_stream = logger.active_stream()
             return self.spack(*args, output=str, error=active_stream).strip()
         else:
             self._dry_run_print(self.spack, args)
             return
 
     def _dry_run_print(self, executable, args):
-        ramble.util.logger.logger.msg(f'DRY-RUN: would run {executable}')
-        ramble.util.logger.logger.msg(f'         with args: {args}')
+        logger.msg(f'DRY-RUN: would run {executable}')
+        logger.msg(f'         with args: {args}')
 
 
 class RunnerError(ramble.error.RambleError):

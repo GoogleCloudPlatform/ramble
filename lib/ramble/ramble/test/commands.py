@@ -9,7 +9,7 @@
 import pytest
 
 from ramble.main import RambleCommand, RambleCommandError
-import ramble.util.logger  # noqa:  F401
+from ramble.util.logger import logger  # noqa:  F401
 
 
 def test_missing_command():
@@ -23,6 +23,6 @@ def test_available_command():
     import ramble.cmd
 
     for command in ramble.cmd.all_commands():
-        ramble.util.logger.logger.msg('Command = %s' % command)
+        logger.msg(f'Command = {command}')
 
         RambleCommand(command)

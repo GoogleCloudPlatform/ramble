@@ -12,7 +12,7 @@ import os
 import ramble.cmd
 import ramble.paths
 import ramble.repository
-import ramble.util.logger
+from ramble.util.logger import logger
 
 from spack.util.editor import editor
 
@@ -41,12 +41,12 @@ def edit_application(name, repo_path, namespace):
 
     if os.path.exists(path):
         if not os.path.isfile(path):
-            ramble.util.logger.logger.die(f"Something is wrong. '{path}' is not a file!")
+            logger.die(f"Something is wrong. '{path}' is not a file!")
         if not os.access(path, os.R_OK):
-            ramble.util.logger.logger.die(f"Insufficient permissions on '{path}'!")
+            logger.die(f"Insufficient permissions on '{path}'!")
     else:
         # TODO: Update this once a `ramble create` command exists
-        ramble.util.logger.logger.die(
+        logger.die(
             f"No application for '{name}' was found."
             # "  Use `ramble create` to create a new application"
         )
@@ -117,9 +117,9 @@ def edit(parser, args):
                     m += ' Please specify a suffix. Files are:\n\n'
                     for f in files:
                         m += '        ' + os.path.basename(f) + '\n'
-                    ramble.util.logger.logger.die(m)
+                    logger.die(m)
                 if not files:
-                    ramble.util.logger.logger.die(f"No file for '{name}' was found in {path}")
+                    logger.die(f"No file for '{name}' was found in {path}")
                 path = files[0]  # already confirmed only one entry in files
 
         editor(path)

@@ -10,7 +10,7 @@ from __future__ import print_function
 import sys
 import inspect
 
-import ramble.util.logger
+from ramble.util.logger import logger
 
 
 #: whether we should write stack traces or short error messages
@@ -54,7 +54,7 @@ class RambleError(Exception):
             return
 
         # basic debug message
-        ramble.util.logger.logger.error(self.message)
+        logger.error(self.message)
         if self.long_message:
             sys.stderr.write(self.long_message)
             sys.stderr.write('\n')

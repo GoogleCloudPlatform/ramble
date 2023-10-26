@@ -31,7 +31,7 @@ from llnl.util.filesystem import mkdirp
 import ramble.config
 import ramble.error
 import ramble.fetch_strategy as fs
-import ramble.util.logger
+from ramble.util.logger import logger
 
 import spack.url
 import spack.util.spack_json
@@ -435,7 +435,7 @@ def add(name, url, scope, args={}):
         mirrors = syaml_dict()
 
     if name in mirrors:
-        ramble.util.logger.logger.die(f"Mirror with name {name} already exists.")
+        logger.die(f"Mirror with name {name} already exists.")
 
     items = [(n, u) for n, u in mirrors.items()]
     mirror_data = url
@@ -451,7 +451,7 @@ def remove(name, scope):
         mirrors = syaml_dict()
 
     if name not in mirrors:
-        ramble.util.logger.logger.die(f"No mirror with name {name}")
+        logger.die(f"No mirror with name {name}")
 
     old_value = mirrors.pop(name)
     ramble.config.set('mirrors', mirrors, scope=scope)
@@ -470,8 +470,8 @@ def remove(name, scope):
         debug_msg.append(debug_msg_url)
         values.append(old_value)
 
-    ramble.util.logger.logger.debug(" ".join(debug_msg) % tuple(values))
-    ramble.util.logger.logger.msg(f"Removed mirror {name}.")
+    logger.debug(" ".join(debug_msg) % tuple(values))
+    logger.msg(f"Removed mirror {name}.")
 
 
 class MirrorStats(object):
@@ -513,9 +513,7 @@ class MirrorStats(object):
 
 
 def _add_single_spec(spec, mirror_root, mirror, mirror_stats):
-    ramble.util.logger.logger.msg(
-        f"Adding inputs for application {spec.format('{name}')} to mirror"
-    )
+    logger.msg(f"Adding inputs for application {spec.format('{name}')} to mirror")
     num_retries = 3
     while num_retries > 0:
         try:
@@ -533,7 +531,7 @@ def _add_single_spec(spec, mirror_root, mirror, mirror_stats):
         if ramble.config.get('config:debug'):
             traceback.print_exception(file=sys.stderr, *exc_tuple)
         else:
-            ramble.util.logger.logger.warn(
+            logger.warn(
                 "Error while fetching %s" % spec.cformat('{name}'),
                 getattr(exception, 'message', exception))
         mirror_stats.error()

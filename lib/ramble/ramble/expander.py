@@ -13,7 +13,7 @@ import operator
 
 import ramble.error
 import ramble.keywords
-import ramble.util.logger
+from ramble.util.logger import logger
 
 supported_math_operators = {
     ast.Add: operator.add, ast.Sub: operator.sub,
@@ -442,7 +442,7 @@ class Expander(object):
         if ramble.config.get('config:disable_passthrough'):
             passthrough_setting = False
 
-        ramble.util.logger.logger.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
+        logger.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
         expansions = self._variables
         if extra_vars:
             expansions = self._variables.copy()
@@ -457,7 +457,7 @@ class Expander(object):
                 raise RambleSyntaxError(f'Encountered a passthrough error while expanding {var}\n'
                                         f'{e}')
 
-        ramble.util.logger.logger.debug(f'END OF EXPAND_VAR STACK {value}')
+        logger.debug(f'END OF EXPAND_VAR STACK {value}')
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):
@@ -474,15 +474,15 @@ class Expander(object):
         evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
 
         if not isinstance(evaluated, six.string_types):
-            ramble.util.logger.logger.die('Logical compute failed to return a string')
+            logger.die('Logical compute failed to return a string')
 
         if evaluated == 'True':
             return True
         elif evaluated == 'False':
             return False
         else:
-            ramble.util.logger.logger.die(f'When evaluating {in_str}, evaluate_predicate returned '
-                                          f'a non-boolean string: "{evaluated}"')
+            logger.die(f'When evaluating {in_str}, evaluate_predicate returned '
+                       f'a non-boolean string: "{evaluated}"')
 
     @staticmethod
     def expansion_str(in_str):
@@ -529,8 +529,8 @@ class Expander(object):
             out_str = self.eval_math(math_ast.body)
             return out_str
         except MathEvaluationError as e:
-            ramble.util.logger.logger.debug(f'   Math input is: "{in_str}"')
-            ramble.util.logger.logger.debug(e)
+            logger.debug(f'   Math input is: "{in_str}"')
+            logger.debug(e)
 
         return in_str
 
@@ -717,9 +717,9 @@ class Expander(object):
 def raise_passthrough_error(in_str, out_str):
     """Raise an error when passthrough is disabled but variables are not all expanded"""
 
-    ramble.util.logger.logger.debug(f'Expansion stack errors: attempted to expand '
-                                    f'"{in_str}"')
-    ramble.util.logger.logger.debug(f'  As: {out_str}')
+    logger.debug(f'Expansion stack errors: attempted to expand '
+                 f'"{in_str}"')
+    logger.debug(f'  As: {out_str}')
     raise RamblePassthroughError('Error Stack:\n'
                                  f'Input: "{in_str}"\n'
                                  f'Output: "{out_str}"\n')

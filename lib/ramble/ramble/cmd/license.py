@@ -12,7 +12,7 @@ import re
 from collections import defaultdict
 
 import ramble.paths
-import ramble.util.logger
+from ramble.util.logger import logger
 from spack.util.executable import which
 
 description = 'list and check license headers on files in ramble'
@@ -140,7 +140,7 @@ def _check_license(lines, path):
                 # out of date.
                 if i == 0:
                     if not re.search(strict_date, line):
-                        ramble.util.logger.logger.debug(f'{path}: copyright date mismatch')
+                        logger.debug(f'{path}: copyright date mismatch')
                 found.append(i)
 
     if len(found) == len(license_lines) and found == list(sorted(found)):
@@ -188,9 +188,9 @@ def verify(args):
             license_errors.add_error(error)
 
     if license_errors.has_errors():
-        ramble.util.logger.logger.die(*license_errors.error_messages())
+        logger.die(*license_errors.error_messages())
     else:
-        ramble.util.logger.logger.msg('No license issues found.')
+        logger.msg('No license issues found.')
 
 
 def setup_parser(subparser):
@@ -205,7 +205,7 @@ def setup_parser(subparser):
 
 def license(parser, args):
     if not git:
-        ramble.util.logger.logger.die('ramble license requires git in your environment')
+        logger.die('ramble license requires git in your environment')
 
     licensed_files[:] = [re.compile(regex) for regex in licensed_files]
 

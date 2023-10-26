@@ -162,6 +162,8 @@ class Logger(object):
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
         tty.warn(*args, **st_kwargs)
 
+        tty.warn(*args, **kwargs)
+
     def debug(self, *args, **kwargs):
         """Print a debug message to the active log
 

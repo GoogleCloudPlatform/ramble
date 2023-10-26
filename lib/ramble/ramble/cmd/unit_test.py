@@ -21,7 +21,7 @@ from llnl.util.tty.colify import colify
 
 import ramble.paths
 import ramble.workspace
-import ramble.util.logger
+from ramble.util.logger import logger
 
 description = "run ramble's unit tests (wrapper around pytest)"
 section = "developer"
@@ -79,7 +79,7 @@ def do_list(args, extra_args):
             import pytest
             pytest.main(['--collect-only'] + extra_args)
         except ImportError:
-            ramble.util.logger.logger.die(
+            logger.die(
                 'Pytest python module not found. Ensure requirements.txt are installed.'
             )
     finally:
@@ -166,7 +166,7 @@ def unit_test(parser, args, unknown_args):
             import pytest
             return pytest.main(['-h'])
         except ImportError:
-            ramble.util.logger.logger.die(
+            logger.die(
                 'Pytest python module not found. Ensure requirements.txt are installed.'
             )
 
@@ -192,6 +192,6 @@ def unit_test(parser, args, unknown_args):
                 import pytest
                 return pytest.main(pytest_args)
             except ImportError:
-                ramble.util.logger.logger.die(
+                logger.die(
                     'Pytest python module not found. Ensure requirements.txt are installed.'
                 )
