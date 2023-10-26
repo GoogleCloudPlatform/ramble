@@ -86,6 +86,23 @@ properties['config']['spack'] = {
             },
             'additionalProperties': False
         },
+        'compiler_find': {
+            'type': 'object',
+            'default': {
+                'flags': '',
+                'prefix': '',
+            },
+            'properties': {
+                'flags': {
+                    'type': 'string',
+                    'default': '',
+                },
+                'prefix': {
+                    'type': 'string',
+                    'default': ''
+                }
+            },
+        },
         'buildcache': {
             'type': 'object',
             'default': {
