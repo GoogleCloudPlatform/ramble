@@ -49,6 +49,7 @@ class SpackRunner(object):
 
     global_config_name = 'config:spack:global'
     install_config_name = 'config:spack:install'
+    compiler_find_config_name = 'config:spack:compiler_find'
     buildcache_config_name = 'config:spack:buildcache'
     concretize_config_name = 'config:spack:concretize'
 
@@ -302,8 +303,13 @@ class SpackRunner(object):
             comp_info_args.extend(['-C', self.env_path])
         comp_info_args.extend(['compiler', 'info', spec])
 
+        compiler_find_flags = ramble.config.get(f'{self.compiler_find_config_name}:flags')
+        compiler_find_args = self.compiler_find_args.copy()
+        if compiler_find_flags:
+            for flag in shlex.split(compiler_find_flags):
+                compiler_find_args.append(flag)
         if not self.dry_run:
-            self.spack(*self.compiler_find_args)
+            self.spack(*compiler_find_args)
 
         try:
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
@@ -328,7 +334,7 @@ class SpackRunner(object):
             self.load_compiler(spec)
 
             if not self.dry_run:
-                self.spack(*self.compiler_find_args)
+                self.spack(*compiler_find_args)
 
                 self.compilers.append(spec)
 
@@ -337,7 +343,7 @@ class SpackRunner(object):
                     self.installer.add_default_env(self.env_key, active_env)
                     self.concretizer.add_default_env(self.env_key, active_env)
             else:
-                self._dry_run_print(self.spack, self.compiler_find_args)
+                self._dry_run_print(self.spack, compiler_find_args)
 
     def activate(self):
         """

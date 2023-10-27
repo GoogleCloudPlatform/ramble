@@ -455,3 +455,54 @@ def test_invalid_external_env_errors(tmpdir):
                 sr.copy_from_external_env(os.getcwd())
         except ramble.spack_runner.RunnerError as e:
             pytest.skip('%s' % e)
+
+
+@pytest.mark.parametrize(
+    'attr,value,expected_str',
+    [
+        ('flags', '--scope site', "'--scope', 'site'"),
+    ]
+)
+def test_config_compiler_find_attribute(tmpdir, capsys, attr, value, expected_str):
+
+    import os
+
+    compilers_config = """
+compilers:
+- compiler:
+    spec: gcc@12.1.0
+    paths:
+      cc: /path/to/gcc
+      cxx: /path/to/g++
+      f77: /path/to/gfortran
+      fc: /path/to/gfortran
+    flags: {}
+    operating_system: 'ramble'
+    target: 'x86_64'
+    modules: []
+    environment: {}
+    extra_rpaths: []
+"""
+
+    with tmpdir.as_cwd():
+        compilers_path = os.path.join(os.getcwd(), 'compilers.yaml')
+        # Write spack_configs
+        with open(compilers_path, 'w+') as f:
+            f.write(compilers_config)
+
+        config_path = os.getcwd()
+        with ramble.config.override('config:spack',
+                                    {'global': {'flags': f'-C {config_path}'}}):
+            with ramble.config.override('config:spack',
+                                        {'compiler_find': {attr: value}}):
+                try:
+                    sr = ramble.spack_runner.SpackRunner(dry_run=True)
+                    sr.create_env(os.getcwd())
+                    sr.activate()
+                    sr.add_include_file(compilers_path)
+                    sr.install_compiler('gcc@12.2.0')
+                    captured = capsys.readouterr()
+
+                    assert expected_str in captured.out
+                except ramble.spack_runner.RunnerError as e:
+                    pytest.skip('%s' % e)
