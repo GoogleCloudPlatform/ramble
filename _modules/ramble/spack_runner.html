@@ -167,6 +167,7 @@
 
     <span class="n">global_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:global&#39;</span>
     <span class="n">install_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:install&#39;</span>
+    <span class="n">compiler_find_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:compiler_find&#39;</span>
     <span class="n">buildcache_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:buildcache&#39;</span>
     <span class="n">concretize_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:concretize&#39;</span>
 
@@ -455,8 +456,13 @@
             <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">])</span>
         <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">spec</span><span class="p">])</span>
 
+        <span class="n">compiler_find_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+        <span class="n">compiler_find_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">compiler_find_flags</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">compiler_find_flags</span><span class="p">):</span>
+                <span class="n">compiler_find_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">compiler_find_args</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">comp_info_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
@@ -481,7 +487,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">load_compiler</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">compiler_find_args</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">compilers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
@@ -490,7 +496,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="n">active_env</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="n">active_env</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">compiler_find_args</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpackRunner.activate">
@@ -946,7 +952,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 27, 2023.
       </span></p>
   </div>
 
