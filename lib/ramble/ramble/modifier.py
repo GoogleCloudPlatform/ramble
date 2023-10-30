@@ -14,13 +14,13 @@ import fnmatch
 from typing import List
 
 from llnl.util.tty.colify import colified
-import llnl.util.tty as tty
 
 from ramble.language.modifier_language import ModifierMeta
 from ramble.language.shared_language import SharedMeta, register_builtin  # noqa: F401
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
 import ramble.util.directives
+from ramble.util.logger import logger
 
 
 class ModifierBase(object, metaclass=ModifierMeta):
@@ -72,14 +72,14 @@ class ModifierBase(object, metaclass=ModifierMeta):
             self._usage_mode = mode
         elif hasattr(self, '_default_usage_mode'):
             self._usage_mode = self._default_usage_mode
-            tty.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+            logger.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
         else:
             if len(self.modes) > 1 or len(self.modes) == 0:
                 raise InvalidModeError('Cannot auto determine usage '
                                        f'mode for modifier {self.name}')
 
             self._usage_mode = list(self.modes.keys())[0]
-            tty.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+            logger.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
 
     def set_on_executables(self, on_executables):
         """Set the executables this modifier applies to.

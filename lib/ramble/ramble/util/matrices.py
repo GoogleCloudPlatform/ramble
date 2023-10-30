@@ -5,10 +5,8 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-
-import llnl.util.tty as tty
-
 from ramble.namespace import namespace
+from ramble.util.logger import logger
 
 
 def extract_matrices(action, name, in_dict):
@@ -33,9 +31,9 @@ def extract_matrices(action, name, in_dict):
             # Extract named matrices
             if isinstance(matrix, dict):
                 if len(matrix.keys()) != 1:
-                    tty.die(f'While performing {action} with {name} '
-                            ' each list element may only contain '
-                            '1 matrix in a matrices definition.')
+                    logger.die(f'While performing {action} with {name} '
+                               ' each list element may only contain '
+                               '1 matrix in a matrices definition.')
 
                 for name, val in matrix.items():
                     matrices.append(val)

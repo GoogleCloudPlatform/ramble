@@ -38,6 +38,7 @@ import ramble.fetch_strategy as fs
 import ramble.util.lock
 import ramble.error
 import ramble.mirror
+from ramble.util.logger import logger
 
 
 # The well-known stage source subdirectory name.
@@ -66,12 +67,12 @@ def create_stage_root(path):
 
             p_stat = os.stat(p)
             if par_stat.st_gid != p_stat.st_gid:
-                tty.warn("Expected {0} to have group {1}, but it is {2}"
-                         .format(p, par_stat.st_gid, p_stat.st_gid))
+                logger.warn(f"Expected {p} to have group "
+                            f"{par_stat.st_gid}, but it is {p_stat.st_gid}")
 
             if par_stat.st_mode & p_stat.st_mode != par_stat.st_mode:
-                tty.warn("Expected {0} to support mode {1}, but it is {2}"
-                         .format(p, par_stat.st_mode, p_stat.st_mode))
+                logger.warn(f"Expected {p} to support mode "
+                            f"{par_stat.st_mode}, but it is {p_stat.st_mode}")
 
             if not can_access(p):
                 raise OSError(errno.EACCES, err_msg.format(path, p))
@@ -89,8 +90,8 @@ def create_stage_root(path):
 
             p_stat = os.stat(p)
             if p_stat.st_mode & stat.S_IRWXU != stat.S_IRWXU:
-                tty.error("Expected {0} to support mode {1}, but it is {2}"
-                          .format(p, stat.S_IRWXU, p_stat.st_mode))
+                logger.error(f"Expected {p} to support mode "
+                             f"{stat.S_IRWXU}, but it is {p_stat.st_mode}")
 
                 raise OSError(errno.EACCES, err_msg.format(path, p))
         else:
@@ -123,8 +124,7 @@ def _first_accessible_path(paths):
                 return path
 
         except OSError as e:
-            tty.debug('OSError while checking stage path %s: %s' % (
-                      path, str(e)))
+            logger.debug(f'OSError while checking stage path {path}: {e}')
 
     return None
 
@@ -290,7 +290,7 @@ class InputStage(object):
                 lock_id = prefix_bits(sha1, bit_length(sys.maxsize))
                 stage_lock_path = os.path.join(self.path, '.lock')
 
-                tty.debug("Creating stage lock {0}".format(self.name))
+                logger.debug(f"Creating stage lock {self.name}")
                 InputStage.stage_locks[self.name] = ramble.util.lock.Lock(
                     stage_lock_path, lock_id, 1, desc=self.name)
 
@@ -451,7 +451,7 @@ class InputStage(object):
 
         def print_errors(errors):
             for msg in errors:
-                tty.debug(msg)
+                logger.debug(msg)
 
         errors = []
         for fetcher in generate_fetchers():
@@ -465,11 +465,11 @@ class InputStage(object):
                 continue
             except ramble.error.RambleError as e:
                 errors.append('Fetching from {0} failed.'.format(fetcher))
-                tty.debug(e)
+                logger.debug(e)
                 continue
             except spack.util.web.SpackWebError as e:
                 errors.append('Fetching from {0} failed.'.format(fetcher))
-                tty.debug(e)
+                logger.debug(e)
                 continue
 
         else:
@@ -520,12 +520,12 @@ class InputStage(object):
            No-op if this stage checks code out of a repository."""
         if self.fetcher is not self.default_fetcher and \
            self.skip_checksum_for_mirror:
-            tty.warn("Fetching from mirror without a checksum!",
-                     "This input is normally checked out from a version "
-                     "control system, but it has been archived on a "
-                     "mirror.  This means we cannot know a checksum for the "
-                     "tarball in advance. Be sure that your connection to "
-                     "this mirror is secure!")
+            logger.warn("Fetching from mirror without a checksum!",
+                        "This input is normally checked out from a version "
+                        "control system, but it has been archived on a "
+                        "mirror.  This means we cannot know a checksum for the "
+                        "tarball in advance. Be sure that your connection to "
+                        "this mirror is secure!")
         elif ramble.config.get('config:checksum'):
             self.fetcher.check()
 
@@ -558,15 +558,15 @@ class InputStage(object):
             mirror.root, self.mirror_paths.storage_path)
 
         if os.path.exists(absolute_storage_path):
-            tty.debug('Already existed: %s' % absolute_storage_path)
+            logger.debug(f'Already existed: {absolute_storage_path}')
             stats.already_existed(absolute_storage_path)
-            tty.debug('   Stats? %s' % stats.present)
+            logger.debug(f'   Stats? {stats.present}')
         else:
             self.fetch()
             self.check()
             mirror.store(
                 self.fetcher, self.mirror_paths.storage_path)
-            tty.debug('Added: %s' % absolute_storage_path)
+            logger.debug(f'Added: {absolute_storage_path}')
             stats.added(absolute_storage_path)
 
         if not os.path.exists(absolute_storage_path):
@@ -580,9 +580,9 @@ class InputStage(object):
         downloaded."""
         if not self.expanded:
             self.fetcher.expand()
-            tty.debug('Created stage in {0}'.format(self.path))
+            logger.debug(f'Created stage in {self.path}')
         else:
-            tty.debug('Already staged {0} in {1}'.format(self.name, self.path))
+            logger.debug(f'Already staged {self.name} in {self.path}')
 
     def restage(self):
         """Removes the expanded archive path if it exists, then re-expands
@@ -613,7 +613,7 @@ class InputStage(object):
         try:
             os.getcwd()
         except OSError as e:
-            tty.debug(e)
+            logger.debug(e)
             os.chdir(os.path.dirname(self.path))
 
         # mark as destroyed
@@ -658,7 +658,7 @@ class ResourceStage(InputStage):
         try:
             os.makedirs(target_path)
         except OSError as err:
-            tty.debug(err)
+            logger.debug(err)
             if err.errno == errno.EEXIST and os.path.isdir(target_path):
                 pass
             else:
@@ -669,10 +669,10 @@ class ResourceStage(InputStage):
             source_path = os.path.join(self.source_path, key)
 
             if not os.path.exists(destination_path):
-                tty.info('Moving resource stage\n\tsource : '
-                         '{stage}\n\tdestination : {destination}'.format(
-                             stage=source_path, destination=destination_path
-                         ))
+                logger.info('Moving resource stage\n\tsource : '
+                            '{stage}\n\tdestination : {destination}'.format(
+                                stage=source_path, destination=destination_path)
+                            )
 
                 src = os.path.realpath(source_path)
 
@@ -756,13 +756,13 @@ class DIYStage(object):
         pass
 
     def fetch(self, *args, **kwargs):
-        tty.debug('No need to fetch for DIY.')
+        logger.debug('No need to fetch for DIY.')
 
     def check(self):
-        tty.debug('No checksum needed for DIY.')
+        logger.debug('No checksum needed for DIY.')
 
     def expand_archive(self):
-        tty.debug('Using source directory: {0}'.format(self.source_path))
+        logger.debug(f'Using source directory: {self.source_path}')
 
     @property
     def expanded(self):
@@ -780,13 +780,13 @@ class DIYStage(object):
         pass
 
     def cache_local(self):
-        tty.debug('Sources for DIY stages are not cached')
+        logger.debug('Sources for DIY stages are not cached')
 
 
 def ensure_access(file):
     """Ensure we can access a directory and die with an error if we can't."""
     if not can_access(file):
-        tty.die("Insufficient permissions for %s" % file)
+        logger.die(f"Insufficient permissions for {file}")
 
 
 # TODO (dwj): Need to add checksums for inputs.
@@ -821,12 +821,12 @@ def get_checksums_for_versions(
     max_len = max(len(str(v)) for v in sorted_versions)
     num_ver = len(sorted_versions)
 
-    tty.msg('Found {0} version{1} of {2}:'.format(
-            num_ver, '' if num_ver == 1 else 's', name),
-            '',
-            *llnl.util.lang.elide_list(
-                ['{0:{1}}  {2}'.format(str(v), max_len, url_dict[v])
-                 for v in sorted_versions]))
+    logger.msg('Found {0} version{1} of {2}:'.format(
+               num_ver, '' if num_ver == 1 else 's', name),
+               '',
+               *llnl.util.lang.elide_list(
+                   ['{0:{1}}  {2}'.format(str(v), max_len, url_dict[v])
+                    for v in sorted_versions]))
     print()
 
     if batch:
@@ -836,12 +836,12 @@ def get_checksums_for_versions(
             "How many would you like to checksum?", default=1, abort='q')
 
     if not archives_to_fetch:
-        tty.die("Aborted.")
+        logger.die("Aborted.")
 
     versions = sorted_versions[:archives_to_fetch]
     urls = [url_dict[v] for v in versions]
 
-    tty.debug('Downloading...')
+    logger.debug('Downloading...')
     version_hashes = []
     i = 0
     errors = []
@@ -867,13 +867,13 @@ def get_checksums_for_versions(
         except FailedDownloadError:
             errors.append('Failed to fetch {0}'.format(url))
         except Exception as e:
-            tty.msg('Something failed on {0}, skipping.  ({1})'.format(url, e))
+            logger.msg(f'Something failed on {url}, skipping.  ({e})')
 
     for msg in errors:
-        tty.debug(msg)
+        logger.debug(msg)
 
     if not version_hashes:
-        tty.die("Could not fetch any versions for {0}".format(name))
+        logger.die(f"Could not fetch any versions for {name}")
 
     # Find length of longest string in the list for padding
     max_len = max(len(str(v)) for v, h in version_hashes)
@@ -885,8 +885,8 @@ def get_checksums_for_versions(
     ])
 
     num_hash = len(version_hashes)
-    tty.debug('Checksummed {0} version{1} of {2}:'.format(
-              num_hash, '' if num_hash == 1 else 's', name))
+    logger.debug('Checksummed {0} version{1} of {2}:'.format(
+                 num_hash, '' if num_hash == 1 else 's', name))
 
     return version_lines
 

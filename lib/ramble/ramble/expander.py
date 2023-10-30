@@ -11,10 +11,9 @@ import ast
 import six
 import operator
 
-import llnl.util.tty as tty
-
 import ramble.error
 import ramble.keywords
+from ramble.util.logger import logger
 
 supported_math_operators = {
     ast.Add: operator.add, ast.Sub: operator.sub,
@@ -443,7 +442,7 @@ class Expander(object):
         if ramble.config.get('config:disable_passthrough'):
             passthrough_setting = False
 
-        tty.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
+        logger.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
         expansions = self._variables
         if extra_vars:
             expansions = self._variables.copy()
@@ -458,7 +457,7 @@ class Expander(object):
                 raise RambleSyntaxError(f'Encountered a passthrough error while expanding {var}\n'
                                         f'{e}')
 
-        tty.debug(f'END OF EXPAND_VAR STACK {value}')
+        logger.debug(f'END OF EXPAND_VAR STACK {value}')
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):
@@ -475,15 +474,15 @@ class Expander(object):
         evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
 
         if not isinstance(evaluated, six.string_types):
-            tty.die('Logical compute failed to return a string')
+            logger.die('Logical compute failed to return a string')
 
         if evaluated == 'True':
             return True
         elif evaluated == 'False':
             return False
         else:
-            tty.die(f'When evaluating {in_str}, evaluate_predicate returned a non-boolean '
-                    f'string: "{evaluated}"')
+            logger.die(f'When evaluating {in_str}, evaluate_predicate returned '
+                       f'a non-boolean string: "{evaluated}"')
 
     @staticmethod
     def expansion_str(in_str):
@@ -530,8 +529,8 @@ class Expander(object):
             out_str = self.eval_math(math_ast.body)
             return out_str
         except MathEvaluationError as e:
-            tty.debug(f'   Math input is: "{in_str}"')
-            tty.debug(e)
+            logger.debug(f'   Math input is: "{in_str}"')
+            logger.debug(e)
 
         return in_str
 
@@ -718,9 +717,9 @@ class Expander(object):
 def raise_passthrough_error(in_str, out_str):
     """Raise an error when passthrough is disabled but variables are not all expanded"""
 
-    tty.debug(f'Expansion stack errors: attempted to expand '
-              f'"{in_str}"')
-    tty.debug(f'  As: {out_str}')
+    logger.debug(f'Expansion stack errors: attempted to expand '
+                 f'"{in_str}"')
+    logger.debug(f'  As: {out_str}')
     raise RamblePassthroughError('Error Stack:\n'
                                  f'Input: "{in_str}"\n'
                                  f'Output: "{out_str}"\n')

@@ -8,9 +8,8 @@
 
 from enum import Enum
 
-import llnl.util.tty as tty
-
 import ramble.error
+from ramble.util.logger import logger
 
 key_type = Enum('type', ['reserved', 'optional', 'required'])
 default_keys = {
@@ -119,7 +118,7 @@ class Keywords(object):
 
         if len(required_set) > 0:
             for key in required_set:
-                tty.warn(f'Required key "{key}" is not defined')
+                logger.warn(f'Required key "{key}" is not defined')
             raise RambleKeywordError('One or more required keys ' +
                                      'are not defined within an experiment.')
 

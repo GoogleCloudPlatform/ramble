@@ -45,7 +45,6 @@ from ruamel.yaml.error import MarkedYAMLError
 from six import iteritems
 
 import llnl.util.lang
-import llnl.util.tty as tty
 from llnl.util.filesystem import mkdirp, rename
 
 import spack.compilers
@@ -68,6 +67,7 @@ import ramble.schema.success_criteria
 import ramble.schema.variables
 
 from ramble.error import RambleError
+from ramble.util.logger import logger
 
 # Hacked yaml for configuration files preserves line numbers.
 import spack.util.spack_yaml as syaml
@@ -120,6 +120,7 @@ config_defaults = {
     'config': {
         'debug': False,
         'disable_passthrough': False,
+        'disable_progress_bar': False,
         'connect_timeout': 10,
         'verify_ssl': True,
         'checksum': True,
@@ -1014,7 +1015,7 @@ def read_config_file(filename, schema=None):
         raise ConfigFileError("Config file is not readable: %s" % filename)
 
     try:
-        tty.debug("Reading config file %s" % filename)
+        logger.debug(f"Reading config file {filename}")
         with open(filename) as f:
             data = syaml.load_config(f)
 

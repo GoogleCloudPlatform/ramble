@@ -6,10 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as color
 
 import ramble.paths
+from ramble.util.logger import logger
 
 
 def shell_init_instructions(cmd, equivalent):
@@ -49,4 +49,4 @@ def shell_init_instructions(cmd, equivalent):
         msg += ["  " + equivalent]
 
     msg += ['']
-    tty.error(*msg)
+    logger.error(*msg)

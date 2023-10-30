@@ -8,13 +8,12 @@
 
 import itertools
 
-import llnl.util.tty as tty
-
 import ramble.error
 import ramble.expander
 from ramble.namespace import namespace
 
 import ramble.util.matrices
+from ramble.util.logger import logger
 
 
 class RenderGroup(object):
@@ -40,12 +39,12 @@ class RenderGroup(object):
             self.objects = 'environments'
             self.context = 'environment_name'
         else:
-            tty.die(f'Object type {obj_type} is not valid to render.\n' +
-                    f'Valid options are: {self._obj_types}')
+            logger.die(f'Object type {obj_type} is not valid to render.\n' +
+                       f'Valid options are: {self._obj_types}')
 
         if action not in self._actions:
-            tty.die(f'Action {action} is not valid to render.\n' +
-                    f'Valid options are: {self._actions}')
+            logger.die(f'Action {action} is not valid to render.\n' +
+                       f'Valid options are: {self._actions}')
         self.action = action
 
         self.variables = {}
@@ -163,19 +162,21 @@ class Renderer(object):
                 # Validate variable definitions
                 for var_name in group_def:
                     if var_name not in object_variables:
-                        tty.die(f'An undefined variable {var_name} is defined in zip {zip_group}')
+                        logger.die(f'An undefined variable {var_name} '
+                                   f'is defined in zip {zip_group}')
 
                     if var_name in zipped_vars:
-                        tty.die(f'Variable {var_name} is used across multiple zips.\n'
-                                'Ensure it is only used in a single zip')
+                        logger.die(f'Variable {var_name} is used '
+                                   'across multiple zips.\n'
+                                   'Ensure it is only used in a single zip')
 
                     if not isinstance(object_variables[var_name], list):
-                        tty.die(f'Variable {var_name} in zip {zip_group} '
-                                'does not refer to a vector.')
+                        logger.die(f'Variable {var_name} in zip {zip_group} '
+                                   'does not refer to a vector.')
 
                     if len(object_variables[var_name]) == 0:
-                        tty.die(f'Variable {var_name} in zip {zip_group} '
-                                'has an invalid length of 0')
+                        logger.die(f'Variable {var_name} in zip {zip_group} '
+                                   'has an invalid length of 0')
 
                 # Validate variable lengths:
                 length_mismatch = False
@@ -186,9 +187,10 @@ class Renderer(object):
                         cur_zip['length'] = cur_len
                     elif cur_len != cur_zip['length']:
                         length_mismatch = True
-                        tty.die(f'Variable {var_name} in zip {zip_group}\n'
-                                f'has a length of {cur_len} which differs from\n'
-                                f'the current max of {cur_zip["length"]}')
+                        logger.die(f'Variable {var_name} in zip {zip_group}\n'
+                                   f'has a length of {cur_len} which differs '
+                                   'from the current max of '
+                                   f'{cur_zip["length"]}')
 
                 # Print length information in error case
                 if length_mismatch:
@@ -198,7 +200,7 @@ class Renderer(object):
                     for var_name in group_def:
                         err_str += f'\tVariable {var_name} has length ' \
                                    f'of {len(object_variables[var_name])}\n'
-                    tty.die(err_str)
+                    logger.die(err_str)
 
                 # Extract variables for zip
                 for var_name in group_def:
@@ -236,15 +238,19 @@ class Renderer(object):
                 variable_names = []
                 for var in matrix:
                     if var in matrix_vars:
-                        tty.die(f'Variable {var} has been used in multiple matrices.\n'
-                                + 'Ensure each variable is only used once across all matrices')
+                        logger.die(
+                            f'Variable {var} has been used in multiple matrices.\n'
+                            + 'Ensure each variable is only used once across all matrices'
+                        )
                     matrix_vars.add(var)
 
                     if var in object_variables:
                         if not isinstance(object_variables[var], list):
                             err_context = object_variables[render_group.context]
-                            tty.die(f'In {render_group.object} {err_context}'
-                                    + f' variable {var} does not refer to a vector.')
+                            logger.die(
+                                f'In {render_group.object} {err_context}'
+                                + f' variable {var} does not refer to a vector.'
+                            )
 
                         matrix_size = matrix_size * len(object_variables[var])
                         vectors.append(object_variables[var])
@@ -262,16 +268,20 @@ class Renderer(object):
                         variable_names.append(var)
                     else:
                         err_context = object_variables[render_group.context]
-                        tty.die(f'In {render_group.object} {err_context}'
-                                + f' variable or zip {var} has not been defined yet.')
+                        logger.die(
+                            f'In {render_group.object} {err_context}'
+                            + f' variable or zip {var} has not been defined yet.'
+                        )
 
                 if last_size == -1:
                     last_size = matrix_size
 
                 if last_size != matrix_size:
                     err_context = object_variables[render_group.context]
-                    tty.die(f'Matrices defined in {render_group.object} {err_context}'
-                            + ' do not result in the same number of elements.')
+                    logger.die(
+                        f'Matrices defined in {render_group.object} {err_context}'
+                        + ' do not result in the same number of elements.'
+                    )
 
                 matrix_vectors.append(vectors)
                 matrix_variables.append(variable_names)
@@ -331,7 +341,7 @@ class Renderer(object):
                           f'{err_context}\n'
                 for var, val in vector_vars.items():
                     err_str += f'\tVariable {var} has length {len(val)}\n'
-                tty.die(err_str)
+                logger.die(err_str)
 
             # Iterate over the vector length, and set the value in the
             # object dict to the index value.
@@ -358,7 +368,7 @@ class Renderer(object):
         where_expander = ramble.expander.Expander(object_variables, None)
 
         for obj in new_objects:
-            tty.debug(f'Rendering {render_group.object}:')
+            logger.debug(f'Rendering {render_group.object}:')
             for var, val in obj.items():
                 object_variables[var] = val
 

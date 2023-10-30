@@ -11,8 +11,6 @@ import os
 import math
 import fnmatch
 
-import llnl.util.tty as tty
-
 import ramble.expander
 from ramble.expander import Expander
 from ramble.namespace import namespace
@@ -22,6 +20,7 @@ import ramble.keywords
 import ramble.error
 import ramble.renderer
 import ramble.util.matrices
+from ramble.util.logger import logger
 import ramble.context
 
 
@@ -223,22 +222,18 @@ class ExperimentSet(object):
             test_n_nodes = math.ceil(int(n_ranks) / int(ppn))
 
             if n_nodes and n_nodes < test_n_nodes:
-                tty.error('n_nodes in %s is %s and should be %s' %
-                          (self.experiment_namespace, n_nodes,
-                           test_n_nodes))
+                logger.error(f'n_nodes in {self.experiment_namespace} is {n_nodes} '
+                             f'and should be {test_n_nodes}')
             elif not n_nodes:
-                tty.debug('Defining n_nodes in %s' %
-                          self.experiment_namespace)
+                logger.debug(f'Defining n_nodes in {self.experiment_namespace}')
                 variables[self.keywords.n_nodes] = test_n_nodes
         elif n_ranks and n_nodes:
             ppn = math.ceil(int(n_ranks) / int(n_nodes))
-            tty.debug('Defining processes_per_node in %s' %
-                      self.experiment_namespace)
+            logger.debug(f'Defining processes_per_node in {self.experiment_namespace}')
             variables[self.keywords.processes_per_node] = ppn
         elif ppn and n_nodes:
             n_ranks = ppn * n_nodes
-            tty.debug('Defining n_ranks in %s' %
-                      self.experiment_namespace)
+            logger.debug(f'Defining n_ranks in {self.experiment_namespace}')
             variables[self.keywords.n_ranks] = n_ranks
         elif not n_nodes:
             variables[self.keywords.n_nodes] = 1
@@ -357,10 +352,10 @@ class ExperimentSet(object):
             experiment_vars[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
                                                                    '{experiment_name}.out')
 
-            tty.debug('   Final name: %s' % final_exp_name)
+            logger.debug('   Final name: %s' % final_exp_name)
 
             if experiment_namespace in rendered_experiments:
-                tty.die('Experiment %s is not unique.' % experiment_namespace)
+                logger.die(f'Experiment {experiment_namespace} is not unique.')
             rendered_experiments.add(experiment_namespace)
 
             try:

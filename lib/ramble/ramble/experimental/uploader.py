@@ -6,12 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
 import json
 import sys
 import math
 
 import ramble.config
+from ramble.util.logger import logger
 from ramble.config import ConfigError
 
 
@@ -119,16 +119,16 @@ def upload_results(results):
             try:
                 formatted_data = ramble.experimental.uploader.format_data(results)
             except KeyError:
-                tty.die("Error parsing file: Does not contain valid data to upload.")
+                logger.die("Error parsing file: Does not contain valid data to upload.")
             # TODO: strategy object?
 
             uploader = BigQueryUploader()
 
             uri = ramble.config.get('config:upload:uri')
             if not uri:
-                tty.die('No upload URI (config:upload:uri) in config.')
+                logger.die('No upload URI (config:upload:uri) in config.')
 
-            tty.msg('Uploading Results to ' + uri)
+            logger.msg(f'Uploading Results to {uri}')
             uploader.perform_upload(uri, formatted_data)
         else:
             raise ConfigError("Unknown config:upload:type value")
@@ -156,8 +156,8 @@ def format_data(data_in):
     Output: The general idea is the decompose the results into a more "database"
     like format, where the runs and FOMs are in a different table.
     """
-    tty.debug("Format Data in")
-    tty.debug(data_in)
+    logger.debug("Format Data in")
+    logger.debug(data_in)
     results = []
 
     # TODO: what is the nice way to deal with the distinction between
@@ -212,16 +212,16 @@ class BigQueryUploader(Uploader):
         if rows_per_batch <= 1:
             rows_per_batch = 1
 
-        tty.debug("Size: {}B".format(sys.getsizeof(json.dumps(data))))
-        tty.debug("Length in rows: {}".format(data_len))
-        tty.debug("Num Batches: {}".format(approx_num_batches))
-        tty.debug("Rows per Batch: {}".format(rows_per_batch))
+        logger.debug(f"Size: {sys.getsizeof(json.dumps(data))}B")
+        logger.debug(f"Length in rows: {data_len}")
+        logger.debug(f"Num Batches: {approx_num_batches}")
+        logger.debug(f"Rows per Batch: {rows_per_batch}")
 
         for i in range(0, data_len, rows_per_batch):
             end = i + rows_per_batch
             if end > data_len:
                 end = data_len
-            tty.debug("Uploading rows {} to {}".format(i, end))
+            logger.debug(f"Uploading rows {i} to {end}")
             error = client.insert_rows_json(table_id, data[i:end])
             if error:
                 return error
@@ -246,22 +246,22 @@ class BigQueryUploader(Uploader):
                 fom_data['experiment_name'] = experiment.name
                 foms_to_insert.append(fom_data)
 
-        tty.debug("Experiments to insert:")
-        tty.debug(exps_to_insert)
+        logger.debug("Experiments to insert:")
+        logger.debug(exps_to_insert)
 
-        tty.msg("Upload experiments...")
+        logger.msg("Upload experiments...")
         errors1 = self.chunked_upload(exp_table_id, exps_to_insert)
         errors2 = None
 
         if errors1 == []:
-            tty.msg("Upload FOMs...")
+            logger.msg("Upload FOMs...")
             errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
 
         for errors, name in zip([errors1, errors2], ['exp', 'fom']):
             if errors == []:
-                tty.msg("New rows have been added in {}.".format(name))
+                logger.msg(f"New rows have been added in {name}")
             else:
-                tty.die("Encountered errors while inserting rows: {}".format(errors))
+                logger.die(f"Encountered errors while inserting rows: {errors}")
 
     def perform_upload(self, uri, results):
         super().perform_upload(uri, results)

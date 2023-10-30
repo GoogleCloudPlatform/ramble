@@ -15,7 +15,6 @@ import re
 import sys
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
 from llnl.util.argparsewriter import (
     ArgparseWriter, ArgparseRstWriter, ArgparseCompletionWriter
 )
@@ -24,6 +23,7 @@ from llnl.util.tty.colify import colify
 import ramble.cmd
 import ramble.main
 import ramble.paths
+from ramble.util.logger import logger
 from ramble.main import section_descriptions
 
 
@@ -257,12 +257,12 @@ def _commands(parser, args):
 
     # check header first so we don't open out files unnecessarily
     if args.header and not os.path.exists(args.header):
-        tty.die("No such file: '%s'" % args.header)
+        logger.die(f"No such file: '{args.header}'")
 
     # if we're updating an existing file, only write output if a command
     # or the header is newer than the file.
     if args.update:
-        tty.msg('Generating file: %s' % args.update)
+        logger.msg(f'Generating file: {args.update}')
         with open(args.update, 'w+') as f:
             prepend_header(args, f)
             formatter(args, f)
@@ -293,7 +293,7 @@ def commands(parser, args):
         if args.format != 'names' or any([
                 args.aliases, args.update, args.header
         ]):
-            tty.die("--update-completion can only be specified alone.")
+            logger.die("--update-completion can only be specified alone.")
 
         # this runs the command multiple times with different arguments
         return update_completion(parser, args)

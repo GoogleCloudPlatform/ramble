@@ -18,9 +18,7 @@ import fnmatch
 from typing import List
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
 import llnl.util.tty.color as color
-import llnl.util.tty.log
 from llnl.util.tty.colify import colified
 
 import spack.util.executable
@@ -33,6 +31,7 @@ import ramble.stage
 import ramble.mirror
 import ramble.fetch_strategy
 import ramble.expander
+import ramble.keywords
 import ramble.repository
 import ramble.modifier
 import ramble.util.executable
@@ -40,7 +39,7 @@ import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.env
 import ramble.util.directives
-import ramble.keywords
+from ramble.util.logger import logger
 
 from ramble.workspace import namespace
 
@@ -108,42 +107,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.license_file = ''
         self.license_inc_name = 'license.inc'
 
-        self.close_logger()
         self.build_phase_order()
 
         ramble.util.directives.define_directive_methods(self)
-
-    def construct_logger(self, logs_dir):
-        """Create and cache logger for this application instance
-
-
-        Using the input argument, logs_dir, construct a log path for this
-        application instance. Using that path, construct a logger instance that
-        will redirect output into that location.
-
-        When called multiple times, closes previously opened loggers, and
-        creates a new one each time.
-
-        Args:
-            logs_dir: Base directory for logs to exist in.
-        Returns:
-            log_path: Absolute path to log file that logger is writing to
-            logger: Logger instance to control writing
-        """
-        if hasattr(self, 'logger') and self.logger is not None:
-            self.close_logger()
-
-        log_path = self.experiment_log_file(logs_dir)
-        self.logger_file = log_path
-        self.logger = llnl.util.tty.log.log_output(log_path,
-                                                   echo=False,
-                                                   debug=tty.debug_level())
-
-    def close_logger(self):
-        """Close and destroy logger instances"""
-
-        self.logger_file = None
-        self.logger = None
 
     def copy(self):
         """Deep copy an application instance"""
@@ -378,8 +344,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def get_pipeline_phases(self, pipeline, phase_filters=['*']):
         if pipeline not in self._pipelines:
-            tty.die(f'Requested pipeline {pipeline} is not valid.\n',
-                    f'\tAvailable pipelinese are {self._pipelines}')
+            logger.die(f'Requested pipeline {pipeline} is not valid.\n',
+                       f'\tAvailable pipelinese are {self._pipelines}')
 
         phases = set()
         if hasattr(self, f'_{pipeline}_phases'):
@@ -388,7 +354,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     if fnmatch.fnmatch(phase, phase_filter):
                         phases.add(phase)
         else:
-            tty.die(f'Pipeline {pipeline} is not defined in application {self.name}')
+            logger.die(f'Pipeline {pipeline} is not defined in application {self.name}')
 
         include_phase_deps = ramble.config.get('config:include_phase_dependencies')
         if include_phase_deps:
@@ -469,11 +435,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._inject_required_modifier_builtins()
         self.add_expand_vars(workspace)
         if self.is_template:
-            tty.debug(f'{self.name} is a template. Skipping phases')
+            logger.debug(f'{self.name} is a template. Skipping phases')
             return
 
         if hasattr(self, f'_{phase}'):
-            tty.msg(f'  Executing phase {phase}')
+            logger.msg(f'  Executing phase {phase}')
             for mod_inst in self._modifier_instances:
                 mod_inst.run_phase_hook(workspace, phase)
             phase_func = getattr(self, f'_{phase}')
@@ -950,7 +916,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                 workspace.add_to_cache(input_tuple)
             else:
-                tty.msg('DRY-RUN: Would download %s' % input_conf['fetcher'].url)
+                logger.msg(f'DRY-RUN: Would download {input_conf["fetcher"].url}')
 
     def _prepare_license_path(self, workspace):
         self.license_path = os.path.join(workspace.shared_license_dir, self.name)
@@ -961,7 +927,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     register_phase('license_includes', pipeline='setup')
 
     def _license_includes(self, workspace):
-        tty.debug("Writing License Includes")
+        logger.debug("Writing License Includes")
         self._prepare_license_path(workspace)
 
         action_funcs = ramble.util.env.action_funcs
@@ -1001,7 +967,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for template_name, template_conf in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
-            tty.msg(f'Writing template {template_name} to {expand_path}')
+            logger.msg(f'Writing template {template_name} to {expand_path}')
 
             with open(expand_path, 'w+') as f:
                 f.write(self.expander.expand_var(template_conf['contents']))
@@ -1218,14 +1184,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             # Start with no active contexts in a file.
             active_contexts = {}
-            tty.debug('Reading log file: %s' % file)
+            logger.debug(f'Reading log file: {file}')
 
             with open(file, 'r') as f:
                 for line in f.readlines():
-                    tty.debug(f'Line: {line}')
+                    logger.debug(f'Line: {line}')
 
                     for criteria in file_conf['success_criteria']:
-                        tty.debug('Looking for criteria %s' % criteria)
+                        logger.debug('Looking for criteria %s' % criteria)
                         criteria_obj = criteria_list.find_criteria(criteria)
                         if criteria_obj.passed(line, self):
                             criteria_obj.mark_found()
@@ -1238,9 +1204,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             context_name = \
                                 format_context(context_match,
                                                context_conf['format'])
-                            tty.debug('Line was: %s' % line)
-                            tty.debug(' Context match %s -- %s' %
-                                      (context, context_name))
+                            logger.debug('Line was: %s' % line)
+                            logger.debug(f' Context match {context} -- {context_name}')
 
                             active_contexts[context] = context_name
 
@@ -1248,7 +1213,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                 fom_values[context_name] = {}
 
                     for fom in file_conf['foms']:
-                        tty.debug(f'  Testing for fom {fom}')
+                        logger.debug(f'  Testing for fom {fom}')
                         fom_conf = foms[fom]
                         fom_match = fom_conf['regex'].match(line)
 
@@ -1259,7 +1224,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             fom_name = self.expander.expand_var(fom, extra_vars=fom_vars)
 
                             if fom_conf['group'] in fom_conf['regex'].groupindex:
-                                tty.debug(' --- Matched fom %s' % fom_name)
+                                logger.debug(' --- Matched fom %s' % fom_name)
                                 fom_contexts = []
                                 if fom_conf['contexts']:
                                     for context in fom_conf['contexts']:
@@ -1297,7 +1262,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        tty.debug('fom_vals = %s' % fom_values)
+        logger.debug('fom_vals = %s' % fom_values)
         results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
         if success:
             self.set_status(status='SUCCESS')
@@ -1359,7 +1324,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             ('application_definition', self.success_criteria),
         ]
 
-        tty.debug(f' Number of modifiers are: {len(self._modifier_instances)}')
+        logger.debug(f' Number of modifiers are: {len(self._modifier_instances)}')
         for mod in self._modifier_instances:
             success_lists.append(('modifier_definition', mod.success_criteria))
 
@@ -1411,8 +1376,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 files[log_path] = self._new_file_dict()
 
             if log_path in files:
-                tty.debug('Log = %s' % log_path)
-                tty.debug('Conf = %s' % conf)
+                logger.debug('Log = %s' % log_path)
+                logger.debug('Conf = %s' % conf)
                 if conf['contexts']:
                     files[log_path]['contexts'].extend(conf['contexts'])
                 files[log_path]['foms'].append(fom)

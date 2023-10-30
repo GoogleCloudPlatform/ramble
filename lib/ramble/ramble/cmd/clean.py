@@ -11,12 +11,11 @@ import argparse
 import os
 import shutil
 
-import llnl.util.tty as tty
-
 import ramble.caches
 import ramble.config
 import ramble.repository
 import ramble.stage
+from ramble.util.logger import logger
 from ramble.paths import lib_path, var_path
 
 description = "remove temporary files and/or downloaded archives"
@@ -53,24 +52,24 @@ def clean(parser, args):
         args.downloads = True
 
     if args.downloads:
-        tty.msg('Removing cached downloads')
+        logger.msg('Removing cached downloads')
         ramble.caches.fetch_cache.destroy()
 
     if args.misc_cache:
-        tty.msg('Removing cached information on repositories')
+        logger.msg('Removing cached information on repositories')
         ramble.caches.misc_cache.destroy()
 
     if args.python_cache:
-        tty.msg('Removing python cache files')
+        logger.msg('Removing python cache files')
         for directory in [lib_path, var_path]:
             for root, dirs, files in os.walk(directory):
                 for f in files:
                     if f.endswith('.pyc') or f.endswith('.pyo'):
                         fname = os.path.join(root, f)
-                        tty.debug('Removing {0}'.format(fname))
+                        logger.debug(f'Removing {fname}')
                         os.remove(fname)
                 for d in dirs:
                     if d == '__pycache__':
                         dname = os.path.join(root, d)
-                        tty.debug('Removing {0}'.format(dname))
+                        logger.debug(f'Removing {dname}')
                         shutil.rmtree(dname)

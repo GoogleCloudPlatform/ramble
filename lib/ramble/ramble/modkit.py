@@ -12,7 +12,11 @@
 
 import llnl.util.filesystem
 from llnl.util.filesystem import *
-import llnl.util.tty as tty
+
+from ramble.util.logger import logger
+
+# Rename logger to tty to preserve old behavior
+from ramble.util.logger import logger as tty
 
 from ramble.modifier import ModifierBase
 from ramble.modifier_types.basic import BasicModifier
