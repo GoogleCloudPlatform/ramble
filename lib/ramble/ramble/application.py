@@ -999,12 +999,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)
 
+        exec_vars = {}
+
+        for mod in self._modifier_instances:
+            exec_vars.update(mod.modded_variables(self))
+
         for template_name, template_conf in workspace.all_templates():
             expand_path = os.path.join(experiment_run_dir, template_name)
             tty.msg(f'Writing template {template_name} to {expand_path}')
 
             with open(expand_path, 'w+') as f:
-                f.write(self.expander.expand_var(template_conf['contents']))
+                f.write(self.expander.expand_var(template_conf['contents'],
+                                                 extra_vars=exec_vars))
             os.chmod(expand_path, stat.S_IRWXU | stat.S_IRWXG
                      | stat.S_IROTH | stat.S_IXOTH)
 
