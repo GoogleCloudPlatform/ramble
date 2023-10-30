@@ -89,6 +89,14 @@ ramble.util.lock module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.logger module
+-------------------------
+
+.. automodule:: ramble.util.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.matrices module
 ---------------------------
 

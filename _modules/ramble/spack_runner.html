@@ -56,29 +56,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-attributes">ramble attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mods">ramble mods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-results">ramble results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
@@ -133,7 +110,6 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">shlex</span>
 
-<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
 <span class="kn">from</span> <span class="nn">spack.util.executable</span> <span class="kn">import</span> <span class="n">CommandNotFoundError</span><span class="p">,</span> <span class="n">ProcessError</span>
 <span class="kn">from</span> <span class="nn">ramble.util.executable</span> <span class="kn">import</span> <span class="n">which</span>
@@ -142,6 +118,7 @@
 <span class="kn">import</span> <span class="nn">ramble.config</span>
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
+<span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">import</span> <span class="nn">spack.util.spack_json</span> <span class="k">as</span> <span class="nn">sjson</span>
 
@@ -285,7 +262,7 @@
         <span class="k">if</span> <span class="n">require_exists</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span> <span class="ow">or</span> \
                     <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Path </span><span class="si">{</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is not a spack environment&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Path </span><span class="si">{</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is not a spack environment&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">env_path</span></div>
 
@@ -368,7 +345,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
                 <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">working_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">env_create_args</span><span class="p">)</span>
+                    <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">env_create_args</span><span class="p">,</span>
+                               <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span>
+                               <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
 
         <span class="c1"># Ensure subsequent commands use the created env now.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">path</span></div>
@@ -413,7 +393,8 @@
         <span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="n">load_cmds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+            <span class="n">load_cmds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">load_cmds</span><span class="p">:</span>
                 <span class="n">env_var</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
@@ -456,17 +437,20 @@
             <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">])</span>
         <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">spec</span><span class="p">])</span>
 
+        <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
         <span class="n">compiler_find_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
         <span class="n">compiler_find_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">compiler_find_flags</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">compiler_find_flags</span><span class="p">):</span>
                 <span class="n">compiler_find_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">compiler_find_args</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">compiler_find_args</span><span class="p">,</span>
+                       <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span>
+                       <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">comp_info_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s1"> is already an available compiler&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s1"> is already an available compiler&#39;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">except</span> <span class="n">ProcessError</span><span class="p">:</span>
 
@@ -480,14 +464,14 @@
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">load_compiler</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">compiler_find_args</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">compiler_find_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">compilers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
@@ -572,7 +556,8 @@
 
         <span class="n">pkg_names</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
             <span class="n">match</span> <span class="o">=</span> <span class="n">package_name_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
                 <span class="n">pkg_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;package_name&#39;</span><span class="p">))</span>
@@ -612,10 +597,16 @@
             <span class="s1">&#39;add&#39;</span>
         <span class="p">]</span>
 
+        <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">config_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">active_stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
@@ -650,7 +641,9 @@
         <span class="n">path</span> <span class="o">=</span> <span class="n">env_name_or_path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">named_location_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">named_location_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                                  <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="c1"># If a named environment fails, copy directly from the path</span>
             <span class="k">except</span> <span class="n">ProcessError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidExternalEnvironment</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1"> is not a spack environment.&#39;</span><span class="p">)</span>
@@ -717,11 +710,11 @@
                 <span class="c1"># If the yaml hash matches the new generated data hash...</span>
                 <span class="k">if</span> <span class="n">gen_env_hash</span> <span class="o">==</span> <span class="n">existing_env_hash</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> will not be regenerated.&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> will not be regenerated.&#39;</span><span class="p">)</span>
                     <span class="k">return</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removing invalid spack lock file </span><span class="si">{</span><span class="n">spack_lock_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removing invalid spack lock file </span><span class="si">{</span><span class="n">spack_lock_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">fs</span><span class="o">.</span><span class="n">force_remove</span><span class="p">(</span><span class="n">spack_lock_file</span><span class="p">)</span>
 
         <span class="c1"># Write spack.yaml to environment before concretizing</span>
@@ -743,7 +736,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is already concretized. Skipping concretize...&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is already concretized. Skipping concretize...&#39;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concretize_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
@@ -753,7 +748,8 @@
             <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">concretize_flags</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
@@ -776,10 +772,12 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">lock_exists</span> <span class="ow">and</span> <span class="n">require_exist</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;spack.lock file does not exist in environment &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                        <span class="s1">&#39;Make sure your workspace is fully setup with</span><span class="se">\n</span><span class="s1">&#39;</span>
-                        <span class="s1">&#39;    ramble workspace setup&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="s1">&#39;spack.lock file does not exist in environment &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s1">&#39;Make sure your workspace is fully setup with</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s1">&#39;    ramble workspace setup&#39;</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="n">lock_exists</span><span class="p">:</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spack_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">contents_to_hash</span> <span class="o">=</span> <span class="n">sjson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -815,7 +813,8 @@
             <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">install_flags</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">active_stream</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
 
@@ -831,8 +830,9 @@
         <span class="n">name_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">name_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">loc_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">name_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">loc_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">name_args</span><span class="p">)</span>
@@ -859,7 +859,8 @@
         <span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -877,7 +878,8 @@
             <span class="s1">&#39;--format&#39;</span><span class="p">,</span>
             <span class="s1">&#39;/</span><span class="si">{hash}</span><span class="s1">&#39;</span>
         <span class="p">]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span></div>
 
 
@@ -895,7 +897,7 @@
         <span class="p">]</span>
         <span class="n">user_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buildcache_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
 
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running with user flags: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user_flags</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running with user flags: </span><span class="si">{</span><span class="n">user_flags</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">user_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">user_flags</span><span class="p">))</span>
@@ -903,15 +905,16 @@
         <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">spack_cache_path</span><span class="p">,</span> <span class="n">hash_list</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">active_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
             <span class="k">return</span></div>
 
 
     <span class="k">def</span> <span class="nf">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;DRY-RUN: would run </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">executable</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;         with args: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DRY-RUN: would run </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;         with args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
 
@@ -952,7 +955,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 27, 2023.
+      <span class="lastupdated">Last updated on Oct 30, 2023.
       </span></p>
   </div>
 

@@ -95,7 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.results">ramble.cmd.results module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.unit_test">ramble.cmd.unit_test module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.workspace">ramble.cmd.workspace module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-cmd-workspace-module">ramble.cmd.workspace module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
@@ -125,7 +125,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.pipeline">ramble.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
@@ -140,29 +140,6 @@
 <li class="toctree-l1"><a class="reference internal" href="workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="success_criteria.html">Success Criteria</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-results">ramble results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
 <ul>
@@ -1230,189 +1207,8 @@ they show up in the short help, so we have to reassemble things here.</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-ramble.cmd.workspace">
-<span id="ramble-cmd-workspace-module"></span><h2>ramble.cmd.workspace module<a class="headerlink" href="#module-ramble.cmd.workspace" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.create_temp_workspace_directory">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">create_temp_workspace_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#create_temp_workspace_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.create_temp_workspace_directory" title="Link to this definition"></a></dt>
-<dd><p>Returns the path of a temporary directory in which to
-create a workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.sanitize_arg_name">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">sanitize_arg_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#sanitize_arg_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.sanitize_arg_name" title="Link to this definition"></a></dt>
-<dd><p>Allow function names to be remaped (eg <cite>-</cite> to <cite>_</cite>)</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.setup_parser" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.subcommand_functions">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">subcommand_functions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.cmd.workspace.subcommand_functions" title="Link to this definition"></a></dt>
-<dd><p>Dictionary mapping subcommand names and aliases to functions</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace" title="Link to this definition"></a></dt>
-<dd><p>Look for a function called environment_&lt;name&gt; and call it.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_activate">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_activate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_activate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_activate" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_activate_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_activate_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_activate_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_activate_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>Set the current workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_analyze">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_analyze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_analyze" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_analyze_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_analyze_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_analyze_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_analyze_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>Analyze a workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_archive">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_archive" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_archive_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_archive_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_archive_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_archive_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>archive current workspace state</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_concretize">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_concretize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_concretize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_concretize" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_concretize_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_concretize_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_concretize_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_concretize_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>Concretize a workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_create">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_create" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_create_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_create_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_create_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_create_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>create a new workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_deactivate">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_deactivate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_deactivate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_deactivate" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_deactivate_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_deactivate_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_deactivate_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_deactivate_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>deactivate any active workspace in the shell</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_edit">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_edit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_edit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_edit_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_edit_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_edit_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_edit_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>edit workspace config or template</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_info">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_info" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_info_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_info_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_info_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_info_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>Information about a workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_list">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_list" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_list_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_list_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_list_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_list_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>list available workspaces</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_mirror">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_mirror</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_mirror"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_mirror" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_mirror_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_mirror_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_mirror_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_mirror_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>mirror current workspace state</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_push_to_cache">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_push_to_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_push_to_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_push_to_cache" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_push_to_cache_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_push_to_cache_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_push_to_cache_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_push_to_cache_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>push workspace envs to a given spack buildcache</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_remove">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_remove" title="Link to this definition"></a></dt>
-<dd><p>Remove a <em>named</em> workspace.</p>
-<p>This removes an environment managed by Ramble. Directory workspaces
-should be removed manually.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_remove_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_remove_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_remove_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_remove_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>remove an existing workspace</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_run_pipeline">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_run_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_run_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_run_pipeline" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_setup">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_setup" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.workspace.workspace_setup_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_setup_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/workspace.html#workspace_setup_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.workspace.workspace_setup_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>Setup a workspace</p>
-</dd></dl>
-
+<section id="ramble-cmd-workspace-module">
+<h2>ramble.cmd.workspace module<a class="headerlink" href="#ramble-cmd-workspace-module" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -1428,7 +1224,7 @@ should be removed manually.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 27, 2023.
+      <span class="lastupdated">Last updated on Oct 30, 2023.
       </span></p>
   </div>
 

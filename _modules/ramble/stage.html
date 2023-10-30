@@ -56,29 +56,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-attributes">ramble attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mods">ramble mods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-results">ramble results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
@@ -154,6 +131,7 @@
 <span class="kn">import</span> <span class="nn">ramble.util.lock</span>
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.mirror</span>
+<span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
 
 <span class="c1"># The well-known stage source subdirectory name.</span>
@@ -184,12 +162,12 @@
 
             <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span> <span class="o">!=</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">{0}</span><span class="s2"> to have group </span><span class="si">{1}</span><span class="s2">, but it is </span><span class="si">{2}</span><span class="s2">&quot;</span>
-                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">,</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to have group &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">!=</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">{0}</span><span class="s2"> to support mode </span><span class="si">{1}</span><span class="s2">, but it is </span><span class="si">{2}</span><span class="s2">&quot;</span>
-                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">,</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to support mode &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">can_access</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
@@ -207,8 +185,8 @@
 
             <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span> <span class="o">!=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">{0}</span><span class="s2"> to support mode </span><span class="si">{1}</span><span class="s2">, but it is </span><span class="si">{2}</span><span class="s2">&quot;</span>
-                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">,</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to support mode &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -242,8 +220,7 @@
                 <span class="k">return</span> <span class="n">path</span>
 
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;OSError while checking stage path </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                      <span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OSError while checking stage path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
 
@@ -411,7 +388,7 @@
                 <span class="n">lock_id</span> <span class="o">=</span> <span class="n">prefix_bits</span><span class="p">(</span><span class="n">sha1</span><span class="p">,</span> <span class="n">bit_length</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">))</span>
                 <span class="n">stage_lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;.lock&#39;</span><span class="p">)</span>
 
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating stage lock </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating stage lock </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">Lock</span><span class="p">(</span>
                     <span class="n">stage_lock_path</span><span class="p">,</span> <span class="n">lock_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
@@ -577,7 +554,7 @@
 
         <span class="k">def</span> <span class="nf">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">fetcher</span> <span class="ow">in</span> <span class="n">generate_fetchers</span><span class="p">():</span>
@@ -591,11 +568,11 @@
                 <span class="k">continue</span>
             <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Fetching from </span><span class="si">{0}</span><span class="s1"> failed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">except</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">SpackWebError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Fetching from </span><span class="si">{0}</span><span class="s1"> failed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                 <span class="k">continue</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -652,12 +629,12 @@
 <span class="sd">           No-op if this stage checks code out of a repository.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="ow">and</span> \
            <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Fetching from mirror without a checksum!&quot;</span><span class="p">,</span>
-                     <span class="s2">&quot;This input is normally checked out from a version &quot;</span>
-                     <span class="s2">&quot;control system, but it has been archived on a &quot;</span>
-                     <span class="s2">&quot;mirror.  This means we cannot know a checksum for the &quot;</span>
-                     <span class="s2">&quot;tarball in advance. Be sure that your connection to &quot;</span>
-                     <span class="s2">&quot;this mirror is secure!&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Fetching from mirror without a checksum!&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;This input is normally checked out from a version &quot;</span>
+                        <span class="s2">&quot;control system, but it has been archived on a &quot;</span>
+                        <span class="s2">&quot;mirror.  This means we cannot know a checksum for the &quot;</span>
+                        <span class="s2">&quot;tarball in advance. Be sure that your connection to &quot;</span>
+                        <span class="s2">&quot;this mirror is secure!&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:checksum&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">check</span><span class="p">()</span></div>
 
@@ -696,15 +673,15 @@
             <span class="n">mirror</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">):</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Already existed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">absolute_storage_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Already existed: </span><span class="si">{</span><span class="n">absolute_storage_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">already_existed</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   Stats? </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">stats</span><span class="o">.</span><span class="n">present</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   Stats? </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">present</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
             <span class="n">mirror</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Added: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">absolute_storage_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added: </span><span class="si">{</span><span class="n">absolute_storage_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">added</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">):</span>
@@ -721,9 +698,9 @@
 <span class="sd">        downloaded.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">expanded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created stage in </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Created stage in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Already staged </span><span class="si">{0}</span><span class="s1"> in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Already staged </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="InputStage.restage">
@@ -763,7 +740,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
 
         <span class="c1"># mark as destroyed</span>
@@ -818,7 +795,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target_path</span><span class="p">):</span>
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
@@ -829,10 +806,10 @@
             <span class="n">source_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">destination_path</span><span class="p">):</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Moving resource stage</span><span class="se">\n\t</span><span class="s1">source : &#39;</span>
-                         <span class="s1">&#39;</span><span class="si">{stage}</span><span class="se">\n\t</span><span class="s1">destination : </span><span class="si">{destination}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                             <span class="n">stage</span><span class="o">=</span><span class="n">source_path</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">destination_path</span>
-                         <span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Moving resource stage</span><span class="se">\n\t</span><span class="s1">source : &#39;</span>
+                            <span class="s1">&#39;</span><span class="si">{stage}</span><span class="se">\n\t</span><span class="s1">destination : </span><span class="si">{destination}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">stage</span><span class="o">=</span><span class="n">source_path</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+                            <span class="p">)</span>
 
                 <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span>
 
@@ -924,19 +901,19 @@
 <div class="viewcode-block" id="DIYStage.fetch">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.fetch">[docs]</a>
     <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No need to fetch for DIY.&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No need to fetch for DIY.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DIYStage.check">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.check">[docs]</a>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No checksum needed for DIY.&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No checksum needed for DIY.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DIYStage.expand_archive">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.expand_archive">[docs]</a>
     <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Using source directory: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">))</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using source directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
@@ -966,7 +943,7 @@
 <div class="viewcode-block" id="DIYStage.cache_local">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.cache_local">[docs]</a>
     <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sources for DIY stages are not cached&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sources for DIY stages are not cached&#39;</span><span class="p">)</span></div>
 </div>
 
 
@@ -976,7 +953,7 @@
 <span class="k">def</span> <span class="nf">ensure_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure we can access a directory and die with an error if we can&#39;t.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">can_access</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Insufficient permissions for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Insufficient permissions for </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -1014,12 +991,12 @@
     <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">)</span>
     <span class="n">num_ver</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_versions</span><span class="p">)</span>
 
-    <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Found </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">num_ver</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_ver</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
-            <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">elide_list</span><span class="p">(</span>
-                <span class="p">[</span><span class="s1">&#39;{0:</span><span class="si">{1}</span><span class="s1">}  </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
-                 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">]))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Found </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+               <span class="n">num_ver</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_ver</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+               <span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">elide_list</span><span class="p">(</span>
+                   <span class="p">[</span><span class="s1">&#39;{0:</span><span class="si">{1}</span><span class="s1">}  </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">batch</span><span class="p">:</span>
@@ -1029,12 +1006,12 @@
             <span class="s2">&quot;How many would you like to checksum?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="s1">&#39;q&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">archives_to_fetch</span><span class="p">:</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Aborted.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Aborted.&quot;</span><span class="p">)</span>
 
     <span class="n">versions</span> <span class="o">=</span> <span class="n">sorted_versions</span><span class="p">[:</span><span class="n">archives_to_fetch</span><span class="p">]</span>
     <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">]</span>
 
-    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Downloading...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Downloading...&#39;</span><span class="p">)</span>
     <span class="n">version_hashes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1060,13 +1037,13 @@
         <span class="k">except</span> <span class="n">FailedDownloadError</span><span class="p">:</span>
             <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Failed to fetch </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Something failed on </span><span class="si">{0}</span><span class="s1">, skipping.  (</span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Something failed on </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">, skipping.  (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">version_hashes</span><span class="p">:</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Could not fetch any versions for </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not fetch any versions for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Find length of longest string in the list for padding</span>
     <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">version_hashes</span><span class="p">)</span>
@@ -1078,8 +1055,8 @@
     <span class="p">])</span>
 
     <span class="n">num_hash</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">version_hashes</span><span class="p">)</span>
-    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Checksummed </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-              <span class="n">num_hash</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_hash</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Checksummed </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">num_hash</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_hash</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">version_lines</span></div>
 
@@ -1125,7 +1102,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 27, 2023.
+      <span class="lastupdated">Last updated on Oct 30, 2023.
       </span></p>
   </div>
 

@@ -56,29 +56,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html">ramble</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-attributes">ramble attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-clean">ramble clean</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-commands">ramble commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-config">ramble config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-debug">ramble debug</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-edit">ramble edit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-flake8">ramble flake8</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-help">ramble help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-info">ramble info</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-license">ramble license</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-list">ramble list</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mirror">ramble mirror</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-mods">ramble mods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-on">ramble on</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-repo">ramble repo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-results">ramble results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-unit-test">ramble unit-test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../command_index.html#ramble-workspace">ramble workspace</a></li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
@@ -129,7 +106,6 @@
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">ruamel.yaml</span> <span class="k">as</span> <span class="nn">yaml</span>
 
-<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 <span class="kn">from</span> <span class="nn">llnl.util.lang</span> <span class="kn">import</span> <span class="n">attr_setdefault</span>
 <span class="kn">from</span> <span class="nn">llnl.util.filesystem</span> <span class="kn">import</span> <span class="n">join_path</span>
 
@@ -137,6 +113,7 @@
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.paths</span>
 <span class="kn">import</span> <span class="nn">ramble.workspace</span>
+<span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">import</span> <span class="nn">spack.extensions</span>
 <span class="kn">import</span> <span class="nn">spack.util.string</span>
@@ -245,7 +222,7 @@
     <span class="n">require_cmd_name</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
     <span class="n">pname</span> <span class="o">=</span> <span class="n">python_name</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
 
-    <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Getting module for command </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Getting module for command </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># Try to import the command from the built-in directory</span>
@@ -253,7 +230,7 @@
         <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span>
                             <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">pname</span><span class="p">,</span> <span class="n">SETUP_PARSER</span><span class="p">,</span> <span class="n">DESCRIPTION</span><span class="p">],</span>
                             <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Imported </span><span class="si">{0}</span><span class="s1"> from built-in commands&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pname</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Imported </span><span class="si">{</span><span class="n">pname</span><span class="si">}</span><span class="s1"> from built-in commands&#39;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">module</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
@@ -265,8 +242,9 @@
     <span class="n">attr_setdefault</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">DESCRIPTION</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">pname</span><span class="p">):</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Command module </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">) must define function &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">pname</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Command module </span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">) must define function &#39;</span><span class="si">{</span><span class="n">pname</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">module</span></div>
 
@@ -390,12 +368,12 @@
     <span class="k">if</span> <span class="n">ws</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ws</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-            <span class="s1">&#39;`ramble </span><span class="si">%s</span><span class="s1">` requires a workspace&#39;</span> <span class="o">%</span> <span class="n">cmd_name</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;`ramble </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s1">` requires a workspace&#39;</span><span class="p">,</span>
             <span class="s1">&#39;activate a workspace first:&#39;</span><span class="p">,</span>
             <span class="s1">&#39;    ramble workspace activate WRKSPC&#39;</span><span class="p">,</span>
             <span class="s1">&#39;or use:&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;    ramble -w WRKSPC </span><span class="si">%s</span><span class="s1"> ...&#39;</span> <span class="o">%</span> <span class="n">cmd_name</span><span class="p">)</span></div>
+            <span class="sa">f</span><span class="s1">&#39;    ramble -w WRKSPC </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s1"> ...&#39;</span><span class="p">)</span></div>
 
 
 
@@ -499,7 +477,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 27, 2023.
+      <span class="lastupdated">Last updated on Oct 30, 2023.
       </span></p>
   </div>
 

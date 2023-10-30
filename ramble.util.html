@@ -75,6 +75,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.hashing">ramble.util.hashing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.install_cache">ramble.util.install_cache module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.lock">ramble.util.lock module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.logger">ramble.util.logger module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.matrices">ramble.util.matrices module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.naming">ramble.util.naming module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.path">ramble.util.path module</a></li>
@@ -103,7 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.pipeline">ramble.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
@@ -118,29 +119,6 @@
 <li class="toctree-l1"><a class="reference internal" href="workspace.html">Ramble Workspace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workspace_config.html">Workspace Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="success_criteria.html">Success Criteria</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html">ramble</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-attributes">ramble attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-clean">ramble clean</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-commands">ramble commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-config">ramble config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-debug">ramble debug</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-edit">ramble edit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-flake8">ramble flake8</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-help">ramble help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-info">ramble info</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-license">ramble license</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-list">ramble list</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mirror">ramble mirror</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-mods">ramble mods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-on">ramble on</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-repo">ramble repo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-results">ramble results</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-software-definitions">ramble software-definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-unit-test">ramble unit-test</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command_index.html#ramble-workspace">ramble workspace</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
 <ul>
@@ -559,6 +537,123 @@ path for testing.</p>
 </dd></dl>
 
 </section>
+<section id="module-ramble.util.logger">
+<span id="ramble-util-logger-module"></span><h2>ramble.util.logger module<a class="headerlink" href="#module-ramble.util.logger" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.logger.</span></span><span class="sig-name descname"><span class="pre">Logger</span></span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Logger class</p>
+<p>This class providers additional functionality on top of LLNL’s tty utility.
+Namely, this class provides a stack of log files, and allows errors to be
+printed to all log files instead of only one.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.active_log">
+<span class="sig-name descname"><span class="pre">active_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.active_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.active_log" title="Link to this definition"></a></dt>
+<dd><p>Return the path for the active log</p>
+<p>If any logs are in the log stack, return the filepath of the active log.
+Otherwise, return the string ‘stdout’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.active_stream">
+<span class="sig-name descname"><span class="pre">active_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.active_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.active_stream" title="Link to this definition"></a></dt>
+<dd><p>Return the stream for the active log</p>
+<p>If any logs are in the log stack, return the stream object of the active log.
+Otherwise, return None to indicate the system is handling printing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.add_log">
+<span class="sig-name descname"><span class="pre">add_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.add_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.add_log" title="Link to this definition"></a></dt>
+<dd><p>Add a log to the current log stack</p>
+<p>Opens (with ‘w+’ permissions) the file provided by the ‘path’ argument,
+and stores both the path, and the opened stream object in the current stack
+in the active position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – File path for the new log file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.all_msg">
+<span class="sig-name descname"><span class="pre">all_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.all_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.all_msg" title="Link to this definition"></a></dt>
+<dd><p>Print a message to all logs</p>
+<p>Pass all args and kwargs to tty.info (which will concatenate and
+print). Perform this action for all logs and the default log (to
+screen).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.debug" title="Link to this definition"></a></dt>
+<dd><p>Print a debug message to the active log</p>
+<p>Pass all args and kwargs to tty.debug (which will concatenate and
+print). Perform this action for the active log only.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.die">
+<span class="sig-name descname"><span class="pre">die</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.die"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.die" title="Link to this definition"></a></dt>
+<dd><p>Print an error message and terminate execution</p>
+<p>Pass all args and kwargs to tty.error (which will concatenate and
+print). Perform this action all logs. After all logs are printed to,
+terminate execution (and error) using tty.die.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.error" title="Link to this definition"></a></dt>
+<dd><p>Print an error message</p>
+<p>Pass all args and kwargs to tty.error (which will concatenate and
+print). Perform this action all logs, and the default stream (print to
+screen).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.info" title="Link to this definition"></a></dt>
+<dd><p>Print a message to the active log</p>
+<p>Pass all args and kwargs to tty.info (which will concatenate and
+print). Perform this action for the active log only.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.msg">
+<span class="sig-name descname"><span class="pre">msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.msg" title="Link to this definition"></a></dt>
+<dd><p>Print a message to the active log</p>
+<p>Pass all args and kwargs to tty.info (which will concatenate and
+print). Perform this action for the active log only.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.remove_log">
+<span class="sig-name descname"><span class="pre">remove_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.remove_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.remove_log" title="Link to this definition"></a></dt>
+<dd><p>Remove the active stack</p>
+<p>Pop the active log from the log stack, and close the log stream.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.verbose">
+<span class="sig-name descname"><span class="pre">verbose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.verbose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.verbose" title="Link to this definition"></a></dt>
+<dd><p>Print a verbose message to the active log</p>
+<p>Pass all args and kwargs to tty.verbose (which will concatenate and
+print). Perform this action for the active log only.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.logger.Logger.warn">
+<span class="sig-name descname"><span class="pre">warn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/logger.html#Logger.warn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.logger.Logger.warn" title="Link to this definition"></a></dt>
+<dd><p>Print a warning message to the active log</p>
+<p>Pass all args and kwargs to tty.warn (which will concatenate and
+print). Perform this action for the active log only.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-ramble.util.matrices">
 <span id="ramble-util-matrices-module"></span><h2>ramble.util.matrices module<a class="headerlink" href="#module-ramble.util.matrices" title="Link to this heading"></a></h2>
 <dl class="py function">
@@ -897,7 +992,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Oct 27, 2023.
+      <span class="lastupdated">Last updated on Oct 30, 2023.
       </span></p>
   </div>
 
