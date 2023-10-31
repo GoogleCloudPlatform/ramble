@@ -9,78 +9,97 @@
 .. _running_an_experiment_tutorial:
 
 =======================================
-1) Running A Simple GROMACS Experiment
+2) Running A Simple GROMACS Experiment
 =======================================
 
-This tutorial will provide a basic introduction to navigating Ramble and running
-experiments. In this tutorial, you will set up and run a benchmark simulation
-using `GROMACS <https://www.gromacs.org/>`_, a free and open-source application
+In this tutorial, you will set up and run a benchmark simulation using
+`GROMACS <https://www.gromacs.org/>`_, a free and open-source application
 for molecular dynamics.
 
-------------
-Installation
-------------
+This tutorial builds off of concepts introduced in the :ref:`hello_world_tutorial` tutorial.
 
-To install Ramble, see the :doc:`../getting_started` guide.
+Application Information
+-----------------------
 
-----------------------
-Available Applications
-----------------------
+As mentioned above, this tutorial uses the `GROMACS <https://www.gromacs.org/>`_
+application definition. We will begin with the `water_bare` and `water_gmx50`
+workloads, as they are able to execute in a short amount of time.
 
-Once Ramble is installed, viewing the available application definitions is as
-simple as executing:
-
-.. code-block:: console
-
-    $ ramble list
-
-The ``ramble list`` command also takes a query string, which can be used to
-filter available application definitions. For example:
-
-.. code-block:: console
-
-    $ ramble list hp*
-
-might output the following:
-
-.. code-block:: console
-
-    ==> 3 applications
-    hpcc  hpcg  hpl
-
-Additionally, applications can be filtered by their tags, e.g.
-
-.. code-block:: console
-
-    $ ramble list -t molecular-dynamics
-    ==> 4 applications
-    gromacs  hmmer  lammps  namd
-
-The available tags (and their mappings to applications) can be listed using:
-
-.. code-block:: console
-
-    $ ramble attributes --all --tags
-
-^^^^^^^^^^^^^^^^^^^^^^^^^
-What's in an application?
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Knowing what applications are available is only part of how you interact
-with Ramble. Each application contains one or more workloads, all of which can
-contain their own variables to control their behavior. The ``ramble info``
-command can be used to get more information about a specific application
-definition. As an example:
-
+Using a previously installed ``ramble``, the following command can be used to
+get information about these workloads:
 .. code-block:: console
 
     $ ramble info gromacs
 
-Will print the workloads and variables the ``GROMACS`` application definition contains.
+Searching the output for the sections marked ``Workload: water_bare`` and
+``Workload: water_gmx50``, you should see something like the following output:
+
+.. code-block:: console
+
+    Workload: water_gmx50
+        Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'pre-process', 'execute-gen']
+        Inputs: ['water_gmx50_bare']
+        Variables:
+            size:
+                Description: Workload size
+                Default: 1536
+                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+            type:
+                Description: Workload type.
+                Default: pme
+                Suggested Values: ['pme', 'rf']
+            input_path:
+                Description: Input path for water GMX50
+                Default: {water_gmx50_bare}/{size}
+    Workload: water_bare
+        Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'pre-process', 'execute-gen']
+        Inputs: ['water_bare_hbonds']
+        Variables:
+            size:
+                Description: Workload size
+                Default: 1536
+                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+            type:
+                Description: Workload type.
+                Default: pme
+                Suggested Values: ['pme', 'rf']
+            input_path:
+                Description: Input path for water bare hbonds
+                Default: {water_bare_hbonds}/{size}
+
+
+
+Here we see that both of these workloads have a ``type`` variable (with
+possible values of ``pme`` and ``rf``) and a ``size`` variable with a variety
+of available sizes.
+
+Towards the bottom of the output you should also see information about a valid
+software configuration:
+
+.. code-block:: console
+
+   Default Compilers:
+    gcc9:
+      spack_spec = gcc@9.3.0
+
+    Software Specs:
+      impi2018:
+        spack_spec = intel-mpi@2018.4.274
+      gromacs:
+        spack_spec = gromacs@2020.5
+        compiler = gcc9
+
+This output does not represent the only possible configuration that works for
+this application, it only presents a good starting point. When using Ramble,
+these can be modified freely and will be explored in a later tutorial.
 
 ------------------------
 Configuring experiments
 ------------------------
+
+As mentioned before, you are going to focus on creating experiments from the
+``water_bare`` and ``water_gmx50`` workloads. We will explore the two available
+values for the ``type`` variable, and a single value for the ``size`` variable.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Create and Activate a Workspace

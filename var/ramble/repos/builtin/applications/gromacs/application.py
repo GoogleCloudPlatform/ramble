@@ -100,10 +100,15 @@ class Gromacs(SpackApplication):
              input='JCP_benchmarks')
 
     workload_variable('size', default='1536',
+                      values=['0000.65', '0000.96', '0001.5',
+                              '0003', '0006', '0012', '0024',
+                              '0048', '0096', '0192', '0384',
+                              '0768', '1536', '3072'],
                       description='Workload size',
                       workloads=['water_gmx50', 'water_bare'])
     workload_variable('type', default='pme',
-                      description='Workload type. Valid values are ''pme'',''rf''',
+                      description='Workload type.',
+                      values=['pme', 'rf'],
                       workloads=['water_gmx50', 'water_bare'])
     workload_variable('input_path', default='{water_gmx50_bare}/{size}',
                       description='Input path for water GMX50',
