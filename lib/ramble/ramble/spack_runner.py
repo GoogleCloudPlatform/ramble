@@ -221,10 +221,7 @@ class SpackRunner(object):
         if not self.dry_run:
             if not os.path.exists(os.path.join(path, 'spack.yaml')):
                 with fs.working_dir(path):
-                    active_stream = logger.active_stream()
-                    self.spack(*self.env_create_args,
-                               output=active_stream,
-                               error=active_stream)
+                    self._run_command(self.spack, self.env_create_args)
 
         # Ensure subsequent commands use the created env now.
         self.env_path = path
@@ -265,8 +262,9 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            active_stream = logger.active_stream()
-            load_cmds = self.spack(*args, output=str, error=active_stream).split('\n')
+            load_cmds = self._run_command(self.spack,
+                                          args,
+                                          return_output=True).split('\n')
 
             for cmd in load_cmds:
                 env_var = regex.match(cmd)
@@ -307,19 +305,18 @@ class SpackRunner(object):
             comp_info_args.extend(['-C', self.env_path])
         comp_info_args.extend(['compiler', 'info', spec])
 
-        active_stream = logger.active_stream()
         compiler_find_flags = ramble.config.get(f'{self.compiler_find_config_name}:flags')
         compiler_find_args = self.compiler_find_args.copy()
         if compiler_find_flags:
             for flag in shlex.split(compiler_find_flags):
                 compiler_find_args.append(flag)
         if not self.dry_run:
-            self.spack(*compiler_find_args,
-                       output=active_stream,
-                       error=active_stream)
+            self._run_command(self.spack, compiler_find_args)
 
         try:
+            self._cmd_start(self.spack, comp_info_args)
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
+            self._cmd_end(self.spack, comp_info_args)
             logger.msg(f'{spec} is already an available compiler')
             return
         except ProcessError:
@@ -334,14 +331,14 @@ class SpackRunner(object):
             args.append(spec)
 
             if not self.dry_run:
-                self.installer(*args, output=active_stream, error=active_stream)
+                self._run_command(self.installer, args)
             else:
                 self._dry_run_print(self.installer, args)
 
             self.load_compiler(spec)
 
             if not self.dry_run:
-                self.spack(*compiler_find_args, output=active_stream, error=active_stream)
+                self._run_command(self.spack, compiler_find_args)
 
                 self.compilers.append(spec)
 
@@ -414,8 +411,10 @@ class SpackRunner(object):
 
         pkg_names = []
 
-        active_stream = logger.active_stream()
-        for pkg in self.spack(*args, output=str, error=active_stream).split('\n'):
+        all_packages = self._run_command(self.spack,
+                                         args,
+                                         return_output=True).split('\n')
+        for pkg in all_packages:
             match = package_name_regex.match(pkg)
             if match:
                 pkg_names.append(match.group('package_name'))
@@ -449,16 +448,11 @@ class SpackRunner(object):
             'add'
         ]
 
-        active_stream = logger.active_stream()
         for config in self.configs:
             args = config_args.copy()
             args.append(config)
 
-            if active_stream is not None:
-                self.spack(*args, output=active_stream, error=active_stream)
-            else:
-                self.spack(*args)
-
+            self._run_command(self.spack, args)
             if self.dry_run:
                 self._dry_run_print(self.spack, args)
 
@@ -490,9 +484,7 @@ class SpackRunner(object):
         path = env_name_or_path
         if not os.path.exists(path):
             try:
-                active_stream = logger.active_stream()
-                path = self.spack(*named_location_args, output=str,
-                                  error=active_stream).strip('\n')
+                path = self._run_command(self.spack, named_location_args, return_output=True)
             # If a named environment fails, copy directly from the path
             except ProcessError:
                 raise InvalidExternalEnvironment(f'{path} is not a spack environment.')
@@ -591,8 +583,7 @@ class SpackRunner(object):
             args.extend(shlex.split(concretize_flags))
 
         if not self.dry_run:
-            active_stream = logger.active_stream()
-            self.concretizer(*args, output=active_stream, error=active_stream)
+            self._run_command(self.concretizer, args)
         else:
             self._dry_run_print(self.concretizer, args)
 
@@ -650,8 +641,7 @@ class SpackRunner(object):
             args.extend(shlex.split(install_flags))
 
         if not self.dry_run:
-            active_stream = logger.active_stream()
-            self.installer(*args, output=active_stream, error=active_stream)
+            self._run_command(self.installer, args)
         else:
             self._dry_run_print(self.installer, args)
 
@@ -664,9 +654,8 @@ class SpackRunner(object):
         name_args.extend(package_spec.split())
 
         if not self.dry_run:
-            active_stream = logger.active_stream()
-            name = self.spack(*name_args, output=str, error=active_stream).strip()
-            location = self.spack(*loc_args, output=str, error=active_stream).strip()
+            name = self._run_command(self.spack, name_args, return_output=True).strip()
+            location = self._run_command(self.spack, loc_args, return_output=True).strip()
             return (name, location)
         else:
             self._dry_run_print(self.spack, name_args)
@@ -690,8 +679,8 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            active_stream = logger.active_stream()
-            return self.spack(*args, output=str, error=active_stream).strip()
+            out_str = self._run_command(self.spack, args, return_output=True).strip()
+            return out_str
         else:
             self._dry_run_print(self.spack, args)
             return """
@@ -706,8 +695,7 @@ class SpackRunner(object):
             '--format',
             '/{hash}'
         ]
-        active_stream = logger.active_stream()
-        output = self.spack(*args, output=str, error=active_stream).strip().replace('\n', ' ')
+        output = self._run_command(self.spack, args, return_output=True).strip().replace('\n', ' ')
         return output
 
     def push_to_spack_cache(self, spack_cache_path):
@@ -730,8 +718,8 @@ class SpackRunner(object):
         args.extend([spack_cache_path, hash_list])
 
         if not self.dry_run:
-            active_stream = logger.active_stream()
-            return self.spack(*args, output=str, error=active_stream).strip()
+            out_str = self._run_command(self.spack, args, return_output=True).strip()
+            return out_str
         else:
             self._dry_run_print(self.spack, args)
             return
@@ -739,6 +727,59 @@ class SpackRunner(object):
     def _dry_run_print(self, executable, args):
         logger.msg(f'DRY-RUN: would run {executable}')
         logger.msg(f'         with args: {args}')
+
+    def _cmd_start(self, executable, args):
+        logger.msg('')
+        logger.msg('*******************************************')
+        logger.msg('********** Running Spack Command **********')
+        logger.msg(f'**     command: {executable}')
+        if args:
+            logger.msg(f'**     with args: {args}')
+        logger.msg('*******************************************')
+        logger.msg('')
+
+    def _cmd_end(self, executable, args):
+        logger.msg('')
+        logger.msg('*******************************************')
+        logger.msg('***** Finished Running Spack Command ******')
+        logger.msg('*******************************************')
+        logger.msg('')
+
+    def _run_command(self, executable, args, return_output=False):
+        active_stream = logger.active_stream()
+        active_log = logger.active_log()
+        error = False
+
+        self._cmd_start(executable, args)
+        try:
+            if active_stream is None:
+                if return_output:
+                    out_str = executable(*args, output=str)
+                else:
+                    executable(*args)
+            else:
+                if return_output:
+                    out_str = executable(*args, output=str, error=active_stream)
+                else:
+                    executable(*args, output=active_stream, error=active_stream)
+        except ProcessError as e:
+            logger.error(e)
+            error = True
+            pass
+
+        if error:
+            err = f'Error running spack command: {executable} ' + ' '.join(args)
+            if active_stream is None:
+                logger.die(err)
+            else:
+                logger.error(err)
+                logger.die(f'For more details, see the log file: {active_log}')
+
+        self._cmd_end(executable, args)
+
+        if return_output:
+            return out_str
+        return
 
 
 class RunnerError(ramble.error.RambleError):
