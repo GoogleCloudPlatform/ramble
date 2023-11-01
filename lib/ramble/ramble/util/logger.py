@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import llnl.util.tty as tty
+import llnl.util.tty.log
 
 
 class Logger(object):
@@ -40,7 +41,7 @@ class Logger(object):
         """
         if isinstance(path, str) and self.enabled:
             stream = None
-            stream = open(path, 'a+')
+            stream = llnl.util.tty.log.Unbuffered(open(path, 'a+'))
             self.log_stack.append((path, stream))
 
     def remove_log(self):
@@ -196,6 +197,9 @@ class Logger(object):
         for idx, log in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(index=idx, default_kwargs=kwargs)
             tty.error(*args, **st_kwargs)
+
+        while self.log_stack:
+            self.remove_log()
 
         tty.die(*args, **kwargs)
 
