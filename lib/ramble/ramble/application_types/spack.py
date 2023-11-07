@@ -82,11 +82,11 @@ class SpackApplication(ApplicationBase):
 
     def _software_install_requested_compilers(self, workspace):
         """Install compilers an application uses"""
-
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
         if not env_path:
             raise ApplicationError('Ramble env_path is set to None.')
+        logger.msg('Installing compilers')
 
         cache_tupl = ('spack-compilers', env_path)
         if workspace.check_cache(cache_tupl):
@@ -101,13 +101,30 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var_name(self.keywords.env_name)
 
+            compilers_to_install = set()
+            root_compilers = []
             for pkg_name in workspace.software_environments.get_env_packages(app_context):
                 pkg_spec = workspace.software_environments.get_spec(pkg_name)
                 if 'compiler' in pkg_spec:
-                    logger.msg('Installing compilers')
-                    logger.debug(f'Compilers: {pkg_spec["compiler"]}')
-                    comp_spec = workspace.software_environments.get_spec(pkg_spec['compiler'])
-                    self.spack_runner.install_compiler(comp_spec['spack_spec'])
+                    if pkg_spec['compiler'] not in compilers_to_install:
+                        logger.debug(f' Adding root compiler: {pkg_spec["compiler"]}')
+                        compilers_to_install.add(pkg_spec['compiler'])
+                        root_compilers.append(pkg_spec['compiler'])
+
+            dep_compilers = []
+            for comp_name in root_compilers:
+                cur_spec = workspace.software_environments.get_spec(comp_name)
+                while 'compiler' in cur_spec and cur_spec['compiler'] not in compilers_to_install:
+                    compilers_to_install.add(cur_spec['compiler'])
+                    dep_compilers.append(cur_spec['compiler'])
+                    logger.debug(f' Adding dependency compiler: {cur_spec["compiler"]}')
+                    cur_spec = workspace.software_environments.get_spec(cur_spec['compiler'])
+
+            # Install all compilers, starting with deps:
+            for comp_pkg in reversed(root_compilers + dep_compilers):
+                spec_str = workspace.software_environments.get_spec_string(comp_pkg)
+                logger.debug(f'Installing compiler: {comp_pkg}')
+                self.spack_runner.install_compiler(spec_str)
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
