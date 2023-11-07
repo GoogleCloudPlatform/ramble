@@ -35,6 +35,7 @@ class Hmmer(SpackApplication):
     software_spec('hmmer', spack_spec='hmmer@3.3.2', compiler='gcc9')
 
     # This would ideally not use the current_relase, as the package will need to be manually updated per release
+    # Here current_release == 'Pfam36.0'
     input_file('Pfam_A',
                url='http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz',
                sha256='8779125bd2ed533886c559a5808903800f5c262798e5b086d276c2b829566b3a',
