@@ -675,7 +675,7 @@ _ramble_workspace_concretize() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help --dry-run --n_repeats --phases --include-phase-dependencies --where --exclude-where"
 }
 
 _ramble_workspace_analyze() {

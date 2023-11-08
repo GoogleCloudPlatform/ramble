@@ -45,6 +45,8 @@ class ExperimentSet(object):
         """Create experiment set class"""
         self.experiments = {}
         self.experiment_order = []
+        self.repeated_experiments = {}
+        self.repeated_order = []
         self.chained_experiments = {}
         self.chained_order = []
         self._workspace = workspace
@@ -83,6 +85,7 @@ class ExperimentSet(object):
         global_context.context_name = self._contexts.global_conf.name
         global_context.variables = self.get_config_vars(workspace)
         global_context.env_variables = self.get_config_env_vars(workspace)
+        global_context.n_repeats = ramble.config.get('config:n_repeats')
         self._set_context(self._contexts.global_conf,
                           global_context)
 
@@ -302,6 +305,7 @@ class ExperimentSet(object):
         render_group.variables = final_context.variables
         render_group.zips = final_context.zips
         render_group.matrices = final_context.matrices
+        render_group.n_repeats = final_context.n_repeats
 
         excluded_experiments = set()
         if final_context.exclude:
@@ -312,7 +316,7 @@ class ExperimentSet(object):
                                         final_context.exclude)
 
             if perform_explicit_exclude:
-                for exclude_exp_vars in renderer.render_objects(exclude_group):
+                for exclude_exp_vars, _ in renderer.render_objects(exclude_group):
                     expander = ramble.expander.Expander(exclude_exp_vars, self)
                     self._compute_mpi_vars(expander, exclude_exp_vars)
                     exclude_exp_name = expander.expand_var(experiment_template_name,
@@ -325,12 +329,17 @@ class ExperimentSet(object):
                 exclude_where = final_context.exclude[namespace.where]
 
         rendered_experiments = set()
-        for experiment_vars in \
+        for experiment_vars, repeats in \
                 renderer.render_objects(render_group, exclude_where=exclude_where):
             experiment_vars[self.keywords.env_path] = \
                 os.path.join(self._workspace.software_dir,
                              Expander.expansion_str(self.keywords.env_name) + '.' +
                              Expander.expansion_str(self.keywords.workload_name))
+
+            experiment_suffix = ''
+            # After generating the base experiment (repeat[1] == 0), add the index
+            if not repeats[0] and repeats[1] > 0:
+                experiment_suffix = f'.{repeats[1]}'
 
             expander = ramble.expander.Expander(experiment_vars, self)
             self._compute_mpi_vars(expander, experiment_vars)
@@ -338,13 +347,15 @@ class ExperimentSet(object):
                                                       allow_passthrough=False)
             final_wl_name = expander.expand_var_name(self.keywords.workload_name,
                                                      allow_passthrough=False)
-            final_exp_name = expander.expand_var(experiment_template_name, allow_passthrough=False)
+            final_exp_name = expander.expand_var(experiment_template_name + experiment_suffix,
+                                                 allow_passthrough=False)
 
             # Skip explicitly excluded experiments
             if final_exp_name in excluded_experiments:
                 continue
 
-            experiment_vars[self.keywords.experiment_template_name] = experiment_template_name
+            experiment_vars[self.keywords.experiment_template_name] = (experiment_template_name
+                                                                       + experiment_suffix)
             experiment_vars[self.keywords.application_name] = final_app_name
             experiment_vars[self.keywords.workload_name] = final_wl_name
             experiment_vars[self.keywords.experiment_name] = final_exp_name
@@ -373,6 +384,7 @@ class ExperimentSet(object):
             app_inst.set_env_variable_sets(final_context.env_variables)
             app_inst.set_internals(final_context.internals)
             app_inst.set_template(final_context.is_template)
+            app_inst.set_repeats(repeats)
             app_inst.set_chained_experiments(final_context.chained_experiments)
             app_inst.set_modifiers(final_context.modifiers)
             app_inst.read_status()
@@ -443,6 +455,13 @@ class ExperimentSet(object):
                                            f'experiment {name} to this experiment set.')
         self.chained_experiments[name] = instance
         self.chained_order.append(name)
+
+    def add_repeated_experiment(self, name, instance):
+        if name in self.repeated_experiments.keys():
+            raise RambleExperimentSetError('Cannot add already defined repeated ' +
+                                           f'experiment {name} to this experiment set.')
+        self.repeated_experiments[name] = instance
+        self.repeated_order.append(name)
 
     def search_primary_experiments(self, pattern):
         """Search primary experiments using a glob syntax.

@@ -27,6 +27,7 @@ class namespace:
     chained_experiments = 'chained_experiments'
     inherit_variables = 'inherit_variables'
     modifiers = 'modifiers'
+    n_repeats = 'n_repeats'
 
     # For rendering objects
     variables = 'variables'

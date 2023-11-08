@@ -355,6 +355,12 @@ def workspace_setup_setup_parser(subparser):
              'all scripts. Prints commands that would be executed ' +
              'for installation, and files that would be downloaded.')
 
+    subparser.add_argument(
+        '--n_repeats', dest='n_repeats',
+        nargs='+',
+        default='0',
+        help='run each experiment n times and generate summary statistics.')
+
     arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
                                                'where', 'exclude_where'])
 
@@ -418,6 +424,7 @@ def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
     ws.always_print_foms = args.always_print_foms
+    ws.repeat_success_strict = ramble.config.get('config:repeat_success_strict')
 
     if args.dry_run:
         ws.dry_run = True
@@ -539,6 +546,8 @@ def workspace_info(args):
 
                     if app_inst.is_template:
                         color.cprint(rucolor.nested_3('      Template Experiment: ') + exp_name)
+                    elif app_inst.repeats[0]:
+                        color.cprint(rucolor.nested_3('      Repeat Base Experiment: ') + exp_name)
                     else:
                         color.cprint(rucolor.nested_3('      Experiment: ') + exp_name)
 

@@ -41,6 +41,7 @@ import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.env
 import ramble.util.directives
+import ramble.util.stats
 from ramble.util.logger import logger
 
 from ramble.workspace import namespace
@@ -85,6 +86,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.experiment_set = None
         self.internals = None
         self.is_template = False
+        self.repeats = (False, 0)
         self.chained_experiments = None
         self.chain_order = []
         self.chain_prepend = []
@@ -95,6 +97,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._modifier_instances = []
         self._modifier_builtins = {}
         self._input_fetchers = None
+        self.results = {}
 
         self.hash_inventory = {
             'attributes': [],
@@ -126,6 +129,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         new_copy.set_variables(self.variables.copy(), self.experiment_set)
         new_copy.set_internals(self.internals.copy())
         new_copy.set_template(False)
+        new_copy.set_repeats((False, 0))
         new_copy.set_chained_experiments(None)
 
         return new_copy
@@ -359,6 +363,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Set if this instance is a template or not"""
         self.is_template = is_template
 
+    def set_repeats(self, repeats):
+        """Set if this instance will use repeats
+
+        Args:
+            repeats (tuple): consists of:
+            is_repeat_base (Bool): True if this is the base experiment of a repeat set,
+                                   False for singletons and for repeats
+            num_repeats (Int): 0 for singletons, positive integer (n_repeats) for base
+                               experiment, index for each repeat of the base experiment
+        """
+        self.repeats = repeats
+
     def set_chained_experiments(self, chained_experiments):
         """Set chained experiments for this instance"""
         self.chained_experiments = None
@@ -478,6 +494,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if self.is_template:
             logger.debug(f'{self.name} is a template. Skipping phases')
             return
+        if self.repeats[0]:
+            logger.debug(f'{self.name} is a repeat base. Skipping phases')
+            return
 
         if hasattr(self, f'_{phase}'):
             logger.msg(f'  Executing phase {phase}')
@@ -596,6 +615,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     new_inst.variables[self.keywords.experiment_name] = new_name
                     new_inst.variables[self.keywords.experiment_index] = \
                         self.expander.expand_var_name(self.keywords.experiment_index)
+                    new_inst.repeats = self.repeats
 
                     # Extract inherited variables
                     if namespace.inherit_variables in cur_exp_def:
@@ -1390,7 +1410,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     criteria_obj.mark_found()
 
         exp_ns = self.expander.experiment_namespace
-        results = {'name': exp_ns}
+        self.results = {'name': exp_ns}
 
         success = False
         for fom in fom_values.values():
@@ -1399,23 +1419,26 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        logger.debug('fom_values = %s' % fom_values)
-        results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
+        if self.repeats[0]:
+            self.results['N_REPEATS'] = self.repeats[1]
+        else:
+            self.results['N_REPEATS'] = 0
+        self.results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
 
         if success:
             self.set_status(status=experiment_status.SUCCESS)
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        results['RAMBLE_STATUS'] = self.get_status()
+        self.results['RAMBLE_STATUS'] = self.get_status()
 
         if success or workspace.always_print_foms:
-            results['RAMBLE_VARIABLES'] = {}
-            results['RAMBLE_RAW_VARIABLES'] = {}
+            self.results['RAMBLE_VARIABLES'] = {}
+            self.results['RAMBLE_RAW_VARIABLES'] = {}
             for var, val in self.variables.items():
-                results['RAMBLE_RAW_VARIABLES'][var] = val
-                results['RAMBLE_VARIABLES'][var] = self.expander.expand_var(val)
-            results['CONTEXTS'] = []
+                self.results['RAMBLE_RAW_VARIABLES'][var] = val
+                self.results['RAMBLE_VARIABLES'][var] = self.expander.expand_var(val)
+            self.results['CONTEXTS'] = []
 
             for context, fom_map in fom_values.items():
                 context_map = {'name': context, 'foms': []}
@@ -1425,9 +1448,170 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     fom_copy['name'] = fom_name
                     context_map['foms'].append(fom_copy)
 
-                results['CONTEXTS'].append(context_map)
+                self.results['CONTEXTS'].append(context_map)
 
-        workspace.append_result(results)
+        workspace.append_result(self.results)
+
+    def calculate_statistics(self, workspace):
+        """Calculate statistics for results of repeated experiments
+
+        When repeated experiments are used, this method aggregates the results of
+        each experiment's repeats and calculates statistics for each numeric FOM.
+
+        If a FOM is non-numeric, no calculations are performed.
+
+        Statistics are injected into the results file under the base experiment
+        namespace.
+        """
+
+        def is_numeric(value):
+            """Returns true if a fom value is numeric"""
+
+            try:
+                float(value)
+                return True
+            except ValueError:
+                return False
+
+        repeat_experiments = {}
+        repeat_foms = {}
+        first_repeat_exp = ''
+
+        # repeat_experiments dict {repeat experiment namespace: {dict}}
+        # repeat_foms dict {context: {(fom name, units, origin, origin_type): [list of values]}}
+        # origin_type is generated as 'summary::stat_name'
+
+        # Check if this is the base experiment of a set of repeats
+        if not self.repeats[0]:
+            return
+        n_repeats = self.repeats[1]
+
+        base_exp_name = self.expander.experiment_name
+        base_exp_namespace = self.expander.experiment_namespace
+
+        # Create a list of all repeats by inserting repeat index
+        for n in range(1, n_repeats + 1):
+            if '.chain' in base_exp_name:
+                insert_idx = base_exp_name.find('.chain')
+                repeat_exp_namespace = base_exp_name[:insert_idx] + f'.{n}' \
+                    + base_exp_name[insert_idx:]
+            else:
+                base_exp_namespace = self.expander.experiment_namespace
+                repeat_exp_namespace = f'{base_exp_namespace}.{n}'
+            repeat_experiments[repeat_exp_namespace] = {}
+            repeat_experiments[repeat_exp_namespace]['base_exp'] = base_exp_namespace
+            if n == 1:
+                first_repeat_exp = repeat_exp_namespace
+
+        # Create initial results dict since analysis pipeline was skipped for base exp
+        self.results = {'name': base_exp_namespace}
+        self.results['N_REPEATS'] = n_repeats
+        self.results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
+
+        #
+        # If repeat_success_strict is true, one failed experiment will fail the whole set
+        # and statistics will not be calculated
+        # If repeat_success_strict is false, statistics will be calculated for all successful
+        # experiments
+        #
+        repeat_success = False
+        exp_success = []
+        for exp in repeat_experiments.keys():
+            if exp in self.experiment_set.experiments.keys():
+                exp_inst = self.experiment_set.experiments[exp]
+            elif exp in self.experiment_set.chained_experiments.keys():
+                exp_inst = self.experiment_set.chained_experiments[exp]
+            else:
+                continue
+
+            exp_success.append(exp_inst.get_status())
+
+        if workspace.repeat_success_strict:
+            if 'FAILED' in exp_success:
+                repeat_success = False
+            else:
+                repeat_success = True
+        else:
+            if 'SUCCESS' in exp_success:
+                repeat_success = True
+            else:
+                repeat_success = False
+
+        if repeat_success:
+            self.set_status(status=experiment_status.SUCCESS)
+        else:
+            self.set_status(status=experiment_status.FAILED)
+
+        self.results['RAMBLE_STATUS'] = self.get_status()
+
+        if repeat_success or workspace.always_print_foms:
+            logger.debug(f'Calculating statistics for {n_repeats} repeats of {base_exp_name}')
+            self.results['RAMBLE_VARIABLES'] = {}
+            self.results['RAMBLE_RAW_VARIABLES'] = {}
+            for var, val in self.variables.items():
+                self.results['RAMBLE_RAW_VARIABLES'][var] = val
+                self.results['RAMBLE_VARIABLES'][var] = self.expander.expand_var(val)
+            self.results['CONTEXTS'] = []
+
+            results = []
+
+            # Iterate through repeat experiment instances, extract foms, and aggregate them
+            for exp in repeat_experiments.keys():
+                if exp in self.experiment_set.experiments.keys():
+                    exp_inst = self.experiment_set.experiments[exp]
+                elif exp in self.experiment_set.chained_experiments.keys():
+                    exp_inst = self.experiment_set.chained_experiments[exp]
+                else:
+                    continue
+
+                # When strict success is off for repeats (loose success), skip failed exps
+                if (not workspace.repeat_success_strict
+                    and exp_inst.results['RAMBLE_STATUS'] == 'FAILED'):
+                    continue
+
+                if 'CONTEXTS' in exp_inst.results:
+                    for context in exp_inst.results['CONTEXTS']:
+                        context_name = context['name']
+
+                        if context_name not in repeat_foms.keys():
+                            repeat_foms[context_name] = {}
+
+                        for foms in context['foms']:
+                            fom_key = (foms['name'], foms['units'],
+                                       foms['origin'], foms['origin_type'])
+
+                            # Stats will not be calculated for non-numeric foms so they're skipped
+                            if is_numeric(foms['value']):
+                                if fom_key not in repeat_foms[context_name].keys():
+                                    repeat_foms[context_name][fom_key] = []
+                                repeat_foms[context_name][fom_key].append(float(foms['value']))
+
+            # Iterate through the aggregated foms, calculate stats, and insert into results
+            for context, fom_dict in repeat_foms.items():
+                context_map = {'name': context, 'foms': []}
+
+                for fom_key, fom_values in fom_dict.items():
+                    fom_name = fom_key[0]
+                    fom_units = fom_key[1]
+                    fom_origin = fom_key[2]
+
+                    calcs = []
+
+                    for statistic in ramble.util.stats.all_stats:
+                        calcs.append(statistic.report(fom_values, fom_units))
+
+                    for calc in calcs:
+                        fom_dict = {'value': calc[0], 'units': calc[1], 'origin': fom_origin,
+                                    'origin_type': calc[2], 'name': fom_name}
+
+                        context_map['foms'].append(fom_dict)
+
+                results.append(context_map)
+
+            if results:
+                self.results['CONTEXTS'] = results
+
+        workspace.insert_result(self.results, first_repeat_exp)
 
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""

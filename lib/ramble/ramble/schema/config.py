@@ -167,6 +167,16 @@ properties['config']['disable_logger'] = {
     'default': False
 }
 
+properties['config']['n_repeats'] = {
+    'type': 'string',
+    'default': '0'
+}
+
+properties['config']['repeat_success_strict'] = {
+    'type': 'boolean',
+    'default': True
+}
+
 
 #: Full schema with metadata
 schema = {
