@@ -97,7 +97,7 @@ class Pipeline(object):
                 ramble.util.hashing.hash_json(self.workspace.hash_inventory)
         else:
             for exp, app_inst, _ in sorted(self._experiment_set.all_experiments()):
-                if not app_inst.is_template:
+                if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
                     self.workspace.hash_inventory['experiments'].append(
                         {
                             'name': exp,
@@ -227,7 +227,7 @@ class AnalyzePipeline(Pipeline):
 
     def _prepare(self):
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
-            if not app_inst.is_template:
+            if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
                 if app_inst.get_status() == ramble.application.experiment_status.UNKNOWN.name:
                     logger.die(
                         f'Workspace status is {app_inst.get_status()}\n'
@@ -238,6 +238,12 @@ class AnalyzePipeline(Pipeline):
         super()._prepare()
 
     def _complete(self):
+        # Calculate statistics for repeats and inject into base experiment results
+        for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
+
+            if app_inst.repeats.n_repeats > 0:
+                app_inst.calculate_statistics(self.workspace)
+
         self.workspace.dump_results(output_formats=self.output_formats)
 
         if self.upload_results:
@@ -476,6 +482,13 @@ class ExecutePipeline(Pipeline):
 
     def _execute(self):
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
+            if app_inst.is_template:
+                logger.debug(f'{app_inst.name} is a template. Skipping execution.')
+                continue
+            if app_inst.repeats.is_repeat_base:
+                logger.debug(f'{app_inst.name} is a repeat base. Skipping execution.')
+                continue
+
             app_inst.add_expand_vars(self.workspace)
             exec_str = app_inst.expander.expand_var(self.executor)
             exec_parts = shlex.split(exec_str)

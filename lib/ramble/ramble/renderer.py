@@ -10,6 +10,7 @@ import itertools
 
 import ramble.error
 import ramble.expander
+import ramble.repeats
 from ramble.namespace import namespace
 
 import ramble.util.matrices
@@ -50,6 +51,7 @@ class RenderGroup(object):
         self.variables = {}
         self.zips = {}
         self.matrices = []
+        self.n_repeats = 0
 
     def copy_contents(self, in_group):
         """Copy contents of in_group into self"""
@@ -131,12 +133,18 @@ class Renderer(object):
         After processing the expansion logic, this function yields a dictionary
         of variable definitions, one for each object that would be rendered.
 
-        Returns:
-            Yield a dictionary of variables for single object definition
+        If n_repeats is defined in input variables, this function yields one base
+        and n copies of the rendered variable dictionary.
+
+        Yields:
+            - a dictionary of variables for single object definition
+            - a Repeats object indicating if rendered object is a repeat and its index
+
         """
         variables = render_group.variables
         zips = render_group.zips
         matrices = render_group.matrices
+        n_repeats = render_group.n_repeats
 
         object_variables = {}
         expander = ramble.expander.Expander(variables, None)
@@ -380,7 +388,17 @@ class Renderer(object):
                         keep_object = False
 
             if keep_object:
-                yield object_variables.copy()
+                # If n_repeats is set, yield 1 base and n duplicate copies of each object
+                # repeats = (is_repeat_base, [T:n_repeats|F:repeat index or 0 if not a repeat])
+                for n in range(0, n_repeats + 1):
+                    repeats = ramble.repeats.Repeats()
+
+                    if n_repeats > 0 and n == 0:  # this is a repeat base
+                        repeats.set_repeats(True, n_repeats)
+                    elif n_repeats > 0 and n > 0:  # this is a repeat with index n
+                        repeats.set_repeat_index(n)
+                    # maybe yield a tuple of vars and repeat info
+                    yield object_variables.copy(), repeats
 
 
 class RambleRendererError(ramble.error.RambleError):

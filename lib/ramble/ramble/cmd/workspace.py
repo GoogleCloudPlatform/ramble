@@ -432,6 +432,7 @@ def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
     ws.always_print_foms = args.always_print_foms
+    ws.repeat_success_strict = ramble.config.get('config:repeat_success_strict')
 
     if args.dry_run:
         ws.dry_run = True
@@ -607,6 +608,11 @@ def workspace_info(args):
                     if app_inst.is_template:
                         color.cprint(
                             rucolor.nested_3(f'      Template Experiment {experiment_index}: ')
+                            + exp_name
+                        )
+                    elif app_inst.repeats.is_repeat_base:
+                        color.cprint(
+                            rucolor.nested_3(f'      Repeat Base Experiment {experiment_index}: ')
                             + exp_name
                         )
                     else:

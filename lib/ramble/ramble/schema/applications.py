@@ -103,6 +103,13 @@ tags_def = {
     }
 }
 
+repeats_def = union_dicts(
+    ramble.schema.types.string_or_num,
+    {
+        'default': 0
+    }
+)
+
 sub_props = union_dicts(
     ramble.schema.variables.properties,
     ramble.schema.success_criteria.properties,
@@ -156,6 +163,7 @@ properties = {
                                                     'matrices': matrices_def,
                                                     'success_criteria': success_list_def,
                                                     'exclude': exclude_def,
+                                                    'n_repeats': repeats_def,
                                                 }
                                             )
                                         }
