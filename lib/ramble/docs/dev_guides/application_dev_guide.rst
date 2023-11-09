@@ -164,7 +164,7 @@ A named executable in Ramble is one or more commands that should be executed
 together within an experiment. Ramble contains a directive for defining named
 executables :py:meth:`ramble.language.application_language.executable`
 
-Having performed a test execution in :ref:`exambple-execution`, you should be
+Having performed a test execution in :ref:`example-execution`, you should be
 able to transcribe the execution commands into ``executable`` statements.
 
 It is important to make sure every step needed to go from a vanilla input file
