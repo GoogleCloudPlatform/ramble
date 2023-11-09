@@ -14,7 +14,7 @@
 
 This tutorial will provide a basic introduction to navigating Ramble and running
 experiments. In this tutorial, you will set up and run a basic experiment using
-``hostname``.
+``hostname`` linux utility as your application.
 
 Installation
 ============
@@ -44,7 +44,7 @@ filter available application definitions. For example:
 
 .. code-block:: console
 
-    $ ramble list h*
+    $ ramble list h
 
 might output the following:
 

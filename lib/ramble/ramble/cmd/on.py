@@ -17,9 +17,9 @@ else:
     from collections import Sequence  # noqa: F401
 
 
-description = "And now's the time, the time is now"
-section = 'secret'
-level = 'long'
+description = "\"And now's the time, the time is now\" (execute workspace experiments)"
+section = 'workspaces'
+level = 'short'
 
 
 def setup_parser(subparser):
