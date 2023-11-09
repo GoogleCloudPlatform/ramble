@@ -7,6 +7,7 @@
 # except according to those terms.
 
 from ramble.appkit import *
+import spack.util.executable
 
 
 class SpackStack(SpackApplication):
