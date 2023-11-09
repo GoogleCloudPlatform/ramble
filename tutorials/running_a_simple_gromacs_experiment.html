@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1) Running A Simple GROMACS Experiment &mdash; Ramble 0.3.0 documentation</title>
+  <title>2) Running A Simple GROMACS Experiment &mdash; Ramble 0.3.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Mirrors" href="mirrors.html" />
-    <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
+    <link rel="prev" title="1) Getting Started Running A “Hello World” Experiment" href="hello_world.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,18 +49,10 @@
               <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">1) Running A Simple GROMACS Experiment</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#available-applications">Available Applications</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#what-s-in-an-application">What’s in an application?</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#configuring-experiments">Configuring experiments</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create-and-activate-a-workspace">Create and Activate a Workspace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#configure-the-workspace">Configure the Workspace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#setting-up-the-experiments">Setting Up the Experiments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#executing-experiments">Executing Experiments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#analyzing-experiments">Analyzing Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2) Running A Simple GROMACS Experiment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#application-information">Application Information</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuring-experiments">Configuring experiments</a></li>
 </ul>
 </li>
 </ul>
@@ -103,7 +95,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">1) Running A Simple GROMACS Experiment</li>
+      <li class="breadcrumb-item active">2) Running A Simple GROMACS Experiment</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/running_a_simple_gromacs_experiment.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -114,59 +106,83 @@
            <div itemprop="articleBody">
              
   <section id="running-a-simple-gromacs-experiment">
-<span id="running-an-experiment-tutorial"></span><h1>1) Running A Simple GROMACS Experiment<a class="headerlink" href="#running-a-simple-gromacs-experiment" title="Link to this heading"></a></h1>
-<p>This tutorial will provide a basic introduction to navigating Ramble and running
-experiments. In this tutorial, you will set up and run a benchmark simulation
-using <a class="reference external" href="https://www.gromacs.org/">GROMACS</a>, a free and open-source application
+<span id="running-an-experiment-tutorial"></span><h1>2) Running A Simple GROMACS Experiment<a class="headerlink" href="#running-a-simple-gromacs-experiment" title="Link to this heading"></a></h1>
+<p>In this tutorial, you will set up and run a benchmark simulation using
+<a class="reference external" href="https://www.gromacs.org/">GROMACS</a>, a free and open-source application
 for molecular dynamics.</p>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>To install Ramble, see the <a class="reference internal" href="../getting_started.html"><span class="doc">Getting Started</span></a> guide.</p>
-</section>
-<section id="available-applications">
-<h2>Available Applications<a class="headerlink" href="#available-applications" title="Link to this heading"></a></h2>
-<p>Once Ramble is installed, viewing the available application definitions is as
-simple as executing:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list
+<p>This tutorial builds off of concepts introduced in the <a class="reference internal" href="hello_world.html#hello-world-tutorial"><span class="std std-ref">1) Getting Started Running A “Hello World” Experiment</span></a> tutorial.</p>
+<section id="application-information">
+<h2>Application Information<a class="headerlink" href="#application-information" title="Link to this heading"></a></h2>
+<p>As mentioned above, this tutorial uses the <a class="reference external" href="https://www.gromacs.org/">GROMACS</a>
+application definition. We will begin with the <cite>water_bare</cite> and <cite>water_gmx50</cite>
+workloads, as they are able to execute in a short amount of time.</p>
+<p>Using a previously installed <code class="docutils literal notranslate"><span class="pre">ramble</span></code>, the following command can be used to
+get information about these workloads:
+.. code-block:: console</p>
+<blockquote>
+<div><p>$ ramble info gromacs</p>
+</div></blockquote>
+<p>Searching the output for the sections marked <code class="docutils literal notranslate"><span class="pre">Workload:</span> <span class="pre">water_bare</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Workload:</span> <span class="pre">water_gmx50</span></code>, you should see something like the following output:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Workload: water_gmx50</span>
+<span class="go">    Executables: [&#39;builtin::env_vars&#39;, &#39;builtin::spack_source&#39;, &#39;builtin::spack_activate&#39;, &#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
+<span class="go">    Inputs: [&#39;water_gmx50_bare&#39;]</span>
+<span class="go">    Variables:</span>
+<span class="go">        size:</span>
+<span class="go">            Description: Workload size</span>
+<span class="go">            Default: 1536</span>
+<span class="go">            Suggested Values: [&#39;0000.65&#39;, &#39;0000.96&#39;, &#39;0001.5&#39;, &#39;0003&#39;, &#39;0006&#39;, &#39;0012&#39;, &#39;0024&#39;, &#39;0048&#39;, &#39;0096&#39;, &#39;0192&#39;, &#39;0384&#39;, &#39;0768&#39;, &#39;1536&#39;, &#39;3072&#39;]</span>
+<span class="go">        type:</span>
+<span class="go">            Description: Workload type.</span>
+<span class="go">            Default: pme</span>
+<span class="go">            Suggested Values: [&#39;pme&#39;, &#39;rf&#39;]</span>
+<span class="go">        input_path:</span>
+<span class="go">            Description: Input path for water GMX50</span>
+<span class="go">            Default: {water_gmx50_bare}/{size}</span>
+<span class="go">Workload: water_bare</span>
+<span class="go">    Executables: [&#39;builtin::env_vars&#39;, &#39;builtin::spack_source&#39;, &#39;builtin::spack_activate&#39;, &#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
+<span class="go">    Inputs: [&#39;water_bare_hbonds&#39;]</span>
+<span class="go">    Variables:</span>
+<span class="go">        size:</span>
+<span class="go">            Description: Workload size</span>
+<span class="go">            Default: 1536</span>
+<span class="go">            Suggested Values: [&#39;0000.65&#39;, &#39;0000.96&#39;, &#39;0001.5&#39;, &#39;0003&#39;, &#39;0006&#39;, &#39;0012&#39;, &#39;0024&#39;, &#39;0048&#39;, &#39;0096&#39;, &#39;0192&#39;, &#39;0384&#39;, &#39;0768&#39;, &#39;1536&#39;, &#39;3072&#39;]</span>
+<span class="go">        type:</span>
+<span class="go">            Description: Workload type.</span>
+<span class="go">            Default: pme</span>
+<span class="go">            Suggested Values: [&#39;pme&#39;, &#39;rf&#39;]</span>
+<span class="go">        input_path:</span>
+<span class="go">            Description: Input path for water bare hbonds</span>
+<span class="go">            Default: {water_bare_hbonds}/{size}</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">list</span></code> command also takes a query string, which can be used to
-filter available application definitions. For example:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list<span class="w"> </span>hp*
+<p>Here we see that both of these workloads have a <code class="docutils literal notranslate"><span class="pre">type</span></code> variable (with
+possible values of <code class="docutils literal notranslate"><span class="pre">pme</span></code> and <code class="docutils literal notranslate"><span class="pre">rf</span></code>) and a <code class="docutils literal notranslate"><span class="pre">size</span></code> variable with a variety
+of available sizes.</p>
+<p>Towards the bottom of the output you should also see information about a valid
+software configuration:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Default Compilers:</span>
+<span class="go"> gcc9:</span>
+<span class="go">   spack_spec = gcc@9.3.0</span>
+
+<span class="go"> Software Specs:</span>
+<span class="go">   impi2018:</span>
+<span class="go">     spack_spec = intel-mpi@2018.4.274</span>
+<span class="go">   gromacs:</span>
+<span class="go">     spack_spec = gromacs@2020.5</span>
+<span class="go">     compiler = gcc9</span>
 </pre></div>
 </div>
-<p>might output the following:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; 3 applications</span>
-<span class="go">hpcc  hpcg  hpl</span>
-</pre></div>
-</div>
-<p>Additionally, applications can be filtered by their tags, e.g.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list<span class="w"> </span>-t<span class="w"> </span>molecular-dynamics
-<span class="go">==&gt; 4 applications</span>
-<span class="go">gromacs  hmmer  lammps  namd</span>
-</pre></div>
-</div>
-<p>The available tags (and their mappings to applications) can be listed using:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>attributes<span class="w"> </span>--all<span class="w"> </span>--tags
-</pre></div>
-</div>
-<section id="what-s-in-an-application">
-<h3>What’s in an application?<a class="headerlink" href="#what-s-in-an-application" title="Link to this heading"></a></h3>
-<p>Knowing what applications are available is only part of how you interact
-with Ramble. Each application contains one or more workloads, all of which can
-contain their own variables to control their behavior. The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">info</span></code>
-command can be used to get more information about a specific application
-definition. As an example:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>gromacs
-</pre></div>
-</div>
-<p>Will print the workloads and variables the <code class="docutils literal notranslate"><span class="pre">GROMACS</span></code> application definition contains.</p>
-</section>
-</section>
+<p>This output does not represent the only possible configuration that works for
+this application, it only presents a good starting point. When using Ramble,
+these can be modified freely and will be explored in a later tutorial.</p>
 <section id="configuring-experiments">
-<h2>Configuring experiments<a class="headerlink" href="#configuring-experiments" title="Link to this heading"></a></h2>
+<h3>Configuring experiments<a class="headerlink" href="#configuring-experiments" title="Link to this heading"></a></h3>
+<p>As mentioned before, you are going to focus on creating experiments from the
+<code class="docutils literal notranslate"><span class="pre">water_bare</span></code> and <code class="docutils literal notranslate"><span class="pre">water_gmx50</span></code> workloads. We will explore the two available
+values for the <code class="docutils literal notranslate"><span class="pre">type</span></code> variable, and a single value for the <code class="docutils literal notranslate"><span class="pre">size</span></code> variable.</p>
 <section id="create-and-activate-a-workspace">
-<h3>Create and Activate a Workspace<a class="headerlink" href="#create-and-activate-a-workspace" title="Link to this heading"></a></h3>
+<h4>Create and Activate a Workspace<a class="headerlink" href="#create-and-activate-a-workspace" title="Link to this heading"></a></h4>
 <p>Before you can configure your GROMACS experiments, you’ll need to set up a
 workspace. You can call this workspace <code class="docutils literal notranslate"><span class="pre">basic_gromacs</span></code>.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>basic_gromacs
@@ -185,7 +201,7 @@ workspace. You can call this workspace <code class="docutils literal notranslate
 files to see how ramble would use the changes you made.</p>
 </section>
 <section id="configure-the-workspace">
-<h3>Configure the Workspace<a class="headerlink" href="#configure-the-workspace" title="Link to this heading"></a></h3>
+<h4>Configure the Workspace<a class="headerlink" href="#configure-the-workspace" title="Link to this heading"></a></h4>
 <p>Within the workspace directory, ramble creates a directory named <code class="docutils literal notranslate"><span class="pre">configs</span></code>.
 This directory contains generated configuration and template files. Each of
 these files can be edited to configure the workspace, and examples will be
@@ -263,7 +279,7 @@ script for each generated experiment. You can feel free to edit it as you need
 to for your given system, but for this tutorial the default value will work.</p>
 </section>
 <section id="setting-up-the-experiments">
-<h3>Setting Up the Experiments<a class="headerlink" href="#setting-up-the-experiments" title="Link to this heading"></a></h3>
+<h4>Setting Up the Experiments<a class="headerlink" href="#setting-up-the-experiments" title="Link to this heading"></a></h4>
 <p>Now that the workspace is configured correctly, you can set up the experiments
 in the active workspace using:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
@@ -286,7 +302,7 @@ you can do a dry run of the setup using:</p>
 experiment that is being configured.</p>
 </section>
 <section id="executing-experiments">
-<h3>Executing Experiments<a class="headerlink" href="#executing-experiments" title="Link to this heading"></a></h3>
+<h4>Executing Experiments<a class="headerlink" href="#executing-experiments" title="Link to this heading"></a></h4>
 <p>After the workspace is set up, its experiments can be executed. The two methods
 to run the experiments are:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"> $ </span>ramble<span class="w"> </span>on
@@ -296,7 +312,7 @@ to run the experiments are:</p>
 </div>
 </section>
 <section id="analyzing-experiments">
-<h3>Analyzing Experiments<a class="headerlink" href="#analyzing-experiments" title="Link to this heading"></a></h3>
+<h4>Analyzing Experiments<a class="headerlink" href="#analyzing-experiments" title="Link to this heading"></a></h4>
 <p>Once the experiments within a workspace are complete, the experiments can be
 analyzed. This is done through:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
@@ -316,12 +332,13 @@ the speed achieved</p></li>
 </section>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hello_world.html" class="btn btn-neutral float-left" title="1) Getting Started Running A “Hello World” Experiment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="mirrors.html" class="btn btn-neutral float-right" title="Mirrors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
