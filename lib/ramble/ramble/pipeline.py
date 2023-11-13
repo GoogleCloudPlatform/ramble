@@ -149,7 +149,7 @@ class Pipeline(object):
                 progress = tqdm.tqdm(total=len(phase_list),
                                      leave=True,
                                      ascii=' >=',
-                                     bar_format='{l_bar}{bar}| Elapsed (s): {elapsed_s}')
+                                     bar_format='{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}')
             for phase_idx, phase in enumerate(phase_list):
                 if not disable_progress:
                     progress.set_description(

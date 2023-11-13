@@ -8,6 +8,9 @@
 
 import llnl.util.tty as tty
 import llnl.util.tty.log
+import llnl.util.tty.color
+
+from contextlib import contextmanager
 
 
 class Logger(object):
@@ -114,6 +117,14 @@ class Logger(object):
 
         return kwargs
 
+    @contextmanager
+    def configure_colors(self, **kwargs):
+        old_value = llnl.util.tty.color.get_color_when()
+        if 'stream' in kwargs:
+            llnl.util.tty.color.set_color_when('never')
+        yield
+        llnl.util.tty.color.set_color_when(old_value)
+
     def all_msg(self, *args, **kwargs):
         """Print a message to all logs
 
@@ -123,9 +134,10 @@ class Logger(object):
         """
         for idx, log in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(default_kwargs=kwargs, index=idx)
-            tty.info(*args, **st_kwargs)
+            with self.configure_colors(**st_kwargs):
+                tty.info(*args, **st_kwargs)
 
-        tty.info(*args, **kwargs)
+        tty.msg(*args, **kwargs)
 
     def msg(self, *args, **kwargs):
         """Print a message to the active log
@@ -134,7 +146,8 @@ class Logger(object):
         print). Perform this action for the active log only.
         """
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        tty.info(*args, **st_kwargs)
+        with self.configure_colors(**st_kwargs):
+            tty.info(*args, **st_kwargs)
 
     def info(self, *args, **kwargs):
         """Print a message to the active log
@@ -143,7 +156,8 @@ class Logger(object):
         print). Perform this action for the active log only.
         """
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        tty.info(*args, **st_kwargs)
+        with self.configure_colors(**st_kwargs):
+            tty.info(*args, **st_kwargs)
 
     def verbose(self, *args, **kwargs):
         """Print a verbose message to the active log
@@ -152,7 +166,8 @@ class Logger(object):
         print). Perform this action for the active log only.
         """
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        tty.verbose(*args, **st_kwargs)
+        with self.configure_colors(**st_kwargs):
+            tty.verbose(*args, **st_kwargs)
 
     def warn(self, *args, **kwargs):
         """Print a warning message to the active log
@@ -161,7 +176,9 @@ class Logger(object):
         print). Perform this action for the active log only.
         """
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        tty.warn(*args, **st_kwargs)
+        if 'stream' in st_kwargs:
+            with self.configure_colors(**st_kwargs):
+                tty.warn(*args, **st_kwargs)
 
         tty.warn(*args, **kwargs)
 
@@ -172,7 +189,8 @@ class Logger(object):
         print). Perform this action for the active log only.
         """
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        tty.debug(*args, **st_kwargs)
+        with self.configure_colors(**st_kwargs):
+            tty.debug(*args, **st_kwargs)
 
     def error(self, *args, **kwargs):
         """Print an error message
@@ -183,7 +201,8 @@ class Logger(object):
         """
         for idx, log in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(index=idx, default_kwargs=kwargs)
-            tty.error(*args, **st_kwargs)
+            with self.configure_colors(**st_kwargs):
+                tty.error(*args, **st_kwargs)
 
         tty.error(*args, **kwargs)
 
@@ -196,7 +215,8 @@ class Logger(object):
         """
         for idx, log in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(index=idx, default_kwargs=kwargs)
-            tty.error(*args, **st_kwargs)
+            with self.configure_colors(**st_kwargs):
+                tty.error(*args, **st_kwargs)
 
         while self.log_stack:
             self.remove_log()
