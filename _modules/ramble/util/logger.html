@@ -101,6 +101,9 @@
 
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty.log</span>
+<span class="kn">import</span> <span class="nn">llnl.util.tty.color</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 
 
 <div class="viewcode-block" id="Logger">
@@ -221,6 +224,17 @@
 
         <span class="k">return</span> <span class="n">kwargs</span>
 
+<div class="viewcode-block" id="Logger.configure_colors">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.logger.Logger.configure_colors">[docs]</a>
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">configure_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">old_value</span> <span class="o">=</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">tty</span><span class="o">.</span><span class="n">color</span><span class="o">.</span><span class="n">get_color_when</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;stream&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">tty</span><span class="o">.</span><span class="n">color</span><span class="o">.</span><span class="n">set_color_when</span><span class="p">(</span><span class="s1">&#39;never&#39;</span><span class="p">)</span>
+        <span class="k">yield</span>
+        <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">tty</span><span class="o">.</span><span class="n">color</span><span class="o">.</span><span class="n">set_color_when</span><span class="p">(</span><span class="n">old_value</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Logger.all_msg">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.logger.Logger.all_msg">[docs]</a>
     <span class="k">def</span> <span class="nf">all_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -232,9 +246,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">log</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stack</span><span class="p">):</span>
             <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
 
-        <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Logger.msg">
@@ -246,7 +261,8 @@
 <span class="sd">        print). Perform this action for the active log only.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Logger.info">
@@ -258,7 +274,8 @@
 <span class="sd">        print). Perform this action for the active log only.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Logger.verbose">
@@ -270,7 +287,8 @@
 <span class="sd">        print). Perform this action for the active log only.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Logger.warn">
@@ -282,7 +300,9 @@
 <span class="sd">        print). Perform this action for the active log only.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stream&#39;</span> <span class="ow">in</span> <span class="n">st_kwargs</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
 
         <span class="n">tty</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -296,7 +316,8 @@
 <span class="sd">        print). Perform this action for the active log only.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Logger.error">
@@ -310,7 +331,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">log</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stack</span><span class="p">):</span>
             <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
 
         <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -326,7 +348,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">log</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_stack</span><span class="p">):</span>
             <span class="n">st_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_kwargs</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">default_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_colors</span><span class="p">(</span><span class="o">**</span><span class="n">st_kwargs</span><span class="p">):</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">st_kwargs</span><span class="p">)</span>
 
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_stack</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">remove_log</span><span class="p">()</span>
@@ -347,7 +370,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Nov 09, 2023.
+      <span class="lastupdated">Last updated on Nov 13, 2023.
       </span></p>
   </div>
 
