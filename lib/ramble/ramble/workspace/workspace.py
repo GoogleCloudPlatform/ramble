@@ -1056,9 +1056,9 @@ class Workspace(object):
         if not results_written:
             logger.die('Results were not written.')
 
-        logger.msg('Results are written to:')
+        logger.all_msg('Results are written to:')
         for out_file in results_written:
-            logger.msg(f'  {out_file}')
+            logger.all_msg(f'  {out_file}')
 
         return filename_base
 
