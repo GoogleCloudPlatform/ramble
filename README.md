@@ -6,7 +6,7 @@ It works on Linux, macOS, and many supercomputers.
 Ramble can be used to configure a variety of experiments for applications.
 These can include anything from:
  - Scientific parameter sweeps
- - Performance focused scalaing studies
+ - Performance focused scaling studies
  - Compiler flag sweeps
 
 To install ramble and configure your experiment workspace, make sure you have
