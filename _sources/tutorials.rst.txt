@@ -21,4 +21,5 @@ various features.
 
     tutorials/hello_world
     tutorials/running_a_simple_gromacs_experiment
+    tutorials/modifying_a_gromacs_experiment
     tutorials/mirrors
