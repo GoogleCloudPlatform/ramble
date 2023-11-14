@@ -16,7 +16,9 @@ In this tutorial, you will set up and run a benchmark simulation using
 `GROMACS <https://www.gromacs.org/>`_, a free and open-source application
 for molecular dynamics.
 
-This tutorial builds off of concepts introduced in the :ref:`hello_world_tutorial` tutorial.
+This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial's content,
+however this tutorial is fully stand-alone as far as steps you need to perform.
 
 Application Information
 -----------------------
@@ -93,131 +95,10 @@ This output does not represent the only possible configuration that works for
 this application, it only presents a good starting point. When using Ramble,
 these can be modified freely and will be explored in a later tutorial.
 
-------------------------
-Configuring experiments
-------------------------
+.. include:: shared/gromacs_workspace.rst
 
-As mentioned before, you are going to focus on creating experiments from the
-``water_bare`` and ``water_gmx50`` workloads. We will explore the two available
-values for the ``type`` variable, and a single value for the ``size`` variable.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Create and Activate a Workspace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Before you can configure your GROMACS experiments, you'll need to set up a
-workspace. You can call this workspace ``basic_gromacs``.
-
-.. code-block:: console
-
-    $ ramble workspace create basic_gromacs
-
-This will create a workspace for you in:
-
-.. code-block:: console
-
-    $ $ramble_root/var/ramble/workspaces/basic_gromacs
-
-Now you can activate the workspace and view its default configuration.
-
-.. code-block:: console
-
-    $ ramble workspace activate basic_gromacs
-    $ ramble workspace info
-
-You can use the ``ramble workspace info`` command after editing configuration
-files to see how ramble would use the changes you made.
-
-^^^^^^^^^^^^^^^^^^^^^^^^
-Configure the Workspace
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Within the workspace directory, ramble creates a directory named ``configs``.
-This directory contains generated configuration and template files. Each of
-these files can be edited to configure the workspace, and examples will be
-provided below.
-
-The available files are:
-* ``ramble.yaml`` This file describes all aspects of the workspace. This
-includes the software stack, the experiments, and all variables.
-* ``execute_experiment.tpl`` This file is a template shell script that will be
-rendered to execute each of the experiments that ramble generates.
-
-You can edit these files directly or with the command ``ramble workspace edit``.
-
-To begin, you should edit the ``ramble.yaml`` file to set up the configuration
-for your experiments. For this tutorial, replace the default yaml text with the
-contents of ``$ramble_root/examples/basic_gromacs_config.yaml``:
-
-.. code-block:: yaml
-
-    ramble:
-      variables:
-        processes_per_node: 1
-        mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-        batch_submit: '{execute_experiment}'
-      applications:
-        gromacs: # Application name, from `ramble list`
-          workloads:
-            water_gmx50: # Workload name from application, in `ramble info <app>`
-              experiments:
-                pme_single_rank: # Arbitrary experiment name
-                  variables:
-                    n_ranks: '1'
-                    n_threads: '1'
-                    size: '0003'
-                    type: 'pme'
-                rf_single_rank: # Arbitrary experiment name
-                  variables:
-                    n_ranks: '1'
-                    n_threads: '1'
-                    size: '0003'
-                    type: 'rf'
-            water_bare: # Workload name from application, in `ramble info <app>`
-              experiments:
-                pme_single_rank: # Arbitrary experiment name
-                  variables:
-                    n_ranks: '1'
-                    n_threads: '1'
-                    size: '0003'
-                    type: 'pme'
-                rf_single_rank: # Arbitrary experiment name
-                  variables:
-                    n_ranks: '1'
-                    n_threads: '1'
-                    size: '0003'
-                    type: 'rf'
-      spack:
-        concretized: true
-        packages:
-          gcc9:
-            spack_spec: gcc@9.3.0 target=x86_64
-            compiler_spec: gcc@9.3.0
-          impi2018:
-            spack_spec: intel-mpi@2018.4.274 target=x86_64
-            compiler: gcc9
-          gromacs:
-            spack_spec: gromacs@2021.6
-            compiler: gcc9
-        environments:
-          gromacs:
-            packages:
-            - gromacs
-            - impi2018
-
-Note that specifying compilers that Spack doesn't have installed may take a while.
-To see available compilers, use ``spack compilers`` or see `Spack documentation
-<https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers>`_
-for more information.
-
-The second file you should edit is the ``execute_experiment.tpl`` template file.
-This file contains a template script that will be rendered into an execution
-script for each generated experiment. You can feel free to edit it as you need
-to for your given system, but for this tutorial the default value will work.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Setting Up the Experiments
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
 Now that the workspace is configured correctly, you can set up the experiments
 in the active workspace using:
@@ -247,9 +128,8 @@ For each setup run, a set of logs will be created at:
 Each run will have its own primary log, along with a folder containing a log for each
 experiment that is being configured.
 
-^^^^^^^^^^^^^^^^^^^^^^
 Executing Experiments
-^^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 After the workspace is set up, its experiments can be executed. The two methods
 to run the experiments are:
@@ -260,9 +140,8 @@ to run the experiments are:
    or;
     $ ./all_experiments
 
-^^^^^^^^^^^^^^^^^^^^^^
 Analyzing Experiments
-^^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 Once the experiments within a workspace are complete, the experiments can be
 analyzed. This is done through:
