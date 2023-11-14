@@ -41,40 +41,45 @@ class IntelMpiBenchmarks(SpackApplication):
                '-genv I_MPI_FABRICS=shm:tcp '
                '-genv I_MPI_PIN_PROCESSOR_LIST=0 '
                'IMB-MPI1 {pingpong_type} -msglog {msglog_min}:{msglog_max} '
-               '-iter {num_iterations} -show_tail on -dumpfile {output_file}',
+               '-iter {num_iterations} {additional_args}',
                use_mpi=True)
 
-    # FIXME: how best to deal with the desirded behavior of <2*num_cores> -ppn <num_cores>
     executable('multi-pingpong',
                '-genv I_MPI_FABRICS=shm:tcp '
                'IMB-MPI1 Pingpong -msglog {msglog_min}:{msglog_max} '
-               '-iter {num_iteration} -multi 0 -map 2*{num_cores} -show_tail on',
+               '-iter {num_iterations} -multi {multi_val} -map {map_args} {additional_args}',
                use_mpi=True)
+
+    workload_variable('num_cores',
+                      default='{{{n_ranks}/2}:0.0f}',
+                      description='Number of cores',
+                      workloads=['multi-pingpong'])
+
+    workload_variable('multi_val',
+                      default='0',
+                      description='Value to pass to the multi arg',
+                      workloads=['multi-pingpong'])
+
+    workload_variable('map_args',
+                      default='{num_cores}x2',
+                      description='Args to map by',
+                      workloads=['multi-pingpong'])
 
     executable('collective',
                '-genv I_MPI_FABRICS=shm:tcp '
                'IMB-MPI1 {collective_type} -msglog {msglog_min}:{msglog_max} '
-               '-iter {num_iterations} -npmin {min_collective_ranks}',
+               '-iter {num_iterations} -npmin {min_collective_ranks} {additional_args}',
                use_mpi=True)
 
     workload('pingpong', executable='pingpong')
     workload('multi-pingpong', executable='multi-pingpong')
     workload('collective', executable='collective')
 
-    workload_variable('output_path', default='./output',
-                      description='Dumpfile Output Path',
-                      workloads=['pingpong'])
-
     workload_variable('pingpong_type',
                       default='Pingpong',
                       values=['Pingpong', 'Unirandom', 'Multi-Pingpong', 'Birandom', 'Corandom'],
                       description='Pingpong Algorithm to Use',
                       workloads=['pingpong'])
-
-    workload_variable('num_cores',
-                      default='{n_ranks}/2',
-                      description='Number of cores',
-                      workloads=['multi-pingpong'])
 
     workload_variable('collective_type',
                       # FIXME: should default just be denoted by the
@@ -101,6 +106,10 @@ class IntelMpiBenchmarks(SpackApplication):
 
     workload_variable('msglog_max', default='30',
                       description='Max Message Size (power of 2)',
+                      workloads=['pingpong', 'multi-pingpong', 'collective'])
+
+    workload_variable('additional_args', default='',
+                      description='Number of iterations to test over',
                       workloads=['pingpong', 'multi-pingpong', 'collective'])
 
     # Matches tables like:
@@ -134,8 +143,8 @@ class IntelMpiBenchmarks(SpackApplication):
     #  bytes #repetitions  t_min[usec]  t_max[usec]  t_avg[usec]   Mbytes/sec
     #   (happens in sendrecv and exchange)
     combined_regex = r'^\s+(?P<bytes>\d+)\s+(?P<repetitions>\d+)\s+' + \
-                     r'(?P<t_min>\d+\.\d+)\s+(?P<t_avg>\d+\.\d+)\s+' + \
-                     r'(?P<t_max>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
+                     r'(?P<t_min>\d+\.\d+)\s+(?P<t_max>\d+\.\d+)\s+' + \
+                     r'(?P<t_avg>\d+\.\d+)\s+(?P<bw>\d+\.\d+)$'
     figure_of_merit('Combo', log_file=log_str,
                     fom_regex=combined_regex,
                     group_name='bw', units='Mbytes/sec', contexts=['combo-bytes'])
