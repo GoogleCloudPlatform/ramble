@@ -209,7 +209,13 @@ have an ``EDITOR`` environment variable set):
     $ ramble workspace edit
 
 This command opens the ``ramble.yaml`` file, along with any ``*.tpl`` files in
-the workspace's ``configs`` directory.
+the workspace's ``configs`` directory. The root directory of the workspace can
+be seen in the ``Location`` attribute output from:
+
+.. code-blocks:: console
+
+    $ ramble workspace info
+
 
 When the ``ramble.yaml`` is open, modify any of the experiment's ``size``
 variable definitions that you want to. Finally, save and exit the file.
