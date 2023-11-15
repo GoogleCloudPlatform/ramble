@@ -22,4 +22,6 @@ various features.
     tutorials/hello_world
     tutorials/running_a_simple_gromacs_experiment
     tutorials/modifying_a_gromacs_experiment
+    tutorials/using_vectors_and_matrices
+    tutorials/changing_your_software_stack
     tutorials/mirrors
