@@ -138,9 +138,9 @@ experiment. This experiment will also include definitions for
 
 .. _ramble-vector-logic:
 
-^^^^^^^^^^^^^^^
-List Variables:
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+List (or Vector) Variables:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Variables can be defined as a list of values as well (again, following the same
 math and variable expansion syntax as defined above).
 

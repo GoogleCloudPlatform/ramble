@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4) Using Vectors and Matrices &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5) Changing A Software Stack" href="changing_your_software_stack.html" />
+    <link rel="prev" title="3) Modifying A GROMACS Experiment" href="modifying_a_gromacs_experiment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4) Using Vectors and Matrices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-experiments">Configuring experiments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-and-activate-a-workspace">Create and Activate a Workspace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configure-the-workspace">Configure the Workspace</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#activate-the-workspace">Activate the Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#experiment-descriptions">Experiment Descriptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#editing-experiments">Editing Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-vector-variables">Using Vector Variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#templatized-experiment-names">Templatized Experiment Names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vectorizing-workload-names">Vectorizing Workload Names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-a-scaling-study">Defining a Scaling Study</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="changing_your_software_stack.html">5) Changing A Software Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">4) Using Vectors and Matrices</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/using_vectors_and_matrices.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="using-vectors-and-matrices">
+<span id="vector-and-matrix-tutorial"></span><h1>4) Using Vectors and Matrices<a class="headerlink" href="#using-vectors-and-matrices" title="Link to this heading"></a></h1>
+<p>In this tutorial, you will learn how to utilized vectors and matrices in Ramble
+workspaces. Ramble’s vector and matrix variable logic is defined in more detail in
+<a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">List (or Vector) Variables:</span></a> and <a class="reference internal" href="../workspace_config.html#ramble-matrix-logic"><span class="std std-ref">Variable Matrices:</span></a></p>
+<p>This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial’s content.</p>
+<section id="configuring-experiments">
+<h2>Configuring experiments<a class="headerlink" href="#configuring-experiments" title="Link to this heading"></a></h2>
+<p>For this tutorial, you are going to focus on creating experiments from the
+<code class="docutils literal notranslate"><span class="pre">water_bare</span></code> and <code class="docutils literal notranslate"><span class="pre">water_gmx50</span></code> workloads. The default configuration will
+contain experiments for each value of the <code class="docutils literal notranslate"><span class="pre">type</span></code> variable, and a single value
+for the <code class="docutils literal notranslate"><span class="pre">size</span></code> variable.</p>
+<p>You will use a Ramble workspace to manage these experiments.</p>
+<section id="create-and-activate-a-workspace">
+<h3>Create and Activate a Workspace<a class="headerlink" href="#create-and-activate-a-workspace" title="Link to this heading"></a></h3>
+<p>Before you can configure your GROMACS experiments, you’ll need to set up a
+workspace. You can call this workspace <code class="docutils literal notranslate"><span class="pre">basic_gromacs</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>basic_gromacs
+</pre></div>
+</div>
+<p>This will create a workspace for you in:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs
+</pre></div>
+</div>
+<p>Now you can activate the workspace and view its default configuration.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>basic_gromacs
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">info</span></code> command after editing configuration
+files to see how ramble would use the changes you made.</p>
+</section>
+<section id="configure-the-workspace">
+<h3>Configure the Workspace<a class="headerlink" href="#configure-the-workspace" title="Link to this heading"></a></h3>
+<p>Within the workspace directory, ramble creates a directory named <code class="docutils literal notranslate"><span class="pre">configs</span></code>.
+This directory contains generated configuration and template files. Each of
+these files can be edited to configure the workspace, and examples will be
+provided below.</p>
+<p>The available files are:
+* <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> This file describes all aspects of the workspace. This
+includes the software stack, the experiments, and all variables.
+* <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> This file is a template shell script that will be
+rendered to execute each of the experiments that ramble generates.</p>
+<p>You can edit these files directly or with the command <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">edit</span></code>.</p>
+<p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
+for your experiments. For this tutorial, replace the default yaml text with the
+contents of <code class="docutils literal notranslate"><span class="pre">$ramble_root/examples/basic_gromacs_config.yaml</span></code>:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span><span class="w"> </span><span class="c1"># Application name</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">water_gmx50</span><span class="p">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="linenos">10</span><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="linenos">12</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">14</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">15</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="linenos">16</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
+<span class="linenos">17</span><span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
+<span class="linenos">18</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">20</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">21</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="linenos">22</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
+<span class="linenos">23</span><span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="linenos">24</span><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">25</span><span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">27</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">28</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">29</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="linenos">30</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
+<span class="linenos">31</span><span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
+<span class="linenos">32</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">33</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">34</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">35</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="linenos">36</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
+<span class="linenos">37</span><span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="linenos">38</span><span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">39</span><span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="linenos">40</span><span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="linenos">41</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="linenos">42</span><span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="linenos">43</span><span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="linenos">44</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="linenos">45</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="linenos">46</span><span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="linenos">47</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="linenos">48</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="linenos">49</span><span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="linenos">50</span><span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="linenos">51</span><span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="linenos">52</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+<span class="linenos">53</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+</pre></div>
+</div>
+<p>Note that specifying compilers that Spack doesn’t have installed may take a while.
+To see available compilers, use <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compilers</span></code> or see <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers">Spack documentation</a>
+for more information.</p>
+<p>The second file you should edit is the <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> template file.
+This file contains a template script that will be rendered into an execution
+script for each generated experiment. You can feel free to edit it as you need
+to for your given system, but for this tutorial the default value will work.</p>
+</section>
+</section>
+<section id="activate-the-workspace">
+<h2>Activate the Workspace<a class="headerlink" href="#activate-the-workspace" title="Link to this heading"></a></h2>
+<p>As you are using a pre-existing workspace, ensure it is activated (NOTE: you
+only need to run this if you do not currently have the workspace active).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>basic_gromacs
+</pre></div>
+</div>
+</section>
+<section id="experiment-descriptions">
+<h2>Experiment Descriptions<a class="headerlink" href="#experiment-descriptions" title="Link to this heading"></a></h2>
+<p>Now that your workspace has been configured, and activated, You can execute the
+following command to see what experiments the workspace currently contains:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>This command provides a summary view of the workspace. It includes the
+experiment names, and the software environments. As an example, its output
+might contain the following information:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_gmx50</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_single_rank</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_gmx50</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_bare</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_bare</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_single_rank</span>
+</pre></div>
+</div>
+<p>To get detailed information about where variable definitions come from, you can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info<span class="w"> </span>-v
+</pre></div>
+</div>
+<p>The experiments section of this command’s output might contain the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_gmx50</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_single_rank</span>
+<span class="go">        Variables from Workspace:</span>
+<span class="go">          processes_per_node = 16 ==&gt; 16</span>
+<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
+<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
+<span class="go">        Variables from Experiment:</span>
+<span class="go">          n_ranks = 1 ==&gt; 1</span>
+<span class="go">          n_threads = 1 ==&gt; 1</span>
+<span class="go">          size = 0003 ==&gt; 0003</span>
+<span class="go">          type = pme ==&gt; pme</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_gmx50</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
+<span class="go">        Variables from Workspace:</span>
+<span class="go">          processes_per_node = 16 ==&gt; 16</span>
+<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
+<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
+<span class="go">        Variables from Experiment:</span>
+<span class="go">          n_ranks = 1 ==&gt; 1</span>
+<span class="go">          n_threads = 1 ==&gt; 1</span>
+<span class="go">          size = 0003 ==&gt; 0003</span>
+<span class="go">          type = rf ==&gt; rf</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_bare</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
+<span class="go">        Variables from Workspace:</span>
+<span class="go">          processes_per_node = 16 ==&gt; 16</span>
+<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
+<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
+<span class="go">        Variables from Experiment:</span>
+<span class="go">          n_ranks = 1 ==&gt; 1</span>
+<span class="go">          n_threads = 1 ==&gt; 1</span>
+<span class="go">          size = 0003 ==&gt; 0003</span>
+<span class="go">          type = pme ==&gt; pme</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_bare</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_single_rank</span>
+<span class="go">        Variables from Workspace:</span>
+<span class="go">          processes_per_node = 16 ==&gt; 16</span>
+<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
+<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
+<span class="go">        Variables from Experiment:</span>
+<span class="go">          n_ranks = 1 ==&gt; 1</span>
+<span class="go">          n_threads = 1 ==&gt; 1</span>
+<span class="go">          size = 0003 ==&gt; 0003</span>
+<span class="go">          type = rf ==&gt; rf</span>
+</pre></div>
+</div>
+<p>When comparing the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to this output, you should notice that
+the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file is very repetitive. Its current content shows how to
+define many explicit experiments, but when trying to generate many experiments
+that are similar it is unncessarily verbose. In the next step, we are going to
+collapase the experiments into a single definition, and extend them to do a
+basic rank based scaling study.</p>
+</section>
+<section id="editing-experiments">
+<h2>Editing Experiments<a class="headerlink" href="#editing-experiments" title="Link to this heading"></a></h2>
+<p>In the next few sections, you will edit the workspace configuration file. To
+make editing the workspace easier, use the following command (assuming you have
+an <code class="docutils literal notranslate"><span class="pre">EDITOR</span></code> environment variable set):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>This command opens the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, along with any <code class="docutils literal notranslate"><span class="pre">*.tpl</span></code> files in
+the workspace’s <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> is open, modify any of the content you want to, and
+save and exit the file.</p>
+<p>These changes should now be reflected in the output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info<span class="w"> </span>-v
+</pre></div>
+</div>
+</section>
+<section id="using-vector-variables">
+<h2>Using Vector Variables<a class="headerlink" href="#using-vector-variables" title="Link to this heading"></a></h2>
+<p>Vector (or list) variables in Ramble are variables who’s value is a list of
+other values in the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> workspace configuration file. There are
+many reasons you might want to use list variables, such as defining a scaling
+study, or exploring a range of a given parameter within a single experiment
+definition.</p>
+<p>Currently, your <code class="docutils literal notranslate"><span class="pre">basic_gromacs</span></code> workspace has 4 experiments defined. There
+are two different workloads ( <code class="docutils literal notranslate"><span class="pre">water_bare</span></code> and <code class="docutils literal notranslate"><span class="pre">water_gmx50</span></code> ), and each
+workload explores the two different values for the <code class="docutils literal notranslate"><span class="pre">type</span></code> variable ( <code class="docutils literal notranslate"><span class="pre">pme</span></code>
+and <code class="docutils literal notranslate"><span class="pre">rf</span></code> ).</p>
+<p>Edit your workspace configuration, and collapse the experiment definitions
+using vectors. To begin with, collapse the <code class="docutils literal notranslate"><span class="pre">type</span></code> values into a list within
+each individual workload. You should end up with only a single experiment
+definition within each of the workloads, which looks something like the
+following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">pme_single_rank</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">    </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">    </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pme&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;rf&#39;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>After writing this configuration, save and exit your <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, and execute:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>To see the experiments within your workspace. If you use the configuration from
+above, you should see the following error printed to the screen:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Experiment gromacs.water_bare.pme_single_rank is not unique.</span>
+</pre></div>
+</div>
+<p>Within Ramble, each experiment is required to have a unique namespace. The
+namespace of an experiment is defined as:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&lt;application name&gt;.&lt;workload name&gt;.&lt;rendered experiment name&gt;</span>
+</pre></div>
+</div>
+<p>So, changing things like the application or workload automatically create a
+unique namespace, but changing vector variables within an experiment do not
+automatically generate a unique namespace. In this case, your experiments that
+have a different <code class="docutils literal notranslate"><span class="pre">type</span></code> both result in the same experiment name.</p>
+</section>
+<section id="templatized-experiment-names">
+<h2>Templatized Experiment Names<a class="headerlink" href="#templatized-experiment-names" title="Link to this heading"></a></h2>
+<p>In order to generate unique experiment namespaces while using vector variable
+definitions, Ramble allows the experiment name to be templatized using variable
+names as expansion placeholders.</p>
+<p>To fix the error from the previous section, you need to modify the experiment
+name that contains the vector <code class="docutils literal notranslate"><span class="pre">type</span></code> definition. The result should look
+something like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="s">&#39;{type}_single_rank&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">    </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">    </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pme&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;rf&#39;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Notice how the name of the experiment changed from <code class="docutils literal notranslate"><span class="pre">pme_single_rank</span></code> to
+<code class="docutils literal notranslate"><span class="pre">'{type}_single_rank'</span></code>. This allows Ramble to populate the experiment name by
+expanding the <code class="docutils literal notranslate"><span class="pre">{type}</span></code> variable reference.</p>
+<p><strong>NOTE</strong> Because we are editing YAML, the experiment name needs to be
+explicitly delimited as a string. Notice how in the above example we wrap the
+experiment name in single quotes to explicitly make it a string.</p>
+<p>Now, save and exit the file. The resulting experiments can be seen using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>And the result should be something like the following (if you have changed the
+experiment definition under both workloads):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_gmx50</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_single_rank</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: water_bare</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_single_rank</span>
+</pre></div>
+</div>
+</section>
+<section id="vectorizing-workload-names">
+<h2>Vectorizing Workload Names<a class="headerlink" href="#vectorizing-workload-names" title="Link to this heading"></a></h2>
+<p>The next step in the process of simplifying your workspace configuration file
+is to vectorize the workload names used. Here, we’ll use a similar technique to
+templates the experiment names.</p>
+<p>Edit your workspace configuration file, and define a new variable named
+<code class="docutils literal notranslate"><span class="pre">app_workload</span></code> within one of the two experiments. Set the value of this
+variable to <code class="docutils literal notranslate"><span class="pre">['water_bare',</span> <span class="pre">'water_gmx50']</span></code> and delete the other experiment
+definition entirely.</p>
+<p>Finally, to allow ramble to generate experiments for each workload, change the
+workload name to <code class="docutils literal notranslate"><span class="pre">'{app_workload}'</span></code>. The resulting portion of the
+<code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file should look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">  </span><span class="s">&#39;{app_workload}&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">      </span><span class="s">&#39;{type}_single_rank&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="w">        </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">app_workload</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;water_bare&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;water_gmx50&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">          </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pme&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;rf&#39;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>At this point, you can save and exit. Executing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Should show the following output:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: {app_workload}</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
+</pre></div>
+</div>
+<p>However, at this point you should only see two experiments while we expect to
+see four. This is because of the way multiple vector variables are handled in
+Ramble. After consuming vector variables (which we’ll describe in the next
+section) the resulting vectors are required to be the same length (in this case
+they are both of length 2) and are zipped together and iterated over to
+generate experiments. In this case, the resulting zip looks something like the
+following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[ (water_bare, pme), (water_gmx50, rf) ]</span>
+</pre></div>
+</div>
+<p>While we want something more like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[ (water_bare, pme), (water_bare, rf), (water_gmx50, pme), (water_gmx50, rf) ]</span>
+</pre></div>
+</div>
+<p>To remedy this issue, we will use Ramble’s matrix definitions.</p>
+</section>
+<section id="variable-matrices">
+<h2>Variable Matrices<a class="headerlink" href="#variable-matrices" title="Link to this heading"></a></h2>
+<p>As you’ve seen so far, you can define vector variables in Ramble. These
+definitions can be implicitly zipped together to generate multiple experiments.
+However, sometimes you would actually prefer to have an explicit cross product
+of the variable definitions to explore a wider range of parameter combinations.
+To perform this task, Ramble allows you to use variable <code class="docutils literal notranslate"><span class="pre">matrix</span></code> or
+<code class="docutils literal notranslate"><span class="pre">matrices</span></code> definitions. These definitions can only happen at the lowest level
+(i.e. within the individual experiment scope) of a <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file.</p>
+<p>Any variable listed within any matrix definition is considered <strong>consumed</strong> by
+the matrix. This removes the variable definition from the implicit zip logic
+defined in the previous section. Multiple matrices can be defined (though we
+will not illustrate this in this tutorial). When multiple matrices are defined
+within the same experiment, they are required to have the same resulting number
+of elements. After they are individually built, they are zipped together to
+create one large set of variable values to generate experiments from. If there
+are unconsumed vector variables, they follow the zip logic described in the
+previous section, and which is then crossed with the result of the matrix
+construction.</p>
+<p>To remedy your currently configuration issue (seeing two experiments instead of
+the desired four experiments), we will employ a variable matrix to define the
+additional experiments.</p>
+<p>Edit your <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> and update your experiment definition to the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">  </span><span class="s">&#39;{app_workload}&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">      </span><span class="s">&#39;{type}_single_rank&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="w">        </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">app_workload</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;water_bare&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;water_gmx50&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">          </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pme&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;rf&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app_workload</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span>
+</pre></div>
+</div>
+<p>You should notice the addition of the <code class="docutils literal notranslate"><span class="pre">matrix</span></code> section at the bottom of this.
+Here we are constructing a new variable matrix which will be created using the
+cross product of the <code class="docutils literal notranslate"><span class="pre">app_workload</span></code> and <code class="docutils literal notranslate"><span class="pre">type</span></code> variable definitions. Since
+each has a length of two, the result would be a matrix with four elements in
+it.</p>
+<p>After saving an exiting this file, the resulting experiments can be seen using the:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>command. Which should present the following output:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: {app_workload}</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_single_rank</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_single_rank</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
+</pre></div>
+</div>
+</section>
+<section id="defining-a-scaling-study">
+<h2>Defining a Scaling Study<a class="headerlink" href="#defining-a-scaling-study" title="Link to this heading"></a></h2>
+<p>The final modification you’ll make to this workspace is to update the
+experiment definition to perform a basic rank based scaling study.</p>
+<p>Edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, and update the value for <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> to be
+<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">4]</span></code>. After doing this, add the <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> variable to the matrix
+definition, and ensure your experiment name uses the <code class="docutils literal notranslate"><span class="pre">{n_ranks}</span></code> placeholder.
+At this point, your complete <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file should look like the
+following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span><span class="w"> </span><span class="c1"># Application name</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="s">&#39;{app_workloads}&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="linenos">10</span><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">            </span><span class="s">&#39;{type}_{n_ranks}ranks&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="linenos">12</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">                </span><span class="nt">app_workloads</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;water_gmx50&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;water_bare&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">14</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="linenos">15</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">16</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="linenos">17</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pme&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;rf&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">18</span><span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app_workloads</span>
+<span class="linenos">20</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span>
+<span class="linenos">21</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_ranks</span>
+<span class="linenos">22</span><span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="linenos">29</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="linenos">30</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="linenos">31</span><span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="linenos">32</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="linenos">33</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="linenos">35</span><span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="linenos">36</span><span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="linenos">37</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+<span class="linenos">38</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+</pre></div>
+</div>
+<p>However, your experiment name template may look different from the above, as
+long as it contains the <code class="docutils literal notranslate"><span class="pre">{type}</span></code> and <code class="docutils literal notranslate"><span class="pre">{n_ranks}</span></code> placeholders, you should
+consider it correct.</p>
+<p>To see the final set of experiments, execute:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Which should contain the following output:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
+<span class="go">  Application: gromacs</span>
+<span class="go">    Workload: {app_workload}</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_1ranks</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_2ranks</span>
+<span class="go">      Experiment: gromacs.water_bare.pme_4ranks</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_1ranks</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_2ranks</span>
+<span class="go">      Experiment: gromacs.water_bare.rf_4ranks</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_1ranks</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_2ranks</span>
+<span class="go">      Experiment: gromacs.water_gmx50.pme_4ranks</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_1ranks</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_2ranks</span>
+<span class="go">      Experiment: gromacs.water_gmx50.rf_4ranks</span>
+</pre></div>
+</div>
+</section>
+<section id="execute-experiments">
+<h2>Execute Experiments<a class="headerlink" href="#execute-experiments" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Core Time: CPU time (in seconds) spent on the benchmark calculations</p></li>
+<li><p>Wall Time: Elapsed real time (in seconds) spent on the benchmark calculations</p></li>
+<li><p>Percent Core Time: Core Time / Wall Time</p></li>
+<li><p>Nanosecs per day: Nanoseconds of simulation per day at the speed achieved</p></li>
+<li><p>Hours per nanosec: Hours required to calculate 1 nanosecond of simulation at
+the speed achieved</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modifying_a_gromacs_experiment.html" class="btn btn-neutral float-left" title="3) Modifying A GROMACS Experiment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="changing_your_software_stack.html" class="btn btn-neutral float-right" title="5) Changing A Software Stack" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Nov 15, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
