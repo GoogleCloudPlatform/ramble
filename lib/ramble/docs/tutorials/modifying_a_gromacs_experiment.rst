@@ -22,17 +22,6 @@ make sure you review those before starting with this tutorial's content.
 
 .. include:: shared/gromacs_workspace.rst
 
-Activate the Workspace
-----------------------
-
-As you are using a pre-existing workspace, ensure it is activated (NOTE: you
-only need to run this if you do not currently have the workspace active).
-
-.. code-block:: console
-
-    $ ramble workspace activate basic_gromacs
-
-
 Experiment Descriptions
 -----------------------
 
