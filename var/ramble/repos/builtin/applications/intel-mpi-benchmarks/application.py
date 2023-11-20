@@ -40,13 +40,13 @@ class IntelMpiBenchmarks(SpackApplication):
     executable('pingpong',
                '-genv I_MPI_FABRICS=shm:tcp '
                '-genv I_MPI_PIN_PROCESSOR_LIST=0 '
-               'IMB-MPI1 {pingpong_type} -msglog {msglog_min}:{msglog_max} '
+               '{install_path}/IMB-MPI1 {pingpong_type} -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} {additional_args}',
                use_mpi=True)
 
     executable('multi-pingpong',
                '-genv I_MPI_FABRICS=shm:tcp '
-               'IMB-MPI1 Pingpong -msglog {msglog_min}:{msglog_max} '
+               '{install_path}/IMB-MPI1 Pingpong -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -multi {multi_val} -map {map_args} {additional_args}',
                use_mpi=True)
 
@@ -67,13 +67,23 @@ class IntelMpiBenchmarks(SpackApplication):
 
     executable('collective',
                '-genv I_MPI_FABRICS=shm:tcp '
-               'IMB-MPI1 {collective_type} -msglog {msglog_min}:{msglog_max} '
+               '{install_path}/IMB-MPI1 {collective_type} -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -npmin {min_collective_ranks} {additional_args}',
                use_mpi=True)
 
     workload('pingpong', executable='pingpong')
     workload('multi-pingpong', executable='multi-pingpong')
     workload('collective', executable='collective')
+
+    # Multiple spack packages (specifically intel-oneapi-mpi) provide the
+    # binary we need. It's fairly common to want to decouple the version of MPI
+    # from the version of the benchmark, so this varialbe gives a user an
+    # explicit way to control that, as well as more strongly implies the binary
+    # from intel-mpi-benchmarks by default
+    workload_variable('install_path',
+                      default='{intel-mpi-benchmarks}/bin',
+                      description='User configurable dir to executables',
+                      workloads=['pingpong', 'multi-pingpong', 'collective'])
 
     workload_variable('pingpong_type',
                       default='Pingpong',
