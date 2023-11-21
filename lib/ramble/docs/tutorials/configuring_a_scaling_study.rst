@@ -106,6 +106,28 @@ configuration file might look like the following now:
                   variables:
                     n_nodes: [1, 2, 4]
 
+At this point, you can attempt to view the experiments defined by this
+configuration file. To do this, use the following command:
+
+.. code-block:: console
+
+    $ ramble workspace info
+
+The output should tell you some required variable definitions are missing, as
+the configuration does not include some system level definitions. The output
+might look like the following:
+
+.. code-block:: console
+
+    ==> Warning: Required key "batch_submit" is not defined
+    ==> Warning: Required key "mpi_command" is not defined
+    ==> Warning: Required key "n_ranks" is not defined
+    ==> Warning: Required key "processes_per_node" is not defined
+    ==> Error: In experiment wrfv4.CONUS_12km.scaling_{n_nodes}: One or more required keys are not defined within an experiment.
+
+To remedy this issue, you need to define some system level variables in the
+following section.
+
 Configuring System Details
 --------------------------
 
@@ -129,9 +151,9 @@ manager (such as SLURM) the default value of ``{execute_experiment}`` is a good
 starting place, however this will execute all experiments sequentially. The
 ``mpi_command`` variable will take the ``mpirun`` command and any MPI specific
 variables you would like to use for your experiments. These vary based on the
-MPI implementation you wish to use, but good default might be ``mpirun -n
-{n_ranks}``. If you would like to add ``hostfile`` and ``ppn`` flags, feel free
-to do so here.
+MPI implementation you wish to use, but good default might be
+``mpirun -n {n_ranks}``. If you would like to add ``hostfile`` and ``ppn``
+flags, feel free to do so here.
 
 Your configuration file might look like the
 following after adding this information:
@@ -228,11 +250,6 @@ analyze the new experiments using:
     $ ramble on
     $ ramble workspace analyze
 
-**NOTE**: Since you changed the package definition for GROMACS, it will be
-recompiled (unless you compiled it outside of Ramble) during the ``ramble
-workspace setup`` command. This will likely take longer than changing
-experiments and performing setup again.
-
 This creates a ``results`` file in the root of the workspace that contains
 extracted figures of merit. If the experiments were successful, this file will
 show the following results:
@@ -243,3 +260,7 @@ show the following results:
 * Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep
 * Number of timesteps: Count of total timesteps performed
 * Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time
+
+Ramble also supports uploading the analyzed data to online databases, using
+``ramble workspace analyze --upload``. We will not cover this functionality in
+detail here, but it is very useful for production experiments.
