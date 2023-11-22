@@ -128,3 +128,11 @@ ramble.schema.workspace module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.schema.zips module
+-------------------------
+
+.. automodule:: ramble.schema.zips
+   :members:
+   :undoc-members:
+   :show-inheritance:
