@@ -22,20 +22,8 @@ import ramble.schema.variables
 import ramble.schema.success_criteria
 import ramble.schema.licenses
 import ramble.schema.modifiers
+import ramble.schema.zips
 
-
-zip_def = {
-    'type': 'array',
-    'default': [],
-    'items': {'type': 'string'}
-}
-
-zips_def = {
-    'type': 'object',
-    'default': {},
-    'properties': {},
-    'additionalProperties': zip_def
-}
 
 matrix_def = {
     'type': 'array',
@@ -88,10 +76,10 @@ exclude_def = {
     'default': {},
     'properties': union_dicts(
         ramble.schema.variables.properties,
+        ramble.schema.zips.properties,
         {
             'matrix': matrix_def,
             'matrices': matrices_def,
-            'zips': zips_def,
             'where': where_def,
         }
     ),
@@ -104,6 +92,7 @@ sub_props = union_dicts(
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,
+    ramble.schema.zips.properties,
     {
         'chained_experiments': chained_experiment_def,
         'template': {'type': 'boolean'},
@@ -145,7 +134,6 @@ properties = {
                                             'properties': union_dicts(
                                                 sub_props,
                                                 {
-                                                    'zips': zips_def,
                                                     'matrix': matrix_def,
                                                     'matrices': matrices_def,
                                                     'success_criteria': success_list_def,

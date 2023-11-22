@@ -87,6 +87,7 @@ section_schemas = {
     'success_criteria': ramble.schema.success_criteria.schema,
     'applications': ramble.schema.applications.schema,
     'variables': ramble.schema.variables.schema,
+    'zips': ramble.schema.zips.schema,
 }
 
 # Same as above, but including keys for workspaces

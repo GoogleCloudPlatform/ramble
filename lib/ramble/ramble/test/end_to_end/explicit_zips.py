@@ -35,10 +35,17 @@ ramble:
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
+  zips:
+    partitions:
+    - partition
+    - processes_per_node
   applications:
     wrfv4:
       variables:
         env_name: ['wrfv4', 'wrfv4-portable']
+      zips:
+        environments:
+        - env_name
       workloads:
         CONUS_12km:
           experiments:
@@ -66,12 +73,11 @@ ramble:
               variables:
                 n_nodes: ['1', '2', '4', '8', '16']
               zips:
-                partitions:
-                - partition
-                - processes_per_node
+                nodes:
+                - n_nodes
               matrix:
-              - n_nodes
-              - env_name
+              - nodes
+              - environments
               - partitions
   spack:
     concretized: true

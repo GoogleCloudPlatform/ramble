@@ -61,6 +61,7 @@ class ExperimentSet(object):
         workspace_context.env_variables = workspace.get_workspace_env_vars()
         workspace_context.internals = workspace.get_workspace_internals()
         workspace_context.modifiers = workspace.get_workspace_modifiers()
+        workspace_context.zips = workspace.get_workspace_zips()
 
         try:
             self.keywords.check_reserved_keys(workspace_context.variables)

@@ -14,6 +14,7 @@
 
 import ramble.schema.variables
 import ramble.schema.applications
+import ramble.schema.zips
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -25,6 +26,7 @@ properties = {
                 'default': False
             },
             'variables': ramble.schema.variables.variables_def,
+            'zips': ramble.schema.zips.zips_def,
             'packages': {
                 'type': 'object',
                 'additionalProperties': {
@@ -40,7 +42,7 @@ properties = {
                             'default': None,
                         },
                         'variables': ramble.schema.variables.variables_def,
-                        'zips': ramble.schema.applications.zips_def,
+                        'zips': ramble.schema.zips.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
                         'exclude': ramble.schema.applications.exclude_def,
@@ -66,7 +68,7 @@ properties = {
                             'default': []
                         },
                         'variables': ramble.schema.variables.variables_def,
-                        'zips': ramble.schema.applications.zips_def,
+                        'zips': ramble.schema.zips.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
                         'exclude': ramble.schema.applications.exclude_def,
