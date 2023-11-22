@@ -35,31 +35,6 @@ properties = {
         'properties': union_dicts(
             ramble.schema.merged.properties,
             {
-                'mpi': {
-                    'type': 'object',
-                    'properties': {
-                        'command': {
-                            'type': 'string'
-                        },
-                        'args': {
-                            'type': 'array',
-                            'items': {'type': 'string'},
-                            'default': []
-                        }
-                    },
-                    'additionalProperties': False,
-                    'default': {},
-                },
-                'batch': {
-                    'type': 'object',
-                    'properties': {
-                        'submit': {
-                            'type': 'string'
-                        },
-                    },
-                    'additionalProperties': False,
-                    'default': {}
-                },
                 'include': {
                     'type': 'array',
                     'default': [],
@@ -76,9 +51,6 @@ properties = {
         ),
         'additionalProperties': False,
     },
-    # TODO (dwj): Remove when non-config spack is removed
-    # DEPRECATED
-    'spack': ramble.schema.spack.properties['spack']  # To support non-config spack
 }
 
 
