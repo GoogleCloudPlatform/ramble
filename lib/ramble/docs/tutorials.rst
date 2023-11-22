@@ -25,4 +25,5 @@ various features.
     tutorials/using_vectors_and_matrices
     tutorials/changing_your_software_stack
     tutorials/configuring_a_scaling_study
+    tutorials/using_zips_and_matrices
     tutorials/mirrors
