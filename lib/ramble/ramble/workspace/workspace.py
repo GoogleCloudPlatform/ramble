@@ -1329,6 +1329,10 @@ class Workspace(object):
         """Return a dict of workspace modifiers"""
         return ramble.config.config.get_config('modifiers')
 
+    def get_workspace_zips(self):
+        """Return a dict of workspace zips"""
+        return ramble.config.config.get_config('zips')
+
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
         return ramble.config.config.get_config('spack')

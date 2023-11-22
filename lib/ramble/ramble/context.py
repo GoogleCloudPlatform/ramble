@@ -74,7 +74,7 @@ class Context(object):
         if in_context.exclude:
             self.exclude = in_context.exclude
         if in_context.zips:
-            self.zips = in_context.zips
+            self.zips.update(in_context.zips)
         if in_context.matrices:
             self.matrices = in_context.matrices
 

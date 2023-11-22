@@ -86,10 +86,15 @@ class SoftwareEnvironments(object):
         expander = ramble.expander.Expander({}, None)
 
         workspace_vars = self._workspace.get_workspace_vars().copy()
+        workspace_zips = self._workspace.get_workspace_zips().copy()
 
         if namespace.variables in self.spack_dict and \
                 self.spack_dict[namespace.variables] is not None:
             workspace_vars.update(self.spack_dict[namespace.variables])
+
+        if namespace.zips in self.spack_dict and \
+                self.spack_dict[namespace.zips] is not None:
+            workspace_zips.update(self.spack_dict[namespace.zips])
 
         if namespace.packages in self.spack_dict:
             for pkg_template, pkg_info in self.spack_dict[namespace.packages].items():
@@ -97,6 +102,7 @@ class SoftwareEnvironments(object):
                 self._package_map[pkg_template] = {}
                 pkg_group = ramble.renderer.RenderGroup('package', 'create')
                 pkg_group.variables.update(workspace_vars)
+                pkg_group.zips.update(workspace_zips)
                 pkg_group.from_dict(pkg_template, pkg_info)
 
                 pkg_group.variables['package_name'] = pkg_template
@@ -147,6 +153,7 @@ class SoftwareEnvironments(object):
             for env_template, env_info in self.spack_dict[namespace.environments].items():
                 env_group = ramble.renderer.RenderGroup('environment', 'create')
                 env_group.variables.update(workspace_vars)
+                env_group.zips.update(workspace_zips)
                 env_group.from_dict(env_template, env_info)
                 self._raw_environments[env_template] = env_info
                 self._environment_map[env_template] = {}
