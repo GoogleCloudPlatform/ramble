@@ -38,14 +38,11 @@ class IntelMpiBenchmarks(SpackApplication):
     required_package('intel-mpi-benchmarks')
 
     executable('pingpong',
-               '-genv I_MPI_FABRICS=shm:tcp '
-               '-genv I_MPI_PIN_PROCESSOR_LIST=0 '
                '{install_path}/IMB-MPI1 {pingpong_type} -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} {additional_args}',
                use_mpi=True)
 
     executable('multi-pingpong',
-               '-genv I_MPI_FABRICS=shm:tcp '
                '{install_path}/IMB-MPI1 Pingpong -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -multi {multi_val} -map {map_args} {additional_args}',
                use_mpi=True)
@@ -66,7 +63,6 @@ class IntelMpiBenchmarks(SpackApplication):
                       workloads=['multi-pingpong'])
 
     executable('collective',
-               '-genv I_MPI_FABRICS=shm:tcp '
                '{install_path}/IMB-MPI1 {collective_type} -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -npmin {min_collective_ranks} {additional_args}',
                use_mpi=True)
