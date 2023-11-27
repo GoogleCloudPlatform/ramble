@@ -27,4 +27,5 @@ various features.
     tutorials/configuring_a_scaling_study
     tutorials/using_zips_and_matrices
     tutorials/var_expansion_indirection_and_stack_parameterization
+    tutorials/using_modifiers
     tutorials/mirrors
