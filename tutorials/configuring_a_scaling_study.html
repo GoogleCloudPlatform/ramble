@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>6) Configuring a Scaling Study &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mirrors" href="mirrors.html" />
+    <link rel="prev" title="5) Changing A Software Stack" href="changing_your_software_stack.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using_vectors_and_matrices.html">4) Using Vectors and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changing_your_software_stack.html">5) Changing A Software Stack</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6) Configuring a Scaling Study</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-workspace">Create a Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#activate-the-workspace">Activate the Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decide-on-a-workload">Decide on a Workload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-experiment-definitions">Configure Experiment Definitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-system-details">Configuring System Details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#applying-the-default-software-configuration">Applying the Default Software Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">6) Configuring a Scaling Study</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/configuring_a_scaling_study.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuring-a-scaling-study">
+<span id="configuring-a-scaling-study-tutorial"></span><h1>6) Configuring a Scaling Study<a class="headerlink" href="#configuring-a-scaling-study" title="Link to this heading"></a></h1>
+<p>In this tutorial, you will learn how to create a workspace containing a scaling
+study for <a class="reference external" href="https://www.mmm.ucar.edu/models/wrf">WRF</a>, a free and open-source
+application for atmospheric research and operational forecasting applications.</p>
+<p>This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial’s content.</p>
+<section id="create-a-workspace">
+<h2>Create a Workspace<a class="headerlink" href="#create-a-workspace" title="Link to this heading"></a></h2>
+<p>To begin with, you need a workspace to configure the scaling study. This can be
+created with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>scaling_wrf
+</pre></div>
+</div>
+</section>
+<section id="activate-the-workspace">
+<h2>Activate the Workspace<a class="headerlink" href="#activate-the-workspace" title="Link to this heading"></a></h2>
+<p>Several of Ramble’s commands require an activated workspace to function
+properly. Activate the newly created workspace using the following command:
+(NOTE: you only need to run this if you do not currently have the workspace
+active).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>scaling_wrf
+</pre></div>
+</div>
+</section>
+<section id="decide-on-a-workload">
+<h2>Decide on a Workload<a class="headerlink" href="#decide-on-a-workload" title="Link to this heading"></a></h2>
+<p>Before you can setup this workspace, you’ll need to configure the experiments
+you want to execute. To begin with, select a workload from the output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>wrfv4
+</pre></div>
+</div>
+<p>For the purposes of this tutorial, the <code class="docutils literal notranslate"><span class="pre">CONUS_12km</span></code> workload is recommended
+because it is less computationally expensive than the <code class="docutils literal notranslate"><span class="pre">CONUS_2p5km</span></code> workload.</p>
+</section>
+<section id="configure-experiment-definitions">
+<h2>Configure Experiment Definitions<a class="headerlink" href="#configure-experiment-definitions" title="Link to this heading"></a></h2>
+<p>Now that you have selected a workload to use, edit the workspace configuration
+file. The workspace’s root location can be seen under the <code class="docutils literal notranslate"><span class="pre">Location</span></code> output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Additionally, the files can be edited directly with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>Within this file, configure the <code class="docutils literal notranslate"><span class="pre">applications</span></code> dictionary to describe the
+experiments you want to execute. The contents might look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>The next step in configuring the experiment definitions is to decide on an
+experiment name template. For the purposes of this tutorial, we’ll assume we
+only want to change the <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> variable definition in our scaling study,
+and as a result the experiment name template will only include this template
+parameter. However, you are free to add additional parameters based on the
+experiments you would like to perform. We will also assume <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> will
+take the values of <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code>, and <code class="docutils literal notranslate"><span class="pre">4</span></code>, however you should edit this for
+the system you are attempting to run these experiments on. The contents of the
+configuration file might look like the following now:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>At this point, you can attempt to view the experiments defined by this
+configuration file. To do this, use the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>The output should tell you some required variable definitions are missing, as
+the configuration does not include some system level definitions. The output
+might look like the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Warning: Required key &quot;batch_submit&quot; is not defined</span>
+<span class="go">==&gt; Warning: Required key &quot;mpi_command&quot; is not defined</span>
+<span class="go">==&gt; Warning: Required key &quot;n_ranks&quot; is not defined</span>
+<span class="go">==&gt; Warning: Required key &quot;processes_per_node&quot; is not defined</span>
+<span class="go">==&gt; Error: In experiment wrfv4.CONUS_12km.scaling_{n_nodes}: One or more required keys are not defined within an experiment.</span>
+</pre></div>
+</div>
+<p>To remedy this issue, you need to define some system level variables in the
+following section.</p>
+</section>
+<section id="configuring-system-details">
+<h2>Configuring System Details<a class="headerlink" href="#configuring-system-details" title="Link to this heading"></a></h2>
+<p>Within Ramble configuration files, it is generally a good practice to keep your
+system level details as close to the top level as possible within a
+<code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> workspace configuration file.</p>
+<p>Currently, your configuration file describes a scaling study, but does not
+define additional important details such as how many MPI ranks you want in each
+experiment (defined by the <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> variable), or how many MPI ranks should
+execute on each node (defined by the <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> variable). You
+should add these details as workspace variables within your configuration file.
+For the purposes of this tutorial, we will assume 4 MPI ranks per node and that
+the number of MPI ranks total will be the number of MPI ranks per node
+multiplied by the number of nodes.</p>
+<p>Additionally, you need to define <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> and <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code>
+variables. The <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> variable will take a command template that can
+be used to actually execute the experiment. For use outside of a workload
+manager (such as SLURM) the default value of <code class="docutils literal notranslate"><span class="pre">{execute_experiment}</span></code> is a good
+starting place, however this will execute all experiments sequentially. The
+<code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> variable will take the <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> command and any MPI specific
+variables you would like to use for your experiments. These vary based on the
+MPI implementation you wish to use, but good default might be
+<code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">{n_ranks}</span></code>. If you would like to add <code class="docutils literal notranslate"><span class="pre">hostfile</span></code> and <code class="docutils literal notranslate"><span class="pre">ppn</span></code>
+flags, feel free to do so here.</p>
+<p>Your configuration file might look like the
+following after adding this information:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p><strong>NOTE</strong> The value of the <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> variable is escaped using single quotes.
+This is because YAML interprets the <code class="docutils literal notranslate"><span class="pre">{</span></code> character as beginning a dictionary,
+so we need to escape it to convert it to a string.</p>
+</section>
+<section id="applying-the-default-software-configuration">
+<h2>Applying the Default Software Configuration<a class="headerlink" href="#applying-the-default-software-configuration" title="Link to this heading"></a></h2>
+<p>At this point, you have fully describe the experiments you would like to
+perform, but have not defined the software stack that should be used for these
+experiments. Every Ramble application definition file should contain a
+suggested starting place for the experiments. To apply this to your workspace, use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>concretize
+</pre></div>
+</div>
+<p>This will fill out the <code class="docutils literal notranslate"><span class="pre">spack</span></code> dictionary within your workspace configuration
+file. After executing this command, your workspace configuration file might
+look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>At this point, you have fully described experiments that can be executed.
+However, your system might not have the correct compiler (and building a
+compiler could be costly). The <code class="docutils literal notranslate"><span class="pre">gcc9</span></code> package definition can be updated to
+refer to a compiler you already have on your system. These can be viewed using
+the <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compiler</span> <span class="pre">list</span></code> command. Edit the <code class="docutils literal notranslate"><span class="pre">gcc9</span></code> package definition as
+you see fit, and make sure the <code class="docutils literal notranslate"><span class="pre">gcc9</span></code> references under <code class="docutils literal notranslate"><span class="pre">intel-mpi</span></code> and
+<code class="docutils literal notranslate"><span class="pre">wrfv4</span></code> are updated appropriately as well.</p>
+</section>
+<section id="execute-experiments">
+<h2>Execute Experiments<a class="headerlink" href="#execute-experiments" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Average Timestep Time: Time (in seconds) on average each timestep takes</p></li>
+<li><p>Cumulative Timestep Time: Time (in seconds) spent executing all timesteps</p></li>
+<li><p>Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep</p></li>
+<li><p>Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep</p></li>
+<li><p>Number of timesteps: Count of total timesteps performed</p></li>
+<li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
+</ul>
+<p>Ramble also supports uploading the analyzed data to online databases, using
+<code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span> <span class="pre">--upload</span></code>. We will not cover this functionality in
+detail here, but it is very useful for production experiments.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="changing_your_software_stack.html" class="btn btn-neutral float-left" title="5) Changing A Software Stack" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mirrors.html" class="btn btn-neutral float-right" title="Mirrors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Nov 27, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

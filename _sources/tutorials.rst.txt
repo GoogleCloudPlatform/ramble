@@ -24,4 +24,5 @@ various features.
     tutorials/modifying_a_gromacs_experiment
     tutorials/using_vectors_and_matrices
     tutorials/changing_your_software_stack
+    tutorials/configuring_a_scaling_study
     tutorials/mirrors
