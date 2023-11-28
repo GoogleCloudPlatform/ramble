@@ -13,7 +13,8 @@
 =======================================================================
 
 In this tutorial, you will learn how to use variable expansion, indirection,
-and software stack parameterization when generating experiments for
+and software stack parameterization when generating experiments. For this
+tutorial, we will use
 `WRF <https://www.mmm.ucar.edu/models/wrf>`_, a free and open-source
 application for atmospheric research and operational forecasting applications.
 
@@ -66,7 +67,6 @@ final configuration from the previous tutorial.
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -106,7 +106,8 @@ final configuration from the previous tutorial.
             - wrfv4
 
 The above configuration will execute 6 experiments, comprising a basic scaling
-study on three different sets of nodes across two different platforms.
+study on three different sets of nodes across two different platforms. This
+configuration was the final result of the :ref:`zips_and_matrices` tutorial.
 
 You will expand this definition to perform the same sweep over multiple MPI
 implementations. Over the course of this tutorial, you will learn how to use
@@ -160,7 +161,6 @@ generation as well. The result might look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -228,7 +228,6 @@ into the matrix. The result might look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -330,15 +329,18 @@ resulting configuration might look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
         platform: ['platform1', 'platform2']
         processes_per_node: ['2', '4']
+
+        # Execution Template
+        batch_submit: '{execute_experiment}'
+        mpi_command: 'mpirun {{mpi_name}_args}'
+
+        # Experiment Expansions
         mpi_name: ['intel-mpi', 'openmpi']
         intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
         openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node'
-        mpi_command: 'mpirun {{mpi_name}_args}'
       zips:
         platform_config:
         - platform
@@ -409,15 +411,18 @@ The resulting configuration file might look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
         platform: ['platform1', 'platform2']
         processes_per_node: ['2', '4']
+
+        # Execution Template
+        batch_submit: '{execute_experiment}'
+        mpi_command: 'mpirun {{mpi_name}_args}'
+
+        # Experiment Expansions
         mpi_name: ['intel-mpi', 'openmpi']
         intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
         openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node'
-        mpi_command: 'mpirun {{mpi_name}_args}'
       zips:
         platform_config:
         - platform

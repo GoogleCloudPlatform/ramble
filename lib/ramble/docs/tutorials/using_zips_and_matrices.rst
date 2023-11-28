@@ -13,7 +13,7 @@
 ==============================
 
 In this tutorial, you will learn how to generate a more comprehensive set of
-experiments using zips and matrices for
+experiments using zips and matrices. For this tutorial we will use
 `WRF <https://www.mmm.ucar.edu/models/wrf>`_, a free and open-source
 application for atmospheric research and operational forecasting applications.
 
@@ -97,7 +97,9 @@ final configuration from the previous tutorial.
             - wrfv4
 
 The above configuration will execute 3 experiments, comprising a basic scaling
-study on three different sets of nodes.
+study on three different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented at :ref:`ramble-vector-logic`. Vector
+experiments were also introduced in :ref:`vector_and_matrix_tutorial`.
 
 We will now expand this to perform more experiments using the zip
 (:ref:`ramble-explicit-zips`) and matrix (:ref:`ramble-matrix-logic`)
@@ -140,7 +142,6 @@ the above section. The result should look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -226,7 +227,6 @@ should have the following in your ``ramble.yaml``:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -287,7 +287,6 @@ Your final configuration file should look something like:
 
     ramble:
       variables:
-        processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
