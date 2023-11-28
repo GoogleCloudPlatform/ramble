@@ -19,14 +19,15 @@ various features.
     :maxdepth: 1
     :caption: Tutorials
 
-    tutorials/hello_world
-    tutorials/running_a_simple_gromacs_experiment
-    tutorials/modifying_a_gromacs_experiment
-    tutorials/using_vectors_and_matrices
-    tutorials/changing_your_software_stack
-    tutorials/configuring_a_scaling_study
-    tutorials/using_zips_and_matrices
-    tutorials/var_expansion_indirection_and_stack_parameterization
-    tutorials/using_modifiers
-    tutorials/using_internals
+    tutorials/1_hello_world
+    tutorials/2_running_a_simple_gromacs_experiment
+    tutorials/3_modifying_a_gromacs_experiment
+    tutorials/4_using_vectors_and_matrices
+    tutorials/5_changing_your_software_stack
+    tutorials/6_configuring_a_scaling_study
+    tutorials/7_using_zips_and_matrices
+    tutorials/8_var_expansion_indirection_and_stack_parameterization
+    tutorials/9_success_criteria
+    tutorials/10_using_modifiers
+    tutorials/11_using_internals
     tutorials/mirrors

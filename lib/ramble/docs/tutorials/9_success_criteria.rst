@@ -6,14 +6,14 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 
-.. _internals_tutorial:
+.. _success-criteria_tutorial:
 
-============
-9) Internals
-============
+===================
+9) Success Criteria
+===================
 
-In this tutorial, you will learn how to use ``internals`` within experiments
-for
+In this tutorial, you will learn how to use success criteria. These will be
+created and applied to experiments for
 `WRF <https://www.mmm.ucar.edu/models/wrf>`_, a free and open-source
 application for atmospheric research and operational forecasting applications.
 
@@ -28,7 +28,7 @@ created with the following command:
 
 .. code-block:: console
 
-    $ ramble workspace create internals_wrf
+    $ ramble workspace create success_wrf
 
 
 Activate the Workspace
@@ -41,7 +41,7 @@ active).
 
 .. code-block:: console
 
-    $ ramble workspace activate internals_wrf
+    $ ramble workspace activate success_wrf
 
 Configure Experiment Definitions
 --------------------------------
@@ -101,66 +101,58 @@ study on three different sets of nodes. This is primarily defined by the use of
 vector experiments, which are documented at :ref:`ramble-vector-logic`. Vector
 experiments were also introduced in :ref:`vector_and_matrix_tutorial`.
 
-Experiment Internals
---------------------
 
-In Ramble, the concept of ``internals`` allows a user to override some aspects
-of a workload within the workspace configuration file. More information about
-``internals`` can be seen at :ref:`workspace_internals`.
+Success Criteria
+----------------
 
-The ``internals`` block within a workspace configuration file can be used to
-define custom executables, and control the order of executables within an
-experiment.
+Ramble provides you with the ability to define success criteria within an
+application's ``application.py`` file, or within the ``success_criteria``
+configuration scope (which can also be defined in a workspace's ``ramble.yaml``
+configuration file). There are three supported types of success criteria,
+including:
 
-In this tutorial, you will define new executables for tracking the start and
-end timestamp of each experiment, and properly inject these into the experiment
-order.
+ #. Regular Expression String Matching
+ #. Figure of Merit Logic Based
+ #. Arbitrary Python Based
 
-Define New Executables
-~~~~~~~~~~~~~~~~~~~~~~
+This tutorial will focus on the first two of these, as the third can only be
+defined within the ``application.py`` file.
 
-The definition of a new executable lives within an ``internals`` block. Below
-is an example of defining a new executable called ``start_time`` which time in
-seconds since 1970-01-01 00:00 UTC:
+For more in-depth documentation about success criteria, see
+:ref:`success-criteria`.
+
+Regular Expression String Matching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The most common success criteria is the regular expression based string
+matching. These can be defined within either the ``application.py`` or the
+``success_criteria`` configuration scope. Several ``application.py`` files
+already define this type of success criteria in order to make it easier for
+users to be sure their experiments completed successfully.
+
+When WRF runs, it outputs the time each timestep takes. To begin with, you will
+define a new success criteria within your workspace configuration file that
+validates some timing data is present in the output an experiment. In the
+experiment output, the timing data is prefixed with the string
+``Timing for main``.
+
+This success criteria might look like the following:
 
 .. code-block:: YAML
 
-    internals:
-      custom_executables:
-        start_time:
-          template:
-          - 'date +%s'
-          use_mpi: false
-          redirect: '{experiment_run_dir}/start_time'
+    success_criteria:
+    - name: 'timing-present'
+      mode: 'string'
+      match: 'Timing for main.*'
 
-Within this ``start_time`` definition, the ``template`` attribute takes a list
-of strings which will be injected as part of this executable. The ``use_mpi``
-attribute tells Ramble if this executable apply the ``mpi_command`` variable
-definition as a prefix to every entry of the ``template`` attribute. The
-``redirect`` attribute defines the file each portion of ``template`` should be
-redirected into.
-
-Not shown above is the ``output_capture`` attribute, which defines the operator
-used for capturing the output from the portions of ``template`` (the default is
-``&>``).
-
-By default, this would define the actual command to be:
-
-.. code-block:: console
-
-    date +%s &> {experiment_run_dir}/start_time
-
-
-Edit your workspace configuration file using:
+Edit your workspace configuration file with:
 
 .. code-block:: console
 
     $ ramble workspace edit
 
-Within this file, use the example above to define two new executables
-``start_time`` and ``end_time``. Make sure you change the value of ``redirect``
-in the ``end_time`` executable definition. The resulting file should look like
-the following:
+And add the example block within the ``wrfv4`` application block. The resulting
+configuration file might look like the following:
 
 .. code-block:: YAML
 
@@ -172,22 +164,14 @@ the following:
         mpi_command: mpirun -n {n_ranks}
       applications:
         wrfv4:
+          success_criteria:
+          - name: 'timing-present'
+            mode: 'string'
+            match: 'Timing for main.*'
           workloads:
             CONUS_12km:
               experiments:
                 scaling_{n_nodes}:
-                  internals:
-                    custom_executables:
-                      start_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/start_time'
-                        use_mpi: false
-                      end_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/end_time'
-                        use_mpi: false
                   variables:
                     n_nodes: [1, 2, 4]
       spack:
@@ -208,53 +192,36 @@ the following:
             - intel-mpi
             - wrfv4
 
-Defining Executable Order
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Placing the success criteria definition here applies it to all of the
+experiments defined within the ``wrfv4`` application.
 
-At this point, ``start_time`` and ``end_time`` are defined as new executables,
-however they are not added to your experiments. To verify this, execute:
+Figure of Merit Logic Based
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: console
+In addition to string matching, Ramble allows you to define a figure of merit
+based success criteria. These success criteria can be defined as equations that
+include placeholders for figures of merit the application will generate.
 
-    $ ramble workspace setup --dry-run
+In this portion of the tutorial, you will define a new success criteria that
+ensures the experiments all have at least 50 timesteps to be considered
+successful. The figure of merit definition for this might look like the follow:
 
-and examine the ``execute_experiment`` scripts in your experiment directories.
-``date +%s`` should not be present in any of these. To fix this issue, we need
-to modify the order of the executables for the workload your experiments are
-using.
+.. code-block:: YAML
 
-Currently, when controlling the order of executables, the entire order of
-executables must be defined. To see the current list of executables for your
-experiments, execute:
+    success_criteria:
+    - name: 'correct-timesteps'
+      mode: 'fom_comparison'
+      fom_name: 'Number of timesteps'
+      formula: '{value} >= 50'
 
-.. code-block:: console
-
-    $ ramble info wrfv4
-
-
-And examine the section under the ``Workload: CONUS_12km`` header. The
-``Executables:`` definition lists the order of executables used for this
-workload. As an example, you might see the following:
-
-.. code-block:: console
-
-    Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'cleanup', 'copy', 'fix_12km', 'execute']
-
-Now, edit the workspace configuration file with:
+Edit your workspace configuration using:
 
 .. code-block:: console
 
     $ ramble workspace edit
 
-And define the order of the executables for your experiments to include
-``start_time`` and ``end_time`` in the correct locations. To do this, add a
-``executables`` attribute to the ``internals`` dictionary. The contents of
-``executables`` are a list of executable names provided in the order you
-want them to be executed.
-
-For the purposes of this tutorial, add ``start_time`` directly before
-``execute`` and ``end_time`` directly after ``exectute``. The resulting
-configuration file should look like the following:
+And add the success criteria within the ``CONUS_12km`` workload definition. The
+resulting configuration file might look like the following:
 
 .. code-block:: YAML
 
@@ -266,32 +233,19 @@ configuration file should look like the following:
         mpi_command: mpirun -n {n_ranks}
       applications:
         wrfv4:
+          success_criteria:
+          - name: 'timing-present'
+            mode: 'string'
+            match: 'Timing for main.*'
           workloads:
             CONUS_12km:
+              success_criteria:
+              - name: 'correct-timesteps'
+                mode: 'fom_comparison'
+                fom_name: 'Number of timesteps'
+                formula: '{value} >= 50'
               experiments:
                 scaling_{n_nodes}:
-                  internals:
-                    custom_executables:
-                      start_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/start_time'
-                        use_mpi: false
-                      end_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/end_time'
-                        use_mpi: false
-                    executables:
-                    - builtin::env_vars
-                    - builtin::spack_source
-                    - builtin::spack_activate
-                    - cleanup
-                    - copy
-                    - fix_12km
-                    - start_time
-                    - execute
-                    - end_time
                   variables:
                     n_nodes: [1, 2, 4]
       spack:
@@ -312,8 +266,30 @@ configuration file should look like the following:
             - intel-mpi
             - wrfv4
 
-**NOTE** Omitting any executables from the ``executables`` list will
-prevent it from being used in the generated experiments.
+This new success criteria will apply to all experiments within the
+``CONUS_12km`` workload. This is because different workloads could have
+different numbers of timesteps.
+
+It is important to note that the ``formula`` attribute of the success criteria
+definition can refer to other variables. As an example, one of the figures of
+merit output by the ``wrfv4`` application definition is
+``Average Timestep Time``. If you had a single node value for this figure of
+merit and expected this to scale linerally you could define a success criteria
+as follows:
+
+.. code-block:: YAML
+
+    variables:
+      single_node_value: '1.0'
+    success_criteria:
+    - name: 'valid-scaling'
+      mode: 'fom_comparison'
+      fom_name: 'Average Timestep Time'
+      formula: '{value} <= {single_node_value} / {n_nodes}'
+
+You won't test this success criteria in this tutorial, as the
+``single_node_value`` might not be correct for your system, but feel free to
+explore using this after you perform experiments.
 
 Execute Experiments
 -------------------
@@ -338,5 +314,13 @@ show the following results:
 * Number of timesteps: Count of total timesteps performed
 * Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time
 
-Examining the experiment run directories, you should see ``start_time`` and
-``end_time`` files which contain the output of our custom executables.
+To ensure the success criteria are checked and the experiments pass them,
+ensure ``SUCCESS`` is printed for the status of each experiment. Also, running
+analyze in debug mode as:
+
+.. code-block:: console
+
+    $ ramble -d workspace analyze
+
+Will print significnatly more output, but you should see where Ramble tests the
+``timing-present`` and ``correct-timesteps`` success criteria in the output.
