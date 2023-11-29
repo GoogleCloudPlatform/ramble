@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>8) Variable Expansion, Indirection, and Software Stack Parameterization &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mirrors" href="mirrors.html" />
+    <link rel="prev" title="7) Zips and Matrices" href="using_zips_and_matrices.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using_vectors_and_matrices.html">4) Using Vectors and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changing_your_software_stack.html">5) Changing A Software Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_a_scaling_study.html">6) Configuring a Scaling Study</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using_zips_and_matrices.html">7) Zips and Matrices</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">8) Variable Expansion, Indirection, and Software Stack Parameterization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-workspace">Create a Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#activate-the-workspace">Activate the Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-experiment-definitions">Configure Experiment Definitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#define-additional-mpi-and-parameterize-software-environments">Define Additional MPI and Parameterize Software Environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-expansion-and-indirection">Variable Expansion and Indirection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#controlling-experiment-software-environments">Controlling Experiment Software Environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dry-run-setup">Dry Run Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">8) Variable Expansion, Indirection, and Software Stack Parameterization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/var_expansion_indirection_and_stack_parameterization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="variable-expansion-indirection-and-software-stack-parameterization">
+<span id="variable-expansion-and-indirection-and-stack-parameterization-tutorial"></span><h1>8) Variable Expansion, Indirection, and Software Stack Parameterization<a class="headerlink" href="#variable-expansion-indirection-and-software-stack-parameterization" title="Link to this heading"></a></h1>
+<p>In this tutorial, you will learn how to use variable expansion, indirection,
+and software stack parameterization when generating experiments. For this
+tutorial, we will use
+<a class="reference external" href="https://www.mmm.ucar.edu/models/wrf">WRF</a>, a free and open-source
+application for atmospheric research and operational forecasting applications.</p>
+<p>This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial’s content.</p>
+<section id="create-a-workspace">
+<h2>Create a Workspace<a class="headerlink" href="#create-a-workspace" title="Link to this heading"></a></h2>
+<p>To begin with, you need a workspace to configure the experiments. This can be
+created with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>var_expansion_and_indirection
+</pre></div>
+</div>
+</section>
+<section id="activate-the-workspace">
+<h2>Activate the Workspace<a class="headerlink" href="#activate-the-workspace" title="Link to this heading"></a></h2>
+<p>Several of Ramble’s commands require an activated workspace to function
+properly. Activate the newly created workspace using the following command:
+(NOTE: you only need to run this if you do not currently have the workspace
+active).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>var_expansion_and_indirection
+</pre></div>
+</div>
+</section>
+<section id="configure-experiment-definitions">
+<h2>Configure Experiment Definitions<a class="headerlink" href="#configure-experiment-definitions" title="Link to this heading"></a></h2>
+<p>To being with, you need to configure the workspace. The workspace’s root
+location can be seen under the <code class="docutils literal notranslate"><span class="pre">Location</span></code> output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Additionally, the files can be edited directly with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which are the
+final configuration from the previous tutorial.</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>The above configuration will execute 6 experiments, comprising a basic scaling
+study on three different sets of nodes across two different platforms. This
+configuration was the final result of the <span class="xref std std-ref">zips_and_matrices</span> tutorial.</p>
+<p>You will expand this definition to perform the same sweep over multiple MPI
+implementations. Over the course of this tutorial, you will learn how to use
+variable expansion and indirection to construct more complex experiments.</p>
+</section>
+<section id="define-additional-mpi-and-parameterize-software-environments">
+<h2>Define Additional MPI and Parameterize Software Environments<a class="headerlink" href="#define-additional-mpi-and-parameterize-software-environments" title="Link to this heading"></a></h2>
+<p>To begin with, you will parameterize the software stack definitions to generate
+experiments using both IntelMPI and OpenMPI. For this section, you can focus on
+the <code class="docutils literal notranslate"><span class="pre">spack</span></code> portion of the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> configuration file. For more
+information on how this section is constructed, see the <a class="reference internal" href="../configuration_files.html#spack-config"><span class="std std-ref">Spack config
+section</span></a> documentation.</p>
+<p>To start with, you will create an OpenMPI package definition. This might look
+like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">openmpi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.6</span>
+</pre></div>
+</div>
+<p>In the definition of the Intel MPI package above, you’ll see we originally
+specified a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute (with the value of <code class="docutils literal notranslate"><span class="pre">gcc9</span></code>). This can be
+explicitly selected if you like, however Ramble generates Spack environments
+with <code class="docutils literal notranslate"><span class="pre">unify:</span> <span class="pre">true</span></code>
+(See <a class="reference external" href="https://spack.readthedocs.io/en/latest/environments.html#spec-concretization">Spack’s environment documentation</a>
+for more details). As a result, OpenMPI should be compiled with the same
+compiler used for WRF.</p>
+<p>We also need to generate additional software environments, however we will
+parameterize the generation of these using a new variable definition.</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">wrfv4-{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">mpi_name</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+<span class="w">    </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">mpi_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;intel-mpi&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;openmpi&#39;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Will create two software environments. One named <code class="docutils literal notranslate"><span class="pre">wrfv4-intel-mpi</span></code> and
+another named <code class="docutils literal notranslate"><span class="pre">wrfv4-openmpi</span></code>. The definition of <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code> can be hoisted
+to the workspace level, however we need to include it in the experiment
+generation as well. The result might look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">mpi_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;intel-mpi&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;openmpi&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.6</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">wrfv4-{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{mpi_name}&#39;</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p><strong>NOTE</strong> The reference to <code class="docutils literal notranslate"><span class="pre">{mpi_name}</span></code> within the environment package list is
+escaped using single quotes. This is to prevent YAML from parsing this as a
+dictionary.</p>
+<p>At this point, executing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Should result in the following error:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Experiment wrfv4.CONUS_12km.scaling_1_platform1 is not unique.</span>
+</pre></div>
+</div>
+<p>As you have implicitly defined 12 experiments (3 from <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, times 2 from
+<code class="docutils literal notranslate"><span class="pre">platform_config</span></code>, times another 2 from <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>), but you haven’t
+updated the experiment name template. To resolve this, add <code class="docutils literal notranslate"><span class="pre">{mpi_name}</span></code> into
+the experiment name template. Additionally, you may explicitly add <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>
+into the matrix. The result might look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">mpi_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;intel-mpi&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;openmpi&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}_{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi_name</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.6</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">wrfv4-{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{mpi_name}&#39;</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+</section>
+<section id="variable-expansion-and-indirection">
+<h2>Variable Expansion and Indirection<a class="headerlink" href="#variable-expansion-and-indirection" title="Link to this heading"></a></h2>
+<p>At this stage, you have defined a workspace that will execute 12 experiments.
+It is important to point out that different MPI implementations have different
+command line flags for controlling their behavior. The existing <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code>
+should work fine with both Intel MPI, and OpenMPI but to illustrate how
+variable expansion and indirection can be used you will now add a flag to
+control the number of MPI ranks per compute node.</p>
+<p>For Intel MPI this is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-ppn {processes_per_node}</span>
+</pre></div>
+</div>
+<p>While in OpenMPI this is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--map-by ppr:{processes_per_node}:node</span>
+</pre></div>
+</div>
+<p>One way to define this is to define <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> as a list variable, with
+the appropriate MPI command line arguments. Then you can define an explicit zip
+that combines <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> and <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>. However, for the purposes of
+this tutorial you will instead use variable expansion and indirection to lookup
+variable definitions.</p>
+<p>In Ramble, every variable can be defines as a combination of other variables. For example:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">  </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+</pre></div>
+</div>
+<p>Would result in <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> having a value of 8, as each of the variable
+references are expanded and then the math is evaluated.</p>
+<p>Additionally, variable references are allowed to be nested to parameterize
+which variables you want to use. For example:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">intel-mpi_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;--np</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">--map-by</span><span class="nv"> </span><span class="s">ppr:{processes_per_node}:node&#39;</span>
+<span class="w">  </span><span class="nt">openmpi_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">{{mpi_name}_args}&#39;</span>
+</pre></div>
+</div>
+<p>Allows the <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> definition to change based on the definition of
+<code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>. This is called variable indirection. If we employ variable
+indirection to help parameterize the MPI arguments as shown above, the
+resulting configuration might look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+
+<span class="w">    </span><span class="c1"># Execution Template</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">{{mpi_name}_args}&#39;</span>
+
+<span class="w">    </span><span class="c1"># Experiment Expansions</span>
+<span class="w">    </span><span class="nt">mpi_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;intel-mpi&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;openmpi&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">intel-mpi_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="w">    </span><span class="nt">openmpi_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;--np</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">--map-by</span><span class="nv"> </span><span class="s">ppr:{processes_per_node}:node&#39;</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}_{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi_name</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.6</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">wrfv4-{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{mpi_name}&#39;</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>At this point, you have described the 12 experiments you want to run, however
+they are still not completely defined. Running:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+<p>Should result in the following error:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Environment wrfv4 is not defined.</span>
+</pre></div>
+</div>
+<p>This is because the default software environment every application uses is
+named the same as the application (in this case, both would be named
+<code class="docutils literal notranslate"><span class="pre">wrfv4</span></code>). You changed the name of the software environment, but didn’t
+connect each experiment to the proper environment.</p>
+</section>
+<section id="controlling-experiment-software-environments">
+<h2>Controlling Experiment Software Environments<a class="headerlink" href="#controlling-experiment-software-environments" title="Link to this heading"></a></h2>
+<p>To control the software environment used within an experiment, Ramble allows
+you to use the <code class="docutils literal notranslate"><span class="pre">env_name</span></code> variable definition. Because <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code> is a list
+variable, you might want <code class="docutils literal notranslate"><span class="pre">env_name</span></code> to be a list that is zipped with
+<code class="docutils literal notranslate"><span class="pre">mpi_name</span></code> to make sure they are iterated over together. However, you may
+also utilize variable indirection / expansion to fix this issue. For the
+purposes of this tutorial, we will use indirection instead of explicit zips.</p>
+<p>The resulting configuration file might look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+
+<span class="w">    </span><span class="c1"># Execution Template</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">{{mpi_name}_args}&#39;</span>
+
+<span class="w">    </span><span class="c1"># Experiment Expansions</span>
+<span class="w">    </span><span class="nt">mpi_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;intel-mpi&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;openmpi&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">intel-mpi_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="w">    </span><span class="nt">openmpi_args</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;--np</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">--map-by</span><span class="nv"> </span><span class="s">ppr:{processes_per_node}:node&#39;</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}_{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">env_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;wrfv4-{mpi_name}&#39;</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi_name</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.6</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">wrfv4-{mpi_name}</span><span class="p p-Indicator">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{mpi_name}&#39;</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>In this case, we defined <code class="docutils literal notranslate"><span class="pre">env_name</span></code> to be <code class="docutils literal notranslate"><span class="pre">wrfv4-{mpi_name}</span></code> which matches
+the definition of the software environments.</p>
+</section>
+<section id="dry-run-setup">
+<h2>Dry Run Setup<a class="headerlink" href="#dry-run-setup" title="Link to this heading"></a></h2>
+<p>Before executing the experiments, you can perform:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+<p>And examine the contents of the rendered <code class="docutils literal notranslate"><span class="pre">execute_experiment</span></code> scripts in some
+experiment directories. Looking at these, you should see the correct MPI
+arguments within the relevant experiments.</p>
+</section>
+<section id="execute-experiments">
+<h2>Execute Experiments<a class="headerlink" href="#execute-experiments" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Average Timestep Time: Time (in seconds) on average each timestep takes</p></li>
+<li><p>Cumulative Timestep Time: Time (in seconds) spent executing all timesteps</p></li>
+<li><p>Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep</p></li>
+<li><p>Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep</p></li>
+<li><p>Number of timesteps: Count of total timesteps performed</p></li>
+<li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="using_zips_and_matrices.html" class="btn btn-neutral float-left" title="7) Zips and Matrices" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mirrors.html" class="btn btn-neutral float-right" title="Mirrors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Nov 29, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
