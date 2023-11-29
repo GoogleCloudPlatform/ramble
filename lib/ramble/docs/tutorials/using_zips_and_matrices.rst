@@ -1,0 +1,353 @@
+.. Copyright 2022-2023 Google LLC
+
+   Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+   https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+   <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+   option. This file may not be copied, modified, or distributed
+   except according to those terms.
+
+.. _zips_and_matrices_tutorial:
+
+==============================
+7) Zips and Matrices
+==============================
+
+In this tutorial, you will learn how to generate a more comprehensive set of
+experiments using zips and matrices. For this tutorial we will use
+`WRF <https://www.mmm.ucar.edu/models/wrf>`_, a free and open-source
+application for atmospheric research and operational forecasting applications.
+
+This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial's content.
+
+Create a Workspace
+------------------
+
+To begin with, you need a workspace to configure the experiments. This can be
+created with the following command:
+
+.. code-block:: console
+
+    $ ramble workspace create zips_and_matrices_wrf
+
+
+Activate the Workspace
+----------------------
+
+Several of Ramble's commands require an activated workspace to function
+properly. Activate the newly created workspace using the following command:
+(NOTE: you only need to run this if you do not currently have the workspace
+active).
+
+.. code-block:: console
+
+    $ ramble workspace activate zips_and_matrices_wrf
+
+Configure Experiment Definitions
+--------------------------------
+
+To being with, you need to configure the workspace. The workspace's root
+location can be seen under the ``Location`` output of:
+
+.. code-block:: console
+
+    $ ramble workspace info
+
+Additionally, the files can be edited directly with:
+
+.. code-block:: console
+
+    $ ramble workspace edit
+
+Within the ``ramble.yaml`` file, write the following contents, which are the
+final configuration from the previous tutorial.
+
+.. code-block:: YAML
+
+    ramble:
+      variables:
+        processes_per_node: 4
+        n_ranks: '{processes_per_node}*{n_nodes}'
+        batch_submit: '{execute_experiment}'
+        mpi_command: mpirun -n {n_ranks}
+      applications:
+        wrfv4:
+          workloads:
+            CONUS_12km:
+              experiments:
+                scaling_{n_nodes}:
+                  variables:
+                    n_nodes: [1, 2, 4]
+      spack:
+        concretized: true
+        packages:
+          gcc9:
+            spack_spec: gcc@9.3.0
+          intel-mpi:
+            spack_spec: intel-mpi@2018.4.274
+            compiler: gcc9
+          wrfv4:
+            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+              ~pnetcdf
+            compiler: gcc9
+        environments:
+          wrfv4:
+            packages:
+            - intel-mpi
+            - wrfv4
+
+The above configuration will execute 3 experiments, comprising a basic scaling
+study on three different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented at :ref:`ramble-vector-logic`. Vector
+experiments were also introduced in :ref:`vector_and_matrix_tutorial`.
+
+We will now expand this to perform more experiments using the zip
+(:ref:`ramble-explicit-zips`) and matrix (:ref:`ramble-matrix-logic`)
+functionality in Ramble.
+
+Construct Platforms Zip
+-----------------------
+
+For the purposes of this tutorial, you will construct a zip representing
+multiple platforms. The platforms will differ by their value of the
+``processes_per_node`` variable.
+
+Zips are explicit groupings of variables, that are combined into a larger
+variable set. A zip is defined by a list of variable definitions, where each
+individual variable is a list / vector variable and all variables are the same
+length. As an example, imagine we had the following variable / zip definitions:
+
+.. code-block:: YAML
+
+    variables:
+      platform: ['platform1', 'platform2']
+      processes_per_node: ['2', '4']
+    zips:
+      platform_config:
+      - platform
+      - processes_per_node
+
+The result of this is that ``platform_config`` would be a list of length 2. The
+first index would contain ``(platform1, 2)`` and the second index would contain
+``(platform2, 4)``. Using this, we can group an arbitrary number of variables
+into a single name.
+
+For the purposes of this tutorial, we'll assume your system has 4 total cores,
+allowing us to use the platform definitions from the above YAML.
+
+Edit your workspace configuration file to include the ``platform_config`` from
+the above section. The result should look like the following:
+
+.. code-block:: YAML
+
+    ramble:
+      variables:
+        n_ranks: '{processes_per_node}*{n_nodes}'
+        batch_submit: '{execute_experiment}'
+        mpi_command: mpirun -n {n_ranks}
+        platform: ['platform1', 'platform2']
+        processes_per_node: ['2', '4']
+      zips:
+        platform_config:
+        - platform
+        - processes_per_node
+      applications:
+        wrfv4:
+          workloads:
+            CONUS_12km:
+              experiments:
+                scaling_{n_nodes}:
+                  variables:
+                    n_nodes: [1, 2, 4]
+      spack:
+        concretized: true
+        packages:
+          gcc9:
+            spack_spec: gcc@9.3.0
+          intel-mpi:
+            spack_spec: intel-mpi@2018.4.274
+            compiler: gcc9
+          wrfv4:
+            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+              ~pnetcdf
+            compiler: gcc9
+        environments:
+          wrfv4:
+            packages:
+            - intel-mpi
+            - wrfv4
+
+Define an Experiment Matrix
+---------------------------
+
+At this point, your workspace should have a single zip along with one other
+list variable, ``n_nodes``. This configuration will not work properly for two reasons.
+
+The first is that neither the zip, nor ``n_nodes`` are unconsumed. Unconsumed
+zips and variables are zipped together to attempt to create a set of
+experiments. In this case, ``n_nodes`` is a different length than
+``platform_config``, and Ramble will refuse to zip them. Running:
+
+.. code-block:: console
+
+    $ ramble workspace info
+
+might give the following error messages:
+
+.. code-block:: console
+
+    ==> Error: Length mismatch in vector variables in experiment scaling_{n_nodes}
+        Variable n_nodes has length 3
+        Variable platform has length 2
+        Variable processes_per_node has length 2
+
+This error message identifies that the ``platform_config`` zip was unzipped
+(since it is not consumed) and the length of the resulting variables are
+different.
+
+To fix this issue, you must define an experiment matrix to consume the
+variables. An experiment matrix is defined within an experiment inside the
+``ramble.yaml`` configuration file. In this case, your goal is to execute the
+``n_nodes`` scaling study on each of the two platforms. So, you are looking to
+create a set of experiments from the cross product of ``platform_config`` and
+``n_nodes``. A matrix definition consists of a list of variable or zip names,
+which are crossed with each other to create a final set of experiments. As an
+example:
+
+.. code-block:: YAML
+
+    matrix:
+    - platform_config
+    - n_nodes
+
+Would result in 6 experiments. Adding this to you workspace configuration, you
+should have the following in your ``ramble.yaml``:
+
+.. code-block:: YAML
+
+    ramble:
+      variables:
+        n_ranks: '{processes_per_node}*{n_nodes}'
+        batch_submit: '{execute_experiment}'
+        mpi_command: mpirun -n {n_ranks}
+        platform: ['platform1', 'platform2']
+        processes_per_node: ['2', '4']
+      zips:
+        platform_config:
+        - platform
+        - processes_per_node
+      applications:
+        wrfv4:
+          workloads:
+            CONUS_12km:
+              experiments:
+                scaling_{n_nodes}:
+                  variables:
+                    n_nodes: [1, 2, 4]
+                  matrix:
+                  - platform_config
+                  - n_nodes
+      spack:
+        concretized: true
+        packages:
+          gcc9:
+            spack_spec: gcc@9.3.0
+          intel-mpi:
+            spack_spec: intel-mpi@2018.4.274
+            compiler: gcc9
+          wrfv4:
+            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+              ~pnetcdf
+            compiler: gcc9
+        environments:
+          wrfv4:
+            packages:
+            - intel-mpi
+            - wrfv4
+
+At this stage, running:
+
+.. code-block:: console
+
+    $ ramble workspace info
+
+should give the following error message:
+
+.. code-block:: console
+
+    ==> Error: Experiment wrfv4.CONUS_12km.scaling_1 is not unique.
+
+This is because your experiment name template is not unique across the values
+of ``platform_config``. To remedy this issue, you can update the experiment
+name template to include either ``platform`` or ``processes_per_node``. The
+below example will use ``platform``, but you are free to experiment with these.
+Your final configuration file should look something like:
+
+.. code-block:: YAML
+
+    ramble:
+      variables:
+        n_ranks: '{processes_per_node}*{n_nodes}'
+        batch_submit: '{execute_experiment}'
+        mpi_command: mpirun -n {n_ranks}
+        platform: ['platform1', 'platform2']
+        processes_per_node: ['2', '4']
+      zips:
+        platform_config:
+        - platform
+        - processes_per_node
+      applications:
+        wrfv4:
+          workloads:
+            CONUS_12km:
+              experiments:
+                scaling_{n_nodes}_{platform}:
+                  variables:
+                    n_nodes: [1, 2, 4]
+                  matrix:
+                  - platform_config
+                  - n_nodes
+      spack:
+        concretized: true
+        packages:
+          gcc9:
+            spack_spec: gcc@9.3.0
+          intel-mpi:
+            spack_spec: intel-mpi@2018.4.274
+            compiler: gcc9
+          wrfv4:
+            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+              ~pnetcdf
+            compiler: gcc9
+        environments:
+          wrfv4:
+            packages:
+            - intel-mpi
+            - wrfv4
+
+Execute Experiments
+-------------------
+
+Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:
+
+.. code-block:: console
+
+    $ ramble workspace setup
+    $ ramble on
+    $ ramble workspace analyze
+
+This creates a ``results`` file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:
+
+* Average Timestep Time: Time (in seconds) on average each timestep takes
+* Cumulative Timestep Time: Time (in seconds) spent executing all timesteps
+* Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep
+* Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep
+* Number of timesteps: Count of total timesteps performed
+* Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time
+
+Ramble also supports generating machine readable results in YAML or JSON format.
+To use this functionality, use the ``--formats`` option on
+``ramble workspace analyze``.
