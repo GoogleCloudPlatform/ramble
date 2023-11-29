@@ -476,25 +476,4 @@ And examine the contents of the rendered ``execute_experiment`` scripts in some
 experiment directories. Looking at these, you should see the correct MPI
 arguments within the relevant experiments.
 
-Execute Experiments
--------------------
-
-Now that you have made the appropriate modifications, set up, execute, and
-analyze the new experiments using:
-
-.. code-block:: console
-
-    $ ramble workspace setup
-    $ ramble on
-    $ ramble workspace analyze
-
-This creates a ``results`` file in the root of the workspace that contains
-extracted figures of merit. If the experiments were successful, this file will
-show the following results:
-
-* Average Timestep Time: Time (in seconds) on average each timestep takes
-* Cumulative Timestep Time: Time (in seconds) spent executing all timesteps
-* Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep
-* Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep
-* Number of timesteps: Count of total timesteps performed
-* Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time
+.. include:: shared/wrf_execute.rst
