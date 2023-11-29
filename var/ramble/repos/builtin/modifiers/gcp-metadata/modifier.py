@@ -28,6 +28,11 @@ class GcpMetadata(BasicModifier):
 
     def gcp_metadata_exec(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
+        if hasattr(self, '_already_applied'):
+            return [], []
+
+        self._already_applied = True
+
         post_cmds = []
         pre_cmds = []
 
@@ -39,17 +44,6 @@ class GcpMetadata(BasicModifier):
             ('id', True),  # True since we want the gid of every node
         ]
 
-        rm_template = []
-        for end_point, _ in payloads:
-            rm_template.append(f'rm "{{experiment_run_dir}}/gcp-metadata.{end_point}.log"')
-
-        pre_cmds.append(
-            CommandExecutable('file-rm',
-                              template=rm_template,
-                              mpi=False,
-                              )
-        )
-
         for end_point, use_mpi in payloads:
             pre_cmds.append(
                 CommandExecutable('machine-type',
@@ -57,7 +51,9 @@ class GcpMetadata(BasicModifier):
                                       f'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/{end_point}" -H "Metadata-Flavor: Google"'
                                   ],
                                   mpi=use_mpi,
-                                  redirect=f'{{experiment_run_dir}}/gcp-metadata.{end_point}.log')
+                                  redirect=f'{{experiment_run_dir}}/gcp-metadata.{end_point}.log',
+                                  output_capture='>'
+                                  )
             )
 
         return pre_cmds, post_cmds
