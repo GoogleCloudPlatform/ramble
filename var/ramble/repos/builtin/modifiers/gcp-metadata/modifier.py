@@ -24,23 +24,58 @@ class GcpMetadata(BasicModifier):
     mode('standard', description='Standard execution mode')
     default_mode('standard')
 
-    variable_modification('log', '{experiment_run_dir}/gcp-metadata.log', method='set', modes=['standard'])
-    archive_pattern('{log}')
+    executable_modifier('gcp_metadata_exec')
 
-    register_builtin('gcp_metadata_exec')
+    def gcp_metadata_exec(self, executable_name, executable, app_inst=None):
+        from ramble.util.executable import CommandExecutable
+        if hasattr(self, '_already_applied'):
+            return [], []
 
-    def gcp_metadata_exec(self):
-        machine_type = 'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/machine-type" -H "Metadata-Flavor: Google" >> {log}'
+        self._already_applied = True
 
-        image = 'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/image" -H "Metadata-Flavor: Google" >> {log}'
+        post_cmds = []
+        pre_cmds = []
 
-        gid = 'curl -s -w "=GID\\n" "http://metadata.google.internal/computeMetadata/v1/instance/id" -H "Metadata-Flavor: Google" >> {log}'
+        payloads = [
+            # end point, use_mpi
+            ('machine-type', False),
+            ('image', False),
+            ('hostname', False),
+            ('id', True),  # True since we want the gid of every node
+        ]
 
-        ghostname = 'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google" >> {log}'
+        for end_point, use_mpi in payloads:
+            pre_cmds.append(
+                CommandExecutable('machine-type',
+                                  template=[
+                                      f'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/{end_point}" -H "Metadata-Flavor: Google"'
+                                  ],
+                                  mpi=use_mpi,
+                                  redirect=f'{{experiment_run_dir}}/gcp-metadata.{end_point}.log',
+                                  output_capture='>'
+                                  )
+            )
 
-        return [machine_type, image, gid, ghostname]
+        return pre_cmds, post_cmds
 
-    figure_of_merit('machine-type', fom_regex=r'.*machineTypes/(?P<machine>.*)', group_name='machine', log_file='{log}')
-    figure_of_merit('image', fom_regex=r'(?P<image>.*global/images.*)', group_name='image', log_file='{log}')
-    figure_of_merit('gid', fom_regex=r':(?P<gid>.*)=GID', group_name='gid', log_file='{log}')
-    figure_of_merit('ghostname', fom_regex=r'(?P<ghostname>.*internal)', group_name='ghostname', log_file='{log}')
+    def _prepare_analysis(self, workspace):
+        import os.path
+        ids = set()
+        file_name = self.expander.expand_var('{experiment_run_dir}/gcp-metadata.id.log')
+
+        if os.path.isfile(file_name):
+            with open(file_name, 'r') as f:
+                for cur_id in f.readlines():
+                    ids.add(cur_id.strip())
+
+            with open(self.expander.expand_var('{experiment_run_dir}/gcp-metadata.id_list.log'), 'w+') as f:
+                f.write(", ".join(sorted(ids)))
+
+    figure_of_merit('machine-type', fom_regex=r'.*machineTypes/(?P<machine>.*)', group_name='machine', log_file='{experiment_run_dir}/gcp-metadata.machine-type.log')
+    figure_of_merit('image', fom_regex=r'(?P<image>.*global/images.*)', group_name='image', log_file='{experiment_run_dir}/gcp-metadata.image.log')
+
+    # This is intentionally left singular, to get the hostname of the "parent" or "root" process
+    figure_of_merit('ghostname', fom_regex=r'(?P<ghostname>.*internal)', group_name='ghostname', log_file='{experiment_run_dir}/gcp-metadata.hostname.log')
+
+    # This returns a list of all known gids in the job
+    figure_of_merit('gids', fom_regex=r'(?P<gid>.*)', group_name='gid', log_file='{experiment_run_dir}/gcp-metadata.id_list.log')
