@@ -19,6 +19,7 @@ class namespace:
     internals = 'internals'
     custom_executables = 'custom_executables'
     executables = 'executables'
+    executable_injection = 'executable_injection'
     env_var = 'env_vars'
     packages = 'packages'
     environments = 'environments'

@@ -37,12 +37,36 @@ custom_executables_def = {
 
 executables_def = ramble.schema.types.array_of_strings_or_nums
 
+executable_injection_def = {
+    'type': 'array',
+    'default': [],
+    'items': {
+        'type': 'object',
+        'default': {},
+        'properties': {
+            'name': {
+                'type': 'string'
+            },
+            'order': {
+                'type': 'string',
+                'default': 'after',
+            }
+        },
+        'additionalProperties': {
+            'relative_to': {
+                'type': 'string'
+            }
+        }
+    }
+}
+
 internals_def = {
     'type': 'object',
     'default': {},
     'properties': {
         'custom_executables': custom_executables_def,
         'executables': executables_def,
+        'executable_injection': executable_injection_def,
     },
     'additionalProperties': False
 }

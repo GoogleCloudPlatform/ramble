@@ -405,6 +405,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             header = rucolor.nested_4('Executable Order')
             color.cprint(f'{indent}{header}: {str(self.internals[namespace.executables])}')
 
+        if namespace.executable_injection in self.internals:
+            header = rucolor.nested_4('Executable Injection')
+            color.cprint(
+                f'{indent}{header}: {str(self.internals[namespace.executable_injection])}'
+            )
+
     def print_chain_order(self, indent=''):
         if not self.chain_order:
             return
@@ -650,12 +656,83 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             executables = self.internals[namespace.executables]
 
         # Define custom executables
-        if namespace.custom_executables in self.internals.keys():
+        if namespace.custom_executables in self.internals:
             for name, conf in self.internals[namespace.custom_executables].items():
                 self.executables[name] = ramble.util.executable.CommandExecutable(
                     name=name,
                     **conf
                 )
+
+        # Perform executable injection
+        if namespace.executable_injection in self.internals:
+
+            supported_orders = set(['before', 'after'])
+
+            # Order can be 'before' or 'after.
+            # If `relative_to` is not set, then before adds to be the beginning of the list
+            #                  and after (default) adds to the end of the list
+            # If `relative_to` IS set, then before adds before the first instance of
+            #                  the executable in the list
+            #                  and after (default) adds after the last instance of the
+            #                  executable in the list
+            # If `relative_to` is set, and the executable name is not found, raise a fatal error.
+            for exec_injection in self.internals[namespace.executable_injection]:
+                exec_name = exec_injection['name']
+
+                injection_order = 'after'
+                if 'order' in exec_injection:
+                    injection_order = exec_injection['order']
+
+                relative = None
+                if 'relative_to' in exec_injection:
+                    relative = exec_injection['relative_to']
+
+                if injection_order not in supported_orders:
+                    logger.die('In experiment '
+                               f'"{self.expander.experiment_namespace}" '
+                               f'injection order of executable "{exec_name}" is set to an '
+                               f'invalid value of "{injection_order}".\n'
+                               f'Valid values are {supported_orders}.')
+
+                if exec_name not in self.executables:
+                    logger.die('In experiment '
+                               f'"{self.expander.experiment_namespace}" '
+                               f'attempting to inject a non existing executable "{exec_name}".')
+
+                if relative is not None and relative not in executables:
+                    logger.die('In experiment '
+                               f'"{self.expander.experiment_namespace}" '
+                               f'attempting to inject executable "{exec_name}" '
+                               f'relative to a non existing executable "{relative}".')
+
+                if relative is None:
+                    if injection_order == 'before':
+                        executables.insert(0, exec_name)
+                    elif injection_order == 'after':
+                        executables.append(exec_name)
+                else:
+
+                    found = False
+                    if injection_order == 'before':
+                        relative_index = 0
+                        increment = 1
+                    elif injection_order == 'after':
+                        relative_index = len(executables) - 1
+                        increment = -1
+
+                    while not found and relative_index <= len(executables) \
+                            and relative_index >= 0:
+                        if executables[relative_index] == relative:
+                            found = True
+                        else:
+                            relative_index += increment
+
+                    if injection_order == 'before':
+                        injection_index = relative_index
+                    elif injection_order == 'after':
+                        injection_index = relative_index + 1
+
+                    executables.insert(injection_index, exec_name)
 
         return executables
 
