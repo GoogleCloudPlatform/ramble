@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3) Modifying A GROMACS Experiment &mdash; Ramble 0.3.0 documentation</title>
+  <title>5) Changing A Software Stack &mdash; Ramble 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
@@ -22,8 +22,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="4) Using Vectors and Matrices" href="using_vectors_and_matrices.html" />
-    <link rel="prev" title="2) Running A Simple GROMACS Experiment" href="running_a_simple_gromacs_experiment.html" /> 
+    <link rel="next" title="6) Configuring a Scaling Study" href="6_configuring_a_scaling_study.html" />
+    <link rel="prev" title="4) Using Vectors and Matrices" href="4_using_vectors_and_matrices.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -51,25 +51,29 @@
               <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">3) Modifying A GROMACS Experiment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="1_hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2_running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3_modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4_using_vectors_and_matrices.html">4) Using Vectors and Matrices</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5) Changing A Software Stack</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#configuring-experiments">Configuring experiments</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#create-and-activate-a-workspace">Create and Activate a Workspace</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#configure-the-workspace">Configure the Workspace</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#experiment-descriptions">Experiment Descriptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#using-workload-variables">Using Workload Variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#editing-experiments">Editing Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#software-description">Software Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changing-software-definitions">Changing Software Definitions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-package-variants">Adding Package Variants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vector-and-matrix-software-definitions">Vector and Matrix Software Definitions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="using_vectors_and_matrices.html">4) Using Vectors and Matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changing_your_software_stack.html">5) Changing A Software Stack</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuring_a_scaling_study.html">6) Configuring a Scaling Study</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_zips_and_matrices.html">7) Zips and Matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="var_expansion_indirection_and_stack_parameterization.html">8) Variable Expansion, Indirection, and Software Stack Parameterization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="6_configuring_a_scaling_study.html">6) Configuring a Scaling Study</a></li>
+<li class="toctree-l2"><a class="reference internal" href="7_using_zips_and_matrices.html">7) Zips and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="8_var_expansion_indirection_and_stack_parameterization.html">8) Variable Expansion, Indirection, and Software Stack Parameterization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="9_success_criteria.html">9) Success Criteria</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10_using_modifiers.html">10) Modifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11_using_internals.html">11) Internals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
 </ul>
 </li>
@@ -108,9 +112,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">3) Modifying A GROMACS Experiment</li>
+      <li class="breadcrumb-item active">5) Changing A Software Stack</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/tutorials/modifying_a_gromacs_experiment.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorials/5_changing_your_software_stack.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -118,8 +122,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="modifying-a-gromacs-experiment">
-<span id="modifying-an-experiment-tutorial"></span><h1>3) Modifying A GROMACS Experiment<a class="headerlink" href="#modifying-a-gromacs-experiment" title="Link to this heading"></a></h1>
+  <section id="changing-a-software-stack">
+<span id="modifying-an-experiment-tutorial"></span><h1>5) Changing A Software Stack<a class="headerlink" href="#changing-a-software-stack" title="Link to this heading"></a></h1>
 <p>In this tutorial, you will learn how to modify an existing workspace
 configuration that contains experiments using
 <a class="reference external" href="https://www.gromacs.org/">GROMACS</a>, a free and open-source application
@@ -231,166 +235,93 @@ script for each generated experiment. You can feel free to edit it as you need
 to for your given system, but for this tutorial the default value will work.</p>
 </section>
 </section>
-<section id="experiment-descriptions">
-<h2>Experiment Descriptions<a class="headerlink" href="#experiment-descriptions" title="Link to this heading"></a></h2>
-<p>Now that your workspace has been configured, and activated, You can execute the
-following command to see what experiments the workspace currently contains:</p>
+<section id="software-description">
+<h2>Software Description<a class="headerlink" href="#software-description" title="Link to this heading"></a></h2>
+<p>Now that your workspace has been created, and configured with the default
+workspace configuration file you can examine the workspace contents. You can
+execute the following command to see what software environments and packages
+the workspace currently contains:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
 </pre></div>
 </div>
 <p>This command provides a summary view of the workspace. It includes the
 experiment names, and the software environments. As an example, its output
-might contain the following information:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_gmx50</span>
-<span class="go">      Experiment: gromacs.water_gmx50.pme_single_rank</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_gmx50</span>
-<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_bare</span>
-<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_bare</span>
-<span class="go">      Experiment: gromacs.water_bare.rf_single_rank</span>
+might contain the following information regarding software packages and
+environments:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Software Stack:</span>
+<span class="go">  Packages:</span>
+<span class="go">    gcc9:</span>
+<span class="go">      Rendered Packages:</span>
+<span class="go">        gcc9:</span>
+<span class="go">          Spack spec: gcc@9.3.0 target=x86_64</span>
+<span class="go">          Compiler spec: gcc@9.3.0</span>
+<span class="go">    impi2018:</span>
+<span class="go">      Rendered Packages:</span>
+<span class="go">        impi2018:</span>
+<span class="go">          Spack spec: intel-mpi@2018.4.274 target=x86_64</span>
+<span class="go">          Compiler: gcc9</span>
+<span class="go">    gromacs:</span>
+<span class="go">      Rendered Packages:</span>
+<span class="go">        gromacs:</span>
+<span class="go">          Spack spec: gromacs@2021.6</span>
+<span class="go">          Compiler: gcc9</span>
+<span class="go">  Environments:</span>
+<span class="go">    gromacs:</span>
+<span class="go">      Rendered Environments:</span>
+<span class="go">        gromacs Packages:</span>
+<span class="go">          - gromacs</span>
+<span class="go">          - impi2018</span>
 </pre></div>
 </div>
-<p>To get detailed information about where variable definitions come from, you can use:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info<span class="w"> </span>-v
-</pre></div>
-</div>
-<p>The experiments section of this command’s output might contain the following:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Experiments:</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_gmx50</span>
-<span class="go">      Experiment: gromacs.water_gmx50.pme_single_rank</span>
-<span class="go">        Variables from Workspace:</span>
-<span class="go">          processes_per_node = 16 ==&gt; 16</span>
-<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
-<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
-<span class="go">        Variables from Experiment:</span>
-<span class="go">          n_ranks = 1 ==&gt; 1</span>
-<span class="go">          n_threads = 1 ==&gt; 1</span>
-<span class="go">          size = 0003 ==&gt; 0003</span>
-<span class="go">          type = pme ==&gt; pme</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_gmx50</span>
-<span class="go">      Experiment: gromacs.water_gmx50.rf_single_rank</span>
-<span class="go">        Variables from Workspace:</span>
-<span class="go">          processes_per_node = 16 ==&gt; 16</span>
-<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
-<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
-<span class="go">        Variables from Experiment:</span>
-<span class="go">          n_ranks = 1 ==&gt; 1</span>
-<span class="go">          n_threads = 1 ==&gt; 1</span>
-<span class="go">          size = 0003 ==&gt; 0003</span>
-<span class="go">          type = rf ==&gt; rf</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_bare</span>
-<span class="go">      Experiment: gromacs.water_bare.pme_single_rank</span>
-<span class="go">        Variables from Workspace:</span>
-<span class="go">          processes_per_node = 16 ==&gt; 16</span>
-<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
-<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
-<span class="go">        Variables from Experiment:</span>
-<span class="go">          n_ranks = 1 ==&gt; 1</span>
-<span class="go">          n_threads = 1 ==&gt; 1</span>
-<span class="go">          size = 0003 ==&gt; 0003</span>
-<span class="go">          type = pme ==&gt; pme</span>
-<span class="go">  Application: gromacs</span>
-<span class="go">    Workload: water_bare</span>
-<span class="go">      Experiment: gromacs.water_bare.rf_single_rank</span>
-<span class="go">        Variables from Workspace:</span>
-<span class="go">          processes_per_node = 16 ==&gt; 16</span>
-<span class="go">          mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==&gt; mpirun -n 1 -ppn 16</span>
-<span class="go">          batch_submit = {execute_experiment} ==&gt; {execute_experiment}</span>
-<span class="go">        Variables from Experiment:</span>
-<span class="go">          n_ranks = 1 ==&gt; 1</span>
-<span class="go">          n_threads = 1 ==&gt; 1</span>
-<span class="go">          size = 0003 ==&gt; 0003</span>
-<span class="go">          type = rf ==&gt; rf</span>
-</pre></div>
-</div>
-<p>The variables <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code>, <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>, and <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code>
-come from the workspace scope on lines 3, 4, and 5 of the YAML file in
-<span class="xref std std-ref">gromacs_workspace_config</span>. Each experiment has its own definition for
-<code class="docutils literal notranslate"><span class="pre">n_ranks</span></code>, <code class="docutils literal notranslate"><span class="pre">n_threads</span></code>, <code class="docutils literal notranslate"><span class="pre">size</span></code>, and <code class="docutils literal notranslate"><span class="pre">type</span></code>.</p>
-<p>The experiments in this configuration use both the <code class="docutils literal notranslate"><span class="pre">water_bare</span></code> and
-<code class="docutils literal notranslate"><span class="pre">water_gmx50</span></code> workloads.</p>
+<p>Currently, this command outputs every package and software environment
+definition, even if they are not used directly by an experiment. By default,
+each experiment expects a software environment that is named the same as the
+application. For example, an experiment for the application <code class="docutils literal notranslate"><span class="pre">gromacs</span></code> expects
+a software environment named <code class="docutils literal notranslate"><span class="pre">gromacs</span></code>. This can be overridden using the
+variable <code class="docutils literal notranslate"><span class="pre">env_name</span></code>, which can be the name of any environment defined in the
+workspace configuration file.</p>
+<p>The above output relates to lines 37-53 in the above configuration file, where
+we define packages for Intel MPI, GROMACS, and GCC 9.3.0. The GROMACS and Intel
+MPI packages are then combined into the <code class="docutils literal notranslate"><span class="pre">gromacs</span></code> software environment. Lines
+40, 43, and 46 are the names of packages within this workspace, while line 50
+is the name of a software environment.</p>
 </section>
-<section id="using-workload-variables">
-<h2>Using Workload Variables<a class="headerlink" href="#using-workload-variables" title="Link to this heading"></a></h2>
-<p>Application definitions are allowed to expose variables that can be used within
-experiments. These are called <strong>workload variables</strong>. User can view the
-available variables with the following command:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>gromacs
+<section id="changing-software-definitions">
+<h2>Changing Software Definitions<a class="headerlink" href="#changing-software-definitions" title="Link to this heading"></a></h2>
+<p>As the GROMACS application definition inherits from the <code class="docutils literal notranslate"><span class="pre">SpackApplication</span></code>
+base class, it is expected to use Spack as its package manager. When changing
+the software definitions in a workspace, many options are available to you. For
+example, you could modify the compiler used for building GROMACS (as defined on
+line 45), or you could modify the MPI used for these experiments (as seen on
+line 53). However, we will explore changing aspects of GROMACS itself (such as
+its version or variants).</p>
+<p><strong>NOTE:</strong> It is important to note that changing aspects of
+compilation could result in build-time errors that need to be resolved before
+Ramble can generate experiments. Oftentimes it is both easier and faster to
+work through these issues (if you encounter them) outside of Ramble, using the
+package manager directly. Because Ramble uses the package manager, if the
+package is already intalled it will not cause the package manager to re-install
+it.</p>
+<p>In order to get information about what changes you can make to the GROMACS
+package, you can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>spack<span class="w"> </span>info<span class="w"> </span>gromacs
 </pre></div>
 </div>
-<p>Focusing on the relevant workloads, you see the following information:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Workload: water_gmx50</span>
-<span class="go">    Executables: [&#39;builtin::env_vars&#39;, &#39;builtin::spack_source&#39;, &#39;builtin::spack_activate&#39;, &#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
-<span class="go">    Inputs: [&#39;water_gmx50_bare&#39;]</span>
-<span class="go">    Variables:</span>
-<span class="go">        size:</span>
-<span class="go">            Description: Workload size</span>
-<span class="go">            Default: 1536</span>
-<span class="go">            Suggested Values: [&#39;0000.65&#39;, &#39;0000.96&#39;, &#39;0001.5&#39;, &#39;0003&#39;, &#39;0006&#39;, &#39;0012&#39;, &#39;0024&#39;, &#39;0048&#39;, &#39;0096&#39;, &#39;0192&#39;, &#39;0384&#39;, &#39;0768&#39;, &#39;1536&#39;, &#39;3072&#39;]</span>
-<span class="go">        type:</span>
-<span class="go">            Description: Workload type.</span>
-<span class="go">            Default: pme</span>
-<span class="go">            Suggested Values: [&#39;pme&#39;, &#39;rf&#39;]</span>
-<span class="go">        input_path:</span>
-<span class="go">            Description: Input path for water GMX50</span>
-<span class="go">            Default: {water_gmx50_bare}/{size}</span>
-<span class="go">Workload: water_bare</span>
-<span class="go">    Executables: [&#39;builtin::env_vars&#39;, &#39;builtin::spack_source&#39;, &#39;builtin::spack_activate&#39;, &#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
-<span class="go">    Inputs: [&#39;water_bare_hbonds&#39;]</span>
-<span class="go">    Variables:</span>
-<span class="go">        size:</span>
-<span class="go">            Description: Workload size</span>
-<span class="go">            Default: 1536</span>
-<span class="go">            Suggested Values: [&#39;0000.65&#39;, &#39;0000.96&#39;, &#39;0001.5&#39;, &#39;0003&#39;, &#39;0006&#39;, &#39;0012&#39;, &#39;0024&#39;, &#39;0048&#39;, &#39;0096&#39;, &#39;0192&#39;, &#39;0384&#39;, &#39;0768&#39;, &#39;1536&#39;, &#39;3072&#39;]</span>
-<span class="go">        type:</span>
-<span class="go">            Description: Workload type.</span>
-<span class="go">            Default: pme</span>
-<span class="go">            Suggested Values: [&#39;pme&#39;, &#39;rf&#39;]</span>
-<span class="go">        input_path:</span>
-<span class="go">            Description: Input path for water bare hbonds</span>
-<span class="go">            Default: {water_bare_hbonds}/{size}</span>
-</pre></div>
-</div>
-<p>Within each of the workloads your workspace has experiments for, you can see
-definitions for both <code class="docutils literal notranslate"><span class="pre">size</span></code> and <code class="docutils literal notranslate"><span class="pre">type</span></code>. The <code class="docutils literal notranslate"><span class="pre">Suggested</span> <span class="pre">Values</span></code> attribute
-defines possible values for each of the variables, which can be defined within
-your workspace’s <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file.</p>
-<p>While these variables contain <code class="docutils literal notranslate"><span class="pre">Suggested</span> <span class="pre">Values</span></code> some other variable
-definitions can take any value you want. As a result, they might not provide
-anything other than a default value. While the default value is expected to
-function properly, you as the user can override their definition within the
-<code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> if your experiments would benefit from it. However, be aware
-that this also has the potential to change the behavior of your experiments and
-is considered an advanced action.</p>
-</section>
-<section id="editing-experiments">
-<h2>Editing Experiments<a class="headerlink" href="#editing-experiments" title="Link to this heading"></a></h2>
-<p>Now that you know how to determine which values are possible, select one or
-more of the possible values for the <code class="docutils literal notranslate"><span class="pre">size</span></code> variable. You will modify the
-experiments in your workspace to use this (remember, you have 4 experiments
-defined currently). <strong>NOTE</strong> The larger the value, the more expensive the
-experiment will be. However you can give each experiment a unique value.</p>
+<p>This command will output all of the supported versions of GROMACS, along with
+the variants for GROMACS which can modify its behavior. While you can change
+any of these, we’ll begin by only modifying the version of GROMACS from
+<code class="docutils literal notranslate"><span class="pre">2021.6</span></code> to <code class="docutils literal notranslate"><span class="pre">2021.7</span></code>.</p>
 <p>To make editing the workspace easier, use the following command (assuming you
 have an <code class="docutils literal notranslate"><span class="pre">EDITOR</span></code> environment variable set):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
 </pre></div>
 </div>
 <p>This command opens the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, along with any <code class="docutils literal notranslate"><span class="pre">*.tpl</span></code> files in
-the workspace’s <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory. The root directory of the workspace can
-be seen in the <code class="docutils literal notranslate"><span class="pre">Location</span></code> attribute output from:</p>
-<p>When the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> is open, modify any of the experiment’s <code class="docutils literal notranslate"><span class="pre">size</span></code>
-variable definitions that you want to. Finally, save and exit the file.</p>
-<p>These changes should now be reflected in the output of:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info<span class="w"> </span>-v
+the workspace’s <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory.</p>
+<p>Once the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file is opened, change the version <code class="docutils literal notranslate"><span class="pre">2021.6</span></code> to
+<code class="docutils literal notranslate"><span class="pre">2021.7</span></code> on line 47. Then save and exit the files. These changes should now
+be reflected in the output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
 </pre></div>
 </div>
 </section>
@@ -414,9 +345,72 @@ show the following results:</p>
 <li><p>Hours per nanosec: Hours required to calculate 1 nanosecond of simulation at
 the speed achieved</p></li>
 </ul>
-<p>If you have a <code class="docutils literal notranslate"><span class="pre">results</span></code> file from the <a class="reference internal" href="running_a_simple_gromacs_experiment.html#running-an-experiment-tutorial"><span class="std std-ref">2) Running A Simple GROMACS Experiment</span></a>,
-you can compare it with the newly created results file to see what impact
-changing the <code class="docutils literal notranslate"><span class="pre">size</span></code> variable had on your figures of merit.</p>
+<p><strong>NOTE</strong>: Since you changed the package definition for GROMACS, it will be
+recompiled (unless you compiled it outside of Ramble) during the <code class="docutils literal notranslate"><span class="pre">ramble</span>
+<span class="pre">workspace</span> <span class="pre">setup</span></code> command. This will likely take longer than changing
+experiments and performing setup again.</p>
+</section>
+<section id="adding-package-variants">
+<h2>Adding Package Variants<a class="headerlink" href="#adding-package-variants" title="Link to this heading"></a></h2>
+<p>So far, we have only explored changing the version a package used. More
+complicated changes to the Spack specs can be made by adding variant
+definitions. This can be directly added to the <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> lines within the
+package definitions in a workspace’s <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute can be parameterized with variable definitions
+also, to allow a wide range of variants to be explored with a single
+configuration.</p>
+</section>
+<section id="vector-and-matrix-software-definitions">
+<h2>Vector and Matrix Software Definitions<a class="headerlink" href="#vector-and-matrix-software-definitions" title="Link to this heading"></a></h2>
+<p>Package and environment definitions support the same vector and matrix logic as
+introduced in <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">4) Using Vectors and Matrices</span></a>. Package and environment names
+should similarly be unique, and can use placeholder values for variable
+definitions.</p>
+<p>As an example, to explore both of the versions of GROMACS described in this
+tutorial, your <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> coudld look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">gromacs_version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2021.6</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2021.7</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span><span class="w"> </span><span class="c1"># Application name</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos">10</span><span class="w">        </span><span class="s">&#39;{app_workloads}&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="linenos">11</span><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">            </span><span class="s">&#39;{type}_{n_ranks}ranks-{gromacs_version}&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="linenos">13</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">14</span><span class="w">                </span><span class="nt">app_workloads</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;water_gmx50&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;water_bare&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">15</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="linenos">16</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">17</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="linenos">18</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pme&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;rf&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">19</span><span class="w">                </span><span class="nt">env_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;gromacs-{gromacs_version}&#39;</span>
+<span class="linenos">20</span><span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app_workloads</span>
+<span class="linenos">22</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span>
+<span class="linenos">23</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_ranks</span>
+<span class="linenos">24</span><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs_version</span>
+<span class="linenos">25</span><span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">27</span><span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="linenos">29</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="linenos">30</span><span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="linenos">31</span><span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="linenos">32</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="linenos">33</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="linenos">34</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span><span class="p p-Indicator">:</span>
+<span class="linenos">35</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@{gromacs_version}</span>
+<span class="linenos">36</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="linenos">37</span><span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="linenos">38</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span><span class="p p-Indicator">:</span>
+<span class="linenos">39</span><span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="linenos">40</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span>
+<span class="linenos">41</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -424,15 +418,15 @@ changing the <code class="docutils literal notranslate"><span class="pre">size</
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="running_a_simple_gromacs_experiment.html" class="btn btn-neutral float-left" title="2) Running A Simple GROMACS Experiment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="using_vectors_and_matrices.html" class="btn btn-neutral float-right" title="4) Using Vectors and Matrices" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="4_using_vectors_and_matrices.html" class="btn btn-neutral float-left" title="4) Using Vectors and Matrices" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="6_configuring_a_scaling_study.html" class="btn btn-neutral float-right" title="6) Configuring a Scaling Study" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Nov 29, 2023.
+      <span class="lastupdated">Last updated on Nov 30, 2023.
       </span></p>
   </div>
 

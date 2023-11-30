@@ -577,6 +577,8 @@ If the ``on_executable`` attribute is not set, it will default to ``'*'`` which
 will match all executables. Modifier classes can (and should) be implemented to
 only act on the correct executable types (i.e. executables with ``use_mpi=true``).
 
+.. _workspace_internals:
+
 ^^^^^^^^^^^^^^^^^^^^^^
 Controlling Internals:
 ^^^^^^^^^^^^^^^^^^^^^^

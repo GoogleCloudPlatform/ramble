@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7) Zips and Matrices &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="8) Variable Expansion, Indirection, and Software Stack Parameterization" href="8_var_expansion_indirection_and_stack_parameterization.html" />
+    <link rel="prev" title="6) Configuring a Scaling Study" href="6_configuring_a_scaling_study.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="1_hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2_running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3_modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4_using_vectors_and_matrices.html">4) Using Vectors and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="5_changing_your_software_stack.html">5) Changing A Software Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="6_configuring_a_scaling_study.html">6) Configuring a Scaling Study</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">7) Zips and Matrices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-workspace">Create a Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#activate-the-workspace">Activate the Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-experiment-definitions">Configure Experiment Definitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#construct-platforms-zip">Construct Platforms Zip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#define-an-experiment-matrix">Define an Experiment Matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="8_var_expansion_indirection_and_stack_parameterization.html">8) Variable Expansion, Indirection, and Software Stack Parameterization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="9_success_criteria.html">9) Success Criteria</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10_using_modifiers.html">10) Modifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11_using_internals.html">11) Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">7) Zips and Matrices</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/7_using_zips_and_matrices.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="zips-and-matrices">
+<span id="zips-and-matrices-tutorial"></span><h1>7) Zips and Matrices<a class="headerlink" href="#zips-and-matrices" title="Link to this heading"></a></h1>
+<p>In this tutorial, you will learn how to generate a more comprehensive set of
+experiments using zips and matrices. For this tutorial we will use
+<a class="reference external" href="https://www.mmm.ucar.edu/models/wrf">WRF</a>, a free and open-source
+application for atmospheric research and operational forecasting applications.</p>
+<p>This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial’s content.</p>
+<section id="create-a-workspace">
+<h2>Create a Workspace<a class="headerlink" href="#create-a-workspace" title="Link to this heading"></a></h2>
+<p>To begin with, you need a workspace to configure the experiments. This can be
+created with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>zips_and_matrices_wrf
+</pre></div>
+</div>
+</section>
+<section id="activate-the-workspace">
+<h2>Activate the Workspace<a class="headerlink" href="#activate-the-workspace" title="Link to this heading"></a></h2>
+<p>Several of Ramble’s commands require an activated workspace to function
+properly. Activate the newly created workspace using the following command:
+(NOTE: you only need to run this if you do not currently have the workspace
+active).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>zips_and_matrices_wrf
+</pre></div>
+</div>
+</section>
+<section id="configure-experiment-definitions">
+<h2>Configure Experiment Definitions<a class="headerlink" href="#configure-experiment-definitions" title="Link to this heading"></a></h2>
+<p>To being with, you need to configure the workspace. The workspace’s root
+location can be seen under the <code class="docutils literal notranslate"><span class="pre">Location</span></code> output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Additionally, the files can be edited directly with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
+final configuration from a previous tutorial.</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>The above configuration will execute 3 experiments, comprising a basic scaling
+study on three different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented at <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">List (or Vector) Variables:</span></a>. Vector
+experiments were also introduced in <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">4) Using Vectors and Matrices</span></a>.</p>
+<p>We will now expand this to perform more experiments using the zip
+(<a class="reference internal" href="../workspace_config.html#ramble-explicit-zips"><span class="std std-ref">Explicit Variable Zips:</span></a>) and matrix (<a class="reference internal" href="../workspace_config.html#ramble-matrix-logic"><span class="std std-ref">Variable Matrices:</span></a>)
+functionality in Ramble.</p>
+</section>
+<section id="construct-platforms-zip">
+<h2>Construct Platforms Zip<a class="headerlink" href="#construct-platforms-zip" title="Link to this heading"></a></h2>
+<p>For the purposes of this tutorial, you will construct a zip representing
+multiple platforms. The platforms will differ by their value of the
+<code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> variable.</p>
+<p>Zips are explicit groupings of variables, that are combined into a larger
+variable set. A zip is defined by a list of variable definitions, where each
+individual variable is a list / vector variable and all variables are the same
+length. As an example, imagine we had the following variable / zip definitions:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="nt">zips</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+</pre></div>
+</div>
+<p>The result of this is that <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> would be a list of length 2. The
+first index would contain <code class="docutils literal notranslate"><span class="pre">(platform1,</span> <span class="pre">2)</span></code> and the second index would contain
+<code class="docutils literal notranslate"><span class="pre">(platform2,</span> <span class="pre">4)</span></code>. Using this, we can group an arbitrary number of variables
+into a single name.</p>
+<p>For the purposes of this tutorial, we’ll assume your system has 4 total cores,
+allowing us to use the platform definitions from the above YAML.</p>
+<p>Edit your workspace configuration file to include the <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> from
+the above section. The result should look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+</section>
+<section id="define-an-experiment-matrix">
+<h2>Define an Experiment Matrix<a class="headerlink" href="#define-an-experiment-matrix" title="Link to this heading"></a></h2>
+<p>At this point, your workspace should have a single zip along with one other
+list variable, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>. This configuration will not work properly for two reasons.</p>
+<p>The first is that neither the zip, nor <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> are unconsumed. Unconsumed
+zips and variables are zipped together to attempt to create a set of
+experiments. In this case, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> is a different length than
+<code class="docutils literal notranslate"><span class="pre">platform_config</span></code>, and Ramble will refuse to zip them. Running:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>might give the following error messages:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Length mismatch in vector variables in experiment scaling_{n_nodes}</span>
+<span class="go">    Variable n_nodes has length 3</span>
+<span class="go">    Variable platform has length 2</span>
+<span class="go">    Variable processes_per_node has length 2</span>
+</pre></div>
+</div>
+<p>This error message identifies that the <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> zip was unzipped
+(since it is not consumed) and the length of the resulting variables are
+different.</p>
+<p>To fix this issue, you must define an experiment matrix to consume the
+variables. An experiment matrix is defined within an experiment inside the
+<code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> configuration file. In this case, your goal is to execute the
+<code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> scaling study on each of the two platforms. So, you are looking to
+create a set of experiments from the cross product of <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> and
+<code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>. A matrix definition consists of a list of variable or zip names,
+which are crossed with each other to create a final set of experiments. As an
+example:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">matrix</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+</pre></div>
+</div>
+<p>Would result in 6 experiments. Adding this to you workspace configuration, you
+should have the following in your <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code>:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>At this stage, running:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>should give the following error message:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Experiment wrfv4.CONUS_12km.scaling_1 is not unique.</span>
+</pre></div>
+</div>
+<p>This is because your experiment name template is not unique across the values
+of <code class="docutils literal notranslate"><span class="pre">platform_config</span></code>. To remedy this issue, you can update the experiment
+name template to include either <code class="docutils literal notranslate"><span class="pre">platform</span></code> or <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>. The
+below example will use <code class="docutils literal notranslate"><span class="pre">platform</span></code>, but you are free to experiment with these.
+Your final configuration file should look something like:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+</section>
+<section id="execute-experiments">
+<h2>Execute Experiments<a class="headerlink" href="#execute-experiments" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Average Timestep Time: Time (in seconds) on average each timestep takes</p></li>
+<li><p>Cumulative Timestep Time: Time (in seconds) spent executing all timesteps</p></li>
+<li><p>Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep</p></li>
+<li><p>Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep</p></li>
+<li><p>Number of timesteps: Count of total timesteps performed</p></li>
+<li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
+</ul>
+<p>Ramble also supports generating machine readable results in YAML or JSON format.
+To use this functionality, use the <code class="docutils literal notranslate"><span class="pre">--formats</span></code> option on
+<code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="6_configuring_a_scaling_study.html" class="btn btn-neutral float-left" title="6) Configuring a Scaling Study" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="8_var_expansion_indirection_and_stack_parameterization.html" class="btn btn-neutral float-right" title="8) Variable Expansion, Indirection, and Software Stack Parameterization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Nov 30, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

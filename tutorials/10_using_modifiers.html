@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>10) Modifiers &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="11) Internals" href="11_using_internals.html" />
+    <link rel="prev" title="9) Success Criteria" href="9_success_criteria.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="1_hello_world.html">1) Getting Started Running A “Hello World” Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2_running_a_simple_gromacs_experiment.html">2) Running A Simple GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3_modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4_using_vectors_and_matrices.html">4) Using Vectors and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="5_changing_your_software_stack.html">5) Changing A Software Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="6_configuring_a_scaling_study.html">6) Configuring a Scaling Study</a></li>
+<li class="toctree-l2"><a class="reference internal" href="7_using_zips_and_matrices.html">7) Zips and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="8_var_expansion_indirection_and_stack_parameterization.html">8) Variable Expansion, Indirection, and Software Stack Parameterization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="9_success_criteria.html">9) Success Criteria</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">10) Modifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-workspace">Create a Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#activate-the-workspace">Activate the Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-experiment-definitions">Configure Experiment Definitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#discovering-modifiers">Discovering Modifiers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#applying-the-lscpu-modifier">Applying the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> Modifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-modifiers">Advanced Modifiers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Execute Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="11_using_internals.html">11) Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">10) Modifiers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/10_using_modifiers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modifiers">
+<span id="modifiers-tutorial"></span><h1>10) Modifiers<a class="headerlink" href="#modifiers" title="Link to this heading"></a></h1>
+<p>In this tutorial, you will learn how to discover modifiers, learn about their
+functionality, and apply them to experiments for
+<a class="reference external" href="https://www.mmm.ucar.edu/models/wrf">WRF</a>, a free and open-source
+application for atmospheric research and operational forecasting applications.</p>
+<p>This tutorial builds off of concepts introduced in previous tutorials. Please
+make sure you review those before starting with this tutorial’s content.</p>
+<section id="create-a-workspace">
+<h2>Create a Workspace<a class="headerlink" href="#create-a-workspace" title="Link to this heading"></a></h2>
+<p>To begin with, you need a workspace to configure the experiments. This can be
+created with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>modifiers_wrf
+</pre></div>
+</div>
+</section>
+<section id="activate-the-workspace">
+<h2>Activate the Workspace<a class="headerlink" href="#activate-the-workspace" title="Link to this heading"></a></h2>
+<p>Several of Ramble’s commands require an activated workspace to function
+properly. Activate the newly created workspace using the following command:
+(NOTE: you only need to run this if you do not currently have the workspace
+active).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>modifiers_wrf
+</pre></div>
+</div>
+</section>
+<section id="configure-experiment-definitions">
+<h2>Configure Experiment Definitions<a class="headerlink" href="#configure-experiment-definitions" title="Link to this heading"></a></h2>
+<p>To being with, you need to configure the workspace. The workspace’s root
+location can be seen under the <code class="docutils literal notranslate"><span class="pre">Location</span></code> output of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>Additionally, the files can be edited directly with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
+final configuration from a previous tutorial.</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>The above configuration will execute 3 experiments, comprising a basic scaling
+study on three different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented at <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">List (or Vector) Variables:</span></a>. Vector
+experiments were also introduced in <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">4) Using Vectors and Matrices</span></a>.</p>
+</section>
+<section id="discovering-modifiers">
+<h2>Discovering Modifiers<a class="headerlink" href="#discovering-modifiers" title="Link to this heading"></a></h2>
+<p>In Ramble, a <code class="docutils literal notranslate"><span class="pre">modifier</span></code> is an abstract object that can be applied to a large
+set of experiments. Modifiers are intended to encasulate reusable patterns that
+perform a specific extension of a workload focused experiment. Some examples of
+useful modifiers include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Collecting system level information</p></li>
+<li><p>Changing underlying system / library functionality</p></li>
+<li><p>Injecting Performance Analysis Tools</p></li>
+</ul>
+</div></blockquote>
+<p>To discover which modifiers are available, execute:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>mods<span class="w"> </span>list
+</pre></div>
+</div>
+<p>Which might output the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; 4 modifiers</span>
+<span class="go">conditional-psm3  gcp-metadata  intel-aps  lscpu</span>
+</pre></div>
+</div>
+<p>This shows there are four modifiers in this installation of Ramble. Two very
+general modifiers in this list are <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> and <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code>. Modifiers are
+allowed to behave in different ways. Their functionality should be documented
+at a high-level through the <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">mods</span> <span class="pre">info</span></code> command. To get information
+about the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> modifier, execute:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>mods<span class="w"> </span>info<span class="w"> </span>lscpu
+</pre></div>
+</div>
+<p>This modifier adds the execution of <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> to each experiment in a workspace
+(to capture additional platform level details, such as the CPU model), and
+defines additional figures of merit related to the output to <code class="docutils literal notranslate"><span class="pre">lscpu</span></code>.</p>
+<p>The output of this command lists all supported modes of operation for the
+modifier, along with some of the behaviors each mode presents. A <code class="docutils literal notranslate"><span class="pre">mode</span></code> is a
+grouping of behaviors that control what the modifier will do to the
+experiments. Some modifiers only have a single mode of operation (as <code class="docutils literal notranslate"><span class="pre">lscpu</span></code>
+only has <code class="docutils literal notranslate"><span class="pre">standard</span></code>), while others might contain more. Modes are provided to
+allow users to easily control the behavior of the modifier.</p>
+</section>
+<section id="applying-the-lscpu-modifier">
+<h2>Applying the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> Modifier<a class="headerlink" href="#applying-the-lscpu-modifier" title="Link to this heading"></a></h2>
+<p>In the minimal case, a modifier can be added to all experiments in a workspace
+with two lines. In the general case, each modifier that is applied to
+experiments must define the mode of operation it will use. In the case that a
+modifier only has a single <code class="docutils literal notranslate"><span class="pre">mode</span></code>, it will be automatically selected as the
+default. Additionally, modifiers are allowed to define their own default modes
+to simplify its usage within a workspace.</p>
+<p>To apply the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> modifier to your experiments, edit the workspace
+configuration file with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>And add the following lines, at the workspace scope:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">modifiers</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lscpu</span>
+</pre></div>
+</div>
+<p>The resulting configuration file should look like the following.</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">modifiers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lscpu</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">modifiers</span></code> dictionary can be defined at any scope <code class="docutils literal notranslate"><span class="pre">variables</span></code> can be
+defined at. Defined <code class="docutils literal notranslate"><span class="pre">modifiers</span></code> are inherited by all experiments at lower
+scope levels.</p>
+</section>
+<section id="execute-experiments">
+<h2>Execute Experiments<a class="headerlink" href="#execute-experiments" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Average Timestep Time: Time (in seconds) on average each timestep takes</p></li>
+<li><p>Cumulative Timestep Time: Time (in seconds) spent executing all timesteps</p></li>
+<li><p>Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep</p></li>
+<li><p>Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep</p></li>
+<li><p>Number of timesteps: Count of total timesteps performed</p></li>
+<li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
+</ul>
+<p>In addition to these WRF defined figures of merit, you should also see
+<code class="docutils literal notranslate"><span class="pre">lscpu</span></code> defined figures of merit. These might include the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CPU family</p></li>
+<li><p>Model</p></li>
+<li><p>Core(s) per socket</p></li>
+<li><p>Socket(s)</p></li>
+</ul>
+</div></blockquote>
+<p>You may also examine the <code class="docutils literal notranslate"><span class="pre">execute_experiment</span></code> script in each of the
+experiment run directories to see what changed after applying the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code>
+modifier.</p>
+</section>
+<section id="advanced-modifiers">
+<h2>Advanced Modifiers<a class="headerlink" href="#advanced-modifiers" title="Link to this heading"></a></h2>
+<p>Some modifiers have additionally functionality, which can include requiring
+specific software packages to be present. An example of this is the
+<code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> modifier, which applies Intel’s
+<a href="#id2"><span class="problematic" id="id3">`Application Performan Snapshot&lt;https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide-application-snapshot-linux/2023-0/introducing-application-performance-snapshot.html&gt;`_</span></a>
+to a workspace’s experiments.</p>
+<p>To get information about the <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> modifier, execute:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>mods<span class="w"> </span>info<span class="w"> </span>intel-aps
+</pre></div>
+</div>
+<p>In the output from this command, you should see a <code class="docutils literal notranslate"><span class="pre">mode</span></code> named <code class="docutils literal notranslate"><span class="pre">mpi</span></code>. One
+additional difference relateive to <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> is that the <code class="docutils literal notranslate"><span class="pre">Software</span> <span class="pre">Specs:</span></code>
+section at the bottom of the output now has information in it. This is because
+Intel APS needs to be installed to be able to run applications under it.</p>
+<p>To apply the <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> modifier, edit the workspace configuration file
+using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>Within this file, add:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-aps</span>
+</pre></div>
+</div>
+<p>To the list of modifiers. This will cause both <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> and <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> to
+be applied to all of the experiments. The resulting configuration file should
+look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">modifiers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lscpu</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-aps</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+<p>To test some aspects of the workspace configuration before spending time
+performing a real setup, use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+<p>This will perform many of the validation checks, and generate the experiment
+directories as a normal setup would, but can execute much faster. Before this
+command proceeds too far, you should see the following error message:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Software spec intel-oneapi-vtune is not defined in environment wrfv4, but is required by the intel-aps modifier definition</span>
+</pre></div>
+</div>
+<p>As mentioned earlier, this is because the <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> modifier requires
+additional software to function properly. In this case, it requires the
+<code class="docutils literal notranslate"><span class="pre">intel-oneapi-vtune</span></code> package. However, this package is not defined, nor is it
+in your environment definition.</p>
+<p>To remedy this issue, again edit your workspace configuration file using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>And write a Spack package definition for <code class="docutils literal notranslate"><span class="pre">intel-oneapi-vtune</span></code>. After the
+package is defined, add the package to the <code class="docutils literal notranslate"><span class="pre">wrfv4</span></code> environment. The resulting
+configuration file should look like the following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">modifiers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lscpu</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-aps</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">aps</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-vtune</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aps</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h2>Execute Experiments<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Average Timestep Time: Time (in seconds) on average each timestep takes</p></li>
+<li><p>Cumulative Timestep Time: Time (in seconds) spent executing all timesteps</p></li>
+<li><p>Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep</p></li>
+<li><p>Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep</p></li>
+<li><p>Number of timesteps: Count of total timesteps performed</p></li>
+<li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
+</ul>
+<p>In addition to these WRF defined figures of merit, you should also see
+<code class="docutils literal notranslate"><span class="pre">lscpu</span></code>, and <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> defined figures of merit. These might include the
+following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CPU family - From <code class="docutils literal notranslate"><span class="pre">lscpu</span></code></p></li>
+<li><p>Model - From <code class="docutils literal notranslate"><span class="pre">lscpu</span></code></p></li>
+<li><p>Core(s) per socket - From <code class="docutils literal notranslate"><span class="pre">lscpu</span></code></p></li>
+<li><p>Socket(s) - From <code class="docutils literal notranslate"><span class="pre">lscpu</span></code></p></li>
+<li><p>MPI Time - From <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code></p></li>
+<li><p>Disk I/O Time - From <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code></p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="9_success_criteria.html" class="btn btn-neutral float-left" title="9) Success Criteria" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="11_using_internals.html" class="btn btn-neutral float-right" title="11) Internals" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Nov 30, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
