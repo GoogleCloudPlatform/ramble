@@ -51,10 +51,9 @@ these files can be edited to configure the workspace, and examples will be
 provided below.
 
 The available files are:
-* ``ramble.yaml`` This file describes all aspects of the workspace. This
-includes the software stack, the experiments, and all variables.
-* ``execute_experiment.tpl`` This file is a template shell script that will be
-rendered to execute each of the experiments that ramble generates.
+
+ * ``ramble.yaml`` This file describes all aspects of the workspace. This includes the software stack, the experiments, and all variables.
+ * ``execute_experiment.tpl`` This file is a template shell script that will be rendered to execute each of the experiments that ramble generates.
 
 You can edit these files directly or with the command ``ramble workspace edit``.
 
@@ -64,7 +63,6 @@ contents of ``$ramble_root/examples/basic_gromacs_config.yaml``:
 
 
 .. literalinclude:: ../../../../examples/basic_gromacs_config.yaml
-   :linenos:
    :language: YAML
 
 Note that specifying compilers that Spack doesn't have installed may take a while.
