@@ -20,7 +20,7 @@ for molecular dynamics.
 This tutorial builds off of concepts introduced in previous tutorials. Please
 make sure you review those before starting with this tutorial's content.
 
-.. include:: shared/gromacs_workspace.rst
+.. include:: shared/gromacs_vector_workspace.rst
 
 Software Description
 --------------------
@@ -74,11 +74,39 @@ a software environment named ``gromacs``. This can be overridden using the
 variable ``env_name``, which can be the name of any environment defined in the
 workspace configuration file.
 
-The above output relates to lines 37-53 in the above configuration file, where
-we define packages for Intel MPI, GROMACS, and GCC 9.3.0. The GROMACS and Intel
-MPI packages are then combined into the ``gromacs`` software environment. Lines
-40, 43, and 46 are the names of packages within this workspace, while line 50
-is the name of a software environment.
+
+The relevant portion of the workspace configuration file is:
+
+.. code-block:: YAML
+
+    spack:
+      concretized: true
+      packages:
+        gcc9:
+          spack_spec: gcc@9.3.0 target=x86_64
+          compiler_spec: gcc@9.3.0
+        impi2018:
+          spack_spec: intel-mpi@2018.4.274 target=x86_64
+          compiler: gcc9
+        gromacs:
+          spack_spec: gromacs@2021.6
+          compiler: gcc9
+      environments:
+        gromacs:
+          packages:
+          - gromacs
+          - impi2018
+
+In this configuration, the ``packages`` block defines software packages that
+can be used to build experiment environments out of. The ``environments`` block
+defines software environments which can be used for the experiments listed
+within the ``ramble:applications`` block. Keys within both ``packages`` and
+``environments`` are the name of the package or environment (respectively).
+Each environment has a ``packages`` block, which contains a list of package
+names that are defined in the higher level ``packages`` block.
+
+These are further documented in the
+:ref:`Spack configuration section<spack-config>` documentation.
 
 Changing Software Definitions
 -----------------------------
@@ -159,8 +187,31 @@ should similarly be unique, and can use placeholder values for variable
 definitions.
 
 As an example, to explore both of the versions of GROMACS described in this
-tutorial, your ``ramble.yaml`` coudld look like the following:
+tutorial, your ``ramble.yaml`` could look like the following:
 
 .. literalinclude:: ../../../../examples/vector_gromacs_software_config.yaml
-   :linenos:
    :language: YAML
+
+Using this configuration file, you can examine what changes it would make to
+your workspace through:
+
+.. code-block:: console
+
+    $ ramble workspace info
+    or;
+    $ ramble workspace setup --dry-run
+
+Cleaning the Workspace
+----------------------
+
+Once your are finished with the tutorial content, deactivate your workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the entire workspace and all of its contents using:
+
+.. code-block:: console
+
+    $ ramble workspace remove basic_gromacs
