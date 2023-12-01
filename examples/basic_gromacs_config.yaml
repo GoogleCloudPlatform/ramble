@@ -1,4 +1,7 @@
 ramble:
+  env_vars:
+    set:
+      OMP_NUM_THREADS: '{n_threads}'
   variables:
     processes_per_node: 16
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
