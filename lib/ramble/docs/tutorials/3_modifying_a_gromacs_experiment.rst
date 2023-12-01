@@ -113,9 +113,8 @@ The experiments section of this command's output might contain the following:
               type = rf ==> rf
 
 The variables ``mpi_command``, ``processes_per_node``, and ``batch_submit``
-come from the workspace scope on lines 3, 4, and 5 of the YAML file in
-:ref:`gromacs_workspace_config`. Each experiment has its own definition for
-``n_ranks``, ``n_threads``, ``size``, and ``type``.
+come from the workspace scope towards the top of the YAML file. Each experiment
+has its own definition for ``n_ranks``, ``n_threads``, ``size``, and ``type``.
 
 The experiments in this configuration use both the ``water_bare`` and
 ``water_gmx50`` workloads.
@@ -176,7 +175,7 @@ your workspace's ``ramble.yaml`` file.
 While these variables contain ``Suggested Values`` some other variable
 definitions can take any value you want. As a result, they might not provide
 anything other than a default value. While the default value is expected to
-function properly, you as the user can override their definition within the
+function properly, you are allowed to override their definition within the
 ``ramble.yaml`` if your experiments would benefit from it. However, be aware
 that this also has the potential to change the behavior of your experiments and
 is considered an advanced action.
@@ -187,7 +186,9 @@ Editing Experiments
 Now that you know how to determine which values are possible, select one or
 more of the possible values for the ``size`` variable. You will modify the
 experiments in your workspace to use this (remember, you have 4 experiments
-defined currently). **NOTE** The larger the value, the more expensive the
+defined currently).
+
+**NOTE** The larger the value, the more expensive the
 experiment will be. However you can give each experiment a unique value.
 
 To make editing the workspace easier, use the following command (assuming you
@@ -217,6 +218,23 @@ These changes should now be reflected in the output of:
 
 .. include:: shared/gromacs_execute.rst
 
-If you have a ``results`` file from the :ref:`running_an_experiment_tutorial`,
+If you have a ``results`` file from the :ref:`previous tutorial <running_an_experiment_tutorial>`,
 you can compare it with the newly created results file to see what impact
 changing the ``size`` variable had on your figures of merit.
+
+Cleaning the Workspace
+----------------------
+
+After you are finished with the content of this tutorial, make sure you
+deactivate your workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+If you no longer need the workspace materials, remove the entire workspace
+with:
+
+.. code-block:: console
+
+    $ ramble workspace remove basic_gromacs
