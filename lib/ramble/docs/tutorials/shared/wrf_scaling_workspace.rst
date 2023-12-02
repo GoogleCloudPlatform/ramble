@@ -16,7 +16,7 @@ location can be seen under the ``Location`` output of:
 
     $ ramble workspace info
 
-Additionally, the files can be edited directly with:
+Alternatively, the files can be edited directly with:
 
 .. code-block:: console
 
@@ -43,7 +43,7 @@ final configuration from a previous tutorial.
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
@@ -62,8 +62,8 @@ final configuration from a previous tutorial.
             - intel-mpi
             - wrfv4
 
-The above configuration will execute 3 experiments, comprising a basic scaling
-study on three different sets of nodes. This is primarily defined by the use of
+The above configuration will execute 2 experiments, comprising a basic scaling
+study on 2 different sets of nodes. This is primarily defined by the use of
 vector experiments, which are documented in the :ref:`vector
 logic<ramble-vector-logic>` portion of the workspace configuration file
 documentation.. Vector experiments were also introduced in the :ref:`vector and
