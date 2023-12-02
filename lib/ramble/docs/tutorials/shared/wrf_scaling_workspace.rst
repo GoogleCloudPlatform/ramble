@@ -28,6 +28,9 @@ final configuration from a previous tutorial.
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
@@ -45,7 +48,7 @@ final configuration from a previous tutorial.
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -61,6 +64,8 @@ final configuration from a previous tutorial.
 
 The above configuration will execute 3 experiments, comprising a basic scaling
 study on three different sets of nodes. This is primarily defined by the use of
-vector experiments, which are documented at :ref:`ramble-vector-logic`. Vector
-experiments were also introduced in :ref:`vector_and_matrix_tutorial`.
+vector experiments, which are documented in the :ref:`vector
+logic<ramble-vector-logic>` portion of the workspace configuration file
+documentation.. Vector experiments were also introduced in the :ref:`vector and
+matrix tutorial <vector_and_matrix_tutorial>`.
 
