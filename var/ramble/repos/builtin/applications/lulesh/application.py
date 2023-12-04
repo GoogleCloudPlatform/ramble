@@ -19,16 +19,14 @@ class Lulesh(SpackApplication):
 
     tags('proxy-app', 'mini-app')
 
-    default_compiler('intel202160',
-                     spack_spec='intel-oneapi-compilers@2022.1.0',
-                     compiler_spec='intel@2021.6.0')
+    default_compiler('gcc13', spack_spec='gcc@13.1.0', compiler_spec='gcc@13.1.0')
 
     software_spec('impi2018',
                   spack_spec='intel-mpi@2018.4.274')
 
     software_spec('lulesh',
                   spack_spec='lulesh@2.0.3 +openmp',
-                  compiler='intel202160')
+                  compiler='gcc13')
 
     required_package('lulesh')
 
