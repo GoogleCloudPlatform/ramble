@@ -87,6 +87,7 @@ This success criteria might look like the following:
     - name: 'timing-present'
       mode: 'string'
       match: 'Timing for main.*'
+      file: '{experiment_run_dir}/rsl.out.0000'
 
 Edit your workspace configuration file with:
 
@@ -101,7 +102,7 @@ configuration file might look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -111,17 +112,18 @@ configuration file might look like the following:
           - name: 'timing-present'
             mode: 'string'
             match: 'Timing for main.*'
+            file: '{experiment_run_dir}/rsl.out.0000'
           workloads:
             CONUS_12km:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -170,7 +172,7 @@ resulting configuration file might look like the following:
 
     ramble:
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -180,6 +182,7 @@ resulting configuration file might look like the following:
           - name: 'timing-present'
             mode: 'string'
             match: 'Timing for main.*'
+            file: '{experiment_run_dir}/rsl.out.0000'
           workloads:
             CONUS_12km:
               success_criteria:
@@ -190,12 +193,12 @@ resulting configuration file might look like the following:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -238,8 +241,16 @@ explore using this after you perform experiments.
 .. include:: shared/wrf_execute.rst
 
 To ensure the success criteria are checked and the experiments pass them,
-ensure ``SUCCESS`` is printed for the status of each experiment. Also, running
-analyze in debug mode as:
+ensure ``SUCCESS`` is printed for the status of each experiment.
+
+When an experiment fails, you can force Ramble to print the figure of merit
+data using:
+
+.. code-block:: console
+
+    $ ramble workspace analyze --always-print-foms
+
+Also, running analyze in debug mode as:
 
 .. code-block:: console
 
