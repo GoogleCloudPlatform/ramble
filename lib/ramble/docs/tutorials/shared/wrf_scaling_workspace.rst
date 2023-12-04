@@ -29,7 +29,7 @@ final configuration from a previous tutorial.
 
     ramble:
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
