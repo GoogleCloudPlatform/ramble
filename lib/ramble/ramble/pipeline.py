@@ -267,14 +267,16 @@ class ArchivePipeline(Pipeline):
                 fs.mkdirp(os.path.dirname(dest))
                 shutil.copyfile(src, dest)
 
-        # Copy current software spack.yamls
+        # Copy current software spack files
+        file_names = ['spack.yaml', 'spack.lock']
         archive_software = os.path.join(self.workspace.latest_archive_path,
                                         ramble.workspace.workspace_software_path)
         fs.mkdirp(archive_software)
-        for file in glob.glob(os.path.join(self.workspace.software_dir, '*', 'spack.yaml')):
-            dest = file.replace(self.workspace.software_dir, archive_software)
-            fs.mkdirp(os.path.dirname(dest))
-            shutil.copyfile(file, dest)
+        for file_name in file_names:
+            for file in glob.glob(os.path.join(self.workspace.software_dir, '*', file_name)):
+                dest = file.replace(self.workspace.software_dir, archive_software)
+                fs.mkdirp(os.path.dirname(dest))
+                shutil.copyfile(file, dest)
 
     def _complete(self):
         if self.create_tar:
