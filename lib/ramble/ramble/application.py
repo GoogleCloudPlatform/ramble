@@ -15,6 +15,7 @@ import textwrap
 import string
 import shutil
 import fnmatch
+import enum
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -666,7 +667,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Perform executable injection
         if namespace.executable_injection in self.internals:
 
-            supported_orders = set(['before', 'after'])
+            supported_orders = enum.Enum('supported_orders', ['before', 'after'])
 
             # Order can be 'before' or 'after.
             # If `relative_to` is not set, then before adds to be the beginning of the list
@@ -679,20 +680,20 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for exec_injection in self.internals[namespace.executable_injection]:
                 exec_name = exec_injection['name']
 
-                injection_order = 'after'
+                injection_order = supported_orders.after
                 if 'order' in exec_injection:
-                    injection_order = exec_injection['order']
+                    if not hasattr(supported_orders, exec_injection['order']):
+                        logger.die('In experiment '
+                                   f'"{self.expander.experiment_namespace}" '
+                                   f'injection order of executable "{exec_name}" is set to an '
+                                   f'invalid value of "{injection_order}".\n'
+                                   f'Valid values are {supported_orders}.')
+
+                    injection_order = getattr(supported_orders, exec_injection['order'])
 
                 relative = None
                 if 'relative_to' in exec_injection:
                     relative = exec_injection['relative_to']
-
-                if injection_order not in supported_orders:
-                    logger.die('In experiment '
-                               f'"{self.expander.experiment_namespace}" '
-                               f'injection order of executable "{exec_name}" is set to an '
-                               f'invalid value of "{injection_order}".\n'
-                               f'Valid values are {supported_orders}.')
 
                 if exec_name not in self.executables:
                     logger.die('In experiment '
@@ -706,17 +707,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                f'relative to a non existing executable "{relative}".')
 
                 if relative is None:
-                    if injection_order == 'before':
+                    if injection_order == supported_orders.before:
                         executables.insert(0, exec_name)
-                    elif injection_order == 'after':
+                    elif injection_order == supported_orders.after:
                         executables.append(exec_name)
                 else:
 
                     found = False
-                    if injection_order == 'before':
+                    if injection_order == supported_orders.before:
                         relative_index = 0
                         increment = 1
-                    elif injection_order == 'after':
+                    elif injection_order == supported_orders.after:
                         relative_index = len(executables) - 1
                         increment = -1
 
@@ -727,9 +728,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         else:
                             relative_index += increment
 
-                    if injection_order == 'before':
+                    if injection_order == supported_orders.before:
                         injection_index = relative_index
-                    elif injection_order == 'after':
+                    elif injection_order == supported_orders.after:
                         injection_index = relative_index + 1
 
                     executables.insert(injection_index, exec_name)
