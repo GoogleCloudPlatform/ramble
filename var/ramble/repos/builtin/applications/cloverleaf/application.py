@@ -22,7 +22,7 @@ class Cloverleaf(SpackApplication):
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 
-    software_spec('ompi414', spack_spec='openmpi@4.1.4 +legacylaunchers +pmi +cxx',
+    software_spec('ompi414', spack_spec='openmpi@4.1.4 +legacylaunchers +cxx',
                   compiler='gcc12')
     software_spec('cloverleaf',
                   spack_spec='cloverleaf@1.1 build=ref',
