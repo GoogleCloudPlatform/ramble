@@ -22,7 +22,7 @@ class Openfoam(SpackApplication):
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('ompi412',
-                  spack_spec='openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx',
+                  spack_spec='openmpi@4.1.2 +legacylaunchers +cxx',
                   compiler='gcc9')
 
     software_spec('flex',
