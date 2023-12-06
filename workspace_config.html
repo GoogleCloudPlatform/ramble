@@ -73,6 +73,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#custom-executables">Custom Executables:</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#controlling-executable-order">Controlling Executable Order:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-executable-injection">Using Executable Injection:</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#reserved-variables">Reserved Variables:</a><ul>
@@ -594,6 +595,29 @@ one can control the order of the executables in the <code class="docutils litera
 <p>The default for the hostname application is <code class="docutils literal notranslate"><span class="pre">[builtin::env_vars,</span>
 <span class="pre">serial/parallel]</span></code> but this changes the order and injects <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> into the
 expansion.</p>
+</section>
+<section id="using-executable-injection">
+<h4>Using Executable Injection:<a class="headerlink" href="#using-executable-injection" title="Link to this heading"></a></h4>
+<p>Executable order can also be controlled via the <code class="docutils literal notranslate"><span class="pre">executable_injection</span></code> block
+within the <code class="docutils literal notranslate"><span class="pre">internals</span></code> block. Injecting the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> executable to the end of
+the list of executables can be performed with the following:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">internals</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">custom_executables</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">lscpu</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;lscpu&#39;</span>
+<span class="w">            </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">            </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{log_file}&#39;</span>
+<span class="w">        </span><span class="nt">executable_injection</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lscpu</span>
+</pre></div>
+</div>
+<p>This is a generic way to add the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> custom executable to the end of the
+list of executables for the experiment. For more information on this see the
+<a class="reference internal" href="configuration_files.html#internals-config"><span class="std std-ref">internals config section</span></a> documentation.</p>
 </section>
 </section>
 <section id="reserved-variables">

@@ -71,6 +71,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-executable-injection">Using Executable Injection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Execute Experiments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mirrors.html">Mirrors</a></li>
@@ -406,6 +408,99 @@ show the following results:</p>
 </ul>
 <p>Examining the experiment run directories, you should see <code class="docutils literal notranslate"><span class="pre">start_time</span></code> and
 <code class="docutils literal notranslate"><span class="pre">end_time</span></code> files which contain the output of our custom executables.</p>
+</section>
+<section id="using-executable-injection">
+<h2>Using Executable Injection<a class="headerlink" href="#using-executable-injection" title="Link to this heading"></a></h2>
+<p>In addition to the full explicit method of injecting an executable shown above,
+you can inject executables relative to existing executables in the experiment’s
+executable list, this is documented in the <a class="reference internal" href="../configuration_files.html#internals-config"><span class="std std-ref">internals config
+section</span></a> and <a class="reference internal" href="../workspace_config.html#workspace-internals"><span class="std std-ref">workspace internals</span></a>
+documentation sections.</p>
+<p>As an example, the following YAML could replace the <code class="docutils literal notranslate"><span class="pre">executables</span></code> section of
+your existing configuration with the following:</p>
+<p>Go ahead and edit the workspace configuration file with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
+</pre></div>
+</div>
+<p>Replace the <code class="docutils literal notranslate"><span class="pre">executables</span></code> block with the <code class="docutils literal notranslate"><span class="pre">executable_injection</span></code> block
+presented above.  The resulting configuration file should look like the
+following:</p>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
+<span class="w">              </span><span class="nt">internals</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">custom_executables</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">start_time</span><span class="p">:</span>
+<span class="w">                    </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">                    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;date</span><span class="nv"> </span><span class="s">+%s&#39;</span>
+<span class="w">                    </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{experiment_run_dir}/start_time&#39;</span>
+<span class="w">                    </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">                  </span><span class="nt">end_time</span><span class="p">:</span>
+<span class="w">                    </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">                    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;date</span><span class="nv"> </span><span class="s">+%s&#39;</span>
+<span class="w">                    </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{experiment_run_dir}/end_time&#39;</span>
+<span class="w">                    </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">                </span><span class="nt">executable_injection</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">start_time</span>
+<span class="w">                  </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">before</span>
+<span class="w">                  </span><span class="nt">relative_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">execute</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">end_time</span>
+<span class="w">                  </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">after</span>
+<span class="w">                  </span><span class="nt">relative_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">execute</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h2>Execute Experiments<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>Now that you have made the appropriate modifications, set up, execute, and
+analyze the new experiments using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
+</pre></div>
+</div>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">results</span></code> file in the root of the workspace that contains
+extracted figures of merit. If the experiments were successful, this file will
+show the following results:</p>
+<ul class="simple">
+<li><p>Average Timestep Time: Time (in seconds) on average each timestep takes</p></li>
+<li><p>Cumulative Timestep Time: Time (in seconds) spent executing all timesteps</p></li>
+<li><p>Minimum Timestep Time: Minimum time (in seconds) spent on any one timestep</p></li>
+<li><p>Maximum Timestep Time: Maximum time (in seconds) spent on any one timestep</p></li>
+<li><p>Number of timesteps: Count of total timesteps performed</p></li>
+<li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
+</ul>
+<p>Examining the experiment run directories, you should see <code class="docutils literal notranslate"><span class="pre">start_time</span></code> and
+<code class="docutils literal notranslate"><span class="pre">end_time</span></code> in the same places as they were when you ran the explicitly
+defined order experiments.</p>
 </section>
 </section>
 

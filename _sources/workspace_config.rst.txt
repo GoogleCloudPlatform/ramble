@@ -647,6 +647,34 @@ The default for the hostname application is ``[builtin::env_vars,
 serial/parallel]`` but this changes the order and injects ``lscpu`` into the
 expansion.
 
+
+"""""""""""""""""""""""""""
+Using Executable Injection:
+"""""""""""""""""""""""""""
+
+Executable order can also be controlled via the ``executable_injection`` block
+within the ``internals`` block. Injecting the ``lscpu`` executable to the end of
+the list of executables can be performed with the following:
+
+.. code-block:: yaml
+
+   ramble:
+     applications:
+       hostname:
+         internals:
+           custom_executables:
+             lscpu:
+               template:
+               - 'lscpu'
+               use_mpi: false
+               redirect: '{log_file}'
+           executable_injection:
+           - name: lscpu
+
+This is a generic way to add the ``lscpu`` custom executable to the end of the
+list of executables for the experiment. For more information on this see the
+:ref:`internals config section<internals-config>` documentation.
+
 ^^^^^^^^^^^^^^^^^^^
 Reserved Variables:
 ^^^^^^^^^^^^^^^^^^^

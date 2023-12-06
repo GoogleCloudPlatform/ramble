@@ -110,6 +110,7 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
@@ -535,7 +536,13 @@
 
         <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">executables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
             <span class="n">header</span> <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_4</span><span class="p">(</span><span class="s1">&#39;Executable Order&#39;</span><span class="p">)</span>
-            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}{</span><span class="n">header</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">executables</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}{</span><span class="n">header</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">executables</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">executable_injection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_4</span><span class="p">(</span><span class="s1">&#39;Executable Injection&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}{</span><span class="n">header</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">executable_injection</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ApplicationBase.print_chain_order">
@@ -798,12 +805,83 @@
             <span class="n">executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">executables</span><span class="p">]</span>
 
         <span class="c1"># Define custom executables</span>
-        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">custom_executables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">custom_executables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">custom_executables</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">CommandExecutable</span><span class="p">(</span>
                     <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">conf</span>
                 <span class="p">)</span>
+
+        <span class="c1"># Perform executable injection</span>
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">executable_injection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
+
+            <span class="n">supported_orders</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;supported_orders&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;before&#39;</span><span class="p">,</span> <span class="s1">&#39;after&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Order can be &#39;before&#39; or &#39;after.</span>
+            <span class="c1"># If `relative_to` is not set, then before adds to be the beginning of the list</span>
+            <span class="c1">#                  and after (default) adds to the end of the list</span>
+            <span class="c1"># If `relative_to` IS set, then before adds before the first instance of</span>
+            <span class="c1">#                  the executable in the list</span>
+            <span class="c1">#                  and after (default) adds after the last instance of the</span>
+            <span class="c1">#                  executable in the list</span>
+            <span class="c1"># If `relative_to` is set, and the executable name is not found, raise a fatal error.</span>
+            <span class="k">for</span> <span class="n">exec_injection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">executable_injection</span><span class="p">]:</span>
+                <span class="n">exec_name</span> <span class="o">=</span> <span class="n">exec_injection</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+                <span class="n">injection_order</span> <span class="o">=</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">after</span>
+                <span class="k">if</span> <span class="s1">&#39;order&#39;</span> <span class="ow">in</span> <span class="n">exec_injection</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">supported_orders</span><span class="p">,</span> <span class="n">exec_injection</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;In experiment &#39;</span>
+                                   <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                                   <span class="sa">f</span><span class="s1">&#39;injection order of executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot; is set to an &#39;</span>
+                                   <span class="sa">f</span><span class="s1">&#39;invalid value of &quot;</span><span class="si">{</span><span class="n">injection_order</span><span class="si">}</span><span class="s1">&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                   <span class="sa">f</span><span class="s1">&#39;Valid values are </span><span class="si">{</span><span class="n">supported_orders</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+                    <span class="n">injection_order</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">supported_orders</span><span class="p">,</span> <span class="n">exec_injection</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">])</span>
+
+                <span class="n">relative</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;relative_to&#39;</span> <span class="ow">in</span> <span class="n">exec_injection</span><span class="p">:</span>
+                    <span class="n">relative</span> <span class="o">=</span> <span class="n">exec_injection</span><span class="p">[</span><span class="s1">&#39;relative_to&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">exec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;In experiment &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;attempting to inject a non existing executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">relative</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">relative</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">executables</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;In experiment &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;attempting to inject executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;relative to a non existing executable &quot;</span><span class="si">{</span><span class="n">relative</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">relative</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">injection_order</span> <span class="o">==</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">before</span><span class="p">:</span>
+                        <span class="n">executables</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">exec_name</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">injection_order</span> <span class="o">==</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">after</span><span class="p">:</span>
+                        <span class="n">executables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exec_name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">injection_order</span> <span class="o">==</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">before</span><span class="p">:</span>
+                        <span class="n">relative_index</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">increment</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">injection_order</span> <span class="o">==</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">after</span><span class="p">:</span>
+                        <span class="n">relative_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">executables</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                        <span class="n">increment</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+                    <span class="k">while</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">and</span> <span class="n">relative_index</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">executables</span><span class="p">)</span> \
+                            <span class="ow">and</span> <span class="n">relative_index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">executables</span><span class="p">[</span><span class="n">relative_index</span><span class="p">]</span> <span class="o">==</span> <span class="n">relative</span><span class="p">:</span>
+                            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">relative_index</span> <span class="o">+=</span> <span class="n">increment</span>
+
+                    <span class="k">if</span> <span class="n">injection_order</span> <span class="o">==</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">before</span><span class="p">:</span>
+                        <span class="n">injection_index</span> <span class="o">=</span> <span class="n">relative_index</span>
+                    <span class="k">elif</span> <span class="n">injection_order</span> <span class="o">==</span> <span class="n">supported_orders</span><span class="o">.</span><span class="n">after</span><span class="p">:</span>
+                        <span class="n">injection_index</span> <span class="o">=</span> <span class="n">relative_index</span> <span class="o">+</span> <span class="mi">1</span>
+
+                    <span class="n">executables</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">injection_index</span><span class="p">,</span> <span class="n">exec_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">executables</span>
 

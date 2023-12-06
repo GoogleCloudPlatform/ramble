@@ -293,6 +293,10 @@ easily break aspects of the experiment if used incorrectly.</p>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">executables</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">to use in</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">experiments</span>
+<span class="w">  </span><span class="nt">executable_injection</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;executable_name&gt;</span>
+<span class="w">    </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;before&#39;</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/ &#39;after&#39;</span><span class="w"> </span><span class="c1"># Default: &#39;after&#39;</span>
+<span class="w">    </span><span class="p p-Indicator">[</span><span class="nv">relative_to</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="nv">&lt;relative_executable_name&gt;</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <p>Currently this section has two sub-sections.</p>
@@ -302,6 +306,20 @@ of an internally defined executable within an experiment.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">executables</span></code> sub-section can be used to control the order executables
 will be used in the experiment. This is also the mechanism to inject custom
 executables into an experiment.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">executable_injection</span></code> sub-section can be used to inject custom
+executables into the list of executables an experiment would use without having
+to define the entire list. The <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute should be set to the name of
+an executable. This can be either a custom executable (defined in
+<code class="docutils literal notranslate"><span class="pre">custom_executables</span></code>) or an existing executable (including a <code class="docutils literal notranslate"><span class="pre">builtin</span></code>).
+The <code class="docutils literal notranslate"><span class="pre">order</span></code> attrbite can be set to either <code class="docutils literal notranslate"><span class="pre">before</span></code> or <code class="docutils literal notranslate"><span class="pre">after</span></code> with
+<code class="docutils literal notranslate"><span class="pre">after</span></code> being the default value if it is not specified. The <code class="docutils literal notranslate"><span class="pre">relative_to</span></code>
+attribute can be set to the name of an executable already in the list of
+experiment executables (including custom executables that are already injected).</p>
+<p>Processing the <code class="docutils literal notranslate"><span class="pre">executable_injection</span></code> sub-section occurs after processing the
+<code class="docutils literal notranslate"><span class="pre">executables</span></code> sub-section. Executables are injected in the order they are
+listed in the YAML file, with lower precedence scopes being processed first.
+(e.g. <code class="docutils literal notranslate"><span class="pre">workspace</span></code> executables are injected before <code class="docutils literal notranslate"><span class="pre">experiment</span></code> executables
+are).</p>
 </section>
 <section id="licenses-section">
 <span id="licenses-config"></span><h2>Licenses Section:<a class="headerlink" href="#licenses-section" title="Link to this heading"></a></h2>

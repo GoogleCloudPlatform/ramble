@@ -231,6 +231,10 @@ The format of the internals config section is as follows:
       - executables
       - to use in
       - experiments
+      executable_injection:
+      - name: <executable_name>
+        order: 'before' / 'after' # Default: 'after'
+        [relative_to: <relative_executable_name>]
 
 Currently this section has two sub-sections.
 
@@ -241,6 +245,22 @@ of an internally defined executable within an experiment.
 The ``executables`` sub-section can be used to control the order executables
 will be used in the experiment. This is also the mechanism to inject custom
 executables into an experiment.
+
+The ``executable_injection`` sub-section can be used to inject custom
+executables into the list of executables an experiment would use without having
+to define the entire list. The ``name`` attribute should be set to the name of
+an executable. This can be either a custom executable (defined in
+``custom_executables``) or an existing executable (including a ``builtin``).
+The ``order`` attrbite can be set to either ``before`` or ``after`` with
+``after`` being the default value if it is not specified. The ``relative_to``
+attribute can be set to the name of an executable already in the list of
+experiment executables (including custom executables that are already injected).
+
+Processing the ``executable_injection`` sub-section occurs after processing the
+``executables`` sub-section. Executables are injected in the order they are
+listed in the YAML file, with lower precedence scopes being processed first.
+(e.g. ``workspace`` executables are injected before ``experiment`` executables
+are).
 
 .. _licenses-config:
 
