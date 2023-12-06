@@ -263,3 +263,94 @@ prevent it from being used in the generated experiments.
 
 Examining the experiment run directories, you should see ``start_time`` and
 ``end_time`` files which contain the output of our custom executables.
+
+Using Executable Injection
+--------------------------
+
+In addition to the full explicit method of injecting an executable shown above,
+you can inject executables relative to existing executables in the experiment's
+executable list, this is documented in the :ref:`internals config
+section<internals-config>` and :ref:`workspace internals<workspace_internals>`
+documentation sections.
+
+As an example, the following YAML could replace the ``executables`` section of
+your existing configuration with the following:
+
+.. code-block:: YAML
+   executable_injection:
+   - name: start_time
+     order: before
+     relative_to: execute
+   - name: end_time
+     order: after
+     relative_to: execute
+
+Go ahead and edit the workspace configuration file with:
+
+.. code-block:: console
+
+    $ ramble workspace edit
+
+Replace the ``executables`` block with the ``executable_injection`` block
+presented above.  The resulting configuration file should look like the
+following:
+
+.. code-block:: YAML
+
+    ramble:
+      variables:
+        processes_per_node: 4
+        n_ranks: '{processes_per_node}*{n_nodes}'
+        batch_submit: '{execute_experiment}'
+        mpi_command: mpirun -n {n_ranks}
+      applications:
+        wrfv4:
+          workloads:
+            CONUS_12km:
+              experiments:
+                scaling_{n_nodes}:
+                  internals:
+                    custom_executables:
+                      start_time:
+                        template:
+                        - 'date +%s'
+                        redirect: '{experiment_run_dir}/start_time'
+                        use_mpi: false
+                      end_time:
+                        template:
+                        - 'date +%s'
+                        redirect: '{experiment_run_dir}/end_time'
+                        use_mpi: false
+                    executable_injection:
+                    - name: start_time
+                      order: before
+                      relative_to: execute
+                    - name: end_time
+                      order: after
+                      relative_to: execute
+                  variables:
+                    n_nodes: [1, 2, 4]
+      spack:
+        concretized: true
+        packages:
+          gcc9:
+            spack_spec: gcc@9.3.0
+          intel-mpi:
+            spack_spec: intel-mpi@2018.4.274
+            compiler: gcc9
+          wrfv4:
+            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+              ~pnetcdf
+            compiler: gcc9
+        environments:
+          wrfv4:
+            packages:
+            - intel-mpi
+            - wrfv4
+
+
+.. include:: shared/wrf_execute.rst
+
+Examining the experiment run directories, you should see ``start_time`` and
+``end_time`` in the same places as they were when you ran the explicitly
+defined order experiments.

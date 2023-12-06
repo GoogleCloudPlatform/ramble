@@ -40,7 +40,8 @@ class Context(object):
         """Merges another Context into this Context."""
 
         internal_sections = [namespace.custom_executables,
-                             namespace.executables]
+                             namespace.executables,
+                             namespace.executable_injection]
 
         if in_context.variables:
             self.variables.update(in_context.variables)
