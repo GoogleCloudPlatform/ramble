@@ -57,6 +57,7 @@ class ExperimentSet(object):
 
         # Set all workspace variables as base variables.
         workspace_context = ramble.context.Context()
+        workspace_context.context_name = workspace.name
         workspace_context.variables = workspace.get_workspace_vars()
         workspace_context.env_variables = workspace.get_workspace_env_vars()
         workspace_context.internals = workspace.get_workspace_internals()
