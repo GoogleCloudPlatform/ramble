@@ -49,8 +49,13 @@ ramble:
                   MY_VAR: 'TEST'
   spack:
     concretized: true
-    packages: {}
-    environments: {}
+    packages:
+      zlib:
+        spack_spec: zlib
+    environments:
+      zlib:
+        packages:
+        - zlib
 """
     workspace_name = 'test_unsetup_workspace_cannot_analyze'
     with ramble.workspace.create(workspace_name) as ws:

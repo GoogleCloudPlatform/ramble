@@ -602,7 +602,7 @@ class SpackRunner(object):
         contents_to_hash = None
 
         if not self.dry_run:
-            if not lock_exists and require_exist:
+            if not lock_exists and (require_exist or len(self.env_contents) == 0):
                 logger.die(
                     'spack.lock file does not exist in environment '
                     f'{self.env_path}\n'
