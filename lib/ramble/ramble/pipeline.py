@@ -256,6 +256,13 @@ class ArchivePipeline(Pipeline):
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
 
+        for filename in [ramble.workspace.Workspace.inventory_file_name,
+                         ramble.workspace.Workspace.hash_file_name]:
+            src = os.path.join(self.workspace.root, filename)
+            if os.path.exists(src):
+                dest = src.replace(self.workspace.root, archive_path)
+                shutil.copyfile(src, dest)
+
         # Copy current configs
         archive_configs = os.path.join(self.workspace.latest_archive_path,
                                        ramble.workspace.workspace_config_path)

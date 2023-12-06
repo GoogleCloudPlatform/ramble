@@ -1210,6 +1210,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for file in glob.glob(exp_pattern):
                 shutil.copy(file, archive_experiment_dir)
 
+        for file_name in [self._inventory_file_name, self._status_file_name]:
+            file = os.path.join(experiment_run_dir, file_name)
+            if os.path.exists(file):
+                shutil.copy(file, archive_experiment_dir)
+
     register_phase('prepare_analysis', pipeline='analyze')
 
     def _prepare_analysis(self, workspace):
