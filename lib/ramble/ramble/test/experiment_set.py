@@ -488,6 +488,8 @@ def test_full_experiments_from_dict(mutable_mock_workspace_path):
         assert 'basic.test_wl.test_8_4_3' in exp_set.experiments.keys()
         assert 'basic.test_wl.test_12_4_4' in exp_set.experiments.keys()
 
+        assert exp_set._context[exp_set._contexts.workspace].context_name is not None
+
 
 def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
     workspace('create', 'test')
