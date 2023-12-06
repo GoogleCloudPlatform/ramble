@@ -154,6 +154,7 @@
 
         <span class="c1"># Set all workspace variables as base variables.</span>
         <span class="n">workspace_context</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
+        <span class="n">workspace_context</span><span class="o">.</span><span class="n">context_name</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">name</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_vars</span><span class="p">()</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">env_variables</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_env_vars</span><span class="p">()</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_internals</span><span class="p">()</span>
@@ -646,7 +647,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 05, 2023.
+      <span class="lastupdated">Last updated on Dec 06, 2023.
       </span></p>
   </div>
 
