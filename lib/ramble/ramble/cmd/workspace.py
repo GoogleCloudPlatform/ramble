@@ -514,6 +514,10 @@ def workspace_info(args):
                     else:
                         color.cprint(rucolor.nested_3('      Experiment: ') + exp_name)
 
+                    experiment_index = \
+                        app_inst.expander.expand_var_name(app_inst.keywords.experiment_index)
+                    color.cprint('        Experiment Index: ' + experiment_index)
+
                     if args.verbose >= 1:
                         var_groups = [config_vars, workspace_vars,
                                       application_context.variables,

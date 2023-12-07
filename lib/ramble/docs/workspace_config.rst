@@ -719,6 +719,8 @@ Ramble automatically generates definitions for the following variables:
   ``$workspace_root/inputs/{application_name}``
 * ``workload_input_dir`` - Absolute path to
   ``$workspace_root/inputs/{application_name}/{workload_name}``
+* ``experiment_index`` - Index, in set, of experiment. If part of a chain,
+  shares a value with its root.
 * ``env_path`` - Absolute path to
   ``$workspace_root/software/{env_name}.{workload_name}``
 * ``log_dir`` - Absolute path to ``$workspace_root/logs``
@@ -1015,6 +1017,10 @@ definition of variables from the chained experiment if needed.
 
 Once the experiments are defined, the final order of the chain can be viewed using
 ``ramble workspace info -v``.
+
+**NOTE** When using the ``experiment_index`` variable, all experiments in a
+chain share the same value. This ensures the resulting experiment will be
+complete when executed.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Suppressing Experiments:

@@ -348,6 +348,7 @@ class ExperimentSet(object):
             experiment_vars[self.keywords.application_name] = final_app_name
             experiment_vars[self.keywords.workload_name] = final_wl_name
             experiment_vars[self.keywords.experiment_name] = final_exp_name
+            experiment_vars[self.keywords.experiment_index] = len(self.experiments) + 1
 
             experiment_namespace = expander.experiment_namespace
 
