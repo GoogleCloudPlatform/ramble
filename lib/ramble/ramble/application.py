@@ -560,6 +560,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     new_inst.expander._experiment_namespace = new_name
                     new_inst.variables[self.keywords.experiment_run_dir] = new_run_dir
                     new_inst.variables[self.keywords.experiment_name] = new_name
+                    new_inst.variables[self.keywords.experiment_index] = \
+                        self.expander.expand_var_name(self.keywords.experiment_index)
 
                     # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)
