@@ -136,8 +136,12 @@ class Pipeline(object):
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             exp_log_path = app_inst.experiment_log_file(self.log_dir)
 
-            logger.all_msg(f'Experiment {idx} ({count}/{num_exps}):')
+            experiment_index_value = \
+                app_inst.expander.expand_var_name(app_inst.keywords.experiment_index)
+
+            logger.all_msg(f'Experiment #{idx} ({count}/{num_exps}):')
             logger.all_msg(f'    name: {exp}')
+            logger.all_msg(f'    root experiment_index: {experiment_index_value}')
             logger.all_msg(f'    log file: {exp_log_path}')
 
             logger.add_log(exp_log_path)
