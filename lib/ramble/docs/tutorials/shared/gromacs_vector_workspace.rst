@@ -59,10 +59,10 @@ You can edit these files directly or with the command ``ramble workspace edit``.
 
 To begin, you should edit the ``ramble.yaml`` file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
-contents of ``$ramble_root/examples/basic_gromacs_config.yaml``:
+contents of ``$ramble_root/examples/vector_matrix_gromacs_config.yaml``:
 
 
-.. literalinclude:: ../../../../examples/basic_gromacs_config.yaml
+.. literalinclude:: ../../../../examples/vector_matrix_gromacs_config.yaml
    :language: YAML
 
 Note that specifying compilers that Spack doesn't have installed may take a while.

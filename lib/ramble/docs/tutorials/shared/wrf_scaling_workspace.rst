@@ -16,7 +16,7 @@ location can be seen under the ``Location`` output of:
 
     $ ramble workspace info
 
-Additionally, the files can be edited directly with:
+Alternatively, the files can be edited directly with:
 
 .. code-block:: console
 
@@ -28,8 +28,11 @@ final configuration from a previous tutorial.
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -40,12 +43,12 @@ final configuration from a previous tutorial.
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -59,8 +62,10 @@ final configuration from a previous tutorial.
             - intel-mpi
             - wrfv4
 
-The above configuration will execute 3 experiments, comprising a basic scaling
-study on three different sets of nodes. This is primarily defined by the use of
-vector experiments, which are documented at :ref:`ramble-vector-logic`. Vector
-experiments were also introduced in :ref:`vector_and_matrix_tutorial`.
+The above configuration will execute 2 experiments, comprising a basic scaling
+study on 2 different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented in the :ref:`vector
+logic<ramble-vector-logic>` portion of the workspace configuration file
+documentation.. Vector experiments were also introduced in the :ref:`vector and
+matrix tutorial <vector_and_matrix_tutorial>`.
 

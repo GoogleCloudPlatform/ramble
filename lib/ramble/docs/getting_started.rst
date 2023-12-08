@@ -195,6 +195,8 @@ that experiments can be generated from. The ``ramble info`` command can also be
 used to see what variables each workload has, and potentially some suggested
 values for variables with a limited set of allowed values.
 
+.. _ramble-workspaces:
+
 ------------------
 Ramble Workspaces
 ------------------

@@ -1,4 +1,7 @@
 ramble:
+  env_vars:
+    set:
+      OMP_NUM_THREADS: '{n_threads}'
   variables:
     processes_per_node: 16
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
@@ -38,8 +41,8 @@ ramble:
     concretized: true
     packages:
       gcc9:
-        spack_spec: gcc@9.3.0 target=x86_64
-        compiler_spec: gcc@9.3.0
+        spack_spec: gcc@9.4.0 target=x86_64
+        compiler_spec: gcc@9.4.0
       impi2018:
         spack_spec: intel-mpi@2018.4.274 target=x86_64
         compiler: gcc9

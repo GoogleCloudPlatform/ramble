@@ -24,11 +24,12 @@ Application Information
 -----------------------
 
 As mentioned above, this tutorial uses the `GROMACS <https://www.gromacs.org/>`_
-application definition. We will begin with the `water_bare` and `water_gmx50`
+application definition. We will begin with the ``water_bare`` and ``water_gmx50``
 workloads, as they are able to execute in a short amount of time.
 
 Using a previously installed ``ramble``, the following command can be used to
 get information about these workloads:
+
 .. code-block:: console
 
     $ ramble info gromacs
@@ -125,8 +126,13 @@ For each setup run, a set of logs will be created at:
 
     $ $ramble_root/var/ramble/workspaces/$workspace_root/logs
 
-Each run will have its own primary log, along with a folder containing a log for each
-experiment that is being configured.
+Each run will have its own primary log, along with a folder containing a log
+for each experiment that is being configured. While setup is running, you can
+monitor the process by looking at the contents of:
+
+.. code-block:: console
+
+    $ $ramble_root/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
 
 Executing Experiments
 ---------------------
@@ -160,3 +166,37 @@ show the following results:
 * Nanosecs per day: Nanoseconds of simulation per day at the speed achieved
 * Hours per nanosec: Hours required to calculate 1 nanosecond of simulation at
   the speed achieved
+
+Workspace Directory Structure
+-----------------------------
+
+After analyzing the workspace, you can exmine the structure of the workspace at:
+
+.. code-block:: console
+
+    $ $ramble_root/var/ramble/workspaces/basic_gromacs
+
+Within this directory, you should see the following directories:
+
+ * ``configs`` - Contains all of the configuration files for the workspace
+ * ``experiments`` - Contains all of the experiment execution directories
+ * ``inputs`` - Contains all of the input files needed for the experiments
+ * ``logs`` - Contains all log files from any Ramble command that acts on the workspace
+ * ``shared`` - Contains auxiliary files the experiment might need, such as environment variable information for licenses
+ * ``software`` - Contains software environments for the experiments
+
+Cleanup the Workspace
+---------------------
+
+Once you are finished with the tutorial content, ensure you have deactivated
+the workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace remove basic_gromacs

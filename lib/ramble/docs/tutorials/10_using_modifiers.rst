@@ -121,8 +121,11 @@ The resulting configuration file should look like the following.
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -135,12 +138,12 @@ The resulting configuration file should look like the following.
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -212,8 +215,11 @@ look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -227,12 +233,12 @@ look like the following:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -279,8 +285,11 @@ configuration file should look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -294,12 +303,12 @@ configuration file should look like the following:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9

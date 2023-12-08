@@ -90,8 +90,8 @@ only want to change the ``n_nodes`` variable definition in our scaling study,
 and as a result the experiment name template will only include this template
 parameter. However, you are free to add additional parameters based on the
 experiments you would like to perform. We will also assume ``n_nodes`` will
-take the values of ``1``, ``2``, and ``4``, however you should edit this for
-the system you are attempting to run these experiments on. The contents of the
+take the values of ``1`` and ``2``, however you should edit this for the system
+you are attempting to run these experiments on. The contents of the
 configuration file might look like the following now:
 
 .. code-block:: YAML
@@ -104,7 +104,7 @@ configuration file might look like the following now:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
 
 At this point, you can attempt to view the experiments defined by this
 configuration file. To do this, use the following command:
@@ -161,8 +161,11 @@ following after adding this information:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: 'mpirun -n {n_ranks}'
@@ -173,7 +176,7 @@ following after adding this information:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
 
 **NOTE** The value of the ``n_ranks`` variable is escaped using single quotes.
 This is because YAML interprets the ``{`` character as beginning a dictionary,
@@ -199,8 +202,11 @@ look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
-        processes_per_node: 4
+        processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
@@ -211,7 +217,7 @@ look like the following:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
