@@ -181,8 +181,8 @@ only want to change the <code class="docutils literal notranslate"><span class="
 and as a result the experiment name template will only include this template
 parameter. However, you are free to add additional parameters based on the
 experiments you would like to perform. We will also assume <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> will
-take the values of <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code>, and <code class="docutils literal notranslate"><span class="pre">4</span></code>, however you should edit this for
-the system you are attempting to run these experiments on. The contents of the
+take the values of <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">2</span></code>, however you should edit this for the system
+you are attempting to run these experiments on. The contents of the
 configuration file might look like the following now:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
@@ -192,7 +192,7 @@ configuration file might look like the following now:</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <p>At this point, you can attempt to view the experiments defined by this
@@ -239,8 +239,11 @@ flags, feel free to do so here.</p>
 <p>Your configuration file might look like the
 following after adding this information:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
@@ -251,7 +254,7 @@ following after adding this information:</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <p><strong>NOTE</strong> The value of the <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> variable is escaped using single quotes.
@@ -271,8 +274,11 @@ suggested starting place for the experiments. To apply this to your workspace, u
 file. After executing this command, your workspace configuration file might
 look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -283,7 +289,7 @@ look like the following:</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
@@ -349,7 +355,7 @@ detail here, but it is very useful for production experiments.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 07, 2023.
+      <span class="lastupdated">Last updated on Dec 08, 2023.
       </span></p>
   </div>
 

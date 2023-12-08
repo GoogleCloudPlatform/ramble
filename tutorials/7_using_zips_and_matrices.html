@@ -64,6 +64,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#construct-platforms-zip">Construct Platforms Zip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#define-an-experiment-matrix">Define an Experiment Matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clean-the-worksapce">Clean the Worksapce</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="8_var_expansion_indirection_and_stack_parameterization.html">8) Variable Expansion, Indirection, and Software Stack Parameterization</a></li>
@@ -151,15 +152,18 @@ location can be seen under the <code class="docutils literal notranslate"><span 
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
 </pre></div>
 </div>
-<p>Additionally, the files can be edited directly with:</p>
+<p>Alternatively, the files can be edited directly with:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
 </pre></div>
 </div>
 <p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
 final configuration from a previous tutorial.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -170,12 +174,12 @@ final configuration from a previous tutorial.</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -190,12 +194,15 @@ final configuration from a previous tutorial.</p>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
 </pre></div>
 </div>
-<p>The above configuration will execute 3 experiments, comprising a basic scaling
-study on three different sets of nodes. This is primarily defined by the use of
-vector experiments, which are documented at <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">List (or Vector) Variables:</span></a>. Vector
-experiments were also introduced in <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">4) Using Vectors and Matrices</span></a>.</p>
+<p>The above configuration will execute 2 experiments, comprising a basic scaling
+study on 2 different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented in the <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector
+logic</span></a> portion of the workspace configuration file
+documentation.. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
+matrix tutorial</span></a>.</p>
 <p>We will now expand this to perform more experiments using the zip
-(<a class="reference internal" href="../workspace_config.html#ramble-explicit-zips"><span class="std std-ref">Explicit Variable Zips:</span></a>) and matrix (<a class="reference internal" href="../workspace_config.html#ramble-matrix-logic"><span class="std std-ref">Variable Matrices:</span></a>)
+(<a class="reference internal" href="../workspace_config.html#ramble-explicit-zips"><span class="std std-ref">zips documentation</span></a>) and matrix
+(<a class="reference internal" href="../workspace_config.html#ramble-matrix-logic"><span class="std std-ref">matrix documentation</span></a>)
 functionality in Ramble.</p>
 </section>
 <section id="construct-platforms-zip">
@@ -209,7 +216,7 @@ individual variable is a list / vector variable and all variables are the same
 length. As an example, imagine we had the following variable / zip definitions:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;20&#39;</span><span class="p p-Indicator">]</span>
 <span class="nt">zips</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">platform_config</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
@@ -225,12 +232,15 @@ allowing us to use the platform definitions from the above YAML.</p>
 <p>Edit your workspace configuration file to include the <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> from
 the above section. The result should look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
-<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform3&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;18&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;20&#39;</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
@@ -242,12 +252,12 @@ the above section. The result should look like the following:</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -267,18 +277,18 @@ the above section. The result should look like the following:</p>
 <h2>Define an Experiment Matrix<a class="headerlink" href="#define-an-experiment-matrix" title="Link to this heading"></a></h2>
 <p>At this point, your workspace should have a single zip along with one other
 list variable, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>. This configuration will not work properly for two reasons.</p>
-<p>The first is that neither the zip, nor <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> are unconsumed. Unconsumed
-zips and variables are zipped together to attempt to create a set of
-experiments. In this case, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> is a different length than
-<code class="docutils literal notranslate"><span class="pre">platform_config</span></code>, and Ramble will refuse to zip them. Running:</p>
+<p>The first is that neither the zip ( <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> ), nor <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> are
+unconsumed. Unconsumed zips and variables are zipped together to attempt to
+create a set of experiments. In this case, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> is a different length
+than <code class="docutils literal notranslate"><span class="pre">platform_config</span></code>, and Ramble will refuse to zip them. Running:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
 </pre></div>
 </div>
 <p>might give the following error messages:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Length mismatch in vector variables in experiment scaling_{n_nodes}</span>
-<span class="go">    Variable n_nodes has length 3</span>
-<span class="go">    Variable platform has length 2</span>
-<span class="go">    Variable processes_per_node has length 2</span>
+<span class="go">    Variable n_nodes has length 2</span>
+<span class="go">    Variable platform has length 3</span>
+<span class="go">    Variable processes_per_node has length 3</span>
 </pre></div>
 </div>
 <p>This error message identifies that the <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> zip was unzipped
@@ -300,12 +310,15 @@ example:</p>
 <p>Would result in 6 experiments. Adding this to you workspace configuration, you
 should have the following in your <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code>:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
-<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform3&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;18&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;20&#39;</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
@@ -317,7 +330,7 @@ should have the following in your <code class="docutils literal notranslate"><sp
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
@@ -325,7 +338,7 @@ should have the following in your <code class="docutils literal notranslate"><sp
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -354,12 +367,15 @@ name template to include either <code class="docutils literal notranslate"><span
 below example will use <code class="docutils literal notranslate"><span class="pre">platform</span></code>, but you are free to experiment with these.
 Your final configuration file should look something like:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
-<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;platform1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;platform3&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;18&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;20&#39;</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">zips</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">platform_config</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform</span>
@@ -371,7 +387,7 @@ Your final configuration file should look something like:</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}_{platform}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
@@ -379,7 +395,7 @@ Your final configuration file should look something like:</p>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -415,9 +431,28 @@ show the following results:</p>
 <li><p>Number of timesteps: Count of total timesteps performed</p></li>
 <li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
 </ul>
+<p><strong>NOTE</strong> Some of these experiments can take a while to execute. Experiments can
+be filtered using the <span class="xref std std-ref">–where&lt;filter-experiments&gt;`</span> option to execute the
+higher scale experiments if desired. To do this, try:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--where<span class="w"> </span><span class="s1">&#39;{n_ranks} &gt;= 20&#39;</span>
+<span class="gp">$ </span>ramble<span class="w"> </span>on
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze<span class="w"> </span>--where<span class="w"> </span><span class="s1">&#39;{n_ranks} &gt;= 20&#39;</span>
+</pre></div>
+</div>
 <p>Ramble also supports generating machine readable results in YAML or JSON format.
 To use this functionality, use the <code class="docutils literal notranslate"><span class="pre">--formats</span></code> option on
 <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span></code>.</p>
+</section>
+<section id="clean-the-worksapce">
+<h2>Clean the Worksapce<a class="headerlink" href="#clean-the-worksapce" title="Link to this heading"></a></h2>
+<p>Once you are finished with the tutorial content, make sure you deactivate the workspace using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<p>Additionally, you can remove the workspace and all of its content with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>remove<span class="w"> </span>zips_and_matrices_wrf
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -433,7 +468,7 @@ To use this functionality, use the <code class="docutils literal notranslate"><s
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 07, 2023.
+      <span class="lastupdated">Last updated on Dec 08, 2023.
       </span></p>
   </div>
 

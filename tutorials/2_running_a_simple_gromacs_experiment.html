@@ -62,6 +62,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#setting-up-the-experiments">Setting Up the Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#executing-experiments">Executing Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#analyzing-experiments">Analyzing Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#workspace-directory-structure">Workspace Directory Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cleanup-the-workspace">Cleanup the Workspace</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="3_modifying_a_gromacs_experiment.html">3) Modifying A GROMACS Experiment</a></li>
@@ -132,14 +134,13 @@ however this tutorial is fully stand-alone as far as steps you need to perform.<
 <section id="application-information">
 <h2>Application Information<a class="headerlink" href="#application-information" title="Link to this heading"></a></h2>
 <p>As mentioned above, this tutorial uses the <a class="reference external" href="https://www.gromacs.org/">GROMACS</a>
-application definition. We will begin with the <cite>water_bare</cite> and <cite>water_gmx50</cite>
+application definition. We will begin with the <code class="docutils literal notranslate"><span class="pre">water_bare</span></code> and <code class="docutils literal notranslate"><span class="pre">water_gmx50</span></code>
 workloads, as they are able to execute in a short amount of time.</p>
 <p>Using a previously installed <code class="docutils literal notranslate"><span class="pre">ramble</span></code>, the following command can be used to
-get information about these workloads:
-.. code-block:: console</p>
-<blockquote>
-<div><p>$ ramble info gromacs</p>
-</div></blockquote>
+get information about these workloads:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>info<span class="w"> </span>gromacs
+</pre></div>
+</div>
 <p>Searching the output for the sections marked <code class="docutils literal notranslate"><span class="pre">Workload:</span> <span class="pre">water_bare</span></code> and
 <code class="docutils literal notranslate"><span class="pre">Workload:</span> <span class="pre">water_gmx50</span></code>, you should see something like the following output:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Workload: water_gmx50</span>
@@ -227,68 +228,73 @@ files to see how ramble would use the changes you made.</p>
 This directory contains generated configuration and template files. Each of
 these files can be edited to configure the workspace, and examples will be
 provided below.</p>
-<p>The available files are:
-* <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> This file describes all aspects of the workspace. This
-includes the software stack, the experiments, and all variables.
-* <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> This file is a template shell script that will be
-rendered to execute each of the experiments that ramble generates.</p>
+<p>The available files are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> This file describes all aspects of the workspace. This includes the software stack, the experiments, and all variables.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> This file is a template shell script that will be rendered to execute each of the experiments that ramble generates.</p></li>
+</ul>
+</div></blockquote>
 <p>You can edit these files directly or with the command <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">edit</span></code>.</p>
 <p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
 contents of <code class="docutils literal notranslate"><span class="pre">$ramble_root/examples/basic_gromacs_config.yaml</span></code>:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">ramble</span><span class="p">:</span>
-<span class="linenos"> 2</span><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="linenos"> 3</span><span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="linenos"> 4</span><span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span><span class="w"> </span><span class="c1"># Application name</span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
-<span class="linenos"> 9</span><span class="w">        </span><span class="nt">water_gmx50</span><span class="p">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
-<span class="linenos">10</span><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
-<span class="linenos">11</span><span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
-<span class="linenos">12</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="linenos">13</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">14</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">15</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
-<span class="linenos">16</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
-<span class="linenos">17</span><span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
-<span class="linenos">18</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="linenos">19</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">20</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">21</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
-<span class="linenos">22</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
-<span class="linenos">23</span><span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
-<span class="linenos">24</span><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
-<span class="linenos">25</span><span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span>
-<span class="linenos">26</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="linenos">27</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">28</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">29</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
-<span class="linenos">30</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
-<span class="linenos">31</span><span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
-<span class="linenos">32</span><span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="linenos">33</span><span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">34</span><span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="linenos">35</span><span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
-<span class="linenos">36</span><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
-<span class="linenos">37</span><span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
-<span class="linenos">38</span><span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="linenos">39</span><span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
-<span class="linenos">40</span><span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="linenos">41</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
-<span class="linenos">42</span><span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
-<span class="linenos">43</span><span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
-<span class="linenos">44</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
-<span class="linenos">45</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
-<span class="linenos">46</span><span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="linenos">47</span><span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
-<span class="linenos">48</span><span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
-<span class="linenos">49</span><span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
-<span class="linenos">50</span><span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="linenos">51</span><span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
-<span class="linenos">52</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
-<span class="linenos">53</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span><span class="w"> </span><span class="c1"># Application name</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">water_gmx50</span><span class="p">:</span><span class="w"> </span><span class="c1"># Workload name from application</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
+<span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
+<span class="w">        </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">pme_single_rank</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pme&#39;</span>
+<span class="w">            </span><span class="nt">rf_single_rank</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
+<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
+<span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
 </pre></div>
 </div>
 <p>Note that specifying compilers that Spack doesn’t have installed may take a while.
@@ -320,8 +326,12 @@ you can do a dry run of the setup using:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/<span class="nv">$workspace_root</span>/logs
 </pre></div>
 </div>
-<p>Each run will have its own primary log, along with a folder containing a log for each
-experiment that is being configured.</p>
+<p>Each run will have its own primary log, along with a folder containing a log
+for each experiment that is being configured. While setup is running, you can
+monitor the process by looking at the contents of:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
+</pre></div>
+</div>
 </section>
 <section id="executing-experiments">
 <h2>Executing Experiments<a class="headerlink" href="#executing-experiments" title="Link to this heading"></a></h2>
@@ -352,6 +362,36 @@ show the following results:</p>
 the speed achieved</p></li>
 </ul>
 </section>
+<section id="workspace-directory-structure">
+<h2>Workspace Directory Structure<a class="headerlink" href="#workspace-directory-structure" title="Link to this heading"></a></h2>
+<p>After analyzing the workspace, you can exmine the structure of the workspace at:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs
+</pre></div>
+</div>
+<p>Within this directory, you should see the following directories:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">configs</span></code> - Contains all of the configuration files for the workspace</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">experiments</span></code> - Contains all of the experiment execution directories</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inputs</span></code> - Contains all of the input files needed for the experiments</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logs</span></code> - Contains all log files from any Ramble command that acts on the workspace</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shared</span></code> - Contains auxiliary files the experiment might need, such as environment variable information for licenses</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software</span></code> - Contains software environments for the experiments</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="cleanup-the-workspace">
+<h2>Cleanup the Workspace<a class="headerlink" href="#cleanup-the-workspace" title="Link to this heading"></a></h2>
+<p>Once you are finished with the tutorial content, ensure you have deactivated
+the workspace using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<p>Additionally, you can remove the workspace using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>remove<span class="w"> </span>basic_gromacs
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -366,7 +406,7 @@ the speed achieved</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 07, 2023.
+      <span class="lastupdated">Last updated on Dec 08, 2023.
       </span></p>
   </div>
 

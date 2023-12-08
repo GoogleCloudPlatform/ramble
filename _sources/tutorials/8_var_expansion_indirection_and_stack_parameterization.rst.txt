@@ -66,12 +66,15 @@ final configuration from the previous tutorial.
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
         platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        processes_per_node: ['16', '18']
       zips:
         platform_config:
         - platform
@@ -83,7 +86,7 @@ final configuration from the previous tutorial.
               experiments:
                 scaling_{n_nodes}_{platform}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                   matrix:
                   - platform_config
                   - n_nodes
@@ -91,7 +94,7 @@ final configuration from the previous tutorial.
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -129,7 +132,7 @@ like the following:
 
     packages:
       openmpi:
-        spack_spec: openmpi@4.1.6
+        spack_spec: openmpi@3.1.6 +orterunprefix
 
 In the definition of the Intel MPI package above, you'll see we originally
 specified a ``compiler`` attribute (with the value of ``gcc9``). This can be
@@ -153,19 +156,22 @@ parameterize the generation of these using a new variable definition.
           mpi_name: ['intel-mpi', 'openmpi']
 
 Will create two software environments. One named ``wrfv4-intel-mpi`` and
-another named ``wrfv4-openmpi``. The definition of ``mpi_name`` can be hoisted
-to the workspace level, however we need to include it in the experiment
+another named ``wrfv4-openmpi``. However, the definition of ``mpi_name`` can be
+hoisted to the workspace level because we need to include it in the experiment
 generation as well. The result might look like the following:
 
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
         platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        processes_per_node: ['16', '18']
         mpi_name: ['intel-mpi', 'openmpi']
       zips:
         platform_config:
@@ -178,7 +184,7 @@ generation as well. The result might look like the following:
               experiments:
                 scaling_{n_nodes}_{platform}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                   matrix:
                   - platform_config
                   - n_nodes
@@ -186,12 +192,12 @@ generation as well. The result might look like the following:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@4.1.6
+            spack_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
@@ -227,12 +233,15 @@ into the matrix. The result might look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
         platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        processes_per_node: ['16', '18']
         mpi_name: ['intel-mpi', 'openmpi']
       zips:
         platform_config:
@@ -245,7 +254,7 @@ into the matrix. The result might look like the following:
               experiments:
                 scaling_{n_nodes}_{platform}_{mpi_name}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                   matrix:
                   - platform_config
                   - n_nodes
@@ -254,12 +263,12 @@ into the matrix. The result might look like the following:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@4.1.6
+            spack_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
@@ -316,8 +325,8 @@ which variables you want to use. For example:
 .. code-block:: YAML
 
     variables:
-      intel-mpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node'
-      openmpi_args: '-n {n_ranks} -ppn {processes_per_node}'
+      openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS'
+      intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
       mpi_command: 'mpirun {{mpi_name}_args}'
 
 Allows the ``mpi_command`` definition to change based on the definition of
@@ -328,10 +337,13 @@ resulting configuration might look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        processes_per_node: ['16', '18']
 
         # Execution Template
         batch_submit: '{execute_experiment}'
@@ -340,7 +352,7 @@ resulting configuration might look like the following:
         # Experiment Expansions
         mpi_name: ['intel-mpi', 'openmpi']
         intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
-        openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node'
+        openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS'
       zips:
         platform_config:
         - platform
@@ -352,7 +364,7 @@ resulting configuration might look like the following:
               experiments:
                 scaling_{n_nodes}_{platform}_{mpi_name}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                   matrix:
                   - platform_config
                   - n_nodes
@@ -361,12 +373,12 @@ resulting configuration might look like the following:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@4.1.6
+            spack_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
@@ -376,6 +388,10 @@ resulting configuration might look like the following:
             packages:
             - '{mpi_name}'
             - wrfv4
+
+**NOTE** The arguments for the various MPI implementations may not run on your
+system if you require additional arguments. To be able to execute these on your
+system, make sure you modify these appropriately.
 
 At this point, you have described the 12 experiments you want to run, however
 they are still not completely defined. Running:
@@ -410,10 +426,13 @@ The resulting configuration file might look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        processes_per_node: ['16', '18']
 
         # Execution Template
         batch_submit: '{execute_experiment}'
@@ -422,7 +441,7 @@ The resulting configuration file might look like the following:
         # Experiment Expansions
         mpi_name: ['intel-mpi', 'openmpi']
         intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
-        openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node'
+        openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS'
       zips:
         platform_config:
         - platform
@@ -434,7 +453,7 @@ The resulting configuration file might look like the following:
               experiments:
                 scaling_{n_nodes}_{platform}_{mpi_name}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                     env_name: 'wrfv4-{mpi_name}'
                   matrix:
                   - platform_config
@@ -444,12 +463,12 @@ The resulting configuration file might look like the following:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@4.1.6
+            spack_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
@@ -477,3 +496,18 @@ experiment directories. Looking at these, you should see the correct MPI
 arguments within the relevant experiments.
 
 .. include:: shared/wrf_execute.rst
+
+Clean the Workspace
+-------------------
+
+Once you are finished with the tutorial content, make sure you deactivate your workspace:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace and all of its content with:
+
+.. code-block:: console
+
+    $ ramble workspace remove var_expansion_and_indirection

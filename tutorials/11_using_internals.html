@@ -156,15 +156,18 @@ location can be seen under the <code class="docutils literal notranslate"><span 
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
 </pre></div>
 </div>
-<p>Additionally, the files can be edited directly with:</p>
+<p>Alternatively, the files can be edited directly with:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
 </pre></div>
 </div>
 <p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
 final configuration from a previous tutorial.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -175,12 +178,12 @@ final configuration from a previous tutorial.</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -195,10 +198,12 @@ final configuration from a previous tutorial.</p>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
 </pre></div>
 </div>
-<p>The above configuration will execute 3 experiments, comprising a basic scaling
-study on three different sets of nodes. This is primarily defined by the use of
-vector experiments, which are documented at <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">List (or Vector) Variables:</span></a>. Vector
-experiments were also introduced in <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">4) Using Vectors and Matrices</span></a>.</p>
+<p>The above configuration will execute 2 experiments, comprising a basic scaling
+study on 2 different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented in the <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector
+logic</span></a> portion of the workspace configuration file
+documentation.. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
+matrix tutorial</span></a>.</p>
 </section>
 <section id="experiment-internals">
 <h2>Experiment Internals<a class="headerlink" href="#experiment-internals" title="Link to this heading"></a></h2>
@@ -247,8 +252,11 @@ used for capturing the output from the portions of <code class="docutils literal
 in the <code class="docutils literal notranslate"><span class="pre">end_time</span></code> executable definition. The resulting file should look like
 the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -271,12 +279,12 @@ the following:</p>
 <span class="w">                    </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{experiment_run_dir}/end_time&#39;</span>
 <span class="w">                    </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -328,8 +336,11 @@ want them to be executed.</p>
 <code class="docutils literal notranslate"><span class="pre">execute</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span></code> directly after <code class="docutils literal notranslate"><span class="pre">exectute</span></code>. The resulting
 configuration file should look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -362,12 +373,12 @@ configuration file should look like the following:</p>
 <span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">execute</span>
 <span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">end_time</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -516,7 +527,7 @@ defined order experiments.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 07, 2023.
+      <span class="lastupdated">Last updated on Dec 08, 2023.
       </span></p>
   </div>
 

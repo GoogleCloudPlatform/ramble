@@ -154,15 +154,18 @@ location can be seen under the <code class="docutils literal notranslate"><span 
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
 </pre></div>
 </div>
-<p>Additionally, the files can be edited directly with:</p>
+<p>Alternatively, the files can be edited directly with:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
 </pre></div>
 </div>
 <p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
 final configuration from a previous tutorial.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">set</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -173,12 +176,12 @@ final configuration from a previous tutorial.</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -193,10 +196,12 @@ final configuration from a previous tutorial.</p>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
 </pre></div>
 </div>
-<p>The above configuration will execute 3 experiments, comprising a basic scaling
-study on three different sets of nodes. This is primarily defined by the use of
-vector experiments, which are documented at <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">List (or Vector) Variables:</span></a>. Vector
-experiments were also introduced in <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">4) Using Vectors and Matrices</span></a>.</p>
+<p>The above configuration will execute 2 experiments, comprising a basic scaling
+study on 2 different sets of nodes. This is primarily defined by the use of
+vector experiments, which are documented in the <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector
+logic</span></a> portion of the workspace configuration file
+documentation.. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
+matrix tutorial</span></a>.</p>
 </section>
 <section id="id1">
 <h2>Success Criteria<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
@@ -233,6 +238,7 @@ experiment output, the timing data is prefixed with the string
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;timing-present&#39;</span>
 <span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;string&#39;</span>
 <span class="w">  </span><span class="nt">match</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Timing</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">main.*&#39;</span>
+<span class="w">  </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{experiment_run_dir}/rsl.out.0000&#39;</span>
 </pre></div>
 </div>
 <p>Edit your workspace configuration file with:</p>
@@ -243,7 +249,7 @@ experiment output, the timing data is prefixed with the string
 configuration file might look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -253,17 +259,18 @@ configuration file might look like the following:</p>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;timing-present&#39;</span>
 <span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;string&#39;</span>
 <span class="w">        </span><span class="nt">match</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Timing</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">main.*&#39;</span>
+<span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{experiment_run_dir}/rsl.out.0000&#39;</span>
 <span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -304,7 +311,7 @@ successful. The figure of merit definition for this might look like the follow:<
 resulting configuration file might look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
 <span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{processes_per_node}*{n_nodes}&#39;</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -n {n_ranks}</span>
@@ -314,6 +321,7 @@ resulting configuration file might look like the following:</p>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;timing-present&#39;</span>
 <span class="w">        </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;string&#39;</span>
 <span class="w">        </span><span class="nt">match</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Timing</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">main.*&#39;</span>
+<span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{experiment_run_dir}/rsl.out.0000&#39;</span>
 <span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">CONUS_12km</span><span class="p">:</span>
 <span class="w">          </span><span class="nt">success_criteria</span><span class="p">:</span>
@@ -324,12 +332,12 @@ resulting configuration file might look like the following:</p>
 <span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">concretized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
@@ -388,8 +396,13 @@ show the following results:</p>
 <li><p>Avg. Max Ratio Time: Ratio of Average Timestep Time and Maximum Timestep Time</p></li>
 </ul>
 <p>To ensure the success criteria are checked and the experiments pass them,
-ensure <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> is printed for the status of each experiment. Also, running
-analyze in debug mode as:</p>
+ensure <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> is printed for the status of each experiment.</p>
+<p>When an experiment fails, you can force Ramble to print the figure of merit
+data using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze<span class="w"> </span>--always-print-foms
+</pre></div>
+</div>
+<p>Also, running analyze in debug mode as:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>-d<span class="w"> </span>workspace<span class="w"> </span>analyze
 </pre></div>
 </div>
@@ -410,7 +423,7 @@ analyze in debug mode as:</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 07, 2023.
+      <span class="lastupdated">Last updated on Dec 08, 2023.
       </span></p>
   </div>
 

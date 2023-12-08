@@ -46,7 +46,8 @@ active).
 .. include:: shared/wrf_scaling_workspace.rst
 
 We will now expand this to perform more experiments using the zip
-(:ref:`ramble-explicit-zips`) and matrix (:ref:`ramble-matrix-logic`)
+(:ref:`zips documentation<ramble-explicit-zips>`) and matrix
+(:ref:`matrix documentation<ramble-matrix-logic>`)
 functionality in Ramble.
 
 Construct Platforms Zip
@@ -65,7 +66,7 @@ length. As an example, imagine we had the following variable / zip definitions:
 
     variables:
       platform: ['platform1', 'platform2']
-      processes_per_node: ['2', '4']
+      processes_per_node: ['16', '20']
     zips:
       platform_config:
       - platform
@@ -85,12 +86,15 @@ the above section. The result should look like the following:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        platform: ['platform1', 'platform2', 'platform3']
+        processes_per_node: ['16', '18', '20']
       zips:
         platform_config:
         - platform
@@ -102,12 +106,12 @@ the above section. The result should look like the following:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
       spack:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -127,10 +131,10 @@ Define an Experiment Matrix
 At this point, your workspace should have a single zip along with one other
 list variable, ``n_nodes``. This configuration will not work properly for two reasons.
 
-The first is that neither the zip, nor ``n_nodes`` are unconsumed. Unconsumed
-zips and variables are zipped together to attempt to create a set of
-experiments. In this case, ``n_nodes`` is a different length than
-``platform_config``, and Ramble will refuse to zip them. Running:
+The first is that neither the zip ( ``platform_config`` ), nor ``n_nodes`` are
+unconsumed. Unconsumed zips and variables are zipped together to attempt to
+create a set of experiments. In this case, ``n_nodes`` is a different length
+than ``platform_config``, and Ramble will refuse to zip them. Running:
 
 .. code-block:: console
 
@@ -141,9 +145,9 @@ might give the following error messages:
 .. code-block:: console
 
     ==> Error: Length mismatch in vector variables in experiment scaling_{n_nodes}
-        Variable n_nodes has length 3
-        Variable platform has length 2
-        Variable processes_per_node has length 2
+        Variable n_nodes has length 2
+        Variable platform has length 3
+        Variable processes_per_node has length 3
 
 This error message identifies that the ``platform_config`` zip was unzipped
 (since it is not consumed) and the length of the resulting variables are
@@ -170,12 +174,15 @@ should have the following in your ``ramble.yaml``:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        platform: ['platform1', 'platform2', 'platform3']
+        processes_per_node: ['16', '18', '20']
       zips:
         platform_config:
         - platform
@@ -187,7 +194,7 @@ should have the following in your ``ramble.yaml``:
               experiments:
                 scaling_{n_nodes}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                   matrix:
                   - platform_config
                   - n_nodes
@@ -195,7 +202,7 @@ should have the following in your ``ramble.yaml``:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -230,12 +237,15 @@ Your final configuration file should look something like:
 .. code-block:: YAML
 
     ramble:
+      env_vars:
+        set:
+          OMP_NUM_THREADS: '{n_threads}'
       variables:
         n_ranks: '{processes_per_node}*{n_nodes}'
         batch_submit: '{execute_experiment}'
         mpi_command: mpirun -n {n_ranks}
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['2', '4']
+        platform: ['platform1', 'platform2', 'platform3']
+        processes_per_node: ['16', '18', '20']
       zips:
         platform_config:
         - platform
@@ -247,7 +257,7 @@ Your final configuration file should look something like:
               experiments:
                 scaling_{n_nodes}_{platform}:
                   variables:
-                    n_nodes: [1, 2, 4]
+                    n_nodes: [1, 2]
                   matrix:
                   - platform_config
                   - n_nodes
@@ -255,7 +265,7 @@ Your final configuration file should look something like:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
@@ -271,6 +281,31 @@ Your final configuration file should look something like:
 
 .. include:: shared/wrf_execute.rst
 
+**NOTE** Some of these experiments can take a while to execute. Experiments can
+be filtered using the :ref:`--where<filter-experiments>`` option to execute the
+higher scale experiments if desired. To do this, try:
+
+.. code-block:: console
+
+    $ ramble workspace setup --where '{n_ranks} >= 20'
+    $ ramble on
+    $ ramble workspace analyze --where '{n_ranks} >= 20'
+
 Ramble also supports generating machine readable results in YAML or JSON format.
 To use this functionality, use the ``--formats`` option on
 ``ramble workspace analyze``.
+
+Clean the Worksapce
+-------------------
+
+Once you are finished with the tutorial content, make sure you deactivate the workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace and all of its content with:
+
+.. code-block:: console
+
+    $ ramble workspace remove zips_and_matrices_wrf

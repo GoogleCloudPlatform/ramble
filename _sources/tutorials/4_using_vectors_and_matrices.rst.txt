@@ -232,7 +232,9 @@ expanding the ``{type}`` variable reference.
 
 **NOTE** Because we are editing YAML, the experiment name needs to be
 explicitly delimited as a string. Notice how in the above example we wrap the
-experiment name in single quotes to explicitly make it a string.
+experiment name in single quotes to explicitly make it a string. Without this,
+YAML parsers identify the leading ``{`` character, and assume the content is a
+dictionary.
 
 Now, save and exit the file. The resulting experiments can be seen using:
 
@@ -396,14 +398,16 @@ Defining a Scaling Study
 The final modification you'll make to this workspace is to update the
 experiment definition to perform a basic rank based scaling study.
 
-Edit the ``ramble.yaml`` file, and update the value for ``n_ranks`` to be
-``[1, 2, 4]``. After doing this, add the ``n_ranks`` variable to the matrix
-definition, and ensure your experiment name uses the ``{n_ranks}`` placeholder.
+Edit the ``ramble.yaml`` file, and perform the following steps:
+
+ #. Update the value for ``n_ranks`` to be ``[1, 2, 4]``
+ #. Add the ``n_ranks`` variable to the matrix definition
+ #. Ensure your experiment name uses the ``{n_ranks}`` placeholder
+
 At this point, your complete ``ramble.yaml`` file should look like the
 following:
 
 .. literalinclude:: ../../../../examples/vector_matrix_gromacs_config.yaml
-   :linenos:
    :language: YAML
 
 However, your experiment name template may look different from the above, as

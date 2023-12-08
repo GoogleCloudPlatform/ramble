@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuring experiments &mdash; Ramble 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e259d695"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuring experiments</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/shared/gromacs_vector_workspace.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuring-experiments">
+<h1>Configuring experiments<a class="headerlink" href="#configuring-experiments" title="Link to this heading"></a></h1>
+<p>For this tutorial, you are going to focus on creating experiments from the
+<code class="docutils literal notranslate"><span class="pre">water_bare</span></code> and <code class="docutils literal notranslate"><span class="pre">water_gmx50</span></code> workloads. The default configuration will
+contain experiments for each value of the <code class="docutils literal notranslate"><span class="pre">type</span></code> variable, and a single value
+for the <code class="docutils literal notranslate"><span class="pre">size</span></code> variable.</p>
+<p>You will use a Ramble workspace to manage these experiments.</p>
+<section id="create-and-activate-a-workspace">
+<h2>Create and Activate a Workspace<a class="headerlink" href="#create-and-activate-a-workspace" title="Link to this heading"></a></h2>
+<p>Before you can configure your GROMACS experiments, you’ll need to set up a
+workspace. You can call this workspace <code class="docutils literal notranslate"><span class="pre">basic_gromacs</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>basic_gromacs
+</pre></div>
+</div>
+<p>This will create a workspace for you in:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs
+</pre></div>
+</div>
+<p>Now you can activate the workspace and view its default configuration.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>activate<span class="w"> </span>basic_gromacs
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>info
+</pre></div>
+</div>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">info</span></code> command after editing configuration
+files to see how ramble would use the changes you made.</p>
+</section>
+<section id="configure-the-workspace">
+<h2>Configure the Workspace<a class="headerlink" href="#configure-the-workspace" title="Link to this heading"></a></h2>
+<p>Within the workspace directory, ramble creates a directory named <code class="docutils literal notranslate"><span class="pre">configs</span></code>.
+This directory contains generated configuration and template files. Each of
+these files can be edited to configure the workspace, and examples will be
+provided below.</p>
+<p>The available files are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> This file describes all aspects of the workspace. This includes the software stack, the experiments, and all variables.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> This file is a template shell script that will be rendered to execute each of the experiments that ramble generates.</p></li>
+</ul>
+</div></blockquote>
+<p>You can edit these files directly or with the command <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">edit</span></code>.</p>
+<p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
+for your experiments. For this tutorial, replace the default yaml text with the
+contents of <code class="docutils literal notranslate"><span class="pre">$ramble_root/examples/vector_matrix_gromacs_config.yaml</span></code>:</p>
+<p>Note that specifying compilers that Spack doesn’t have installed may take a while.
+To see available compilers, use <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compilers</span></code> or see <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers">Spack documentation</a>
+for more information.</p>
+<p>The second file you should edit is the <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> template file.
+This file contains a template script that will be rendered into an execution
+script for each generated experiment. You can feel free to edit it as you need
+to for your given system, but for this tutorial the default value will work.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Dec 08, 2023.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

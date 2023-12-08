@@ -50,6 +50,19 @@ might output the following:
 
 .. code-block:: console
 
+    ==> 10 applications
+    hmmer  hostname  hpcc  hpcg  hpl  intel-hpl  intel-mpi-benchmarks  lulesh  osu-micro-benchmarks  ufs-weather-model
+
+The ``ramble list`` command also accepts regular expressions. For example:
+
+.. code-block:: console
+
+    $ ramble list h*
+
+might output the following:
+
+.. code-block:: console
+
     ==> 5 applications
     hmmer  hostname  hpcc  hpcg  hpl
 
@@ -95,7 +108,7 @@ workspace. You can call this workspace ``hello_world``.
 
     $ ramble workspace create hello_world
 
-This will create a workspace for you in:
+This will create a named workspace for you in:
 
 .. code-block:: console
 
@@ -111,6 +124,16 @@ Now you can activate the workspace and view its default configuration.
 You can use the ``ramble workspace info`` command after editing configuration
 files to see how ramble would use the changes you made.
 
+As an aside, if you had used:
+
+.. code-block:: console
+
+    $ ramble workspace create -d hello_world
+
+Ramble would create an anonymous workspace for you in ``${PWD}/hello_world``
+for more information on named and anonymous workspaces, see
+:ref:`Ramble workspace documentation<ramble-workspaces>`.
+
 Configure the Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -125,7 +148,11 @@ includes the software stack, the experiments, and all variables.
 * ``execute_experiment.tpl`` This file is a template shell script that will be
 rendered to execute each of the experiments that ramble generates.
 
-You can edit these files directly or with the command ``ramble workspace edit``.
+You can edit these files directly or with the command:
+
+.. code-block:: console
+
+    $ ramble workspace edit
 
 To begin, you should edit the ``ramble.yaml`` file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
@@ -217,3 +244,19 @@ extracted figures of merit. If the experiments were successful, this file will
 show the following results:
 
 * possible hostname: hostname of machine the experiment was executed on
+
+Cleanup the Workspace
+^^^^^^^^^^^^^^^^^^^^^
+
+After you are finished exploring the workspace and tutorial content, make sure
+you deactivate the workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace you used with:
+
+.. code-block:: console
+
+    $ ramble workspace remove hello_world
