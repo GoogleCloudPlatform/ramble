@@ -1738,7 +1738,7 @@ class FsCache(object):
 
 
 class FetchError(ramble.error.RambleError):
-    """Superclass fo fetcher errors."""
+    """Superclass for fetcher errors."""
 
 
 class NoCacheError(FetchError):
