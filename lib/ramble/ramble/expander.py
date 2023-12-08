@@ -200,6 +200,8 @@ class ExpansionGraph(object):
                     children[-1].append(cur_match)
                 else:
                     self.root.add_children(cur_match)
+            elif c == '\n':  # Don't expand across new lines
+                opened = []
 
         if len(opened) > 0:
             self.root.add_children(children.pop())
