@@ -224,7 +224,7 @@ class Namd(SpackApplication):
     figure_of_merit_context(
         'Energy iteration',
         regex=energy_regex,
-        output_format='Enery Iteration: {itr}'
+        output_format='Energy Iteration: {itr}'
     )
 
     figure_of_merit(

@@ -189,7 +189,7 @@ class Hpl(SpackApplication):
                       description='DEPTH for optimized calculator',
                       workloads=['calculator'])
 
-    # FoMs:
+    # FOMs:
     log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
                            Expander.expansion_str('experiment_name') + '.out')
 

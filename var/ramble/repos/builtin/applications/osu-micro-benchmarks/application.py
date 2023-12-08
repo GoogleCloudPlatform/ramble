@@ -51,7 +51,7 @@ class OsuMicroBenchmarks(SpackApplication):
     size_time_regex = r'(?P<msg_size>[0-9.]+)+\s+(?P<fom>[0-9.]+)'
     figure_of_merit_context('msg_size',
                             regex=size_time_regex,
-                            output_format='Messae Size: {msg_size}')
+                            output_format='Message Size: {msg_size}')
 
     log_str = Expander.expansion_str('log_file')
     for benchmark, unit in pt2pt:

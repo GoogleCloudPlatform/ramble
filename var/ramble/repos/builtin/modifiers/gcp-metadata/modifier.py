@@ -12,7 +12,7 @@ from ramble.modkit import *  # noqa: F403
 class GcpMetadata(BasicModifier):
     """Define a modifier to grab GCP VM metadata
 
-    This mod can capture usefull metadata (such as node type and VM image) for
+    This mod can capture useful metadata (such as node type and VM image) for
     GCP VMs
     """
 

@@ -10,7 +10,7 @@ import os
 from ramble.appkit import *
 from ramble.expander import Expander
 
-# Genral Guidance:
+# General Guidance:
 # - Use compact placement policy
 # - Check the compute nodes in a single rack using the network topology API
 
@@ -73,7 +73,7 @@ class IntelMpiBenchmarks(SpackApplication):
 
     # Multiple spack packages (specifically intel-oneapi-mpi) provide the
     # binary we need. It's fairly common to want to decouple the version of MPI
-    # from the version of the benchmark, so this varialbe gives a user an
+    # from the version of the benchmark, so this variable gives a user an
     # explicit way to control that, as well as more strongly implies the binary
     # from intel-mpi-benchmarks by default
     workload_variable('install_path',
