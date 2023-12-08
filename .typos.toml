@@ -5,7 +5,6 @@ extend-exclude = [
     "lib/ramble/external/",
     "lib/ramble/llnl/",
     "lib/ramble/spack/",
-    "var/",
 ]
 ignore-hidden = false
 
@@ -17,8 +16,10 @@ extend-ignore-re = [
 [default.extend-words]
 "fom" = "fom"
 "namd" = "namd"
+"reord" = "reord"
 
 [default.extend-identifiers]
 "ATPase" = "ATPase"
 "cachable" = "cachable"
 "clen" = "clen"
+"enable_deck_based_FOMs" = "enable_deck_based_FOMs"

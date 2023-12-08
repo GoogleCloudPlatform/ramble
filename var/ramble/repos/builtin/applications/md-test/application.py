@@ -22,7 +22,7 @@ class MdTest(SpackApplication):
     software_spec('openmpi', spack_spec='openmpi')
 
     # The IOR spack package also includes MDTest, but we implement it as a
-    # seperate application in ramble
+    # separate application in ramble
     software_spec('ior', spack_spec='ior', compiler='gcc')
 
     required_package('ior')
