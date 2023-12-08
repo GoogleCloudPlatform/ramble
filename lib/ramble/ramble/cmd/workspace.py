@@ -698,7 +698,7 @@ subcommand_functions = {}
 
 
 def sanitize_arg_name(base_name):
-    """Allow function names to be remaped (eg `-` to `_`) """
+    """Allow function names to be remapped (eg `-` to `_`) """
     formatted_name = base_name.replace('-', '_')
     return formatted_name
 

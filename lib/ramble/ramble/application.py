@@ -1353,7 +1353,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        logger.debug('fom_vals = %s' % fom_values)
+        logger.debug('fom_values = %s' % fom_values)
         results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
         if success:
             self.set_status(status='SUCCESS')

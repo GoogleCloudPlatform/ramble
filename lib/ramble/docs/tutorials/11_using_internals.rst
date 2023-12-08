@@ -200,7 +200,7 @@ And define the order of the executables for your experiments to include
 want them to be executed.
 
 For the purposes of this tutorial, add ``start_time`` directly before
-``execute`` and ``end_time`` directly after ``exectute``. The resulting
+``execute`` and ``end_time`` directly after ``execute``. The resulting
 configuration file should look like the following:
 
 .. code-block:: YAML
