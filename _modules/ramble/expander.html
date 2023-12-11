@@ -315,6 +315,8 @@
                     <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_match</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">add_children</span><span class="p">(</span><span class="n">cur_match</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>  <span class="c1"># Don&#39;t expand across new lines</span>
+                <span class="n">opened</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opened</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">add_children</span><span class="p">(</span><span class="n">children</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
@@ -936,7 +938,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 08, 2023.
+      <span class="lastupdated">Last updated on Dec 11, 2023.
       </span></p>
   </div>
 
