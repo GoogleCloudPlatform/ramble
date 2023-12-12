@@ -37,10 +37,10 @@ class Wrfv3(SpackApplication):
                sha256='0c5ecfc85f2a982f0fa0191371401c1474cf562a7cf97192acd3c9b91ebcc48d',
                description='12 km resolution mesh of the continental United States.')
 
-    executable('cleanup', 'rm -f rsl.* wrfout*', use_mpi=False)
+    executable('cleanup', 'rm -f rsl.* wrfout*', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
     executable('copy', template=['cp -R {input_path}/* {experiment_run_dir}/.',
                                  'ln -s {wrf}/run/* {experiment_run_dir}/.'],
-               use_mpi=False)
+               use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
     executable('execute', 'wrf.exe', use_mpi=True)
 
     workload('CONUS_2p5km', executables=['cleanup', 'copy', 'execute'],
