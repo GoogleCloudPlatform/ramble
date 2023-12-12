@@ -23,7 +23,7 @@ class Lammps(SpackApplication):
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
 
     software_spec('lammps',
-                  spack_spec='lammps@20220623.3 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth',
+                  spack_spec='lammps@20220623.4 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth',
                   compiler='gcc9')
 
     required_package('lammps')

@@ -117,6 +117,7 @@ class Openfoam(SpackApplication):
 
     input_file('hpc_motorbike',
                url='https://develop.openfoam.com/committees/hpc/-/archive/develop/hpc-develop.tar.gz',
+               sha256='b285a18332fd718dbdc6b6c90dd7f134c9745cb7eb479d93b394160bbef97390',
                description='HPC Benchmarking version of the Motorbike input')
 
     executable('get_inputs', template=['cp -R {input_path}/* {experiment_run_dir}/.',
