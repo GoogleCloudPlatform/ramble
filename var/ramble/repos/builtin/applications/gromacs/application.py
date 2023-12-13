@@ -27,13 +27,13 @@ class Gromacs(SpackApplication):
                '-f {input_path}/{type}.mdp ' +
                '-c {input_path}/conf.gro ' +
                '-p {input_path}/topol.top ' +
-               '-o exp_input.tpr', use_mpi=False)
+               '-o exp_input.tpr', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
     executable('execute-gen', 'gmx_mpi mdrun -notunepme -dlb yes ' +
                '-v -resethway -noconfout -nsteps 4000 ' +
-               '-s exp_input.tpr', use_mpi=True)
+               '-s exp_input.tpr', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
     executable('execute', 'gmx_mpi mdrun -notunepme -dlb yes ' +
                '-v -resethway -noconfout -nsteps 4000 ' +
-               '-s {input_path}', use_mpi=True)
+               '-s {input_path}', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
 
     input_file('water_gmx50_bare', url='https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz',
                sha256='2219c10acb97787f80f6638132bad3ff2ca1e68600eef1bc8b89d9560e74c66a',
