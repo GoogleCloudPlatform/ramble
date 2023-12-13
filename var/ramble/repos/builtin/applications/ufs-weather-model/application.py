@@ -13,7 +13,7 @@ from ramble.expander import Expander
 
 class UfsWeatherModel(SpackApplication):
     '''Define FV3 application via ufs-weather-model'''
-    name = 'UfsWeatherModel'
+    name = 'ufs-weather-model'
 
     maintainers('dodecatheon')
 
@@ -24,6 +24,7 @@ class UfsWeatherModel(SpackApplication):
     software_spec('ompi415', spack_spec="openmpi@4.1.5", compiler='gcc9')
 
     software_spec('python39', spack_spec="python@3.9.15", compiler='gcc9')
+    software_spec('esmf', spack_spec="esmf@8.0.1", compiler='gcc9')
 
     software_spec('ufs-weather-model',
                   spack_spec='ufs-weather-model@2.0.0 +avx2 +openmp', compiler='gcc9')
@@ -31,7 +32,7 @@ class UfsWeatherModel(SpackApplication):
     required_package('ufs-weather-model')
 
     input_file('simple_test_case', url='https://ftp.emc.ncep.noaa.gov/EIB/UFS/simple-test-case.tar.gz',
-               sha='c713ecb208abcff9a7ec74d7991915d842f85a53b5771afa6b9c57c27651aaeb',
+               sha256='c713ecb208abcff9a7ec74d7991915d842f85a53b5771afa6b9c57c27651aaeb',
                description='Simple test case for ufs-weather-model')
 
     executable('execute', 'ufs_weather_model', use_mpi=True)
