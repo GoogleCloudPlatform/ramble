@@ -46,8 +46,8 @@ environments:
         gcc9:
           Rendered Packages:
             gcc9:
-              Spack spec: gcc@9.3.0 target=x86_64
-              Compiler spec: gcc@9.3.0
+              Spack spec: gcc@9.4.0 target=x86_64
+              Compiler spec: gcc@9.4.0
         impi2018:
           Rendered Packages:
             impi2018:
@@ -83,8 +83,8 @@ The relevant portion of the workspace configuration file is:
       concretized: true
       packages:
         gcc9:
-          spack_spec: gcc@9.3.0 target=x86_64
-          compiler_spec: gcc@9.3.0
+          spack_spec: gcc@9.4.0 target=x86_64
+          compiler_spec: gcc@9.4.0
         impi2018:
           spack_spec: intel-mpi@2018.4.274 target=x86_64
           compiler: gcc9
