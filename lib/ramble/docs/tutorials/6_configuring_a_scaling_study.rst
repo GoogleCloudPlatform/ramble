@@ -222,7 +222,7 @@ look like the following:
         concretized: true
         packages:
           gcc9:
-            spack_spec: gcc@9.3.0
+            spack_spec: gcc@9.4.0
           intel-mpi:
             spack_spec: intel-mpi@2018.4.274
             compiler: gcc9
