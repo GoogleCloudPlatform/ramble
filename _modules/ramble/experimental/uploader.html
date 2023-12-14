@@ -247,7 +247,11 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;No upload URI (config:upload:uri) in config.&#39;</span><span class="p">)</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Uploading Results to </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">uploader</span><span class="o">.</span><span class="n">perform_upload</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">formatted_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">formatted_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No data to upload&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">uploader</span><span class="o">.</span><span class="n">perform_upload</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">formatted_data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Unknown config:upload:type value&quot;</span><span class="p">)</span>
 
