@@ -672,13 +672,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">math_ast</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">in_str</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
-            <span class="c1"># If the only node in the AST is a constant, return an unmodified</span>
-            <span class="c1"># in_str.</span>
-            <span class="n">is_num_const</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> \
-                <span class="nb">hasattr</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
-            <span class="n">backport_num_const</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Num</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">is_num_const</span> <span class="ow">or</span> <span class="n">backport_num_const</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">in_str</span>
             <span class="n">out_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">math_ast</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out_str</span>
         <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
