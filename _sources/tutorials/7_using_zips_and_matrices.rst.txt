@@ -73,8 +73,8 @@ length. As an example, imagine we had the following variable / zip definitions:
       - processes_per_node
 
 The result of this is that ``platform_config`` would be a list of length 2. The
-first index would contain ``(platform1, 2)`` and the second index would contain
-``(platform2, 4)``. Using this, we can group an arbitrary number of variables
+first index would contain ``(platform1, 16)`` and the second index would contain
+``(platform2, 20)``. Using this, we can group an arbitrary number of variables
 into a single name.
 
 For the purposes of this tutorial, we'll assume your system has 4 total cores,
