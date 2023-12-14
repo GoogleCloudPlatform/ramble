@@ -29,6 +29,7 @@ def exp_dict():
         'var2': '{var3}',
         'var3': '3',
         'decimal.06.var': 'foo',
+        'size': '0000.96'
     }
 
 
@@ -51,6 +52,7 @@ def exp_dict():
         ('{{n_ranks}+2}', '6'),
         ('{{n_ranks}*{var{processes_per_node}}:05d}', '00012'),
         ('{{n_ranks}-1}', '3'),
+        ('{{{n_ranks}/2}:0.0f}', '2')
     ]
 )
 def test_expansions(input, output):
