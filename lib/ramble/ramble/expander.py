@@ -528,13 +528,6 @@ class Expander(object):
         """
         try:
             math_ast = ast.parse(in_str, mode='eval')
-            # If the only node in the AST is a constant, return an unmodified
-            # in_str.
-            is_num_const = isinstance(math_ast.body, ast.Constant) and \
-                hasattr(math_ast.body, 'value')
-            backport_num_const = isinstance(math_ast.body, ast.Num) and hasattr(math_ast.body, 'n')
-            if is_num_const or backport_num_const:
-                return in_str
             out_str = self.eval_math(math_ast.body)
             return out_str
         except MathEvaluationError as e:

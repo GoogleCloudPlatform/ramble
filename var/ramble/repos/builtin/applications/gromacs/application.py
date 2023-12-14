@@ -110,10 +110,10 @@ class Gromacs(SpackApplication):
                       description='Workload type.',
                       values=['pme', 'rf'],
                       workloads=['water_gmx50', 'water_bare'])
-    workload_variable('input_path', default='{water_gmx50_bare}/{size}',
+    workload_variable('input_path', default='{water_gmx50_bare}/*{size}',
                       description='Input path for water GMX50',
                       workload='water_gmx50')
-    workload_variable('input_path', default='{water_bare_hbonds}/{size}',
+    workload_variable('input_path', default='{water_bare_hbonds}/*{size}',
                       description='Input path for water bare hbonds',
                       workload='water_bare')
     workload_variable('input_path', default='{lignocellulose}/lignocellulose-rf.tpr',
