@@ -725,7 +725,8 @@ def setup_parser(subparser):
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(
-            name, aliases=aliases, help=setup_parser_cmd.__doc__)
+            name, aliases=aliases, help=setup_parser_cmd.__doc__,
+            description=setup_parser_cmd.__doc__)
         setup_parser_cmd(subsubparser)
 
 

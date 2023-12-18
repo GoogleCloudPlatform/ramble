@@ -30,7 +30,8 @@ def setup_parser(subparser):
         metavar='SUBCOMMAND', dest='mirror_command')
 
     # Destroy
-    destroy_parser = sp.add_parser('destroy', help=mirror_destroy.__doc__)
+    destroy_parser = sp.add_parser('destroy', help=mirror_destroy.__doc__,
+                                   description=mirror_destroy.__doc__)
 
     destroy_target = destroy_parser.add_mutually_exclusive_group(required=True)
     destroy_target.add_argument('-m', '--mirror-name',
@@ -47,7 +48,8 @@ def setup_parser(subparser):
     scopes_metavar = ramble.config.scopes_metavar
 
     # Add
-    add_parser = sp.add_parser('add', help=mirror_add.__doc__)
+    add_parser = sp.add_parser('add', help=mirror_add.__doc__,
+                               description=mirror_add.__doc__)
     add_parser.add_argument(
         'name', help="mnemonic name for mirror", metavar="mirror")
     add_parser.add_argument(
@@ -58,7 +60,8 @@ def setup_parser(subparser):
         help="configuration scope to modify")
     # Remove
     remove_parser = sp.add_parser('remove', aliases=['rm'],
-                                  help=mirror_remove.__doc__)
+                                  help=mirror_remove.__doc__,
+                                  description=mirror_remove.__doc__)
     remove_parser.add_argument(
         'name', help="mnemonic name for mirror", metavar="mirror")
     remove_parser.add_argument(
@@ -67,7 +70,8 @@ def setup_parser(subparser):
         help="configuration scope to modify")
 
     # Set-Url
-    set_url_parser = sp.add_parser('set-url', help=mirror_set_url.__doc__)
+    set_url_parser = sp.add_parser('set-url', help=mirror_set_url.__doc__,
+                                   description=mirror_set_url.__doc__)
     set_url_parser.add_argument(
         'name', help="mnemonic name for mirror", metavar="mirror")
     set_url_parser.add_argument(
@@ -81,7 +85,8 @@ def setup_parser(subparser):
         help="configuration scope to modify")
 
     # List
-    list_parser = sp.add_parser('list', help=mirror_list.__doc__)
+    list_parser = sp.add_parser('list', help=mirror_list.__doc__,
+                                description=mirror_list.__doc__)
     list_parser.add_argument(
         '--scope', choices=scopes, metavar=scopes_metavar,
         default=ramble.config.default_list_scope(),

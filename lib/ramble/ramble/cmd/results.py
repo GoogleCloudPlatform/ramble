@@ -21,7 +21,8 @@ def setup_parser(subparser):
                                   dest='results_command')
 
     # Upload
-    upload_parser = sp.add_parser('upload', help=results_upload.__doc__)
+    upload_parser = sp.add_parser('upload', help=results_upload.__doc__,
+                                  description=results_upload.__doc__)
     upload_parser.add_argument(
         'filename', help='path of file to upload')
 
