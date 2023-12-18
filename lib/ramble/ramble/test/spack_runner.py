@@ -280,7 +280,7 @@ def test_new_compiler_installs(tmpdir, capsys):
     import os
 
     compilers_config = """
-compilers:
+compilers::
 - compiler:
     spec: gcc@12.1.0
     paths:
@@ -468,7 +468,7 @@ def test_config_compiler_find_attribute(tmpdir, capsys, attr, value, expected_st
     import os
 
     compilers_config = """
-compilers:
+compilers::
 - compiler:
     spec: gcc@12.1.0
     paths:
