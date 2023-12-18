@@ -96,7 +96,7 @@ class Hpcc(SpackApplication):
     log_str = Expander.expansion_str('out_file')
 
     for metric, unit in summary_metrics:
-        summary_regex = metric + '=(?P<val>[0-9]+\.[0-9]+)'
+        summary_regex = metric + r'=(?P<val>[0-9]+\.[0-9]+)'
         figure_of_merit(metric,
                         log_file=log_str,
                         fom_regex=summary_regex,

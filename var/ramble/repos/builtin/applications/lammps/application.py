@@ -65,7 +65,7 @@ class Lammps(SpackApplication):
 
     executable(
         'set-data-path',
-        template=["sed 's|data\.|" + os.path.join("{lammps-stage}", "bench", "data.") + "|g' -i input.txt"],
+        template=[r"sed 's|data\.|" + os.path.join("{lammps-stage}", "bench", "data.") + "|g' -i input.txt"],
         use_mpi=False
     )
 
@@ -165,7 +165,7 @@ class Lammps(SpackApplication):
                       description='Additional execution flags for lammps',
                       workloads=['hns-reaxff'])
 
-    success_criteria('walltime', mode='string', match='\s*Total wall time', file='{log_file}')
+    success_criteria('walltime', mode='string', match=r'\s*Total wall time', file='{log_file}')
 
     figure_of_merit('Total wall time', fom_regex=r'Total wall time.*\s+(?P<walltime>[0-9:]+)', group_name='walltime', units='')
     figure_of_merit('Nanoseconds per day', fom_regex=r'Performance.*\s+(?P<nspd>[0-9\.]+) (ns|tau)/day', group_name='nspd', units='ns/day')
