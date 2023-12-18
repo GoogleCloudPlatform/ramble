@@ -29,10 +29,10 @@ class Gromacs(SpackApplication):
                '-p {input_path}/topol.top ' +
                '-o exp_input.tpr', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
     executable('execute-gen', 'gmx_mpi mdrun -notunepme -dlb yes ' +
-               '-v -resethway -noconfout -nsteps 4000 ' +
+               '-v -resetstep {resetstep} -noconfout -nsteps {nsteps} ' +
                '-s exp_input.tpr', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
     executable('execute', 'gmx_mpi mdrun -notunepme -dlb yes ' +
-               '-v -resethway -noconfout -nsteps 4000 ' +
+               '-v -resetstep {resetstep} -noconfout -nsteps {nsteps} ' +
                '-s {input_path}', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
 
     input_file('water_gmx50_bare', url='https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz',
@@ -98,6 +98,34 @@ class Gromacs(SpackApplication):
              input='JCP_benchmarks')
     workload('ion_channel', executables=['pre-process', 'execute-gen'],
              input='JCP_benchmarks')
+    workload('adh_dodec', executables=['pre-process', 'execute-gen'],
+             input='JCP_benchmarks')
+
+    all_workloads = [
+        'water_gmx50',
+        'water_bare',
+        'lignocellulose',
+        'hecbiosim',
+        'benchpep',
+        'benchpep_h',
+        'benchmem',
+        'benchrib',
+        'stmv_rf',
+        'stmv_pme',
+        'rnase_cubic',
+        'ion_channel',
+        'adh_dodec',
+    ]
+
+    default_nsteps = 20000
+    workload_variable('nsteps', default=str(default_nsteps),
+                      description='Simulation steps',
+                      workloads=all_workloads,
+    )
+    workload_variable('resetstep', default=str(int(0.9*default_nsteps)),
+                      description='Reset performance counters at this step',
+                      workloads=all_workloads,
+    )
 
     workload_variable('size', default='1536',
                       values=['0000.65', '0000.96', '0001.5',
@@ -152,6 +180,12 @@ class Gromacs(SpackApplication):
     workload_variable('input_path', default='{JCP_benchmarks}/{workload_name}',
                       description='Input path for JCP_benchmark {workload_name}',
                       workloads=['ion_channel', 'rnase_cubic'])
+    workload_variable('input_path', default='{JCP_benchmarks}/{workload_name}',
+                      description='Input path for JCP_benchmark {workload_name}',
+                      workloads=['adh_dodec'])
+    workload_variable('type', default='pme_verlet',
+                      description='Workload type for JCP_benchmarks',
+                      workloads=['adh_dodec'])
 
     log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
                            'md.log')
