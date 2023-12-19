@@ -120,7 +120,7 @@ class Gromacs(SpackApplication):
     workload_variable('gmx', default='gmx_mpi',
                       description='Name of the gromacs binary',
                       workloads=all_workloads,
-    )    
+    )
     workload_variable('grompp', default='{gmx} grompp',
                       description='How to run grompp',
                       workloads=all_workloads,
@@ -137,10 +137,6 @@ class Gromacs(SpackApplication):
                       description='Reset performance counters at this step',
                       workloads=all_workloads,
     )
-    workload_variable('grompp_command', default="",
-                      description='Command to run grompp',
-                      workloads=all_workloads,
-    )
     workload_variable('verbose', default="-v",
                       description='Set to empty string to run without verbose mode',
                       workloads=all_workloads,
@@ -152,7 +148,7 @@ class Gromacs(SpackApplication):
     workload_variable('dlb', default='yes',
                       description='Whether to use dynamic load balancing for mdrun',
                       workloads=all_workloads,
-    )    
+    )
 
     workload_variable('size', default='1536',
                       values=['0000.65', '0000.96', '0001.5',
