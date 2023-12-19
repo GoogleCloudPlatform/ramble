@@ -112,7 +112,7 @@ This will create a named workspace for you in:
 
 .. code-block:: console
 
-    $ $ramble_root/var/ramble/workspaces/hello_world
+    $ $RAMBLE_ROOT/var/ramble/workspaces/hello_world
 
 Now you can activate the workspace and view its default configuration.
 
@@ -212,7 +212,7 @@ For each setup run, a set of logs will be created at:
 
 .. code-block:: console
 
-    $ $ramble_root/var/ramble/workspaces/$workspace_root/logs
+    $ $RAMBLE_ROOT/var/ramble/workspaces/$workspace_root/logs
 
 Each run will have its own primary log, along with a folder containing a log for each
 experiment that is being configured.
