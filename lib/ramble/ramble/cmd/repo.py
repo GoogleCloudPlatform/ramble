@@ -35,7 +35,8 @@ def setup_parser(subparser):
     scopes_metavar = ramble.config.scopes_metavar
 
     # Create
-    create_parser = sp.add_parser('create', help=repo_create.__doc__)
+    create_parser = sp.add_parser('create', help=repo_create.__doc__,
+                                  description=repo_create.__doc__)
     create_parser.add_argument(
         'directory', help="directory to create the repo in")
     create_parser.add_argument(
@@ -53,7 +54,8 @@ def setup_parser(subparser):
     ramble.cmd.common.arguments.add_common_arguments(create_parser, ['repo_type'])
 
     # List
-    list_parser = sp.add_parser('list', help=repo_list.__doc__)
+    list_parser = sp.add_parser('list', help=repo_list.__doc__,
+                                description=repo_list.__doc__)
     list_parser.add_argument(
         '--scope', choices=scopes, metavar=scopes_metavar,
         default=ramble.config.default_list_scope(),
@@ -61,7 +63,8 @@ def setup_parser(subparser):
     ramble.cmd.common.arguments.add_common_arguments(list_parser, ['repo_type'])
 
     # Add
-    add_parser = sp.add_parser('add', help=repo_add.__doc__)
+    add_parser = sp.add_parser('add', help=repo_add.__doc__,
+                               description=repo_add.__doc__)
     add_parser.add_argument(
         'path', help="path to a Ramble repository directory")
     add_parser.add_argument(
@@ -72,7 +75,8 @@ def setup_parser(subparser):
 
     # Remove
     remove_parser = sp.add_parser(
-        'remove', help=repo_remove.__doc__, aliases=['rm'])
+        'remove', help=repo_remove.__doc__,
+        description=repo_remove.__doc__, aliases=['rm'])
     remove_parser.add_argument(
         'namespace_or_path',
         help="namespace or path of a Ramble repository")

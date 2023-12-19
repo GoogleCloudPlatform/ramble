@@ -195,9 +195,11 @@ def verify(args):
 
 def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='license_command')
-    sp.add_parser('list-files', help=list_files.__doc__)
+    sp.add_parser('list-files', help=list_files.__doc__,
+                  description=list_files.__doc__)
 
-    verify_parser = sp.add_parser('verify', help=verify.__doc__)
+    verify_parser = sp.add_parser('verify', help=verify.__doc__,
+                                  description=verify.__doc__)
     verify_parser.add_argument(
         '--root', action='store', default=ramble.paths.prefix,
         help='scan a different prefix for license issues')
