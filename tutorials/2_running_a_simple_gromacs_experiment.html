@@ -211,7 +211,7 @@ workspace. You can call this workspace <code class="docutils literal notranslate
 </pre></div>
 </div>
 <p>This will create a workspace for you in:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$RAMBLE_ROOT</span>/var/ramble/workspaces/basic_gromacs
 </pre></div>
 </div>
 <p>Now you can activate the workspace and view its default configuration.</p>
@@ -238,7 +238,7 @@ provided below.</p>
 <p>You can edit these files directly or with the command <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">edit</span></code>.</p>
 <p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
-contents of <code class="docutils literal notranslate"><span class="pre">$ramble_root/examples/basic_gromacs_config.yaml</span></code>:</p>
+contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE_ROOT/examples/basic_gromacs_config.yaml</span></code>:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
@@ -323,13 +323,13 @@ you can do a dry run of the setup using:</p>
 </pre></div>
 </div>
 <p>For each setup run, a set of logs will be created at:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/<span class="nv">$workspace_root</span>/logs
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$RAMBLE_ROOT</span>/var/ramble/workspaces/<span class="nv">$workspace_root</span>/logs
 </pre></div>
 </div>
 <p>Each run will have its own primary log, along with a folder containing a log
 for each experiment that is being configured. While setup is running, you can
 monitor the process by looking at the contents of:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$RAMBLE_ROOT</span>/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
 </pre></div>
 </div>
 </section>
@@ -365,7 +365,7 @@ the speed achieved</p></li>
 <section id="workspace-directory-structure">
 <h2>Workspace Directory Structure<a class="headerlink" href="#workspace-directory-structure" title="Link to this heading"></a></h2>
 <p>After analyzing the workspace, you can exmine the structure of the workspace at:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$ramble_root</span>/var/ramble/workspaces/basic_gromacs
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">$RAMBLE_ROOT</span>/var/ramble/workspaces/basic_gromacs
 </pre></div>
 </div>
 <p>Within this directory, you should see the following directories:</p>
@@ -406,7 +406,7 @@ the workspace using:</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 18, 2023.
+      <span class="lastupdated">Last updated on Dec 19, 2023.
       </span></p>
   </div>
 

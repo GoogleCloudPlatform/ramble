@@ -30,7 +30,7 @@ This will create a workspace for you in:
 
 .. code-block:: console
 
-    $ $ramble_root/var/ramble/workspaces/basic_gromacs
+    $ $RAMBLE_ROOT/var/ramble/workspaces/basic_gromacs
 
 Now you can activate the workspace and view its default configuration.
 
@@ -59,7 +59,7 @@ You can edit these files directly or with the command ``ramble workspace edit``.
 
 To begin, you should edit the ``ramble.yaml`` file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
-contents of ``$ramble_root/examples/vector_matrix_gromacs_config.yaml``:
+contents of ``$RAMBLE_ROOT/examples/vector_matrix_gromacs_config.yaml``:
 
 
 .. literalinclude:: ../../../../examples/vector_matrix_gromacs_config.yaml
