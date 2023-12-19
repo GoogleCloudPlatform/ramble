@@ -124,7 +124,7 @@ For each setup run, a set of logs will be created at:
 
 .. code-block:: console
 
-    $ $ramble_root/var/ramble/workspaces/$workspace_root/logs
+    $ $RAMBLE_ROOT/var/ramble/workspaces/$workspace_root/logs
 
 Each run will have its own primary log, along with a folder containing a log
 for each experiment that is being configured. While setup is running, you can
@@ -132,7 +132,7 @@ monitor the process by looking at the contents of:
 
 .. code-block:: console
 
-    $ $ramble_root/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
+    $ $RAMBLE_ROOT/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
 
 Executing Experiments
 ---------------------
@@ -174,7 +174,7 @@ After analyzing the workspace, you can exmine the structure of the workspace at:
 
 .. code-block:: console
 
-    $ $ramble_root/var/ramble/workspaces/basic_gromacs
+    $ $RAMBLE_ROOT/var/ramble/workspaces/basic_gromacs
 
 Within this directory, you should see the following directories:
 
