@@ -179,7 +179,8 @@
         <span class="n">setup_parser_cmd</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">setup_parser_cmd_name</span><span class="p">]</span>
 
         <span class="n">subsubparser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="n">aliases</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">setup_parser_cmd</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="n">aliases</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">setup_parser_cmd</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">setup_parser_cmd</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
         <span class="n">setup_parser_cmd</span><span class="p">(</span><span class="n">subsubparser</span><span class="p">)</span></div>
 
 

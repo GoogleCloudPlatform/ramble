@@ -133,7 +133,8 @@
     <span class="n">scopes_metavar</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scopes_metavar</span>
 
     <span class="c1"># Create</span>
-    <span class="n">create_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_create</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">create_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_create</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                                  <span class="n">description</span><span class="o">=</span><span class="n">repo_create</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
     <span class="n">create_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;directory&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;directory to create the repo in&quot;</span><span class="p">)</span>
     <span class="n">create_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -151,7 +152,8 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">create_parser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;repo_type&#39;</span><span class="p">])</span>
 
     <span class="c1"># List</span>
-    <span class="n">list_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">list_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                                <span class="n">description</span><span class="o">=</span><span class="n">repo_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
     <span class="n">list_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--scope&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_list_scope</span><span class="p">(),</span>
@@ -159,7 +161,8 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">list_parser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;repo_type&#39;</span><span class="p">])</span>
 
     <span class="c1"># Add</span>
-    <span class="n">add_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">add_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                               <span class="n">description</span><span class="o">=</span><span class="n">repo_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
     <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to a Ramble repository directory&quot;</span><span class="p">)</span>
     <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -170,7 +173,8 @@
 
     <span class="c1"># Remove</span>
     <span class="n">remove_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
-        <span class="s1">&#39;remove&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_remove</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rm&#39;</span><span class="p">])</span>
+        <span class="s1">&#39;remove&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">repo_remove</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">repo_remove</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rm&#39;</span><span class="p">])</span>
     <span class="n">remove_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;namespace_or_path&#39;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;namespace or path of a Ramble repository&quot;</span><span class="p">)</span>

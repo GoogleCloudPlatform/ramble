@@ -119,7 +119,8 @@
                                   <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;results_command&#39;</span><span class="p">)</span>
 
     <span class="c1"># Upload</span>
-    <span class="n">upload_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;upload&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">results_upload</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">upload_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;upload&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">results_upload</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                                  <span class="n">description</span><span class="o">=</span><span class="n">results_upload</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
     <span class="n">upload_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path of file to upload&#39;</span><span class="p">)</span></div>
 
