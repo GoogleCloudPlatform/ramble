@@ -829,3 +829,32 @@ def test_environment_vector_expansion_exclusion(mutable_mock_workspace_path):
         assert 'basic-x86_64' in software_environments._environments.keys()
         assert 'basic-x86_64_v4' not in software_environments._environments.keys()
         assert 'basic-x86_64' in software_environments._environments['basic-x86_64']['packages']
+
+
+def test_environment_with_missing_package_errors(mutable_mock_workspace_path, capsys):
+    ws_name = 'test_environment_with_missing_package_errors'
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic'] = {
+            'spack_spec': 'basic@1.1',
+        }
+        spack_dict['environments'] = {
+            'basic': {
+                'packages': ['basic', 'undefined_package']
+            }
+        }
+
+        with pytest.raises(SystemExit):
+            ramble.software_environments.SoftwareEnvironments(ws)
+            output = capsys.readouterr()
+
+            assert 'Error: Environment basic refers to the following packages' in output
+            assert 'undefined_package' in output
+            assert 'Please make sure all packages are defined before using this environment' \
+                in output
