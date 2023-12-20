@@ -132,13 +132,13 @@ class Gromacs(SpackApplication):
     workload_variable('resetstep', default='{str(int(0.9*{nsteps}))}',
                       description='Reset performance counters at this step',
                       workloads=all_workloads)
-    workload_variable('verbose', default="-v",
+    workload_variable('verbose', default="", values=['', '-v'],
                       description='Set to empty string to run without verbose mode',
                       workloads=all_workloads)
-    workload_variable('notunepme', default='-notunepme',
+    workload_variable('notunepme', default='-notunepme', values=['', '-notunepme'],
                       description='Whether to set -notunepme for mdrun',
                       workloads=all_workloads)
-    workload_variable('dlb', default='yes',
+    workload_variable('dlb', default='yes', values=['yes', 'no'],
                       description='Whether to use dynamic load balancing for mdrun',
                       workloads=all_workloads)
 
