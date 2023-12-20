@@ -303,11 +303,16 @@
                             <span class="n">env_packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">expanded_pkg</span><span class="p">)</span>
 
                         <span class="n">pkgs_with_compiler</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">missing_pkgs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
                         <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">env_packages</span><span class="p">:</span>
-                            <span class="n">pkg_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">:</span>
+                                <span class="n">pkg_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
 
-                            <span class="k">if</span> <span class="s1">&#39;compiler&#39;</span> <span class="ow">in</span> <span class="n">pkg_info</span> <span class="ow">and</span> <span class="n">pkg_info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">env_packages</span><span class="p">:</span>
-                                <span class="n">pkgs_with_compiler</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]))</span>
+                                <span class="k">if</span> <span class="s1">&#39;compiler&#39;</span> <span class="ow">in</span> <span class="n">pkg_info</span> <span class="ow">and</span> <span class="n">pkg_info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">env_packages</span><span class="p">:</span>
+                                    <span class="n">pkgs_with_compiler</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">missing_pkgs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
+
                         <span class="k">if</span> <span class="n">pkgs_with_compiler</span><span class="p">:</span>
                             <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                                 <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="n">final_name</span><span class="si">}</span><span class="s1"> contains packages and their &#39;</span>
@@ -320,6 +325,14 @@
                             <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                                 <span class="s1">&#39;This might cause problems when installing the packages.&#39;</span>
                             <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">missing_pkgs</span><span class="p">:</span>
+                            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="n">final_name</span><span class="si">}</span><span class="s1"> refers to the following &#39;</span> \
+                                      <span class="s1">&#39;packages, which are not defined:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">missing_pkgs</span><span class="p">:</span>
+                                <span class="n">err_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="n">err_msg</span> <span class="o">+=</span> <span class="s1">&#39;Please make sure all packages are defined &#39;</span> \
+                                       <span class="s1">&#39;before using this environment.&#39;</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SoftwareEnvironments.print_environments">
 <a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.print_environments">[docs]</a>
@@ -556,7 +569,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 19, 2023.
+      <span class="lastupdated">Last updated on Dec 20, 2023.
       </span></p>
   </div>
 
