@@ -11,6 +11,7 @@ import stat
 import os
 import shutil
 import py.path
+import shlex
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -30,7 +31,7 @@ from ramble.namespace import namespace
 from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
-from spack.util.executable import which
+from spack.util.executable import which, Executable
 
 if not ramble.config.get('config:disable_progress_bar', False):
     try:
@@ -402,9 +403,32 @@ class PushToCachePipeline(Pipeline):
         logger.msg(f'Pushed envs to spack cache {self.spack_cache_path}')
 
 
+class ExecutePipeline(Pipeline):
+    """class for the `execute` (`on`) pipeline"""
+
+    name = 'execute'
+
+    def __init__(self, workspace, filters, executor='{batch_submit}'):
+        super().__init__(workspace, filters)
+        self.action_string = 'Executing'
+        self.require_inventory = True
+        self.executor = executor
+
+    def _execute(self):
+        for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
+            app_inst.add_expand_vars(self.workspace)
+            exec_str = app_inst.expander.expand_var(self.executor)
+            exec_parts = shlex.split(exec_str)
+            exec_name = exec_parts[0]
+            exec_args = exec_parts[1:]
+
+            executor = Executable(exec_name)
+            executor(' '.join(exec_args))
+
+
 pipelines = Enum('pipelines',
                  [AnalyzePipeline.name, ArchivePipeline.name, MirrorPipeline.name,
-                  SetupPipeline.name, PushToCachePipeline.name]
+                  SetupPipeline.name, PushToCachePipeline.name, ExecutePipeline.name]
                  )
 
 _pipeline_map = {
@@ -412,7 +436,8 @@ _pipeline_map = {
     pipelines.archive: ArchivePipeline,
     pipelines.mirror: MirrorPipeline,
     pipelines.setup: SetupPipeline,
-    pipelines.pushtocache: PushToCachePipeline
+    pipelines.pushtocache: PushToCachePipeline,
+    pipelines.execute: ExecutePipeline
 }
 
 
