@@ -60,8 +60,8 @@
 <li class="toctree-l2 current"><a class="reference internal" href="ramble.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ramble.application_types package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-ramble.application_types.executable">ramble.application_types.executable module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-ramble.application_types.spack">ramble.application_types.spack module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-application-types-executable-module">ramble.application_types.executable module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-application-types-spack-module">ramble.application_types.spack module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html">ramble.cmd package</a></li>
@@ -75,8 +75,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-application-module">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.context">ramble.context module</a></li>
@@ -148,257 +148,11 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-ramble.application_types.executable">
-<span id="ramble-application-types-executable-module"></span><h2>ramble.application_types.executable module<a class="headerlink" href="#module-ramble.application_types.executable" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application_types.executable.</span></span><span class="sig-name descname"><span class="pre">ExecutableApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/executable.html#ExecutableApplication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="ramble.html#ramble.application.ApplicationBase" title="ramble.application.ApplicationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationBase</span></code></a></p>
-<p>Specialized class for applications that are pre-built binaries.</p>
-<p>This class can be used to set up an application that uses an executable
-which should already be on the platform.</p>
-<p>It currently only utilizes phases defined in the base class.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.archive_patterns">
-<span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.archive_patterns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.builtins">
-<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'builtin::env_vars':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'env_vars',</span> <span class="pre">'required':</span> <span class="pre">True}}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.builtins" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.default_compilers">
-<span class="sig-name descname"><span class="pre">default_compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.default_compilers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.env_var_modifications">
-<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.env_var_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.executable_modifiers">
-<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.executable_modifiers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.executables">
-<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.executables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.figure_of_merit_contexts">
-<span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.figure_of_merit_contexts" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.figures_of_merit">
-<span class="sig-name descname"><span class="pre">figures_of_merit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.figures_of_merit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.inputs">
-<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.inputs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.modes">
-<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.modes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.package_manager_configs">
-<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.package_manager_configs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.phase_definitions">
-<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">['prepare_analysis'],</span> <span class="pre">'prepare_analysis':</span> <span class="pre">[],</span> <span class="pre">'write_status':</span> <span class="pre">['analyze_experiments']},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">[]},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">[]},</span> <span class="pre">'setup':</span> <span class="pre">{'get_inputs':</span> <span class="pre">[],</span> <span class="pre">'license_includes':</span> <span class="pre">[],</span> <span class="pre">'make_experiments':</span> <span class="pre">['get_inputs'],</span> <span class="pre">'write_inventory':</span> <span class="pre">['make_experiments'],</span> <span class="pre">'write_status':</span> <span class="pre">['make_experiments']}}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.phase_definitions" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.required_packages">
-<span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.required_packages" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.required_vars">
-<span class="sig-name descname"><span class="pre">required_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.required_vars" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.software_specs">
-<span class="sig-name descname"><span class="pre">software_specs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.software_specs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.success_criteria">
-<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.success_criteria" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.variable_modifications">
-<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.variable_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.workload_variables">
-<span class="sig-name descname"><span class="pre">workload_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.workload_variables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.executable.ExecutableApplication.workloads">
-<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.executable.ExecutableApplication.workloads" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="ramble-application-types-executable-module">
+<h2>ramble.application_types.executable module<a class="headerlink" href="#ramble-application-types-executable-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-ramble.application_types.spack">
-<span id="ramble-application-types-spack-module"></span><h2>ramble.application_types.spack module<a class="headerlink" href="#module-ramble.application_types.spack" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application_types.spack.</span></span><span class="sig-name descname"><span class="pre">SpackApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#SpackApplication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.SpackApplication" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="ramble.html#ramble.application.ApplicationBase" title="ramble.application.ApplicationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationBase</span></code></a></p>
-<p>Specialized class for applications that are installed from spack.</p>
-<p>This class can be used to set up an application that will be installed
-via spack.</p>
-<p>It currently only utilizes phases defined in the base class.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.archive_patterns">
-<span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.archive_patterns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.builtins">
-<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'builtin::env_vars':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'env_vars',</span> <span class="pre">'required':</span> <span class="pre">True},</span> <span class="pre">'builtin::spack_activate':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'spack_activate',</span> <span class="pre">'required':</span> <span class="pre">True},</span> <span class="pre">'builtin::spack_deactivate':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'spack_deactivate',</span> <span class="pre">'required':</span> <span class="pre">False},</span> <span class="pre">'builtin::spack_source':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'spack_source',</span> <span class="pre">'required':</span> <span class="pre">True}}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.builtins" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.default_compilers">
-<span class="sig-name descname"><span class="pre">default_compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.default_compilers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.env_var_modifications">
-<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.env_var_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.executable_modifiers">
-<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.executable_modifiers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.executables">
-<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.executables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.figure_of_merit_contexts">
-<span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.figure_of_merit_contexts" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.figures_of_merit">
-<span class="sig-name descname"><span class="pre">figures_of_merit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.figures_of_merit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.inputs">
-<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.inputs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.modes">
-<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.modes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.package_manager_configs">
-<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.package_manager_configs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.phase_definitions">
-<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">['prepare_analysis'],</span> <span class="pre">'prepare_analysis':</span> <span class="pre">[],</span> <span class="pre">'write_status':</span> <span class="pre">['analyze_experiments']},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">[]},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">[],</span> <span class="pre">'mirror_software':</span> <span class="pre">['software_create_env'],</span> <span class="pre">'software_create_env':</span> <span class="pre">[]},</span> <span class="pre">'pushtocache':</span> <span class="pre">{'push_to_spack_cache':</span> <span class="pre">[]},</span> <span class="pre">'setup':</span> <span class="pre">{'define_package_paths':</span> <span class="pre">['software_install'],</span> <span class="pre">'get_inputs':</span> <span class="pre">[],</span> <span class="pre">'license_includes':</span> <span class="pre">[],</span> <span class="pre">'make_experiments':</span> <span class="pre">['get_inputs',</span> <span class="pre">'define_package_paths'],</span> <span class="pre">'software_configure':</span> <span class="pre">['software_create_env',</span> <span class="pre">'software_install_requested_compilers'],</span> <span class="pre">'software_create_env':</span> <span class="pre">[],</span> <span class="pre">'software_install':</span> <span class="pre">['software_configure'],</span> <span class="pre">'software_install_requested_compilers':</span> <span class="pre">['software_create_env'],</span> <span class="pre">'write_inventory':</span> <span class="pre">['make_experiments'],</span> <span class="pre">'write_status':</span> <span class="pre">['make_experiments']}}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.phase_definitions" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.populate_inventory">
-<span class="sig-name descname"><span class="pre">populate_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_exist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#SpackApplication.populate_inventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.populate_inventory" title="Link to this definition"></a></dt>
-<dd><p>Add software environment information to hash inventory</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.required_packages">
-<span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.required_packages" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.required_vars">
-<span class="sig-name descname"><span class="pre">required_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.required_vars" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.software_specs">
-<span class="sig-name descname"><span class="pre">software_specs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.software_specs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.spack_activate">
-<span class="sig-name descname"><span class="pre">spack_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#SpackApplication.spack_activate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.spack_activate" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.spack_deactivate">
-<span class="sig-name descname"><span class="pre">spack_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#SpackApplication.spack_deactivate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.spack_deactivate" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.spack_source">
-<span class="sig-name descname"><span class="pre">spack_source</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#SpackApplication.spack_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.spack_source" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.success_criteria">
-<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.success_criteria" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.uses_spack">
-<span class="sig-name descname"><span class="pre">uses_spack</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.uses_spack" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.variable_modifications">
-<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.variable_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.workload_variables">
-<span class="sig-name descname"><span class="pre">workload_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.workload_variables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.application_types.spack.SpackApplication.workloads">
-<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application_types.spack.SpackApplication.workloads" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.application_types.spack.section_title">
-<span class="sig-prename descclassname"><span class="pre">ramble.application_types.spack.</span></span><span class="sig-name descname"><span class="pre">section_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#section_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.section_title" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.application_types.spack.subsection_title">
-<span class="sig-prename descclassname"><span class="pre">ramble.application_types.spack.</span></span><span class="sig-name descname"><span class="pre">subsection_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application_types/spack.html#subsection_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application_types.spack.subsection_title" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="ramble-application-types-spack-module">
+<h2>ramble.application_types.spack module<a class="headerlink" href="#ramble-application-types-spack-module" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -414,7 +168,7 @@ via spack.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 20, 2023.
+      <span class="lastupdated">Last updated on Jan 02, 2024.
       </span></p>
   </div>
 

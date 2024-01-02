@@ -74,7 +74,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#workspace-inventory-and-hash">Workspace Inventory and Hash</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#executing-a-workspace">Executing a Workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executing-a-workspace">Executing a Workspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-executors">Custom Executors</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#analyzing-a-workspace">Analyzing a Workspace</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#archiving-a-workspace">Archiving a Workspace</a></li>
 </ul>
@@ -270,7 +273,7 @@ true, the experiment will be included or excluded for action (respectively).</p>
 </pre></div>
 </div>
 <p>Will only setup experiments that have less than 500 ranks, and:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--exclude-shere<span class="w"> </span><span class="s1">&#39;&quot;{application_name}&quot; == &quot;hostname&quot;&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--exclude-where<span class="w"> </span><span class="s1">&#39;&quot;{application_name}&quot; == &quot;hostname&quot;&#39;</span>
 </pre></div>
 </div>
 <p>Will exclude all experiments from the <code class="docutils literal notranslate"><span class="pre">hostname</span></code> application.</p>
@@ -279,6 +282,7 @@ true, the experiment will be included or excluded for action (respectively).</p>
 <span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>archive
 <span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>mirror
 <span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup
+<span class="gp">$ </span>ramble<span class="w"> </span>on
 </pre></div>
 </div>
 <p><strong>NOTE:</strong> The exclusive filter takes precedence over the inclusive filter.</p>
@@ -408,6 +412,24 @@ workspace is the hash of its inventory file. All hashes are sha256.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>on
 </pre></div>
 </div>
+<section id="custom-executors">
+<h3>Custom Executors<a class="headerlink" href="#custom-executors" title="Link to this heading"></a></h3>
+<p>When executing the experiments within a workspace, an executor is used.
+Executors are arbitrary strings which are expanded for each experiment, and
+then executed directly.</p>
+<p>The default executor is <code class="docutils literal notranslate"><span class="pre">'{batch_submit}'</span></code> as this is the variable that is
+used to generate the execution command in the <code class="docutils literal notranslate"><span class="pre">all_experiments</span></code> script.</p>
+<p>Custom executors can be defined using the <code class="docutils literal notranslate"><span class="pre">--executor</span></code> argument to <code class="docutils literal notranslate"><span class="pre">ramble</span>
+<span class="pre">on</span></code> as in:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>on<span class="w"> </span>--executor<span class="w"> </span><span class="s1">&#39;echo &quot;{experiment_namespace}&quot;&#39;</span>
+</pre></div>
+</div>
+<p>This executor will echo each experiment’s fully qualified namespace instead of
+executing the experiment.</p>
+<p>The value of the executor will be expanded for each experiment, and executed
+independently. Custom executors can be used to have more control over what
+actions to perform with an experiment.</p>
+</section>
 </section>
 <section id="analyzing-a-workspace">
 <h2>Analyzing a Workspace<a class="headerlink" href="#analyzing-a-workspace" title="Link to this heading"></a></h2>
@@ -469,7 +491,7 @@ of <a class="reference internal" href="configuration_files.html#config-yaml"><sp
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Dec 20, 2023.
+      <span class="lastupdated">Last updated on Jan 02, 2024.
       </span></p>
   </div>
 
