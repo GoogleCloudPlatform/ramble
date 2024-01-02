@@ -232,7 +232,7 @@ Will only setup experiments that have less than 500 ranks, and:
 
 .. code-block:: console
 
-    $ ramble workspace setup --exclude-shere '"{application_name}" == "hostname"'
+    $ ramble workspace setup --exclude-where '"{application_name}" == "hostname"'
 
 Will exclude all experiments from the ``hostname`` application.
 
@@ -244,6 +244,7 @@ The commands that accept these filters are:
     $ ramble workspace archive
     $ ramble workspace mirror
     $ ramble workspace setup
+    $ ramble on
 
 **NOTE:** The exclusive filter takes precedence over the inclusive filter.
 
@@ -389,6 +390,31 @@ Once a workspace is set up, the experiments inside it can be executed using:
 .. code-block:: console
 
     $ ramble on
+
+^^^^^^^^^^^^^^^^
+Custom Executors
+^^^^^^^^^^^^^^^^
+
+When executing the experiments within a workspace, an executor is used.
+Executors are arbitrary strings which are expanded for each experiment, and
+then executed directly.
+
+The default executor is ``'{batch_submit}'`` as this is the variable that is
+used to generate the execution command in the ``all_experiments`` script.
+
+Custom executors can be defined using the ``--executor`` argument to ``ramble
+on`` as in:
+
+.. code-block:: console
+
+    $ ramble on --executor 'echo "{experiment_namespace}"'
+
+This executor will echo each experiment's fully qualified namespace instead of
+executing the experiment.
+
+The value of the executor will be expanded for each experiment, and executed
+independently. Custom executors can be used to have more control over what
+actions to perform with an experiment.
 
 ---------------------
 Analyzing a Workspace
