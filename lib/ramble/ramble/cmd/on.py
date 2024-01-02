@@ -10,6 +10,10 @@ import sys
 
 import ramble.workspace
 import ramble.expander
+import ramble.pipeline
+import ramble.filters
+
+import ramble.cmd.common.arguments as arguments
 
 if sys.version_info >= (3, 3):
     from collections.abc import Sequence  # novm noqa: F401
@@ -24,18 +28,32 @@ level = 'short'
 
 def setup_parser(subparser):
     subparser.add_argument(
-        '-w', '--workspace', metavar='workspace', dest='ramble_workspace',
-        help='name of workspace to `ramble on`',
+        '--executor', metavar='executor', dest='executor',
+        help='execution template for each experiment',
              required=False)
+
+    arguments.add_common_arguments(subparser, ['where', 'exclude_where'])
 
 
 def ramble_on(args):
-    ws = ramble.cmd.require_active_workspace(cmd_name='workspace info')
+    current_pipeline = ramble.pipeline.pipelines.execute
+    ws = ramble.cmd.require_active_workspace(cmd_name='on')
+
+    executor = args.executor if args.executor else '{batch_submit}'
+
+    filters = ramble.filters.Filters(
+        phase_filters=[],
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where
+    )
+
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+    pipeline = pipeline_cls(ws, filters, executor=executor)
 
     with ws.write_transaction():
-        ws.run_experiments()
+        pipeline.run()
 
 
 def on(parser, args):
-    """Look for a function called environment_<name> and call it."""
+    """Execute `ramble_on` command"""
     ramble_on(args)

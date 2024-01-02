@@ -63,3 +63,37 @@ def test_execute_nothing(mutable_mock_workspace_path):
         assert os.path.exists(ws.root + '/all_experiments')
 
         ws.run_experiments()
+
+
+def test_on_where(mutable_mock_workspace_path):
+    ws_name = 'test'
+    workspace('create', ws_name)
+
+    with ramble.workspace.read('test') as ws:
+        ramble.test.cmd.workspace.add_basic(ws)
+        ramble.test.cmd.workspace.check_basic(ws)
+
+        workspace('concretize')
+        assert ws.is_concretized()
+
+        workspace('setup')
+        assert os.path.exists(ws.root + '/all_experiments')
+
+        on('--where', '"{experiment_index}" == "1"')
+
+
+def test_on_executor(mutable_mock_workspace_path):
+    ws_name = 'test'
+    workspace('create', ws_name)
+
+    with ramble.workspace.read('test') as ws:
+        ramble.test.cmd.workspace.add_basic(ws)
+        ramble.test.cmd.workspace.check_basic(ws)
+
+        workspace('concretize')
+        assert ws.is_concretized()
+
+        workspace('setup')
+        assert os.path.exists(ws.root + '/all_experiments')
+
+        on('--executor', 'echo "Index = {experiment_index}"')

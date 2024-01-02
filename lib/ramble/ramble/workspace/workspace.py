@@ -150,6 +150,7 @@ workspace_execution_template = 'execute_experiment' + \
     workspace_template_extension
 
 template_execute_script = """\
+#!/bin/sh
 # This is a template execution script for
 # running the execute pipeline.
 #

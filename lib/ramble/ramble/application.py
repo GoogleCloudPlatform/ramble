@@ -35,6 +35,7 @@ import ramble.expander
 import ramble.keywords
 import ramble.repository
 import ramble.modifier
+import ramble.pipeline
 import ramble.util.executable
 import ramble.util.colors as rucolor
 import ramble.util.hashing
@@ -59,7 +60,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
-    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache']
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache', 'execute']
     _language_classes = [ApplicationMeta, SharedMeta]
 
     #: Lists of strings which contains GitHub usernames of attributes.

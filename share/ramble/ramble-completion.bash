@@ -543,7 +543,7 @@ _ramble_mods_info() {
 }
 
 _ramble_on() {
-    RAMBLE_COMPREPLY="-h --help -w --workspace"
+    RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where"
 }
 
 _ramble_repo() {
