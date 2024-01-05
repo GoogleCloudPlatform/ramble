@@ -129,11 +129,7 @@ def upload_results(results):
                 logger.die('No upload URI (config:upload:uri) in config.')
 
             logger.msg(f'Uploading Results to {uri}')
-
-            if len(formatted_data) == 0:
-                logger.warn('No data to upload')
-            else:
-                uploader.perform_upload(uri, formatted_data)
+            uploader.perform_upload(uri, formatted_data)
         else:
             raise ConfigError("Unknown config:upload:type value")
 
