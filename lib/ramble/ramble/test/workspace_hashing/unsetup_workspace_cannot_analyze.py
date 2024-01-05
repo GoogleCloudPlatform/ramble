@@ -68,4 +68,4 @@ ramble:
         ws._re_read()
         with pytest.raises(RambleCommandError):
             output = workspace('analyze', global_args=['-w', workspace_name])
-            assert 'spack.lock file does not exist' in output
+            assert 'Make sure your workspace is fully setup' in output

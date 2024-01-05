@@ -48,6 +48,9 @@ from ramble.language.application_language import ApplicationMeta, register_phase
 from ramble.language.shared_language import SharedMeta, register_builtin
 from ramble.error import RambleError
 
+from enum import Enum
+experiment_status = Enum('experiment_status', ['UNKNOWN', 'SETUP', 'SUCCESS', 'FAILED'])
+
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
@@ -1062,7 +1065,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         experiment_script = workspace.experiments_script
         experiment_script.write(self.expander.expand_var('{batch_submit}\n'))
-        self.set_status(status='UNKNOWN')
+        self.set_status(status=experiment_status.SETUP)
 
     def _clean_hash_variables(self, workspace, variables):
         """Cleanup variables to hash before computing the hash
@@ -1252,6 +1255,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         injected in a workspace config.
         """
 
+        if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
+            logger.die(
+                f'Workspace status is {self.get_status()}\n'
+                'Make sure your workspace is fully setup with\n'
+                '    ramble workspace setup'
+            )
+
         def format_context(context_match, context_format):
 
             context_val = {}
@@ -1355,12 +1365,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         logger.debug('fom_values = %s' % fom_values)
         results['EXPERIMENT_CHAIN'] = self.chain_order.copy()
+
         if success:
-            self.set_status(status='SUCCESS')
-            results['RAMBLE_STATUS'] = 'SUCCESS'
+            self.set_status(status=experiment_status.SUCCESS)
         else:
-            self.set_status(status='FAILED')
-            results['RAMBLE_STATUS'] = 'FAILED'
+            self.set_status(status=experiment_status.FAILED)
+
+        results['RAMBLE_STATUS'] = self.get_status()
 
         if success or workspace.always_print_foms:
             results['RAMBLE_VARIABLES'] = {}
@@ -1512,7 +1523,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         Set this experiment's status based on the status file in the experiment
         run directory, if it exists. If it doesn't exist, set its status to
-        UNKNOWN
+        experiment_status.UNKNOWN
         """
         status_path = os.path.join(
             self.expander.expand_var_name(self.keywords.experiment_run_dir),
@@ -1525,12 +1536,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             self.variables[self.keywords.experiment_status] = \
                 status_data[self.keywords.experiment_status]
         else:
-            self.variables[self.keywords.experiment_status] = \
-                'UNKNOWN'
+            self.set_status(experiment_status.UNKNOWN)
 
-    def set_status(self, status='UNKNOWN'):
+    def set_status(self, status=experiment_status.UNKNOWN):
         """Set the status of this experiment"""
-        self.variables[self.keywords.experiment_status] = status
+        self.variables[self.keywords.experiment_status] = status.name
+
+    def get_status(self):
+        """Get the status of this experiment"""
+        return self.variables[self.keywords.experiment_status]
 
     register_phase('write_status', pipeline='analyze', depends_on=['analyze_experiments'])
     register_phase('write_status', pipeline='setup', depends_on=['make_experiments'])
