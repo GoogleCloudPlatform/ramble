@@ -423,7 +423,7 @@ class ExecutePipeline(Pipeline):
             exec_args = exec_parts[1:]
 
             executor = Executable(exec_name)
-            executor(' '.join(exec_args))
+            executor(*exec_args)
 
 
 pipelines = Enum('pipelines',
