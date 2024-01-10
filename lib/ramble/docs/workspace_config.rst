@@ -280,6 +280,11 @@ there would be 4 experiments, each defined by a unique
 Explicit Variable Zips:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+A common pattern in python for iterating over multiple lists in lock-step is to
+use something called a zip. For more information on how this behaves in
+practice, see
+`Python's zip documentation <https://docs.python.org/3.3/library/functions.html#zip>`_.
+
 Ramble's workspace config contains syntax for defining explicit variable zips.
 These zips are named grouping of variables that are related and should be
 iterated over together when generating experiments.
