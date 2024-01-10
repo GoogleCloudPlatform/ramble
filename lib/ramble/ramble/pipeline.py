@@ -290,6 +290,20 @@ class ArchivePipeline(Pipeline):
                 fs.mkdirp(os.path.dirname(dest))
                 shutil.copyfile(file, dest)
 
+        # Copy logs, but omit all symlinks (i.e. "latest")
+        archive_logs = os.path.join(self.workspace.latest_archive_path,
+                                    ramble.workspace.workspace_log_path)
+        fs.mkdirp(archive_logs)
+        for root, dirs, files in os.walk(self.workspace.log_dir):
+            for name in files:
+                src_dir = os.path.join(self.workspace.log_dir, root)
+                src = os.path.join(src_dir, name)
+                if not (os.path.islink(src_dir) or os.path.islink(src)) \
+                        and os.path.isfile(src):
+                    dest = src.replace(self.workspace.log_dir, archive_logs)
+                    fs.mkdirp(os.path.dirname(dest))
+                    shutil.copyfile(src, dest)
+
     def _complete(self):
         if self.create_tar:
             tar = which('tar', required=True)
