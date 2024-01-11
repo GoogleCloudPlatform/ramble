@@ -7,7 +7,6 @@
 # except according to those terms.
 
 from ramble.appkit import *
-from ramble.expander import Expander
 
 
 class Nvbandwidth(SpackApplication):
