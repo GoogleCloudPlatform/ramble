@@ -274,6 +274,26 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             out_str.append(rucolor.section_title('Analyze Pipeline Phases:\n'))
             out_str.append(colified(self._analyze_phases, tty=True))
 
+        # Print all FOMs without a context
+        if hasattr(self, 'figures_of_merit'):
+            out_str.append('\n')
+            out_str.append(rucolor.section_title('Figure of merit contexts:\n'))
+            out_str.append(rucolor.nested_1('\t(null) context (default):\n'))
+            for name, conf in self.figures_of_merit.items():
+                if len(conf['contexts']) == 0:
+                    out_str.append(rucolor.nested_2(f'\t\t{name}\n'))
+                    out_str.append(f'\t\t\tunits = {conf["units"]}\n')
+                    out_str.append(f'\t\t\tlog file = {conf["log_file"]}\n')
+
+            if hasattr(self, 'figure_of_merit_contexts'):
+                for context_name, context_conf in self.figure_of_merit_contexts.items():
+                    out_str.append(rucolor.nested_1(f'\t{context_name} context:\n'))
+                    for name, conf in self.figures_of_merit.items():
+                        if context_name in conf['contexts']:
+                            out_str.append(rucolor.nested_2(f'\t\t{name}\n'))
+                            out_str.append(f'\t\t\tunits = {conf["units"]}\n')
+                            out_str.append(f'\t\t\tlog file = {conf["log_file"]}\n')
+
         if hasattr(self, 'workloads'):
             out_str.append('\n')
             for wl_name, wl_conf in self.workloads.items():
