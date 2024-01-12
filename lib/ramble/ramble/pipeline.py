@@ -309,7 +309,7 @@ class ArchivePipeline(Pipeline):
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
 
-        archive_path_latest = "archive.latest"
+        archive_path_latest = os.path.join(self.workspace.archive_dir, 'archive.latest')
         self.create_simlink(archive_path, archive_path_latest)
 
     def _complete(self):
@@ -324,7 +324,10 @@ class ArchivePipeline(Pipeline):
                 ramble.config.get('config:archive_url')
             archive_url = archive_url.rstrip('/') if archive_url else None
 
-            tar_path_latest = "archive.latest" + tar_extension
+            tar_path_latest = os.path.join(
+                self.workspace.archive_dir,
+                "archive.latest" + tar_extension)
+
             self.create_simlink(tar_path, tar_path_latest)
 
             logger.debug(f'Archive url: {archive_url}')
