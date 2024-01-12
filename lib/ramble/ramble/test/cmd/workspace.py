@@ -1119,6 +1119,7 @@ ramble:
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
+    assert os.path.exists(os.path.join(ws1.archive_dir, 'archive.latest'))
 
     for template in new_templates:
         archived_path = template.replace(ws1.root, ws1.latest_archive_path)
@@ -1204,6 +1205,7 @@ ramble:
         assert os.path.exists(archived_path)
 
     assert os.path.exists(ws1.latest_archive_path + '.tar.gz')
+    assert os.path.exists(os.path.join(ws1.archive_dir, 'archive.latest.tar.gz'))
 
 
 def test_workspace_tar_upload_archive():

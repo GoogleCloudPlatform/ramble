@@ -66,8 +66,8 @@ class Pipeline(object):
         fs.mkdirp(self.log_dir)
 
         # Create simlinks to give known paths
-        self.simlink_log(self.log_dir, self.log_dir_latest)
-        self.simlink_log(self.log_path, self.log_path_latest)
+        self.create_simlink(self.log_dir, self.log_dir_latest)
+        self.create_simlink(self.log_path, self.log_path_latest)
 
         self._experiment_set = workspace.build_experiment_set()
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
@@ -196,9 +196,9 @@ class Pipeline(object):
         self._complete()
         logger.remove_log()
 
-    def simlink_log(self, base, link):
+    def create_simlink(self, base, link):
         """
-        Create simlink of log file to give a known and predictable path
+        Create simlink of a file to give a known and predictable path
         """
         if os.path.islink(link):
             os.unlink(link)
@@ -240,11 +240,12 @@ class ArchivePipeline(Pipeline):
 
     name = 'archive'
 
-    def __init__(self, workspace, filters, create_tar=False, upload_url=None):
+    def __init__(self, workspace, filters, create_tar=False, archive_prefix=None, upload_url=None):
         super().__init__(workspace, filters)
         self.action_string = 'Archiving'
         self.create_tar = create_tar
         self.upload_url = upload_url
+        self.archive_prefix = archive_prefix
         self.archive_name = None
 
     def _prepare(self):
@@ -256,7 +257,11 @@ class ArchivePipeline(Pipeline):
 
         # Use the basename from the path as the name of the workspace.
         # If we use `self.workspace.name` we get the path multiple times.
-        self.archive_name = '%s-archive-%s' % (os.path.basename(self.workspace.path), date_str)
+
+        if not self.archive_prefix:
+            self.archive_prefix = os.path.basename(self.workspace.path)
+
+        self.archive_name = '%s-archive-%s' % (self.archive_prefix, date_str)
 
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
@@ -304,21 +309,32 @@ class ArchivePipeline(Pipeline):
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
 
+        archive_path_latest = os.path.join(self.workspace.archive_dir, 'archive.latest')
+        self.create_simlink(archive_path, archive_path_latest)
+
     def _complete(self):
         if self.create_tar:
+            tar_extension = '.tar.gz'
             tar = which('tar', required=True)
+            tar_path = self.archive_name + tar_extension
             with py.path.local(self.workspace.archive_dir).as_cwd():
-                tar('-czf', self.archive_name + '.tar.gz', self.archive_name)
+                tar('-czf', tar_path, self.archive_name)
 
             archive_url = self.upload_url if self.upload_url else \
                 ramble.config.get('config:archive_url')
             archive_url = archive_url.rstrip('/') if archive_url else None
 
+            tar_path_latest = os.path.join(
+                self.workspace.archive_dir,
+                "archive.latest" + tar_extension)
+
+            self.create_simlink(tar_path, tar_path_latest)
+
             logger.debug(f'Archive url: {archive_url}')
 
             if archive_url:
-                tar_path = self.workspace.latest_archive_path + '.tar.gz'
-                remote_tar_path = archive_url + '/' + self.workspace.latest_archive + '.tar.gz'
+                tar_path = self.workspace.latest_archive_path + tar_extension
+                remote_tar_path = archive_url + '/' + self.workspace.latest_archive + tar_extension
                 fetcher = ramble.fetch_strategy.URLFetchStrategy(tar_path)
                 fetcher.stage = ramble.stage.DIYStage(self.workspace.latest_archive_path)
                 fetcher.stage.archive_file = tar_path
