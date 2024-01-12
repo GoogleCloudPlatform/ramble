@@ -31,7 +31,7 @@ class Gromacs(SpackApplication):
     executable('execute-gen', '{mdrun} {notunepme} -dlb {dlb} ' +
                '{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} ' +
                '-s exp_input.tpr', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
-    executable('execute', '{mdrun} {notunepme} -dlb ${dlb} ' +
+    executable('execute', '{mdrun} {notunepme} -dlb {dlb} ' +
                '{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} ' +
                '-s {input_path}', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
 
