@@ -240,11 +240,12 @@ class ArchivePipeline(Pipeline):
 
     name = 'archive'
 
-    def __init__(self, workspace, filters, create_tar=False, upload_url=None):
+    def __init__(self, workspace, filters, create_tar=False, archive_prefix=None, upload_url=None):
         super().__init__(workspace, filters)
         self.action_string = 'Archiving'
         self.create_tar = create_tar
         self.upload_url = upload_url
+        self.archive_prefix = archive_prefix
         self.archive_name = None
 
     def _prepare(self):
@@ -256,7 +257,11 @@ class ArchivePipeline(Pipeline):
 
         # Use the basename from the path as the name of the workspace.
         # If we use `self.workspace.name` we get the path multiple times.
-        self.archive_name = '%s-archive-%s' % (os.path.basename(self.workspace.path), date_str)
+
+        if not self.archive_prefix:
+            self.archive_prefix = os.path.basename(self.workspace.path)
+
+        self.archive_name = '%s-archive-%s' % (self.archive_prefix, date_str)
 
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)

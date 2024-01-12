@@ -627,6 +627,11 @@ def workspace_archive_setup_parser(subparser):
         help='create a tar.gz of the archive directory for backing up.')
 
     subparser.add_argument(
+        '--prefix', '-p', dest='archive_prefix',
+        default=None,
+        help='Specify archive prefix to customize output filename.')
+
+    subparser.add_argument(
         '--upload-url', '-u', dest='upload_url',
         default=None,
         help='URL to upload tar archive into. Does nothing if `-t` is not specified.')
@@ -649,6 +654,7 @@ def workspace_archive(args):
     pipeline = pipeline_cls(ws,
                             filters,
                             create_tar=args.tar_archive,
+                            archive_prefix=args.archive_prefix,
                             upload_url=args.upload_url)
 
     workspace_run_pipeline(args, pipeline)
