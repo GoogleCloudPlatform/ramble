@@ -1106,7 +1106,7 @@ class Workspace(object):
 
             for subdir in os.listdir(self.archive_dir):
                 archive_path = os.path.join(self.archive_dir, subdir)
-                if os.path.isdir(archive_path):
+                if os.path.isdir(archive_path) and not os.path.islink(archive_path):
                     archive_dirs.append(archive_path)
 
             if archive_dirs:
