@@ -341,7 +341,7 @@ experiment definition. This block contains definitions of ``variables``,
 ``matrices``, ``zips``, and optional mathematical ``where`` statements to
 define which experiments should be excluded from the generation process.
 
-.. code-block::yaml
+.. code-block:: yaml
    :linenos:
 
     ramble:
@@ -384,7 +384,7 @@ generation process.
 
 This logic can be replicated in a ``where`` statement as well:
 
-.. code-block::yaml
+.. code-block:: yaml
    :linenos:
 
     ramble:
