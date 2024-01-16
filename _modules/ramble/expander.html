@@ -196,7 +196,8 @@
 <div class="viewcode-block" id="ExpansionNode.define_value">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.ExpansionNode.define_value">[docs]</a>
     <span class="k">def</span> <span class="nf">define_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expansion_dict</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">expansion_func</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">evaluation_func</span><span class="o">=</span><span class="nb">eval</span><span class="p">):</span>
+                     <span class="n">expansion_func</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">evaluation_func</span><span class="o">=</span><span class="nb">eval</span><span class="p">,</span>
+                     <span class="n">no_expand_vars</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define the value for this node.</span>
 
 <span class="sd">        Construct the value of self. This builds up a string representation of</span>
@@ -214,6 +215,7 @@
 <span class="sd">            expansion_func (func): function to use for expansion of nested</span>
 <span class="sd">            variable definitions</span>
 <span class="sd">            evaluation_func (func): function to use for evaluating math of strings</span>
+<span class="sd">            no_expand_vars (set): set of variable names that should never be expanded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
@@ -240,9 +242,14 @@
                 <span class="n">required_passthrough</span> <span class="o">=</span> <span class="kc">False</span>
 
                 <span class="k">if</span> <span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">expansion_dict</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">expansion_func</span><span class="p">(</span><span class="n">expansion_dict</span><span class="p">,</span>
-                                                <span class="n">expansion_dict</span><span class="p">[</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                                                <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span>
+                    <span class="c1"># Exit expansion for variables defined as no_expand</span>
+                    <span class="k">if</span> <span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">no_expand_vars</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">expansion_dict</span><span class="p">[</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                        <span class="k">return</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">expansion_func</span><span class="p">(</span><span class="n">expansion_dict</span><span class="p">,</span>
+                                                    <span class="n">expansion_dict</span><span class="p">[</span><span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                                                    <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">kw_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">required_passthrough</span> <span class="o">=</span> <span class="kc">True</span>
@@ -372,11 +379,12 @@
 
 <span class="sd">    Additionally, math will be evaluated as part of expansion.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">experiment_set</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">experiment_set</span><span class="p">,</span> <span class="n">no_expand_vars</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">=</span> <span class="n">variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_no_expand_vars</span> <span class="o">=</span> <span class="n">no_expand_vars</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_set</span> <span class="o">=</span> <span class="n">experiment_set</span>
 
@@ -397,6 +405,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_application_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Expander.set_no_expand_vars">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.set_no_expand_vars">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_no_expand_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_expand_vars</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_no_expand_vars</span> <span class="o">=</span> <span class="n">no_expand_vars</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="Expander.copy">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.copy">[docs]</a>
@@ -651,7 +665,8 @@
                 <span class="n">node</span><span class="o">.</span><span class="n">define_value</span><span class="p">(</span><span class="n">expansion_vars</span><span class="p">,</span>
                                   <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">,</span>
                                   <span class="n">expansion_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_partial_expand</span><span class="p">,</span>
-                                  <span class="n">evaluation_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perform_math_eval</span><span class="p">)</span>
+                                  <span class="n">evaluation_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perform_math_eval</span><span class="p">,</span>
+                                  <span class="n">no_expand_vars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_no_expand_vars</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">str_graph</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
@@ -938,7 +953,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 12, 2024.
+      <span class="lastupdated">Last updated on Jan 16, 2024.
       </span></p>
   </div>
 

@@ -264,7 +264,7 @@
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload_variable">[docs]</a>
 <span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workload_variables&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">workload_variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">workloads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                      <span class="n">workloads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a new variable to be used in experiments</span>
 
 <span class="sd">    Defines a new variable that can be defined within the</span>
@@ -287,7 +287,8 @@
 
             <span class="n">app</span><span class="o">.</span><span class="n">workload_variables</span><span class="p">[</span><span class="n">wl_name</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">default</span><span class="p">,</span>
-                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+                <span class="s1">&#39;expandable&#39;</span><span class="p">:</span> <span class="n">expandable</span>
             <span class="p">}</span>
             <span class="k">if</span> <span class="n">values</span><span class="p">:</span>
                 <span class="n">app</span><span class="o">.</span><span class="n">workload_variables</span><span class="p">[</span><span class="n">wl_name</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
@@ -352,7 +353,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 12, 2024.
+      <span class="lastupdated">Last updated on Jan 16, 2024.
       </span></p>
   </div>
 
