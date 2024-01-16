@@ -76,6 +76,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._vars_are_expanded = False
         self.expander = None
         self.variables = None
+        self.no_expand_vars = None
         self.experiment_set = None
         self.internals = None
         self.is_template = False
@@ -335,6 +336,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.variables = variables
         self.experiment_set = experiment_set
         self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
+
+        self.no_expand_vars = set()
+        workload_name = self.expander.workload_name
+        if workload_name in self.workload_variables:
+            for var, conf in self.workload_variables[workload_name].items():
+                if 'expandable' in conf and not conf['expandable']:
+                    self.no_expand_vars.add(var)
+        self.expander.set_no_expand_vars(self.no_expand_vars)
 
     def set_internals(self, internals):
         """Set internal reference to application internals

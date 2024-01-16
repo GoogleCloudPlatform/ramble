@@ -155,7 +155,7 @@ def input_file(name, url, description, target_dir='{input_name}', sha256=None, e
 
 @application_directive('workload_variables')
 def workload_variable(name, default, description, values=None, workload=None,
-                      workloads=None, **kwargs):
+                      workloads=None, expandable=True, **kwargs):
     """Define a new variable to be used in experiments
 
     Defines a new variable that can be defined within the
@@ -178,7 +178,8 @@ def workload_variable(name, default, description, values=None, workload=None,
 
             app.workload_variables[wl_name][name] = {
                 'default': default,
-                'description': description
+                'description': description,
+                'expandable': expandable
             }
             if values:
                 app.workload_variables[wl_name][name]['values'] = values
