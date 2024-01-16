@@ -142,7 +142,7 @@ ramble:
     with archive_dir.as_cwd():
         app_type = ramble.repository.ObjectTypes.applications
         app_class = ramble.repository.paths[app_type].get_obj_class(app_name)('test')
-        app_class.set_variables(None, None)
+        app_class.set_variables({}, None)
         create_archive(archive_dir, app_class)
 
         # Create workspace
