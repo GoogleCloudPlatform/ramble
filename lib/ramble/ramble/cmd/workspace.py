@@ -237,6 +237,11 @@ def _workspace_create(name_or_path, dir=False,
                                 create the workspace with
     """
 
+    # Sanity check file paths, to avoid half-creating an incomplete workspace
+    for filepath in [config, template_execute]:
+        if filepath and not os.path.isfile(filepath):
+            logger.die(f"{filepath} file path invalid")
+
     if dir:
         workspace = ramble.workspace.Workspace(name_or_path)
         workspace.write()
