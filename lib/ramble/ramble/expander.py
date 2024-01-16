@@ -85,7 +85,8 @@ class ExpansionNode(object):
             self.children.append(children)
 
     def define_value(self, expansion_dict, allow_passthrough=True,
-                     expansion_func=str, evaluation_func=eval):
+                     expansion_func=str, evaluation_func=eval,
+                     no_expand_vars=set()):
         """Define the value for this node.
 
         Construct the value of self. This builds up a string representation of
@@ -103,6 +104,7 @@ class ExpansionNode(object):
             expansion_func (func): function to use for expansion of nested
             variable definitions
             evaluation_func (func): function to use for evaluating math of strings
+            no_expand_vars (set): set of variable names that should never be expanded
         """
         if self.contents is not None:
             parts = []
@@ -129,9 +131,14 @@ class ExpansionNode(object):
                 required_passthrough = False
 
                 if kw_parts[0] in expansion_dict:
-                    self.value = expansion_func(expansion_dict,
-                                                expansion_dict[kw_parts[0]],
-                                                allow_passthrough=allow_passthrough)
+                    # Exit expansion for variables defined as no_expand
+                    if kw_parts[0] in no_expand_vars:
+                        self.value = expansion_dict[kw_parts[0]]
+                        return
+                    else:
+                        self.value = expansion_func(expansion_dict,
+                                                    expansion_dict[kw_parts[0]],
+                                                    allow_passthrough=allow_passthrough)
                 else:
                     self.value = kw_parts[0]
                     required_passthrough = True
@@ -248,11 +255,12 @@ class Expander(object):
 
     Additionally, math will be evaluated as part of expansion.
     """
-    def __init__(self, variables, experiment_set):
+    def __init__(self, variables, experiment_set, no_expand_vars=set()):
 
         self._keywords = ramble.keywords.keywords
 
         self._variables = variables
+        self._no_expand_vars = no_expand_vars
 
         self._experiment_set = experiment_set
 
@@ -273,6 +281,9 @@ class Expander(object):
         self._application_run_dir = None
         self._workload_run_dir = None
         self._experiment_run_dir = None
+
+    def set_no_expand_vars(self, no_expand_vars):
+        self._no_expand_vars = no_expand_vars.copy()
 
     def copy(self):
         return Expander(self._variables.copy(), self._experiment_set)
@@ -509,7 +520,8 @@ class Expander(object):
                 node.define_value(expansion_vars,
                                   allow_passthrough=allow_passthrough,
                                   expansion_func=self._partial_expand,
-                                  evaluation_func=self.perform_math_eval)
+                                  evaluation_func=self.perform_math_eval,
+                                  no_expand_vars=self._no_expand_vars)
 
             return str(str_graph.root.value)
 
