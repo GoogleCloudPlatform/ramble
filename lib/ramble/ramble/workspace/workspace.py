@@ -351,12 +351,12 @@ def is_workspace_dir(path):
     return ret_val
 
 
-def create(name):
+def create(name, read_default_template=True):
     """Create a named workspace in Ramble"""
     validate_workspace_name(name)
     if exists(name):
         raise RambleWorkspaceError("'%s': workspace already exists" % name)
-    return Workspace(root(name))
+    return Workspace(root(name), read_default_template=read_default_template)
 
 
 def config_dict(yaml_data):
@@ -448,13 +448,14 @@ class Workspace(object):
     inventory_file_name = 'ramble_inventory.json'
     hash_file_name = 'workspace_hash.sha256'
 
-    def __init__(self, root, dry_run=False):
+    def __init__(self, root, dry_run=False, read_default_template=True):
         logger.debug(f'In workspace init. Root = {root}')
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
         self.always_print_foms = False
 
+        self.read_default_template = read_default_template
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
         self._templates = {}
         self._auxiliary_software_files = {}
@@ -553,7 +554,7 @@ class Workspace(object):
             with open(self.config_file_path) as f:
                 self._read_config(config_section, f)
 
-        read_default_script = True
+        read_default_script = self.read_default_template
         ext_len = len(workspace_template_extension)
         if os.path.exists(self.config_dir):
             for filename in os.listdir(self.config_dir):

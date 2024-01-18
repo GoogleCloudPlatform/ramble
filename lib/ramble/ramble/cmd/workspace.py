@@ -237,18 +237,38 @@ def _workspace_create(name_or_path, dir=False,
                                 create the workspace with
     """
 
+    # Sanity check file paths, to avoid half-creating an incomplete workspace
+    for filepath in [config, template_execute]:
+        if filepath and not os.path.isfile(filepath):
+            logger.die(f"{filepath} file path invalid")
+
+    read_default_template = True
+
+    # Disallow generation of default template when both a config and a template
+    # are specified
+    if config and template_execute:
+        read_default_template = False
+
     if dir:
-        workspace = ramble.workspace.Workspace(name_or_path)
-        workspace.write()
+        workspace = ramble.workspace.Workspace(
+            name_or_path,
+            read_default_template=read_default_template)
+
         logger.msg(f"Created workspace in {workspace.path}")
         logger.msg("You can activate this workspace with:")
         logger.msg(f"  ramble workspace activate {workspace.path}")
+
     else:
-        workspace = ramble.workspace.create(name_or_path)
-        workspace.write()
+        workspace = ramble.workspace.create(
+            name_or_path,
+            read_default_template=read_default_template)
+
+        workspace.read_default_template = read_default_template
         logger.msg(f"Created workspace in {name_or_path}")
         logger.msg("You can activate this workspace with:")
         logger.msg(f"  ramble workspace activate {name_or_path}")
+
+    workspace.write()
 
     if config:
         with open(config, 'r') as f:
