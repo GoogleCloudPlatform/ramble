@@ -227,7 +227,7 @@ specification</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.workspace.Workspace">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workspace.</span></span><span class="sig-name descname"><span class="pre">Workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.Workspace" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workspace.</span></span><span class="sig-name descname"><span class="pre">Workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_default_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.Workspace" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class representing a working directory for workload
 experiments</p>
@@ -649,7 +649,7 @@ workspace.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.workspace.create">
-<span class="sig-prename descclassname"><span class="pre">ramble.workspace.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.create" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_default_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.create" title="Link to this definition"></a></dt>
 <dd><p>Create a named workspace in Ramble</p>
 </dd></dl>
 
@@ -968,7 +968,7 @@ specification</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">Workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.Workspace" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">Workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_default_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.Workspace" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class representing a working directory for workload
 experiments</p>
@@ -1409,7 +1409,7 @@ Keys are filenames, values are dictionaries describing the config files.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.create">
-<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.create" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_default_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.create" title="Link to this definition"></a></dt>
 <dd><p>Create a named workspace in Ramble</p>
 </dd></dl>
 
@@ -1623,7 +1623,7 @@ are stored</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 16, 2024.
+      <span class="lastupdated">Last updated on Jan 18, 2024.
       </span></p>
   </div>
 

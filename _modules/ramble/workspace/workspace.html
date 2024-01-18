@@ -505,12 +505,12 @@
 
 <div class="viewcode-block" id="create">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.create">[docs]</a>
-<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">read_default_template</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a named workspace in Ramble&quot;&quot;&quot;</span>
     <span class="n">validate_workspace_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">RambleWorkspaceError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;: workspace already exists&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Workspace</span><span class="p">(</span><span class="n">root</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">Workspace</span><span class="p">(</span><span class="n">root</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">read_default_template</span><span class="o">=</span><span class="n">read_default_template</span><span class="p">)</span></div>
 
 
 
@@ -611,13 +611,14 @@
     <span class="n">inventory_file_name</span> <span class="o">=</span> <span class="s1">&#39;ramble_inventory.json&#39;</span>
     <span class="n">hash_file_name</span> <span class="o">=</span> <span class="s1">&#39;workspace_hash.sha256&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">read_default_template</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In workspace init. Root = </span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">txlock</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">Lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transaction_lock_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="n">dry_run</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">always_print_foms</span> <span class="o">=</span> <span class="kc">False</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_default_template</span> <span class="o">=</span> <span class="n">read_default_template</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configs</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ConfigScope</span><span class="p">(</span><span class="s1">&#39;workspace&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_templates</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auxiliary_software_files</span> <span class="o">=</span> <span class="p">{}</span>
@@ -716,7 +717,7 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_read_config</span><span class="p">(</span><span class="n">config_section</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-        <span class="n">read_default_script</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">read_default_script</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_default_template</span>
         <span class="n">ext_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">workspace_template_extension</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">):</span>
@@ -1789,7 +1790,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 16, 2024.
+      <span class="lastupdated">Last updated on Jan 18, 2024.
       </span></p>
   </div>
 
