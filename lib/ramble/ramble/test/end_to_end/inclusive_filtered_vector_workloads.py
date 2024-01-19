@@ -58,7 +58,7 @@ ramble:
 
         workspace('setup', '--dry-run', '--where', '"{workload_name}" == "serial"',
                   global_args=['-w', workspace_name])
-        workspace('analyze', '--where', '"{workload_name}" == "serial"',
+        workspace('analyze', '--dry-run', '--where', '"{workload_name}" == "serial"',
                   global_args=['-w', workspace_name])
         workspace('archive', '--where', '"{workload_name}" == "serial"',
                   global_args=['-w', workspace_name])

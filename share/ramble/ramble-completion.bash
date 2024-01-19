@@ -670,7 +670,7 @@ _ramble_workspace_setup() {
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --phases --include-phase-dependencies --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run --phases --include-phase-dependencies --where --exclude-where"
 }
 
 _ramble_workspace_push_to_cache() {

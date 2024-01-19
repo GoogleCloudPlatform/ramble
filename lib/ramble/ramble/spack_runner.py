@@ -602,14 +602,15 @@ class SpackRunner(object):
         contents_to_hash = None
 
         if not self.dry_run:
-            if not lock_exists and (require_exist or len(self.env_contents) == 0):
-                logger.die(
-                    'spack.lock file does not exist in environment '
-                    f'{self.env_path}\n'
-                    'Make sure your workspace is fully setup with\n'
-                    '    ramble workspace setup'
-                )
-            elif lock_exists:
+            if not lock_exists:
+                if require_exist and len(self.env_contents) > 0:
+                    logger.die(
+                        'spack.lock file does not exist in environment '
+                        f'{self.env_path}\n'
+                        'Make sure your workspace is fully setup with\n'
+                        '    ramble workspace setup'
+                    )
+            else:  # lock_exists
                 with open(spack_file, 'r') as f:
                     contents_to_hash = sjson.load(f)
 

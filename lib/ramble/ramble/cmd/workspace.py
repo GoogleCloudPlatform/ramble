@@ -405,6 +405,11 @@ def workspace_analyze_setup_parser(subparser):
         help='Control if figures of merit are printed even if an experiment fails',
         required=False)
 
+    subparser.add_argument(
+        '--dry-run', dest='dry_run',
+        action='store_true',
+        help='perform a dry run. Allows progress on workspaces which are not fully setup')
+
     arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
                                                'where', 'exclude_where'])
 
@@ -413,6 +418,9 @@ def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace analyze')
     ws.always_print_foms = args.always_print_foms
+
+    if args.dry_run:
+        ws.dry_run = True
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
