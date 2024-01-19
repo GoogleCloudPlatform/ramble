@@ -764,14 +764,15 @@
         <span class="n">contents_to_hash</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">lock_exists</span> <span class="ow">and</span> <span class="p">(</span><span class="n">require_exist</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-                    <span class="s1">&#39;spack.lock file does not exist in environment &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                    <span class="s1">&#39;Make sure your workspace is fully setup with</span><span class="se">\n</span><span class="s1">&#39;</span>
-                    <span class="s1">&#39;    ramble workspace setup&#39;</span>
-                <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">lock_exists</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lock_exists</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">require_exist</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                        <span class="s1">&#39;spack.lock file does not exist in environment &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;Make sure your workspace is fully setup with</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;    ramble workspace setup&#39;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># lock_exists</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spack_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">contents_to_hash</span> <span class="o">=</span> <span class="n">sjson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
@@ -998,7 +999,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 18, 2024.
+      <span class="lastupdated">Last updated on Jan 19, 2024.
       </span></p>
   </div>
 
