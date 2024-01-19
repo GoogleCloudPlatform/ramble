@@ -129,6 +129,14 @@ ramble.cmd.on module
    :undoc-members:
    :show-inheritance:
 
+ramble.cmd.python module
+------------------------
+
+.. automodule:: ramble.cmd.python
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.cmd.repo module
 ----------------------
 

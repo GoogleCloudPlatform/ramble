@@ -78,6 +78,14 @@ ramble.test.cmd.on module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.cmd.python module
+-----------------------------
+
+.. automodule:: ramble.test.cmd.python
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.cmd.repo module
 ---------------------------
 

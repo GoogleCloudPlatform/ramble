@@ -93,6 +93,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mirror">ramble.cmd.mirror module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mods">ramble.cmd.mods module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-cmd-on-module">ramble.cmd.on module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.python">ramble.cmd.python module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.repo">ramble.cmd.repo module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.results">ramble.cmd.results module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions module</a></li>
@@ -1040,6 +1041,43 @@ so far, just this command – so it can find LGPL things elsewhere</p>
 </section>
 <section id="ramble-cmd-on-module">
 <h2>ramble.cmd.on module<a class="headerlink" href="#ramble-cmd-on-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-ramble.cmd.python">
+<span id="ramble-cmd-python-module"></span><h2>ramble.cmd.python module<a class="headerlink" href="#module-ramble.cmd.python" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.python.ipython_interpreter">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.python.</span></span><span class="sig-name descname"><span class="pre">ipython_interpreter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/python.html#ipython_interpreter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.python.ipython_interpreter" title="Link to this definition"></a></dt>
+<dd><p>An ipython interpreter is intended to be interactive, so it doesn’t
+support running a script or arguments</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.python.propagate_exceptions_from">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.python.</span></span><span class="sig-name descname"><span class="pre">propagate_exceptions_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">console</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/python.html#propagate_exceptions_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.python.propagate_exceptions_from" title="Link to this definition"></a></dt>
+<dd><p>Set sys.excepthook to let uncaught exceptions return 1 to the shell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>console</strong> (<em>code.InteractiveConsole</em>) – the console that needs a change in sys.excepthook</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.python.python">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.python.</span></span><span class="sig-name descname"><span class="pre">python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unknown_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/python.html#python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.python.python" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.python.python_interpreter">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.python.</span></span><span class="sig-name descname"><span class="pre">python_interpreter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/python.html#python_interpreter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.python.python_interpreter" title="Link to this definition"></a></dt>
+<dd><p>A python interpreter is the default interpreter</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.python.setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.python.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/python.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.python.setup_parser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-ramble.cmd.repo">
 <span id="ramble-cmd-repo-module"></span><h2>ramble.cmd.repo module<a class="headerlink" href="#module-ramble.cmd.repo" title="Link to this heading"></a></h2>
