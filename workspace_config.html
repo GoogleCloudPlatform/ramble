@@ -399,11 +399,77 @@ excluded from the generated set using an <code class="docutils literal notransla
 experiment definition. This block contains definitions of <code class="docutils literal notranslate"><span class="pre">variables</span></code>,
 <code class="docutils literal notranslate"><span class="pre">matrices</span></code>, <code class="docutils literal notranslate"><span class="pre">zips</span></code>, and optional mathematical <code class="docutils literal notranslate"><span class="pre">where</span></code> statements to
 define which experiments should be excluded from the generation process.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="w"> </span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">   </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">     </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="linenos"> 4</span><span class="w">     </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 5</span><span class="w">     </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="linenos"> 6</span><span class="w">   </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">     </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">       </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">         </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">10</span><span class="w">       </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">         </span><span class="nt">serial</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">           </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">             </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;32&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">14</span><span class="w">             </span><span class="nt">partition</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;part1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;part2&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">15</span><span class="w">             </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">16</span><span class="w">           </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="linenos">18</span><span class="w">               </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">                 </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">20</span><span class="w">               </span><span class="nt">zips</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">                 </span><span class="nt">partition_defs</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition</span>
+<span class="linenos">23</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="linenos">24</span><span class="w">               </span><span class="nt">matrices</span><span class="p">:</span>
+<span class="linenos">25</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition_defs</span>
+<span class="linenos">26</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="linenos">27</span><span class="w">               </span><span class="nt">exclude</span><span class="p">:</span>
+<span class="linenos">28</span><span class="w">                 </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">29</span><span class="w">                   </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">30</span><span class="w">                 </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="linenos">31</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition_defs</span>
+<span class="linenos">32</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+</pre></div>
+</div>
 <p>In the example above, of the eight experiments that would be generated from the
 experiment definition, four will be excluded. In the defined <code class="docutils literal notranslate"><span class="pre">exclude</span></code> block
 experiments with <code class="docutils literal notranslate"><span class="pre">n_nodes</span> <span class="pre">=</span> <span class="pre">2</span></code> or <code class="docutils literal notranslate"><span class="pre">n_nodes</span> <span class="pre">=</span> <span class="pre">3</span></code> will be excluded from the
 generation process.</p>
 <p>This logic can be replicated in a <code class="docutils literal notranslate"><span class="pre">where</span></code> statement as well:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="w"> </span><span class="nt">ramble</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">   </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 3</span><span class="w">     </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="linenos"> 4</span><span class="w">     </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="linenos"> 5</span><span class="w">     </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="linenos"> 6</span><span class="w">   </span><span class="nt">applications</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">     </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">       </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">         </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">10</span><span class="w">       </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">         </span><span class="nt">serial</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">           </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">             </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;16&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;32&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">14</span><span class="w">             </span><span class="nt">partition</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;part1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;part2&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">15</span><span class="w">             </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;1&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;3&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;4&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos">16</span><span class="w">           </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">test_exp_{n_nodes}_{processes_per_node}</span><span class="p p-Indicator">:</span>
+<span class="linenos">18</span><span class="w">               </span><span class="nt">variables</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">                 </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="linenos">20</span><span class="w">               </span><span class="nt">zips</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">                 </span><span class="nt">partition_defs</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition</span>
+<span class="linenos">23</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">processes_per_node</span>
+<span class="linenos">24</span><span class="w">               </span><span class="nt">matrices</span><span class="p">:</span>
+<span class="linenos">25</span><span class="w">               </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partition_defs</span>
+<span class="linenos">26</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+<span class="linenos">27</span><span class="w">               </span><span class="nt">exclude</span><span class="p">:</span>
+<span class="linenos">28</span><span class="w">                 </span><span class="nt">where</span><span class="p">:</span>
+<span class="linenos">29</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{n_nodes}</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">2&#39;</span>
+<span class="linenos">30</span><span class="w">                 </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{n_nodes}</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">3&#39;</span>
+</pre></div>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">where</span></code> statements can contain mathematical operations, but must result in a
 boolean value. If any of the <code class="docutils literal notranslate"><span class="pre">where</span></code> statements evalaute to <code class="docutils literal notranslate"><span class="pre">True</span></code> within
 an experiment, that experiment will be excluded from generation. To be more
