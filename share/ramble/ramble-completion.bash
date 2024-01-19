@@ -267,7 +267,7 @@ _ramble() {
     then
         RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
-        RAMBLE_COMPREPLY="attributes clean commands config debug edit flake8 help info license list mirror mods on repo results software-definitions unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config debug edit flake8 help info license list mirror mods on python repo results software-definitions unit-test workspace"
     fi
 }
 
@@ -544,6 +544,15 @@ _ramble_mods_info() {
 
 _ramble_on() {
     RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where"
+}
+
+_ramble_python() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -V --version -c -u -i -m --path"
+    else
+        RAMBLE_COMREPLY=""
+    fi
 }
 
 _ramble_repo() {
