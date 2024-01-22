@@ -29,7 +29,7 @@ def exp_dict():
         'var2': '{var3}',
         'var3': '3',
         'decimal.06.var': 'foo',
-        'size': '"0000.96"'  # Escaped as a string
+        'size': '"0000.96"',  # Escaped as a string
     }
 
 
@@ -54,6 +54,7 @@ def exp_dict():
         ('{{n_ranks}-1}', '3', set()),
         ('{{{n_ranks}/2}:0.0f}', '2', set()),
         ('{size}', '0000.96', set(['size'])),
+        ('CPU(s)', 'CPU(s)', set())
     ]
 )
 def test_expansions(input, output, no_expand_vars):
