@@ -625,6 +625,9 @@ class Expander(object):
 
         if node.func.id == 'range':
             return list(range(*args, **kwargs))
+        else:
+            raise MathEvaluationError(f'Undefined function {node.func.id} used.\n'
+                                      'returning unexapanded string')
 
     def _eval_bool_op(self, node):
         """Handle a boolean operator node in the ast"""
