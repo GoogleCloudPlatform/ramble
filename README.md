@@ -27,6 +27,11 @@ e.g.
 
     $ pip install -r requirements.txt
 
+We recommend Python >= 3.7 for Ramble, but a best effort attempt is made to
+support Python 3.6 as it is used by older operating systems such as Centos7.
+Specifically, you might need to update `pip` and downgrade `protobuf` when
+using Python 3.6.
+
 Outside of these requirements, ramble requires an existing installation of
 spack for some application definition. See
 [Spack’s documentation](https://github.com/spack/spack#-spack) to install Spack.
