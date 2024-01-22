@@ -1464,7 +1464,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for criteria, conf in success_list.items():
                 if conf['mode'] == 'string':
                     criteria_list.add_criteria(success_scope, criteria,
-                                               conf['mode'], re.compile(conf['match']),
+                                               conf['mode'], re.compile(
+                                                   self.expander.expand_var(conf['match'])
+                                               ),
                                                conf['file'])
 
         criteria_list.add_criteria(scope='application_definition',
@@ -1515,7 +1517,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 files[log_path]['foms'].append(fom)
 
             foms[fom] = {
-                'regex': re.compile(r'%s' % conf['regex']),
+                'regex': re.compile(r'%s' % self.expander.expand_var(conf['regex'])),
                 'contexts': [],
                 'group': conf['group_name'],
                 'units': conf['units'],
@@ -1524,11 +1526,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             }
             if conf['contexts']:
                 foms[fom]['contexts'].extend(conf['contexts'])
-
-            if conf['contexts']:
                 for context in conf['contexts']:
                     regex_str = \
-                        fom_contexts[context]['regex']
+                        self.expander.expand_var(fom_contexts[context]['regex'])
                     format_str = \
                         fom_contexts[context]['output_format']
                     contexts[context] = {
@@ -1536,16 +1536,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         'format': format_str
                     }
 
-            if conf['contexts']:
-                for context in conf['contexts']:
-                    regex_str = \
-                        fom_contexts[context]['regex']
-                    format_str = \
-                        fom_contexts[context]['output_format']
-                    contexts[context] = {
-                        'regex': re.compile(r'%s' % regex_str),
-                        'format': format_str
-                    }
         return files, contexts, foms
 
     def read_status(self):
