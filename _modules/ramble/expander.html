@@ -776,6 +776,9 @@
 
         <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s1">&#39;range&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MathEvaluationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Undefined function </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1"> used.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                      <span class="s1">&#39;returning unexapanded string&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_eval_bool_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle a boolean operator node in the ast&quot;&quot;&quot;</span>
