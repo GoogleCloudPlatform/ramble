@@ -105,8 +105,6 @@ variables apply to all experiments within their scope.
 
 These variables can be referred to within the YAML file, or template files
 using python keyword ( ``{var_name}`` ) syntax to perform variable expansion.
-This syntax allows basic math operations ( ``+``, ``-``, ``/``, ``*``, and
-``**`` ) to evaluate math expressions using variable definitions.
 
 If a variable is defined within multiple dictionaries, values defined closer to
 individual experiments take precedence.
@@ -135,6 +133,35 @@ individual experiments take precedence.
 In this example, ``n_ranks`` will take a value of ``1`` within the ``test_exp``
 experiment. This experiment will also include definitions for
 ``processes_per_node``, ``n_nodes``, and ``n_threads``.
+
+
+.. _ramble-supported-functions:
+
+~~~~~~~~~~~~~~~~~~~~
+Supported Functions:
+~~~~~~~~~~~~~~~~~~~~
+
+Ramble's variable expansion logic supports several mathematical operators and
+functions to help construct useful variable definitions.
+
+Supported math operators are:
+
+* ``+`` (addition)
+* ``-`` (subtraction)
+* ``*`` (multiplication)
+* ``/`` (division)
+* ``**`` (exponent)
+
+Support functions are:
+
+* ``str()`` (explicit string cast)
+* ``int()`` (explicit integer cast)
+* ``float()`` (explicit float cast)
+* ``min()`` (minimum)
+* ``max()`` (maximum)
+* ``ceil()`` (ceiling of input)
+* ``floor()`` (floor of input)
+* ``range()`` (construct range, see :ref:`ramble vector logic<ramble-vector-logic>` for more information)
 
 .. _ramble-vector-logic:
 
@@ -173,7 +200,7 @@ All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.
 
 In addition to accepting explicit lists, Ramble supports using
-`python's range function<https://docs.python.org/3/library/functions.html#func-range>`
+`Python's range() function <https://docs.python.org/3/library/functions.html#func-range>`_
 to create a list. With this functionality, the example above could be re-written as:
 
 .. code-block:: yaml
