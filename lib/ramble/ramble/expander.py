@@ -11,6 +11,7 @@ import ast
 import six
 import operator
 import math
+import random
 
 import ramble.error
 import ramble.keywords
@@ -22,7 +23,7 @@ supported_math_operators = {
     operator.pow, ast.BitXor: operator.xor, ast.USub: operator.neg,
     ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.Gt: operator.gt,
     ast.GtE: operator.ge, ast.Lt: operator.lt, ast.LtE: operator.le,
-    ast.And: operator.and_, ast.Or: operator.or_
+    ast.And: operator.and_, ast.Or: operator.or_, ast.Mod: operator.mod
 }
 
 supported_scalar_function_pointers = {
@@ -32,7 +33,9 @@ supported_scalar_function_pointers = {
     'max': max,
     'min': min,
     'ceil': math.ceil,
-    'floor': math.floor
+    'floor': math.floor,
+    'randrange': random.randrange,
+    'randint': random.randint
 }
 
 supported_list_function_pointers = {
