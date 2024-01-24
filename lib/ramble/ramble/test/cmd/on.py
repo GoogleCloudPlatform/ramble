@@ -28,6 +28,7 @@ on = RambleCommand('on')
 def test_on_command(mutable_mock_workspace_path):
     ws_name = 'test'
     workspace('create', ws_name)
+    assert ws_name in workspace('list')
 
     with ramble.workspace.read('test') as ws:
         ramble.test.cmd.workspace.add_basic(ws)
@@ -39,16 +40,18 @@ def test_on_command(mutable_mock_workspace_path):
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
 
-        on()
+        on(global_args=['-w', ws_name])
 
 
-def test_execute_nothing(mutable_mock_workspace_path):
+def test_execute_pipeline(mutable_mock_workspace_path):
     ws_name = 'test'
     workspace('create', ws_name)
     assert ws_name in workspace('list')
 
-    pipeline_type = ramble.pipeline.pipelines.setup
-    pipeline_class = ramble.pipeline.pipeline_class(pipeline_type)
+    setup_pipeline_type = ramble.pipeline.pipelines.setup
+    setup_pipeline_class = ramble.pipeline.pipeline_class(setup_pipeline_type)
+    execute_pipeline_type = ramble.pipeline.pipelines.execute
+    execute_pipeline_class = ramble.pipeline.pipeline_class(execute_pipeline_type)
     filters = ramble.filters.Filters()
 
     with ramble.workspace.read(ws_name) as ws:
@@ -58,11 +61,12 @@ def test_execute_nothing(mutable_mock_workspace_path):
         ws.concretize()
         assert ws.is_concretized()
 
-        setup_pipeline = pipeline_class(ws, filters)
+        setup_pipeline = setup_pipeline_class(ws, filters)
         setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
 
-        ws.run_experiments()
+        execute_pipeline = execute_pipeline_class(ws, filters)
+        execute_pipeline.run()
 
 
 def test_on_where(mutable_mock_workspace_path):
@@ -79,7 +83,7 @@ def test_on_where(mutable_mock_workspace_path):
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
 
-        on('--where', '"{experiment_index}" == "1"')
+        on('--where', '"{experiment_index}" == "1"', global_args=['-w', ws_name])
 
 
 def test_on_executor(mutable_mock_workspace_path):
@@ -96,4 +100,4 @@ def test_on_executor(mutable_mock_workspace_path):
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
 
-        on('--executor', 'echo "Index = {experiment_index}"')
+        on('--executor', 'echo "Index = {experiment_index}"', global_args=['-w', ws_name])
