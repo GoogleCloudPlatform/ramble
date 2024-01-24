@@ -61,7 +61,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Workspace Configuration File</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ramble-dictionary">Ramble Dictionary:</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-names">Experiment Names:</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#variable-dictionaries">Variable Dictionaries:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-dictionaries">Variable Dictionaries:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#supported-functions">Supported Functions:</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#list-or-vector-variables">List (or Vector) Variables:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#explicit-variable-zips">Explicit Variable Zips:</a></li>
@@ -70,18 +73,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#templatized-workloads">Templatized Workloads:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-modifiers">Experiment Modifiers:</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#custom-executables">Custom Executables:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#controlling-executable-order">Controlling Executable Order:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#using-executable-injection">Using Executable Injection:</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#reserved-variables">Reserved Variables:</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#required-variables">Required Variables:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#generated-variables">Generated Variables:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#spack-specific-generated-variables">Spack Specific Generated Variables:</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reserved-variables">Reserved Variables:</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#spack-dictionary">Spack Dictionary:</a></li>
@@ -204,9 +197,7 @@ or ramble will throw an error.</p>
 <p>Within a variable dictionary, arbitrary variables can be defined. Defined
 variables apply to all experiments within their scope.</p>
 <p>These variables can be referred to within the YAML file, or template files
-using python keyword ( <code class="docutils literal notranslate"><span class="pre">{var_name}</span></code> ) syntax to perform variable expansion.
-This syntax allows basic math operations ( <code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">**</span></code> ) to evaluate math expressions using variable definitions.</p>
+using python keyword ( <code class="docutils literal notranslate"><span class="pre">{var_name}</span></code> ) syntax to perform variable expansion.</p>
 <p>If a variable is defined within multiple dictionaries, values defined closer to
 individual experiments take precedence.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -232,6 +223,30 @@ individual experiments take precedence.</p>
 <p>In this example, <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> will take a value of <code class="docutils literal notranslate"><span class="pre">1</span></code> within the <code class="docutils literal notranslate"><span class="pre">test_exp</span></code>
 experiment. This experiment will also include definitions for
 <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>, <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, and <code class="docutils literal notranslate"><span class="pre">n_threads</span></code>.</p>
+<section id="supported-functions">
+<span id="ramble-supported-functions"></span><h4>Supported Functions:<a class="headerlink" href="#supported-functions" title="Link to this heading"></a></h4>
+<p>Ramble’s variable expansion logic supports several mathematical operators and
+functions to help construct useful variable definitions.</p>
+<p>Supported math operators are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">+</span></code> (addition)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-</span></code> (subtraction)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> (multiplication)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/</span></code> (division)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">**</span></code> (exponent)</p></li>
+</ul>
+<p>Support functions are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">str()</span></code> (explicit string cast)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">int()</span></code> (explicit integer cast)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">float()</span></code> (explicit float cast)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min()</span></code> (minimum)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max()</span></code> (maximum)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ceil()</span></code> (ceiling of input)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">floor()</span></code> (floor of input)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">range()</span></code> (construct range, see <a class="reference internal" href="#ramble-vector-logic"><span class="std std-ref">ramble vector logic</span></a> for more information)</p></li>
+</ul>
+</section>
 </section>
 <section id="list-or-vector-variables">
 <span id="ramble-vector-logic"></span><h3>List (or Vector) Variables:<a class="headerlink" href="#list-or-vector-variables" title="Link to this heading"></a></h3>
@@ -263,7 +278,7 @@ math and variable expansion syntax as defined above).</p>
 <p>All lists defined within any experiment namespace are required to be the same
 length. They are zipped together, and iterated over to generate unique experiments.</p>
 <p>In addition to accepting explicit lists, Ramble supports using
-<cite>python’s range function&lt;https://docs.python.org/3/library/functions.html#func-range&gt;</cite>
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#func-range">Python’s range() function</a>
 to create a list. With this functionality, the example above could be re-written as:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
@@ -619,8 +634,6 @@ several internal aspects of the application, workload, and experiment.</p>
 <p>This config section is defined in the
 <a class="reference internal" href="configuration_files.html#internals-config"><span class="std std-ref">internals config section</span></a>.</p>
 <p>Below are examples of using this within a workspace config file.</p>
-<section id="custom-executables">
-<h4>Custom Executables:<a class="headerlink" href="#custom-executables" title="Link to this heading"></a></h4>
 <p>Custom executables can be created within the internals dictionary. Below is an
 example, showing how to create a <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> executable at the application level.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -639,9 +652,6 @@ example, showing how to create a <code class="docutils literal notranslate"><spa
 <p>The above example creates a custom executable, named <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> that will inject
 the command <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> into the command for an experiment when it is used. It is
 important to note that this only creates the executable, and does not use it.</p>
-</section>
-<section id="controlling-executable-order">
-<h4>Controlling Executable Order:<a class="headerlink" href="#controlling-executable-order" title="Link to this heading"></a></h4>
 <p>The internals dictionary allows the ability to control the order pre-defined
 executables (or custom executables) are pieced together to build an experiment.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
@@ -665,9 +675,6 @@ one can control the order of the executables in the <code class="docutils litera
 <p>The default for the hostname application is <code class="docutils literal notranslate"><span class="pre">[builtin::env_vars,</span>
 <span class="pre">serial/parallel]</span></code> but this changes the order and injects <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> into the
 expansion.</p>
-</section>
-<section id="using-executable-injection">
-<h4>Using Executable Injection:<a class="headerlink" href="#using-executable-injection" title="Link to this heading"></a></h4>
 <p>Executable order can also be controlled via the <code class="docutils literal notranslate"><span class="pre">executable_injection</span></code> block
 within the <code class="docutils literal notranslate"><span class="pre">internals</span></code> block. Injecting the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> executable to the end of
 the list of executables can be performed with the following:</p>
@@ -689,13 +696,10 @@ the list of executables can be performed with the following:</p>
 list of executables for the experiment. For more information on this see the
 <a class="reference internal" href="configuration_files.html#internals-config"><span class="std std-ref">internals config section</span></a> documentation.</p>
 </section>
-</section>
 <section id="reserved-variables">
 <h3>Reserved Variables:<a class="headerlink" href="#reserved-variables" title="Link to this heading"></a></h3>
 <p>There are several reserved, auto-generated, and required variables for Ramble
 to function properly. This section will describe them.</p>
-<section id="required-variables">
-<h4>Required Variables:<a class="headerlink" href="#required-variables" title="Link to this heading"></a></h4>
 <p>Ramble requires the following variables to be defined:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> - Defines the number of MPI ranks to use. If not explicitly set,
@@ -708,9 +712,6 @@ not explicitly set, is defined as: <code class="docutils literal notranslate"><s
 <li><p><code class="docutils literal notranslate"><span class="pre">mpi_command</span></code> - Template for generating an MPI command</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> - Template for generating a batch system submit command</p></li>
 </ul>
-</section>
-<section id="generated-variables">
-<h4>Generated Variables:<a class="headerlink" href="#generated-variables" title="Link to this heading"></a></h4>
 <p>Ramble automatically generates definitions for the following variables:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">application_name</span></code> - Set to the name of the application</p></li>
@@ -746,9 +747,6 @@ absolute path to: <code class="docutils literal notranslate"><span class="pre">{
 <code class="docutils literal notranslate"><span class="pre">&lt;template_name&gt;</span></code> is the filename of the template, without the extension.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">command</span></code> - Set to all of the commands needed to perform an experiment.</p></li>
 </ul>
-</section>
-<section id="spack-specific-generated-variables">
-<h4>Spack Specific Generated Variables:<a class="headerlink" href="#spack-specific-generated-variables" title="Link to this heading"></a></h4>
 <p>When using spack applications, Ramble also generates the following variables:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> - Set to the equivalent of <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">location</span> <span class="pre">-i</span>
@@ -777,7 +775,6 @@ the installation location for the <code class="docutils literal notranslate"><sp
 <p><strong>NOTE</strong>: Package installation location variables are only generated when
 actually performing the setup of a workspace. When a <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> is
 performed, these paths are not populated.</p>
-</section>
 </section>
 </section>
 <section id="spack-dictionary">
@@ -1091,7 +1088,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 22, 2024.
+      <span class="lastupdated">Last updated on Jan 24, 2024.
       </span></p>
   </div>
 

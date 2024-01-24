@@ -105,6 +105,7 @@
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
@@ -117,6 +118,20 @@
     <span class="n">ast</span><span class="o">.</span><span class="n">Eq</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">NotEq</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Gt</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">GtE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Lt</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">LtE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">And</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Or</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span>
+<span class="p">}</span>
+
+<span class="n">supported_scalar_function_pointers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;str&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="nb">max</span><span class="p">,</span>
+    <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">,</span>
+    <span class="s1">&#39;ceil&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">,</span>
+    <span class="s1">&#39;floor&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span>
+<span class="p">}</span>
+
+<span class="n">supported_list_function_pointers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;range&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -774,8 +789,12 @@
         <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">keywords</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">kw</span><span class="o">.</span><span class="n">arg</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">kw</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s1">&#39;range&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">supported_scalar_function_pointers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">supported_scalar_function_pointers</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">supported_list_function_pointers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">supported_list_function_pointers</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MathEvaluationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Undefined function </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1"> used.</span><span class="se">\n</span><span class="s1">&#39;</span>
                                       <span class="s1">&#39;returning unexapanded string&#39;</span><span class="p">)</span>
@@ -956,7 +975,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 22, 2024.
+      <span class="lastupdated">Last updated on Jan 24, 2024.
       </span></p>
   </div>
 
