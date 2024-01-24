@@ -37,7 +37,6 @@ from ramble.mirror import MirrorStats
 
 import spack.util.spack_yaml as syaml
 import spack.util.spack_json as sjson
-from spack.util.executable import CommandNotFoundError, which
 import spack.util.url as url_util
 import spack.util.web as web_util
 
@@ -1063,15 +1062,6 @@ class Workspace(object):
             logger.all_msg(f'  {out_file}')
 
         return filename_base
-
-    def run_experiments(self):
-
-        try:
-            experiment_script = which('%s/all_experiments' % self.root, required=True)
-        except CommandNotFoundError:
-            raise RambleWorkspaceError('Cannot find `all_experiments` in workspace root.')
-
-        experiment_script()
 
     def create_mirror(self, mirror_root):
         parsed_url = url_util.parse(mirror_root)
