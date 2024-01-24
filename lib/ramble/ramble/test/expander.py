@@ -54,7 +54,14 @@ def exp_dict():
         ('{{n_ranks}-1}', '3', set()),
         ('{{{n_ranks}/2}:0.0f}', '2', set()),
         ('{size}', '0000.96', set(['size'])),
-        ('CPU(s)', 'CPU(s)', set())
+        ('CPU(s)', 'CPU(s)', set()),
+        ('str(1.5)', '1.5', set()),
+        ('int(1.5)', '1', set()),
+        ('float(1.5)', '1.5', set()),
+        ('ceil(0.6)', '1', set()),
+        ('floor(0.6)', '0', set()),
+        ('max(1, 5)', '5', set()),
+        ('min(1, 5)', '1', set()),
     ]
 )
 def test_expansions(input, output, no_expand_vars):

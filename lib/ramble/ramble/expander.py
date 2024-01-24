@@ -10,6 +10,7 @@ import string
 import ast
 import six
 import operator
+import math
 
 import ramble.error
 import ramble.keywords
@@ -22,6 +23,20 @@ supported_math_operators = {
     ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.Gt: operator.gt,
     ast.GtE: operator.ge, ast.Lt: operator.lt, ast.LtE: operator.le,
     ast.And: operator.and_, ast.Or: operator.or_
+}
+
+supported_scalar_function_pointers = {
+    'str': str,
+    'int': int,
+    'float': float,
+    'max': max,
+    'min': min,
+    'ceil': math.ceil,
+    'floor': math.floor
+}
+
+supported_list_function_pointers = {
+    'range': range,
 }
 
 
@@ -623,8 +638,12 @@ class Expander(object):
         for kw in node.keywords:
             kwargs[self.eval_math(kw.arg)] = self.eval_math(kw.value)
 
-        if node.func.id == 'range':
-            return list(range(*args, **kwargs))
+        if node.func.id in supported_scalar_function_pointers.keys():
+            func = supported_scalar_function_pointers[node.func.id]
+            return func(*args, **kwargs)
+        elif node.func.id in supported_list_function_pointers.keys():
+            func = supported_list_function_pointers[node.func.id]
+            return list(func(*args, **kwargs))
         else:
             raise MathEvaluationError(f'Undefined function {node.func.id} used.\n'
                                       'returning unexapanded string')
