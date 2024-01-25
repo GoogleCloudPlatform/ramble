@@ -664,6 +664,10 @@ def workspace_archive_setup_parser(subparser):
         default=None,
         help='URL to upload tar archive into. Does nothing if `-t` is not specified.')
 
+    subparser.add_argument(
+        '--include-secrets', action='store_true',
+        help='If set, secrets are included in the archive. Default is false')
+
     arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
                                                'where', 'exclude_where'])
 
@@ -683,7 +687,8 @@ def workspace_archive(args):
                             filters,
                             create_tar=args.tar_archive,
                             archive_prefix=args.archive_prefix,
-                            upload_url=args.upload_url)
+                            upload_url=args.upload_url,
+                            include_secrets=args.include_secrets)
 
     workspace_run_pipeline(args, pipeline)
 
