@@ -166,13 +166,14 @@ The current default configuration is as follows:
         type: 'BigQuery'
         uri: ''
 
+
 .. _upload-config-option:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Upload
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Ramble aims to support the uplaod of experiment outcomes (including FOMs), to
+Ramble aims to support the upload of experiment outcomes (including FOMs), to
 SQL-like datastores. To do this we can specify an ``upload:type`` as defined by
 :mod:`ramble.experimental.uploader.Upload`, and a ``upload:uri`` to specify the
 destination.

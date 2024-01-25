@@ -71,6 +71,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     maintainers: List[str] = []
     tags: List[str] = []
 
+    license_inc_name = 'license.inc'
+
     def __init__(self, file_path):
         super().__init__()
 
@@ -111,7 +113,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.license_path = ''
         self.license_file = ''
-        self.license_inc_name = 'license.inc'
 
         self.build_phase_order()
 

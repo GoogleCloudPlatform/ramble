@@ -19,6 +19,10 @@ workspaces. Ramble's vector and matrix variable logic is defined in more detail 
 This tutorial builds off of concepts introduced in previous tutorials. Please
 make sure you review those before starting with this tutorial's content.
 
+**NOTE:** In this tutorial, you will encounter expected errors when copying and
+pasting the commands. This is to help show situations you might run into when
+trying to use Ramble on your own, and illustrate how you might fix them.
+
 .. include:: shared/gromacs_workspace.rst
 
 Activate the Workspace
