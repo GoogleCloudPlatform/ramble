@@ -30,13 +30,15 @@ class Uploader():
                 f"{self.__class__} requires %{data} argument.")
         pass
 
+
 def get_user():
-    import getpass
-    user = getpass.getuser()
     config_user = ramble.config.get('config:user')
     if config_user:
-        user = config_user
-    return user
+        return config_user
+    else:
+        import getpass
+        return getpass.getuser()
+
 
 class Experiment():
     """
