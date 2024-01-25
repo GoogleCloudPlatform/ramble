@@ -596,6 +596,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     new_inst.variables[self.keywords.experiment_index] = \
                         self.expander.expand_var_name(self.keywords.experiment_index)
 
+                    # Extract inherited variables
+                    if namespace.inherit_variables in cur_exp_def:
+                        for inherit_var in cur_exp_def[namespace.inherit_variables]:
+                            new_inst.variables[inherit_var] = self.variables[inherit_var]
+
                     # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)
                     chain_cmd = new_inst.expander.expand_var(cur_exp_def[self.keywords.command])
