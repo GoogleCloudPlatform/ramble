@@ -217,10 +217,11 @@ Filtering Experiments
 
 Several of the workspace commands support filtering the experiments they should
 act on. This can be performed using the ``--where`` argument for inclusive
-filtering, or the ``--exclude-where`` argument for exclusive filtering. These
-arguments take a string representing a logical expression, which can use
-variables the experiment would define. If the logical expression evaluates to
-true, the experiment will be included or excluded for action (respectively).
+filtering, the ``--exclude-where`` argument for exclusive filtering, or the
+``--filter-tags`` argument to filter based on experiment tags.. These arguments
+take a string representing a logical expression, which can use variables the
+experiment would define. If the logical expression evaluates to true, the
+experiment will be included or excluded for action (respectively).
 
 As an example:
 
@@ -236,6 +237,14 @@ Will only setup experiments that have less than 500 ranks, and:
 
 Will exclude all experiments from the ``hostname`` application.
 
+To filter by tags, see the following example:
+
+.. code-block:: console
+
+  $ ramble workspace setup --filter-tags my-tag
+
+Will only setup experiments that have the ``my-tag`` on them.
+
 The commands that accept these filters are:
 
 .. code-block:: console
@@ -247,6 +256,7 @@ The commands that accept these filters are:
     $ ramble on
 
 **NOTE:** The exclusive filter takes precedence over the inclusive filter.
+
 
 ^^^^^^^^^^^^^^^^^^^^^
 Software Environments
