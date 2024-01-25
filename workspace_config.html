@@ -86,6 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#experiment-chains">Experiment Chains:</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#defining-experiment-chains">Defining Experiment Chains:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#suppressing-experiments">Suppressing Experiments:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-inheritance">Variable Inheritance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#defining-chains-of-chains">Defining Chains of Chains:</a></li>
 </ul>
 </li>
@@ -1025,6 +1026,53 @@ it as a template.</p>
 being used as a stand-alone experiment, but it will still be generated and used
 when it’s chained into other experiments.</p>
 </section>
+<section id="variable-inheritance">
+<h3>Variable Inheritance<a class="headerlink" href="#variable-inheritance" title="Link to this heading"></a></h3>
+<p>In some cases, it’s useful for an experiment to take values for its variables
+from the root of the chain. For example, if an allreduce benchmark should be
+run on all of the nodes within a job before the actual experiment begins, but
+the number of nodes changes based on the root experiment. In this case, a
+workspace might be more simply defined if the root experiment can inject its
+own definition for the number of nodes into the chained experiments. To
+accomplish this, the: <code class="docutils literal notranslate"><span class="pre">inherit_variables</span></code> attribute within a chained
+experiment definition can be used to define which variables should be inherited
+from the root experiment.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">    </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}*{processes_per_node}&#39;</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_exp1</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">            </span><span class="nt">test_exp2</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;4&#39;</span>
+<span class="w">              </span><span class="nt">chained_experiments</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname.serial.test_exp1</span>
+<span class="w">                </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">                </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;after_chain&#39;</span>
+<span class="w">                </span><span class="nt">inherit_variables</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_ranks</span>
+</pre></div>
+</div>
+<p>In the example above, the <code class="docutils literal notranslate"><span class="pre">hostname.serial.test_exp2</span></code> experiment represents
+the root of the experiment chain. The <code class="docutils literal notranslate"><span class="pre">inherit_variables</span></code> list will cause
+this root experiment to inject its own value for <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> into the chained
+experiment, overriding its explicitly defined value in the experiment
+definition.</p>
+</section>
 <section id="defining-chains-of-chains">
 <h3>Defining Chains of Chains:<a class="headerlink" href="#defining-chains-of-chains" title="Link to this heading"></a></h3>
 <p>Ramble supports the ability to define chains of experiment chains. This allows
@@ -1088,7 +1136,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 24, 2024.
+      <span class="lastupdated">Last updated on Jan 25, 2024.
       </span></p>
   </div>
 

@@ -1097,6 +1097,57 @@ In the above example, the ``template`` keyword is used to mark
 being used as a stand-alone experiment, but it will still be generated and used
 when it's chained into other experiments.
 
+^^^^^^^^^^^^^^^^^^^^
+Variable Inheritance
+^^^^^^^^^^^^^^^^^^^^
+
+In some cases, it's useful for an experiment to take values for its variables
+from the root of the chain. For example, if an allreduce benchmark should be
+run on all of the nodes within a job before the actual experiment begins, but
+the number of nodes changes based on the root experiment. In this case, a
+workspace might be more simply defined if the root experiment can inject its
+own definition for the number of nodes into the chained experiments. To
+accomplish this, the: ``inherit_variables`` attribute within a chained
+experiment definition can be used to define which variables should be inherited
+from the root experiment.
+
+.. code-block:: yaml
+
+    ramble:
+      variables:
+        mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        processes_per_node: '16'
+        n_ranks: '{n_nodes}*{processes_per_node}'
+      applications:
+        hostname:
+          variables:
+            n_threads: '1'
+          workloads:
+            serial:
+              variables:
+                n_nodes: '1'
+              experiments:
+                test_exp1:
+                  template: true
+                  variables:
+                    n_nodes: '1'
+                test_exp2:
+                  variables:
+                    n_nodes: '4'
+                  chained_experiments:
+                  - name: hostname.serial.test_exp1
+                    command: '{execute_experiment}'
+                    order: 'after_chain'
+                    inherit_variables:
+                    - n_ranks
+
+In the example above, the ``hostname.serial.test_exp2`` experiment represents
+the root of the experiment chain. The ``inherit_variables`` list will cause
+this root experiment to inject its own value for ``n_nodes`` into the chained
+experiment, overriding its explicitly defined value in the experiment
+definition.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Defining Chains of Chains:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
