@@ -66,6 +66,9 @@ ramble:
         with open(config_path, 'w+') as f:
             f.write(test_config)
         ws._re_read()
+
+        assert not os.path.exists(os.path.join(ws.experiment_dir, 'zlib'))
+
         with pytest.raises(RambleCommandError):
             output = workspace('analyze', global_args=['-w', workspace_name])
             assert 'Make sure your workspace is fully setup' in output

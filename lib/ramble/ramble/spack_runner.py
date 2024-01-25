@@ -27,8 +27,6 @@ import ramble.error
 import ramble.util.hashing
 from ramble.util.logger import logger
 
-import spack.util.spack_json as sjson
-
 spack_namespace = 'spack'
 
 package_name_regex = re.compile(r"\s*(?P<package_name>[\w][\w-]+).*")
@@ -555,9 +553,14 @@ class SpackRunner(object):
                 logger.verbose(f'Removing invalid spack lock file {spack_lock_file}')
                 fs.force_remove(spack_lock_file)
 
-        # Write spack.yaml to environment before concretizing
+        spack_hash = self.inventory_hash()
+
+        # Write spack.yaml to environment before concretizing, and its hash
         with open(os.path.join(self.env_path, 'spack.yaml'), 'w+') as f:
             syaml.dump_config(env_file, f, default_flow_style=False)
+
+        with open(os.path.join(self.env_path, 'ramble.hash'), 'w+') as f:
+            f.write(spack_hash)
 
         if self.configs:
             self.apply_configs()
@@ -589,7 +592,7 @@ class SpackRunner(object):
 
         self.concretized = True
 
-    def inventory_hash(self, require_exist=False):
+    def inventory_hash(self):
         """
         Create a hash of the spack.lock file for ramble inventory purposes
 
@@ -597,34 +600,11 @@ class SpackRunner(object):
         """
         self._check_active()
 
-        spack_file = os.path.join(self.env_path, 'spack.lock')
-        lock_exists = os.path.exists(spack_file)
-        contents_to_hash = None
+        env_data = syaml.load_config(syaml.dump_config(self._env_file_dict(),
+                                                       default_flow_style=False))
+        self.hash = ramble.util.hashing.hash_json(env_data)
 
-        if not self.dry_run:
-            if not lock_exists:
-                if require_exist and len(self.env_contents) > 0:
-                    logger.die(
-                        'spack.lock file does not exist in environment '
-                        f'{self.env_path}\n'
-                        'Make sure your workspace is fully setup with\n'
-                        '    ramble workspace setup'
-                    )
-            else:  # lock_exists
-                with open(spack_file, 'r') as f:
-                    contents_to_hash = sjson.load(f)
-
-        if self.dry_run or not lock_exists:
-            contents_to_hash = self._env_file_dict()
-
-        spack_hash = ramble.util.hashing.hash_json(contents_to_hash)
-
-        if not self.dry_run:
-            hash_path = os.path.join(self.env_path, 'ramble.hash')
-            with open(hash_path, 'w+') as f:
-                f.write(spack_hash)
-
-        return spack_hash
+        return self.hash
 
     def install(self):
         """
