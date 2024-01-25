@@ -139,7 +139,7 @@ licenses:
 
         ws1._re_read()
 
-        output = workspace('info', global_args=['-w', workspace_name])
+        output = workspace('info', '-vv', global_args=['-w', workspace_name])
         assert "Phases for setup pipeline:" in output
         assert "get_inputs" in output
         assert "make_experiments" in output

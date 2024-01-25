@@ -181,7 +181,7 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', global_args=['-w', workspace_name])
+    output = workspace('info', '--software', global_args=['-w', workspace_name])
 
     check_info_basic(output)
 
@@ -233,7 +233,7 @@ config:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '--expansions', global_args=['-w', workspace_name])
     assert 'Variables from Config:' in output
     assert 'Variables from Workspace:' in output
     assert 'Variables from Application:' in output
@@ -283,7 +283,7 @@ ramble:
 
     output = workspace('info', global_args=['-w', workspace_name])
 
-    assert "Template Experiment: basic.test_wl.test_experiment" in output
+    assert "Template Experiment 1: basic.test_wl.test_experiment" in output
 
 
 def test_workspace_info_with_experiment_chain():
@@ -330,9 +330,9 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
-    assert "Template Experiment: basic.test_wl.test_experiment" in output
+    assert "Template Experiment 1: basic.test_wl.test_experiment" in output
     assert "Experiment Chain:" in output
     assert "- basic.test_wl2.test_experiment.chain.0.basic.test_wl.test_experiment" in output
 
@@ -1544,7 +1544,7 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', global_args=['-w', workspace_name])
+    output = workspace('info', '--software', global_args=['-w', workspace_name])
 
     check_info_basic(output)
 
@@ -1646,7 +1646,7 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert 'app_level_cmd' in output
     assert 'wl_level_cmd' in output
@@ -1709,7 +1709,7 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
 
