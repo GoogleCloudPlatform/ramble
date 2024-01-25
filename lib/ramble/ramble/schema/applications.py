@@ -47,6 +47,14 @@ matrices_def = {
     }
 }
 
+variable_list = {
+    'type': 'array',
+    'default': [],
+    'items': {
+        'type': 'string',
+    }
+}
+
 chained_experiment_def = {
     'type': 'array',
     'default': [],
@@ -58,6 +66,7 @@ chained_experiment_def = {
                 'name': {'type': 'string'},
                 'command': {'type': 'string'},
                 'order': {'type': 'string'},
+                'inherit_variables': variable_list,
             },
             ramble.schema.variables.properties
         ),
