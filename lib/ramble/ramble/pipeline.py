@@ -17,6 +17,7 @@ import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 from llnl.util.tty.color import cprint
 
+import ramble.application
 import ramble.config
 import ramble.experiment_set
 import ramble.software_environments
@@ -249,11 +250,14 @@ class ArchivePipeline(Pipeline):
 
     name = 'archive'
 
-    def __init__(self, workspace, filters, create_tar=False, archive_prefix=None, upload_url=None):
+    def __init__(self, workspace, filters, create_tar=False,
+                 archive_prefix=None, upload_url=None,
+                 include_secrets=False):
         super().__init__(workspace, filters)
         self.action_string = 'Archiving'
         self.create_tar = create_tar
         self.upload_url = upload_url
+        self.include_secrets = include_secrets
         self.archive_prefix = archive_prefix
         self.archive_name = None
 
@@ -303,6 +307,24 @@ class ArchivePipeline(Pipeline):
                 dest = file.replace(self.workspace.software_dir, archive_software)
                 fs.mkdirp(os.path.dirname(dest))
                 shutil.copyfile(file, dest)
+
+        # Copy shared files
+        archive_shared = os.path.join(self.workspace.latest_archive_path,
+                                      ramble.workspace.workspace_shared_path)
+
+        excluded_secrets = set()
+        if not self.include_secrets:
+            excluded_secrets.add(ramble.application.ApplicationBase.license_inc_name)
+
+        fs.mkdirp(archive_shared)
+        for root, dirs, files in os.walk(self.workspace.shared_dir):
+            for name in files:
+                if name not in excluded_secrets:
+                    src_dir = os.path.join(self.workspace.shared_dir, root)
+                    src = os.path.join(src_dir, name)
+                    dest = src.replace(self.workspace.shared_dir, archive_shared)
+                    fs.mkdirp(os.path.dirname(dest))
+                    shutil.copy(src, dest)
 
         # Copy logs, but omit all symlinks (i.e. "latest")
         archive_logs = os.path.join(self.workspace.latest_archive_path,
