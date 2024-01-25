@@ -122,8 +122,6 @@
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
-<span class="kn">import</span> <span class="nn">spack.util.spack_json</span> <span class="k">as</span> <span class="nn">sjson</span>
-
 <span class="n">spack_namespace</span> <span class="o">=</span> <span class="s1">&#39;spack&#39;</span>
 
 <span class="n">package_name_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*(?P&lt;package_name&gt;[\w][\w-]+).*&quot;</span><span class="p">)</span>
@@ -711,9 +709,14 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removing invalid spack lock file </span><span class="si">{</span><span class="n">spack_lock_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">fs</span><span class="o">.</span><span class="n">force_remove</span><span class="p">(</span><span class="n">spack_lock_file</span><span class="p">)</span>
 
-        <span class="c1"># Write spack.yaml to environment before concretizing</span>
+        <span class="n">spack_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">()</span>
+
+        <span class="c1"># Write spack.yaml to environment before concretizing, and its hash</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">env_file</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;ramble.hash&#39;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">spack_hash</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_configs</span><span class="p">()</span></div>
@@ -751,7 +754,7 @@
 
 <div class="viewcode-block" id="SpackRunner.inventory_hash">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.inventory_hash">[docs]</a>
-    <span class="k">def</span> <span class="nf">inventory_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">require_exist</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inventory_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a hash of the spack.lock file for ramble inventory purposes</span>
 
@@ -759,34 +762,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
-        <span class="n">spack_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.lock&#39;</span><span class="p">)</span>
-        <span class="n">lock_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">spack_file</span><span class="p">)</span>
-        <span class="n">contents_to_hash</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">env_data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_file_dict</span><span class="p">(),</span>
+                                                       <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="n">env_data</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">lock_exists</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">require_exist</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-                        <span class="s1">&#39;spack.lock file does not exist in environment &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                        <span class="s1">&#39;Make sure your workspace is fully setup with</span><span class="se">\n</span><span class="s1">&#39;</span>
-                        <span class="s1">&#39;    ramble workspace setup&#39;</span>
-                    <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># lock_exists</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spack_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">contents_to_hash</span> <span class="o">=</span> <span class="n">sjson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">lock_exists</span><span class="p">:</span>
-            <span class="n">contents_to_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_file_dict</span><span class="p">()</span>
-
-        <span class="n">spack_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="n">contents_to_hash</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="n">hash_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;ramble.hash&#39;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">hash_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">spack_hash</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">spack_hash</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span></div>
 
 
 <div class="viewcode-block" id="SpackRunner.install">

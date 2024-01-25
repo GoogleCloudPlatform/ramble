@@ -513,7 +513,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;software&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">env_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-                <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">(</span><span class="n">require_exist</span><span class="p">)</span>
+                <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">()</span>
             <span class="p">}</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
