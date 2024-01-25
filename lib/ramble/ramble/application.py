@@ -92,6 +92,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.chain_commands = {}
         self._env_variable_sets = None
         self.modifiers = []
+        self.experiment_tags = []
         self._modifier_instances = []
         self._modifier_builtins = {}
         self._input_fetchers = None
@@ -307,6 +308,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                f'{wl_conf["executables"]}\n')
                 out_str.append('\t' + rucolor.nested_1('Inputs: ') +
                                f'{wl_conf["inputs"]}\n')
+                out_str.append('\t' + rucolor.nested_1('Workload Tags: \n'))
+                if 'tags' in wl_conf and wl_conf['tags']:
+                    out_str.append(colified(wl_conf['tags'], indent=8) + '\n')
 
                 if wl_name in self.workload_variables:
                     out_str.append(rucolor.nested_1('\tVariables:\n'))
@@ -369,6 +373,37 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
+
+    def set_tags(self, tags):
+        """Set experiment tags for this instance"""
+
+        self.experiment_tags = self.tags.copy()
+
+        workload_name = self.expander.workload_name
+        self.experiment_tags.extend(self.workloads[workload_name]['tags'])
+
+        if tags:
+            self.experiment_tags.extend(tags)
+
+    def has_tags(self, tags):
+        """Check if this instance has provided tags.
+
+        Args:
+            tags (list): List of strings, where each string is an indivudal tag
+        Returns:
+            (bool): True if all tags are in this instance, False otherwise
+        """
+
+        if tags and self.experiment_tags:
+            tag_set = set(tags)
+            exp_tag_set = set(self.experiment_tags)
+
+            for tag in tag_set:
+                if tag not in exp_tag_set:
+                    return False
+            return True
+
+        return False
 
     def experiment_log_file(self, logs_dir):
         """Returns an experiment log file path for the given logs directory"""
@@ -1411,6 +1446,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         results['RAMBLE_STATUS'] = self.get_status()
 
         if success or workspace.always_print_foms:
+            results['TAGS'] = list(self.experiment_tags)
             results['RAMBLE_VARIABLES'] = {}
             results['RAMBLE_RAW_VARIABLES'] = {}
             for var, val in self.variables.items():

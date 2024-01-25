@@ -375,6 +375,7 @@ class ExperimentSet(object):
             app_inst.set_template(final_context.is_template)
             app_inst.set_chained_experiments(final_context.chained_experiments)
             app_inst.set_modifiers(final_context.modifiers)
+            app_inst.set_tags(final_context.tags)
             app_inst.read_status()
             self.experiments[experiment_namespace] = app_inst
             self.experiment_order.append(experiment_namespace)
@@ -385,6 +386,19 @@ class ExperimentSet(object):
         for experiment in base_experiments:
             instance = self.experiments[experiment]
             instance.create_experiment_chain(self._workspace)
+
+    def all_experiment_tags(self):
+        """Aggregate all tags from experiments in this experiment set
+
+        Returns:
+            (set): A set of all tags from the experiment set.
+        """
+        all_tags = set()
+        for _, inst, _ in self.all_experiments():
+            if inst.experiment_tags:
+                for tag in inst.experiment_tags:
+                    all_tags.add(tag)
+        return all_tags
 
     def all_experiments(self):
         """Iterator over all experiments in this set"""
@@ -433,6 +447,10 @@ class ExperimentSet(object):
                 for expression in filters.exclude_where:
                     if inst.expander.evaluate_predicate(expression):
                         active = False
+
+            if filters.tags:
+                if not inst.has_tags(filters.tags):
+                    active = False
 
             if active:
                 yield exp, inst, idx
