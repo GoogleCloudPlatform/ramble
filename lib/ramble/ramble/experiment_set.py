@@ -23,6 +23,8 @@ import ramble.util.matrices
 from ramble.util.logger import logger
 import ramble.context
 
+import spack.util.naming
+
 
 class ExperimentSet(object):
     """Class to represent a full set of experiments
@@ -267,9 +269,15 @@ class ExperimentSet(object):
                 final_context.variables[var_name] = self._context[context].context_name
 
         # Set namespaces
-        final_context.variables['application_namespace'] = self.application_namespace
-        final_context.variables['workload_namespace'] = self.workload_namespace
-        final_context.variables['experiment_namespace'] = self.experiment_namespace
+        final_context.variables[self.keywords.application_namespace] = self.application_namespace
+        final_context.variables[self.keywords.workload_namespace] = self.workload_namespace
+        final_context.variables[self.keywords.experiment_namespace] = self.experiment_namespace
+        final_context.variables[self.keywords.simplified_application_namespace] = \
+            spack.util.naming.simplify_name(self.application_namespace)
+        final_context.variables[self.keywords.simplified_workload_namespace] = \
+            spack.util.naming.simplify_name(self.workload_namespace)
+        final_context.variables[self.keywords.simplified_experiment_namespace] = \
+            spack.util.naming.simplify_name(self.experiment_namespace)
 
         # Set required variables for directories.
         final_context.variables[self.keywords.application_run_dir] = \
