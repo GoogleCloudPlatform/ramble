@@ -13,6 +13,7 @@ import pytest
 
 import llnl.util.filesystem as fs
 
+import ramble.application
 import ramble.workspace
 from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
@@ -1076,14 +1077,25 @@ ramble:
     environments: {}
 """
 
+    test_licenses = """
+licenses:
+  basic:
+    set:
+      TEST_LIC: 'value'
+"""
+
     workspace_name = 'test_basic_archive'
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    lic_path = os.path.join(ws1.config_dir, 'licenses.yaml')
 
     with open(config_path, 'w+') as f:
         f.write(test_config)
+
+    with open(lic_path, 'w+') as f:
+        f.write(test_licenses)
 
     # Create more templates
     new_templates = []
@@ -1128,6 +1140,69 @@ ramble:
     for file in new_files:
         archived_path = file.replace(ws1.root, ws1.latest_archive_path)
         assert os.path.exists(archived_path)
+
+    assert not os.path.exists(os.path.join(ws1.latest_archive_path, 'shared', 'licenses', 'basic',
+                                           ramble.application.ApplicationBase.license_inc_name))
+
+
+def test_workspace_archive_include_secrets():
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
+"""
+
+    test_licenses = """
+licenses:
+  basic:
+    set:
+      TEST_LIC: 'value'
+"""
+
+    workspace_name = 'test_basic_archive'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    lic_path = os.path.join(ws1.config_dir, 'licenses.yaml')
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    with open(lic_path, 'w+') as f:
+        f.write(test_licenses)
+
+    # Create more templates
+    new_templates = []
+    for i in range(0, 5):
+        new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
+        new_templates.append(new_template)
+        f = open(new_template, 'w+')
+        f.close()
+
+    ws1._re_read()
+
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+    workspace('archive', '--include-secrets', global_args=['-w', workspace_name])
+
+    assert os.path.exists(os.path.join(ws1.latest_archive_path, 'shared', 'licenses', 'basic',
+                                       ramble.application.ApplicationBase.license_inc_name))
 
 
 def test_workspace_tar_archive():
