@@ -17,6 +17,8 @@ import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
 
+import spack.util.naming
+
 supported_math_operators = {
     ast.Add: operator.add, ast.Sub: operator.sub,
     ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow:
@@ -35,7 +37,8 @@ supported_scalar_function_pointers = {
     'ceil': math.ceil,
     'floor': math.floor,
     'randrange': random.randrange,
-    'randint': random.randint
+    'randint': random.randint,
+    'simplify_str': spack.util.naming.simplify_name
 }
 
 supported_list_function_pointers = {
@@ -647,6 +650,8 @@ class Expander(object):
         elif node.func.id in supported_list_function_pointers.keys():
             func = supported_list_function_pointers[node.func.id]
             return list(func(*args, **kwargs))
+        elif node.func.id == 'replace':
+            return str(args[0]).replace(*args[1:], **kwargs)
         else:
             raise MathEvaluationError(f'Undefined function {node.func.id} used.\n'
                                       'returning unexapanded string')

@@ -272,12 +272,6 @@ class ExperimentSet(object):
         final_context.variables[self.keywords.application_namespace] = self.application_namespace
         final_context.variables[self.keywords.workload_namespace] = self.workload_namespace
         final_context.variables[self.keywords.experiment_namespace] = self.experiment_namespace
-        final_context.variables[self.keywords.simplified_application_namespace] = \
-            spack.util.naming.simplify_name(self.application_namespace)
-        final_context.variables[self.keywords.simplified_workload_namespace] = \
-            spack.util.naming.simplify_name(self.workload_namespace)
-        final_context.variables[self.keywords.simplified_experiment_namespace] = \
-            spack.util.naming.simplify_name(self.experiment_namespace)
 
         # Set required variables for directories.
         final_context.variables[self.keywords.application_run_dir] = \
@@ -362,6 +356,25 @@ class ExperimentSet(object):
 
             experiment_vars[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
                                                                    '{experiment_name}.out')
+
+            experiment_vars[self.keywords.simplified_application_namespace] = \
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(
+                        self.keywords.application_namespace
+                    )
+            )
+            experiment_vars[self.keywords.simplified_workload_namespace] = \
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(
+                        self.keywords.workload_namespace
+                    )
+            )
+            experiment_vars[self.keywords.simplified_experiment_namespace] = \
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(
+                        self.keywords.experiment_namespace
+                    )
+            )
 
             logger.debug('   Final name: %s' % final_exp_name)
 

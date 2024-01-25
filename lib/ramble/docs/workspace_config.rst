@@ -162,6 +162,7 @@ Support functions are:
 * ``ceil()`` (ceiling of input)
 * ``floor()`` (floor of input)
 * ``range()`` (construct range, see :ref:`ramble vector logic<ramble-vector-logic>` for more information)
+* ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
 
 .. _ramble-vector-logic:
 
