@@ -595,6 +595,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     new_inst.variables[self.keywords.experiment_name] = new_name
                     new_inst.variables[self.keywords.experiment_index] = \
                         self.expander.expand_var_name(self.keywords.experiment_index)
+                    new_inst.read_status()
 
                     # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)

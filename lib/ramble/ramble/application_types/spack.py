@@ -408,7 +408,7 @@ class SpackApplication(ApplicationBase):
         self.hash_inventory['software'].append(
             {
                 'name': self.spack_runner.env_path.replace(workspace.root + os.path.sep, ''),
-                'digest': self.spack_runner.inventory_hash(require_exist)
+                'digest': self.spack_runner.inventory_hash()
             }
         )
         self.spack_runner.deactivate()
