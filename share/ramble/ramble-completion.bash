@@ -543,7 +543,7 @@ _ramble_mods_info() {
 }
 
 _ramble_on() {
-    RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where --filter-tags"
 }
 
 _ramble_python() {
@@ -675,19 +675,19 @@ _ramble_workspace_concretize() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run --phases --include-phase-dependencies --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_push_to_cache() {
-    RAMBLE_COMPREPLY="-h --help -d --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help -d --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help -v --verbose"
+    RAMBLE_COMPREPLY="-h --help --software --templates --expansions --tags --phases --where --exclude-where --filter-tags -v --verbose"
 }
 
 _ramble_workspace_edit() {
