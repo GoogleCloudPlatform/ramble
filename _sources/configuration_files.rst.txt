@@ -166,6 +166,25 @@ The current default configuration is as follows:
         type: 'BigQuery'
         uri: ''
 
+.. _disable-passthrough-config-option:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Config Options: Disable Passthrough
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An optional flag can be set in ``config`` or with ``--disable-passthrough``
+on the command line to disable expansion passthrough. Its format is as follows:
+
+.. code-block:: yaml
+
+    config:
+      disable_passthrough: True
+
+Expansion passthrough allows variables that don't expand completely to pass
+through and not cause an error. This is useful for things like `${ENV_VAR}` 
+that are recognized as a variable. When passthrough is disabled, any variables
+that fail to expand will raise a syntax error, which can aid in debugging.
+
 .. _env-vars-config:
 
 ------------------------------

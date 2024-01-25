@@ -60,7 +60,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#configuration-sections">Configuration Sections:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-scopes">Configuration Scopes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#application-section">Application Section:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-section">Config Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-section">Config Section:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-options-disable-passthrough">Config Options: Disable Passthrough</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#environment-variables-section">Environment Variables Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#internals-section">Internals Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#licenses-section">Licenses Section:</a></li>
@@ -244,6 +247,19 @@ The current default configuration is as follows:</p>
 <span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
 </pre></div>
 </div>
+<section id="config-options-disable-passthrough">
+<span id="disable-passthrough-config-option"></span><h3>Config Options: Disable Passthrough<a class="headerlink" href="#config-options-disable-passthrough" title="Link to this heading"></a></h3>
+<p>An optional flag can be set in <code class="docutils literal notranslate"><span class="pre">config</span></code> or with <code class="docutils literal notranslate"><span class="pre">--disable-passthrough</span></code>
+on the command line to disable expansion passthrough. Its format is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">disable_passthrough</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+<p>Expansion passthrough allows variables that don’t expand completely to pass
+through and not cause an error. This is useful for things like <cite>${ENV_VAR}</cite> 
+that are recognized as a variable. When passthrough is disabled, any variables
+that fail to expand will raise a syntax error, which can aid in debugging.</p>
+</section>
 </section>
 <section id="environment-variables-section">
 <span id="env-vars-config"></span><h2>Environment Variables Section:<a class="headerlink" href="#environment-variables-section" title="Link to this heading"></a></h2>
