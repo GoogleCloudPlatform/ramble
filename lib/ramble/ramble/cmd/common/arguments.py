@@ -132,7 +132,7 @@ def exclude_where():
 
 
 @arg
-def tag_filter():
+def filter_tags():
     return Args(
         '--filter-tags', action='append',
         nargs='+',

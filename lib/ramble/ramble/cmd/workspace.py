@@ -356,7 +356,7 @@ def workspace_setup_setup_parser(subparser):
              'for installation, and files that would be downloaded.')
 
     arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
-                                               'where', 'exclude_where'])
+                                               'where', 'exclude_where', 'filter_tags'])
 
 
 def workspace_setup(args):
@@ -369,7 +369,8 @@ def workspace_setup(args):
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
         include_where_filters=args.where,
-        exclude_where_filters=args.exclude_where
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags
     )
 
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
@@ -411,7 +412,7 @@ def workspace_analyze_setup_parser(subparser):
         help='perform a dry run. Allows progress on workspaces which are not fully setup')
 
     arguments.add_common_arguments(subparser, ['phases', 'include_phase_dependencies',
-                                               'where', 'exclude_where'])
+                                               'where', 'exclude_where', 'filter_tags'])
 
 
 def workspace_analyze(args):
@@ -425,7 +426,8 @@ def workspace_analyze(args):
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
         include_where_filters=args.where,
-        exclude_where_filters=args.exclude_where
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags
     )
 
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
@@ -447,7 +449,8 @@ def workspace_push_to_cache(args):
     filters = ramble.filters.Filters(
         phase_filters='*',
         include_where_filters=args.where,
-        exclude_where_filters=args.exclude_where
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags
     )
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
@@ -466,7 +469,7 @@ def workspace_push_to_cache_setup_parser(subparser):
         required=True,
         help='Path to spack cache.')
 
-    arguments.add_common_arguments(subparser, ['where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['where', 'exclude_where', 'filter_tags'])
 
 
 def workspace_info_setup_parser(subparser):
@@ -486,15 +489,27 @@ def workspace_info_setup_parser(subparser):
     subparser.add_argument('--phases', action='store_true',
                            help='If set, phase information will be printed')
 
-    arguments.add_common_arguments(subparser, ['where', 'exclude_where', 'tag_filter'])
+    arguments.add_common_arguments(subparser, ['where', 'exclude_where', 'filter_tags'])
 
     subparser.add_argument('-v', '--verbose', action='count', default=0,
                            help='level of verbosity. Add flags to ' +
-                                'increase description of workspace')
+                                'increase description of workspace\n' +
+                                'level 1 enables software, tags, and templates\n' +
+                                'level 2 enables expansions and phases\n')
 
 
 def workspace_info(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace info')
+
+    # Enable verbose mode
+    if args.verbose >= 1:
+        args.software = True
+        args.tags = True
+        args.templates = True
+
+    if args.verbose >= 2:
+        args.expansions = True
+        args.phases = True
 
     color.cprint(rucolor.section_title('Workspace: ') + ws.name)
     color.cprint('')
