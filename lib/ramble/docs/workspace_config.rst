@@ -707,6 +707,41 @@ This is a generic way to add the ``lscpu`` custom executable to the end of the
 list of executables for the experiment. For more information on this see the
 :ref:`internals config section<internals-config>` documentation.
 
+"""""""""""""""""""""""""""""""
+Overriding Variable Definitions
+"""""""""""""""""""""""""""""""
+
+When defining custom executables, sometimes it's useful to be able to override
+specific variable definitions for only this executable definition. As an
+example, consider running a command to get information from every node in a job
+allocation. While the actual experiment might be utilizing many processes on
+each compute node, the custom executable only wants to run a single process on
+each compute node. Ramble provides the ability for users to define variables
+that are scoped to only the custom executable instead of the entire experiment.
+Consider the following example:
+
+.. code-block:: yaml
+
+   ramble:
+     applications:
+       gromacs:
+         internals:
+           custom_executables:
+             all_hosts:
+               template:
+               - 'hostname'
+               use_mpi: true
+               variables:
+                 n_ranks: '{n_nodes}'
+                 processes_per_node: '1'
+               redirect: '{log_file}'
+
+In this example, a custom executable named ``all_hosts`` is defined. Within
+this executable, the value of ``n_ranks`` is defined to be the value of
+``n_nodes``, and ``processes_per_node`` is defined to be ``1``, causing only
+one rank per compute node. This would print the hostname of each node in the
+experiment once.
+
 ^^^^^^^^^^^^^^^^^^^
 Reserved Variables:
 ^^^^^^^^^^^^^^^^^^^

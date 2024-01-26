@@ -54,10 +54,12 @@ ramble:
                     - 'echo "after all"'
                   before_env_vars:
                     template:
-                    - 'echo "before env_vars"'
+                    - 'echo "before env_vars {env_var_name}"'
+                    variables:
+                      env_var_name: 'OTHER_ENV_VAR'
                   after_env_vars:
                     template:
-                    - 'echo "after env_vars"'
+                    - 'echo "after env_vars {env_var_name}"'
                 executables:
                 - lscpu
                 - builtin::env_vars
@@ -74,9 +76,11 @@ ramble:
                   relative_to: builtin::env_vars
               variables:
                 n_nodes: 1
+                env_var_name: 'MY_VAR'
               env_vars:
                 set:
                   MY_VAR: 'TEST'
+                  OTHER_ENV_VAR: 'ANOTHER_TEST'
   spack:
     concretized: true
     packages: {}
@@ -105,8 +109,8 @@ ramble:
 
         inject_order_regex = [
             re.compile('echo "before all"'),
-            re.compile('echo "before env_vars"'),
-            re.compile('echo "after env_vars"'),
+            re.compile('echo "before env_vars OTHER_ENV_VAR"'),
+            re.compile('echo "after env_vars MY_VAR"'),
             re.compile('echo "after all"'),
         ]
 

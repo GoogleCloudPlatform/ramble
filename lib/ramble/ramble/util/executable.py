@@ -62,8 +62,8 @@ class CommandExecutable(object):
     generally used to group one or more commands together into an executable
     name.
     """
-    def __init__(self, name, template, use_mpi=False, mpi=False, redirect='{log_file}',
-                 output_capture=OUTPUT_CAPTURE.DEFAULT, **kwargs):
+    def __init__(self, name, template, use_mpi=False, mpi=False, variables={},
+                 redirect='{log_file}', output_capture=OUTPUT_CAPTURE.DEFAULT, **kwargs):
         """Create a CommandExecutable instance
 
         Args:
@@ -72,6 +72,7 @@ class CommandExecutable(object):
         - use_mpi: Boolean value for if MPI should be applied to each
                    portion of this executable's template
         - mpi: Same as use_mpi
+        - variables (dict): dictionary of variable definitions to use for this executable only
         - redirect: File to redirect output of template into
         - output_capture: Operator to use when capturing output
         """
@@ -88,11 +89,13 @@ class CommandExecutable(object):
         self.mpi = use_mpi or mpi
         self.redirect = redirect
         self.output_capture = output_capture
+        self.variables = variables.copy()
 
     def copy(self):
         """Replicate a CommandExecutable instance"""
         new_inst = type(self)(self.name, self.template, mpi=self.mpi,
                               redirect=self.redirect,
+                              variables=self.variables,
                               output_capture=self.output_capture)
         return new_inst
 
@@ -101,6 +104,7 @@ class CommandExecutable(object):
         self_str = f'exec: {self.name}:\n' + \
                    f'    template: {str(self.template)}\n' + \
                    f'    mpi: {self.mpi}\n' +\
+                   f'    variables: {self.variables}\n' +\
                    f'    redirect: {self.redirect}\n' +\
                    f'    output_capture: {self.output_capture}\n'
 

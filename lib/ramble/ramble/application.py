@@ -831,6 +831,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             builtin_match = builtin_regex.match(executable)
 
             exec_vars = {'executable_name': executable}
+            if executable in self.executables:
+                exec_vars.update(self.executables[executable].variables)
 
             for mod in self._modifier_instances:
                 if mod.applies_to_executable(executable):
