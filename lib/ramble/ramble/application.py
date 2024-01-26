@@ -616,6 +616,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     new_inst.variables[self.keywords.experiment_index] = \
                         self.expander.expand_var_name(self.keywords.experiment_index)
                     new_inst.repeats = self.repeats
+                    new_inst.read_status()
 
                     # Extract inherited variables
                     if namespace.inherit_variables in cur_exp_def:

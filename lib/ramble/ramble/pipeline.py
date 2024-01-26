@@ -77,15 +77,6 @@ class Pipeline(object):
     def _construct_hash(self):
         """Hash all of the experiments, construct workspace inventory"""
         for exp, app_inst, _ in self._experiment_set.all_experiments():
-            if self.require_inventory and not (app_inst.is_template or app_inst.repeats[0]):
-                if app_inst.get_status() == ramble.application.experiment_status.UNKNOWN.name:
-                    if not self.workspace.dry_run:
-                        logger.die(
-                            f'Workspace status is {app_inst.get_status()}\n'
-                            'Make sure your workspace is fully setup with\n'
-                            '    ramble workspace setup'
-                        )
-
             app_inst.populate_inventory(self.workspace,
                                         force_compute=self.force_inventory,
                                         require_exist=self.require_inventory)
@@ -235,6 +226,14 @@ class AnalyzePipeline(Pipeline):
         self.upload_results = upload
 
     def _prepare(self):
+        for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
+            if not (app_inst.is_template or app_inst.repeats[0]):
+                if app_inst.get_status() == ramble.application.experiment_status.UNKNOWN.name:
+                    logger.die(
+                        f'Workspace status is {app_inst.get_status()}\n'
+                        'Make sure your workspace is fully setup with\n'
+                        '    ramble workspace setup'
+                    )
         super()._construct_hash()
         super()._prepare()
 

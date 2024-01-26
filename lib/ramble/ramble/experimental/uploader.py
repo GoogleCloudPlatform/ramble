@@ -31,6 +31,15 @@ class Uploader():
         pass
 
 
+def get_user():
+    config_user = ramble.config.get('config:user')
+    if config_user:
+        return config_user
+    else:
+        import getpass
+        return getpass.getuser()
+
+
 class Experiment():
     """
     Class representation of experiment data
@@ -50,6 +59,7 @@ class Experiment():
         self.n_ranks = data['RAMBLE_VARIABLES']['n_ranks']
         self.n_threads = data['RAMBLE_VARIABLES']['n_threads']
         self.node_type = default_node_type_val
+        self.user = get_user()
 
         # FIXME: this is no longer strictly needed since it is just a concat of known properties
         exps_hash = "{workspace_name}::{application}::{workload}::{date}".format(

@@ -152,6 +152,11 @@ properties['config']['upload'] = {
     }
 }
 
+properties['config']['user'] = {
+    'type': 'string',
+    'default': ''
+}
+
 properties['config']['disable_passthrough'] = {
     'type': 'boolean',
     'default': False

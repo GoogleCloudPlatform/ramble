@@ -143,7 +143,7 @@ together, with the order of precedence (from lowest to highest) being:
 .. _config-yaml:
 
 ---------------
-Config Section:
+Config Section
 ---------------
 
 The config configuration section is used to control internal aspects of Ramble.
@@ -166,10 +166,27 @@ The current default configuration is as follows:
         type: 'BigQuery'
         uri: ''
 
+
+.. _upload-config-option:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Upload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble aims to support the upload of experiment outcomes (including FOMs), to
+SQL-like datastores. To do this we can specify an ``upload:type`` as defined by
+:mod:`ramble.experimental.uploader.Upload`, and a ``upload:uri`` to specify the
+destination.
+
+As part of the upload it tries to attribute the data to a user. This can be
+specified via ``config:user``, or if blank ramble will try deduce it based on
+the calling user.
+
+
 .. _disable-passthrough-config-option:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Config Options: Disable Passthrough
+Disable Passthrough
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An optional flag can be set in ``config`` or with ``--disable-passthrough``
