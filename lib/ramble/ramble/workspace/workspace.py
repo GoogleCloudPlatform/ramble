@@ -668,7 +668,7 @@ class Workspace(object):
         """Read an auxiliary software file for generated software directories"""
         self._auxiliary_software_files[name] = f
 
-    def write(self):
+    def write(self, software_dir=None, inputs_dir=None):
         """Write an in-memory workspace to its location on disk."""
 
         # Ensure required directory structure exists
@@ -677,8 +677,17 @@ class Workspace(object):
         fs.mkdirp(self.auxiliary_software_dir)
         fs.mkdirp(self.log_dir)
         fs.mkdirp(self.experiment_dir)
-        fs.mkdirp(self.input_dir)
-        fs.mkdirp(self.software_dir)
+
+        if inputs_dir:
+            os.symlink(os.path.abspath(inputs_dir), self.input_dir, target_is_directory=True)
+        elif not os.path.exists(self.input_dir):
+            fs.mkdirp(self.input_dir)
+
+        if software_dir:
+            os.symlink(os.path.abspath(software_dir), self.software_dir, target_is_directory=True)
+        elif not os.path.exists(self.software_dir):
+            fs.mkdirp(self.software_dir)
+
         fs.mkdirp(self.shared_dir)
         fs.mkdirp(self.shared_license_dir)
 

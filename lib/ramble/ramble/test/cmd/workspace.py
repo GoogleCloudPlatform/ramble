@@ -114,6 +114,21 @@ def check_results(ws):
     assert os.path.exists(os.path.join(ws.root, fn + '.yaml'))
 
 
+def test_workspace_create_links(mutable_mock_workspace_path, tmpdir):
+    import pathlib
+    expected_links = ['software', 'inputs']
+    with tmpdir.as_cwd():
+        workspace('create', '-d', 'foo')
+        workspace('create', '-d', 'bar', '--inputs-dir', 'foo/inputs',
+                  '--software-dir', 'foo/software')
+
+        for expected_link in expected_links:
+            assert os.path.exists(os.path.join('bar', expected_link))
+            assert os.path.islink(os.path.join('bar', expected_link))
+            resolved_path = pathlib.PosixPath(os.path.join('bar', expected_link)).resolve()
+            assert str(resolved_path) == os.path.abspath(os.path.join('foo', expected_link))
+
+
 def test_workspace_activate_fails(mutable_mock_workspace_path):
     workspace('create', 'foo')
     out = workspace('activate', 'foo')
