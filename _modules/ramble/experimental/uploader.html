@@ -132,6 +132,18 @@
 
 
 
+<div class="viewcode-block" id="get_user">
+<a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.get_user">[docs]</a>
+<span class="k">def</span> <span class="nf">get_user</span><span class="p">():</span>
+    <span class="n">config_user</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:user&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config_user</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config_user</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">getpass</span>
+        <span class="k">return</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span></div>
+
+
+
 <div class="viewcode-block" id="Experiment">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment">[docs]</a>
 <span class="k">class</span> <span class="nc">Experiment</span><span class="p">():</span>
@@ -153,6 +165,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_ranks&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_threads</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_threads&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">default_node_type_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">()</span>
 
         <span class="c1"># FIXME: this is no longer strictly needed since it is just a concat of known properties</span>
         <span class="n">exps_hash</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{workspace_name}</span><span class="s2">::</span><span class="si">{application}</span><span class="s2">::</span><span class="si">{workload}</span><span class="s2">::</span><span class="si">{date}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -438,7 +451,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 25, 2024.
+      <span class="lastupdated">Last updated on Jan 26, 2024.
       </span></p>
   </div>
 

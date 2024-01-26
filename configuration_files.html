@@ -60,8 +60,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#configuration-sections">Configuration Sections:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-scopes">Configuration Scopes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#application-section">Application Section:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-section">Config Section:</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#config-options-disable-passthrough">Config Options: Disable Passthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-section">Config Section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#upload">Upload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#disable-passthrough">Disable Passthrough</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#environment-variables-section">Environment Variables Section:</a></li>
@@ -228,7 +229,7 @@ together, with the order of precedence (from lowest to highest) being:</p>
 </ul>
 </section>
 <section id="config-section">
-<span id="config-yaml"></span><h2>Config Section:<a class="headerlink" href="#config-section" title="Link to this heading"></a></h2>
+<span id="config-yaml"></span><h2>Config Section<a class="headerlink" href="#config-section" title="Link to this heading"></a></h2>
 <p>The config configuration section is used to control internal aspects of Ramble.
 The current default configuration is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
@@ -247,8 +248,18 @@ The current default configuration is as follows:</p>
 <span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
 </pre></div>
 </div>
-<section id="config-options-disable-passthrough">
-<span id="disable-passthrough-config-option"></span><h3>Config Options: Disable Passthrough<a class="headerlink" href="#config-options-disable-passthrough" title="Link to this heading"></a></h3>
+<section id="upload">
+<span id="upload-config-option"></span><h3>Upload<a class="headerlink" href="#upload" title="Link to this heading"></a></h3>
+<p>Ramble aims to support the upload of experiment outcomes (including FOMs), to
+SQL-like datastores. To do this we can specify an <code class="docutils literal notranslate"><span class="pre">upload:type</span></code> as defined by
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.experimental.uploader.Upload</span></code>, and a <code class="docutils literal notranslate"><span class="pre">upload:uri</span></code> to specify the
+destination.</p>
+<p>As part of the upload it tries to attribute the data to a user. This can be
+specified via <code class="docutils literal notranslate"><span class="pre">config:user</span></code>, or if blank ramble will try deduce it based on
+the calling user.</p>
+</section>
+<section id="disable-passthrough">
+<span id="disable-passthrough-config-option"></span><h3>Disable Passthrough<a class="headerlink" href="#disable-passthrough" title="Link to this heading"></a></h3>
 <p>An optional flag can be set in <code class="docutils literal notranslate"><span class="pre">config</span></code> or with <code class="docutils literal notranslate"><span class="pre">--disable-passthrough</span></code>
 on the command line to disable expansion passthrough. Its format is as follows:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">config</span><span class="p">:</span>
@@ -582,7 +593,7 @@ another fully qualified experiment (through the <code class="docutils literal no
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 25, 2024.
+      <span class="lastupdated">Last updated on Jan 26, 2024.
       </span></p>
   </div>
 
