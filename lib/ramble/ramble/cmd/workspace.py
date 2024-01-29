@@ -215,15 +215,24 @@ def workspace_create_setup_parser(subparser):
     subparser.add_argument(
         '-d', '--dir', action='store_true',
         help='create a workspace in a specific directory')
+    subparser.add_argument(
+        '--software-dir', metavar='dir',
+        help='external directory to link as software directory in workspace')
+    subparser.add_argument(
+        '--inputs-dir', metavar='dir',
+        help='external directory to link as inputs directory in workspace')
 
 
 def workspace_create(args):
     _workspace_create(args.create_workspace, args.dir,
-                      args.config, args.template_execute)
+                      args.config, args.template_execute,
+                      software_dir=args.software_dir,
+                      inputs_dir=args.inputs_dir)
 
 
 def _workspace_create(name_or_path, dir=False,
-                      config=None, template_execute=None):
+                      config=None, template_execute=None,
+                      software_dir=None, inputs_dir=None):
     """Create a new workspace
 
     Arguments:
@@ -235,6 +244,10 @@ def _workspace_create(name_or_path, dir=False,
                       generate the workspace
         template_execute (str): Path to a template execute script to
                                 create the workspace with
+        software_dir (str): Path to software dir that should be linked
+                            instead of creating a new directory.
+        inputs_dir (str): Path to inputs dir that should be linked
+                          instead of creating a new directory.
     """
 
     # Sanity check file paths, to avoid half-creating an incomplete workspace
@@ -268,7 +281,7 @@ def _workspace_create(name_or_path, dir=False,
         logger.msg("You can activate this workspace with:")
         logger.msg(f"  ramble workspace activate {name_or_path}")
 
-    workspace.write()
+    workspace.write(inputs_dir=inputs_dir, software_dir=software_dir)
 
     if config:
         with open(config, 'r') as f:
