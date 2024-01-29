@@ -118,6 +118,8 @@
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">ramble.context</span>
 
+<span class="kn">import</span> <span class="nn">spack.util.naming</span>
+
 
 <div class="viewcode-block" id="ExperimentSet">
 <a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet">[docs]</a>
@@ -388,9 +390,9 @@
                 <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">context_name</span>
 
         <span class="c1"># Set namespaces</span>
-        <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;application_namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_namespace</span>
-        <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;workload_namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workload_namespace</span>
-        <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;experiment_namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_namespace</span>
+        <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">application_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_namespace</span>
+        <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">workload_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workload_namespace</span>
+        <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_namespace</span>
 
         <span class="c1"># Set required variables for directories.</span>
         <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">application_run_dir</span><span class="p">]</span> <span class="o">=</span> \
@@ -475,6 +477,25 @@
 
             <span class="n">experiment_vars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">log_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{experiment_run_dir}</span><span class="s1">&#39;</span><span class="p">,</span>
                                                                    <span class="s1">&#39;</span><span class="si">{experiment_name}</span><span class="s1">.out&#39;</span><span class="p">)</span>
+
+            <span class="n">experiment_vars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">simplified_application_namespace</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">simplify_name</span><span class="p">(</span>
+                    <span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">application_namespace</span>
+                    <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">experiment_vars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">simplified_workload_namespace</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">simplify_name</span><span class="p">(</span>
+                    <span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">workload_namespace</span>
+                    <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">experiment_vars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">simplified_experiment_namespace</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">simplify_name</span><span class="p">(</span>
+                    <span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_namespace</span>
+                    <span class="p">)</span>
+            <span class="p">)</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   Final name: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">final_exp_name</span><span class="p">)</span>
 
@@ -648,7 +669,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 26, 2024.
+      <span class="lastupdated">Last updated on Jan 29, 2024.
       </span></p>
   </div>
 

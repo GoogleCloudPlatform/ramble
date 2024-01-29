@@ -112,6 +112,8 @@
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
+<span class="kn">import</span> <span class="nn">spack.util.naming</span>
+
 <span class="n">supported_math_operators</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">Mult</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Div</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Pow</span><span class="p">:</span>
@@ -130,7 +132,8 @@
     <span class="s1">&#39;ceil&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">,</span>
     <span class="s1">&#39;floor&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">,</span>
     <span class="s1">&#39;randrange&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">,</span>
-    <span class="s1">&#39;randint&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span>
+    <span class="s1">&#39;randint&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">,</span>
+    <span class="s1">&#39;simplify_str&#39;</span><span class="p">:</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">simplify_name</span>
 <span class="p">}</span>
 
 <span class="n">supported_list_function_pointers</span> <span class="o">=</span> <span class="p">{</span>
@@ -798,6 +801,8 @@
         <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">supported_list_function_pointers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">func</span> <span class="o">=</span> <span class="n">supported_list_function_pointers</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s1">&#39;replace&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MathEvaluationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Undefined function </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1"> used.</span><span class="se">\n</span><span class="s1">&#39;</span>
                                       <span class="s1">&#39;returning unexapanded string&#39;</span><span class="p">)</span>
@@ -978,7 +983,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 26, 2024.
+      <span class="lastupdated">Last updated on Jan 29, 2024.
       </span></p>
   </div>
 
