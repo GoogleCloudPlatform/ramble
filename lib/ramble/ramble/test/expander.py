@@ -62,6 +62,7 @@ def exp_dict():
         ('floor(0.6)', '0', set()),
         ('max(1, 5)', '5', set()),
         ('min(1, 5)', '1', set()),
+        ('simplify_str("a.b_c")', 'a-b-c', set()),
     ]
 )
 def test_expansions(input, output, no_expand_vars):

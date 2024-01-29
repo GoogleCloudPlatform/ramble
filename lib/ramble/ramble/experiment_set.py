@@ -23,6 +23,8 @@ import ramble.util.matrices
 from ramble.util.logger import logger
 import ramble.context
 
+import spack.util.naming
+
 
 class ExperimentSet(object):
     """Class to represent a full set of experiments
@@ -267,9 +269,9 @@ class ExperimentSet(object):
                 final_context.variables[var_name] = self._context[context].context_name
 
         # Set namespaces
-        final_context.variables['application_namespace'] = self.application_namespace
-        final_context.variables['workload_namespace'] = self.workload_namespace
-        final_context.variables['experiment_namespace'] = self.experiment_namespace
+        final_context.variables[self.keywords.application_namespace] = self.application_namespace
+        final_context.variables[self.keywords.workload_namespace] = self.workload_namespace
+        final_context.variables[self.keywords.experiment_namespace] = self.experiment_namespace
 
         # Set required variables for directories.
         final_context.variables[self.keywords.application_run_dir] = \
@@ -354,6 +356,25 @@ class ExperimentSet(object):
 
             experiment_vars[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
                                                                    '{experiment_name}.out')
+
+            experiment_vars[self.keywords.simplified_application_namespace] = \
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(
+                        self.keywords.application_namespace
+                    )
+            )
+            experiment_vars[self.keywords.simplified_workload_namespace] = \
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(
+                        self.keywords.workload_namespace
+                    )
+            )
+            experiment_vars[self.keywords.simplified_experiment_namespace] = \
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(
+                        self.keywords.experiment_namespace
+                    )
+            )
 
             logger.debug('   Final name: %s' % final_exp_name)
 
