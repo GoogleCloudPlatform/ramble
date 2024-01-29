@@ -833,7 +833,7 @@
 
 <div class="viewcode-block" id="Workspace.write">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.write">[docs]</a>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">software_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write an in-memory workspace to its location on disk.&quot;&quot;&quot;</span>
 
         <span class="c1"># Ensure required directory structure exists</span>
@@ -842,8 +842,17 @@
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auxiliary_software_dir</span><span class="p">)</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">)</span>
-        <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">)</span>
-        <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">software_dir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inputs_dir</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">inputs_dir</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">target_is_directory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">):</span>
+            <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">software_dir</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">software_dir</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">software_dir</span><span class="p">,</span> <span class="n">target_is_directory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">software_dir</span><span class="p">):</span>
+            <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">software_dir</span><span class="p">)</span>
+
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_dir</span><span class="p">)</span>
         <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_license_dir</span><span class="p">)</span>
 

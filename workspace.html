@@ -61,6 +61,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#creating-workspaces">Creating Workspaces</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#named-workspace">Named Workspace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#anonymous-workspace">Anonymous Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#workspace-links">Workspace Links</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#workspace-structure">Workspace Structure</a></li>
@@ -156,9 +157,31 @@ in a specified directory. To create an anonymous workspace, use:</p>
 </pre></div>
 </div>
 </section>
+<section id="workspace-links">
+<span id="id1"></span><h3>Workspace Links<a class="headerlink" href="#workspace-links" title="Link to this heading"></a></h3>
+<p>In order to save disk space, sometimes it can be useful to share internal
+workspace directories across workspaces when they reuse aspects of each others
+workflows. Ramble provides a way to create a new workspace where the inputs and
+software directories are symbolic links to external directories (whether in a
+workspace or not), to help minimize duplication of files across workspaces.</p>
+<p>To use this, when creating a workspace you can use the <code class="docutils literal notranslate"><span class="pre">--inputs-dir</span></code> and
+<code class="docutils literal notranslate"><span class="pre">--software-dir</span></code> argument to provide paths for the source of these symbolic
+links.</p>
+<p>As an example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>-d<span class="w"> </span>foo
+<span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span>-d<span class="w"> </span>bar<span class="w"> </span>--software-dir<span class="w"> </span>foo/software<span class="w"> </span>--inputs-dir<span class="w"> </span>foo/inputs
+</pre></div>
+</div>
+<p>In the above example, two workspaces are created (<code class="docutils literal notranslate"><span class="pre">foo</span></code> and <code class="docutils literal notranslate"><span class="pre">bar</span></code>). The
+workspace named <code class="docutils literal notranslate"><span class="pre">bar</span></code> has symbolic links for its <code class="docutils literal notranslate"><span class="pre">software</span></code> and <code class="docutils literal notranslate"><span class="pre">inputs</span></code>
+directories that link to the same named directories in the <code class="docutils literal notranslate"><span class="pre">foo</span></code> workspace.</p>
+<p>Additionally, these directories do not need to be part of any workspace, and
+could instead be external directories used to have a common storage location
+for software environments and input files.</p>
+</section>
 </section>
 <section id="workspace-structure">
-<span id="id1"></span><h2>Workspace Structure<a class="headerlink" href="#workspace-structure" title="Link to this heading"></a></h2>
+<span id="id2"></span><h2>Workspace Structure<a class="headerlink" href="#workspace-structure" title="Link to this heading"></a></h2>
 <p>Ramble creates workspaces using the following structure by default:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span>workspace
 <span class="go">| - configs/</span>

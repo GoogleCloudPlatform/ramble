@@ -61,6 +61,37 @@ in a specified directory. To create an anonymous workspace, use:
 
     $ ramble workspace create -d <path_to_workspace>
 
+.. _workspace-links:
+
+^^^^^^^^^^^^^^^
+Workspace Links
+^^^^^^^^^^^^^^^
+
+In order to save disk space, sometimes it can be useful to share internal
+workspace directories across workspaces when they reuse aspects of each others
+workflows. Ramble provides a way to create a new workspace where the inputs and
+software directories are symbolic links to external directories (whether in a
+workspace or not), to help minimize duplication of files across workspaces.
+
+To use this, when creating a workspace you can use the ``--inputs-dir`` and
+``--software-dir`` argument to provide paths for the source of these symbolic
+links.
+
+As an example:
+
+.. code-block:: console
+
+  $ ramble workspace create -d foo
+  $ ramble workspace create -d bar --software-dir foo/software --inputs-dir foo/inputs
+
+In the above example, two workspaces are created (``foo`` and ``bar``). The
+workspace named ``bar`` has symbolic links for its ``software`` and ``inputs``
+directories that link to the same named directories in the ``foo`` workspace.
+
+Additionally, these directories do not need to be part of any workspace, and
+could instead be external directories used to have a common storage location
+for software environments and input files.
+
 .. _workspace-structure:
 
 -------------------
