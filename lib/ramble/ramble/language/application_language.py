@@ -91,7 +91,7 @@ def workload(name, executables=None, executable=None, input=None,
 
 
 @application_directive('executables')
-def executable(name, template, use_mpi=False, redirect='{log_file}',
+def executable(name, template, use_mpi=False, variables={}, redirect='{log_file}',
                output_capture=OUTPUT_CAPTURE.DEFAULT, **kwargs):
     """Adds an executable to this application
 
@@ -104,6 +104,8 @@ def executable(name, template, use_mpi=False, redirect='{log_file}',
         template: The template command this executable should generate from
         use_mpi: (Boolean) determines if this executable should be
                  wrapped with an `mpirun` like command or not.
+
+        variables (dict): dictionary of variable definitions to use for this executable only
         redirect (Optional): Sets the path for outputs to be written to.
                              defaults to {log_file}
         output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
