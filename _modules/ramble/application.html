@@ -979,6 +979,8 @@
             <span class="n">builtin_match</span> <span class="o">=</span> <span class="n">builtin_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
 
             <span class="n">exec_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;executable_name&#39;</span><span class="p">:</span> <span class="n">executable</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">executable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">:</span>
+                <span class="n">exec_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="n">executable</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">mod</span><span class="o">.</span><span class="n">applies_to_executable</span><span class="p">(</span><span class="n">executable</span><span class="p">):</span>
@@ -1871,7 +1873,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 29, 2024.
+      <span class="lastupdated">Last updated on Jan 31, 2024.
       </span></p>
   </div>
 

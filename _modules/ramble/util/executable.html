@@ -171,8 +171,8 @@
 <span class="sd">    generally used to group one or more commands together into an executable</span>
 <span class="sd">    name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
-                 <span class="n">output_capture</span><span class="o">=</span><span class="n">OUTPUT_CAPTURE</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{},</span>
+                 <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">output_capture</span><span class="o">=</span><span class="n">OUTPUT_CAPTURE</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a CommandExecutable instance</span>
 
 <span class="sd">        Args:</span>
@@ -181,6 +181,7 @@
 <span class="sd">        - use_mpi: Boolean value for if MPI should be applied to each</span>
 <span class="sd">                   portion of this executable&#39;s template</span>
 <span class="sd">        - mpi: Same as use_mpi</span>
+<span class="sd">        - variables (dict): dictionary of variable definitions to use for this executable only</span>
 <span class="sd">        - redirect: File to redirect output of template into</span>
 <span class="sd">        - output_capture: Operator to use when capturing output</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -197,6 +198,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mpi</span> <span class="o">=</span> <span class="n">use_mpi</span> <span class="ow">or</span> <span class="n">mpi</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span> <span class="o">=</span> <span class="n">redirect</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_capture</span> <span class="o">=</span> <span class="n">output_capture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 <div class="viewcode-block" id="CommandExecutable.copy">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.executable.CommandExecutable.copy">[docs]</a>
@@ -204,6 +206,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Replicate a CommandExecutable instance&quot;&quot;&quot;</span>
         <span class="n">new_inst</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">,</span> <span class="n">mpi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi</span><span class="p">,</span>
                               <span class="n">redirect</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">,</span>
+                              <span class="n">variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span>
                               <span class="n">output_capture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_capture</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_inst</span></div>
 
@@ -213,6 +216,7 @@
         <span class="n">self_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;exec: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
                    <span class="sa">f</span><span class="s1">&#39;    template: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
                    <span class="sa">f</span><span class="s1">&#39;    mpi: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>\
+                   <span class="sa">f</span><span class="s1">&#39;    variables: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>\
                    <span class="sa">f</span><span class="s1">&#39;    redirect: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>\
                    <span class="sa">f</span><span class="s1">&#39;    output_capture: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_capture</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
 
@@ -235,7 +239,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 29, 2024.
+      <span class="lastupdated">Last updated on Jan 31, 2024.
       </span></p>
   </div>
 

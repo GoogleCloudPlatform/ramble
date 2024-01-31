@@ -194,7 +194,7 @@
 <div class="viewcode-block" id="executable">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.executable">[docs]</a>
 <span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;executables&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">executable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">executable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{},</span> <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
                <span class="n">output_capture</span><span class="o">=</span><span class="n">OUTPUT_CAPTURE</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds an executable to this application</span>
 
@@ -207,6 +207,8 @@
 <span class="sd">        template: The template command this executable should generate from</span>
 <span class="sd">        use_mpi: (Boolean) determines if this executable should be</span>
 <span class="sd">                 wrapped with an `mpirun` like command or not.</span>
+
+<span class="sd">        variables (dict): dictionary of variable definitions to use for this executable only</span>
 <span class="sd">        redirect (Optional): Sets the path for outputs to be written to.</span>
 <span class="sd">                             defaults to {log_file}</span>
 <span class="sd">        output_capture (Optional): Declare which ouptu (stdout, stderr, both) to</span>
@@ -353,7 +355,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 29, 2024.
+      <span class="lastupdated">Last updated on Jan 31, 2024.
       </span></p>
   </div>
 

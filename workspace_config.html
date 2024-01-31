@@ -697,6 +697,34 @@ the list of executables can be performed with the following:</p>
 <p>This is a generic way to add the <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> custom executable to the end of the
 list of executables for the experiment. For more information on this see the
 <a class="reference internal" href="configuration_files.html#internals-config"><span class="std std-ref">internals config section</span></a> documentation.</p>
+<p>When defining custom executables, sometimes it’s useful to be able to override
+specific variable definitions for only this executable definition. As an
+example, consider running a command to get information from every node in a job
+allocation. While the actual experiment might be utilizing many processes on
+each compute node, the custom executable only wants to run a single process on
+each compute node. Ramble provides the ability for users to define variables
+that are scoped to only the custom executable instead of the entire experiment.
+Consider the following example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">internals</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">custom_executables</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">all_hosts</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;hostname&#39;</span>
+<span class="w">            </span><span class="nt">use_mpi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">            </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_nodes}&#39;</span>
+<span class="w">              </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">            </span><span class="nt">redirect</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{log_file}&#39;</span>
+</pre></div>
+</div>
+<p>In this example, a custom executable named <code class="docutils literal notranslate"><span class="pre">all_hosts</span></code> is defined. Within
+this executable, the value of <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> is defined to be the value of
+<code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, and <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> is defined to be <code class="docutils literal notranslate"><span class="pre">1</span></code>, causing only
+one rank per compute node. This would print the hostname of each node in the
+experiment once.</p>
 </section>
 <section id="reserved-variables">
 <h3>Reserved Variables:<a class="headerlink" href="#reserved-variables" title="Link to this heading"></a></h3>
@@ -1137,7 +1165,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 29, 2024.
+      <span class="lastupdated">Last updated on Jan 31, 2024.
       </span></p>
   </div>
 
