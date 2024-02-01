@@ -999,7 +999,7 @@ class Repo(object):
 
         object_class = self.get_obj_class(spec.name)
         try:
-            return object_class(spec)
+            return object_class(self.object_path(spec))
         except ramble.error.RambleError:
             # pass these through as their error messages will be fine.
             raise
@@ -1060,6 +1060,12 @@ class Repo(object):
         """
         obj_dir = self.dirname_for_object_name(obj_name)
         return os.path.join(obj_dir, self.object_file_name)
+
+    @autospec
+    def object_path(self, spec):
+        return os.path.join(self.objects_path,
+                            self.dirname_for_object_name(spec.name),
+                            self.filename_for_object_name(spec.name))
 
     @property
     def _obj_checker(self):
