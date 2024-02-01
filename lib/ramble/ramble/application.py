@@ -950,6 +950,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             workload = self.workloads[workload_name]
 
             for input_file in workload['inputs']:
+                if input_file not in self.inputs:
+                    logger.die(
+                        f'Workload {workload_name} references a non-existent input file '
+                        f'{input_file}.\n'
+                        f'Make sure this input file is defined before using it in a workload.'
+                    )
+
                 input_conf = self.inputs[input_file].copy()
 
                 # Expand input value as it may be a var
