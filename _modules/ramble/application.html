@@ -1101,6 +1101,13 @@
             <span class="n">workload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">workload_name</span><span class="p">]</span>
 
             <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="n">workload</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">input_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;Workload </span><span class="si">{</span><span class="n">workload_name</span><span class="si">}</span><span class="s1"> references a non-existent input file &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">input_file</span><span class="si">}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;Make sure this input file is defined before using it in a workload.&#39;</span>
+                    <span class="p">)</span>
+
                 <span class="n">input_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="n">input_file</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
                 <span class="c1"># Expand input value as it may be a var</span>
@@ -1873,7 +1880,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jan 31, 2024.
+      <span class="lastupdated">Last updated on Feb 01, 2024.
       </span></p>
   </div>
 
