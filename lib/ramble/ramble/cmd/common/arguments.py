@@ -132,6 +132,16 @@ def exclude_where():
 
 
 @arg
+def filter_tags():
+    return Args(
+        '--filter-tags', action='append',
+        nargs='+',
+        help='filter experiments to only those that include the provided tags',
+        required=False
+    )
+
+
+@arg
 def no_checksum():
     return Args(
         '-n', '--no-checksum', action='store_true', default=False,

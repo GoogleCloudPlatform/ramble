@@ -32,7 +32,7 @@ def setup_parser(subparser):
         help='execution template for each experiment',
              required=False)
 
-    arguments.add_common_arguments(subparser, ['where', 'exclude_where'])
+    arguments.add_common_arguments(subparser, ['where', 'exclude_where', 'filter_tags'])
 
 
 def ramble_on(args):
@@ -44,7 +44,8 @@ def ramble_on(args):
     filters = ramble.filters.Filters(
         phase_filters=[],
         include_where_filters=args.where,
-        exclude_where_filters=args.exclude_where
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags
     )
 
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)

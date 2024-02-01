@@ -34,6 +34,7 @@ class Context(object):
         self.exclude = {}
         self.zips = {}
         self.matrices = []
+        self.tags = []
         self.is_template = False
 
     def merge_context(self, in_context):
@@ -78,6 +79,8 @@ class Context(object):
             self.zips.update(in_context.zips)
         if in_context.matrices:
             self.matrices = in_context.matrices
+        if in_context.tags:
+            self.tags.extend(in_context.tags)
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -96,6 +99,7 @@ def create_context_from_dict(context_name, in_dict):
         'exclude': {},
         'zips': {},
         'matrices': {} or [],
+        'tags': []
 
     Args:
         context_name: The name of the context (e.g., application name)
@@ -132,6 +136,9 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.zips in in_dict:
         new_context.zips = in_dict[namespace.zips]
+
+    if namespace.tags in in_dict:
+        new_context.tags = in_dict[namespace.tags].copy()
 
     new_context.matrices = ramble.util.matrices.extract_matrices(
         'experiment creation',

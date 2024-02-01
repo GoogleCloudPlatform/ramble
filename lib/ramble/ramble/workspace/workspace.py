@@ -1027,6 +1027,9 @@ class Workspace(object):
                                 exp['name'])
                         f.write('  Status = %s\n' %
                                 exp['RAMBLE_STATUS'])
+                        if 'TAGS' in exp:
+                            f.write(f'  Tags = {exp["TAGS"]}\n')
+
                         if exp['RAMBLE_STATUS'] == 'SUCCESS' or self.always_print_foms:
                             for context in exp['CONTEXTS']:
                                 f.write('  %s figures of merit:\n' %

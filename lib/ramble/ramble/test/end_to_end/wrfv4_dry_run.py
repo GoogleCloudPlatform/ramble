@@ -267,6 +267,7 @@ licenses:
         for text_result in text_results_files:
             with open(text_result, 'r') as f:
                 data = f.read()
+                assert 'Tags =' in data
                 assert 'Average Timestep Time = 33.3 s' in data
                 assert 'Cumulative Timestep Time = 166.5 s' in data
                 assert 'Minimum Timestep Time = 11.1 s' in data

@@ -95,6 +95,14 @@ exclude_def = {
     'additionalProperties': False
 }
 
+tags_def = {
+    'type': 'array',
+    'default': [],
+    'items': {
+        'type': 'string'
+    }
+}
+
 sub_props = union_dicts(
     ramble.schema.variables.properties,
     ramble.schema.success_criteria.properties,
@@ -105,6 +113,7 @@ sub_props = union_dicts(
     {
         'chained_experiments': chained_experiment_def,
         'template': {'type': 'boolean'},
+        'tags': tags_def,
     }
 )
 

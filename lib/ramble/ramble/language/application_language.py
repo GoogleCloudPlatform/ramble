@@ -54,7 +54,7 @@ application_directive = ApplicationMeta.directive
 
 @application_directive('workloads')
 def workload(name, executables=None, executable=None, input=None,
-             inputs=None, **kwargs):
+             inputs=None, tags=None, **kwargs):
     """Adds a workload to this application
 
     Defines a new workload that can be used within the context of
@@ -72,7 +72,8 @@ def workload(name, executables=None, executable=None, input=None,
     def _execute_workload(app):
         app.workloads[name] = {
             'executables': [],
-            'inputs': []
+            'inputs': [],
+            'tags': [],
         }
 
         all_execs = ramble.language.language_helpers.require_definition(executable,
@@ -86,6 +87,9 @@ def workload(name, executables=None, executable=None, input=None,
         all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs)
 
         app.workloads[name]['inputs'] = all_inputs.copy()
+
+        if tags:
+            app.workloads[name]['tags'] = tags.copy()
 
     return _execute_workload
 
