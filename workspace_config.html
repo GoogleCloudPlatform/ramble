@@ -73,6 +73,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#templatized-workloads">Templatized Workloads:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-modifiers">Experiment Modifiers:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#experiment-tags">Experiment Tags</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#controlling-internals">Controlling Internals:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#reserved-variables">Reserved Variables:</a></li>
 </ul>
@@ -628,6 +629,46 @@ there are multiple modes, this will raise an exception.</p>
 <p>If the <code class="docutils literal notranslate"><span class="pre">on_executable</span></code> attribute is not set, it will default to <code class="docutils literal notranslate"><span class="pre">'*'</span></code> which
 will match all executables. Modifier classes can (and should) be implemented to
 only act on the correct executable types (i.e. executables with <code class="docutils literal notranslate"><span class="pre">use_mpi=true</span></code>).</p>
+</section>
+<section id="experiment-tags">
+<span id="id3"></span><h3>Experiment Tags<a class="headerlink" href="#experiment-tags" title="Link to this heading"></a></h3>
+<p>While applications and workloads can be tagged within an application definition
+file (using the <code class="docutils literal notranslate"><span class="pre">tags()</span></code> or <code class="docutils literal notranslate"><span class="pre">workload()</span></code> directives), workloads and
+experiments can also be tagged within a workspace configuration file. This
+allows users to define their own tags to communicate what an experiment and
+workload might be used for beyond the information captured in the application
+definition file.</p>
+<p>The below example shows how tags can be defined within a workspace:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}&#39;</span>
+<span class="w">      </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
+<span class="w">      </span><span class="nt">processes_per_node</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;16&#39;</span>
+<span class="w">    </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">water_bare</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">tags</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wltag</span>
+<span class="w">            </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">test_exp1</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">tags</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tag1</span>
+<span class="w">                </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span><span class="w"> </span>
+<span class="w">              </span><span class="nt">test_exp2</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">tags</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tag2</span>
+<span class="w">                </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">                  </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span><span class="w"> </span>
+</pre></div>
+</div>
+<p>In the above example, all experiments are tagged with the <code class="docutils literal notranslate"><span class="pre">wltag</span></code> tag. Only
+the <code class="docutils literal notranslate"><span class="pre">test_exp1</span></code> experiment is tagged with the <code class="docutils literal notranslate"><span class="pre">tag1</span></code> tag, while the
+<code class="docutils literal notranslate"><span class="pre">test_exp2</span></code> experiment is tagged with the <code class="docutils literal notranslate"><span class="pre">tag2</span></code> tag.</p>
+<p>These tags are propagated into a workspace’s results file, and can be used to
+filter pipeline commands, as show in the
+<a class="reference internal" href="workspace.html#filter-experiments"><span class="std std-ref">filtering experiments documentation</span></a>.</p>
 </section>
 <section id="controlling-internals">
 <span id="workspace-internals"></span><h3>Controlling Internals:<a class="headerlink" href="#controlling-internals" title="Link to this heading"></a></h3>

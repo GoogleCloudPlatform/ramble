@@ -154,7 +154,7 @@
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload">[docs]</a>
 <span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workloads&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">workload</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">executables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">executable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+             <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a workload to this application</span>
 
 <span class="sd">    Defines a new workload that can be used within the context of</span>
@@ -172,7 +172,8 @@
     <span class="k">def</span> <span class="nf">_execute_workload</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
         <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;executables&#39;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[]</span>
+            <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[],</span>
         <span class="p">}</span>
 
         <span class="n">all_execs</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span>
@@ -186,6 +187,9 @@
         <span class="n">all_inputs</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">merge_definitions</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
 
         <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_inputs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tags</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">_execute_workload</span></div>
 

@@ -610,6 +610,55 @@ If the ``on_executable`` attribute is not set, it will default to ``'*'`` which
 will match all executables. Modifier classes can (and should) be implemented to
 only act on the correct executable types (i.e. executables with ``use_mpi=true``).
 
+.. _experiment_tags:
+
+^^^^^^^^^^^^^^^
+Experiment Tags
+^^^^^^^^^^^^^^^
+
+While applications and workloads can be tagged within an application definition
+file (using the ``tags()`` or ``workload()`` directives), workloads and
+experiments can also be tagged within a workspace configuration file. This
+allows users to define their own tags to communicate what an experiment and
+workload might be used for beyond the information captured in the application
+definition file.
+
+The below example shows how tags can be defined within a workspace:
+
+.. code-block:: yaml
+
+  ramble:
+    variables:
+      mpi_command: 'mpirun -n {n_ranks}'
+        batch_submit: '{execute_experiment}'
+        processes_per_node: '16'
+      applications:
+        gromacs:
+          workloads:
+            water_bare:
+              tags:
+              - wltag
+              experiments:
+                test_exp1:
+                  tags:
+                  - tag1
+                  variables:
+                    n_ranks: '1' 
+                test_exp2:
+                  tags:
+                  - tag2
+                  variables:
+                    n_ranks: '1' 
+
+
+In the above example, all experiments are tagged with the ``wltag`` tag. Only
+the ``test_exp1`` experiment is tagged with the ``tag1`` tag, while the
+``test_exp2`` experiment is tagged with the ``tag2`` tag.
+
+These tags are propagated into a workspace's results file, and can be used to
+filter pipeline commands, as show in the
+:ref:`filtering experiments documentation <filter-experiments>`.
+
 .. _workspace_internals:
 
 ^^^^^^^^^^^^^^^^^^^^^^

@@ -182,6 +182,14 @@ ramble.test.end\_to\_end.shared\_context module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.tag\_filtering module
+----------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.tag_filtering
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.test\_configvar\_dry\_run module
 ---------------------------------------------------------
 

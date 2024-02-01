@@ -287,10 +287,11 @@ this phase.</p>
 <span id="filter-experiments"></span><h3>Filtering Experiments<a class="headerlink" href="#filtering-experiments" title="Link to this heading"></a></h3>
 <p>Several of the workspace commands support filtering the experiments they should
 act on. This can be performed using the <code class="docutils literal notranslate"><span class="pre">--where</span></code> argument for inclusive
-filtering, or the <code class="docutils literal notranslate"><span class="pre">--exclude-where</span></code> argument for exclusive filtering. These
-arguments take a string representing a logical expression, which can use
-variables the experiment would define. If the logical expression evaluates to
-true, the experiment will be included or excluded for action (respectively).</p>
+filtering, the <code class="docutils literal notranslate"><span class="pre">--exclude-where</span></code> argument for exclusive filtering, or the
+<code class="docutils literal notranslate"><span class="pre">--filter-tags</span></code> argument to filter based on experiment tags.. These arguments
+take a string representing a logical expression, which can use variables the
+experiment would define. If the logical expression evaluates to true, the
+experiment will be included or excluded for action (respectively).</p>
 <p>As an example:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--where<span class="w"> </span><span class="s1">&#39;&quot;{n_ranks}&quot; &lt; 500&#39;</span>
 </pre></div>
@@ -300,6 +301,11 @@ true, the experiment will be included or excluded for action (respectively).</p>
 </pre></div>
 </div>
 <p>Will exclude all experiments from the <code class="docutils literal notranslate"><span class="pre">hostname</span></code> application.</p>
+<p>To filter by tags, see the following example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--filter-tags<span class="w"> </span>my-tag
+</pre></div>
+</div>
+<p>Will only setup experiments that have the <code class="docutils literal notranslate"><span class="pre">my-tag</span></code> on them.</p>
 <p>The commands that accept these filters are:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>analyze
 <span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>archive
