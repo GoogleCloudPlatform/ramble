@@ -62,6 +62,14 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
 
         assert search_files_for_string(out_files, expected_str)
 
+        expected_str = "with args: ['list', 'not-a-package']"
+
+        assert search_files_for_string(out_files, expected_str)
+
+        expected_str = "with args: ['info', 'zlib']"
+
+        assert search_files_for_string(out_files, expected_str)
+
         # Test software directories
         software_base_dir = ws1.software_dir
 

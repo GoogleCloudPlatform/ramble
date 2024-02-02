@@ -272,8 +272,21 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
 
-    register_phase('define_package_paths', pipeline='setup',
+    register_phase('evaluate_requirements', pipeline='setup',
                    depends_on=['software_install'])
+
+    def _evaluate_requirements(self, workspace):
+        """Evaluate all requirements for this experiment"""
+
+        for mod_inst in self._modifier_instances:
+            for req in mod_inst.all_package_manager_requirements():
+                expanded_req = {}
+                for key, val in req.items():
+                    expanded_req[key] = self.expander.expand_var(val)
+                self.spack_runner.validate_command(**expanded_req)
+
+    register_phase('define_package_paths', pipeline='setup',
+                   depends_on=['software_install', 'evaluate_requirements'])
 
     def _define_package_paths(self, workspace):
         """Define variables containing the path to all spack packages

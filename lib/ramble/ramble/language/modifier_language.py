@@ -235,3 +235,44 @@ def required_variable(var: str):
         mod.required_vars[var] = ramble.keywords.key_type.required
 
     return _mark_required_var
+
+
+@modifier_directive('package_manager_requirements')
+def package_manager_requirement(command: str, validation_type: str, modes: list,
+                                regex=None, **kwargs):
+    """Define a requirement for the modifier's package manager
+
+    Args:
+        command: Package manager command to execute, when evaluating the requirement
+        validation_type: Type of validation to perform on output of command.
+                         Valid types are: 'empty', 'not_empty', 'contains_regex',
+                         'does_not_contain_regex'
+        modes: List of usage modes this requirement should apply to
+        regex: Regular expression to use when validation_type is either 'contains_regex'
+               or 'does_no_contain_regex'
+    """
+    def _new_package_manager_requirement(mod):
+
+        regex_validations = ['contains_regex', 'does_not_contain_regex']
+        validation_types = ['empty', 'not_empty'] + regex_validations
+
+        if validation_type not in validation_types:
+            raise DirectiveError(f'package_manager_requirement directive given an invalid '
+                                 f'validation_type of {validation_type}\n'
+                                 f'Valid values are {validation_types}')
+
+        if validation_type in regex_validations and not regex:
+            raise DirectiveError(f'package_manager_requirement validation type is '
+                                 f'{validation_type} but no regex is given')
+
+        for mode in modes:
+            if mode not in mod.package_manager_requirements:
+                mod.package_manager_requirements[mode] = []
+
+            mod.package_manager_requirements[mode].append({
+                'command': command,
+                'validation_type': validation_type,
+                'regex': regex,
+            })
+
+    return _new_package_manager_requirement

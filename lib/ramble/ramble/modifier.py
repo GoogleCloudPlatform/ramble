@@ -261,6 +261,11 @@ class ModifierBase(object, metaclass=ModifierMeta):
         for action, conf in self.env_var_modifications[self._usage_mode].items():
             yield action, conf
 
+    def all_package_manager_requirements(self):
+        if self._usage_mode in self.package_manager_requirements:
+            for req in self.package_manager_requirements[self._usage_mode]:
+                yield req
+
     def run_phase_hook(self, workspace, hook_name):
         """Run a modifier hook.
 
