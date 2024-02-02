@@ -98,6 +98,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._input_fetchers = None
 
         self.hash_inventory = {
+            'application_definition': None,
+            'modifier_definitions': [],
             'attributes': [],
             'inputs': [],
             'software': [],
@@ -1198,6 +1200,20 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 ('internals', self.internals),
                 ('env_vars', self._env_variable_sets),
             ]
+
+            self.hash_inventory['application_definition'] = \
+                ramble.util.hashing.hash_file(self._file_path)
+
+            added_mods = set()
+            for mod_inst in self._modifier_instances:
+                if mod_inst.name not in added_mods:
+                    self.hash_inventory['modifier_definitions'].append(
+                        {
+                            'name': mod_inst.name,
+                            'digest': ramble.util.hashing.hash_file(mod_inst._file_path)
+                        }
+                    )
+                    added_mods.add(mod_inst.name)
 
             for attr, attr_dict in attributes_to_hash:
                 self.hash_inventory['attributes'].append(
