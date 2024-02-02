@@ -970,6 +970,7 @@ class Workspace(object):
             except OSError:
                 res['workspace_hash'] = "Unknown.."
 
+        res['workspace_name'] = self.name
         res['experiments'] = []
 
         return res

@@ -224,14 +224,17 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
 
 
 @modifier_directive('required_vars')
-def required_variable(var: str):
+def required_variable(var: str, results_level='variable'):
     """Mark a var as being required
 
     Args:
         var: Value to mark as required
+        results_level (str): 'variable' or 'key'. If 'key' variable is promoted to
+                             a key within JSON or YAML formatted results.
     """
 
     def _mark_required_var(mod):
-        mod.required_vars[var] = ramble.keywords.key_type.required
+        mod.required_vars[var] = {'type': ramble.keywords.key_type.required,
+                                  'level': ramble.keywords.output_level.variable}
 
     return _mark_required_var

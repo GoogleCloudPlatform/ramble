@@ -960,11 +960,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             self._set_default_experiment_variables()
             self._set_input_path()
             self._inject_commands(executables)
-            # ---------------------------------------------------------------------------------
-            # TODO (dwj): Remove this after we validate that 'spack_setup' is not in templates.
-            #             this is no longer needed, as spack was converted to builtins.
-            self.variables['spack_setup'] = ''
-            # ---------------------------------------------------------------------------------
+
             self._derive_variables_for_template_path(workspace)
             self._vars_are_expanded = True
 
@@ -1456,11 +1452,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if success or workspace.always_print_foms:
             results['TAGS'] = list(self.experiment_tags)
+
+            # Add defined keywords as top level keys
+            for key in self.keywords.keys:
+                if self.keywords.is_key_level(key):
+                    results[key] = self.expander.expand_var_name(key)
+
             results['RAMBLE_VARIABLES'] = {}
             results['RAMBLE_RAW_VARIABLES'] = {}
             for var, val in self.variables.items():
                 results['RAMBLE_RAW_VARIABLES'][var] = val
-                results['RAMBLE_VARIABLES'][var] = self.expander.expand_var(val)
+                if var not in self.keywords.keys or not self.keywords.is_key_level(var):
+                    results['RAMBLE_VARIABLES'][var] = self.expander.expand_var(val)
+
             results['CONTEXTS'] = []
 
             for context, fom_map in fom_values.items():
