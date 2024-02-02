@@ -195,6 +195,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;application_definition&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;modifier_definitions&#39;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s1">&#39;software&#39;</span><span class="p">:</span> <span class="p">[],</span>
@@ -1358,6 +1360,20 @@
                 <span class="p">(</span><span class="s1">&#39;env_vars&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variable_sets</span><span class="p">),</span>
             <span class="p">]</span>
 
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;application_definition&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">)</span>
+
+            <span class="n">added_mods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">added_mods</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;modifier_definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                            <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_file</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">_file_path</span><span class="p">)</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                    <span class="n">added_mods</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
             <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">attr_dict</span> <span class="ow">in</span> <span class="n">attributes_to_hash</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">{</span>
@@ -1922,7 +1938,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 01, 2024.
+      <span class="lastupdated">Last updated on Feb 02, 2024.
       </span></p>
   </div>
 
