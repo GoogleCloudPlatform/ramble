@@ -1118,11 +1118,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_experiment_variables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_input_path</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inject_commands</span><span class="p">(</span><span class="n">executables</span><span class="p">)</span>
-            <span class="c1"># ---------------------------------------------------------------------------------</span>
-            <span class="c1"># TODO (dwj): Remove this after we validate that &#39;spack_setup&#39; is not in templates.</span>
-            <span class="c1">#             this is no longer needed, as spack was converted to builtins.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;spack_setup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-            <span class="c1"># ---------------------------------------------------------------------------------</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_derive_variables_for_template_path</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span> <span class="o">=</span> <span class="kc">True</span></div>
 
@@ -1632,11 +1628,19 @@
 
         <span class="k">if</span> <span class="n">success</span> <span class="ow">or</span> <span class="n">workspace</span><span class="o">.</span><span class="n">always_print_foms</span><span class="p">:</span>
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;TAGS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_tags</span><span class="p">)</span>
+
+            <span class="c1"># Add defined keywords as top level keys</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">is_key_level</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                    <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-                <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keys</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">is_key_level</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+                    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
             <span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="k">for</span> <span class="n">context</span><span class="p">,</span> <span class="n">fom_map</span> <span class="ow">in</span> <span class="n">fom_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1938,7 +1942,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 02, 2024.
+      <span class="lastupdated">Last updated on Feb 05, 2024.
       </span></p>
   </div>
 

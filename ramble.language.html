@@ -443,11 +443,15 @@ append_execs: List of executables to inject after the base executable</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.modifier_language.required_variable">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">required_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#required_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.required_variable" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">required_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variable'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#required_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.required_variable" title="Link to this definition"></a></dt>
 <dd><p>Mark a var as being required</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>var</strong> – Value to mark as required</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Value to mark as required</p></li>
+<li><p><strong>results_level</strong> (<em>str</em>) – ‘variable’ or ‘key’. If ‘key’ variable is promoted to
+a key within JSON or YAML formatted results.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -669,7 +673,7 @@ in. Accepts globbing.</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 02, 2024.
+      <span class="lastupdated">Last updated on Feb 05, 2024.
       </span></p>
   </div>
 

@@ -107,41 +107,43 @@
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
 <span class="n">key_type</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;reserved&#39;</span><span class="p">,</span> <span class="s1">&#39;optional&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">])</span>
+<span class="n">output_level</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;variable&#39;</span><span class="p">])</span>
 <span class="n">default_keys</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;application_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;application_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;application_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;application_namespace&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;simplified_application_namespace&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;workload_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;workload_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;workload_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;workload_namespace&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;simplified_workload_namespace&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;license_input_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;experiment_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;experiment_run_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;experiment_status&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;experiment_index&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;experiment_namespace&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;simplified_experiment_namespace&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;log_dir&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;log_file&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;err_file&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;env_path&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
-    <span class="s1">&#39;input_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+    <span class="s1">&#39;workspace_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;application_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;application_run_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;application_input_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;application_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;simplified_application_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;workload_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;workload_run_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;workload_input_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;workload_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;simplified_workload_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;license_input_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;experiment_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;experiment_run_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;experiment_status&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;experiment_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;experiment_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;simplified_experiment_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;log_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;log_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;err_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;env_path&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;input_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
 
-    <span class="s1">&#39;spec_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span>
-    <span class="s1">&#39;env_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span>
+    <span class="s1">&#39;spec_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;env_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
 
-    <span class="s1">&#39;n_ranks&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="s1">&#39;n_nodes&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="s1">&#39;processes_per_node&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="s1">&#39;n_threads&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="s1">&#39;batch_submit&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="s1">&#39;mpi_command&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
-    <span class="s1">&#39;experiment_template_name&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+    <span class="s1">&#39;n_ranks&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;n_nodes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;processes_per_node&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;n_threads&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
+    <span class="s1">&#39;batch_submit&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;mpi_command&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;experiment_template_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
 <span class="p">}</span>
 
 
@@ -150,11 +152,12 @@
 <span class="k">class</span> <span class="nc">Keywords</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent known ramble keywords.</span>
 
-<span class="sd">    Each keyword can have a type. Valid types are identified by the</span>
-<span class="sd">    &#39;key_type&#39; variable as an enum.</span>
+<span class="sd">    Each keyword contains a dictionary of its attributes. Currently, these include:</span>
+<span class="sd">    - type</span>
+<span class="sd">    - level</span>
 
-<span class="sd">    A map of keys, and their types is provided in the class level &#39;keys&#39;</span>
-<span class="sd">    variable. This enforces that each keyword can only have a single type.</span>
+<span class="sd">    Valid types are identified by the &#39;key_type&#39; variable as an enum.</span>
+<span class="sd">    Valid levels are identified by the &#39;output_level&#39;.</span>
 
 <span class="sd">    Current key types are:</span>
 <span class="sd">      - Reserved: Ramble defines these, and a user should not be allowed to define them</span>
@@ -162,10 +165,19 @@
 <span class="sd">      - Required: Ramble requires a definition for these. Ramble will try to set sensible defaults,</span>
 <span class="sd">        but it might not be possible always.</span>
 
+<span class="sd">    Current levels are:</span>
+<span class="sd">      - Key: Ramble defines this as a top level variable. When results are</span>
+<span class="sd">             output, these are hoisted to a set of variables that are guaranteed to</span>
+<span class="sd">             be in the output. These are non-application specific inputs that</span>
+<span class="sd">             define a Ramble experiment.</span>
+<span class="sd">      - Variable: These are considered standard variables. They might be</span>
+<span class="sd">                  derived from the values of entries with the level `key`. In results, they</span>
+<span class="sd">                  are presented in the variables section. These may include application</span>
+<span class="sd">                  specific inputs to further configure the experiment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_keys</span><span class="o">=</span><span class="p">{}):</span>
         <span class="c1"># Merge in additional Keys:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">default_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">default_keys</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_keys</span><span class="p">(</span><span class="n">extra_keys</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Keywords.update_keys">
@@ -190,7 +202,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is reserved&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span></div>
 
 
 <div class="viewcode-block" id="Keywords.is_optional">
@@ -199,7 +211,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is optional&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">optional</span></div>
 
 
 <div class="viewcode-block" id="Keywords.is_required">
@@ -208,7 +220,25 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a key is required&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key_type</span><span class="o">.</span><span class="n">required</span></div>
+
+
+<div class="viewcode-block" id="Keywords.is_key_level">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_key_level">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_key_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if key is part of the key level&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span></div>
+
+
+<div class="viewcode-block" id="Keywords.is_variable_level">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.is_variable_level">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_variable_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if key is part of the variable level&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span></div>
 
 
 <div class="viewcode-block" id="Keywords.check_reserved_keys">
@@ -267,7 +297,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 02, 2024.
+      <span class="lastupdated">Last updated on Feb 05, 2024.
       </span></p>
   </div>
 

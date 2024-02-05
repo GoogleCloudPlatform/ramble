@@ -339,15 +339,18 @@
 <div class="viewcode-block" id="required_variable">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.required_variable">[docs]</a>
 <span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;required_vars&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">required_variable</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">required_variable</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">results_level</span><span class="o">=</span><span class="s1">&#39;variable&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mark a var as being required</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        var: Value to mark as required</span>
+<span class="sd">        results_level (str): &#39;variable&#39; or &#39;key&#39;. If &#39;key&#39; variable is promoted to</span>
+<span class="sd">                             a key within JSON or YAML formatted results.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_mark_required_var</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
-        <span class="n">mod</span><span class="o">.</span><span class="n">required_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">required</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">required_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+                                  <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">}</span>
 
     <span class="k">return</span> <span class="n">_mark_required_var</span></div>
 
@@ -361,7 +364,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 02, 2024.
+      <span class="lastupdated">Last updated on Feb 05, 2024.
       </span></p>
   </div>
 

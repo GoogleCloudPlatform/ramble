@@ -379,15 +379,18 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">no_var_contexts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">global_conf</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="o">.</span><span class="n">required</span><span class="p">]</span>
         <span class="n">final_context</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="p">:</span>
             <span class="n">final_context</span><span class="o">.</span><span class="n">merge_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="n">context</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span><span class="p">:</span>
-            <span class="n">var_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_name&#39;</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">context_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
-                <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">context_name</span>
+            <span class="k">if</span> <span class="n">context</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">no_var_contexts</span><span class="p">:</span>
+                <span class="n">var_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_name&#39;</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">context_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                    <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">context_name</span>
 
         <span class="c1"># Set namespaces</span>
         <span class="n">final_context</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">application_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_namespace</span>
@@ -690,7 +693,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 02, 2024.
+      <span class="lastupdated">Last updated on Feb 05, 2024.
       </span></p>
   </div>
 
