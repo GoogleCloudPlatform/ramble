@@ -258,15 +258,18 @@ class ExperimentSet(object):
             None
         """
 
+        no_var_contexts = [self._contexts.global_conf,
+                           self._contexts.base, self._contexts.required]
         final_context = ramble.context.Context()
 
         for context in self._contexts:
             final_context.merge_context(self._context[context])
 
         for context in self._contexts:
-            var_name = f'{context.name}_name'
-            if self._context[context].context_name not in final_context.variables:
-                final_context.variables[var_name] = self._context[context].context_name
+            if context not in no_var_contexts:
+                var_name = f'{context.name}_name'
+                if self._context[context].context_name not in final_context.variables:
+                    final_context.variables[var_name] = self._context[context].context_name
 
         # Set namespaces
         final_context.variables[self.keywords.application_namespace] = self.application_namespace
