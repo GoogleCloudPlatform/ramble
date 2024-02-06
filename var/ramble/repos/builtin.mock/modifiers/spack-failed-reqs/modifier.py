@@ -9,15 +9,13 @@
 from ramble.modkit import *  # noqa: F403
 
 
-class SpackMod(SpackModifier):
-    """Define spack modifier with various software aspects"""
+class SpackFailedReqs(SpackModifier):
+    """Define spack modifier requirements that will fail"""
     name = "spack-mod"
 
     tags('test')
 
-    mode('default', description='This is the default mode for the spack-mod')
-
-    package_manager_config('enable_debug', 'config:debug:true')
+    mode('default', description='This is the default mode for the spack-failed-reqs modifier')
 
     default_compiler('mod_compiler',
                      spack_spec='mod_compiler@1.1 target=x86_64',
@@ -31,9 +29,4 @@ class SpackMod(SpackModifier):
                   spack_spec='mod_package2@1.1',
                   compiler='mod_compiler')
 
-    package_manager_requirement('list not-a-package', validation_type='empty', modes=['default'])
-    package_manager_requirement('list zlib', validation_type='not_empty', modes=['default'])
-    package_manager_requirement('info zlib', validation_type='contains_regex', modes=['default'],
-                                regex=r'\s*Safe versions:\s*')
-    package_manager_requirement('info zlib', validation_type='does_not_contain_regex',
-                                modes=['default'], regex=r'\s*Broken versions:\s*')
+    package_manager_requirement('list not-a-package', validation_type='not_empty', modes=['default'])

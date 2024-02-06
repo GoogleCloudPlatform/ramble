@@ -705,6 +705,47 @@ class SpackRunner(object):
             self._dry_run_print(self.spack, args)
             return
 
+    def validate_command(self, command='', validation_type='not_empty', regex=None):
+        regex_validations = ['contains_regex', 'does_not_contain_regex']
+
+        args = command.split()
+
+        compiled_regex = None
+        if validation_type in regex_validations and regex:
+            compiled_regex = re.compile(regex)
+
+        if not self.dry_run:
+            output = self._run_command(self.spack, args,
+                                       return_output=True)
+
+            logger.debug(' Validation output:')
+            logger.debug(output)
+            if validation_type == 'empty':
+                if output != '':
+                    self._raise_validation_error(command, validation_type)
+            elif validation_type == 'not_empty':
+                if output == '':
+                    self._raise_validation_error(command, validation_type)
+            elif validation_type == 'contains_regex':
+                found = False
+                for line in output.split('\n'):
+                    if compiled_regex.match(line):
+                        found = True
+                if not found:
+                    self._raise_validation_error(command, validation_type)
+            elif validation_type == 'does_not_contain_regex':
+                for line in output.split('\n'):
+                    if compiled_regex.match(line):
+                        self._raise_validation_error(command, validation_type)
+        else:
+            self._dry_run_print(self.spack, args)
+
+    def _raise_validation_error(self, command, validation_type):
+        raise ValidationFailedError(
+            f'Validation of: "spack {command}" failed '
+            f' with a validation_type of "{validation_type}"'
+        )
+
     def _dry_run_print(self, executable, args):
         logger.msg(f'DRY-RUN: would run {executable}')
         logger.msg(f'         with args: {args}')
@@ -778,3 +819,7 @@ class NoActiveEnvironmentError(RunnerError):
 
 class InvalidExternalEnvironment(RunnerError):
     """Raised when an invalid external spack environment is passed in"""
+
+
+class ValidationFailedError(RunnerError):
+    """Raised when a package manager requirement was not met"""
