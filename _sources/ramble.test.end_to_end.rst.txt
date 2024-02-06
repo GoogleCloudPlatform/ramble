@@ -150,6 +150,14 @@ ramble.test.end\_to\_end.package\_manager\_config module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.package\_manager\_requirements module
+--------------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.package_manager_requirements
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.passthrough\_variables module
 ------------------------------------------------------
 

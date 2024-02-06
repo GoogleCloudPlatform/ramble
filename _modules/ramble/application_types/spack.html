@@ -375,8 +375,21 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
                    <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_evaluate_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate all requirements for this experiment&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">all_package_manager_requirements</span><span class="p">():</span>
+                <span class="n">expanded_req</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">expanded_req</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">validate_command</span><span class="p">(</span><span class="o">**</span><span class="n">expanded_req</span><span class="p">)</span>
+
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
+                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_define_package_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables containing the path to all spack packages</span>
@@ -578,7 +591,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 05, 2024.
+      <span class="lastupdated">Last updated on Feb 06, 2024.
       </span></p>
   </div>
 

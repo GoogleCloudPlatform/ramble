@@ -442,6 +442,25 @@ append_execs: List of executables to inject after the base executable</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.package_manager_requirement">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#package_manager_requirement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.package_manager_requirement" title="Link to this definition"></a></dt>
+<dd><p>Define a requirement for the modifier’s package manager</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> – Package manager command to execute, when evaluating the requirement</p></li>
+<li><p><strong>validation_type</strong> – Type of validation to perform on output of command.
+Valid types are: ‘empty’, ‘not_empty’, ‘contains_regex’,
+‘does_not_contain_regex’</p></li>
+<li><p><strong>modes</strong> – List of usage modes this requirement should apply to</p></li>
+<li><p><strong>regex</strong> – Regular expression to use when validation_type is either ‘contains_regex’
+or ‘does_no_contain_regex’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.modifier_language.required_variable">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">required_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variable'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#required_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.required_variable" title="Link to this definition"></a></dt>
 <dd><p>Mark a var as being required</p>
@@ -673,7 +692,7 @@ in. Accepts globbing.</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 05, 2024.
+      <span class="lastupdated">Last updated on Feb 06, 2024.
       </span></p>
   </div>
 

@@ -385,6 +385,14 @@
             <span class="k">yield</span> <span class="n">action</span><span class="p">,</span> <span class="n">conf</span></div>
 
 
+<div class="viewcode-block" id="ModifierBase.all_package_manager_requirements">
+<a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.all_package_manager_requirements">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_package_manager_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager_requirements</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager_requirements</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_usage_mode</span><span class="p">]:</span>
+                <span class="k">yield</span> <span class="n">req</span></div>
+
+
 <div class="viewcode-block" id="ModifierBase.run_phase_hook">
 <a class="viewcode-back" href="../../ramble.html#ramble.modifier.ModifierBase.run_phase_hook">[docs]</a>
     <span class="k">def</span> <span class="nf">run_phase_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">hook_name</span><span class="p">):</span>
@@ -439,7 +447,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 05, 2024.
+      <span class="lastupdated">Last updated on Feb 06, 2024.
       </span></p>
   </div>
 

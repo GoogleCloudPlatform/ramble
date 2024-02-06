@@ -883,6 +883,50 @@
             <span class="k">return</span></div>
 
 
+<div class="viewcode-block" id="SpackRunner.validate_command">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.validate_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">validation_type</span><span class="o">=</span><span class="s1">&#39;not_empty&#39;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">regex_validations</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;contains_regex&#39;</span><span class="p">,</span> <span class="s1">&#39;does_not_contain_regex&#39;</span><span class="p">]</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+        <span class="n">compiled_regex</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">validation_type</span> <span class="ow">in</span> <span class="n">regex_validations</span> <span class="ow">and</span> <span class="n">regex</span><span class="p">:</span>
+            <span class="n">compiled_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span>
+                                       <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; Validation output:&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;not_empty&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">output</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;contains_regex&#39;</span><span class="p">:</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">compiled_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                        <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;does_not_contain_regex&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">compiled_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_raise_validation_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ValidationFailedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Validation of: &quot;spack </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">&quot; failed &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39; with a validation_type of &quot;</span><span class="si">{</span><span class="n">validation_type</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+        <span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DRY-RUN: would run </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;         with args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -969,6 +1013,13 @@
 <span class="k">class</span> <span class="nc">InvalidExternalEnvironment</span><span class="p">(</span><span class="n">RunnerError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an invalid external spack environment is passed in&quot;&quot;&quot;</span></div>
 
+
+
+<div class="viewcode-block" id="ValidationFailedError">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.ValidationFailedError">[docs]</a>
+<span class="k">class</span> <span class="nc">ValidationFailedError</span><span class="p">(</span><span class="n">RunnerError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a package manager requirement was not met&quot;&quot;&quot;</span></div>
+
 </pre></div>
 
            </div>
@@ -979,7 +1030,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 05, 2024.
+      <span class="lastupdated">Last updated on Feb 06, 2024.
       </span></p>
   </div>
 
