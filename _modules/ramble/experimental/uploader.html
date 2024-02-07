@@ -155,15 +155,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">foms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># This is essentially the hash</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;application_name&#39;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;application_name&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workspace_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;workspace_name&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="n">workspace_hash</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;workload_name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;workload_name&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bulk_hash</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># proxy for workspace or &quot;uploaded with&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_nodes&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">processes_per_node</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;processes_per_node&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_ranks&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_threads</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;n_threads&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;n_nodes&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processes_per_node</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;processes_per_node&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;n_ranks&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_threads</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;n_threads&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">default_node_type_val</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">()</span>
 
@@ -451,7 +452,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 06, 2024.
+      <span class="lastupdated">Last updated on Feb 07, 2024.
       </span></p>
   </div>
 
