@@ -49,15 +49,16 @@ class Experiment():
         self.foms = []
         self.id = None  # This is essentially the hash
         self.data = data
-        self.application_name = data['RAMBLE_VARIABLES']['application_name']
+        print(data)
+        self.application_name = data['application_name']
         self.workspace_name = data['RAMBLE_VARIABLES']['workspace_name']
         self.workspace_hash = workspace_hash
-        self.workload_name = data['RAMBLE_VARIABLES']['workload_name']
+        self.workload_name = data['workload_name']
         self.bulk_hash = None  # proxy for workspace or "uploaded with"
-        self.n_nodes = data['RAMBLE_VARIABLES']['n_nodes']
-        self.processes_per_node = data['RAMBLE_VARIABLES']['processes_per_node']
-        self.n_ranks = data['RAMBLE_VARIABLES']['n_ranks']
-        self.n_threads = data['RAMBLE_VARIABLES']['n_threads']
+        self.n_nodes = data['n_nodes']
+        self.processes_per_node = data['processes_per_node']
+        self.n_ranks = data['n_ranks']
+        self.n_threads = data['n_threads']
         self.node_type = default_node_type_val
         self.user = get_user()
 
