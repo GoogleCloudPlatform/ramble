@@ -49,7 +49,6 @@ class Experiment():
         self.foms = []
         self.id = None  # This is essentially the hash
         self.data = data
-        print(data)
         self.application_name = data['application_name']
         self.workspace_name = data['RAMBLE_VARIABLES']['workspace_name']
         self.workspace_hash = workspace_hash
