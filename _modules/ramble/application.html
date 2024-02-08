@@ -111,6 +111,7 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">fnmatch</span>
 <span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
@@ -193,6 +194,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_builtins</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;application_definition&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
@@ -665,10 +667,29 @@
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Executing phase </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
                 <span class="n">mod_inst</span><span class="o">.</span><span class="n">run_phase_hook</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
             <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span></div>
+            <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span></div>
+
+
+<div class="viewcode-block" id="ApplicationBase.print_phase_times">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.print_phase_times">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_phase_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">phase_filters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print phase execution times by pipeline phase order</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pipeline (str): Name of pipeline to print timing information for</span>
+<span class="sd">            phase_filters (list(str)): Filters to limit phases to print</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Phase timing statistics:&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">phase_filters</span><span class="o">=</span><span class="n">phase_filters</span><span class="p">):</span>
+            <span class="c1"># Set default time to 0.0 s, to prevent KeyError from skipped phases</span>
+            <span class="k">if</span> <span class="n">phase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1"> time: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span><span class="p">[</span><span class="n">phase</span><span class="p">],</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s1"> (s)&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ApplicationBase.create_experiment_chain">
