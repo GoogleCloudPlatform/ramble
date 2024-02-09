@@ -133,7 +133,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         new_copy.set_variables(self.variables.copy(), self.experiment_set)
         new_copy.set_internals(self.internals.copy())
         new_copy.set_template(False)
-        new_copy.repeats.set_repeats()
+        new_copy.repeats.set_repeats(False, 0)
         new_copy.set_chained_experiments(None)
 
         return new_copy
