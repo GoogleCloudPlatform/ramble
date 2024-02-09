@@ -16,6 +16,7 @@ import string
 import shutil
 import fnmatch
 import enum
+import time
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -100,6 +101,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._modifier_builtins = {}
         self._input_fetchers = None
         self.results = {}
+        self._phase_times = {}
 
         self.hash_inventory = {
             'application_definition': None,
@@ -526,10 +528,26 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, f'_{phase}'):
             logger.msg(f'  Executing phase {phase}')
+            start_time = time.time()
             for mod_inst in self._modifier_instances:
                 mod_inst.run_phase_hook(workspace, phase)
             phase_func = getattr(self, f'_{phase}')
             phase_func(workspace)
+            self._phase_times[phase] = time.time() - start_time
+
+    def print_phase_times(self, pipeline, phase_filters=['*']):
+        """Print phase execution times by pipeline phase order
+
+        Args:
+            pipeline (str): Name of pipeline to print timing information for
+            phase_filters (list(str)): Filters to limit phases to print
+        """
+        logger.msg('Phase timing statistics:')
+        for phase in self.get_pipeline_phases(pipeline, phase_filters=phase_filters):
+            # Set default time to 0.0 s, to prevent KeyError from skipped phases
+            if phase not in self._phase_times:
+                self._phase_times[phase] = 0.0
+            logger.msg(f'  {phase} time: {round(self._phase_times[phase], 5)} (s)')
 
     def create_experiment_chain(self, workspace):
         """Create the necessary chained experiments for this instance

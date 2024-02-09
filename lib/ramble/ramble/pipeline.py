@@ -164,6 +164,7 @@ class Pipeline(object):
                 app_inst.run_phase(phase, self.workspace)
                 if not disable_progress:
                     progress.update()
+            app_inst.print_phase_times(self.name, self.filters.phases)
             if not disable_progress:
                 progress.set_description('Experiment complete')
                 progress.close()
