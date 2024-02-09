@@ -910,6 +910,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">check_required_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="ApplicationBase.define_modifier_variables">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.define_modifier_variables">[docs]</a>
+    <span class="k">def</span> <span class="nf">define_modifier_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract default variable definitions from modifier instances&quot;&quot;&quot;</span></div>
+
+
     <span class="k">def</span> <span class="nf">_get_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return executables for add_expand_vars&quot;&quot;&quot;</span>
 
@@ -1017,10 +1023,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set default experiment variables (for add_expand_vars),</span>
 <span class="sd">        if they haven&#39;t been set already&quot;&quot;&quot;</span>
         <span class="c1"># Set default experiment variables, if they haven&#39;t been set already</span>
+        <span class="n">var_sets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">workload_variables</span><span class="p">:</span>
-            <span class="n">wl_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workload_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">]</span>
+            <span class="n">var_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workload_variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">])</span>
 
-            <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">wl_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+            <span class="n">var_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">mode_variables</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">var_set</span> <span class="ow">in</span> <span class="n">var_sets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">var_set</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
 

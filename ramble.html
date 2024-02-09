@@ -82,6 +82,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.copy"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.create_experiment_chain"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.create_experiment_chain()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.default_compilers"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.default_compilers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.define_modifier_variables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.define_modifier_variables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.env_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.env_vars()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.evaluate_success"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.evaluate_success()</span></code></a></li>
@@ -98,6 +99,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.license_inc_name"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.license_inc_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.maintainers"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.maintainers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.modes"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.modifier_variables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.name"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_requirements</span></code></a></li>
@@ -609,20 +611,19 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.default_compilers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.format_doc"><code class="docutils literal notranslate"><span class="pre">ModifierBase.format_doc()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.inherit_from_application"><code class="docutils literal notranslate"><span class="pre">ModifierBase.inherit_from_application()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.inputs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.maintainers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.maintainers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modded_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modded_variables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.mode_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.mode_variables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modes"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modifier_class"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modifier_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modifier_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.name"><code class="docutils literal notranslate"><span class="pre">ModifierBase.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">ModifierBase.package_manager_requirements</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ModifierBase.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.required_packages"><code class="docutils literal notranslate"><span class="pre">ModifierBase.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.required_vars"><code class="docutils literal notranslate"><span class="pre">ModifierBase.required_vars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.run_phase_hook"><code class="docutils literal notranslate"><span class="pre">ModifierBase.run_phase_hook()</span></code></a></li>
@@ -633,8 +634,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.tags"><code class="docutils literal notranslate"><span class="pre">ModifierBase.tags</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.uses_spack"><code class="docutils literal notranslate"><span class="pre">ModifierBase.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.variable_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workload_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workload_variables</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workloads"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workloads</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.modifier.ModifierError"><code class="docutils literal notranslate"><span class="pre">ModifierError</span></code></a></li>
@@ -1073,6 +1072,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.inputs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.modes"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.modifier_variables"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_requirements</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.phase_definitions</span></code></a></li>
@@ -1099,6 +1099,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">SpackApplication.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.inputs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.modes"><code class="docutils literal notranslate"><span class="pre">SpackApplication.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.modifier_variables"><code class="docutils literal notranslate"><span class="pre">SpackApplication.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">SpackApplication.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">SpackApplication.package_manager_requirements</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.phase_definitions"><code class="docutils literal notranslate"><span class="pre">SpackApplication.phase_definitions</span></code></a></li>
@@ -1392,6 +1393,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.env_var_modification"><code class="docutils literal notranslate"><span class="pre">env_var_modification()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.executable_modifier"><code class="docutils literal notranslate"><span class="pre">executable_modifier()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.mode"><code class="docutils literal notranslate"><span class="pre">mode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.modifier_variable"><code class="docutils literal notranslate"><span class="pre">modifier_variable()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.package_manager_requirement"><code class="docutils literal notranslate"><span class="pre">package_manager_requirement()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.required_variable"><code class="docutils literal notranslate"><span class="pre">required_variable()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.modifier_language.variable_modification"><code class="docutils literal notranslate"><span class="pre">variable_modification()</span></code></a></li>
@@ -1423,22 +1425,18 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.default_compilers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figures_of_merit</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modes"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_requirements</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.phase_definitions"><code class="docutils literal notranslate"><span class="pre">BasicModifier.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_vars"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_vars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">BasicModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workload_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workload_variables</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workloads"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1450,23 +1448,19 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.default_compilers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figures_of_merit</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modes"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">SpackModifier.package_manager_requirements</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.phase_definitions"><code class="docutils literal notranslate"><span class="pre">SpackModifier.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">SpackModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.required_vars"><code class="docutils literal notranslate"><span class="pre">SpackModifier.required_vars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">SpackModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.uses_spack"><code class="docutils literal notranslate"><span class="pre">SpackModifier.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workload_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workload_variables</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workloads"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2234,6 +2228,12 @@ and builds an internal mapping from unique name to the chaining definition.</p>
 <span class="sig-name descname"><span class="pre">default_compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.default_compilers" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.define_modifier_variables">
+<span class="sig-name descname"><span class="pre">define_modifier_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.define_modifier_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.define_modifier_variables" title="Link to this definition"></a></dt>
+<dd><p>Extract default variable definitions from modifier instances</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.env_var_modifications">
 <span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.env_var_modifications" title="Link to this definition"></a></dt>
@@ -2331,6 +2331,11 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.modes">
 <span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.modes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.modifier_variables">
+<span class="sig-name descname"><span class="pre">modifier_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.modifier_variables" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -5629,11 +5634,6 @@ which to push resources.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.executables">
-<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.executables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.figure_of_merit_contexts">
 <span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -5655,11 +5655,6 @@ which to push resources.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.inputs">
-<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.inputs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.maintainers">
 <span class="sig-name descname"><span class="pre">maintainers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.maintainers" title="Link to this definition"></a></dt>
 <dd><p>Lists of strings which contains GitHub usernames of attributes.
@@ -5671,6 +5666,12 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <span class="sig-name descname"><span class="pre">modded_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier.html#ModifierBase.modded_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier.ModifierBase.modded_variables" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.mode_variables">
+<span class="sig-name descname"><span class="pre">mode_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier.html#ModifierBase.mode_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier.ModifierBase.mode_variables" title="Link to this definition"></a></dt>
+<dd><p>Return a dict of variables that should be defined for the current mode</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.modes">
 <span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.modes" title="Link to this definition"></a></dt>
@@ -5679,6 +5680,11 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.modifier_class">
 <span class="sig-name descname"><span class="pre">modifier_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ModifierBase'</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.modifier_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.modifier_variables">
+<span class="sig-name descname"><span class="pre">modifier_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.modifier_variables" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -5694,11 +5700,6 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.package_manager_requirements">
 <span class="sig-name descname"><span class="pre">package_manager_requirements</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.package_manager_requirements" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.phase_definitions">
-<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.phase_definitions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -5758,16 +5759,6 @@ properly.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.variable_modifications">
 <span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.variable_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workload_variables">
-<span class="sig-name descname"><span class="pre">workload_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workload_variables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workloads">
-<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workloads" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
