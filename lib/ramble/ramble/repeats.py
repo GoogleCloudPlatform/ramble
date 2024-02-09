@@ -21,7 +21,7 @@ class Repeats(object):
         self.is_repeat_base = False
         self.repeat_index = None
 
-    def set_repeats(self, is_repeat_base=False, n_repeats=0):
+    def set_repeats(self, is_repeat_base, n_repeats):
         """Set if this instance will use repeats
 
         Args:
