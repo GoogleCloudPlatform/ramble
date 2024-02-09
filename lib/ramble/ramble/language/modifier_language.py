@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import Optional
+
 import ramble.language.language_helpers
 import ramble.language.language_base
 import ramble.language.shared_language
@@ -238,6 +240,45 @@ def required_variable(var: str, results_level='variable'):
                                   'level': ramble.keywords.output_level.variable}
 
     return _mark_required_var
+
+
+@modifier_directive('modifier_variables')
+def modifier_variable(name: str, default, description: str, values: Optional[list] = None,
+                      mode: Optional[str] = None, modes: Optional[list] = None,
+                      expandable: bool = True, **kwargs):
+    """Define a variable for this modifier
+
+    Args:
+        name (str): Name of variable to define
+        default: Default value of variable definition
+        description (str): Description of variable's purpose
+        values (list): Optional list of suggested values for this variable
+        mode (str): Single mode this variable is used in
+        modes (list): List of modes this variable is used in
+        expandable (bool): True if the variable should be expanded, False if not.
+    """
+
+    def _define_modifier_variable(mod):
+        all_modes = ramble.language.language_helpers.require_definition(mode,
+                                                                        modes,
+                                                                        'mode',
+                                                                        'modes',
+                                                                        'modifier_variable')
+
+        for mode_name in all_modes:
+            if mode_name not in mod.modifier_variables:
+                mod.modifier_variables[mode_name] = {}
+
+            mod.modifier_variables[mode_name][name] = {
+                'default': default,
+                'description': description,
+                'expandable': expandable
+            }
+
+            if values:
+                mod.modifier_variables[mode_name][name]['values'] = values
+
+    return _define_modifier_variable
 
 
 @modifier_directive('package_manager_requirements')
