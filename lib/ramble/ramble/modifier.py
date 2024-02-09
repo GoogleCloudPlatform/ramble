@@ -124,11 +124,20 @@ class ModifierBase(object, metaclass=ModifierMeta):
             for mode_name, wl_conf in self.modes.items():
                 out_str.append(rucolor.section_title('Mode:') + f' {mode_name}\n')
 
+                if mode_name in self.modifier_variables:
+                    out_str.append(rucolor.nested_1('\tVariables:\n'))
+                    indent = '\t\t'
+                    for var, conf in self.modifier_variables[mode_name].items():
+                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
+                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
+                        out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
+                        if 'values' in conf:
+                            out_str.append(f'{indent}\tSuggested Values: {conf["values"]}\n')
+
                 if mode_name in self.variable_modifications:
                     out_str.append(rucolor.nested_1('\tVariable Modifications:\n'))
+                    indent = '\t\t'
                     for var, conf in self.variable_modifications[mode_name].items():
-                        indent = '\t\t'
-
                         out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
                         out_str.append(f'{indent}\tMethod: {conf["method"]}\n')
                         out_str.append(f'{indent}\tModification: {conf["modification"]}\n')
@@ -265,6 +274,13 @@ class ModifierBase(object, metaclass=ModifierMeta):
         if self._usage_mode in self.package_manager_requirements:
             for req in self.package_manager_requirements[self._usage_mode]:
                 yield req
+
+    def mode_variables(self):
+        """Return a dict of variables that should be defined for the current mode"""
+
+        if self._usage_mode in self.modifier_variables:
+            return self.modifier_variables[self._usage_mode]
+        return {}
 
     def run_phase_hook(self, workspace, hook_name):
         """Run a modifier hook.

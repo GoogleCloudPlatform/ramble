@@ -726,6 +726,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(self.variables)
 
+    def define_modifier_variables(self):
+        """Extract default variable definitions from modifier instances"""
+
     def _get_executables(self):
         """Return executables for add_expand_vars"""
 
@@ -833,10 +836,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Set default experiment variables (for add_expand_vars),
         if they haven't been set already"""
         # Set default experiment variables, if they haven't been set already
+        var_sets = []
         if self.expander.workload_name in self.workload_variables:
-            wl_vars = self.workload_variables[self.expander.workload_name]
+            var_sets.append(self.workload_variables[self.expander.workload_name])
 
-            for var, conf in wl_vars.items():
+        for mod_inst in self._modifier_instances:
+            var_sets.append(mod_inst.mode_variables())
+
+        for var_set in var_sets:
+            for var, conf in var_set.items():
                 if var not in self.variables.keys():
                     self.variables[var] = conf['default']
 

@@ -49,6 +49,7 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, 'required_packages')
     assert hasattr(test_mod, 'success_criteria')
     assert hasattr(test_mod, 'builtins')
+    assert hasattr(test_mod, 'modifier_variables')
     assert hasattr(test_mod, 'executable_modifiers')
     assert hasattr(test_mod, 'env_var_modifications')
     assert hasattr(test_mod, 'maintainers')
@@ -503,3 +504,48 @@ def test_env_var_modification_directive(mod_class, func_type):
             assert test_def['name'] in mod_inst.env_var_modifications[mode][method]
             assert test_def['modification'] == \
                 mod_inst.env_var_modifications[mode][method][test_def['name']]
+
+
+def add_modifier_variable(mod_inst, mod_var_num=1, func_type=func_types.directive):
+    var_name = f'mod_var_{mod_var_num}'
+    var_default = f'default_{mod_var_num}'
+    var_desc = f'Test variable {mod_var_num}'
+    var_mode = 'mod_var_mode'
+
+    test_defs = {
+        'name': var_name,
+        'default': var_default,
+        'description': var_desc,
+        'mode': var_mode
+    }
+
+    if func_type == func_types.directive:
+        modifier_variable(var_name, default=var_default, description=var_desc,
+                          mode=var_mode)(mod_inst)
+    elif func_type == func_types.method:
+        mod_inst.modifier_variable(var_name, default=var_default, description=var_desc,
+                                   mode=var_mode)
+    else:
+        assert False
+
+    return test_defs
+
+
+@pytest.mark.parametrize('func_type', func_types)
+@pytest.mark.parametrize('mod_class', mod_types)
+def test_modifier_variable_directive(mod_class, func_type):
+    test_class = generate_mod_class(mod_class)
+    mod_inst = test_class('/not/a/path')
+    test_defs = []
+    test_defs.append(add_modifier_variable(mod_inst, func_type))
+
+    assert hasattr(mod_inst, 'modifier_variables')
+
+    for test_def in test_defs:
+        mode = test_def['mode']
+        var_name = test_def['name']
+
+        assert mode in mod_inst.modifier_variables
+        assert test_def['name'] in mod_inst.modifier_variables[mode]
+        for attr in ['description', 'default']:
+            assert test_def[attr] == mod_inst.modifier_variables[mode][var_name][attr]
