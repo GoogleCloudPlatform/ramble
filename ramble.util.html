@@ -82,6 +82,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.naming">ramble.util.naming module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.path">ramble.util.path module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.spec_utils">ramble.util.spec_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.stats">ramble.util.stats module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.web">ramble.util.web module</a></li>
 </ul>
 </li>
@@ -108,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repeats">ramble.repeats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
@@ -840,6 +842,164 @@ use either <code class="docutils literal notranslate"><span class="pre">$var</sp
 <dd></dd></dl>
 
 </section>
+<section id="module-ramble.util.stats">
+<span id="ramble-util-stats-module"></span><h2>ramble.util.stats module<a class="headerlink" href="#module-ramble.util.stats" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsBase</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsBase.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsBase.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsBase.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsBase.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsBase.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsBase.report" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsCountValues</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsCountValues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsCountValues" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsCountValues.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsCountValues.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'n_successful_repeats'</span></em><a class="headerlink" href="#ramble.util.stats.StatsCountValues.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsCountValues.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsCountValues.report" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMax">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsMax</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMax" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMax.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMax.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMax.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMax.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'max'</span></em><a class="headerlink" href="#ramble.util.stats.StatsMax.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMean">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsMean</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMean" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMean.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMean.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMean.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMean.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean'</span></em><a class="headerlink" href="#ramble.util.stats.StatsMean.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMedian">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsMedian</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMedian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMedian" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMedian.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMedian.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMedian.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMedian.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'median'</span></em><a class="headerlink" href="#ramble.util.stats.StatsMedian.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsMin</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMin.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsMin.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsMin.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsMin.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'min'</span></em><a class="headerlink" href="#ramble.util.stats.StatsMin.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsStdev</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsStdev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsStdev" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsStdev.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsStdev.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stdev'</span></em><a class="headerlink" href="#ramble.util.stats.StatsStdev.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsStdev.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsStdev.report" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">StatsVar</span></span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsVar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsVar" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.util.stats.StatsBase" title="ramble.util.stats.StatsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatsBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsVar.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsVar.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsVar.compute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsVar.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'variance'</span></em><a class="headerlink" href="#ramble.util.stats.StatsVar.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsVar.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsVar.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsVar.report" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.stats.decimal_places">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">decimal_places</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#decimal_places"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.decimal_places" title="Link to this definition"></a></dt>
+<dd><p>Returns the number of decimal places of a value</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.stats.max_decimal_places">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.stats.</span></span><span class="sig-name descname"><span class="pre">max_decimal_places</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#max_decimal_places"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.max_decimal_places" title="Link to this definition"></a></dt>
+<dd><p>Returns the max decimal places of a list of values</p>
+</dd></dl>
+
+</section>
 <section id="module-ramble.util.web">
 <span id="ramble-util-web-module"></span><h2>ramble.util.web module<a class="headerlink" href="#module-ramble.util.web" title="Link to this heading"></a></h2>
 <dl class="py exception">
@@ -999,7 +1159,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 08, 2024.
+      <span class="lastupdated">Last updated on Feb 09, 2024.
       </span></p>
   </div>
 

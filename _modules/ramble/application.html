@@ -129,6 +129,7 @@
 <span class="kn">import</span> <span class="nn">ramble.fetch_strategy</span>
 <span class="kn">import</span> <span class="nn">ramble.expander</span>
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
+<span class="kn">import</span> <span class="nn">ramble.repeats</span>
 <span class="kn">import</span> <span class="nn">ramble.repository</span>
 <span class="kn">import</span> <span class="nn">ramble.modifier</span>
 <span class="kn">import</span> <span class="nn">ramble.pipeline</span>
@@ -137,6 +138,7 @@
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 <span class="kn">import</span> <span class="nn">ramble.util.env</span>
 <span class="kn">import</span> <span class="nn">ramble.util.directives</span>
+<span class="kn">import</span> <span class="nn">ramble.util.stats</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
@@ -183,6 +185,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_template</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">Repeats</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain_prepend</span> <span class="o">=</span> <span class="p">[]</span>
@@ -194,6 +197,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_builtins</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_fetchers</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
@@ -230,6 +234,7 @@
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_variables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_internals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_template</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">new_copy</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">set_repeats</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_chained_experiments</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_copy</span></div>
@@ -664,6 +669,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_template</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> is a template. Skipping phases&#39;</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">is_repeat_base</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> is a repeat base. Skipping phases&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Executing phase </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -804,6 +812,7 @@
                     <span class="n">new_inst</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
                     <span class="n">new_inst</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_index</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">experiment_index</span><span class="p">)</span>
+                    <span class="n">new_inst</span><span class="o">.</span><span class="n">repeats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span>
                     <span class="n">new_inst</span><span class="o">.</span><span class="n">read_status</span><span class="p">()</span>
 
                     <span class="c1"># Extract inherited variables</span>
@@ -1628,7 +1637,7 @@
                     <span class="n">criteria_obj</span><span class="o">.</span><span class="n">mark_found</span><span class="p">()</span>
 
         <span class="n">exp_ns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">exp_ns</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">exp_ns</span><span class="p">}</span>
 
         <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">fom_values</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -1637,32 +1646,33 @@
                     <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">success</span> <span class="o">=</span> <span class="n">success</span> <span class="ow">and</span> <span class="n">criteria_list</span><span class="o">.</span><span class="n">passed</span><span class="p">()</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;fom_values = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fom_values</span><span class="p">)</span>
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;EXPERIMENT_CHAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;N_REPEATS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">n_repeats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;EXPERIMENT_CHAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">experiment_status</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">experiment_status</span><span class="o">.</span><span class="n">FAILED</span><span class="p">)</span>
 
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">success</span> <span class="ow">or</span> <span class="n">workspace</span><span class="o">.</span><span class="n">always_print_foms</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;TAGS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_tags</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;TAGS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_tags</span><span class="p">)</span>
 
             <span class="c1"># Add defined keywords as top level keys</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">is_key_level</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-                    <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
                 <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keys</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">is_key_level</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
-                    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="k">for</span> <span class="n">context</span><span class="p">,</span> <span class="n">fom_map</span> <span class="ow">in</span> <span class="n">fom_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">context_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">context</span><span class="p">,</span> <span class="s1">&#39;foms&#39;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -1672,9 +1682,171 @@
                     <span class="n">fom_copy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fom_name</span>
                     <span class="n">context_map</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fom_copy</span><span class="p">)</span>
 
-                <span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_map</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_map</span><span class="p">)</span>
 
-        <span class="n">workspace</span><span class="o">.</span><span class="n">append_result</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="n">workspace</span><span class="o">.</span><span class="n">append_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ApplicationBase.calculate_statistics">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.calculate_statistics">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate statistics for results of repeated experiments</span>
+
+<span class="sd">        When repeated experiments are used, this method aggregates the results of</span>
+<span class="sd">        each experiment&#39;s repeats and calculates statistics for each numeric FOM.</span>
+
+<span class="sd">        If a FOM is non-numeric, no calculations are performed.</span>
+
+<span class="sd">        Statistics are injected into the results file under the base experiment</span>
+<span class="sd">        namespace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Returns true if a fom value is numeric&quot;&quot;&quot;</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">is_repeat_base</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">repeat_experiments</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">repeat_foms</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">first_repeat_exp</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1"># repeat_experiments dict = {repeat_experiment_namespace: {dict}}</span>
+        <span class="c1"># repeat_foms dict = {context: {(fom_name, units, origin, origin_type): [list of values]}}</span>
+        <span class="c1"># origin_type is generated as &#39;summary::stat_name&#39;</span>
+
+        <span class="n">base_exp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_name</span>
+        <span class="n">base_exp_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span>
+
+        <span class="c1"># Create a list of all repeats by inserting repeat index</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">base_exp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                <span class="ow">and</span> <span class="n">base_exp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">insert_idx</span> <span class="o">=</span> <span class="n">base_exp_name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;.chain&#39;</span><span class="p">)</span>
+                <span class="n">repeat_exp_namespace</span> <span class="o">=</span> <span class="n">base_exp_name</span><span class="p">[:</span><span class="n">insert_idx</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">&#39;</span> \
+                    <span class="o">+</span> <span class="n">base_exp_name</span><span class="p">[</span><span class="n">insert_idx</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">base_exp_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span>
+                <span class="n">repeat_exp_namespace</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">base_exp_namespace</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">repeat_experiments</span><span class="p">[</span><span class="n">repeat_exp_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">repeat_experiments</span><span class="p">[</span><span class="n">repeat_exp_namespace</span><span class="p">][</span><span class="s1">&#39;base_exp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_exp_namespace</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">first_repeat_exp</span> <span class="o">=</span> <span class="n">repeat_exp_namespace</span>
+
+        <span class="c1"># Create initial results dict since analysis pipeline was skipped for base exp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">base_exp_namespace</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;N_REPEATS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">n_repeats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;EXPERIMENT_CHAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># If repeat_success_strict is true, one failed experiment will fail the whole set</span>
+        <span class="c1"># and statistics will not be calculated</span>
+        <span class="c1"># If repeat_success_strict is false, statistics will be calculated for all successful</span>
+        <span class="c1"># experiments</span>
+        <span class="n">repeat_success</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">exp_success</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">repeat_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">exp_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">exp</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">exp_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">[</span><span class="n">exp</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">exp_success</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exp_inst</span><span class="o">.</span><span class="n">get_status</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">repeat_success_strict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">experiment_status</span><span class="o">.</span><span class="n">FAILED</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">exp_success</span><span class="p">:</span>
+                <span class="n">repeat_success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repeat_success</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">experiment_status</span><span class="o">.</span><span class="n">SUCCESS</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">exp_success</span><span class="p">:</span>
+                <span class="n">repeat_success</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repeat_success</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">repeat_success</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">experiment_status</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">experiment_status</span><span class="o">.</span><span class="n">FAILED</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">repeat_success</span> <span class="ow">or</span> <span class="n">workspace</span><span class="o">.</span><span class="n">always_print_foms</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Calculating statistics for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">n_repeats</span><span class="si">}</span><span class="s1"> repeats of &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">base_exp_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_RAW_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Iterate through repeat experiment instances, extract foms, and aggregate them</span>
+            <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">repeat_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">exp_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">exp</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">exp_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">[</span><span class="n">exp</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># When strict success is off for repeats (loose success), skip failed exps</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">workspace</span><span class="o">.</span><span class="n">repeat_success_strict</span>
+                    <span class="ow">and</span> <span class="n">exp_inst</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;FAILED&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="s1">&#39;CONTEXTS&#39;</span> <span class="ow">in</span> <span class="n">exp_inst</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">exp_inst</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]:</span>
+                        <span class="n">context_name</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+                        <span class="k">if</span> <span class="n">context_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repeat_foms</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">repeat_foms</span><span class="p">[</span><span class="n">context_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+                        <span class="k">for</span> <span class="n">foms</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
+                            <span class="n">fom_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">foms</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">foms</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">],</span>
+                                       <span class="n">foms</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">],</span> <span class="n">foms</span><span class="p">[</span><span class="s1">&#39;origin_type&#39;</span><span class="p">])</span>
+
+                            <span class="c1"># Stats will not be calculated for non-numeric foms so they&#39;re skipped</span>
+                            <span class="k">if</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">foms</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]):</span>
+                                <span class="k">if</span> <span class="n">fom_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repeat_foms</span><span class="p">[</span><span class="n">context_name</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                    <span class="n">repeat_foms</span><span class="p">[</span><span class="n">context_name</span><span class="p">][</span><span class="n">fom_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                                <span class="n">repeat_foms</span><span class="p">[</span><span class="n">context_name</span><span class="p">][</span><span class="n">fom_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">foms</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]))</span>
+
+            <span class="c1"># Iterate through the aggregated foms, calculate stats, and insert into results</span>
+            <span class="k">for</span> <span class="n">context</span><span class="p">,</span> <span class="n">fom_dict</span> <span class="ow">in</span> <span class="n">repeat_foms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">context_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">context</span><span class="p">,</span> <span class="s1">&#39;foms&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+                <span class="k">for</span> <span class="n">fom_key</span><span class="p">,</span> <span class="n">fom_values</span> <span class="ow">in</span> <span class="n">fom_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">fom_name</span> <span class="o">=</span> <span class="n">fom_key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">fom_units</span> <span class="o">=</span> <span class="n">fom_key</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">fom_origin</span> <span class="o">=</span> <span class="n">fom_key</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                    <span class="n">calcs</span> <span class="o">=</span> <span class="p">[]</span>
+
+                    <span class="k">for</span> <span class="n">statistic</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">all_stats</span><span class="p">:</span>
+                        <span class="n">calcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">statistic</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">fom_values</span><span class="p">,</span> <span class="n">fom_units</span><span class="p">))</span>
+
+                    <span class="k">for</span> <span class="n">calc</span> <span class="ow">in</span> <span class="n">calcs</span><span class="p">:</span>
+                        <span class="n">fom_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">calc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">calc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">fom_origin</span><span class="p">,</span>
+                                    <span class="s1">&#39;origin_type&#39;</span><span class="p">:</span> <span class="n">calc</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">fom_name</span><span class="p">}</span>
+
+                        <span class="n">context_map</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fom_dict</span><span class="p">)</span>
+
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_map</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span>
+
+        <span class="n">workspace</span><span class="o">.</span><span class="n">insert_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">first_repeat_exp</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_new_file_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a dictionary to represent a new log file&quot;&quot;&quot;</span>
@@ -1963,7 +2135,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 08, 2024.
+      <span class="lastupdated">Last updated on Feb 09, 2024.
       </span></p>
   </div>
 

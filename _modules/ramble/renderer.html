@@ -105,6 +105,7 @@
 
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.expander</span>
+<span class="kn">import</span> <span class="nn">ramble.repeats</span>
 <span class="kn">from</span> <span class="nn">ramble.namespace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
 <span class="kn">import</span> <span class="nn">ramble.util.matrices</span>
@@ -147,6 +148,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zips</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="RenderGroup.copy_contents">
 <a class="viewcode-back" href="../../ramble.html#ramble.renderer.RenderGroup.copy_contents">[docs]</a>
@@ -239,12 +241,18 @@
 <span class="sd">        After processing the expansion logic, this function yields a dictionary</span>
 <span class="sd">        of variable definitions, one for each object that would be rendered.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            Yield a dictionary of variables for single object definition</span>
+<span class="sd">        If n_repeats is defined in input variables, this function yields one base</span>
+<span class="sd">        and n copies of the rendered variable dictionary.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            - a dictionary of variables for single object definition</span>
+<span class="sd">            - a Repeats object indicating if rendered object is a repeat and its index</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">variables</span>
         <span class="n">zips</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">zips</span>
         <span class="n">matrices</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">matrices</span>
+        <span class="n">n_repeats</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">n_repeats</span>
 
         <span class="n">object_variables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -488,7 +496,17 @@
                         <span class="n">keep_object</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="n">keep_object</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">object_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+                <span class="c1"># If n_repeats is set, yield 1 base and n duplicate copies of each object</span>
+                <span class="c1"># repeats = (is_repeat_base, [T:n_repeats|F:repeat index or 0 if not a repeat])</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_repeats</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">repeats</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">Repeats</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="n">n_repeats</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># this is a repeat base</span>
+                        <span class="n">repeats</span><span class="o">.</span><span class="n">set_repeats</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">n_repeats</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># this is a repeat with index n</span>
+                        <span class="n">repeats</span><span class="o">.</span><span class="n">set_repeat_index</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                    <span class="c1"># maybe yield a tuple of vars and repeat info</span>
+                    <span class="k">yield</span> <span class="n">object_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">repeats</span></div>
 </div>
 
 
@@ -508,7 +526,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 08, 2024.
+      <span class="lastupdated">Last updated on Feb 09, 2024.
       </span></p>
   </div>
 

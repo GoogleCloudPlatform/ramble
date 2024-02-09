@@ -202,6 +202,30 @@ through and not cause an error. This is useful for things like `${ENV_VAR}`
 that are recognized as a variable. When passthrough is disabled, any variables
 that fail to expand will raise a syntax error, which can aid in debugging.
 
+.. _experiment-repeats-config-option:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Experiment Repeats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The repeats config options within the ``config`` section are used to define a number
+of times each experiment will be repeated. Summary statistics will be calculated for
+the set of repeats. Its format is as follows:
+
+.. code-block:: yaml
+
+    config:
+      n_repeats: 'int'
+      repeats_success_strict: [True/False]
+
+By default, a set of repeats is successful if all individual repeats are successful.
+When ``repeats_success_strict`` is set to false, the set will be considered successful
+if any repeat succeeds, and statistics will be calculated over the successful experiments
+only.
+
+More information on using repeats within a workspace can be found in the
+:ref:`workspace configuration file<workspace-config>`.
+
 .. _env-vars-config:
 
 ------------------------------
@@ -556,7 +580,6 @@ old files, changing the configuration of the environment that Ramble will use
 for the experiments it generates.
 
 
-
 .. _success-criteria-config:
 
 -------------------------
@@ -577,6 +600,7 @@ use when determining if they were successful or not. Its format is as follows:
 
 For more information about using success criteria, see the
 :ref:`success criteria documentation<success-criteria>`.
+
 
 .. _variables-config:
 

@@ -21,3 +21,11 @@ ramble.test.util.env module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.test.util.stats module
+-----------------------------
+
+.. automodule:: ramble.test.util.stats
+   :members:
+   :undoc-members:
+   :show-inheritance:

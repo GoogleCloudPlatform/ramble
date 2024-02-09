@@ -14,6 +14,14 @@ ramble.test.success\_criteria.always\_print\_foms module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.success\_criteria.repeat\_success\_strict module
+------------------------------------------------------------
+
+.. automodule:: ramble.test.success_criteria.repeat_success_strict
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.success\_criteria.success\_fom\_comparison module
 -------------------------------------------------------------
 

@@ -177,6 +177,14 @@ ramble.renderer module
    :undoc-members:
    :show-inheritance:
 
+ramble.repeats module
+---------------------
+
+.. automodule:: ramble.repeats
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.repository module
 ------------------------
 

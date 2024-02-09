@@ -129,6 +129,14 @@ ramble.util.spec\_utils module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.stats module
+------------------------
+
+.. automodule:: ramble.util.stats
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.web module
 ----------------------
 

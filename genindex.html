@@ -545,6 +545,8 @@
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.CacheURLFetchStrategy">CacheURLFetchStrategy (class in ramble.fetch_strategy)</a>
 </li>
+      <li><a href="ramble.html#ramble.application.ApplicationBase.calculate_statistics">calculate_statistics() (ramble.application.ApplicationBase method)</a>
+</li>
       <li><a href="ramble.html#ramble.fetch_strategy.URLFetchStrategy.candidate_urls">candidate_urls (ramble.fetch_strategy.URLFetchStrategy property)</a>
 </li>
       <li><a href="ramble.util.html#ramble.util.path.canonicalize_path">canonicalize_path() (in module ramble.util.path)</a>
@@ -649,6 +651,26 @@
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.compiler_spec">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsBase.compute">compute() (ramble.util.stats.StatsBase method)</a>
+
+      <ul>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsCountValues.compute">(ramble.util.stats.StatsCountValues method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMax.compute">(ramble.util.stats.StatsMax method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMean.compute">(ramble.util.stats.StatsMean method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMedian.compute">(ramble.util.stats.StatsMedian method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMin.compute">(ramble.util.stats.StatsMin method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsStdev.compute">(ramble.util.stats.StatsStdev method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsVar.compute">(ramble.util.stats.StatsVar method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.repository.ReposFinder.compute_loader">compute_loader() (ramble.repository.ReposFinder method)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.concretize">concretize() (ramble.spack_runner.SpackRunner method)</a>
@@ -661,8 +683,6 @@
       </ul></li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.concretize_config_name">concretize_config_name (ramble.spack_runner.SpackRunner attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.config.config">config (in module ramble.config)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.config.config">config() (in module ramble.cmd.config)</a>
@@ -843,6 +863,8 @@
         <li><a href="ramble.util.html#ramble.util.logger.Logger.debug">(ramble.util.logger.Logger method)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.util.html#ramble.util.stats.decimal_places">decimal_places() (in module ramble.util.stats)</a>
+</li>
       <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE.DEFAULT">DEFAULT (ramble.schema.types.OUTPUT_CAPTURE attribute)</a>
 </li>
       <li><a href="ramble.language.html#ramble.language.shared_language.default_compiler">default_compiler() (in module ramble.language.shared_language)</a>
@@ -879,10 +901,10 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.default_results">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
-      <li><a href="ramble.util.html#ramble.util.directives.define_directive_methods">define_directive_methods() (in module ramble.util.directives)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.util.html#ramble.util.directives.define_directive_methods">define_directive_methods() (in module ramble.util.directives)</a>
+</li>
       <li><a href="ramble.html#ramble.expander.ExpansionNode.define_value">define_value() (ramble.expander.ExpansionNode method)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.attributes.defined_objects">defined_objects() (in module ramble.cmd.attributes)</a>
@@ -1087,6 +1109,8 @@
         <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.executables">(ramble.application_types.executable.ExecutableApplication attribute)</a>
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.executables">(ramble.application_types.spack.SpackApplication attribute)</a>
+</li>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.executables">(ramble.modifier.ModifierBase attribute)</a>
 </li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executables">(ramble.modifier_types.basic.BasicModifier attribute)</a>
 </li>
@@ -1716,6 +1740,8 @@
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.inputs">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.inputs">(ramble.modifier.ModifierBase attribute)</a>
+</li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs">(ramble.modifier_types.basic.BasicModifier attribute)</a>
 </li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs">(ramble.modifier_types.spack.SpackModifier attribute)</a>
@@ -1725,6 +1751,12 @@
 </li>
       <li><a href="ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.insert_data">insert_data() (ramble.experimental.uploader.BigQueryUploader method)</a>
 </li>
+      <li><a href="ramble.workspace.html#ramble.workspace.Workspace.insert_result">insert_result() (ramble.workspace.Workspace method)</a>
+
+      <ul>
+        <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.insert_result">(ramble.workspace.workspace.Workspace method)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.install">install() (ramble.spack_runner.SpackRunner method)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.install_compiler">install_compiler() (ramble.spack_runner.SpackRunner method)</a>
@@ -1735,14 +1767,14 @@
 </li>
       <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_modifier">intel_aps_modifier() (in module ramble.test.modifier_functionality.modifier_helpers)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.internal">internal (ramble.workspace.Workspace property)</a>
 
       <ul>
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.internal">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.config.InternalConfigScope">InternalConfigScope (class in ramble.config)</a>
 </li>
       <li><a href="ramble.html#ramble.namespace.namespace.internals">internals (ramble.namespace.namespace attribute)</a>
@@ -1979,6 +2011,8 @@
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.matrix">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.util.html#ramble.util.stats.max_decimal_places">max_decimal_places() (in module ramble.util.stats)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.flake8.max_line_length">max_line_length (in module ramble.cmd.flake8)</a>
 </li>
       <li><a href="ramble.html#ramble.context.Context.merge_context">merge_context() (ramble.context.Context method)</a>
@@ -2201,6 +2235,8 @@
 </li>
         <li><a href="ramble.html#module-ramble.renderer">ramble.renderer</a>
 </li>
+        <li><a href="ramble.html#module-ramble.repeats">ramble.repeats</a>
+</li>
         <li><a href="ramble.html#module-ramble.repository">ramble.repository</a>
 </li>
         <li><a href="ramble.schema.html#module-ramble.schema">ramble.schema</a>
@@ -2311,6 +2347,8 @@
 </li>
         <li><a href="ramble.util.html#module-ramble.util.spec_utils">ramble.util.spec_utils</a>
 </li>
+        <li><a href="ramble.util.html#module-ramble.util.stats">ramble.util.stats</a>
+</li>
         <li><a href="ramble.util.html#module-ramble.util.web">ramble.util.web</a>
 </li>
         <li><a href="ramble.workspace.html#module-ramble.workspace">ramble.workspace</a>
@@ -2332,12 +2370,32 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.namespace.namespace.n_repeats">n_repeats (ramble.namespace.namespace attribute)</a>
+
+      <ul>
+        <li><a href="ramble.workspace.html#ramble.workspace.namespace.n_repeats">(ramble.workspace.namespace attribute)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.name">name (ramble.application.ApplicationBase attribute)</a>
 
       <ul>
         <li><a href="ramble.html#ramble.mirror.Mirror.name">(ramble.mirror.Mirror property)</a>
 </li>
         <li><a href="ramble.html#ramble.modifier.ModifierBase.name">(ramble.modifier.ModifierBase attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsCountValues.name">(ramble.util.stats.StatsCountValues attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMax.name">(ramble.util.stats.StatsMax attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMean.name">(ramble.util.stats.StatsMean attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMedian.name">(ramble.util.stats.StatsMedian attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsMin.name">(ramble.util.stats.StatsMin attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsStdev.name">(ramble.util.stats.StatsStdev attribute)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsVar.name">(ramble.util.stats.StatsVar attribute)</a>
 </li>
         <li><a href="ramble.workspace.html#ramble.workspace.Workspace.name">(ramble.workspace.Workspace property)</a>
 </li>
@@ -2360,6 +2418,8 @@
 </li>
       <li><a href="ramble.util.html#ramble.util.naming.NamespaceTrie.Element">NamespaceTrie.Element (class in ramble.util.naming)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.repository.Indexer.needs_update">needs_update() (ramble.repository.Indexer method)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.nested_1">nested_1() (in module ramble.cmd.software_definitions)</a>
@@ -2374,8 +2434,6 @@
         <li><a href="ramble.util.html#ramble.util.colors.nested_2">(in module ramble.util.colors)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.util.html#ramble.util.colors.nested_3">nested_3() (in module ramble.util.colors)</a>
 </li>
       <li><a href="ramble.util.html#ramble.util.colors.nested_4">nested_4() (in module ramble.util.colors)</a>
@@ -2545,6 +2603,8 @@
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.phase_definitions">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.phase_definitions">(ramble.modifier.ModifierBase attribute)</a>
+</li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.phase_definitions">(ramble.modifier_types.basic.BasicModifier attribute)</a>
 </li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.phase_definitions">(ramble.modifier_types.spack.SpackModifier attribute)</a>
@@ -2570,10 +2630,10 @@
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.workspace.prepare_config_scope">prepare_config_scope() (in module ramble.workspace.workspace)</a>
 </li>
-      <li><a href="ramble.cmd.html#ramble.cmd.commands.prepend_header">prepend_header() (in module ramble.cmd.commands)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.cmd.html#ramble.cmd.commands.prepend_header">prepend_header() (in module ramble.cmd.commands)</a>
+</li>
       <li><a href="ramble.util.imp.html#ramble.util.imp.imp_importer.prepend_open">prepend_open() (in module ramble.util.imp.imp_importer)</a>
 </li>
       <li><a href="ramble.util.imp.html#ramble.util.imp.importlib_importer.PrependFileLoader">PrependFileLoader (class in ramble.util.imp.importlib_importer)</a>
@@ -3071,6 +3131,13 @@
 </li>
       </ul></li>
       <li>
+    ramble.repeats
+
+      <ul>
+        <li><a href="ramble.html#module-ramble.repeats">module</a>
+</li>
+      </ul></li>
+      <li>
     ramble.repository
 
       <ul>
@@ -3273,8 +3340,6 @@
         <li><a href="ramble.test.html#module-ramble.test.dry_run_helpers">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.end_to_end
 
@@ -3282,6 +3347,8 @@
         <li><a href="ramble.test.end_to_end.html#module-ramble.test.end_to_end">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.modifier_functionality
 
@@ -3458,6 +3525,13 @@
 </li>
       </ul></li>
       <li>
+    ramble.util.stats
+
+      <ul>
+        <li><a href="ramble.util.html#module-ramble.util.stats">module</a>
+</li>
+      </ul></li>
+      <li>
     ramble.util.web
 
       <ul>
@@ -3595,6 +3669,8 @@
 </li>
       <li><a href="ramble.html#ramble.renderer.RenderGroup">RenderGroup (class in ramble.renderer)</a>
 </li>
+      <li><a href="ramble.html#ramble.repeats.Repeats">Repeats (class in ramble.repeats)</a>
+</li>
       <li><a href="ramble.html#ramble.repository.Repo">Repo (class in ramble.repository)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.repo.repo">repo() (in module ramble.cmd.repo)</a>
@@ -3618,7 +3694,17 @@
       <li><a href="ramble.html#ramble.repository.RepoPath">RepoPath (class in ramble.repository)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.debug.report">report() (in module ramble.cmd.debug)</a>
+
+      <ul>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsBase.report">(ramble.util.stats.StatsBase method)</a>
 </li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsCountValues.report">(ramble.util.stats.StatsCountValues method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsStdev.report">(ramble.util.stats.StatsStdev method)</a>
+</li>
+        <li><a href="ramble.util.html#ramble.util.stats.StatsVar.report">(ramble.util.stats.StatsVar method)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.html#ramble.repository.ReposFinder">ReposFinder (class in ramble.repository)</a>
 </li>
       <li><a href="ramble.html#ramble.repository.RepositoryNamespace">RepositoryNamespace (class in ramble.repository)</a>
@@ -3841,6 +3927,10 @@
 </li>
       <li><a href="ramble.html#ramble.mirror.Mirror.set_profile">set_profile() (ramble.mirror.Mirror method)</a>
 </li>
+      <li><a href="ramble.html#ramble.repeats.Repeats.set_repeat_index">set_repeat_index() (ramble.repeats.Repeats method)</a>
+</li>
+      <li><a href="ramble.html#ramble.repeats.Repeats.set_repeats">set_repeats() (ramble.repeats.Repeats method)</a>
+</li>
       <li><a href="ramble.html#ramble.experiment_set.ExperimentSet.set_required_var">set_required_var() (ramble.experiment_set.ExperimentSet method)</a>
 </li>
       <li><a href="ramble.html#ramble.application.ApplicationBase.set_status">set_status() (ramble.application.ApplicationBase method)</a>
@@ -3913,14 +4003,14 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_dir">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.shared_license_dir">shared_license_dir (ramble.workspace.Workspace property)</a>
 
       <ul>
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_license_dir">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.language.html#ramble.language.shared_language.SharedMeta">SharedMeta (class in ramble.language.shared_language)</a>
 </li>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.shell_init_instructions">shell_init_instructions() (in module ramble.cmd.common)</a>
@@ -4044,6 +4134,22 @@
       <li><a href="ramble.html#ramble.main.stat_names">stat_names (in module ramble.main)</a>
 </li>
       <li><a href="ramble.html#ramble.mirror.MirrorStats.stats">stats() (ramble.mirror.MirrorStats method)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsBase">StatsBase (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsCountValues">StatsCountValues (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsMax">StatsMax (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsMean">StatsMean (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsMedian">StatsMedian (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsMin">StatsMin (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsStdev">StatsStdev (class in ramble.util.stats)</a>
+</li>
+      <li><a href="ramble.util.html#ramble.util.stats.StatsVar">StatsVar (class in ramble.util.stats)</a>
 </li>
       <li><a href="ramble.schema.html#ramble.schema.types.OUTPUT_CAPTURE.STDERR">STDERR (ramble.schema.types.OUTPUT_CAPTURE attribute)</a>
 </li>
@@ -4416,6 +4522,8 @@
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workload_variables">(ramble.application_types.spack.SpackApplication attribute)</a>
 </li>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.workload_variables">(ramble.modifier.ModifierBase attribute)</a>
+</li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workload_variables">(ramble.modifier_types.basic.BasicModifier attribute)</a>
 </li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workload_variables">(ramble.modifier_types.spack.SpackModifier attribute)</a>
@@ -4429,6 +4537,8 @@
         <li><a href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.workloads">(ramble.application_types.executable.ExecutableApplication attribute)</a>
 </li>
         <li><a href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workloads">(ramble.application_types.spack.SpackApplication attribute)</a>
+</li>
+        <li><a href="ramble.html#ramble.modifier.ModifierBase.workloads">(ramble.modifier.ModifierBase attribute)</a>
 </li>
         <li><a href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workloads">(ramble.modifier_types.basic.BasicModifier attribute)</a>
 </li>
@@ -4534,7 +4644,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 08, 2024.
+      <span class="lastupdated">Last updated on Feb 09, 2024.
       </span></p>
   </div>
 

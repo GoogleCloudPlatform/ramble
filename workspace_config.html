@@ -69,6 +69,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#explicit-variable-zips">Explicit Variable Zips:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-exclusion">Experiment Exclusion:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#experiment-repeats">Experiment Repeats:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#templatized-workloads">Templatized Workloads:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cross-experiment-variable-references">Cross Experiment Variable References:</a></li>
@@ -494,6 +495,30 @@ an experiment, that experiment will be excluded from generation. To be more
 explicit, all <code class="docutils literal notranslate"><span class="pre">where</span></code> statements are joined together with <code class="docutils literal notranslate"><span class="pre">or</span></code> operators.
 Within any single <code class="docutils literal notranslate"><span class="pre">where</span></code> statement, operators can be joined together with
 <code class="docutils literal notranslate"><span class="pre">and</span></code> and <code class="docutils literal notranslate"><span class="pre">or</span></code> operators as well.</p>
+</section>
+<section id="experiment-repeats">
+<span id="ramble-experiment-repeats"></span><h3>Experiment Repeats:<a class="headerlink" href="#experiment-repeats" title="Link to this heading"></a></h3>
+<p>Ramble provides a simple mechanism to repeat the same experiment a specified number of
+times, and calculates summary statistics for the set of repeated experiments. To enable
+repeats, an <code class="docutils literal notranslate"><span class="pre">n_repeats</span></code> block can be added at the application, workload, or experiment
+level.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">    </span><span class="nt">repeats_success_strict</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">True/False</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">n_repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">      </span><span class="nt">workloads</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">serial</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">n_repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">test_experiment</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">n_repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+</pre></div>
+</div>
+<p>More information on setting repeats at the config level can be found in the
+<a class="reference internal" href="configuration_files.html#experiment-repeats-config-option"><span class="std std-ref">configuration files</span></a> documentation.</p>
 </section>
 <section id="environment-variable-control">
 <h3>Environment Variable Control:<a class="headerlink" href="#environment-variable-control" title="Link to this heading"></a></h3>
@@ -1206,7 +1231,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 08, 2024.
+      <span class="lastupdated">Last updated on Feb 09, 2024.
       </span></p>
   </div>
 
