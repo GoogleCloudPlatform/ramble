@@ -31,6 +31,7 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, 'figures_of_merit')
     assert hasattr(test_app, 'inputs')
     assert hasattr(test_app, 'workload_variables')
+    assert hasattr(test_app, 'environment_variables')
     assert hasattr(test_app, 'default_compilers')
     assert hasattr(test_app, 'software_specs')
     assert hasattr(test_app, 'required_packages')

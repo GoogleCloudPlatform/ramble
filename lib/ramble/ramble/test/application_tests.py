@@ -30,6 +30,7 @@ def test_app_features(mutable_mock_apps_repo, app):
     assert hasattr(app_inst, 'software_specs')
     assert hasattr(app_inst, 'required_packages')
     assert hasattr(app_inst, 'workload_variables')
+    assert hasattr(app_inst, 'environment_variables')
     assert hasattr(app_inst, 'builtins')
 
 

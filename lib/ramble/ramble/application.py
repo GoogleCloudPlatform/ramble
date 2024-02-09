@@ -314,6 +314,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 if 'tags' in wl_conf and wl_conf['tags']:
                     out_str.append(colified(wl_conf['tags'], indent=8) + '\n')
 
+                if wl_name in self.environment_variables:
+                    out_str.append(rucolor.nested_1('\tEnvironment Variables:\n'))
+                    for var, conf in self.environment_variables[wl_name].items():
+                        indent = '\t\t'
+
+                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
+                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
+                        out_str.append(f'{indent}\tValue: {conf["value"]}\n')
+
                 if wl_name in self.workload_variables:
                     out_str.append(rucolor.nested_1('\tVariables:\n'))
                     for var, conf in self.workload_variables[wl_name].items():
@@ -839,6 +848,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for var, conf in wl_vars.items():
                 if var not in self.variables.keys():
                     self.variables[var] = conf['default']
+
+        if self.expander.workload_name in self.environment_variables:
+            wl_env_vars = self.environment_variables[self.expander.workload_name]
+
+            for name, vals in wl_env_vars.items():
+
+                action = vals['action']
+                value = vals['value']
+
+                for env_var_set in self._env_variable_sets:
+                    if action in env_var_set:
+                        if name not in env_var_set[action].keys():
+                            env_var_set[action][name] = value
 
     def _inject_commands(self, executables):
         """For add_expand_vars, inject all commands"""
