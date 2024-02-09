@@ -29,9 +29,9 @@ Within the ``ramble.yaml`` file, there are two top level dictionairies.
 Each of these dictionaries is used to control different aspects of the Ramble
 workspace.
 
-------------------
-Ramble Dictionary:
-------------------
+-----------------
+Ramble Dictionary
+-----------------
 
 The ramble dictionary is used to control the experiments a workspace is
 responsible for configuring, executing, analyzing, and archiving.
@@ -65,9 +65,9 @@ The name ``variables`` defines arbitrary variables, and will be explained in
 
 .. _experiment-names:
 
-^^^^^^^^^^^^^^^^^
-Experiment Names:
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+Experiment Names
+^^^^^^^^^^^^^^^^
 
 While the names of applications and workloads are defined by the application
 definition file, experiment names are more arbitrary. Experiment names are
@@ -96,9 +96,9 @@ or ramble will throw an error.
 
 .. _variable-dictionaries:
 
-^^^^^^^^^^^^^^^^^^^^^^
-Variable Dictionaries:
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+Variable Dictionaries
+^^^^^^^^^^^^^^^^^^^^^
 
 Within a variable dictionary, arbitrary variables can be defined. Defined
 variables apply to all experiments within their scope.
@@ -137,9 +137,9 @@ experiment. This experiment will also include definitions for
 
 .. _ramble-supported-functions:
 
-~~~~~~~~~~~~~~~~~~~~
-Supported Functions:
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+Supported Functions
+~~~~~~~~~~~~~~~~~~~
 
 Ramble's variable expansion logic supports several mathematical operators and
 functions to help construct useful variable definitions.
@@ -182,9 +182,9 @@ to ``\{``).
 
 .. _ramble-vector-logic:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-List (or Vector) Variables:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+List (or Vector) Variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 Variables can be defined as a list of values as well (again, following the same
 math and variable expansion syntax as defined above).
 
@@ -244,9 +244,9 @@ to create a list. With this functionality, the example above could be re-written
 
 .. _ramble-matrix-logic:
 
-^^^^^^^^^^^^^^^^^^
-Variable Matrices:
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+Variable Matrices
+^^^^^^^^^^^^^^^^^
 
 In addition to allowing variables, Ramble's config file has a special syntax for define variable matrices.
 
@@ -320,9 +320,9 @@ there would be 4 experiments, each defined by a unique
 .. _ramble-explicit-zips:
 
 
-^^^^^^^^^^^^^^^^^^^^^^^
-Explicit Variable Zips:
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+Explicit Variable Zips
+^^^^^^^^^^^^^^^^^^^^^^
 
 A common pattern in python for iterating over multiple lists in lock-step is to
 use something called a zip. For more information on how this behaves in
@@ -375,9 +375,9 @@ the zip of ``partition`` and ``processes_per_node``.
 
 .. _ramble-experiment-exclusion:
 
-^^^^^^^^^^^^^^^^^^^^^
-Experiment Exclusion:
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+Experiment Exclusion
+^^^^^^^^^^^^^^^^^^^^
 
 When writing a workspace configuration file, experiments can be explicitly
 excluded from the generated set using an ``exclude`` block inside the
@@ -471,9 +471,9 @@ Within any single ``where`` statement, operators can be joined together with
 
 .. _ramble-experiment-repeats:
 
-^^^^^^^^^^^^^^^^^^^
-Experiment Repeats:
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
+Experiment Repeats
+^^^^^^^^^^^^^^^^^^
 
 Ramble provides a simple mechanism to repeat the same experiment a specified number of
 times, and calculates summary statistics for the set of repeated experiments. To enable
@@ -499,9 +499,11 @@ level.
 More information on setting repeats at the config level can be found in the
 :ref:`configuration files<experiment-repeats-config-option>` documentation.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Environment Variable Control:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Environment Variable Control
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Environment variables can be controlled using an
 :ref:`env_var config section<env-vars-config>`,
 defined at the appropriate level of the workspace config.
@@ -534,9 +536,9 @@ Would result in roughly the following bash commands:
     export PATH=prepend_path:$PATH:app_path
     unset LD_LIBRARY_PATH
 
-^^^^^^^^^^^^^^^^^^^^^^
-Templatized Workloads:
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+Templatized Workloads
+^^^^^^^^^^^^^^^^^^^^^
 
 As previously shown, variables can be defined using lists or matrices. In addition to
 controlling several aspects of experiments, list and matrix variables can be used to
@@ -561,9 +563,9 @@ the names of the workloads we'd like to generate experiments for. Any variable
 can be used to define the name of the workloads, except those reserved by
 Ramble. These can be seen in the :ref:`ramble-reserved-variables` section.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Cross Experiment Variable References:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cross Experiment Variable References
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Variables can be defined to pull the value of a variable out of a different
 experiment. This is particularly useful when an experiment needs the path to
 something ramble automatically generates in a different experiment.
@@ -598,9 +600,9 @@ In the above example, ``test_value`` extracts the value of ``real_value`` as
 defined in the experiment ``hostname.serial.test_exp1``. When evaluated, this
 will set ``test_value`` to ``'exp1_value'``.
 
-^^^^^^^^^^^^^^^^^^^^^
-Experiment Modifiers:
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+Experiment Modifiers
+^^^^^^^^^^^^^^^^^^^^
 
 In addition to containing application definitions, Ramble also provides
 experiment modifiers. Experiment modifiers encapsulate several aspects of a
@@ -707,9 +709,9 @@ filter pipeline commands, as show in the
 
 .. _workspace_internals:
 
-^^^^^^^^^^^^^^^^^^^^^^
-Controlling Internals:
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+Controlling Internals
+^^^^^^^^^^^^^^^^^^^^^
 
 Within a workspace config, an internals dictionary can be used to control
 several internal aspects of the application, workload, and experiment.
@@ -719,9 +721,9 @@ This config section is defined in the
 
 Below are examples of using this within a workspace config file.
 
-"""""""""""""""""""
-Custom Executables:
-"""""""""""""""""""
+""""""""""""""""""
+Custom Executables
+""""""""""""""""""
 
 Custom executables can be created within the internals dictionary. Below is an
 example, showing how to create a ``lscpu`` executable at the application level.
@@ -744,9 +746,9 @@ The above example creates a custom executable, named ``lscpu`` that will inject
 the command ``lscpu`` into the command for an experiment when it is used. It is
 important to note that this only creates the executable, and does not use it.
 
-"""""""""""""""""""""""""""""
-Controlling Executable Order:
-"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""
+Controlling Executable Order
+""""""""""""""""""""""""""""
 
 The internals dictionary allows the ability to control the order pre-defined
 executables (or custom executables) are pieced together to build an experiment.
@@ -776,9 +778,9 @@ serial/parallel]`` but this changes the order and injects ``lscpu`` into the
 expansion.
 
 
-"""""""""""""""""""""""""""
-Using Executable Injection:
-"""""""""""""""""""""""""""
+""""""""""""""""""""""""""
+Using Executable Injection
+""""""""""""""""""""""""""
 
 Executable order can also be controlled via the ``executable_injection`` block
 within the ``internals`` block. Injecting the ``lscpu`` executable to the end of
@@ -840,16 +842,16 @@ experiment once.
 
 .. _ramble-reserved-variables:
 
-^^^^^^^^^^^^^^^^^^^
-Reserved Variables:
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
+Reserved Variables
+^^^^^^^^^^^^^^^^^^
 
 There are several reserved, auto-generated, and required variables for Ramble
 to function properly. This section will describe them.
 
-"""""""""""""""""""
-Required Variables:
-"""""""""""""""""""
+""""""""""""""""""
+Required Variables
+""""""""""""""""""
 
 Ramble requires the following variables to be defined:
 
@@ -863,9 +865,9 @@ Ramble requires the following variables to be defined:
 * ``mpi_command`` - Template for generating an MPI command
 * ``batch_submit`` - Template for generating a batch system submit command
 
-""""""""""""""""""""
-Generated Variables:
-""""""""""""""""""""
+"""""""""""""""""""
+Generated Variables
+"""""""""""""""""""
 
 Ramble automatically generates definitions for the following variables:
 
@@ -902,9 +904,9 @@ Ramble automatically generates definitions for the following variables:
   ``<template_name>`` is the filename of the template, without the extension.
 * ``command`` - Set to all of the commands needed to perform an experiment.
 
-"""""""""""""""""""""""""""""""""""
-Spack Specific Generated Variables:
-"""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""
+Spack Specific Generated Variables
+""""""""""""""""""""""""""""""""""
 When using spack applications, Ramble also generates the following variables:
 
 * ``<software_spec_name>`` - Set to the equivalent of ``spack location -i
@@ -938,9 +940,9 @@ actually performing the setup of a workspace. When a ``--dry-run`` is
 performed, these paths are not populated.
 
 
------------------
-Spack Dictionary:
------------------
+----------------
+Spack Dictionary
+----------------
 
 Within a ramble.yaml file, the ``spack:`` dictionary controls the software
 stack installation that ramble performs. This configuration section is defined
@@ -958,9 +960,9 @@ directives, which are packages the application might need to run properly.
 Additionally, spack packages can be marked as required through the
 ``required_package`` directive.
 
---------------------------------------------
-Controlling MPI Libraries and Batch Systems:
---------------------------------------------
+-------------------------------------------
+Controlling MPI Libraries and Batch Systems
+-------------------------------------------
 
 Some workspaces might be configured with the goal of exploring the performance
 of different MPI libraries (e.g. MPICH vs. Open MPI), or of performing the same
@@ -970,9 +972,9 @@ This section will show how to perform these experiments within a workspace
 configuration file.
 
 
-^^^^^^^^^^^^^^^^^^^^
-MPI Command Control:
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+MPI Command Control
+^^^^^^^^^^^^^^^^^^^
 
 When writing a ramble configuration file to perform the same experiment with
 different MPI libraries, the MPI section within the Ramble dictionary is
@@ -1034,9 +1036,9 @@ env_name)`` which allows us to pair a specific MPI command to the
 corresponding Gromacs spec.
 
 
-^^^^^^^^^^^^^^^^^^^^^
-Batch System Control:
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+Batch System Control
+^^^^^^^^^^^^^^^^^^^^
 
 Similar to the previously describe MPI command control, experiments can use
 different batch systems by overriding the ``batch_submit`` variable.
@@ -1089,9 +1091,9 @@ template. This means the workspace's configs directory should have two files:
 ``execute_slurm.tpl`` and ``execute_pbs.tpl`` which will be template submission
 scripts to each of the batch systems.
 
-------------------
-Experiment Chains:
-------------------
+-----------------
+Experiment Chains
+-----------------
 
 Multiple experiments can be executed within the same context by a process known
 as chaining, this allows multiple experiments (potentially from multiple
@@ -1104,9 +1106,9 @@ these is simply defining the experiment chain, and the second is defining
 experiments which are only intended to be used when chained into another
 experiment, known as template experiments.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Defining Experiment Chains:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining Experiment Chains
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following example shows how to specify a chain of experiments:
 
@@ -1187,9 +1189,9 @@ Once the experiments are defined, the final order of the chain can be viewed usi
 chain share the same value. This ensures the resulting experiment will be
 complete when executed.
 
-^^^^^^^^^^^^^^^^^^^^^^^^
-Suppressing Experiments:
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+Suppressing Experiments
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The below example shows how to suppress generation of an experiment, by marking
 it as a template.
@@ -1281,9 +1283,9 @@ this root experiment to inject its own value for ``n_nodes`` into the chained
 experiment, overriding its explicitly defined value in the experiment
 definition.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Defining Chains of Chains:
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining Chains of Chains
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ramble supports the ability to define chains of experiment chains. This allows
 an experiment to automatically implicitly include all of the experiments chained
