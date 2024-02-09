@@ -164,6 +164,22 @@ Support functions are:
 * ``range()`` (construct range, see :ref:`ramble vector logic<ramble-vector-logic>` for more information)
 * ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
 
+.. _ramble-escaped-variables:
+
+~~~~~~~~~~~~~~~~~
+Escaped Variables
+~~~~~~~~~~~~~~~~~
+
+When referring to variables in Ramble, sometimes it is useful to be able to
+escape curly braces to prevent the expander from fully expanding the variable
+reference. Curly braces that are prefixed with a back slash (i.e. ``\{`` or
+``\}``) will be ignored by the expander.
+
+Each time the variable is expanded, the escaped curly braces will be replaced
+with unescaped curly braces (i.e. ``\{`` will expand to ``{``). Additional back
+slashes can be added to prevent multiple expansions (i.e. ``\\{`` will expand
+to ``\{``).
+
 .. _ramble-vector-logic:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -543,7 +559,7 @@ replicate an experiment across workloads.
 In the above example, we use the ``application_workloads`` variable to define
 the names of the workloads we'd like to generate experiments for. Any variable
 can be used to define the name of the workloads, except those reserved by
-Ramble. These can be seen in the reserved variables section below.
+Ramble. These can be seen in the :ref:`ramble-reserved-variables` section.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Cross Experiment Variable References:
@@ -821,6 +837,8 @@ this executable, the value of ``n_ranks`` is defined to be the value of
 ``n_nodes``, and ``processes_per_node`` is defined to be ``1``, causing only
 one rank per compute node. This would print the hostname of each node in the
 experiment once.
+
+.. _ramble-reserved-variables:
 
 ^^^^^^^^^^^^^^^^^^^
 Reserved Variables:
