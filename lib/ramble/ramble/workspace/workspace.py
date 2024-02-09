@@ -453,6 +453,7 @@ class Workspace(object):
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
         self.always_print_foms = False
+        self.repeat_success_strict = True
 
         self.read_default_template = read_default_template
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
@@ -805,6 +806,7 @@ class Workspace(object):
                     ramble.context.create_context_from_dict(application, contents)
 
                 self.extract_success_criteria('application', contents)
+
                 yield contents, application_context
 
     def all_workloads(self, application):
@@ -981,6 +983,27 @@ class Workspace(object):
 
         self.results['experiments'].append(result)
 
+    def insert_result(self, result, insert_before_exp):
+        """Insert a result before a specified experiment"""
+
+        def search_exp_index(results_list, exp_to_search):
+            for i, exp in enumerate(results_list):
+                if exp['name'] == exp_to_search:
+                    return i
+            return None
+
+        if not self.results:
+            self.results = self.default_results()
+
+        insert_index = search_exp_index(self.results['experiments'], insert_before_exp)
+
+        tty.debug(f'Attempting to insert result before experiment {insert_before_exp}')
+        if insert_index is not None:
+            self.results['experiments'].insert(insert_index, result)
+        else:
+            tty.debug(f'Could not find {insert_before_exp}, appending result to end instead.')
+            self.results['experiments'].append(result)
+
     def simlink_result(self, filename_base, latest_base, file_extension):
         """
         Create simlink of result file so that results.latest.txt always points
@@ -1003,6 +1026,7 @@ class Workspace(object):
         results.latest.<extension>
 
         """
+
         if not self.results:
             self.results = {}
 
@@ -1032,20 +1056,41 @@ class Workspace(object):
                             f.write(f'  Tags = {exp["TAGS"]}\n')
 
                         if exp['RAMBLE_STATUS'] == 'SUCCESS' or self.always_print_foms:
-                            for context in exp['CONTEXTS']:
-                                f.write('  %s figures of merit:\n' %
-                                        context['name'])
-                                for fom in context['foms']:
-                                    name = fom['name']
-                                    if fom['origin_type'] == 'modifier':
-                                        delim = '::'
-                                        mod = fom['origin']
-                                        name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
+                            if exp['N_REPEATS'] > 0:  # this is a base exp with summary of repeats
+                                for context in exp['CONTEXTS']:
+                                    f.write('  %s figures of merit:\n' %
+                                            context['name'])
 
-                                    output = '%s = %s %s' % (name,
-                                                             fom['value'],
-                                                             fom['units'])
-                                    f.write('    %s\n' % (output.strip()))
+                                    fom_summary = {}
+                                    for fom in context['foms']:
+                                        name = fom['name']
+                                        if name not in fom_summary.keys():
+                                            fom_summary[name] = []
+                                        stat_name = fom['origin_type']
+                                        value = fom['value']
+                                        units = fom['units']
+
+                                        output = f'{stat_name} = {value} {units}\n'
+                                        fom_summary[name].append(output)
+
+                                    for fom_name, fom_val_list in fom_summary.items():
+                                        f.write(f'    {fom_name}:\n')
+                                        for fom_val in fom_val_list:
+                                            f.write(f'      {fom_val.strip()}\n')
+                            else:
+                                for context in exp['CONTEXTS']:
+                                    f.write(f'  {context["name"]} figures of merit:\n')
+                                    for fom in context['foms']:
+                                        name = fom['name']
+                                        if fom['origin_type'] == 'modifier':
+                                            delim = '::'
+                                            mod = fom['origin']
+                                            name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
+
+                                        output = '%s = %s %s' % (name,
+                                                                 fom['value'],
+                                                                 fom['units'])
+                                        f.write('    %s\n' % (output.strip()))
                 else:
                     logger.msg('No results to write')
 

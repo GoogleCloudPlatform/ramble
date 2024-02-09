@@ -36,6 +36,7 @@ class Context(object):
         self.matrices = []
         self.tags = []
         self.is_template = False
+        self.n_repeats = 0
 
     def merge_context(self, in_context):
         """Merges another Context into this Context."""
@@ -81,6 +82,8 @@ class Context(object):
             self.matrices = in_context.matrices
         if in_context.tags:
             self.tags.extend(in_context.tags)
+        if in_context.n_repeats != 0:
+            self.n_repeats = int(in_context.n_repeats)
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -100,6 +103,7 @@ def create_context_from_dict(context_name, in_dict):
         'zips': {},
         'matrices': {} or [],
         'tags': []
+        'n_repeats': '',
 
     Args:
         context_name: The name of the context (e.g., application name)
@@ -145,5 +149,8 @@ def create_context_from_dict(context_name, in_dict):
         context_name,
         in_dict
     )
+
+    if namespace.n_repeats in in_dict:
+        new_context.n_repeats = int(in_dict[namespace.n_repeats])
 
     return new_context

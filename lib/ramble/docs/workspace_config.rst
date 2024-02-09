@@ -453,6 +453,36 @@ explicit, all ``where`` statements are joined together with ``or`` operators.
 Within any single ``where`` statement, operators can be joined together with
 ``and`` and ``or`` operators as well.
 
+.. _ramble-experiment-repeats:
+
+^^^^^^^^^^^^^^^^^^^
+Experiment Repeats:
+^^^^^^^^^^^^^^^^^^^
+
+Ramble provides a simple mechanism to repeat the same experiment a specified number of
+times, and calculates summary statistics for the set of repeated experiments. To enable
+repeats, an ``n_repeats`` block can be added at the application, workload, or experiment
+level.
+
+.. code-block:: yaml
+
+    ramble:
+      config:
+        n_repeats: int
+        repeats_success_strict: [True/False]
+      applications:
+        hostname:
+          n_repeats: int
+          workloads:
+            serial:
+              n_repeats: int
+              experiments:
+                test_experiment:
+                  n_repeats: int
+
+More information on setting repeats at the config level can be found in the
+:ref:`configuration files<experiment-repeats-config-option>` documentation.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Variable Control:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

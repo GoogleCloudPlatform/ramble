@@ -120,13 +120,13 @@ class SoftwareEnvironments(object):
                         exclude_where = pkg_info[namespace.exclude][namespace.where].copy()
 
                     if perform_explicit_exclude:
-                        for exclude_vars in pkg_renderer.render_objects(exclude_group):
+                        for exclude_vars, _ in pkg_renderer.render_objects(exclude_group):
                             final_name = expander.expand_var_name('package_name',
                                                                   extra_vars=exclude_vars)
                             exclude_pkgs.add(final_name)
 
-                for rendered_vars in pkg_renderer.render_objects(pkg_group,
-                                                                 exclude_where=exclude_where):
+                for rendered_vars, _ in pkg_renderer.render_objects(pkg_group,
+                                                                    exclude_where=exclude_where):
                     final_name = expander.expand_var_name('package_name',
                                                           extra_vars=rendered_vars)
                     if final_name in exclude_pkgs:
@@ -173,13 +173,13 @@ class SoftwareEnvironments(object):
                         exclude_where = env_info[namespace.exclude][namespace.where].copy()
 
                     if perform_explicit_exclude:
-                        for exclude_vars in env_renderer.render_objects(exclude_group):
+                        for exclude_vars, _ in env_renderer.render_objects(exclude_group):
                             final_name = expander.expand_var_name('environment_name',
                                                                   extra_vars=exclude_vars)
                             exclude_envs.add(final_name)
 
-                for rendered_vars in env_renderer.render_objects(env_group,
-                                                                 exclude_where=exclude_where):
+                for rendered_vars, _ in env_renderer.render_objects(env_group,
+                                                                    exclude_where=exclude_where):
                     final_name = expander.expand_var_name('environment_name',
                                                           extra_vars=rendered_vars)
 

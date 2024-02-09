@@ -123,6 +123,8 @@ config_defaults = {
         'disable_passthrough': False,
         'disable_progress_bar': False,
         'connect_timeout': 10,
+        'n_repeats': '0',
+        'repeat_success_strict': True,
         'verify_ssl': True,
         'checksum': True,
         'dirty': False,

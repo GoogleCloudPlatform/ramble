@@ -28,6 +28,7 @@ class namespace:
     inherit_variables = 'inherit_variables'
     modifiers = 'modifiers'
     tags = 'tags'
+    n_repeats = 'n_repeats'
 
     # For rendering objects
     variables = 'variables'
