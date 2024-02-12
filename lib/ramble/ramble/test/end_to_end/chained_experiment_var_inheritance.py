@@ -30,6 +30,9 @@ def test_chained_experiment_variable_inheritance(mutable_config,
                                                  mutable_mock_workspace_path):
     test_config = r"""
 ramble:
+  formatted_executables:
+    command:
+      join_separator: '\n'
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'

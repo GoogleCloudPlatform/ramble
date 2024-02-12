@@ -15,6 +15,7 @@
 from llnl.util.lang import union_dicts
 from ramble.schema.success_criteria import success_list_def
 
+import ramble.schema.formatted_executables
 import ramble.schema.env_vars
 import ramble.schema.internals
 import ramble.schema.types
@@ -117,6 +118,7 @@ sub_props = union_dicts(
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,
     ramble.schema.zips.properties,
+    ramble.schema.formatted_executables.properties,
     {
         'chained_experiments': chained_experiment_def,
         'template': {'type': 'boolean'},

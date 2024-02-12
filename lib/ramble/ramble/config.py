@@ -54,6 +54,7 @@ import spack.platforms
 import ramble.schema
 import ramble.schema.config
 import ramble.schema.env_vars
+import ramble.schema.formatted_executables
 import ramble.schema.repos
 import ramble.schema.modifier_repos
 import ramble.schema.workspace
@@ -75,6 +76,7 @@ from spack.util.cpus import cpus_available
 
 #: Dict from section names -> schema for that section
 section_schemas = {
+    'formatted_executables': ramble.schema.formatted_executables.schema,
     'config': ramble.schema.config.schema,
     'env_vars': ramble.schema.env_vars.schema,
     'repos': ramble.schema.repos.schema,

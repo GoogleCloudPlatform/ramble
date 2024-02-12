@@ -62,6 +62,7 @@ class ExperimentSet(object):
         workspace_context.context_name = workspace.name
         workspace_context.variables = workspace.get_workspace_vars()
         workspace_context.env_variables = workspace.get_workspace_env_vars()
+        workspace_context.formatted_executables = workspace.get_workspace_formatted_executables()
         workspace_context.internals = workspace.get_workspace_internals()
         workspace_context.modifiers = workspace.get_workspace_modifiers()
         workspace_context.zips = workspace.get_workspace_zips()
@@ -410,6 +411,7 @@ class ExperimentSet(object):
             app_inst.set_chained_experiments(final_context.chained_experiments)
             app_inst.set_modifiers(final_context.modifiers)
             app_inst.set_tags(final_context.tags)
+            app_inst.set_formatted_executables(final_context.formatted_executables)
             app_inst.read_status()
             self.experiments[experiment_namespace] = app_inst
             self.experiment_order.append(experiment_namespace)

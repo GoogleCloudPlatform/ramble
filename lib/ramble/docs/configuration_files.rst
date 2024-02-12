@@ -29,6 +29,7 @@ Currently, Ramble supports the following configuration sections:
 * :ref:`applications <application-config>`
 * :ref:`config <config-yaml>`
 * :ref:`env_vars <env-vars-config>`
+* :ref:`formatted_executables <formatted-execs-config>`
 * :ref:`internals <internals-config>`
 * :ref:`licenses <licenses-config>`
 * :ref:`mirrors <mirrors-config>`
@@ -262,6 +263,38 @@ actions is available. These actions are:
 * ``append`` - Append the given value to the end of a previous variable definition. Delimited for vars is defined by ``var_separator``, ``paths`` uses ``:``
 * ``prepend`` - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is ``:``
 * ``unset`` - Remove a variable definition, if it is set.
+
+.. _formatted-execs-config:
+
+------------------------------
+Formatted Executables Section:
+------------------------------
+
+The formatted executables config section is named ``formatted_executables`` and
+controls the creation of variables that represent the complete list of
+executables an experiment needs to execute.
+
+The format of this config section is as follows:
+
+.. code-block:: yaml
+
+  formatted_executables:
+    new_command:
+      indentation: 8
+      prefix: '- '
+      join_separator: '\n'
+
+
+The above example defines a new variable named ``new_command`` which will be a
+new-line (``\n``) demlimited list of executables, where each executable is
+prefixed with ``- `` and is indented 8 space characters.
+
+The default configuration files define one formatted executable named
+``command``. Its definition can be seen with:
+
+.. code-block:: console
+
+  $ ramble config get formatted_executables
 
 .. _internals-config:
 

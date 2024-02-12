@@ -28,6 +28,7 @@ class Context(object):
         self.variables = syaml.syaml_dict()
         self.internals = {}
         self.templates = None
+        self.formatted_executables = {}
         self.chained_experiments = []
         self.modifiers = []
         self.context_name = None
@@ -84,6 +85,8 @@ class Context(object):
             self.tags.extend(in_context.tags)
         if in_context.n_repeats != 0:
             self.n_repeats = int(in_context.n_repeats)
+        if in_context.formatted_executables:
+            self.formatted_executables.update(in_context.formatted_executables)
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -152,5 +155,8 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.n_repeats in in_dict:
         new_context.n_repeats = int(in_dict[namespace.n_repeats])
+
+    if namespace.formatted_executables in in_dict:
+        new_context.formatted_executables = in_dict[namespace.formatted_executables].copy()
 
     return new_context

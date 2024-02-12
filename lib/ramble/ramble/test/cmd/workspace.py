@@ -1519,7 +1519,7 @@ ramble:
 
 
 @pytest.mark.parametrize('tpl_name', [
-    'command'
+    'env_path'
 ])
 def test_invalid_template_name_errors(tpl_name, capsys):
     test_config = """

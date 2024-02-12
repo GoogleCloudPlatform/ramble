@@ -25,10 +25,14 @@ class namespace:
     environments = 'environments'
     template = 'template'
     chained_experiments = 'chained_experiments'
-    inherit_variables = 'inherit_variables'
     modifiers = 'modifiers'
     tags = 'tags'
     n_repeats = 'n_repeats'
+    formatted_executables = 'formatted_executables'
+
+    # For chained experiments
+    command = 'command'
+    inherit_variables = 'inherit_variables'
 
     # For rendering objects
     variables = 'variables'
@@ -48,3 +52,8 @@ class namespace:
     spack_spec = 'spack_spec'
     compiler_spec = 'compiler_spec'
     compiler = 'compiler'
+
+    # For formatted executables
+    indentation = 'indentation'
+    prefix = 'prefix'
+    join_separator = 'join_separator'

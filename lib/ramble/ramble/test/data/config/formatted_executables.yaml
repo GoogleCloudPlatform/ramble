@@ -1,0 +1,3 @@
+formatted_executables:
+  command:
+    join_separator: '\n'

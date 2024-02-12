@@ -771,7 +771,7 @@ executables (or custom executables) are pieced together to build an experiment.
            - lscpu
 
 The above example builds off of the custom executable example, and shows how
-one can control the order of the executables in the ``{command}`` expansion.
+one can control the order of the executables in the formatted executable expansions.
 
 The default for the hostname application is ``[builtin::env_vars,
 serial/parallel]`` but this changes the order and injects ``lscpu`` into the
@@ -902,7 +902,6 @@ Ramble automatically generates definitions for the following variables:
   ``$workspace_root/configs`` have a variable generated that resolves to the
   absolute path to: ``{experiment_run_dir}/<template_name>`` where
   ``<template_name>`` is the filename of the template, without the extension.
-* ``command`` - Set to all of the commands needed to perform an experiment.
 
 """"""""""""""""""""""""""""""""""
 Spack Specific Generated Variables
