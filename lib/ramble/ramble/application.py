@@ -140,6 +140,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         return new_copy
 
+    def is_actionable(self):
+        """Determine if an experiment should be actioned in pipelines
+
+        Returns True if the experiment should be actioned in a pipeline, False
+        if not.
+        """
+
+        if self.is_template:
+            return False
+
+        return True
+
     def build_phase_order(self):
         for pipeline in self._pipelines:
             pipeline_phases = []

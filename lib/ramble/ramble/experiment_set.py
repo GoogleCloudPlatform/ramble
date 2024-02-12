@@ -439,16 +439,21 @@ class ExperimentSet(object):
         count = 1
 
         for exp, inst in self.experiments.items():
-            yield exp, inst, count
-            count += 1
+            if inst.is_actionable():
+                yield exp, inst, count
+                count += 1
 
         for exp, inst in self.chained_experiments.items():
-            yield exp, inst, count
-            count += 1
+            if inst.is_actionable():
+                yield exp, inst, count
+                count += 1
 
     def num_experiments(self):
         """Return the number of total experiments in this set"""
-        return len(self.experiments.items()) + len(self.chained_experiments.items())
+        count = 0
+        for _, _, _ in self.all_experiments():
+            count += 1
+        return count
 
     def num_filtered_experiments(self, filters):
         """Return the number of filtered experiments in this set"""
@@ -486,7 +491,7 @@ class ExperimentSet(object):
                 if not inst.has_tags(filters.tags):
                     active = False
 
-            if active:
+            if active and inst.is_actionable():
                 yield exp, inst, idx
 
     def add_chained_experiment(self, name, instance):
