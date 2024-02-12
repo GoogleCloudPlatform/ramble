@@ -53,6 +53,7 @@ class ExpansionDelimiter(object):
     """Class representing the delimiters for ramble expansion strings"""
     left = '{'
     right = '}'
+    escape = '\\'
 
 
 class VformatDelimiter(object):
@@ -199,6 +200,10 @@ class ExpansionNode(object):
                 except SyntaxError:
                     self.value = replaced_contents
 
+                # Replace escaped curly braces with curly braces
+                if isinstance(self.value, six.string_types):
+                    self.value = self.value.replace('\\{', '{').replace('\\}', '}')
+
 
 class ExpansionGraph(object):
     """Class representing a graph of ExpansionNodes"""
@@ -211,11 +216,12 @@ class ExpansionGraph(object):
 
         opened = []
         children = []
+        escaped = False
         for i, c in enumerate(self.str):
-            if c == ExpansionDelimiter.left:
+            if c == ExpansionDelimiter.left and not escaped:
                 opened.append(i)
                 children.append([])
-            elif c == ExpansionDelimiter.right and len(opened) > 0:
+            elif c == ExpansionDelimiter.right and len(opened) > 0 and not escaped:
                 left_idx = opened.pop()
                 right_idx = i
 
@@ -230,6 +236,11 @@ class ExpansionGraph(object):
                     self.root.add_children(cur_match)
             elif c == '\n':  # Don't expand across new lines
                 opened = []
+
+            if c == ExpansionDelimiter.escape:
+                escaped = True
+            elif escaped:
+                escaped = False
 
         if len(opened) > 0:
             self.root.add_children(children.pop())
