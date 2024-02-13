@@ -27,6 +27,9 @@ class Basic(ExecutableApplication):
                       description='Example var',
                       workload='test_wl')
 
+    environment_variable('TEST_ENV', value="1",
+                         description="test var", workload="test_wl")
+
     archive_pattern('{experiment_run_dir}/archive_test.*')
 
     figure_of_merit('test_fom',

@@ -193,6 +193,34 @@ def workload_variable(name, default, description, values=None, workload=None,
     return _execute_workload_variable
 
 
+@application_directive('environment_variables')
+def environment_variable(name, value, description, workload=None,
+                         workloads=None, **kwargs):
+    """Define an environment variable to be used in experiments
+
+    These can be specific to workloads.
+    """
+
+    def _execute_environment_variable(app):
+        all_workloads = ramble.language.language_helpers.require_definition(workload,
+                                                                            workloads,
+                                                                            'workload',
+                                                                            'workloads',
+                                                                            'environment_variable')
+
+        for wl_name in all_workloads:
+            if wl_name not in app.environment_variables:
+                app.environment_variables[wl_name] = {}
+
+            app.environment_variables[wl_name][name] = {
+                'value': value,
+                'action': 'set',
+                'description': description,
+            }
+
+    return _execute_environment_variable
+
+
 @application_directive('phase_definitions')
 def register_phase(name, pipeline=None, depends_on=[]):
     """Register a phase
