@@ -303,6 +303,37 @@
 
 
 
+<div class="viewcode-block" id="environment_variable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.environment_variable">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;environment_variables&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">environment_variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">workload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">workloads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define an environment variable to be used in experiments</span>
+
+<span class="sd">    These can be specific to workloads.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_environment_variable</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="n">all_workloads</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span>
+                                                                            <span class="n">workloads</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workload&#39;</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workloads&#39;</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;environment_variable&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">wl_name</span> <span class="ow">in</span> <span class="n">all_workloads</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wl_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">:</span>
+                <span class="n">app</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">[</span><span class="n">wl_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">app</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">[</span><span class="n">wl_name</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+            <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_environment_variable</span></div>
+
+
+
 <div class="viewcode-block" id="register_phase">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.register_phase">[docs]</a>
 <span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;phase_definitions&#39;</span><span class="p">)</span>
