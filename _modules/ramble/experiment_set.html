@@ -568,19 +568,24 @@
         <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">count</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">is_actionable</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">count</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">count</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span></div>
+            <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">is_actionable</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">count</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 
 <div class="viewcode-block" id="ExperimentSet.num_experiments">
 <a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.num_experiments">[docs]</a>
     <span class="k">def</span> <span class="nf">num_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of total experiments in this set&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_experiments</span><span class="p">():</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">count</span></div>
 
 
 <div class="viewcode-block" id="ExperimentSet.num_filtered_experiments">
@@ -624,7 +629,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">inst</span><span class="o">.</span><span class="n">has_tags</span><span class="p">(</span><span class="n">filters</span><span class="o">.</span><span class="n">tags</span><span class="p">):</span>
                     <span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">active</span> <span class="ow">and</span> <span class="n">inst</span><span class="o">.</span><span class="n">is_actionable</span><span class="p">():</span>
                 <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">idx</span></div>
 
 
@@ -703,7 +708,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 12, 2024.
+      <span class="lastupdated">Last updated on Feb 13, 2024.
       </span></p>
   </div>
 
