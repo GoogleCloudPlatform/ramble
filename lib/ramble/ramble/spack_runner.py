@@ -107,6 +107,7 @@ class SpackRunner(object):
         self.compiler_config_dir = None
         self.configs = []
         self.configs_applied = False
+        self.env_contents = []
 
         self.installer = self.spack.copy()
         self.installer.add_default_prefix(ramble.config.get(f'{self.install_config_name}:prefix'))
@@ -365,8 +366,6 @@ class SpackRunner(object):
         self.spack.add_default_env(self.env_key, self.env_path)
         self.installer.add_default_env(self.env_key, self.env_path)
         self.concretizer.add_default_env(self.env_key, self.env_path)
-
-        self.env_contents = []
 
         self.active = True
 
@@ -746,6 +745,22 @@ class SpackRunner(object):
                         self._raise_validation_error(command, validation_type)
         else:
             self._dry_run_print(self.spack, args)
+
+    def package_definitions(self):
+        """For each package in this environment, yield the path to its application.py file"""
+        package_def_name = 'package.py'
+        location_args = ['location', '-p']
+
+        self._check_active()
+
+        if not self.dry_run:
+            for pkg in self.env_contents:
+                args = location_args.copy()
+                args.append(pkg)
+                path = self._run_command(self.spack, args, return_output=True).strip()
+                yield pkg, os.path.join(path, package_def_name)
+        else:
+            self._dry_run_print(self.spack, location_args)
 
     def _raise_validation_error(self, command, validation_type):
         raise ValidationFailedError(

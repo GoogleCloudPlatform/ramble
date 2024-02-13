@@ -84,6 +84,9 @@ workspace_shared_path = 'shared'
 #: Name of the subdirectory where shared/sourale files are stored
 workspace_shared_license_path = 'licenses'
 
+#: Name of the subdirectory where deployments are stored
+workspace_deployments_path = 'deployments'
+
 #: regex for validating workspace names
 valid_workspace_name_re = r'^\w[\w-]*$'
 
@@ -521,6 +524,8 @@ class Workspace(object):
 
         # Create a logger to redirect certain prints from screen to log file
         self.logger = log.log_output(echo=False, debug=tty.debug_level())
+
+        self.deployment_name = self.name
 
     def _re_read(self):
         """Reinitialize the workspace object if it has been written (this
@@ -1243,6 +1248,16 @@ class Workspace(object):
     def shared_dir(self):
         """Path to the shared directory"""
         return os.path.join(self.root, workspace_shared_path)
+
+    @property
+    def deployments_dir(self):
+        """Path to the deployments directory"""
+        return os.path.join(self.root, workspace_deployments_path)
+
+    @property
+    def named_deployment(self):
+        """Path to the specific deployment directory"""
+        return os.path.join(self.deployments_dir, self.deployment_name)
 
     @property
     def shared_license_dir(self):

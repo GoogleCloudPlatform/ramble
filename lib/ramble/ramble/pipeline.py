@@ -306,13 +306,7 @@ class ArchivePipeline(Pipeline):
         # Copy current configs
         archive_configs = os.path.join(self.workspace.latest_archive_path,
                                        ramble.workspace.workspace_config_path)
-        fs.mkdirp(archive_configs)
-        for root, dirs, files in os.walk(self.workspace.config_dir):
-            for name in files:
-                src = os.path.join(self.workspace.config_dir, root, name)
-                dest = src.replace(self.workspace.config_dir, archive_configs)
-                fs.mkdirp(os.path.dirname(dest))
-                shutil.copyfile(src, dest)
+        _copy_tree(self.workspace.config_dir, archive_configs)
 
         # Copy current software spack files
         file_names = ['spack.yaml', 'spack.lock']
@@ -383,10 +377,7 @@ class ArchivePipeline(Pipeline):
             if archive_url:
                 tar_path = self.workspace.latest_archive_path + tar_extension
                 remote_tar_path = archive_url + '/' + self.workspace.latest_archive + tar_extension
-                fetcher = ramble.fetch_strategy.URLFetchStrategy(tar_path)
-                fetcher.stage = ramble.stage.DIYStage(self.workspace.latest_archive_path)
-                fetcher.stage.archive_file = tar_path
-                fetcher.archive(remote_tar_path)
+                _upload_file(tar_path, remote_tar_path)
 
 
 class MirrorPipeline(Pipeline):
@@ -521,9 +512,144 @@ class ExecutePipeline(Pipeline):
             executor(*exec_args)
 
 
+class PushDeploymentPipeline(Pipeline):
+    """class for the `prepare-deployment` pipeline"""
+
+    name = 'pushdeployment'
+    index_filename = 'index.json'
+    index_namespace = 'deployment_files'
+    tar_extension = '.tar.gz'
+
+    def __init__(self, workspace, filters,
+                 create_tar=False, upload_url=None,
+                 deployment_name=None):
+        super().__init__(workspace, filters)
+        self.action_string = 'Pushing deployment of'
+        self.require_inventory = True
+        self.create_tar = create_tar
+        self.upload_url = upload_url
+        self.object_repo_name = 'object_repo'
+
+        if deployment_name:
+            workspace.deployment_name = deployment_name
+            self.deployment_name = deployment_name
+        else:
+            self.deployment_name = workspace.name
+
+    def _execute(self):
+        from spack.util import spack_yaml as syaml
+
+        configs_dir = os.path.join(self.workspace.named_deployment,
+                                   ramble.workspace.workspace_config_path)
+        fs.mkdirp(configs_dir)
+
+        _copy_tree(self.workspace.config_dir, configs_dir)
+
+        aux_software_dir = os.path.join(configs_dir, ramble.workspace.auxiliary_software_dir_name)
+        fs.mkdirp(aux_software_dir)
+        aux_repo_conf = os.path.join(aux_software_dir, 'repos.yaml')
+
+        repo_conf_defs = [('repos', 'repos.yaml'),
+                          ('modifier_repos', 'modifier_repos.yaml')]
+
+        for repo_conf in repo_conf_defs:
+            aux_repo_conf = os.path.join(aux_software_dir, repo_conf[1])
+            repo_data = syaml.syaml_dict()
+            if os.path.exists(aux_repo_conf):
+                with open(aux_repo_conf, 'r') as f:
+                    repo_data = syaml.load_config(f.read())
+            else:
+                repo_data[repo_conf[0]] = []
+
+            add_repo = True
+            for repo in repo_data[repo_conf[0]]:
+                if repo == f'../../{self.object_repo_name}':
+                    add_repo = False
+            if add_repo:
+                repo_data[repo_conf[0]].append(f'../../{self.object_repo_name}')
+
+            with open(aux_repo_conf, 'w+') as f:
+                f.write(syaml.dump_config(repo_data))
+
+        repo_path = os.path.join(self.workspace.named_deployment, self.object_repo_name)
+        object_types = ['applications', 'modifiers', 'packages']
+        for object_type in object_types:
+            fs.mkdirp(os.path.join(repo_path, object_type))
+
+        for conf_file in ['repo.yaml', 'modifier_repo.yaml']:
+            with open(os.path.join(repo_path, conf_file), 'w+') as f:
+                f.write('repo:\n')
+                f.write(f'  namespace: deployment_{self.deployment_name}\n')
+
+        super()._execute()
+
+    def _deployment_files(self):
+        """Yield the full path to each file in a deployment"""
+        for root, dirs, files in os.walk(self.workspace.named_deployment):
+            for name in files:
+                yield os.path.join(self.workspace.named_deployment, root, name)
+
+    def _complete(self):
+        # Create an index.json of the deployment
+        deployment_index = {self.index_namespace: []}
+        for file in self._deployment_files():
+            deployment_index[self.index_namespace].append(
+                file.replace(self.workspace.named_deployment + os.path.sep, '')
+            )
+        index_file = os.path.join(self.workspace.named_deployment, self.index_filename)
+        with open(index_file, 'w+') as f:
+            f.write(sjson.dump(deployment_index))
+
+        tar_path = os.path.join(self.workspace.deployments_dir,
+                                self.deployment_name + self.tar_extension)
+        if self.create_tar:
+            tar = which('tar', required=True)
+            with py.path.local(self.workspace.deployments_dir).as_cwd():
+                tar('-czf', tar_path, self.deployment_name)
+
+        if self.upload_url:
+            remote_base = self.upload_url + '/' + self.deployment_name
+
+            for file in self._deployment_files():
+                dest = file.replace(self.workspace.named_deployment, remote_base)
+                _upload_file(file, dest)
+
+            if self.create_tar:
+                stage_dir = self.workspace.deployments_dir
+                tar_path = os.path.join(stage_dir, self.deployment_name + self.tar_extension)
+                remote_tar_path = self.upload_url + '/' + self.deployment_name + self.tar_extension
+                _upload_file(tar_path, remote_tar_path)
+
+        logger.all_msg(f'Deployment created in: {self.workspace.named_deployment}')
+        if self.create_tar:
+            logger.all_msg(f'  Tar of deployment created in: {tar_path}')
+        if self.upload_url:
+            remote_base = self.upload_url + '/' + self.deployment_name
+            logger.all_msg(f'  Deployment uploaded to: {remote_base}')
+
+
+def _copy_tree(src_dir, dest_dir):
+    """Copy all files in src_dir to dest_dir"""
+    for root, dirs, files in os.walk(src_dir):
+        for name in files:
+            src = os.path.join(src_dir, root, name)
+            dest = src.replace(src_dir, dest_dir)
+            fs.mkdirp(os.path.dirname(dest))
+            shutil.copyfile(src, dest)
+
+
+def _upload_file(src_file, dest_file):
+    stage_dir = os.path.dirname(src_file)
+    fetcher = ramble.fetch_strategy.URLFetchStrategy(src_file)
+    fetcher.stage = ramble.stage.DIYStage(stage_dir)
+    fetcher.stage.archive_file = src_file
+    fetcher.archive(dest_file)
+
+
 pipelines = Enum('pipelines',
                  [AnalyzePipeline.name, ArchivePipeline.name, MirrorPipeline.name,
-                  SetupPipeline.name, PushToCachePipeline.name, ExecutePipeline.name]
+                  SetupPipeline.name, PushToCachePipeline.name, ExecutePipeline.name,
+                  PushDeploymentPipeline.name]
                  )
 
 _pipeline_map = {
@@ -532,7 +658,8 @@ _pipeline_map = {
     pipelines.mirror: MirrorPipeline,
     pipelines.setup: SetupPipeline,
     pipelines.pushtocache: PushToCachePipeline,
-    pipelines.execute: ExecutePipeline
+    pipelines.execute: ExecutePipeline,
+    pipelines.pushdeployment: PushDeploymentPipeline
 }
 
 

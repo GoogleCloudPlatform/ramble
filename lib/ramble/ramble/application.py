@@ -65,7 +65,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     _builtin_required_key = 'required'
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
-    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache', 'execute']
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup',
+                  'pushdeployment', 'pushtocache', 'execute']
     _language_classes = [ApplicationMeta, SharedMeta]
 
     #: Lists of strings which contains GitHub usernames of attributes.
@@ -1822,6 +1823,22 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if os.path.exists(exp_dir):
             with open(status_path, 'w+') as f:
                 spack.util.spack_json.dump(status_data, f)
+
+    register_phase('deploy_artifacts', pipeline='pushdeployment')
+
+    def _deploy_artifacts(self, workspace):
+        repo_path = os.path.join(workspace.named_deployment, 'object_repo')
+
+        app_dir_name = os.path.basename(os.path.dirname(self._file_path))
+        app_dir = os.path.join(repo_path, 'applications', app_dir_name)
+        fs.mkdirp(app_dir)
+        shutil.copyfile(self._file_path, os.path.join(app_dir, 'application.py'))
+
+        for mod_inst in self._modifier_instances:
+            mod_dir_name = os.path.basename(os.path.dirname(mod_inst._file_path))
+            mod_dir = os.path.join(repo_path, 'modifiers', mod_dir_name)
+            fs.mkdirp(mod_dir)
+            shutil.copyfile(mod_inst._file_path, os.path.join(mod_dir, 'modifier.py'))
 
     register_builtin('env_vars', required=True)
 
