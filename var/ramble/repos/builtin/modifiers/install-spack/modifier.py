@@ -54,9 +54,9 @@ fi
     modifier_variable('install_spack_shallow', default=install_spack_shallow, description='Install script for shallow spack history',
                       mode='standard')
 
-    executable_modifier('source_installed_ramble')
+    executable_modifier('source_installed_spack')
 
-    def source_installed_ramble(self, executable_name, executable, app_inst=None):
+    def source_installed_spack(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
         pre_exec = []
@@ -64,8 +64,8 @@ fi
 
         if not hasattr(self, '_already_applied'):
             pre_exec.append(
-                CommandExecutable('source-installed-ramble',
-                                  template=['. {ramble_install_dir}/share/ramble/setup-env.sh']
+                CommandExecutable('source-installed-spack',
+                                  template=['. {spack_install_dir}/share/spack/setup-env.sh']
                                   )
             )
 
