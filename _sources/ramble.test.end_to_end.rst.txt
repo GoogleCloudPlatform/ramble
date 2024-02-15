@@ -102,6 +102,14 @@ ramble.test.end\_to\_end.explicit\_zips module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.formatted\_executables module
+------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.formatted_executables
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.gromacs\_size\_expansion module
 --------------------------------------------------------
 

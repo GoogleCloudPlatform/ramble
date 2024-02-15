@@ -159,6 +159,7 @@
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">context_name</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">name</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_vars</span><span class="p">()</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">env_variables</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_env_vars</span><span class="p">()</span>
+        <span class="n">workspace_context</span><span class="o">.</span><span class="n">formatted_executables</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_formatted_executables</span><span class="p">()</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_internals</span><span class="p">()</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">modifiers</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_modifiers</span><span class="p">()</span>
         <span class="n">workspace_context</span><span class="o">.</span><span class="n">zips</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">get_workspace_zips</span><span class="p">()</span>
@@ -531,6 +532,7 @@
             <span class="n">app_inst</span><span class="o">.</span><span class="n">set_chained_experiments</span><span class="p">(</span><span class="n">final_context</span><span class="o">.</span><span class="n">chained_experiments</span><span class="p">)</span>
             <span class="n">app_inst</span><span class="o">.</span><span class="n">set_modifiers</span><span class="p">(</span><span class="n">final_context</span><span class="o">.</span><span class="n">modifiers</span><span class="p">)</span>
             <span class="n">app_inst</span><span class="o">.</span><span class="n">set_tags</span><span class="p">(</span><span class="n">final_context</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+            <span class="n">app_inst</span><span class="o">.</span><span class="n">set_formatted_executables</span><span class="p">(</span><span class="n">final_context</span><span class="o">.</span><span class="n">formatted_executables</span><span class="p">)</span>
             <span class="n">app_inst</span><span class="o">.</span><span class="n">read_status</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">app_inst</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">experiment_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">experiment_namespace</span><span class="p">)</span>
@@ -708,7 +710,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 14, 2024.
+      <span class="lastupdated">Last updated on Feb 15, 2024.
       </span></p>
   </div>
 

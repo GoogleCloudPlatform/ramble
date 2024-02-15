@@ -751,7 +751,7 @@ executables (or custom executables) are pieced together to build an experiment.<
 </pre></div>
 </div>
 <p>The above example builds off of the custom executable example, and shows how
-one can control the order of the executables in the <code class="docutils literal notranslate"><span class="pre">{command}</span></code> expansion.</p>
+one can control the order of the executables in the formatted executable expansions.</p>
 <p>The default for the hostname application is <code class="docutils literal notranslate"><span class="pre">[builtin::env_vars,</span>
 <span class="pre">serial/parallel]</span></code> but this changes the order and injects <code class="docutils literal notranslate"><span class="pre">lscpu</span></code> into the
 expansion.</p>
@@ -853,7 +853,6 @@ directive.</p></li>
 <code class="docutils literal notranslate"><span class="pre">$workspace_root/configs</span></code> have a variable generated that resolves to the
 absolute path to: <code class="docutils literal notranslate"><span class="pre">{experiment_run_dir}/&lt;template_name&gt;</span></code> where
 <code class="docutils literal notranslate"><span class="pre">&lt;template_name&gt;</span></code> is the filename of the template, without the extension.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">command</span></code> - Set to all of the commands needed to perform an experiment.</p></li>
 </ul>
 <p>When using spack applications, Ramble also generates the following variables:</p>
 <ul class="simple">
@@ -1243,7 +1242,7 @@ into the explicitly chained experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 14, 2024.
+      <span class="lastupdated">Last updated on Feb 15, 2024.
       </span></p>
   </div>
 

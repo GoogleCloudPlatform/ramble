@@ -180,12 +180,14 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">no_expand_vars</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_template</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">Repeats</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain_prepend</span> <span class="o">=</span> <span class="p">[]</span>
@@ -233,6 +235,7 @@
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_env_variable_sets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_variable_sets</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_variables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_internals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">new_copy</span><span class="o">.</span><span class="n">set_formatted_executables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_template</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">set_repeats</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_chained_experiments</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -542,6 +545,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">experiment_tags</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="ApplicationBase.set_formatted_executables">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_formatted_executables">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_formatted_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatted_executables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set formatted executables for this instance&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span> <span class="o">=</span> <span class="n">formatted_executables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
 <div class="viewcode-block" id="ApplicationBase.has_tags">
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.has_tags">[docs]</a>
     <span class="k">def</span> <span class="nf">has_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
@@ -817,7 +827,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">chain_append</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;after_chain&#39;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">chain_append</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_exp_def</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">command</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_exp_def</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">command</span><span class="p">]</span>
 
                 <span class="c1"># Skip editing the new instance if the base_inst doesn&#39;t work</span>
                 <span class="c1"># This happens if the originating command is `workspace info`</span>
@@ -846,9 +856,9 @@
 
                     <span class="c1"># Expand the chained experiment vars, so we can build the execution command</span>
                     <span class="n">new_inst</span><span class="o">.</span><span class="n">add_expand_vars</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
-                    <span class="n">chain_cmd</span> <span class="o">=</span> <span class="n">new_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">cur_exp_def</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">command</span><span class="p">])</span>
+                    <span class="n">chain_cmd</span> <span class="o">=</span> <span class="n">new_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">cur_exp_def</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">command</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain_cmd</span>
-                    <span class="n">cur_exp_def</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain_cmd</span>
+                    <span class="n">cur_exp_def</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">command</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain_cmd</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">add_chained_experiment</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span> <span class="n">new_inst</span><span class="p">)</span>
 
                 <span class="n">chain_idx</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1072,13 +1082,20 @@
                         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env_var_set</span><span class="p">[</span><span class="n">action</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                             <span class="n">env_var_set</span><span class="p">[</span><span class="n">action</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">_inject_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executables</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;For add_expand_vars, inject all commands&quot;&quot;&quot;</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">_define_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the internal list of commands based on executables</span>
+
+<span class="sd">        Populates self._command_list with a list of the executable commands that</span>
+<span class="sd">        should be executed by this experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Inject all prepended chained experiments</span>
         <span class="k">for</span> <span class="n">chained_exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_prepend</span><span class="p">:</span>
-            <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">chained_exp</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">chained_exp</span><span class="p">])</span>
 
         <span class="c1"># ensure all log files are purged and set up</span>
         <span class="n">logs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -1093,8 +1110,8 @@
                     <span class="n">logs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">command_config</span><span class="o">.</span><span class="n">redirect</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
-            <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rm -f &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">log</span><span class="p">)</span>
-            <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;touch &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">log</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rm -f &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">log</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;touch &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">log</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">executable</span> <span class="ow">in</span> <span class="n">executables</span><span class="p">:</span>
             <span class="n">builtin_match</span> <span class="o">=</span> <span class="n">builtin_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
@@ -1115,13 +1132,13 @@
                 <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
                 <span class="n">func_cmds</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">func_cmds</span><span class="p">:</span>
-                    <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">exec_vars</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">exec_vars</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">executable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_builtins</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">builtin_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_builtins</span><span class="p">[</span><span class="n">executable</span><span class="p">]</span>
                 <span class="n">func</span> <span class="o">=</span> <span class="n">builtin_def</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">]</span>
                 <span class="n">func_cmds</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">func_cmds</span><span class="p">:</span>
-                    <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">exec_vars</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">exec_vars</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Process directive defined executables</span>
                 <span class="n">base_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="n">executable</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1153,13 +1170,53 @@
 
                     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">cmd_conf</span><span class="o">.</span><span class="n">template</span><span class="p">:</span>
                         <span class="n">command_part</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mpi_cmd</span><span class="si">}{</span><span class="n">part</span><span class="si">}{</span><span class="n">redirect</span><span class="si">}</span><span class="s1">&#39;</span>
-                        <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">command_part</span><span class="p">,</span> <span class="n">exec_vars</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">command_part</span><span class="p">,</span>
+                                                                           <span class="n">exec_vars</span><span class="p">))</span>
 
         <span class="c1"># Inject all appended chained experiments</span>
         <span class="k">for</span> <span class="n">chained_exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_append</span><span class="p">:</span>
-            <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">chained_exp</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_commands</span><span class="p">[</span><span class="n">chained_exp</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;command&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_define_formatted_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables representing the formatted executables</span>
+
+<span class="sd">        Process the formatted_executables definitions, and construct their</span>
+<span class="sd">        variable definitions.</span>
+
+<span class="sd">        Each formatted executable definition is injected as its own variable</span>
+<span class="sd">        based on the formatting requested.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">formatted_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FormattedExecutableError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Formatted executable </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> defined, but variable &#39;</span>
+                    <span class="s1">&#39;definition already exists.&#39;</span>
+                <span class="p">)</span>
+
+            <span class="n">n_indentation</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">indentation</span> <span class="ow">in</span> <span class="n">formatted_conf</span><span class="p">:</span>
+                <span class="n">n_indentation</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">formatted_conf</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">indentation</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">in</span> <span class="n">formatted_conf</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="n">formatted_conf</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">prefix</span><span class="p">]</span>
+
+            <span class="n">join_separator</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">join_separator</span> <span class="ow">in</span> <span class="n">formatted_conf</span><span class="p">:</span>
+                <span class="n">join_separator</span> <span class="o">=</span> <span class="n">formatted_conf</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">join_separator</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\n&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_indentation</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">indentation</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span>
+
+            <span class="n">formatted_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">formatted_str</span><span class="p">:</span>
+                    <span class="n">formatted_str</span> <span class="o">+=</span> <span class="n">join_separator</span>
+                <span class="n">formatted_str</span> <span class="o">+=</span> <span class="n">indentation</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">cmd</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatted_str</span>
 
     <span class="k">def</span> <span class="nf">_derive_variables_for_template_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables for template paths (for add_expand_vars)&quot;&quot;&quot;</span>
@@ -1195,7 +1252,8 @@
             <span class="n">executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_executables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_experiment_variables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_input_path</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_inject_commands</span><span class="p">(</span><span class="n">executables</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_define_commands</span><span class="p">(</span><span class="n">executables</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_define_formatted_executables</span><span class="p">()</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_derive_variables_for_template_path</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -2139,6 +2197,15 @@
 
 
 
+<div class="viewcode-block" id="FormattedExecutableError">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.FormattedExecutableError">[docs]</a>
+<span class="k">class</span> <span class="nc">FormattedExecutableError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception raise when there are issues defining formatted executables</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="PhaseCycleDetectedError">
 <a class="viewcode-back" href="../../ramble.html#ramble.application.PhaseCycleDetectedError">[docs]</a>
 <span class="k">class</span> <span class="nc">PhaseCycleDetectedError</span><span class="p">(</span><span class="n">ApplicationError</span><span class="p">):</span>
@@ -2183,7 +2250,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 14, 2024.
+      <span class="lastupdated">Last updated on Feb 15, 2024.
       </span></p>
   </div>
 

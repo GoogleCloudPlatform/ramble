@@ -67,6 +67,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#environment-variables-section">Environment Variables Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#formatted-executables-section">Formatted Executables Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#internals-section">Internals Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#licenses-section">Licenses Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mirrors-section">Mirrors Section:</a></li>
@@ -136,6 +137,7 @@ does not cover the <a class="reference internal" href="workspace_config.html#wor
 <li><p><a class="reference internal" href="#application-config"><span class="std std-ref">applications</span></a></p></li>
 <li><p><a class="reference internal" href="#config-yaml"><span class="std std-ref">config</span></a></p></li>
 <li><p><a class="reference internal" href="#env-vars-config"><span class="std std-ref">env_vars</span></a></p></li>
+<li><p><a class="reference internal" href="#formatted-execs-config"><span class="std std-ref">formatted_executables</span></a></p></li>
 <li><p><a class="reference internal" href="#internals-config"><span class="std std-ref">internals</span></a></p></li>
 <li><p><a class="reference internal" href="#licenses-config"><span class="std std-ref">licenses</span></a></p></li>
 <li><p><a class="reference internal" href="#mirrors-config"><span class="std std-ref">mirrors</span></a></p></li>
@@ -318,6 +320,28 @@ actions is available. These actions are:
 * <code class="docutils literal notranslate"><span class="pre">append</span></code> - Append the given value to the end of a previous variable definition. Delimited for vars is defined by <code class="docutils literal notranslate"><span class="pre">var_separator</span></code>, <code class="docutils literal notranslate"><span class="pre">paths</span></code> uses <code class="docutils literal notranslate"><span class="pre">:</span></code>
 * <code class="docutils literal notranslate"><span class="pre">prepend</span></code> - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is <code class="docutils literal notranslate"><span class="pre">:</span></code>
 * <code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p>
+</section>
+<section id="formatted-executables-section">
+<span id="formatted-execs-config"></span><h2>Formatted Executables Section:<a class="headerlink" href="#formatted-executables-section" title="Link to this heading"></a></h2>
+<p>The formatted executables config section is named <code class="docutils literal notranslate"><span class="pre">formatted_executables</span></code> and
+controls the creation of variables that represent the complete list of
+executables an experiment needs to execute.</p>
+<p>The format of this config section is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">formatted_executables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">new_command</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">indentation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="w">    </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;-</span><span class="nv"> </span><span class="s">&#39;</span>
+<span class="w">    </span><span class="nt">join_separator</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;\n&#39;</span>
+</pre></div>
+</div>
+<p>The above example defines a new variable named <code class="docutils literal notranslate"><span class="pre">new_command</span></code> which will be a
+new-line (<code class="docutils literal notranslate"><span class="pre">\n</span></code>) demlimited list of executables, where each executable is
+prefixed with <a href="#id2"><span class="problematic" id="id3">``</span></a>- `` and is indented 8 space characters.</p>
+<p>The default configuration files define one formatted executable named
+<code class="docutils literal notranslate"><span class="pre">command</span></code>. Its definition can be seen with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>formatted_executables
+</pre></div>
+</div>
 </section>
 <section id="internals-section">
 <span id="internals-config"></span><h2>Internals Section:<a class="headerlink" href="#internals-section" title="Link to this heading"></a></h2>
@@ -611,7 +635,7 @@ another fully qualified experiment (through the <code class="docutils literal no
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 14, 2024.
+      <span class="lastupdated">Last updated on Feb 15, 2024.
       </span></p>
   </div>
 

@@ -33,6 +33,14 @@ ramble.schema.env\_vars module
    :undoc-members:
    :show-inheritance:
 
+ramble.schema.formatted\_executables module
+-------------------------------------------
+
+.. automodule:: ramble.schema.formatted_executables
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.schema.internals module
 ------------------------------
 

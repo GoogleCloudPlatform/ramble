@@ -125,6 +125,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">templates</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatted_executables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">modifiers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">context_name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -182,7 +183,9 @@
         <span class="k">if</span> <span class="n">in_context</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">in_context</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">in_context</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">in_context</span><span class="o">.</span><span class="n">n_repeats</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">in_context</span><span class="o">.</span><span class="n">n_repeats</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">in_context</span><span class="o">.</span><span class="n">formatted_executables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formatted_executables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">in_context</span><span class="o">.</span><span class="n">formatted_executables</span><span class="p">)</span></div>
 </div>
 
 
@@ -256,6 +259,9 @@
     <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">n_repeats</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
         <span class="n">new_context</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">in_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">n_repeats</span><span class="p">])</span>
 
+    <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">formatted_executables</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
+        <span class="n">new_context</span><span class="o">.</span><span class="n">formatted_executables</span> <span class="o">=</span> <span class="n">in_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">formatted_executables</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
     <span class="k">return</span> <span class="n">new_context</span></div>
 
 </pre></div>
@@ -268,7 +274,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 14, 2024.
+      <span class="lastupdated">Last updated on Feb 15, 2024.
       </span></p>
   </div>
 
