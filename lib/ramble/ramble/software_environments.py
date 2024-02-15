@@ -203,7 +203,8 @@ class SoftwareEnvironments(object):
                         for pkg_name in env_info[namespace.packages]:
                             expanded_pkg = expander.expand_var(pkg_name,
                                                                extra_vars=rendered_vars)
-                            env_packages.append(expanded_pkg)
+                            if expanded_pkg:
+                                env_packages.append(expanded_pkg)
 
                         pkgs_with_compiler = []
                         missing_pkgs = set()
