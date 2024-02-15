@@ -35,7 +35,6 @@ default_keys = {
     'log_dir': {'type': key_type.reserved, 'level': output_level.variable},
     'log_file': {'type': key_type.reserved, 'level': output_level.variable},
     'err_file': {'type': key_type.reserved, 'level': output_level.variable},
-    'command': {'type': key_type.reserved, 'level': output_level.variable},
     'env_path': {'type': key_type.reserved, 'level': output_level.variable},
     'input_name': {'type': key_type.reserved, 'level': output_level.variable},
 

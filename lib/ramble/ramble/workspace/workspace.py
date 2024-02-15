@@ -1371,6 +1371,10 @@ class Workspace(object):
         """Return a dict of workspace environment variables"""
         return ramble.config.config.get_config('env_vars')
 
+    def get_workspace_formatted_executables(self):
+        """Return a dict of workspace formatted executables"""
+        return ramble.config.config.get_config('formatted_executables')
+
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""
         return ramble.config.config.get_config(namespace.internals)

@@ -410,8 +410,8 @@ def test_set_default_experiment_variables(mutable_mock_apps_repo):
     assert executable_application_instance.variables['n_ranks'] == '1'
 
 
-def test_inject_commands(mutable_mock_apps_repo):
-    """ test _inject_commands """
+def test_define_commands(mutable_mock_apps_repo):
+    """ test _define_commands """
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -435,10 +435,14 @@ def test_inject_commands(mutable_mock_apps_repo):
     executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
                                                                        {'default': '1'}}}
 
+    executable_application_instance.set_formatted_executables(
+        {'command': {'join_separator': '\n'}}
+    )
     executable_application_instance._set_default_experiment_variables()
 
     executable_application_instance.chain_prepend = []
-    executable_application_instance._inject_commands(executables)
+    executable_application_instance._define_commands(executables)
+    executable_application_instance._define_formatted_executables()
     assert 'mpirun' in executable_application_instance.variables['command']
 
 
@@ -511,7 +515,8 @@ ramble:
     executable_application_instance._set_default_experiment_variables()
 
     executable_application_instance.chain_prepend = []
-    executable_application_instance._inject_commands(executables)
+    executable_application_instance._define_commands(executables)
+    executable_application_instance._define_formatted_executables()
 
     test_answer = "/workspace/experiments/bar/test_wl2/baz/execute_experiment"
     executable_application_instance._derive_variables_for_template_path(ws1)

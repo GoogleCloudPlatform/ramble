@@ -83,12 +83,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self._vars_are_expanded = False
         self.expander = None
+        self._formatted_executables = {}
         self.variables = None
         self.no_expand_vars = None
         self.experiment_set = None
         self.internals = None
         self.is_template = False
         self.repeats = ramble.repeats.Repeats()
+        self._command_list = []
         self.chained_experiments = None
         self.chain_order = []
         self.chain_prepend = []
@@ -134,6 +136,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         new_copy.set_env_variable_sets(self._env_variable_sets.copy())
         new_copy.set_variables(self.variables.copy(), self.experiment_set)
         new_copy.set_internals(self.internals.copy())
+        new_copy.set_formatted_executables(self._formatted_executables.copy())
         new_copy.set_template(False)
         new_copy.repeats.set_repeats(False, 0)
         new_copy.set_chained_experiments(None)
@@ -415,6 +418,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if tags:
             self.experiment_tags.extend(tags)
 
+    def set_formatted_executables(self, formatted_executables):
+        """Set formatted executables for this instance"""
+        self._formatted_executables = formatted_executables.copy()
+
     def has_tags(self, tags):
         """Check if this instance has provided tags.
 
@@ -661,7 +668,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     self.chain_append.insert(0, new_name)
                 elif order == 'after_chain':
                     self.chain_append.append(new_name)
-                self.chain_commands[new_name] = cur_exp_def[self.keywords.command]
+                self.chain_commands[new_name] = cur_exp_def[namespace.command]
 
                 # Skip editing the new instance if the base_inst doesn't work
                 # This happens if the originating command is `workspace info`
@@ -690,9 +697,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                     # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)
-                    chain_cmd = new_inst.expander.expand_var(cur_exp_def[self.keywords.command])
+                    chain_cmd = new_inst.expander.expand_var(cur_exp_def[namespace.command])
                     self.chain_commands[new_name] = chain_cmd
-                    cur_exp_def[self.keywords.command] = chain_cmd
+                    cur_exp_def[namespace.command] = chain_cmd
                     self.experiment_set.add_chained_experiment(new_name, new_inst)
 
                 chain_idx += 1
@@ -909,13 +916,20 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         if name not in env_var_set[action].keys():
                             env_var_set[action][name] = value
 
-    def _inject_commands(self, executables):
-        """For add_expand_vars, inject all commands"""
-        command = []
+    def _define_commands(self, executables):
+        """Populate the internal list of commands based on executables
+
+        Populates self._command_list with a list of the executable commands that
+        should be executed by this experiment.
+        """
+        if len(self._command_list) > 0:
+            return
+
+        self._command_list = []
 
         # Inject all prepended chained experiments
         for chained_exp in self.chain_prepend:
-            command.append(self.chain_commands[chained_exp])
+            self._command_list.append(self.chain_commands[chained_exp])
 
         # ensure all log files are purged and set up
         logs = set()
@@ -930,8 +944,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     logs.add(command_config.redirect)
 
         for log in logs:
-            command.append('rm -f "%s"' % log)
-            command.append('touch "%s"' % log)
+            self._command_list.append('rm -f "%s"' % log)
+            self._command_list.append('touch "%s"' % log)
 
         for executable in executables:
             builtin_match = builtin_regex.match(executable)
@@ -952,13 +966,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 func = getattr(self, func_name)
                 func_cmds = func()
                 for cmd in func_cmds:
-                    command.append(self.expander.expand_var(cmd, exec_vars))
+                    self._command_list.append(self.expander.expand_var(cmd, exec_vars))
             elif executable in self._modifier_builtins.keys():
                 builtin_def = self._modifier_builtins[executable]
                 func = builtin_def['func']
                 func_cmds = func()
                 for cmd in func_cmds:
-                    command.append(self.expander.expand_var(cmd, exec_vars))
+                    self._command_list.append(self.expander.expand_var(cmd, exec_vars))
             else:
                 # Process directive defined executables
                 base_command = self.executables[executable].copy()
@@ -990,13 +1004,53 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                     for part in cmd_conf.template:
                         command_part = f'{mpi_cmd}{part}{redirect}'
-                        command.append(self.expander.expand_var(command_part, exec_vars))
+                        self._command_list.append(self.expander.expand_var(command_part,
+                                                                           exec_vars))
 
         # Inject all appended chained experiments
         for chained_exp in self.chain_append:
-            command.append(self.chain_commands[chained_exp])
+            self._command_list.append(self.chain_commands[chained_exp])
 
-        self.variables['command'] = '\n'.join(command)
+    def _define_formatted_executables(self):
+        """Define variables representing the formatted executables
+
+        Process the formatted_executables definitions, and construct their
+        variable definitions.
+
+        Each formatted executable definition is injected as its own variable
+        based on the formatting requested.
+        """
+
+        for var_name, formatted_conf in self._formatted_executables.items():
+            if var_name in self.variables:
+                raise FormattedExecutableError(
+                    f'Formatted executable {var_name} defined, but variable '
+                    'definition already exists.'
+                )
+
+            n_indentation = 0
+            if namespace.indentation in formatted_conf:
+                n_indentation = int(formatted_conf[namespace.indentation]) + 1
+
+            prefix = ''
+            if namespace.prefix in formatted_conf:
+                prefix = formatted_conf[namespace.prefix]
+
+            join_separator = '\n'
+            if namespace.join_separator in formatted_conf:
+                join_separator = formatted_conf[namespace.join_separator].replace(r'\n', '\n')
+
+            indentation = ''
+            for _ in range(0, n_indentation + 1):
+                indentation += ' '
+
+            formatted_str = ''
+            for cmd in self._command_list:
+                if formatted_str:
+                    formatted_str += join_separator
+                formatted_str += indentation + prefix + cmd
+
+            self.variables[var_name] = formatted_str
 
     def _derive_variables_for_template_path(self, workspace):
         """Define variables for template paths (for add_expand_vars)"""
@@ -1030,7 +1084,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             executables = self._get_executables()
             self._set_default_experiment_variables()
             self._set_input_path()
-            self._inject_commands(executables)
+            self._define_commands(executables)
+            self._define_formatted_executables()
 
             self._derive_variables_for_template_path(workspace)
             self._vars_are_expanded = True
@@ -1945,6 +2000,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 class ApplicationError(RambleError):
     """
     Exception that is raised by applications
+    """
+
+
+class FormattedExecutableError(ApplicationError):
+    """
+    Exception raise when there are issues defining formatted executables
     """
 
 
