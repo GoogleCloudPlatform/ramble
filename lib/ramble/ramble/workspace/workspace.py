@@ -148,8 +148,9 @@ workspace_all_experiments_file = 'all_experiments'
 workspace_execution_template = 'execute_experiment' + \
     workspace_template_extension
 
-template_execute_script = """\
-#!/bin/sh
+shell = ramble.config.get('config:shell')
+shell_path = os.path.join('/bin/', shell)
+template_execute_script = f'#!{shell_path}\n' + """\
 # This is a template execution script for
 # running the execute pipeline.
 #

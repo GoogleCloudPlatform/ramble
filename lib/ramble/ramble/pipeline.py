@@ -430,7 +430,9 @@ class SetupPipeline(Pipeline):
     def _prepare(self):
         super()._prepare()
         experiment_file = open(self.workspace.all_experiments_path, 'w+')
-        experiment_file.write('#!/bin/sh\n')
+        shell = ramble.config.get('config:shell')
+        shell_path = os.path.join('/bin/', shell)
+        experiment_file.write(f'#!{shell_path}\n')
         self.workspace.experiments_script = experiment_file
 
     def _complete(self):
