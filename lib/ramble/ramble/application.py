@@ -1527,7 +1527,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     fom_copy['name'] = fom_name
                     context_map['foms'].append(fom_copy)
 
-                self.results['CONTEXTS'].append(context_map)
+                if context == 'null':
+                    self.results['CONTEXTS'].insert(0, context_map)
+                else:
+                    self.results['CONTEXTS'].append(context_map)
 
         workspace.append_result(self.results)
 
