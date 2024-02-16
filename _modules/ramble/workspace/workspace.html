@@ -246,8 +246,9 @@
 <span class="n">workspace_execution_template</span> <span class="o">=</span> <span class="s1">&#39;execute_experiment&#39;</span> <span class="o">+</span> \
     <span class="n">workspace_template_extension</span>
 
-<span class="n">template_execute_script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
-<span class="s2">#!/bin/sh</span>
+<span class="n">shell</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:shell&#39;</span><span class="p">)</span>
+<span class="n">shell_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/bin/&#39;</span><span class="p">,</span> <span class="n">shell</span><span class="p">)</span>
+<span class="n">template_execute_script</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;#!</span><span class="si">{</span><span class="n">shell_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2"># This is a template execution script for</span>
 <span class="s2"># running the execute pipeline.</span>
 <span class="s2">#</span>
