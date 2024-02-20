@@ -147,6 +147,7 @@
     <span class="n">compiler_find_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:compiler_find&#39;</span>
     <span class="n">buildcache_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:buildcache&#39;</span>
     <span class="n">concretize_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:concretize&#39;</span>
+    <span class="n">env_create_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:env_create&#39;</span>
 
     <span class="n">env_create_args</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;env&#39;</span><span class="p">,</span>
@@ -344,8 +345,13 @@
         <span class="c1"># Create a spack env</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
+                <span class="n">env_create_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_create_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+                <span class="n">env_create_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_create_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">env_create_flags</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">env_create_flags</span><span class="p">):</span>
+                        <span class="n">env_create_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
                 <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">working_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_create_args</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">env_create_args</span><span class="p">)</span>
 
         <span class="c1"># Ensure subsequent commands use the created env now.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">path</span></div>
@@ -1030,7 +1036,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 17, 2024.
+      <span class="lastupdated">Last updated on Feb 20, 2024.
       </span></p>
   </div>
 
