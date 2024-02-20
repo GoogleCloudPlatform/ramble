@@ -121,6 +121,19 @@ properties['config']['spack'] = {
             },
             'additionalProperties': False
         },
+        'env_create': {
+            'type': 'object',
+            'default': {
+                'flags': '',
+            },
+            'properties': {
+                'flags': {
+                    'type': 'string',
+                    'default': '',
+                },
+            },
+            'additionalProperties': False
+        },
     },
     'additionalProperties': False,
 }

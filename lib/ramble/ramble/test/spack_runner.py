@@ -506,3 +506,25 @@ compilers::
                     assert expected_str in captured.out
                 except ramble.spack_runner.RunnerError as e:
                     pytest.skip('%s' % e)
+
+
+def test_env_create_no_view(tmpdir):
+
+    import os
+
+    with tmpdir.as_cwd():
+        with ramble.config.override('config:spack',
+                                    {'env_create': {'flags': '--without-view'}}):
+            try:
+                sr = ramble.spack_runner.SpackRunner()
+                sr.create_env(os.getcwd())
+
+                assert not os.path.exists(
+                    os.path.join(
+                        os.getcwd(),
+                        '.spack-env',
+                        'view'
+                    )
+                )
+            except ramble.spack_runner.RunnerError as e:
+                pytest.skip('%s' % e)
