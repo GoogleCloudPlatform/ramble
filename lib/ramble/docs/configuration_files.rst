@@ -158,15 +158,18 @@ The current default configuration is as follows:
         install:
           flags: '--reuse'
         concretize:
-            flags: '--reuse'
+          flags: '--reuse'
+        buildcache:
+          flags: ''
+        env_create:
+          flags: ''
         global
-            flags: ''
+          flags: ''
       input_cache: '$ramble/var/ramble/cache'
       workspace_dirs: '$ramble/var/ramble/workspaces'
       upload:
         type: 'BigQuery'
         uri: ''
-
 
 .. _upload-config-option:
 
