@@ -222,7 +222,7 @@ def environment_variable(name, value, description, workload=None,
 
 
 @application_directive('phase_definitions')
-def register_phase(name, pipeline=None, depends_on=[]):
+def register_phase(name, pipeline=None, run_before=[], run_after=[]):
     """Register a phase
 
     Phases are portions of a pipeline that will execute when
@@ -237,30 +237,49 @@ def register_phase(name, pipeline=None, depends_on=[]):
     Args:
     - name: The name of the phase. Phases are functions named '_<phase>'.
     - pipeline: The name of the pipeline this phase should be registered into.
-    - depends_on: A list of phase names this phase depends on
+    - run_before: A list of phase names this phase should run before
+    - run_after: A list of phase names this phase should run after
     """
 
     def _execute_register_phase(app):
+        import ramble.util.graph
         if pipeline not in app._pipelines:
             raise DirectiveError('Directive register_phase was '
                                  f'given an invalid pipeline "{pipeline}"\n'
                                  'Available pipelines are: '
                                  f' {app._pipelines}')
 
-        if not isinstance(depends_on, list):
+        if not isinstance(run_before, list):
             raise DirectiveError('Directive register_phase was '
                                  'given an invalid type for '
-                                 'the depends_on attribute in application '
+                                 'the run_before attribute in application '
                                  f'{app.name}')
+
+        if not isinstance(run_after, list):
+            raise DirectiveError('Directive register_phase was '
+                                 'given an invalid type for '
+                                 'the run_after attribute in application '
+                                 f'{app.name}')
+
+        if not hasattr(app, f'_{name}'):
+            raise DirectiveError('Directive register_phase was '
+                                 f'given an undefined phase {name} '
+                                 f'in application {app.name}')
 
         if pipeline not in app.phase_definitions:
             app.phase_definitions[pipeline] = {}
 
-        if name not in app.phase_definitions[pipeline]:
-            app.phase_definitions[pipeline][name] = []
+        if name in app.phase_definitions[pipeline]:
+            phase_node = app.phase_definitions[pipeline][name]
+        else:
+            phase_node = ramble.util.graph.GraphNode(name)
 
-        for dep in depends_on:
-            if dep not in app.phase_definitions[pipeline][name]:
-                app.phase_definitions[pipeline][name].append(dep)
+        for before in run_before:
+            phase_node.order_before(before)
+
+        for after in run_after:
+            phase_node.order_after(after)
+
+        app.phase_definitions[pipeline][name] = phase_node
 
     return _execute_register_phase

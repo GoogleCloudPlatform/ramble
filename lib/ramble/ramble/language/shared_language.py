@@ -222,7 +222,7 @@ def success_criteria(name, mode, match=None, file='{log_file}',
 
 
 @shared_directive('builtins')
-def register_builtin(name, required=True, injection_method='prepend'):
+def register_builtin(name, required=True, injection_method='prepend', depends_on=[]):
     """Register a builtin
 
     Builtins are methods that return lists of strings. These methods represent
@@ -268,7 +268,7 @@ def register_builtin(name, required=True, injection_method='prepend'):
     def _store_builtin(obj):
         if injection_method not in supported_injection_methods:
             raise ramble.language.language_base.DirectiveError(
-                f'Object {obj.name} has an invalid '
+                f'Object {obj.name} defines builtin {name} with an invalid '
                 f'injection method of {injection_method}.\n'
                 f'Valid methods are {str(supported_injection_methods)}'
             )
@@ -277,7 +277,9 @@ def register_builtin(name, required=True, injection_method='prepend'):
 
         obj.builtins[builtin_name] = {'name': name,
                                       'required': required,
-                                      'injection_method': injection_method}
+                                      'injection_method': injection_method,
+                                      'depends_on': depends_on.copy(),
+                                      'function': getattr(obj, name)}
     return _store_builtin
 
 

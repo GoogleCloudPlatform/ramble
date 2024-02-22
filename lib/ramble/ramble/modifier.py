@@ -28,9 +28,6 @@ class ModifierBase(object, metaclass=ModifierMeta):
     uses_spack = False
     _builtin_name = 'modifier_builtin::{obj_name}::{name}'
     _mod_prefix_builtin = r'modifier_builtin::'
-    _mod_builtin_regex = r'modifier_builtin::(?P<modifier>[\w-]+)::'
-    _builtin_required_key = 'required'
-    builtin_group = 'modifier'
     _language_classes = [ModifierMeta, SharedMeta]
 
     modifier_class = 'ModifierBase'
