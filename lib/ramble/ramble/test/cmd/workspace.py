@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,22 +7,27 @@
 # except according to those terms.
 
 import os
+import glob
 
 import pytest
 
 import llnl.util.filesystem as fs
 
+import ramble.application
 import ramble.workspace
 from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
+from ramble.test.dry_run_helpers import search_files_for_string
 import ramble.config
+import ramble.filters
+import ramble.pipeline
 
 import spack.util.spack_yaml as syaml
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_workspace_path',
-                                     'mutable_mock_repo')
+                                     'mutable_mock_apps_repo')
 
 config = RambleCommand('config')
 workspace = RambleCommand('workspace')
@@ -56,13 +61,13 @@ def check_basic(ws):
     found_test_wl = False
     found_test_wl2 = False
 
-    for app, workloads, *_ in ws.all_applications():
-        if app == 'basic':
+    for workloads, application_context in ws.all_applications():
+        if application_context.context_name == 'basic':
             found_basic = True
-        for workload, experiments, *_ in ws.all_workloads(workloads):
-            if workload == 'test_wl':
+        for experiments, workload_context in ws.all_workloads(workloads):
+            if workload_context.context_name == 'test_wl':
                 found_test_wl = True
-            elif workload == 'test_wl2':
+            elif workload_context.context_name == 'test_wl2':
                 found_test_wl2 = True
 
     assert found_basic
@@ -75,13 +80,13 @@ def check_no_basic(ws):
     found_test_wl = False
     found_test_wl2 = False
 
-    for app, workloads, *_ in ws.all_applications():
-        if app == 'basic':
+    for workloads, application_context in ws.all_applications():
+        if application_context.context_name == 'basic':
             found_basic = True
-        for workload, experiments, *_ in ws.all_workloads(workloads):
-            if workload == 'test_wl':
+        for experiments, workload_context in ws.all_workloads(workloads):
+            if workload_context.context_name == 'test_wl':
                 found_test_wl = True
-            elif workload == 'test_wl2':
+            elif workload_context.context_name == 'test_wl2':
                 found_test_wl2 = True
 
     assert not found_basic
@@ -107,6 +112,21 @@ def check_results(ws):
     assert os.path.exists(os.path.join(ws.root, fn + '.txt'))
     assert os.path.exists(os.path.join(ws.root, fn + '.json'))
     assert os.path.exists(os.path.join(ws.root, fn + '.yaml'))
+
+
+def test_workspace_create_links(mutable_mock_workspace_path, tmpdir):
+    import pathlib
+    expected_links = ['software', 'inputs']
+    with tmpdir.as_cwd():
+        workspace('create', '-d', 'foo')
+        workspace('create', '-d', 'bar', '--inputs-dir', 'foo/inputs',
+                  '--software-dir', 'foo/software')
+
+        for expected_link in expected_links:
+            assert os.path.exists(os.path.join('bar', expected_link))
+            assert os.path.islink(os.path.join('bar', expected_link))
+            resolved_path = pathlib.PosixPath(os.path.join('bar', expected_link)).resolve()
+            assert str(resolved_path) == os.path.abspath(os.path.join('foo', expected_link))
 
 
 def test_workspace_activate_fails(mutable_mock_workspace_path):
@@ -176,7 +196,7 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', global_args=['-w', workspace_name])
+    output = workspace('info', '--software', global_args=['-w', workspace_name])
 
     check_info_basic(output)
 
@@ -228,57 +248,12 @@ config:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '--expansions', global_args=['-w', workspace_name])
     assert 'Variables from Config:' in output
     assert 'Variables from Workspace:' in output
     assert 'Variables from Application:' in output
     assert 'Variables from Workload:' in output
     assert 'Variables from Experiment:' in output
-
-
-def test_workspace_info_with_templates():
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              template: true
-              variables:
-                n_nodes: '2'
-        test_wl2:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-
-  spack:
-    concretized: true
-    packages: {}
-    environments: {}
-"""
-
-    workspace_name = 'test_workspace_info_with_templates'
-    ws1 = ramble.workspace.create(workspace_name)
-    ws1.write()
-
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
-
-    ws1._re_read()
-
-    output = workspace('info', global_args=['-w', workspace_name])
-
-    assert "Template Experiment: basic.test_wl.test_experiment" in output
 
 
 def test_workspace_info_with_experiment_chain():
@@ -325,9 +300,8 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
-    assert "Template Experiment: basic.test_wl.test_experiment" in output
     assert "Experiment Chain:" in output
     assert "- basic.test_wl2.test_experiment.chain.0.basic.test_wl.test_experiment" in output
 
@@ -462,6 +436,9 @@ def test_setup_nothing():
     ws_name = 'test'
     workspace('create', ws_name)
     assert ws_name in workspace('list')
+    pipeline_type = ramble.pipeline.pipelines.setup
+    pipeline_cls = ramble.pipeline.pipeline_class(pipeline_type)
+    filters = ramble.filters.Filters()
 
     with ramble.workspace.read(ws_name) as ws:
         add_basic(ws)
@@ -470,7 +447,8 @@ def test_setup_nothing():
         ws.concretize()
         assert ws.is_concretized()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = pipeline_cls(ws, filters)
+        setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
 
 
@@ -496,6 +474,11 @@ def test_analyze_nothing():
     ws_name = 'test'
     workspace('create', ws_name)
     assert ws_name in workspace('list')
+    setup_type = ramble.pipeline.pipelines.setup
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+    analyze_type = ramble.pipeline.pipelines.analyze
+    analyze_cls = ramble.pipeline.pipeline_class(analyze_type)
+    filters = ramble.filters.Filters()
 
     with ramble.workspace.read(ws_name) as ws:
         add_basic(ws)
@@ -504,10 +487,12 @@ def test_analyze_nothing():
         ws.concretize()
         assert ws.is_concretized()
 
-        ws.run_pipeline('setup')
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
 
-        ws.run_pipeline('analyze')
+        analyze_pipeline = analyze_cls(ws, filters)
+        analyze_pipeline.run()
         check_results(ws)
 
 
@@ -669,9 +654,11 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-    assert "Would download file:///tmp/test_file.log" in output
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(ws1.root, 'experiments',
                                        'basic', 'test_wl',
                                        'test_experiment',
@@ -740,9 +727,11 @@ ramble:
     for exp in expected_experiments:
         assert exp in output
 
-    output = workspace('setup', '--dry-run', global_args=workspace_flags)
+    workspace('setup', '--dry-run', global_args=workspace_flags)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
 
     exp_base = os.path.join(ws1.experiment_dir, 'basic', 'test_wl')
     for exp in expected_experiments:
@@ -788,15 +777,15 @@ ramble:
     workspace_flags = ['-w', workspace_name]
 
     output = workspace('info', global_args=workspace_flags, fail_on_error=False)
-    assert "Size of vector" in output
-    assert "is not the same as max" in output
+    assert "Length mismatch in vector variables in " + \
+        "experiment exp_series_{idx}_{n_nodes}_{cells}_{processes_per_node}" in output
 
     output = workspace('setup', '--dry-run',
                        global_args=workspace_flags,
                        fail_on_error=False)
 
-    assert "Size of vector" in output
-    assert "is not the same as max" in output
+    assert "Length mismatch in vector variables in " + \
+        "experiment exp_series_{idx}_{n_nodes}_{cells}_{processes_per_node}" in output
 
 
 def test_invalid_size_matrices_workspace():
@@ -882,12 +871,12 @@ ramble:
     workspace_flags = ['-w', workspace_name]
 
     output = workspace('info', global_args=workspace_flags, fail_on_error=False)
-    assert "variable foo has not been defined yet" in output
+    assert "variable or zip foo has not been defined yet" in output
 
     output = workspace('setup', '--dry-run',
                        global_args=workspace_flags,
                        fail_on_error=False)
-    assert "variable foo has not been defined yet" in output
+    assert "variable or zip foo has not been defined yet" in output
 
 
 def test_non_vector_var_matrices_workspace():
@@ -982,13 +971,15 @@ ramble:
 def test_reconcretize_in_configs_dir(tmpdir):
     """
     Test multiple concretizations while the configs dir is the cwd do not fail.
-    This catchs a bug that existed when lock files were written incorrectly.
+    This catches a bug that existed when lock files were written incorrectly.
     """
     test_config = """
 ramble:
   variables:
     mpi_command: 'mpirun'
     batch_submit: '{execute_experiment}'
+    n_ranks: '1'
+    n_nodes: '1'
   applications:
     basic:
       workloads:
@@ -1010,8 +1001,9 @@ ramble:
             config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
             with open(config_path, 'w+') as f:
                 f.write(config)
+            ws._re_read()
 
-    ws_path = str(tmpdir.join('test_concretize_in_configs_dir'))
+    ws_path = str(tmpdir.join('test_reconcretize_in_configs_dir'))
     workspace('create', '-d', ws_path)
     assert ramble.workspace.is_workspace_dir(ws_path)
 
@@ -1054,16 +1046,27 @@ ramble:
     environments: {}
 """
 
+    test_licenses = """
+licenses:
+  basic:
+    set:
+      TEST_LIC: 'value'
+"""
+
     workspace_name = 'test_basic_archive'
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    lic_path = os.path.join(ws1.config_dir, 'licenses.yaml')
 
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    with open(lic_path, 'w+') as f:
+        f.write(test_licenses)
+
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1073,12 +1076,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1092,10 +1096,11 @@ ramble:
         f = open(new_file, 'w+')
         f.close()
 
-    output = workspace('archive', global_args=['-w', workspace_name])
+    workspace('archive', global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
+    assert os.path.exists(os.path.join(ws1.archive_dir, 'archive.latest'))
 
     for template in new_templates:
         archived_path = template.replace(ws1.root, ws1.latest_archive_path)
@@ -1104,6 +1109,69 @@ ramble:
     for file in new_files:
         archived_path = file.replace(ws1.root, ws1.latest_archive_path)
         assert os.path.exists(archived_path)
+
+    assert not os.path.exists(os.path.join(ws1.latest_archive_path, 'shared', 'licenses', 'basic',
+                                           ramble.application.ApplicationBase.license_inc_name))
+
+
+def test_workspace_archive_include_secrets():
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
+"""
+
+    test_licenses = """
+licenses:
+  basic:
+    set:
+      TEST_LIC: 'value'
+"""
+
+    workspace_name = 'test_basic_archive'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    lic_path = os.path.join(ws1.config_dir, 'licenses.yaml')
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    with open(lic_path, 'w+') as f:
+        f.write(test_licenses)
+
+    # Create more templates
+    new_templates = []
+    for i in range(0, 5):
+        new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
+        new_templates.append(new_template)
+        f = open(new_template, 'w+')
+        f.close()
+
+    ws1._re_read()
+
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+    workspace('archive', '--include-secrets', global_args=['-w', workspace_name])
+
+    assert os.path.exists(os.path.join(ws1.latest_archive_path, 'shared', 'licenses', 'basic',
+                                       ramble.application.ApplicationBase.license_inc_name))
 
 
 def test_workspace_tar_archive():
@@ -1137,7 +1205,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more temlates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1147,12 +1215,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1166,7 +1235,7 @@ ramble:
         f = open(new_file, 'w+')
         f.close()
 
-    output = workspace('archive', '-t', global_args=['-w', workspace_name])
+    workspace('archive', '-t', global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1180,6 +1249,7 @@ ramble:
         assert os.path.exists(archived_path)
 
     assert os.path.exists(ws1.latest_archive_path + '.tar.gz')
+    assert os.path.exists(os.path.join(ws1.archive_dir, 'archive.latest.tar.gz'))
 
 
 def test_workspace_tar_upload_archive():
@@ -1213,7 +1283,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1223,12 +1293,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1245,7 +1316,8 @@ ramble:
     remote_archive_path = os.path.join(ws1.root, 'archive_backup')
     fs.mkdirp(remote_archive_path)
 
-    output = workspace('archive', '-t', '-u', 'file://' + remote_archive_path, global_args=['-w', workspace_name])
+    workspace('archive', '-t', '-u', 'file://' + remote_archive_path,
+              global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1294,7 +1366,7 @@ ramble:
     with open(config_path, 'w+') as f:
         f.write(test_config)
 
-    # Create more tempaltes
+    # Create more templates
     new_templates = []
     for i in range(0, 5):
         new_template = os.path.join(ws1.config_dir, 'test_template.%s' % i)
@@ -1304,12 +1376,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
     experiment_dir = os.path.join(ws1.root, 'experiments',
                                   'basic', 'test_wl',
                                   'test_experiment')
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
 
-    assert "Would download file:///tmp/test_file.log" in output
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(experiment_dir,
                                        'execute_experiment'))
 
@@ -1327,9 +1400,9 @@ ramble:
     fs.mkdirp(remote_archive_path)
 
     config('add', 'config:archive_url:%s/' % remote_archive_path,
-           gloabl_args=['-w', workspace_name])
+           global_args=['-w', workspace_name])
 
-    output = workspace('archive', '-t', global_args=['-w', workspace_name])
+    workspace('archive', '-t', global_args=['-w', workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1378,9 +1451,11 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-    assert "Would download file:///tmp/test_file.log" in output
+    out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+    assert search_files_for_string(out_files, 'Would download file:///tmp/test_file.log')
     assert os.path.exists(os.path.join(ws1.root, 'experiments',
                                        'basic', 'test_wl',
                                        'test_experiment',
@@ -1438,13 +1513,13 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', global_args=['-w', workspace_name])
+    output = workspace('info', '--software', global_args=['-w', workspace_name])
 
     check_info_basic(output)
 
 
 @pytest.mark.parametrize('tpl_name', [
-    'command'
+    'env_path'
 ])
 def test_invalid_template_name_errors(tpl_name, capsys):
     test_config = """
@@ -1540,7 +1615,7 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert 'app_level_cmd' in output
     assert 'wl_level_cmd' in output
@@ -1603,119 +1678,9 @@ ramble:
 
     ws1._re_read()
 
-    output = workspace('info', '-v', global_args=['-w', workspace_name])
+    output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
-
-
-def test_old_config_warns(capsys):
-    test_config = """
-ramble:
-  mpi:
-    command: mpirun
-    args:
-    - '-n'
-    - '{n_ranks}'
-  batch:
-    submit: '{execute_experiment}'
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}'
-  applications:
-    basic:
-      internals:
-        custom_executables:
-          app_level_cmd:
-            template:
-            - 'app_level_cmd'
-            use_mpi: false
-            redirect: '{log_file}'
-      workloads:
-        test_wl:
-          internals:
-            custom_executables:
-              wl_level_cmd:
-                template:
-                - 'wl_level_cmd'
-                use_mpi: false
-                redirect: '{log_file}'
-          experiments:
-            test_experiment:
-              internals:
-                custom_executables:
-                  exp_level_cmd:
-                    template:
-                    - 'exp_level_cmd'
-                    use_mpi: false
-                    redirect: '{log_file}'
-                executables:
-                - exp_level_cmd
-                - wl_level_cmd
-                - app_level_cmd
-spack:
-  concretized: true
-  packages: {}
-  environments: {}
-"""
-
-    workspace_name = 'test_custom_executables_info'
-    ws1 = ramble.workspace.create(workspace_name)
-    ws1.write()
-
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
-
-    ws1._re_read()
-    captured = capsys.readouterr()
-    assert 'Your workspace configuration contains deprecated sections' in captured.err
-    assert 'ramble:mpi' in captured.err
-    assert 'ramble:batch' in captured.err
-
-
-def test_v1_spack_config_warns(capsys):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}'
-  applications:
-    zlib:
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_ranks: '1'
-spack:
-  concretized: true
-  compilers: {}
-  mpi_libraries: {}
-  applications:
-    zlib:
-      zlib:
-        base: zlib
-"""
-
-    workspace_name = 'test_v1_spack_config_warns'
-    ws1 = ramble.workspace.create(workspace_name)
-    ws1.write()
-
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
-
-    ws1._re_read()
-    ramble.software_environments.SoftwareEnvironments(ws1)
-    captured = capsys.readouterr()
-    assert 'Your workspace configuration uses the v1 format for the spack section' in captured.err
-    assert 'v1 support will be removed in the future.' in captured.err
 
 
 def test_invalid_spack_config_errors(capsys):
@@ -1749,4 +1714,4 @@ ramble:
     with pytest.raises(RambleSoftwareEnvironmentError):
         ramble.software_environments.SoftwareEnvironments(ws1)
         captured = capsys.readouterr()
-        assert "Software configuration type invalid is not one of ['v1', 'v2']" in captured.err
+        assert "Software configuration type invalid is not one of ['v2']" in captured.err

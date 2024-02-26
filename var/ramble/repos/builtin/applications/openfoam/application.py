@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,19 +6,23 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Openfoam(SpackApplication):
     '''Define the Openfoam application'''
     name = 'openfoam'
 
-    tags = ['cfd', 'fluid', 'dynamics']
+    maintainers('douglasjacobsen')
+
+    tags('cfd', 'fluid', 'dynamics')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('ompi412',
-                  spack_spec='openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx',
+                  spack_spec='openmpi@4.1.2 +legacylaunchers +cxx',
                   compiler='gcc9')
 
     software_spec('flex',
@@ -30,9 +34,11 @@ class Openfoam(SpackApplication):
 
     required_package('openfoam-org')
 
-    workload('motorbike', executables=['get_inputs', 'configure', 'serial_decompose',
-                                       'snappyHexMesh', 'patchSummary', 'potentialFoam',
-                                       'simpleFoam', 'reconstructParMesh', 'reconstructPar'])
+    workload('motorbike', executables=['get_inputs', 'configure_mesh', 'surfaceFeatures',
+                                       'blockMesh', 'decomposePar', 'snappyHexMesh',
+                                       'reconstructParMesh', 'renumberMesh', 'configure_simplefoam',
+                                       'decomposePar', 'patchSummary', 'checkMesh', 'potentialFoam',
+                                       'simpleFoam'])
 
     workload_variable('input_path', default='$FOAM_TUTORIALS/incompressible/simpleFoam/motorBike',
                       description='Path to the tutorial input',
@@ -53,14 +59,20 @@ class Openfoam(SpackApplication):
                       description='Path to hexh mesh file',
                       workloads=['hpc_motorbike', 'motorbike'])
 
-    workload_variable('timestep', default='500',
-                      description='Timestep for simulation',
+    workload_variable('end_time', default='250',
+                      description='End time for simulation',
+                      workload='motorbike')
+    workload_variable('write_interval', default='500',
+                      description='Interval to write output files',
+                      workload='motorbike')
+    workload_variable('start_from', default='startTime',
+                      description='How to start a new simulation',
                       workload='motorbike')
     workload_variable('mesh_size', default='(20 8 8)',
-                      description='Timestep for simulation',
+                      description='Mesh size for simulation',
                       workload='motorbike')
     workload_variable('mesh_size', default='(50 20 20)',
-                      description='Timestep for simulation',
+                      description='Mesh size for simulation',
                       workload='hpc_motorbike')
     workload_variable('max_local_cells', default='100000',
                       description='Max local cells for simulation',
@@ -68,28 +80,20 @@ class Openfoam(SpackApplication):
     workload_variable('max_local_cells', default='10000000',
                       description='Max local cells for simulation',
                       workload='hpc_motorbike')
-    workload_variable('max_global_cells', default='200000',
+    workload_variable('max_global_cells', default='50000000',
                       description='Max global cells for simulation',
                       workload='motorbike')
     workload_variable('max_global_cells', default='200000000',
                       description='Max global cells for simulation',
                       workload='hpc_motorbike')
 
-    workload_variable('x_decomp', default='{n_ranks}',
-                      description='Workload X decomposition',
-                      workload='motorbike')
-    workload_variable('y_decomp', default='1',
-                      description='Workload Y decomposition',
-                      workload='motorbike')
-    workload_variable('z_decomp', default='1',
-                      description='Workload Z decomposition',
-                      workload='motorbike')
-
-    workload_variable('decomp', default='({x_decomp} {y_decomp} {z_decomp})',
-                      description='Workload decomposition',
-                      workload='motorbike')
-
-    workload_variable('hex_flags', default='-overwrite -parallel',
+    workload_variable('n_ranks_hex', default='16',
+                      description='Number of ranks to use for snappyHexMesh',
+                      workloads=['motorbike'])
+    workload_variable('n_ranks_hex', default='{n_rank}',
+                      description='Number of ranks to use for snappyHexMesh',
+                      workloads=['hpc_motorbike'])
+    workload_variable('hex_flags', default='-overwrite',
                       description='Flags for snappyHexMesh',
                       workloads=['hpc_motorbike', 'motorbike'])
     workload_variable('potential_flags', default='-parallel',
@@ -113,6 +117,7 @@ class Openfoam(SpackApplication):
 
     input_file('hpc_motorbike',
                url='https://develop.openfoam.com/committees/hpc/-/archive/develop/hpc-develop.tar.gz',
+               sha256='b285a18332fd718dbdc6b6c90dd7f134c9745cb7eb479d93b394160bbef97390',
                description='HPC Benchmarking version of the Motorbike input')
 
     executable('get_inputs', template=['cp -R {input_path}/* {experiment_run_dir}/.',
@@ -129,26 +134,50 @@ class Openfoam(SpackApplication):
                                        './Allmesh'],
                use_mpi=False)
 
-    executable('configure', template=[r'sed "/^numberOfSubdomains/ c\\numberOfSubdomains {n_ranks};" -i {decomposition_path}',
-                                      r'sed "/^method/c\\method          scotch;" -i {decomposition_path}',
-                                      'sed "s/(3 2 1)/{decomp}/" -i {decomposition_path}',
-                                      r'sed "/^endTime/c\\endTime {timestep};" -i {control_path}',
-                                      r'sed "/^writeInterval/c\\writeInterval {timestep};" -i {control_path}',
-                                      'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
-                                      'sed "s/maxLocalCells 100000/maxLocalCells {max_local_cells}/" -i {hex_mesh_path}',
-                                      'sed "s/maxGlobalCells 2000000/maxGlobalCells {max_global_cells}/" -i {hex_mesh_path}',
-                                      'ln -s 0.orig 0'],
+    executable('configure_mesh', template=['. $WM_PROJECT_DIR/bin/tools/RunFunctions',
+                                           'rm log.*',
+                                           'foamDictionary -entry "numberOfSubdomains" -set "{n_ranks_hex}" {decomposition_path}',
+                                           'foamDictionary -entry "method" -set "hierarchical" {decomposition_path}',
+                                           'foamDictionary -entry "hierarchicalCoeffs.n" -set "(4 2 2)" {decomposition_path}',
+                                           'foamDictionary -entry "castellatedMeshControls.maxLocalCells" -set "{max_local_cells}" {hex_mesh_path}',
+                                           'foamDictionary -entry "castellatedMeshControls.maxGlobalCells" -set "{max_global_cells}" {hex_mesh_path}',
+                                           'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
+                                           'ln -s 0 0.orig'],
                use_mpi=False)
 
-    executable('serial_decompose', template=['surfaceFeatures',
-                                             'blockMesh',
-                                             'decomposePar -copyZero'],
+    executable('configure_simplefoam', template=['. $WM_PROJECT_DIR/bin/tools/RunFunctions',
+                                                 'foamDictionary -entry "numberOfSubdomains" -set "{n_ranks}" {decomposition_path}',
+                                                 'foamDictionary -entry "endTime" -set "{end_time}" {control_path}',
+                                                 'foamDictionary -entry "writeInterval" -set "{write_interval}" {control_path}',
+                                                 'foamDictionary -entry "startFrom" -set "{start_from}" {control_path}',
+                                                 'foamDictionary -entry "hierarchicalCoeffs.n" -set "(3 2 1)" {decomposition_path}',
+                                                 'foamDictionary -entry "method" -set "scotch" {decomposition_path}',
+                                                 'foamDictionary system/fvSolution -entry relaxationFactors.equations.U -set "0.7"',
+                                                 'foamDictionary system/fvSolution -entry relaxationFactors.fields -add "{}"',
+                                                 'foamDictionary system/fvSolution -entry relaxationFactors.fields.p -set "0.3"',
+                                                 'foamDictionary system/fvSolution -entry solvers.p.nPreSweeps -set "0"',
+                                                 'foamDictionary system/fvSolution -entry solvers.p.nPostSweeps -set "2"',
+                                                 'foamDictionary system/fvSolution -entry solvers.p.cacheAgglomeration -set "on"',
+                                                 'foamDictionary system/fvSolution -entry solvers.p.agglomerator -set "faceAreaPair"',
+                                                 'foamDictionary system/fvSolution -entry solvers.p.nCellsInCoarsestLevel -set "10"',
+                                                 'foamDictionary system/fvSolution -entry solvers.p.mergeLevels -set "1"',
+                                                 'foamDictionary system/fvSolution -entry SIMPLE.consistent -set "yes"'],
                use_mpi=False)
 
-    executable('snappyHexMesh', 'snappyHexMesh {hex_flags}', use_mpi=True,
-               redirect='{experiment_run_dir}/log.snappyHexMesh')
+    executable('surfaceFeatures', 'runApplication surfaceFeatures',
+               use_mpi=False)
+
+    executable('blockMesh', 'runApplication blockMesh',
+               use_mpi=False)
+
+    executable('decomposePar', template=['rm log.decomposePar', 'runApplication decomposePar'],
+               use_mpi=False)
+
+    executable('snappyHexMesh', 'runParallel snappyHexMesh {hex_flags}', use_mpi=False)
     executable('patchSummary', 'patchSummary', use_mpi=True,
                redirect='{experiment_run_dir}/log.patchSummary')
+    executable('checkMesh', 'checkMesh', use_mpi=True,
+               redirect='{experiment_run_dir}/log.checkMesh')
     executable('potentialFoam', 'potentialFoam {potential_flags}', use_mpi=True,
                redirect='{experiment_run_dir}/log.potentialFoam')
     executable('simpleFoam', 'simpleFoam {simple_flags}', use_mpi=True,
@@ -156,23 +185,38 @@ class Openfoam(SpackApplication):
 
     executable('reconstructParMesh', 'reconstructParMesh -constant', use_mpi=False,
                redirect='{experiment_run_dir}/log.reconstructParMesh')
-    executable('reconstructPar', 'reconstructPar -latestTime', use_mpi=False,
-               redirect='{experiment_run_dir}/log.reconstructPar')
+
+    executable('renumberMesh', template=['rm -rf processor*',
+                                         'renumberMesh -constant -overwrite'],
+               use_mpi=False,
+               redirect='{experiment_run_dir}/log.renumberMesh')
 
     executable('allRun', template=[r'sed "s/writephi/writePhi/g" -i Allrun',
-                                   r'sed "s/rm.*log\./#/g" -i Allclean',
+                                   r'sed "s/rm.*log./#/g" -i Allclean',
                                    r'chmod a+x Allrun',
                                    './Allrun'],
                use_mpi=False)
 
-    figure_of_merit('snappyHexMesh Time', log_file='{experiment_run_dir}/log.snappyHexMesh',
+    log_prefix = os.path.join(Expander.expansion_str('experiment_run_dir'), 'log.')
+
+    figure_of_merit('Number of cells', log_file=(log_prefix + 'snappyHexMesh'),
+                    fom_regex=r'Layer mesh\s+:\s+cells:(?P<ncells>[0-9]+)\s+.*',
+                    group_name='ncells', units='')
+
+    figure_of_merit('snappyHexMesh Time ({n_ranks_hex} ranks)', log_file=(log_prefix + 'snappyHexMesh'),
                     fom_regex=r'Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*',
                     group_name='mesh_time', units='s')
 
-    figure_of_merit('simpleFoam Time', log_file='{experiment_run_dir}/log.simpleFoam',
+    figure_of_merit('simpleFoam Time ({n_ranks} ranks)', log_file=(log_prefix + 'simpleFoam'),
                     fom_regex=r'\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
                     group_name='foam_time', units='s')
 
-    figure_of_merit('potentialFoam Time', log_file='{experiment_run_dir}/log.potentialFoam',
+    figure_of_merit('potentialFoam Time ({n_ranks} ranks)', log_file=(log_prefix + 'potentialFoam'),
                     fom_regex=r'\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*',
                     group_name='foam_time', units='s')
+
+    success_criteria('snappyHexMesh_completed', mode='string', match='Finalising parallel run',
+                     file='{experiment_run_dir}/log.snappyHexMesh')
+
+    success_criteria('simpleFoam_completed', mode='string', match='Finalising parallel run',
+                     file='{experiment_run_dir}/log.simpleFoam')

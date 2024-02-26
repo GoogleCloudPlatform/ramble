@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -25,6 +25,7 @@ import sys
 import traceback
 import warnings
 import jsonschema
+import ruamel
 
 from six import StringIO
 
@@ -41,6 +42,7 @@ import ramble.workspace
 import ramble.workspace.shell
 import ramble.paths
 import ramble.repository
+from ramble.util.logger import logger
 import spack.util.debug
 import spack.util.environment
 import spack.util.path
@@ -116,16 +118,29 @@ def get_version():
 
     The commit sha is only added when available.
     """
-    import spack.util.git
     version = ramble.ramble_version
-    git_path = os.path.join(ramble.paths.prefix, ".git")
+    git_hash = get_git_hash(path=ramble.paths.prefix)
+
+    if git_hash:
+        version += f' ({git_hash})'
+
+    return version
+
+
+def get_git_hash(path=ramble.paths.prefix):
+    """Get get hash from a path
+
+    Outputs '<git commit sha>'.
+    """
+    import spack.util.git
+    git_path = os.path.join(path, ".git")
     if os.path.exists(git_path):
         git = spack.util.git.git()
         if not git:
-            return version
+            return
         rev = git(
             "-C",
-            ramble.paths.prefix,
+            path,
             "rev-parse",
             "HEAD",
             output=str,
@@ -133,12 +148,12 @@ def get_version():
             fail_on_error=False,
         )
         if git.returncode != 0:
-            return version
+            return
         match = re.match(r"[a-f\d]{7,}$", rev)
         if match:
-            version += " ({0})".format(match.group(0))
+            return match.group(0)
 
-    return version
+    return
 
 
 def index_commands():
@@ -151,8 +166,7 @@ def index_commands():
         for p in required_command_properties:
             prop = getattr(cmd_module, p, None)
             if not prop:
-                tty.die("Command doesn't define a property '%s': %s"
-                        % (p, command))
+                logger.die(f"Command doesn't define a property '{p}': {command}")
 
         # add commands to lists for their level and higher levels
         for level in reversed(levels):
@@ -366,7 +380,7 @@ def make_argument_parser(**kwargs):
     parser = RambleArgumentParser(
         formatter_class=RambleHelpFormatter, add_help=False,
         description=(
-            "A fleixble benchmark experiment manager."),
+            "A flexible benchmark experiment manager."),
         **kwargs)
 
     # stat names in groups of 7, for nice wrapping.
@@ -395,6 +409,16 @@ def make_argument_parser(**kwargs):
         '-d', '--debug', action='count', default=0,
         help="write out debug messages "
              "(more d's for more verbosity: -d, -dd, -ddd, etc.)")
+    parser.add_argument(
+        '--disable-passthrough', action='store_true',
+        help="disable passthrough of expansion variables for debugging")
+    parser.add_argument(
+        '-N', '--disable-logger', action='store_true',
+        help="disable the ramble logger. All output will be printed to stdout.")
+    parser.add_argument(
+        '-P', '--disable-progress-bar', action='store_true',
+        help="disable the progress bars while setting up experiments.")
+
     parser.add_argument(
         '--timestamp', action='store_true',
         help="Add a timestamp to tty output")
@@ -460,8 +484,8 @@ def make_argument_parser(**kwargs):
 
 
 def send_warning_to_tty(message, *args):
-    """Redirects messages to tty.warn."""
-    tty.warn(message)
+    """Redirects messages to ramble.util.logger.logger.warn."""
+    logger.warn(message)
 
 
 def setup_main_options(args):
@@ -492,13 +516,36 @@ def setup_main_options(args):
             spack.util.lock.check_lock_safety(ramble.paths.prefix)
         ramble.config.set('config:locks', args.locks, scope='command_line')
 
+    # override disable_passthrough configuration if passed on command line
+    if args.disable_passthrough:
+        ramble.config.set('config:disable_passthrough', True, scope='command_line')
+
+    if args.disable_logger:
+        ramble.config.set('config:disable_logger', True, scope='command_line')
+
+    logger.enabled = not ramble.config.get('config:disable_logger', False)
+
+    if args.disable_progress_bar:
+        ramble.config.set('config:disable_progress_bar', True, scope='command_line')
+
     if args.mock:
-        ramble.repository.apps_path = \
-            ramble.repository.RepoPath(ramble.paths.mock_applications_path)
+        import spack.util.spack_yaml as syaml
+
+        for obj in ramble.repository.ObjectTypes:
+            obj_section = ramble.repository.type_definitions[obj]['config_section']
+            key = syaml.syaml_str(obj_section)
+            key.override = True
+
+            ramble.config.config.scopes["command_line"].sections[obj_section] = syaml.syaml_dict(
+                [(key, [ramble.paths.mock_builtin_path])]
+            )
+
+            ramble.repository.paths[obj] = \
+                ramble.repository.create(ramble.config.config, object_type=obj)
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:
-        tty.warn("You asked for --insecure. Will NOT check SSL certificates.")
+        logger.warn("You asked for --insecure. Will NOT check SSL certificates.")
         ramble.config.set('config:verify_ssl', False, scope='command_line')
 
     # Use the ramble config command to handle parsing the config strings
@@ -513,7 +560,7 @@ def allows_unknown_args(command):
     """Implements really simple argument injection for unknown arguments.
 
     Commands may add an optional argument called "unknown args" to
-    indicate they can handle unknonwn args, and we'll pass the unknown
+    indicate they can handle unknown args, and we'll pass the unknown
     args in.
     """
     info = dict(inspect.getmembers(command))
@@ -528,7 +575,7 @@ def _invoke_command(command, parser, args, unknown_args):
         return_val = command(parser, args, unknown_args)
     else:
         if unknown_args:
-            tty.die('unrecognized arguments: %s' % ' '.join(unknown_args))
+            logger.die(f'unrecognized arguments: {" ".join(unknown_args)}')
         return_val = command(parser, args)
 
     # Allow commands to return and error code if they want
@@ -586,6 +633,7 @@ class RambleCommand(object):
         fail_on_error = kwargs.get('fail_on_error', True)
 
         # activate a workspace if one was specified on the command line
+
         if not args.no_workspace:
             ws = ramble.cmd.find_workspace(args)
             if ws:
@@ -603,7 +651,7 @@ class RambleCommand(object):
             self.returncode = e.code
 
         except BaseException as e:
-            tty.debug(e)
+            logger.debug(e)
             self.error = e
             if fail_on_error:
                 self._log_command_output(out)
@@ -623,7 +671,7 @@ class RambleCommand(object):
             fmt = self.command_name + ': {0}'
             for ln in out.getvalue().split('\n'):
                 if len(ln) > 0:
-                    tty.verbose(fmt.format(ln.replace('==> ', '')))
+                    logger.verbose(fmt.format(ln.replace('==> ', '')))
 
 
 def _profile_wrapper(command, parser, args, unknown_args):
@@ -633,7 +681,7 @@ def _profile_wrapper(command, parser, args, unknown_args):
         nlines = int(args.lines)
     except ValueError:
         if args.lines != 'all':
-            tty.die('Invalid number for --lines: %s' % args.lines)
+            logger.die(f'Invalid number for --lines: {args.lines}')
         nlines = -1
 
     # allow comma-separated list of fields
@@ -642,7 +690,7 @@ def _profile_wrapper(command, parser, args, unknown_args):
         sortby = args.sorted_profile.split(',')
         for stat in sortby:
             if stat not in stat_names:
-                tty.die("Invalid sort field: %s" % stat)
+                logger.die(f"Invalid sort field: {stat}")
 
     try:
         # make a profiler and run the code.
@@ -677,7 +725,7 @@ def print_setup_info(*info):
         elif shell == 'csh':
             print("set %s = '%s'" % (var, value))
         else:
-            tty.die('shell must be sh or csh')
+            logger.die('shell must be sh or csh')
 
 
 def _main(argv=None):
@@ -762,15 +810,15 @@ def _main(argv=None):
             ws = ramble.cmd.find_workspace(args)
             if ws:
                 ramble.workspace.shell.activate(ws)
+        # print the context but delay this exception so that commands like
+        # `ramble config edit` can still work with a bad workspace.
         except ramble.config.ConfigFormatError as e:
-            # print the context but delay this exception so that commands like
-            # `ramble config edit` can still work with a bad workspace.
             e.print_context()
             workspace_format_error = e
         except jsonschema.exceptions.ValidationError as e:
-            # print the context but delay this exception so that commands like
-            # `ramble config edit` can still work with a bad workspace.
             e.print_context()
+            workspace_format_error = e
+        except ruamel.yaml.parser.ParserError as e:
             workspace_format_error = e
 
     # ------------------------------------------------------------------------
@@ -813,11 +861,17 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
     edit_cmds = ["workspace", "config"]
+    allowed_subcommands = ['edit', 'list']
     if workspace_format_error:
-        raise_error = True
+        raise_error = False
         if cmd_name.strip() in edit_cmds:
+            logger.msg(
+                "Error while reading workspace config. In some cases this can be " +
+                "avoided by passing `-W` to ramble"
+            )
+            raise_error = True
             subcommand = getattr(args, "%s_command" % cmd_name, None)
-            if subcommand == "edit":
+            if subcommand in allowed_subcommands:
                 raise_error = False
 
         if raise_error:
@@ -855,14 +909,14 @@ def main(argv=None):
         return _main(argv)
 
     except RambleError as e:
-        tty.debug(e)
+        logger.debug(e)
         e.die()  # gracefully die on any RambleErrors
 
     except KeyboardInterrupt:
         if ramble.config.get('config:debug'):
             raise
         sys.stderr.write('\n')
-        tty.error("Keyboard interrupt.")
+        logger.error("Keyboard interrupt.")
         if sys.version_info >= (3, 5):
             return signal.SIGINT.value
         else:
@@ -876,7 +930,7 @@ def main(argv=None):
     except Exception as e:
         if ramble.config.get('config:debug'):
             raise
-        tty.error(e)
+        logger.error(e)
         return 3
 
 

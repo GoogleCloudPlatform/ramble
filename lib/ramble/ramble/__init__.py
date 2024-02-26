@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,7 +8,7 @@
 
 
 #: major, minor, patch version for Ramble, in a tuple
-ramble_version_info = (0, 3, 0)
+ramble_version_info = (0, 4, 0)
 
 #: String containing Ramble version joined with .'s
 ramble_version = '.'.join(str(v) for v in ramble_version_info)

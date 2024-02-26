@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -45,7 +45,6 @@ from ruamel.yaml.error import MarkedYAMLError
 from six import iteritems
 
 import llnl.util.lang
-import llnl.util.tty as tty
 from llnl.util.filesystem import mkdirp, rename
 
 import spack.compilers
@@ -55,16 +54,21 @@ import spack.platforms
 import ramble.schema
 import ramble.schema.config
 import ramble.schema.env_vars
+import ramble.schema.formatted_executables
 import ramble.schema.repos
+import ramble.schema.modifier_repos
 import ramble.schema.workspace
 import ramble.schema.applications
+import ramble.schema.internals
 import ramble.schema.licenses
 import ramble.schema.mirrors
+import ramble.schema.modifiers
 import ramble.schema.spack
 import ramble.schema.success_criteria
 import ramble.schema.variables
 
 from ramble.error import RambleError
+from ramble.util.logger import logger
 
 # Hacked yaml for configuration files preserves line numbers.
 import spack.util.spack_yaml as syaml
@@ -72,19 +76,24 @@ from spack.util.cpus import cpus_available
 
 #: Dict from section names -> schema for that section
 section_schemas = {
+    'formatted_executables': ramble.schema.formatted_executables.schema,
     'config': ramble.schema.config.schema,
     'env_vars': ramble.schema.env_vars.schema,
     'repos': ramble.schema.repos.schema,
+    'internals': ramble.schema.internals.schema,
     'licenses': ramble.schema.licenses.schema,
     'mirrors': ramble.schema.mirrors.schema,
+    'modifier_repos': ramble.schema.modifier_repos.schema,
+    'modifiers': ramble.schema.modifiers.schema,
     'spack': ramble.schema.spack.schema,
     'success_criteria': ramble.schema.success_criteria.schema,
     'applications': ramble.schema.applications.schema,
     'variables': ramble.schema.variables.schema,
+    'zips': ramble.schema.zips.schema,
 }
 
-# Same as above, but including keys for environments
-# this allows us to unify config reading between configs and environments
+# Same as above, but including keys for workspaces
+# this allows us to unify config reading between configs and workspaces
 all_schemas = copy.deepcopy(section_schemas)
 all_schemas.update(dict((key, ramble.schema.workspace.schema)
                         for key in ramble.schema.workspace.keys))
@@ -113,7 +122,11 @@ configuration_paths = (
 config_defaults = {
     'config': {
         'debug': False,
+        'disable_passthrough': False,
+        'disable_progress_bar': False,
         'connect_timeout': 10,
+        'n_repeats': '0',
+        'repeat_success_strict': True,
         'verify_ssl': True,
         'checksum': True,
         'dirty': False,
@@ -122,9 +135,11 @@ config_defaults = {
         'concretizer': 'clingo',
         'license_dir': spack.paths.default_license_dir,
         'shell': 'sh',
-        'spack_flags': {
-            'install': '--reuse',
-            'concretize': '--reuse'
+        'spack': {
+            'flags': {
+                'install': '--reuse',
+                'concretize': '--reuse'
+            }
         },
         'input_cache': '$ramble/var/ramble/cache',
         'workspace_dirs': '$ramble/var/ramble/workspaces'
@@ -582,7 +597,7 @@ class Configuration(object):
 
         If ``scope`` is ``None`` or not provided, return the merged contents
         of all of ramble's configuration scopes.  If ``scope`` is provided,
-        return only the confiugration as specified in that scope.
+        return only the configuration as specified in that scope.
 
         This off the top-level name from the YAML section.  That is, for a
         YAML config file that looks like this::
@@ -825,7 +840,7 @@ def _config():
     for name, path in configuration_paths:
         cfg.push_scope(ConfigScope(name, path))
 
-        # Each scope can have per-platfom overrides in subdirectories
+        # Each scope can have per-platform overrides in subdirectories
         _add_platform_scope(cfg, ConfigScope, name, path)
 
     # add command-line scopes
@@ -845,12 +860,8 @@ config = llnl.util.lang.Singleton(_config)
 def add_from_file(filename, scope=None):
     """Add updates to a config from a filename
     """
-    import spack.environment as ev
-
     # Get file as config dict
     data = read_config_file(filename)
-    if any(k in data for k in spack.schema.env.keys):
-        data = ev.config_dict(data)
 
     # update all sections from config dict
     # We have to iterate on keys to keep overrides from the file
@@ -967,7 +978,7 @@ def validate(data, schema, filename=None):
 
     if isinstance(test_data, yaml.comments.CommentedMap):
         # HACK to fully copy ruamel CommentedMap that doesn't provide copy
-        # method. Especially necessary for environments
+        # method. Especially necessary for workspaces
         setattr(test_data,
                 yaml.comments.Comment.attrib,
                 getattr(data,
@@ -983,7 +994,7 @@ def validate(data, schema, filename=None):
             line_number = None
         raise six.raise_from(ConfigFormatError(e, data, filename, line_number), e)
     # return the validated data so that we can access the raw data
-    # mostly relevant for environments
+    # mostly relevant for workspaces
     return test_data
 
 
@@ -1009,7 +1020,7 @@ def read_config_file(filename, schema=None):
         raise ConfigFileError("Config file is not readable: %s" % filename)
 
     try:
-        tty.debug("Reading config file %s" % filename)
+        logger.debug(f"Reading config file {filename}")
         with open(filename) as f:
             data = syaml.load_config(f)
 
@@ -1138,7 +1149,7 @@ def merge_yaml(dest, source):
     # Source dict is merged into dest.
     elif they_are(dict):
         # save dest keys to reinsert later -- this ensures that  source items
-        # come *before* dest in OrderdDicts
+        # come *before* dest in OrderedDicts
         dest_keys = [dk for dk in dest.keys() if dk not in source]
 
         for sk, sv in iteritems(source):
@@ -1158,7 +1169,8 @@ def merge_yaml(dest, source):
         for dk in dest_keys:
             dest[dk] = dest.pop(dk)
 
-        return dest
+        import ruamel.yaml
+        return ruamel.yaml.comments.CommentedMap(dest)
 
     # If we reach here source and dest are either different types or are
     # not both lists or dicts: replace with source.
@@ -1331,18 +1343,21 @@ class ConfigFormatError(ConfigError):
 
         self.filename = filename  # record this for ruamel.yaml
 
-        # construct location
+        # construct the location and retrieve the line that caused the error
         location = '<unknown file>'
         if filename:
-            location = '%s' % filename
+            location = f'{filename}'
         if line is not None:
-            location += ':%d' % line
+            location += f':{line}'
+            with open(filename, 'r') as file:
+                lines = file.readlines()
+                location += f'\n{lines[mark.line]}'
 
-        message = '%s: %s' % (location, validation_error.message)
+        message = f'{location}\n{validation_error}'
         super(ConfigError, self).__init__(message)
 
     def _get_mark(self, validation_error, data):
-        """Get the file/line mark fo a validation error from a Ramble YAML file.
+        """Get the file/line mark for a validation error from a Ramble YAML file.
         """
         def _get_mark_or_first_member_mark(obj):
             # mark of object itelf

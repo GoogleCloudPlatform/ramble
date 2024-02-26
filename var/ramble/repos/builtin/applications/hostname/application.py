@@ -1,5 +1,5 @@
 
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,18 +7,22 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Hostname(ExecutableApplication):
     """This is an example application that will simply run the hostname command"""  # noqa: E501
     name = "hostname"
 
-    tags = ["test-app"]
+    tags("test-app")
 
-    input_file('test', url="https://no.domain/file/test_dir.tgz", description="Example input file...")
+    maintainers('douglasjacobsen')
 
-    executable('local', 'time hostname', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
+    time_file = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                             'time_output')
+    executable('local', 'hostname', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
     executable('serial', '/usr/bin/time hostname', use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL)
     executable('parallel', '/usr/bin/time hostname', use_mpi=True, output_capture=OUTPUT_CAPTURE.ALL)
 
@@ -26,8 +30,16 @@ class Hostname(ExecutableApplication):
     workload('serial', executable='serial')
     workload('parallel', executable='parallel')
 
-    figure_of_merit('user time', log_file='{experiment_run_dir}/{experiment_name}.out',
+    figure_of_merit('user time from file', log_file=time_file,
                     fom_regex=r'(?P<user_time>[0-9]+\.[0-9]+)user.*',
                     group_name='user_time', units='s')
 
-    success_criteria('has_user_time', mode='string', match=r'[0-9]+\.[0-9]+user.*', file='{experiment_run_dir}/{experiment_name}.out')
+    figure_of_merit('user time',
+                    fom_regex=r'(?P<user_time>[0-9]+\.[0-9]+)user.*',
+                    group_name='user_time', units='s')
+
+    figure_of_merit('possible hostname',
+                    fom_regex=r'(?P<hostname>\S+)\s*',
+                    group_name='hostname', units='')
+
+    success_criteria('wrote_anything', mode='string', match=r'.*')

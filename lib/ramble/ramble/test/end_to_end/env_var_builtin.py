@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -40,7 +40,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
         test_wl2:
@@ -48,7 +48,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
         test_wl3:
@@ -56,7 +56,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-              env-vars:
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
   spack:

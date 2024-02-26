@@ -33,7 +33,7 @@ or
 ```bash
 ./all_experiments
 ```
-excuted from the root of the workspace.
+executed from the root of the workspace.
 
 ## Variable syntax:
 
@@ -74,7 +74,7 @@ This configuration changes from a pre-existing binary to using spack to build gr
 ### [Basic Expansion Config](basic_expansion_config.yaml)
 The basic expansion configuration file shows some examples of the experiment generation syntax.
 
-It changes from using groamcs to using OpenFoam and WRF.
+It changes from using gromacs to using OpenFoam and WRF.
 
 Additionally, it shows how a configuration file can contain experiments for
 multiple applications and / or workloads at the same time.
@@ -84,8 +84,8 @@ multiple applications and / or workloads at the same time.
 The full expansion configuration file shows a more complete example of
 experiment generation. It extends the basic expansion config file by showing two main aspects:
 
-1) How to define environment variables (`env-vars`)
-2) How to generate experiments using different binaries for the same application name (`spec_name`)
+1) How to define environment variables (`env_vars`)
+2) How to generate experiments using different binaries for the same application name (`env_name`)
 
 ## Available Template Files:
 

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -48,7 +48,7 @@ ramble:
                 mode: 'string'
                 match: '.*Timing for main.*'
                 file: '{experiment_run_dir}/rsl.out.0000'
-              env-vars:
+              env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
                   TEST_VAR: '1'
@@ -67,7 +67,6 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-              - env_name
   spack:
     concretized: false
     packages: {}

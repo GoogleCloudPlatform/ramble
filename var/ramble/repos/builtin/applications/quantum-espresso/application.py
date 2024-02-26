@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,13 +15,14 @@ class QuantumEspresso(SpackApplication):
     '''Define Quantum-Espresso application.'''
     name = 'quantum-espresso'
 
-    tags = ['electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials']
+    maintainers('douglasjacobsen')
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0', compiler_spec='gcc@12.2.0')
+    tags('electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials')
 
-    software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0', compiler='gcc12')
+    default_compiler('gcc13', spack_spec='gcc@13.1.0')
 
-    software_spec('quantum-espresso', spack_spec='quantum-espresso@7.1', compiler='gcc12')
+    software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0')
+    software_spec('quantum-espresso', spack_spec='quantum-espresso@7.1', compiler='gcc13')
 
     required_package('quantum-espresso')
 
@@ -45,9 +46,37 @@ class QuantumEspresso(SpackApplication):
                sha256='698fbdac9f307b9ebc77e70e52574d67adb0f21bfd6874559d633471664b77d6',
                description='Input file for PSIWAT benchmark')
 
-    executable('copy_inputs', 'cp ' + os.path.join(Expander.expansion_str('input_path'), '*')
+    input_file('WATER_EXX', url='https://raw.githubusercontent.com/QEF/benchmarks/master/other-inputs/water/pw.in',
+               sha256='20a20b2f9370103cc62b97367b36d95017a4e9330b693fefe8742c345e963bbc',
+               expand=False,
+               description='Input file for WATER_EXX benchmark')
+
+    input_file('WATER_EXX_H', url='https://raw.githubusercontent.com/QEF/benchmarks/master/other-inputs/water/pseudo/H.pbe-mt_fhi.UPF',
+               sha256='124e26c52bc3ccaa24012895ad5f4902e1f646546a3477be7e7e6080a2f6b3af',
+               expand=False,
+               description='H Pseudopotential for WATER_EXX benchmark')
+
+    input_file('WATER_EXX_O', url='https://raw.githubusercontent.com/QEF/benchmarks/master/other-inputs/water/pseudo/O.pbe-mt_fhi.UPF',
+               sha256='436751b1fe7bb83e647fb1a9d754d2d9c1057e7df6243811fc8ca266f5f74fc8',
+               expand=False,
+               description='O Pseudopotential for WATER_EXX benchmark')
+
+    executable('copy_inputs', 'cp ' + os.path.join(Expander.expansion_str('input_path'), '*') + ' '
                + os.path.join(Expander.expansion_str('experiment_run_dir'), '.'),
                use_mpi=False)
+    executable('copy_potential1',
+               template=[
+                   'mkdir -p {experiment_run_dir}/pseudo',
+                   'cp {potential1} {experiment_run_dir}/pseudo/.'
+               ],
+               use_mpi=False)
+    executable('copy_potential2',
+               template=[
+                   'mkdir -p {experiment_run_dir}/pseudo',
+                   'cp {potential2} {experiment_run_dir}/pseudo/.'
+               ],
+               use_mpi=False)
+
     executable('execute', 'pw.x {flags} < {input_file}', use_mpi=True)
 
     workload_names = ['AUSURF112', 'CNT10POR8', 'GRIR443', 'GRIR686', 'PSIWAT']
@@ -60,6 +89,25 @@ class QuantumEspresso(SpackApplication):
         workload_variable('input_file', default=input_file,
                           description='Name of input file for ' + wl_name + ' workload',
                           workloads=[wl_name])
+        workload_variable('flags', default='',
+                          description='Flags for Quantum Espresso',
+                          workloads=[wl_name])
+
+    workload('WATER_EXX', executables=['copy_potential1', 'copy_potential2', 'execute'],
+             inputs=['WATER_EXX', 'WATER_EXX_H', 'WATER_EXX_O'])
+    workload_variable('input_file', default=Expander.expansion_str('WATER_EXX'),
+                      description='Path to WATER_EXX input',
+                      workloads=['WATER_EXX'])
+    workload_variable('potential1', default=Expander.expansion_str('WATER_EXX_H'),
+                      description='Path to WATER_EXX H potential file',
+                      workloads=['WATER_EXX'])
+    workload_variable('potential2', default=Expander.expansion_str('WATER_EXX_O'),
+                      description='Path to WATER_EXX O potential file',
+                      workloads=['WATER_EXX'])
+
+    workload_variable('flags', default='',
+                      description='Flags for Quantum Espresso',
+                      workloads=['WATER_EXX'])
 
     log_str = Expander.expansion_str('log_file')
     figure_of_merit('Total CPU time',

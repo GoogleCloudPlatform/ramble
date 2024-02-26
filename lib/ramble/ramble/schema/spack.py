@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,6 +14,7 @@
 
 import ramble.schema.variables
 import ramble.schema.applications
+import ramble.schema.zips
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -24,6 +25,8 @@ properties = {
                 'type': 'boolean',
                 'default': False
             },
+            'variables': ramble.schema.variables.variables_def,
+            'zips': ramble.schema.zips.zips_def,
             'packages': {
                 'type': 'object',
                 'additionalProperties': {
@@ -39,8 +42,10 @@ properties = {
                             'default': None,
                         },
                         'variables': ramble.schema.variables.variables_def,
+                        'zips': ramble.schema.zips.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
+                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}
@@ -63,8 +68,10 @@ properties = {
                             'default': []
                         },
                         'variables': ramble.schema.variables.variables_def,
+                        'zips': ramble.schema.zips.zips_def,
                         'matrix': ramble.schema.applications.matrix_def,
                         'matrices': ramble.schema.applications.matrices_def,
+                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}
@@ -72,9 +79,7 @@ properties = {
             }
         },
         'default': {},
-        # TODO (dwj): Remove when v1 spack support is dropped
-        # DEPRECATED
-        'additionalProperties': True,  # to support v1 formats
+        'additionalProperties': False,
     }
 }
 

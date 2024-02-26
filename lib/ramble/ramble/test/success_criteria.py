@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -34,7 +34,7 @@ def test_single_criteria(tmpdir):
 
     with open(log_path, 'r') as f:
         for line in f.readlines():
-            if new_criteria.matches(line):
+            if new_criteria.passed(line):
                 new_criteria.mark_found()
 
     assert new_criteria.found
@@ -79,7 +79,7 @@ def test_criteria_list(tmpdir):
     with open(log_path, 'r') as f:
         for line in f.readlines():
             for criteria in criteria_list.all_criteria():
-                if criteria.matches(line):
+                if criteria.passed(line):
                     criteria.mark_found()
 
     assert criteria_list.passed()

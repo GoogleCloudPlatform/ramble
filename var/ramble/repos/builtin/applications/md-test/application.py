@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,20 +7,25 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class MdTest(SpackApplication):
     '''Define the MDTest parallel IO benchmark'''
     name = 'md-test'
 
-    tags = ['synthetic-benchmarks', 'IO']
+    maintainers('rfbgo')
+
+    tags('synthetic-benchmarks', 'IO')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
 
     # The IOR spack package also includes MDTest, but we implement it as a
-    # seperate application in ramble
+    # separate application in ramble
     software_spec('ior', spack_spec='ior', compiler='gcc')
+
+    required_package('ior')
 
     workload('multi-file', executable='ior')
 
@@ -45,13 +50,15 @@ class MdTest(SpackApplication):
     metrics = ['max', 'min', 'mean', 'stddev']
     base_regex = ':'
     for metric in metrics:
-        base_regex += f'\s+(?P<{metric}>[0-9]+\.[0-9]+)'
+        base_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'
+
+    log_str = Expander.expansion_str('log_file')
 
     for op in operations:
-        fom_regex = '\s*' + op + '\s+' + base_regex
+        fom_regex = r'\s*' + op + r'\s+' + base_regex
         for metric in metrics:
             figure_of_merit(f'{op}-{metric}',
-                            log_file='{log_file}',
+                            log_file=log_str,
                             fom_regex=fom_regex,
                             group_name=metric,
                             units=unit)

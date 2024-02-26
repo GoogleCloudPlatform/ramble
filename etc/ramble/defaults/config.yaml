@@ -14,14 +14,21 @@
 #   ~/.ramble/config.yaml
 # -------------------------------------------------------------------------
 config:
-    test_stage: ~/.ramble/test
-    locks: true
-    verify_ssl: true
-    connect_timeout: 10
-    checksum: true
-    shell: 'sh'
-    spack_flags:
-      install: '--reuse'
-      concretize: '--reuse'
-    input_cache: $ramble/var/ramble/cache
-    workspace_dirs: $ramble/var/ramble/workspaces
+  test_stage: ~/.ramble/test
+  locks: true
+  verify_ssl: true
+  connect_timeout: 10
+  checksum: true
+  shell: sh
+  input_cache: $ramble/var/ramble/cache
+  workspace_dirs: $ramble/var/ramble/workspaces
+  include_phase_dependencies: false
+  spack:
+    install:
+      flags: --reuse
+    concretize:
+      flags: --reuse
+    buildcache:
+      flags: ''
+    env_create:
+      flags: ''

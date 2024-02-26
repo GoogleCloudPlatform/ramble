@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -41,6 +41,9 @@ from .workspace import (
     root,
     ramble_workspace_var,
     namespace,
+    workspace_config_path,
+    workspace_log_path,
+    workspace_shared_path
 )
 
 __all__ = [
@@ -75,4 +78,7 @@ __all__ = [
     'root',
     'ramble_workspace_var',
     'namespace',
+    'workspace_config_path',
+    'workspace_log_path',
+    'workspace_shared_path',
 ]

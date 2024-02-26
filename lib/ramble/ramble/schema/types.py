@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -16,12 +16,10 @@ class OUTPUT_CAPTURE:
     DEFAULT = STDOUT
 
 
-# FIXME: should this use the vector notation which type natively supports?
+string_or_num_list = [{'type': 'string'}, {'type': 'number'}]
+
 string_or_num = {
-    'anyOf': [
-        {'type': 'string'},
-        {'type': 'number'}
-    ]
+    'anyOf': string_or_num_list
 }
 
 array_of_strings_or_nums = {
@@ -31,12 +29,9 @@ array_of_strings_or_nums = {
 }
 
 array_or_scalar_of_strings_or_nums = {
-    'anyOf': [
-        {
-            'type': 'array',
-            'default': [],
-            'items': string_or_num,
-        },
-        string_or_num
-    ]
+    'anyOf':
+        [
+            *string_or_num_list,
+            {'type': 'array', 'default': [], 'items': string_or_num}
+        ]
 }

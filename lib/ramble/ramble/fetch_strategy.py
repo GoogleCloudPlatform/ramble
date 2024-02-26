@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -49,6 +49,7 @@ from spack.util.string import comma_and, quote
 from spack.version import Version, ver
 
 import ramble.config
+from ramble.util.logger import logger
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
 all_strategies = []
@@ -61,7 +62,7 @@ CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE = (
 
 
 def warn_content_type_mismatch(subject, content_type='HTML'):
-    tty.warn(CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE.format(
+    logger.warn(CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE.format(
         subject=subject, content_type=content_type))
 
 
@@ -278,7 +279,7 @@ class URLFetchStrategy(FetchStrategy):
             try:
                 self._curl = which('curl', required=True)
             except CommandNotFoundError as exc:
-                tty.error(str(exc))
+                logger.error(str(exc))
         return self._curl
 
     def source_id(self):
@@ -310,7 +311,7 @@ class URLFetchStrategy(FetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            tty.debug('Already downloaded {0}'.format(self.archive_file))
+            logger.debug('Already downloaded {0}'.format(self.archive_file))
             return
 
         url = None
@@ -328,13 +329,13 @@ class URLFetchStrategy(FetchStrategy):
                 errors.append(str(e))
 
         for msg in errors:
-            tty.debug(msg)
+            logger.debug(msg)
 
         if not self.archive_file:
             raise FailedDownloadError(url)
 
     def _existing_url(self, url):
-        tty.debug('Checking existence of {0}'.format(url))
+        logger.debug('Checking existence of {0}'.format(url))
 
         if ramble.config.get('config:url_fetch_method') == 'curl':
             curl = self.curl
@@ -375,7 +376,13 @@ class URLFetchStrategy(FetchStrategy):
         save_file = None
         if self.stage.save_filename:
             save_file = self.stage.save_filename
-        tty.msg('Fetching {0}'.format(url))
+        logger.msg('Fetching {0}'.format(url))
+
+        # Check if we're about to try and open a broken simlink, and if so
+        # remove that file to avoid a bad situation where a file "exists" but
+        # cannot be opened (warning: this is not atomic)
+        if os.path.islink(save_file) and not os.path.exists(save_file):
+            os.unlink(save_file)
 
         # Run urllib but grab the mime type from the http headers
         try:
@@ -402,7 +409,7 @@ class URLFetchStrategy(FetchStrategy):
         if self.stage.save_filename:
             save_file = self.stage.save_filename
             partial_file = self.stage.save_filename + '.part'
-        tty.msg('Fetching {0}'.format(url))
+        logger.msg('Fetching {0}'.format(url))
         if partial_file:
             save_args = ['-C',
                          '-',  # continue partial downloads
@@ -502,8 +509,8 @@ class URLFetchStrategy(FetchStrategy):
     @_needs_stage
     def expand(self):
         if not self.expand_archive:
-            tty.debug('Staging unexpanded archive {0} in {1}'
-                      .format(self.archive_file, self.stage.source_path))
+            logger.debug(f'Staging unexpanded archive {self.archive_file} '
+                         f'in {self.stage.source_path}')
             if not self.stage.expanded:
                 mkdirp(self.stage.source_path)
             dest = os.path.join(self.stage.source_path,
@@ -511,7 +518,7 @@ class URLFetchStrategy(FetchStrategy):
             shutil.move(self.archive_file, dest)
             return
 
-        tty.debug('Staging archive: {0}'.format(self.archive_file))
+        logger.debug(f'Staging archive: {self.archive_file}')
 
         if not self.archive_file:
             raise NoArchiveFileError(
@@ -522,7 +529,7 @@ class URLFetchStrategy(FetchStrategy):
             self.extension = extension(self.archive_file)
 
         if self.stage.expanded:
-            tty.debug('Source already staged to %s' % self.stage.source_path)
+            logger.debug(f'Source already staged to {self.stage.source_path}')
             return
 
         decompress = decompressor_for(self.archive_file, self.extension)
@@ -547,7 +554,7 @@ class URLFetchStrategy(FetchStrategy):
         # NOTE: The tar program on Mac OS X will encode HFS metadata in
         # hidden files, which can end up *alongside* a single top-level
         # directory.  We initially ignore presence of hidden files to
-        # accomodate these "semi-exploding" tarballs but ensure the files
+        # accommodate these "semi-exploding" tarballs but ensure the files
         # are copied to the source directory.
         files = os.listdir(tarball_container)
         non_hidden = [f for f in files if not f.startswith('.')]
@@ -656,7 +663,7 @@ class CacheURLFetchStrategy(URLFetchStrategy):
                 raise
 
         # Notify the user how we fetched.
-        tty.msg('Using cached archive: {0}'.format(path))
+        logger.msg(f'Using cached archive: {path}')
 
 
 class VCSFetchStrategy(FetchStrategy):
@@ -686,13 +693,11 @@ class VCSFetchStrategy(FetchStrategy):
 
     @_needs_stage
     def check(self):
-        tty.debug('No checksum needed when fetching with {0}'
-                  .format(self.url_attr))
+        logger.debug(f'No checksum needed when fetching with {self.url_attr}')
 
     @_needs_stage
     def expand(self):
-        tty.debug(
-            "Source fetched with %s is already expanded." % self.url_attr)
+        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
 
     @_needs_stage
     def archive(self, destination, **kwargs):
@@ -765,7 +770,7 @@ class GoFetchStrategy(VCSFetchStrategy):
 
     @_needs_stage
     def fetch(self):
-        tty.debug('Getting go resource: {0}'.format(self.url))
+        logger.debug(f'Getting go resource: {self.url}')
 
         with working_dir(self.stage.path):
             try:
@@ -781,8 +786,7 @@ class GoFetchStrategy(VCSFetchStrategy):
 
     @_needs_stage
     def expand(self):
-        tty.debug(
-            "Source fetched with %s is already expanded." % self.url_attr)
+        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
 
         # Move the directory to the well-known stage source path
         repo_root = _ensure_one_stage_entry(self.stage.path)
@@ -897,7 +901,7 @@ class GitFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            tty.debug('Already fetched {0}'.format(self.stage.source_path))
+            logger.debug(f'Already fetched {self.stage.source_path}')
             return
 
         self.clone(commit=self.commit, branch=self.branch, tag=self.tag)
@@ -919,7 +923,7 @@ class GitFetchStrategy(VCSFetchStrategy):
         """
         # Default to spack source path
         dest = dest or self.stage.source_path
-        tty.debug('Cloning git repository: {0}'.format(self._repo_info()))
+        logger.debug(f'Cloning git repository: {self._repo_info()}')
 
         git = self.git
         debug = ramble.config.get('config:debug')
@@ -1117,10 +1121,10 @@ class CvsFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            tty.debug('Already fetched {0}'.format(self.stage.source_path))
+            logger.debug('Already fetched {self.stage.source_path}')
             return
 
-        tty.debug('Checking out CVS repository: {0}'.format(self.url))
+        logger.debug('Checking out CVS repository: {self.url}')
 
         with temp_cwd():
             url, module = self.url.split('%module=')
@@ -1211,10 +1215,10 @@ class SvnFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            tty.debug('Already fetched {0}'.format(self.stage.source_path))
+            logger.debug(f'Already fetched {self.stage.source_path}')
             return
 
-        tty.debug('Checking out subversion repository: {0}'.format(self.url))
+        logger.debug(f'Checking out subversion repository: {self.url}')
 
         args = ['checkout', '--force', '--quiet']
         if self.revision:
@@ -1321,14 +1325,13 @@ class HgFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            tty.debug('Already fetched {0}'.format(self.stage.source_path))
+            logger.debug(f'Already fetched {self.stage.source_path}')
             return
 
         args = []
         if self.revision:
             args.append('at revision %s' % self.revision)
-        tty.debug('Cloning mercurial repository: {0} {1}'
-                  .format(self.url, args))
+        logger.debug(f'Cloning mercurial repository: {self.url} {args}')
 
         args = ['clone']
 
@@ -1384,7 +1387,7 @@ class S3FetchStrategy(URLFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            tty.debug('Already downloaded {0}'.format(self.archive_file))
+            logger.debug(f'Already downloaded {self.archive_file}')
             return
 
         parsed_url = url_util.parse(self.url)
@@ -1392,7 +1395,7 @@ class S3FetchStrategy(URLFetchStrategy):
             raise FetchError(
                 'S3FetchStrategy can only fetch from s3:// urls.')
 
-        tty.debug('Fetching {0}'.format(self.url))
+        logger.debug(f'Fetching {self.url}')
 
         basename = os.path.basename(parsed_url.path)
 
@@ -1433,7 +1436,7 @@ class GCSFetchStrategy(URLFetchStrategy):
     def fetch(self):
         import ramble.util.web as web_util
         if self.archive_file:
-            tty.debug('Already downloaded {0}'.format(self.archive_file))
+            logger.debug(f'Already downloaded {self.archive_file}')
             return
 
         parsed_url = url_util.parse(self.url)
@@ -1441,7 +1444,7 @@ class GCSFetchStrategy(URLFetchStrategy):
             raise FetchError(
                 'GCSFetchStrategy can only fetch from gs:// urls.')
 
-        tty.debug('Fetching {0}'.format(self.url))
+        logger.debug(f'Fetching {self.url}')
 
         basename = os.path.basename(parsed_url.path)
 
@@ -1493,7 +1496,7 @@ def from_kwargs(**kwargs):
 
     Returns:
         FetchStrategy: The fetch strategy that matches the args, based
-            on attribute names (e.g., ``git``, ``hg``, etc.)
+          on attribute names (e.g., ``git``, ``hg``, etc.)
 
     Raises:
         FetchError: If no ``fetch_strategy`` matches the args.
@@ -1699,13 +1702,13 @@ def from_list_url(pkg):
                 return URLFetchStrategy(url_from_list, checksum,
                                         fetch_options=pkg.fetch_options)
             except KeyError as e:
-                tty.debug(e)
-                tty.msg("Cannot find version %s in url_list" % pkg.version)
+                logger.debug(e)
+                logger.msg(f"Cannot find version {pkg.version} in url_list")
 
         except BaseException as e:
             # TODO: Don't catch BaseException here! Be more specific.
-            tty.debug(e)
-            tty.msg("Could not determine url from list_url.")
+            logger.debug(e)
+            logger.msg("Could not determine url from list_url.")
 
 
 class FsCache(object):
@@ -1735,7 +1738,7 @@ class FsCache(object):
 
 
 class FetchError(ramble.error.RambleError):
-    """Superclass fo fetcher errors."""
+    """Superclass for fetcher errors."""
 
 
 class NoCacheError(FetchError):

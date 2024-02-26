@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,11 +9,10 @@
 import glob
 import os
 
-import llnl.util.tty as tty
-
 import ramble.cmd
 import ramble.paths
 import ramble.repository
+from ramble.util.logger import logger
 
 from spack.util.editor import editor
 
@@ -30,23 +29,27 @@ def edit_application(name, repo_path, namespace):
         repo_path (str): The path to the repository containing this application
         namespace (str): A valid namespace registered with Ramble
     """
+    app_type = ramble.repository.ObjectTypes.applications
     # Find the location of the package
     if repo_path:
         repo = ramble.repository.Repo(repo_path)
     elif namespace:
-        repo = ramble.repository.apps_path.get_repo(namespace)
+        repo = ramble.repository.paths[app_type].get_repo(namespace)
     else:
-        repo = ramble.repository.apps_path
+        repo = ramble.repository.paths[app_type]
     path = repo.filename_for_object_name(name)
 
     if os.path.exists(path):
         if not os.path.isfile(path):
-            tty.die("Something is wrong. '{0}' is not a file!".format(path))
+            logger.die(f"Something is wrong. '{path}' is not a file!")
         if not os.access(path, os.R_OK):
-            tty.die("Insufficient permissions on '%s'!" % path)
+            logger.die(f"Insufficient permissions on '{path}'!")
     else:
-        tty.die("No package for '{0}' was found.".format(name),
-                "  Use `spack create` to create a new package")
+        # TODO: Update this once a `ramble create` command exists
+        logger.die(
+            f"No application for '{name}' was found."
+            # "  Use `ramble create` to create a new application"
+        )
 
     editor(path)
 
@@ -93,7 +96,7 @@ def edit(parser, args):
     name = args.application
 
     # By default, edit application files
-    path = ramble.paths.applications_path
+    path = ramble.paths.builtin_path
 
     # If `--command`, `--test`, or `--module` is chosen, edit those instead
     if args.path:
@@ -114,10 +117,9 @@ def edit(parser, args):
                     m += ' Please specify a suffix. Files are:\n\n'
                     for f in files:
                         m += '        ' + os.path.basename(f) + '\n'
-                    tty.die(m)
+                    logger.die(m)
                 if not files:
-                    tty.die("No file for '{0}' was found in {1}".format(name,
-                                                                        path))
+                    logger.die(f"No file for '{name}' was found in {path}")
                 path = files[0]  # already confirmed only one entry in files
 
         editor(path)

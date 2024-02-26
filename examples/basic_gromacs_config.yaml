@@ -1,7 +1,10 @@
 ramble:
+  env_vars:
+    set:
+      OMP_NUM_THREADS: '{n_threads}'
   variables:
     processes_per_node: 16
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node} -hostfile hostfile'
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: '{execute_experiment}'
   applications:
     gromacs: # Application name
@@ -28,17 +31,18 @@ ramble:
                 n_threads: '1'
                 size: '0003'
                 type: 'pme'
-              rf_single_rank:
-                variables:
-                  n_ranks: '1'
-                  n_threads: '1'
-                  size: '0003'
-                  type: 'rf'
-spack:
+            rf_single_rank:
+              variables:
+                n_ranks: '1'
+                n_threads: '1'
+                size: '0003'
+                type: 'rf'
+  spack:
     concretized: true
     packages:
       gcc9:
-        spack_spec: gcc@9.3.0 target=x86_64
+        spack_spec: gcc@9.4.0 target=x86_64
+        compiler_spec: gcc@9.4.0
       impi2018:
         spack_spec: intel-mpi@2018.4.274 target=x86_64
         compiler: gcc9

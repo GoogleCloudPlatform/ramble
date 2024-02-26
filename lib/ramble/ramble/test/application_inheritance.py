@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,15 +7,15 @@
 # except according to those terms.
 
 
-def test_basic_inheritance(mutable_mock_repo):
-    app_inst = mutable_mock_repo.get('basic-inherited')
+def test_basic_inheritance(mutable_mock_apps_repo):
+    app_inst = mutable_mock_apps_repo.get('basic-inherited')
 
     assert 'foo' in app_inst.executables
-    assert app_inst.executables['foo']['template'] == 'bar'
-    assert not app_inst.executables['foo']['mpi']
+    assert app_inst.executables['foo'].template == ['bar']
+    assert not app_inst.executables['foo'].mpi
     assert 'bar' in app_inst.executables
-    assert app_inst.executables['bar']['template'] == 'baz'
-    assert app_inst.executables['bar']['mpi']
+    assert app_inst.executables['bar'].template == ['baz']
+    assert app_inst.executables['bar'].mpi
 
     assert 'test_wl' in app_inst.workloads
     assert app_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']
@@ -29,7 +29,7 @@ def test_basic_inheritance(mutable_mock_repo):
 
     assert 'test_fom' in app_inst.figures_of_merit
     fom_conf = app_inst.figures_of_merit['test_fom']
-    assert fom_conf['log_file'] == 'log_file'
+    assert fom_conf['log_file'] == '{log_file}'
     assert fom_conf['regex'] == \
         r'(?P<test>[0-9]+\.[0-9]+).*seconds.*'  # noqa: W605
     assert fom_conf['group_name'] == 'test'

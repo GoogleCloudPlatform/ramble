@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -71,13 +71,12 @@ apidoc_args = [
     "--no-toc",  # Don't create a table of contents file
     "--output-dir=.",  # Directory to place all output
     "--module-first",  # emit module docs before submodule docs
+    "--implicit-namespaces"
 ]
 sphinx_apidoc(
     apidoc_args
     + [
         "_ramble_root/lib/ramble/ramble",
-        "_ramble_root/lib/ramble/ramble/test/*.py",
-        "_ramble_root/lib/ramble/ramble/test/cmd/*.py",
     ]
 )
 
@@ -123,6 +122,7 @@ needs_sphinx = "3.4"
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.graphviz",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",

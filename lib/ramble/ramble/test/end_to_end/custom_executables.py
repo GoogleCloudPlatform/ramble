@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -46,15 +46,41 @@ ramble:
                     use_mpi: false
                     redirect: '{log_file}'
                     output_capture: '>>'
+                  before_all:
+                    template:
+                    - 'echo "before all"'
+                  after_all:
+                    template:
+                    - 'echo "after all"'
+                  before_env_vars:
+                    template:
+                    - 'echo "before env_vars {env_var_name}"'
+                    variables:
+                      env_var_name: 'OTHER_ENV_VAR'
+                  after_env_vars:
+                    template:
+                    - 'echo "after env_vars {env_var_name}"'
                 executables:
                 - lscpu
                 - builtin::env_vars
                 - baz
+                executable_injection:
+                - name: before_all
+                  order: before
+                - name: after_all
+                - name: before_env_vars
+                  order: before
+                  relative_to: builtin::env_vars
+                - name: after_env_vars
+                  order: after
+                  relative_to: builtin::env_vars
               variables:
                 n_nodes: 1
-              env-vars:
+                env_var_name: 'MY_VAR'
+              env_vars:
                 set:
                   MY_VAR: 'TEST'
+                  OTHER_ENV_VAR: 'ANOTHER_TEST'
   spack:
     concretized: true
     packages: {}
@@ -81,11 +107,26 @@ ramble:
         export_regex = re.compile(r'export MY_VAR=TEST')
         cmd_regex = re.compile('foo >>')
 
+        inject_order_regex = [
+            re.compile('echo "before all"'),
+            re.compile('echo "before env_vars OTHER_ENV_VAR"'),
+            re.compile('echo "after env_vars MY_VAR"'),
+            re.compile('echo "after all"'),
+        ]
+
         # Assert command order is: lscpu -> export -> foo
         with open(exp_script, 'r') as f:
             custom_found = False
             cmd_found = False
             export_found = False
+
+            inject_order_found = [
+                False,
+                False,
+                False,
+                False,
+            ]
+            inject_idx = 0
 
             for line in f.readlines():
                 if not custom_found and custom_regex.search(line):
@@ -97,4 +138,11 @@ ramble:
                     export_found = True
                 if export_found and not cmd_found and cmd_regex.search(line):
                     cmd_found = True
+
+                if inject_idx < len(inject_order_found):
+                    if inject_order_regex[inject_idx].search(line):
+                        inject_order_found[inject_idx] = True
+                        inject_idx += 1
+
             assert custom_found and cmd_found and export_found
+            assert all(inject_order_found)

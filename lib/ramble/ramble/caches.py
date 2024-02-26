@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -70,7 +70,7 @@ class MirrorCache(object):
         fetcher.archive(dst)
 
     def symlink(self, mirror_ref):
-        """Symlink a human readible path in our mirror to the actual
+        """Symlink a human readable path in our mirror to the actual
         storage location."""
 
         cosmetic_path = os.path.join(self.root, mirror_ref.cosmetic_path)

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 workspace = RambleCommand('workspace')
 
 
-def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path, capsys):
+def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
     """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
     test_config = """
 ramble:
@@ -71,10 +71,8 @@ ramble:
         ws._re_read()
 
         with pytest.raises(RambleCommandError):
-            workspace('setup',
-                      '--dry-run',
-                      global_args=['-w', workspace_name])
-
-            captured = capsys.readouterr()
+            captured = workspace('setup',
+                                 '--dry-run',
+                                 global_args=['-w', workspace_name])
 
             assert "Software spec wrf is not defined in environment wrfv3" in captured

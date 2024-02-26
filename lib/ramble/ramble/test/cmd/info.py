@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,7 +9,7 @@
 import argparse
 
 import pytest
-import ramble.cmd.info
+import ramble.cmd.common.info
 
 from ramble.main import RambleCommand
 
@@ -36,7 +36,7 @@ def mock_print(monkeypatch, info_lines):
     def _print(*args):
         info_lines.extend(args)
 
-    monkeypatch.setattr(ramble.cmd.info.color, 'cprint', _print, raising=False)
+    monkeypatch.setattr(ramble.cmd.common.info.color, 'cprint', _print, raising=False)
 
 
 @pytest.mark.parametrize('app', [
@@ -78,7 +78,25 @@ def test_spack_info_software(app_query):
         'Tags:',
         'spack_spec =',
         'compiler =',
+    )
 
+    out = info(app_query)
+
+    for field in expected_fields:
+        assert field in out
+
+
+@pytest.mark.parametrize('app_query', [
+    'zlib-configs',
+])
+def test_mock_spack_info_software(mock_applications, app_query):
+    expected_fields = (
+        'Description:',
+        'Setup Pipeline Phases:',
+        'Analyze Pipeline Phases:',
+        'Tags:',
+        'Package Manager Configs:',
+        'spack_spec =',
     )
 
     out = info(app_query)

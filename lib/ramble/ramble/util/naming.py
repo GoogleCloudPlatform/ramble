@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -40,7 +40,7 @@ def mod_to_class(mod_name):
           * Module and package names use lowercase_with_underscores.
           * Class names use the CapWords convention.
 
-       Regular source code follows these convetions.  Ramble is a bit
+       Regular source code follows these conventions.  Ramble is a bit
        more liberal with its Application names:
 
           * They can contain '-' as well as '_', but cannot start with '-'.

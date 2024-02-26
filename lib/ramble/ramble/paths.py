@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -44,8 +44,8 @@ repos_path             = os.path.join(var_path, "repos")
 application_types_path = os.path.join(module_path, 'application_types')
 
 # Paths to built-in Ramble repositories.
-applications_path      = os.path.join(repos_path, "builtin")
-mock_applications_path = os.path.join(repos_path, "builtin.mock")
+builtin_path      = os.path.join(repos_path, "builtin")
+mock_builtin_path = os.path.join(repos_path, "builtin.mock")
 
 #: User configuration location
 user_config_path = os.path.expanduser('~/.ramble')

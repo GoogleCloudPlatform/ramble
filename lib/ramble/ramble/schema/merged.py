@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,23 +15,29 @@ from llnl.util.lang import union_dicts
 
 import ramble.schema.applications
 import ramble.schema.config
+import ramble.schema.formatted_executables
 import ramble.schema.repos
 import ramble.schema.spack
 import ramble.schema.success_criteria
 import ramble.schema.variables
 import ramble.schema.env_vars
 import ramble.schema.internals
+import ramble.schema.modifiers
+import ramble.schema.zips
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
     ramble.schema.applications.properties,
     ramble.schema.config.properties,
+    ramble.schema.formatted_executables.properties,
     ramble.schema.repos.properties,
     ramble.schema.spack.properties,
     ramble.schema.success_criteria.properties,
     ramble.schema.variables.properties,
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
+    ramble.schema.modifiers.properties,
+    ramble.schema.zips.properties
 )
 
 #: Full schema with metadata

@@ -1,0 +1,44 @@
+ramble:
+  env_vars:
+    set:
+      OMP_NUM_THREADS: '{n_threads}'
+  variables:
+    processes_per_node: 16
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: '{execute_experiment}'
+    gromacs_version: [2021.6, 2021.7]
+  applications:
+    gromacs: # Application name
+      workloads:
+        '{app_workloads}': # Workload name from application
+          experiments:
+            '{type}_{n_ranks}ranks-{gromacs_version}': # Arbitrary experiment name
+              variables:
+                app_workloads: ['water_gmx50', 'water_bare']
+                n_ranks: [1, 2]
+                n_threads: '1'
+                size: '0003'
+                type: ['pme', 'rf']
+                env_name: 'gromacs-{gromacs_version}'
+              matrix:
+              - app_workloads
+              - type
+              - n_ranks
+              - gromacs_version
+  spack:
+    concretized: true
+    packages:
+      gcc9:
+        spack_spec: gcc@9.4.0 target=x86_64
+        compiler_spec: gcc@9.4.0
+      impi2018:
+        spack_spec: intel-mpi@2018.4.274 target=x86_64
+        compiler: gcc9
+      gromacs-{gromacs_version}:
+        spack_spec: gromacs@{gromacs_version}
+        compiler: gcc9
+    environments:
+      gromacs-{gromacs_version}:
+        packages:
+        - gromacs-{gromacs_version}
+        - impi2018

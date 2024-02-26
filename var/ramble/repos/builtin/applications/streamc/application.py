@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,14 +6,18 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Streamc(SpackApplication):
     '''Define STREAMC application'''
     name = 'streamc'
 
-    tags = ['memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark']
+    maintainers('dodecatheon')
+
+    tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 
     default_compiler('gcc12', spack_spec='gcc@12.2.0')
 
@@ -27,7 +31,8 @@ class Streamc(SpackApplication):
 
     workload('streamc', executable='execute_c')
 
-    log_file = '{experiment_run_dir}/{experiment_name}.out'
+    log_file = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                            Expander.expansion_str('experiment_name') + '.out')
 
     success_criteria('valid', mode='string',
                      match=r'Solution Validates: avg error less than 1.000000e-13 on all three arrays',

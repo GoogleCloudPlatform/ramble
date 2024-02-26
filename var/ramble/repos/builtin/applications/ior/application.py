@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,17 +7,22 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Ior(SpackApplication):
     '''Define the IOR parallel IO benchmark. Also includes'''
     name = 'ior'
 
-    tags = ['synthetic-benchmarks', 'IO']
+    maintainers('rfbgo')
+
+    tags('synthetic-benchmarks', 'IO')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
     software_spec('ior', spack_spec='ior', compiler='gcc')
+
+    required_package('ior')
 
     workload('multi-file', executable='ior')
 
@@ -50,22 +55,24 @@ class Ior(SpackApplication):
 
     iter_regex = ''
     for metric in metrics[0:3]:  # iter is non-float
-        iter_regex += f'\s+(?P<{metric}>[0-9]+\.[0-9]+)'  # xfer => total
-    iter_regex += f'\s+(?P<{metrics[3]}>[0-9]+)'  # handle block
+        iter_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'  # xfer => total
+    iter_regex += r'\s+(?P<' + metrics[3] + r'>[0-9]+)'  # handle block
 
     for metric in metrics[4:-1]:  # iter is non-float
-        iter_regex += f'\s+(?P<{metric}>[0-9]+\.[0-9]+)'  # xfer => total
-    iter_regex += f'\s+(?P<{metrics[-1]}>[0-9]+)\s*$'  # handle iter
+        iter_regex += r'\s+(?P<' + metric + r'>[0-9]+\.[0-9]+)'  # xfer => total
+    iter_regex += r'\s+(?P<' + metrics[-1] + r'>[0-9]+)\s*$'  # handle iter
 
     access_regex = '(?P<access>(read|write))' + iter_regex
     figure_of_merit_context('iter', regex=access_regex,
                             output_format='{iter}')
 
+    log_str = Expander.expansion_str('log_file')
+
     # Capture Per Iteration Data
     for metric, unit in zip(metrics, units):
-        fom_regex = '\w+' + iter_regex
+        fom_regex = r'\w+' + iter_regex
         figure_of_merit(metric,
-                        log_file='{log_file}',
+                        log_file=log_str,
                         fom_regex=fom_regex,
                         group_name=metric,
                         units=unit,
@@ -108,11 +115,11 @@ class Ior(SpackApplication):
     summary_regex = '(?P<Operation>(read|write))'
     for name, unit, variant in metrics:
         if 'str' in variant:
-            summary_regex += f'\s+(?P<{name}>\w+)'
+            summary_regex += r'\s+(?P<' + name + r'>\w+)'
         elif 'int' in variant:
-            summary_regex += f'\s+(?P<{name}>[0-9]+)'
+            summary_regex += r'\s+(?P<' + name + r'>[0-9]+)'
         elif 'float' in variant:
-            summary_regex += f'\s+(?P<{name}>[0-9]+\.[0-9]+)'
+            summary_regex += r'\s+(?P<' + name + r'>[0-9]+\.[0-9]+)'
         else:
             tty.error("Incorrect metric for FOMs")
 
@@ -121,7 +128,7 @@ class Ior(SpackApplication):
 
     for metric, unit, _ in metrics:
         figure_of_merit(metric,
-                        log_file='{log_file}',
+                        log_file=log_str,
                         fom_regex=summary_regex,
                         group_name=metric,
                         units=unit,

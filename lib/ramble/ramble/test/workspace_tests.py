@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,7 +14,7 @@ import ramble.workspace
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    'mutable_mock_workspace_path', 'config', 'mutable_mock_repo')
+    'mutable_mock_workspace_path', 'config', 'mutable_mock_apps_repo')
 
 
 @pytest.fixture()

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,18 +7,23 @@
 # except according to those terms.
 
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class OsuMicroBenchmarks(SpackApplication):
     '''Define an OSU micro benchmarks application'''
     name = 'osu-micro-benchmarks'
 
-    tags = ['synthetic-benchmarks']
+    maintainers('rfbgo')
+
+    tags('synthetic-benchmarks')
 
     default_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
     software_spec('osu-micro-benchmarks', spack_spec='osu-micro-benchmarks',
                   compiler='gcc')
+
+    required_package('osu-micro-benchmarks')
 
     workload_variable('message-size', default='0:4194304',
                       description='Message size interval',
@@ -46,15 +51,16 @@ class OsuMicroBenchmarks(SpackApplication):
     size_time_regex = r'(?P<msg_size>[0-9.]+)+\s+(?P<fom>[0-9.]+)'
     figure_of_merit_context('msg_size',
                             regex=size_time_regex,
-                            output_format='Messae Size: {msg_size}')
+                            output_format='Message Size: {msg_size}')
 
+    log_str = Expander.expansion_str('log_file')
     for benchmark, unit in pt2pt:
         executable(name=f'execute-{benchmark}', template=benchmark, use_mpi=True,
-                   redirect='{log_file}' + f'-{benchmark}')
+                   redirect=log_str + f'-{benchmark}')
         workload(benchmark, executable=f'execute-{benchmark}')
 
         figure_of_merit(f'osu_{benchmark}',
-                        log_file='{log_file}' + f'-{benchmark}',
+                        log_file=log_str + f'-{benchmark}',
                         fom_regex=size_time_regex,
                         group_name='fom',
                         units=unit,

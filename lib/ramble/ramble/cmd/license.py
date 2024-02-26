@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,9 +11,8 @@ import os
 import re
 from collections import defaultdict
 
-import llnl.util.tty as tty
-
 import ramble.paths
+from ramble.util.logger import logger
 from spack.util.executable import which
 
 description = 'list and check license headers on files in ramble'
@@ -119,7 +118,7 @@ class LicenseError(object):
 
 def _check_license(lines, path):
     license_lines = [
-        r'Copyright 2022-2023 Google LLC',  # noqa: E501
+        r'Copyright 2022-2024 Google LLC',  # noqa: E501
         r'Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or',  # noqa: E501
         r'https://www.apache.org/licenses/LICENSE-2.0> or the MIT license',  # noqa: E501
         r'<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your',  # noqa: E501
@@ -127,7 +126,7 @@ def _check_license(lines, path):
         r'except according to those terms.'  # noqa: E501
     ]
 
-    strict_date = r'Copyright 2022'
+    strict_date = r'Copyright 2024'
 
     found = []
 
@@ -141,7 +140,7 @@ def _check_license(lines, path):
                 # out of date.
                 if i == 0:
                     if not re.search(strict_date, line):
-                        tty.debug('{0}: copyright date mismatch'.format(path))
+                        logger.debug(f'{path}: copyright date mismatch')
                 found.append(i)
 
     if len(found) == len(license_lines) and found == list(sorted(found)):
@@ -189,16 +188,18 @@ def verify(args):
             license_errors.add_error(error)
 
     if license_errors.has_errors():
-        tty.die(*license_errors.error_messages())
+        logger.die(*license_errors.error_messages())
     else:
-        tty.msg('No license issues found.')
+        logger.msg('No license issues found.')
 
 
 def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='license_command')
-    sp.add_parser('list-files', help=list_files.__doc__)
+    sp.add_parser('list-files', help=list_files.__doc__,
+                  description=list_files.__doc__)
 
-    verify_parser = sp.add_parser('verify', help=verify.__doc__)
+    verify_parser = sp.add_parser('verify', help=verify.__doc__,
+                                  description=verify.__doc__)
     verify_parser.add_argument(
         '--root', action='store', default=ramble.paths.prefix,
         help='scan a different prefix for license issues')
@@ -206,7 +207,7 @@ def setup_parser(subparser):
 
 def license(parser, args):
     if not git:
-        tty.die('ramble license requires git in your environment')
+        logger.die('ramble license requires git in your environment')
 
     licensed_files[:] = [re.compile(regex) for regex in licensed_files]
 

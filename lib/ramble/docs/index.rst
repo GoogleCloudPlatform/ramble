@@ -1,4 +1,4 @@
-.. Copyright 2022-2023 Google LLC
+.. Copyright 2022-2024 Google LLC
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,11 +14,20 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 
 .. toctree::
    :maxdepth: 2
+   :caption: Tutorials
+
+   tutorials
+
+.. toctree::
+   :maxdepth: 2
    :caption: Basics
 
    ramble
    getting_started
+   configuration_files
+   workspace
    workspace_config
+   success_criteria
 
 .. toctree::
    :maxdepth: 2
@@ -31,7 +40,7 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    :caption: Contributing
 
    Contributing Guidelines <https://github.com/GoogleCloudPlatform/ramble#contributing>
-   developer_guide
+   dev_guides
 
 .. toctree::
    :maxdepth: 2

@@ -1,18 +1,17 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-import llnl.util.tty as tty
-
 import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.spec
 import ramble.workspace
 import ramble.mirror
 import ramble.repository
+from ramble.util.logger import logger
 from ramble.error import RambleError
 
 import spack.util.url as url_util
@@ -31,7 +30,8 @@ def setup_parser(subparser):
         metavar='SUBCOMMAND', dest='mirror_command')
 
     # Destroy
-    destroy_parser = sp.add_parser('destroy', help=mirror_destroy.__doc__)
+    destroy_parser = sp.add_parser('destroy', help=mirror_destroy.__doc__,
+                                   description=mirror_destroy.__doc__)
 
     destroy_target = destroy_parser.add_mutually_exclusive_group(required=True)
     destroy_target.add_argument('-m', '--mirror-name',
@@ -48,7 +48,8 @@ def setup_parser(subparser):
     scopes_metavar = ramble.config.scopes_metavar
 
     # Add
-    add_parser = sp.add_parser('add', help=mirror_add.__doc__)
+    add_parser = sp.add_parser('add', help=mirror_add.__doc__,
+                               description=mirror_add.__doc__)
     add_parser.add_argument(
         'name', help="mnemonic name for mirror", metavar="mirror")
     add_parser.add_argument(
@@ -59,7 +60,8 @@ def setup_parser(subparser):
         help="configuration scope to modify")
     # Remove
     remove_parser = sp.add_parser('remove', aliases=['rm'],
-                                  help=mirror_remove.__doc__)
+                                  help=mirror_remove.__doc__,
+                                  description=mirror_remove.__doc__)
     remove_parser.add_argument(
         'name', help="mnemonic name for mirror", metavar="mirror")
     remove_parser.add_argument(
@@ -68,7 +70,8 @@ def setup_parser(subparser):
         help="configuration scope to modify")
 
     # Set-Url
-    set_url_parser = sp.add_parser('set-url', help=mirror_set_url.__doc__)
+    set_url_parser = sp.add_parser('set-url', help=mirror_set_url.__doc__,
+                                   description=mirror_set_url.__doc__)
     set_url_parser.add_argument(
         'name', help="mnemonic name for mirror", metavar="mirror")
     set_url_parser.add_argument(
@@ -82,7 +85,8 @@ def setup_parser(subparser):
         help="configuration scope to modify")
 
     # List
-    list_parser = sp.add_parser('list', help=mirror_list.__doc__)
+    list_parser = sp.add_parser('list', help=mirror_list.__doc__,
+                                description=mirror_list.__doc__)
     list_parser.add_argument(
         '--scope', choices=scopes, metavar=scopes_metavar,
         default=ramble.config.default_list_scope(),
@@ -108,7 +112,7 @@ def mirror_set_url(args):
         mirrors = syaml_dict()
 
     if args.name not in mirrors:
-        tty.die("No mirror found with name %s." % args.name)
+        logger.die(f"No mirror found with name {args.name}.")
 
     entry = mirrors[args.name]
     try:
@@ -142,11 +146,11 @@ def mirror_set_url(args):
     ramble.config.set('mirrors', mirrors, scope=args.scope)
 
     if changes_made:
-        tty.msg(
+        logger.msg(
             "Changed%s url or connection information for mirror %s." %
             ((" (push)" if args.push else ""), args.name))
     else:
-        tty.msg("No changes made to mirror %s." % args.name)
+        logger.msg(f"No changes made to mirror {args.name}.")
 
 
 def mirror_list(args):
@@ -154,7 +158,7 @@ def mirror_list(args):
 
     mirrors = ramble.mirror.MirrorCollection(scope=args.scope)
     if not mirrors:
-        tty.msg("No mirrors configured.")
+        logger.msg("No mirrors configured.")
         return
 
     mirrors.display()
@@ -169,9 +173,9 @@ def _read_specs_from_file(filename):
                 s.application
                 specs.append(s)
             except RambleError as e:
-                tty.debug(e)
-                tty.die("Parse error in %s, line %d:" % (filename, i + 1),
-                        ">>> " + string, str(e))
+                logger.debug(e)
+                logger.die("Parse error in %s, line %d:" % (filename, i + 1),
+                           ">>> " + string, str(e))
     return specs
 
 

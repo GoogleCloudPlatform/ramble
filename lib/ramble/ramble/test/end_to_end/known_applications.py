@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,6 +11,8 @@ import re
 
 import pytest
 
+import ramble.filters
+import ramble.pipeline
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
@@ -25,8 +27,16 @@ workspace = RambleCommand('workspace')
 
 
 @pytest.mark.long
-def test_known_applications(application):
+def test_known_applications(application, capsys):
     info_cmd = RambleCommand('info')
+
+    setup_type = ramble.pipeline.pipelines.setup
+    analyze_type = ramble.pipeline.pipelines.analyze
+    archive_type = ramble.pipeline.pipelines.archive
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+    analyze_cls = ramble.pipeline.pipeline_class(analyze_type)
+    archive_cls = ramble.pipeline.pipeline_class(archive_type)
+    filters = ramble.filters.Filters()
 
     workload_regex = re.compile(r'Workload: (?P<wl_name>.*)')
     ws_name = f'test_all_apps_{application}'
@@ -69,6 +79,9 @@ def test_known_applications(application):
         ws.concretize()
         ws._re_read()
         ws.dry_run = True
-        ws.run_pipeline('setup')
-        ws.run_pipeline('analyze')
-        ws.archive(create_tar=True)
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
+        analyze_pipeline = analyze_cls(ws, filters)
+        analyze_pipeline.run()
+        archive_pipeline = archive_cls(ws, filters, create_tar=True)
+        archive_pipeline.run()

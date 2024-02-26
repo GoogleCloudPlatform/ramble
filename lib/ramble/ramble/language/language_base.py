@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,22 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-# TODO Define language features
-"""This package contains directives that can be used within a package.
-
-Directives are functions that can be called inside a package
-definition to modify the package, for example:
-
-    class Gromacs(MpiRunApplication):
-        workload('water_bare_hbonds_1536')
-        ...
-
-    'workload' is a ramble directive
-
-The available directives are:
-
-    <TO BE IMPLEMENTED>
-
+"""This package contains the underlying implementation for the language
+directives, which are to allow functions to be invoked at class level
 """
 
 import functools
@@ -47,6 +33,8 @@ __all__ = ['DirectiveMeta', 'DirectiveError']
 #: them
 reserved_names = []
 
+namespaces = ['ramble.app', 'ramble.mod']
+
 
 class DirectiveMeta(type):
     """Flushes the directives that were temporarily stored in the staging
@@ -56,6 +44,8 @@ class DirectiveMeta(type):
     # Set of all known directives
     _directive_names = set()
     _directives_to_be_executed = []
+    _directive_functions = {}
+    _directive_classes = {}
 
     def __new__(cls, name, bases, attr_dict):
         # Initialize the attribute containing the list of directives
@@ -92,11 +82,28 @@ class DirectiveMeta(type):
         # The instance is being initialized: if it is a package we must ensure
         # that the directives are called to set it up.
 
-        if "ramble.app" in cls.__module__:
+        valid_module = False
+        for namespace in namespaces:
+            if namespace in cls.__module__:
+                valid_module = True
+
+        if valid_module:
             # Ensure the presence of the dictionaries associated
             # with the directives
             for d in DirectiveMeta._directive_names:
                 setattr(cls, d, {})
+
+            directive_attrs = {
+                '_directive_functions': {},
+                '_directive_classes': {}
+            }
+
+            for attr in directive_attrs.keys():
+                if hasattr(DirectiveMeta, attr):
+                    directive_attrs[attr].update(getattr(DirectiveMeta, attr))
+
+            for attr in directive_attrs.keys():
+                setattr(cls, attr, directive_attrs[attr])
 
             # Lazily execute directives
             for directive in cls._directives_to_be_executed:
@@ -114,16 +121,20 @@ class DirectiveMeta(type):
 
         Ramble directives allow you to modify a package while it is being
         defined, e.g. to add version or dependency information.  Directives are
-        one of the key pieces of Ramble's appliaction "language", which is
+        one of the key pieces of Ramble's application "language", which is
         embedded in python.
 
         Here's an example directive:
+
+        .. code-block:: python
 
             @directive(dicts='workloads')
             workload('workload_name', ...):
                 ...
 
         This directive allows you write:
+
+        .. code-block:: python
 
             class Foo(ApplicationBase):
                 workload(...)
@@ -143,7 +154,7 @@ class DirectiveMeta(type):
         and that if no directive actually modified it, it will just be an empty
         dict.
 
-        This is just a modular way to add storage attributes to the Appliaction
+        This is just a modular way to add storage attributes to the Application
         class, and it's how Ramble gets information from the applications to
         the core.
 
@@ -199,6 +210,9 @@ class DirectiveMeta(type):
                 # wrapped function returns same result as original so
                 # that we can nest directives
                 return result
+
+            DirectiveMeta._directive_classes[decorated_function.__name__] = cls
+            DirectiveMeta._directive_functions[decorated_function.__name__] = decorated_function
 
             return _wrapper
 

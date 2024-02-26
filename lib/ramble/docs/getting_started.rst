@@ -1,4 +1,4 @@
-.. Copyright 2022-2023 Google LLC
+.. Copyright 2022-2024 Google LLC
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,32 +12,68 @@
 Getting Started
 ===============
 
+----------------
+What is Ramble?
+----------------
+
+Ramble stands for Reproducible And Measurable Benchmarks in a Layered Environment.
+
+Ramble is a multi-platform experimentation framework to increase exploration
+productivity and improve reproducibility. Ramble is capable of driving software
+installation, acquiring input files, configuring experiments, and extracting results.
+It works on Linux, macOS, and many supercomputers.
+
+Ramble can be used to configure a variety of experiments for applications. These
+can include anything from:
+
+* Scientific parameter sweeps
+* Performance focused scalaing studies
+* Compiler flag sweeps
+
 --------------------
 System Requirements
 --------------------
 
-Ramble's dependencies are listed within the top level
-requirements.txt file.
+Ramble requires Python 3.6.8 or greater. Some applications also require
+`Spack <https://spack.io/about/#install-spack>`_, which is used for managing
+binaries and their dependencies.
 
-In addition to the listed python dependencies, Ramble depends on
-spack for some application definition files.
+Ramble's Python dependencies are listed within the top level requirements.txt
+file.
 
-Please see Spack's `documentation <https://spack.readthedocs.io/en/latest/getting_started.html>`_ for getting spack installed.
-
+For Ramble developers, pytest and flake8 are required for linting and performing
+unit tests.
 
 -------------
 Installation
 -------------
 
-Installing ramble is easy. You can clone it from the
-`github repository <https://github.com/GoogleCloudPlatform/ramble>`_ using this command:
+There are two ways to install Ramble. The first, and recommended, approach is to
+clone its `github repository <https://github.com/GoogleCloudPlatform/ramble>`_.
+This can be done with:
 
 .. code-block:: console
 
-   $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
+    $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
 
+By default, this will checkout the ``develop`` branch, which is the most
+up-to-date version of Ramble. Several tags, as well as the ``main`` branch
+(which contains the latest tag) can provide a more stable exeperience.
 
-This will create a directory called ``ramble``.
+The second approach is to download one of the releases from
+`Ramble's releases page <https://github.com/GoogleCloudPlatform/ramble/releases>`_
+
+Once Ramble is available on your system, its python dependencies can be
+installed using the ``requirements.txt`` file included in the root of Ramble's
+source directory.
+
+To install this, you can use:
+
+.. code-block:: console
+
+    $ pip install -r requirements.txt
+
+However, the exact command will depend on your environment.
 
 ^^^^^^^^^^^^^^
 Shell Support
@@ -64,17 +100,17 @@ If you do not want to use Ramble's shell support, you can always just run the
 ``ramble`` command directly from ``ramble/bin/ramble``.
 
 When the ``ramble`` command is executed, it searches for an appropriate Python
-interpreter to use, which can be explicitly overriden by setting the
+interpreter to use, which can be explicitly overridden by setting the
 ``RAMBLE_PYTHON`` environment variable. When sourcing the appropriate shell
 setup script, ``RAMBLE_PYTHON`` will be set to the interpreter found at
 sourcing time, ensuring future invocations of the ``ramble`` command will
 continue to use the same consistent python version regardless of changes in the
 environment.
 
-
 -------------
 Command Help
 -------------
+
 To get information on the available commands, you can execute:
 
 .. code-block:: console
@@ -85,9 +121,22 @@ To get information on the available commands, you can execute:
 For help with sub-commands, the ``-h`` flag can be used:
 
 .. code-block:: console
-  
+
    $ ramble <subcommand> -h
 
+^^^^^^^^^^^^^^^^
+Debugging Ramble
+^^^^^^^^^^^^^^^^
+
+When an issue occurs while running Ramble, it can be useful to get additionally
+debugging information. To enable the debugging mode in Ramble, you can use the
+`-d` global option, as follows:
+
+.. code-block:: console
+
+    $ ramble -d <subcommand>
+    or;
+    $ ramble --debug <subcommand>
 
 ---------------------
 Defined Applications
@@ -108,6 +157,45 @@ This command uses filtering to search the defined applications, e.g.:
    $ ramble list wrf
 
 will list both ``wrfv3`` and ``wrfv4``.
+
+Available applications can be filtered using tags, e.g.:
+
+.. code-block:: console
+
+    $ ramble list -t weather
+
+will also list both ``wrfv3`` and ``wrfrv4``. The available tags can be seen with:
+
+.. code-block:: console
+
+    $ ramble attributes --tags --all
+
+---------------------
+Application Workloads
+---------------------
+
+To get detailed information about an application, you can use the command:
+
+.. code-block:: console
+
+    $ ramble info <application>
+
+For example:
+
+.. code-block:: console
+
+    $ ramble info wrfv3
+
+Will show that ``wrfv3`` has two workloads
+
+* ``CONUS_12km``
+* ``CONUS_2p5km``
+
+that experiments can be generated from. The ``ramble info`` command can also be
+used to see what variables each workload has, and potentially some suggested
+values for variables with a limited set of allowed values.
+
+.. _ramble-workspaces:
 
 ------------------
 Ramble Workspaces
@@ -190,7 +278,7 @@ the rendered version within every experiment. As an example:
 
     configs/execute_experiment.tpl
 
-Will define ``{execute_experiment}`` with a value set to the path of hte
+Will define ``{execute_experiment}`` with a value set to the path of the
 generated file.
 (More explicitly, ``execute_experiment={experiment_run_dir}/{template_name_sans_extension}``)
 
@@ -234,7 +322,7 @@ After the workspace is set up, its experiments can be executed. The two methods
 to run the experiments are:
 
 .. code-block:: console
-   
+
     $ ramble on
    or;
     $ ./all_experiments
@@ -253,7 +341,6 @@ analyzed. This is done through:
 This creates a ``results`` file in the root of the workspace that contains
 extracted figures of merit.
 
-
 ^^^^^^^^^^^^^^^^^^^^^^
 Archiving A Workspace
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -263,7 +350,7 @@ Ramble can create an archive of a workspace. This is a self contained copy of va
  - Rendered templates in the experiments directories
  - Files that would have figures of merit extracted
  - Auxiliary files that an application lists for archival
- - All genreated spack.yaml files
+ - All generated spack.yaml files
 
 You can archive a workspace with:
 

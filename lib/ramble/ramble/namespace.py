@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,24 +19,32 @@ class namespace:
     internals = 'internals'
     custom_executables = 'custom_executables'
     executables = 'executables'
-    env_var = 'env-vars'
+    executable_injection = 'executable_injection'
+    env_var = 'env_vars'
     packages = 'packages'
     environments = 'environments'
     template = 'template'
     chained_experiments = 'chained_experiments'
+    modifiers = 'modifiers'
+    tags = 'tags'
+    n_repeats = 'n_repeats'
+    formatted_executables = 'formatted_executables'
+
+    # For chained experiments
+    command = 'command'
+    inherit_variables = 'inherit_variables'
 
     # For rendering objects
     variables = 'variables'
+    zips = 'zips'
     matrices = 'matrices'
     matrix = 'matrix'
+    exclude = 'exclude'
+    where = 'where'
 
     # For software definitions
     spack = 'spack'
     external_env = 'external_spack_env'
-
-    # v1 configs
-    mpi_lib = 'mpi_libraries'
-    compilers = 'compilers'
 
     # v2 configs
     packages = 'packages'
@@ -44,3 +52,8 @@ class namespace:
     spack_spec = 'spack_spec'
     compiler_spec = 'compiler_spec'
     compiler = 'compiler'
+
+    # For formatted executables
+    indentation = 'indentation'
+    prefix = 'prefix'
+    join_separator = 'join_separator'

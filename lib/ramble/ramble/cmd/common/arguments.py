@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -73,6 +73,72 @@ def workspace():
 def specs():
     return Args(
         'specs', nargs=argparse.REMAINDER, help='one or more workload specs')
+
+
+@arg
+def repo_type():
+    from ramble.repository import default_type, OBJECT_NAMES
+    return Args(
+        '-t', '--type', default=default_type.name,
+        help=f"type of repositories to manage. Defaults to '{default_type.name}'. "
+        f"Allowed types are {str(OBJECT_NAMES)}",
+    )
+
+
+@arg
+def phases():
+    return Args(
+        '--phases', dest='phases',
+        nargs='+',
+        default=['*'],
+        help='select phases to execute when performing setup. ' +
+             'Phase names support globbing',
+        required=False
+    )
+
+
+@arg
+def include_phase_dependencies():
+    return Args(
+        '--include-phase-dependencies',
+        dest='include_phase_dependencies',
+        action='store_true',
+        help='if set, phase dependencies are automatically added to '
+             'the list of executed phases',
+        required=False
+    )
+
+
+@arg
+def where():
+    return Args(
+        '--where', dest='where',
+        nargs='+',
+        action='append',
+        help='inclusive filter on experiments where the provided logical statement is True',
+        required=False
+    )
+
+
+@arg
+def exclude_where():
+    return Args(
+        '--exclude-where', dest='exclude_where',
+        nargs='+',
+        action='append',
+        help='exclusive filter experiments where the provided logical statement is True',
+        required=False
+    )
+
+
+@arg
+def filter_tags():
+    return Args(
+        '--filter-tags', action='append',
+        nargs='+',
+        help='filter experiments to only those that include the provided tags',
+        required=False
+    )
 
 
 @arg

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,41 +17,54 @@ class Namd(SpackApplication):
     '''Define NAMD application'''
     name = 'namd'
 
-    tags = ['molecular-dynamics', 'charm++', 'task-parallelism']
+    maintainers('douglasjacobsen')
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0', compiler_spec='gcc@12.2.0')
+    tags('molecular-dynamics', 'charm++', 'task-parallelism')
 
-    software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0', compiler='gcc12')
+    default_compiler('gcc12', spack_spec='gcc@12.2.0')
+
+    software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0')
 
     software_spec('charmpp', spack_spec='charmpp backend=mpi build-target=charm++', compiler='gcc12')
 
     software_spec('namd', spack_spec='namd@2.14 interface=tcl', compiler='gcc12')
 
+    required_package('namd')
+
     input_file('stmv', url='https://www.ks.uiuc.edu/Research/namd/utilities/stmv.tar.gz',
+               sha256='2ef8beaa22046f2bf4ddc85bb8141391a27041302f101f5302f937d04104ccdd',
                description='STMV (virus) benchmark (1,066,628 atoms, periodic, PME')
 
     input_file('ApoA1', url='https://www.ks.uiuc.edu/Research/namd/utilities/apoa1.tar.gz',
+               sha256='fe30322cc94d93dff6c4e517d28584c48d0d0a1a7b23e2cd74cdb36d03863b22',
                description='ApoA1 benchmark (92,224 atoms, periodic, PME)')
 
     input_file('ATPase', url='https://www.ks.uiuc.edu/Research/namd/utilities/f1atpase.tar.gz',
+               sha256='ec34e31c69a7fc3c1649158bf7dbf20d20fe77520f73d05cbec4e9806b79148d',
                description='ATPase benchmark (327,506 atoms, periodic, PME)')
 
     input_file('20STMV', url='https://www.ks.uiuc.edu/Research/namd/utilities/stmv_sc14.tar.gz',
+               sha256='e166ca309ae614417f1c2da3b0eed139c816666403d552955b04849f703ef719',
                description='20STMV and 210STMV benchmarks from SC14 paper')
 
     input_file('tiny', url='https://www.ks.uiuc.edu/Research/namd/utilities/tiny.tar.gz',
+               sha256='dabf5986456d504a5ba40d3660bb8b6e6bd5d714b413390a733a4f819c1512ec',
                description='tiny benchmark (507 atoms, periodic, PME)')
 
     input_file('interactive_BPTI', url='https://www.ks.uiuc.edu/Research/namd/utilities/bpti_imd.tar.gz',
+               sha256='751ab94d13fc227a3313bc0a323597943fbf1f9a98d88c81086717399d61b8ec',
                description='Interactive BPTI (882 atoms, small)')
 
     input_file('ER-GRE', url='https://www.ks.uiuc.edu/Research/namd/utilities/er-gre.tar.gz',
+               sha256='8aaff093cddf5f28aec9ea65f9bce5853efa4f4346a64477efe0e0cde16740ce',
                description='ER-GRE benchmark (36573 atoms, spherical)')
 
     input_file('decalanin', url='https://www.ks.uiuc.edu/Research/namd/utilities/alanin.tar.gz',
+               sha256='92f8b6f1a55b548d450fe858cde9db901445964ed24639d5aa3667f3fc1ec52c',
                description='decalanin (66 atoms, tiny, ancient)')
 
     input_file('tcl-forces', url='https://www.ks.uiuc.edu/Research/namd/utilities/tclforces.tar.gz',
+               sha256='3daa557c51a41d4f2484aa3b4de7c1d96671da2baa159798ed0d90e638965eee',
                description='Tcl forces (decalanin)')
 
     executable('copy_inputs', 'cp {input_path}/* {experiment_run_dir}/.', use_mpi=False)
@@ -73,6 +86,13 @@ class Namd(SpackApplication):
     for wl_def in benchmark_workloads:
         workload(wl_def[0], executables=['copy_inputs', 'execute'],
                  inputs=[wl_def[0]])
+
+        workload_variable(
+            'namd_flags',
+            default='+ppn {processes_per_node} +setcpuaffinity',
+            description='Flags for running NAMD',
+            workloads=[wl_def[0]]
+        )
 
         workload_variable(
             'input_path',
@@ -204,7 +224,7 @@ class Namd(SpackApplication):
     figure_of_merit_context(
         'Energy iteration',
         regex=energy_regex,
-        output_format='Enery Iteration: {itr}'
+        output_format='Energy Iteration: {itr}'
     )
 
     figure_of_merit(
@@ -290,9 +310,11 @@ class Namd(SpackApplication):
         units='MB'
     )
 
+    namd_nspd_stat_file = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                                       'namd_nspd_stat.out')
     figure_of_merit(
         'Nanoseconds per day',
-        log_file='{experiment_run_dir}/namd_nspd_stat.out',
+        log_file=namd_nspd_stat_file,
         fom_regex=r'(?P<ns_per_day>[0-9]+\.*[0-9]*) ns/day',
         group_name='ns_per_day',
         units='ns/day'

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -71,6 +71,41 @@ def test_env_concretize(tmpdir):
         pytest.skip('%s' % e)
 
 
+def test_env_concretize_skips_already_concretized_envs(tmpdir, capsys):
+    import time
+    try:
+        env_path = tmpdir.join('spack-env')
+        sr = ramble.spack_runner.SpackRunner()
+        sr.create_env(env_path)
+        sr.activate()
+        sr.add_spec('zlib')
+
+        # Generate an initial env file
+        sr.generate_env_file()
+
+        time.sleep(0.5)
+
+        # Create a spack.lock file in the env
+        with open(os.path.join(env_path, 'spack.lock'), 'w+') as f:
+            f.write('')
+
+        # Mock regenerating an env file, after the lock was created.
+        sr.generate_env_file()
+
+        sr.concretize()
+
+        output = capsys.readouterr()
+        assert f'Environment {env_path} will not be regenerated' in output.out
+        assert f'Environment {env_path} is already concretized. Skipping concretize...' \
+            in output.out
+
+        sr.deactivate()
+
+        assert os.path.exists(os.path.join(env_path, 'spack.yaml'))
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)
+
+
 def test_env_install(tmpdir, capsys):
     try:
         env_path = str(tmpdir.join('spack-env'))
@@ -84,8 +119,7 @@ def test_env_install(tmpdir, capsys):
         sr.install()
 
         captured = capsys.readouterr()
-        assert "with args: ['install'" in captured.out
-        assert "with args: ['env', 'loads']" in captured.out
+        assert 'spack install' in captured.out
 
         sr.deactivate()
 
@@ -95,6 +129,35 @@ def test_env_install(tmpdir, capsys):
 
         with open(env_file, 'r') as f:
             assert 'zlib' in f.read()
+
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)
+
+
+def test_env_configs_apply(tmpdir, capsys):
+    try:
+        env_path = str(tmpdir.join('spack-env'))
+        # Dry run so we don't actually install zlib
+        sr = ramble.spack_runner.SpackRunner(dry_run=True)
+        sr.create_env(env_path)
+        sr.activate()
+        sr.add_spec('zlib')
+        sr.add_config('config:debug:true')
+        sr.generate_env_file()
+
+        captured = capsys.readouterr()
+        assert "with args: ['config', 'add', 'config:debug:true']" in captured.out
+
+        sr.deactivate()
+
+        env_file = os.path.join(env_path, 'spack.yaml')
+
+        assert os.path.exists(env_file)
+
+        with open(env_file, 'r') as f:
+            data = f.read()
+            assert 'zlib' in data
+            assert 'debug: true' in data
 
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
@@ -110,24 +173,32 @@ def test_default_concretize_flags(tmpdir, capsys):
 
         sr.concretize()
         captured = capsys.readouterr()
-        assert "with args: ['concretize', '--reuse']" in captured.out
+        assert 'spack concretize' in captured.out
+        assert "with args: ['--reuse']" in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
 
-def test_config_concretize_flags(tmpdir, capsys):
+@pytest.mark.parametrize(
+    'attr,value,expected_str',
+    [
+        ('flags', '-f --fresh', "'-f', '--fresh'"),
+        ('prefix', 'time', 'would run time')
+    ]
+)
+def test_config_concretize_attribute(tmpdir, capsys, attr, value, expected_str):
     try:
         env_path = tmpdir.join('spack-env')
-        sr = ramble.spack_runner.SpackRunner(dry_run=True)
-        sr.create_env(env_path)
-        sr.activate()
-        sr.add_spec('zlib')
+        with ramble.config.override('config:spack', {'concretize': {attr: value}}):
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            sr.create_env(env_path)
+            sr.activate()
+            sr.add_spec('zlib')
 
-        with ramble.config.override('config:spack_flags', {'concretize': '-f --fresh'}):
             sr.concretize()
             captured = capsys.readouterr()
 
-            assert "with args: ['concretize', '-f', '--fresh']" in captured.out
+            assert expected_str in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
@@ -144,35 +215,38 @@ def test_default_install_flags(tmpdir, capsys):
         sr.install()
         captured = capsys.readouterr()
 
-        install_flags = ramble.config.config.get('config:spack_flags:install')
-        expected_str = "with args: ['install'"
+        install_flags = ramble.config.config.get('config:spack:install:flags')
+        expected_str = "with args: ["
+        str_args = []
         for flag in install_flags.split():
-            expected_str += f", '{flag}'"
-        expected_str += "]"
+            str_args.append(f"'{flag}'")
+        expected_str += ','.join(str_args) + ']'
 
-        assert expected_str in captured.out
+        assert 'spack install' in captured.out
     except ramble.spack_runner.RunnerError as e:
         pytest.skip('%s' % e)
 
 
-def test_config_install_flags(tmpdir, capsys):
+@pytest.mark.parametrize(
+    'attr,value,expected_str',
+    [
+        ('flags', '--fresh --keep-prefix', "'--fresh', '--keep-prefix'"),
+        ('prefix', 'time', 'would run time'),
+    ]
+)
+def test_config_install_attribute(tmpdir, capsys, attr, value, expected_str):
     try:
         env_path = tmpdir.join('spack-env')
-        sr = ramble.spack_runner.SpackRunner(dry_run=True)
-        sr.create_env(env_path)
-        sr.activate()
-        sr.add_spec('zlib')
-        sr.concretize()
+        with ramble.config.override('config:spack',
+                                    {'install': {attr: value}}):
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            sr.create_env(env_path)
+            sr.activate()
+            sr.add_spec('zlib')
+            sr.concretize()
 
-        with ramble.config.override('config:spack_flags', {'install': '--fresh --keep-prefix'}):
             sr.install()
             captured = capsys.readouterr()
-
-            install_flags = ramble.config.config.get('config:spack_flags:install')
-            expected_str = "with args: ['install'"
-            for flag in install_flags.split():
-                expected_str += f", '{flag}'"
-            expected_str += "]"
 
             assert expected_str in captured.out
     except ramble.spack_runner.RunnerError as e:
@@ -206,7 +280,7 @@ def test_new_compiler_installs(tmpdir, capsys):
     import os
 
     compilers_config = """
-compilers:
+compilers::
 - compiler:
     spec: gcc@12.1.0
     paths:
@@ -242,7 +316,8 @@ packages:
             f.write(compilers_config)
 
         config_path = os.getcwd()
-        with ramble.config.override('config:spack_flags', {'global_args': f'-C {config_path}'}):
+        with ramble.config.override('config:spack',
+                                    {'global': {'flags': f'-C {config_path}'}}):
             try:
                 sr = ramble.spack_runner.SpackRunner(dry_run=True)
                 sr.create_env(os.getcwd())
@@ -341,6 +416,34 @@ spack:
             pytest.skip('%s' % e)
 
 
+def test_configs_apply_to_external_env(tmpdir):
+    src_spack_yaml = """
+spack:
+  specs: [ 'zlib' ]
+"""
+    with tmpdir.as_cwd():
+        with open(os.path.join(os.getcwd(), 'spack.yaml'), 'w+') as f:
+            f.write(src_spack_yaml)
+
+        try:
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            generated_env = os.path.join(os.getcwd(), 'dest_env')
+            sr.create_env(os.path.join(generated_env))
+            sr.activate()
+            sr.add_config('config:debug:true')
+            sr.copy_from_external_env(os.getcwd())
+
+            assert os.path.exists(os.path.join(generated_env, 'spack.yaml'))
+
+            with open(os.path.join(generated_env, 'spack.yaml'), 'r') as f:
+                data = f.read()
+                assert 'zlib' in data
+                assert 'config:' in data
+                assert 'debug: true' in data
+        except ramble.spack_runner.RunnerError as e:
+            pytest.skip('%s' % e)
+
+
 def test_invalid_external_env_errors(tmpdir):
     with tmpdir.as_cwd():
         try:
@@ -352,3 +455,76 @@ def test_invalid_external_env_errors(tmpdir):
                 sr.copy_from_external_env(os.getcwd())
         except ramble.spack_runner.RunnerError as e:
             pytest.skip('%s' % e)
+
+
+@pytest.mark.parametrize(
+    'attr,value,expected_str',
+    [
+        ('flags', '--scope site', "'--scope', 'site'"),
+    ]
+)
+def test_config_compiler_find_attribute(tmpdir, capsys, attr, value, expected_str):
+
+    import os
+
+    compilers_config = """
+compilers::
+- compiler:
+    spec: gcc@12.1.0
+    paths:
+      cc: /path/to/gcc
+      cxx: /path/to/g++
+      f77: /path/to/gfortran
+      fc: /path/to/gfortran
+    flags: {}
+    operating_system: 'ramble'
+    target: 'x86_64'
+    modules: []
+    environment: {}
+    extra_rpaths: []
+"""
+
+    with tmpdir.as_cwd():
+        compilers_path = os.path.join(os.getcwd(), 'compilers.yaml')
+        # Write spack_configs
+        with open(compilers_path, 'w+') as f:
+            f.write(compilers_config)
+
+        config_path = os.getcwd()
+        with ramble.config.override('config:spack',
+                                    {'global': {'flags': f'-C {config_path}'}}):
+            with ramble.config.override('config:spack',
+                                        {'compiler_find': {attr: value}}):
+                try:
+                    sr = ramble.spack_runner.SpackRunner(dry_run=True)
+                    sr.create_env(os.getcwd())
+                    sr.activate()
+                    sr.add_include_file(compilers_path)
+                    sr.install_compiler('gcc@12.2.0')
+                    captured = capsys.readouterr()
+
+                    assert expected_str in captured.out
+                except ramble.spack_runner.RunnerError as e:
+                    pytest.skip('%s' % e)
+
+
+def test_env_create_no_view(tmpdir):
+
+    import os
+
+    with tmpdir.as_cwd():
+        with ramble.config.override('config:spack',
+                                    {'env_create': {'flags': '--without-view'}}):
+            try:
+                sr = ramble.spack_runner.SpackRunner()
+                sr.create_env(os.getcwd())
+
+                assert not os.path.exists(
+                    os.path.join(
+                        os.getcwd(),
+                        '.spack-env',
+                        'view'
+                    )
+                )
+            except ramble.spack_runner.RunnerError as e:
+                pytest.skip('%s' % e)

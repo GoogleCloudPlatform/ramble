@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,13 +7,17 @@
 # except according to those terms.
 
 import os
+import glob
 
 import pytest
 
+import ramble.filters
+import ramble.pipeline
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import search_files_for_string
 
 
 # everything here uses the mock_workspace_path
@@ -62,6 +66,10 @@ ramble:
         - intel
 """
 
+    setup_type = ramble.pipeline.pipelines.setup
+    setup_cls = ramble.pipeline.pipeline_class(setup_type)
+    filters = ramble.filters.Filters()
+
     workspace_name = 'test_unused_compilers_are_skipped'
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
@@ -74,13 +82,15 @@ ramble:
         ws.dry_run = True
         ws._re_read()
 
-        ws.run_pipeline('setup')
-        captured = capsys.readouterr()
+        setup_pipeline = setup_cls(ws, filters)
+        setup_pipeline.run()
 
         required_compiler_str = "gcc@8.5.0"
         unused_gcc9_str = "gcc@9.3.0"
         unused_gcc10_str = "gcc@10.1.0"
 
-        assert required_compiler_str in captured.out
-        assert unused_gcc9_str not in captured.out
-        assert unused_gcc10_str not in captured.out
+        out_files = glob.glob(os.path.join(ws.log_dir, '**', '*.out'), recursive=True)
+
+        assert search_files_for_string(out_files, required_compiler_str) is True
+        assert search_files_for_string(out_files, unused_gcc9_str) is False
+        assert search_files_for_string(out_files, unused_gcc10_str) is False

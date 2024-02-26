@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -76,7 +76,7 @@ _bash_completion_ramble() {
     local COMP_CWORD_NO_FLAGS=$((${#COMP_WORDS_NO_FLAGS[@]} - 1))
 
     # There is no guarantee that the cursor is at the end of the command line
-    # when tab completion is envoked. For example, in the following situation:
+    # when tab completion is invoked. For example, in the following situation:
     #     `ramble -d [] install`
     # if the user presses the TAB key, a list of valid flags should be listed.
     # Note that we cannot simply ignore everything after the cursor. In the
@@ -91,7 +91,7 @@ _bash_completion_ramble() {
         list_options=true
     fi
 
-    # In general, when envoking tab completion, the user is not expecting to
+    # In general, when evoking tab completion, the user is not expecting to
     # see optional flags mixed in with subcommands or package names. Tab
     # completion is used by those who are either lazy or just bad at spelling.
     # If someone doesn't remember what flag to use, seeing single letter flags
@@ -265,9 +265,18 @@ complete -o bashdefault -o default -F _bash_completion_ramble ramble
 _ramble() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
+        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
-        RAMBLE_COMPREPLY="clean commands config debug edit flake8 help info license list mirror on repo unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config debug edit flake8 help info license list mirror mods on python repo results software-definitions unit-test workspace"
+    fi
+}
+
+_ramble_attributes() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --maintainers --tags"
+    else
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -280,7 +289,7 @@ _ramble_commands() {
     then
         RAMBLE_COMPREPLY="-h --help --update-completion -a --aliases --format --header --update"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -329,7 +338,7 @@ _ramble_config_add() {
     then
         RAMBLE_COMPREPLY="-h --help -f --file"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -338,7 +347,7 @@ _ramble_config_remove() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -347,7 +356,7 @@ _ramble_config_rm() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -396,7 +405,7 @@ _ramble_flake8() {
     then
         RAMBLE_COMPREPLY="-h --help -b --base -k --keep-temp -a --all -o --output -r --root-relative -U --no-untracked"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -462,7 +471,7 @@ _ramble_mirror_add() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -471,7 +480,7 @@ _ramble_mirror_remove() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -480,7 +489,7 @@ _ramble_mirror_rm() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -489,7 +498,7 @@ _ramble_mirror_set_url() {
     then
         RAMBLE_COMPREPLY="-h --help --push --scope"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -497,8 +506,53 @@ _ramble_mirror_list() {
     RAMBLE_COMPREPLY="-h --help --scope"
 }
 
+_ramble_mods() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMPREPLY="list ls info"
+    fi
+}
+
+_ramble_mods_list() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -d --search-description --format --update -t --tags"
+    else
+        _all_applications
+    fi
+}
+
+_ramble_mods_ls() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -d --search-description --format --update -t --tags"
+    else
+        _all_applications
+    fi
+}
+
+_ramble_mods_info() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMREPLY=""
+    fi
+}
+
 _ramble_on() {
-    RAMBLE_COMPREPLY="-h --help -w --workspace"
+    RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where --filter-tags"
+}
+
+_ramble_python() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -V --version -c -u -i -m --path"
+    else
+        RAMBLE_COMREPLY=""
+    fi
 }
 
 _ramble_repo() {
@@ -513,29 +567,29 @@ _ramble_repo() {
 _ramble_repo_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -d --subdirectory"
+        RAMBLE_COMPREPLY="-h --help -d --subdirectory -t --type"
     else
         _repos
     fi
 }
 
 _ramble_repo_list() {
-    RAMBLE_COMPREPLY="-h --help --scope"
+    RAMBLE_COMPREPLY="-h --help --scope -t --type"
 }
 
 _ramble_repo_add() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --scope"
+        RAMBLE_COMPREPLY="-h --help --scope -t --type"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
 _ramble_repo_remove() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --scope"
+        RAMBLE_COMPREPLY="-h --help --scope -t --type"
     else
         _repos
     fi
@@ -544,10 +598,32 @@ _ramble_repo_remove() {
 _ramble_repo_rm() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --scope"
+        RAMBLE_COMPREPLY="-h --help --scope -t --type"
     else
         _repos
     fi
+}
+
+_ramble_results() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMPREPLY="upload"
+    fi
+}
+
+_ramble_results_upload() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMREPLY=""
+    fi
+}
+
+_ramble_software_definitions() {
+    RAMBLE_COMPREPLY="-h --help -s --summary -c --conflicts -e --error-on-conflict"
 }
 
 _ramble_unit_test() {
@@ -564,7 +640,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze info edit mirror list ls remove rm"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror list ls remove rm"
     fi
 }
 
@@ -578,7 +654,7 @@ _ramble_workspace_activate() {
 }
 
 _ramble_workspace_archive() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --upload-url -u"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --phases --include-phase-dependencies --where --exclude-where"
 }
 
 _ramble_workspace_deactivate() {
@@ -588,9 +664,9 @@ _ramble_workspace_deactivate() {
 _ramble_workspace_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir"
+        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -599,15 +675,19 @@ _ramble_workspace_concretize() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run"
+    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
+}
+
+_ramble_workspace_push_to_cache() {
+    RAMBLE_COMPREPLY="-h --help -d --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help -v --verbose"
+    RAMBLE_COMPREPLY="-h --help --software --templates --expansions --tags --phases --where --exclude-where --filter-tags -v --verbose"
 }
 
 _ramble_workspace_edit() {
@@ -615,7 +695,7 @@ _ramble_workspace_edit() {
 }
 
 _ramble_workspace_mirror() {
-    RAMBLE_COMPREPLY="-h --help -d --dry-run"
+    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --include-phase-dependencies --where --exclude-where"
 }
 
 _ramble_workspace_list() {
@@ -631,7 +711,7 @@ _ramble_workspace_remove() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -640,6 +720,6 @@ _ramble_workspace_rm() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE=""
+        RAMBLE_COMREPLY=""
     fi
 }

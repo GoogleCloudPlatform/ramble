@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -188,6 +188,9 @@ def filter_file(source, dest, output=False):
     # https://gitlab.com/pycqa/flake8/issues/583
     ignore_f811_on_previous_line = False
 
+    if not os.path.isfile(source):
+        return
+
     with open(source) as infile:
         parent = os.path.dirname(dest)
         mkdirp(parent)
@@ -312,7 +315,7 @@ def flake8(parser, args):
 
         # TODO: make these repeated blocks a function?
         if primary_file_list:
-            # Copy flake8 file so the paths will be reltive to the new location
+            # Copy flake8 file so the paths will be relative to the new location
             f = '.flake8'
             shutil.copy(f, primary_dest_dir)
             qa_dir = os.path.join(primary_dest_dir, 'share', 'ramble', 'qa')

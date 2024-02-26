@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -31,7 +31,7 @@ steps:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         unit_err=$$?
 
-        coverage report -m --fail-under=74
+        coverage report -m --fail-under=80
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         coverage_err=$$?
@@ -65,6 +65,6 @@ steps:
     id: ramble-unit-tests
     entrypoint: /bin/bash
 
-timeout: 600s
+timeout: 900s
 options:
   machineType: N1_HIGHCPU_8

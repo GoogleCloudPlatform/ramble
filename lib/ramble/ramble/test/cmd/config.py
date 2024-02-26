@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -196,7 +196,7 @@ success_criteria:
   file: '{log_file}'"""
 
 
-def test_merged_appliactions_section(mock_low_high_config):
+def test_merged_applications_section(mock_low_high_config):
     low_path = mock_low_high_config.scopes['low'].path
     high_path = mock_low_high_config.scopes['high'].path
 
@@ -278,7 +278,7 @@ def test_config_edit():
     assert config('edit', '--print-file', 'repos').strip() == repos_path
 
 
-def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_repo):
+def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_apps_repo):
     ws = ramble.workspace.create('test')
 
     config('get', fail_on_error=False)
@@ -630,7 +630,7 @@ def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspa
 #     config_yaml_v015()
 #     config('update', '-y', 'config')
 #
-#     # Check the entires have been transformed
+#     # Check the entries have been transformed
 #     data = ramble.config.get('config')
 #     check_config_updated(data)
 
@@ -721,3 +721,30 @@ def check_config_updated(data):
     assert isinstance(data['install_tree'], dict)
     assert data['install_tree']['root'] == '/fake/path'
     assert data['install_tree']['projections'] == {'all': '{name}-{version}'}
+
+
+@pytest.fixture(scope='function')
+def mock_editor(monkeypatch):
+    def _editor(*args, **kwargs):
+        return True
+
+    monkeypatch.setattr('ramble.util.editor.editor', _editor)
+
+
+def section_args(section_name):
+    class TestArgs(object):
+        scope = None
+        section = section_name
+        config_command = 'edit'
+        print_file = False
+
+    return TestArgs()
+
+
+def test_config_edit_file(mutable_config, config_section, mock_editor):
+    import ramble.cmd.config
+    import ramble.util.editor
+
+    args = section_args(config_section)
+
+    assert ramble.cmd.config.config_edit(args)

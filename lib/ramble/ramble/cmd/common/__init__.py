@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,10 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as color
 
 import ramble.paths
+from ramble.util.logger import logger
 
 
 def shell_init_instructions(cmd, equivalent):
@@ -49,4 +49,4 @@ def shell_init_instructions(cmd, equivalent):
         msg += ["  " + equivalent]
 
     msg += ['']
-    tty.error(*msg)
+    logger.error(*msg)

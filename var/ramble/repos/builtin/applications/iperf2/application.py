@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,14 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from ramble.appkit import *
+from ramble.expander import Expander
 
 
 class Iperf2(SpackApplication):
     '''Define the iperf2 application'''
     name = 'iperf2'
 
-    tags = []
+    maintainers('rfbgo')
 
     default_compiler('gcc9', spack_spec='gcc@9.3.0')
 
@@ -74,10 +76,12 @@ class Iperf2(SpackApplication):
                template='iperf {input_flags} {additional_flags}',
                use_mpi=False)
 
-    # TODO: addsuccess_criteria(..
+    # TODO: add success_criteria(..
+    log_str = os.path.join(Expander.expansion_str('experiment_run_dir'),
+                           Expander.expansion_str('experiment_name') + '.out')
     figure_of_merit(
         'Total BW',
-        log_file='{experiment_run_dir}/{experiment_name}.out',
+        log_file=log_str,
         fom_regex=r'\[SUM\]\s.*sec\s.*GBytes\s(?P<bw>.*)\sGbits/sec.*',
         group_name='bw',
         units='Gbits/sec'

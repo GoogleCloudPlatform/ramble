@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,6 +9,7 @@
 import collections
 import os
 import shutil
+from typing import List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -16,9 +17,10 @@ import llnl.util.tty as tty
 import ramble.cmd.common.arguments
 import ramble.config
 import ramble.workspace
+from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
-from spack.util.editor import editor
+import ramble.util.editor
 
 description = "get and set configuration options"
 section = "config"
@@ -102,6 +104,7 @@ def setup_parser(subparser):
 
 def _get_scope_and_section(args):
     """Extract config scope and section from arguments."""
+    logger.debug(f' Args = {str(args)}')
     scope = args.scope
     section = getattr(args, 'section', None)
     path = getattr(args, 'path', None)
@@ -142,11 +145,13 @@ def config_get(args):
             with open(config_file) as f:
                 print(f.read())
         else:
-            tty.die('workspace has no %s file' % ramble.workspace.config_file_name)
+            logger.die(f'workspace has no {ramble.workspace.config_file_name} file')
 
     else:
-        tty.die('`ramble config get` requires a section argument '
-                'or an active workspace.')
+        logger.die(
+            '`ramble config get` requires a section argument '
+            'or an active workspace.'
+        )
 
 
 def config_blame(args):
@@ -169,14 +174,19 @@ def config_edit(args):
         # If we aren't editing a ramble.yaml file, get config path from scope.
         scope, section = _get_scope_and_section(args)
         if not scope and not section:
-            tty.die('`ramble config edit` requires a section argument '
-                    'or an active workspace.')
+            logger.die(
+                '`ramble config edit` requires a section argument '
+                'or an active workspace.'
+            )
         config_file = ramble.config.config.get_config_filename(scope, section)
 
     if args.print_file:
         print(config_file)
     else:
-        editor(config_file)
+        if not os.path.isdir(os.path.dirname(config_file)):
+            fs.mkdirp(os.path.dirname(config_file))
+
+        return ramble.util.editor.editor(config_file)
 
 
 def config_list(args):
@@ -192,7 +202,7 @@ def config_add(args):
 
     This is a stateful operation that edits the config files."""
     if not (args.file or args.path):
-        tty.error("No changes requested. Specify a file or value.")
+        logger.error("No changes requested. Specify a file or value.")
         setup_parser.add_parser.print_help()
         exit(1)
 
@@ -242,7 +252,14 @@ def _can_update_config_file(scope_dir, cfg_file):
 def config_update(args):
     # Read the configuration files
     ramble.config.config.get_config(args.section, scope=args.scope)
-    updates = ramble.config.config.format_updates[args.section]
+    updates: List[ramble.config.ConfigScope] = list(
+        filter(
+            lambda s: not isinstance(
+                s, (ramble.config.InternalConfigScope, ramble.config.ImmutableConfigScope)
+            ),
+            ramble.config.config.format_updates[args.section],
+        )
+    )
 
     cannot_overwrite, skip_system_scope = [], False
     for scope in updates:
@@ -255,8 +272,8 @@ def config_update(args):
             if scope.name == 'system':
                 skip_system_scope = True
                 msg = ('Not enough permissions to write to "system" scope. '
-                       'Skipping update at that location [cfg={0}]')
-                tty.warn(msg.format(cfg_file))
+                       f'Skipping update at that location [cfg={cfg_file}]')
+                logger.warn(msg)
                 continue
             cannot_overwrite.append((scope, cfg_file))
 
@@ -267,15 +284,14 @@ def config_update(args):
         msg += ('\nEither ensure that you have sufficient permissions to '
                 'modify these files or do not include these scopes in the '
                 'update.')
-        tty.die(msg)
+        logger.die(msg)
 
     if skip_system_scope:
         updates = [x for x in updates if x.name != 'system']
 
     # Report if there are no updates to be done
     if not updates:
-        msg = 'No updates needed for "{0}" section.'
-        tty.msg(msg.format(args.section))
+        logger.msg(f'No updates needed for "{args.section}" section.')
         return
 
     proceed = True
@@ -291,11 +307,11 @@ def config_update(args):
                 'that are older than this version may not be able to read '
                 'them. Ramble stores backups of the updated files which can '
                 'be retrieved with "ramble config revert"')
-        tty.msg(msg)
+        logger.msg(msg)
         proceed = tty.get_yes_or_no('Do you want to proceed?', default=False)
 
     if not proceed:
-        tty.die('Operation aborted.')
+        logger.die('Operation aborted.')
 
     # Get a function to update the format
     update_fn = ramble.config.ensure_latest_format_fn(args.section)
@@ -314,8 +330,7 @@ def config_update(args):
         ramble.config.config.update_config(
             args.section, data, scope=scope.name, force=True
         )
-        msg = 'File "{0}" updated [backup={1}]'
-        tty.msg(msg.format(cfg_file, bkp_file))
+        logger.msg(f'File "{cfg_file}" updated [backup={bkp_file}]')
 
 
 def _can_revert_update(scope_dir, cfg_file, bkp_file):
@@ -359,7 +374,7 @@ def config_revert(args):
             msg += '\t[scope={0.scope}, cfg={0.cfg}, bkp={0.bkp}]\n'.format(e)
         msg += ('\nEither ensure to have the right permissions before retrying'
                 ' or be more specific on the scope to revert.')
-        tty.die(msg)
+        logger.die(msg)
 
     proceed = True
     if not args.yes_to_all:
@@ -368,17 +383,16 @@ def config_revert(args):
         for entry in to_be_restored:
             msg += '\t[scope={0.scope}, bkp={0.bkp}]\n'.format(entry)
         msg += 'This operation cannot be undone.'
-        tty.msg(msg)
+        logger.msg(msg)
         proceed = tty.get_yes_or_no('Do you want to proceed?', default=False)
 
     if not proceed:
-        tty.die('Operation aborted.')
+        logger.die('Operation aborted.')
 
     for _, cfg_file, bkp_file in to_be_restored:
         shutil.copy(bkp_file, cfg_file)
         os.unlink(bkp_file)
-        msg = 'File "{0}" reverted to old state'
-        tty.msg(msg.format(cfg_file))
+        logger.msg(f'File "{cfg_file}" reverted to old state')
 
 
 def config(parser, args):

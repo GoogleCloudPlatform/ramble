@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,13 +15,13 @@ import re
 import argparse
 from six import StringIO
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as color
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
 
 import ramble.paths
 import ramble.workspace
+from ramble.util.logger import logger
 
 description = "run ramble's unit tests (wrapper around pytest)"
 section = "developer"
@@ -79,7 +79,9 @@ def do_list(args, extra_args):
             import pytest
             pytest.main(['--collect-only'] + extra_args)
         except ImportError:
-            tty.die('Pytest python module not found. Ensure requirements.txt are installed.')
+            logger.die(
+                'Pytest python module not found. Ensure requirements.txt are installed.'
+            )
     finally:
         sys.stdout = old_output
 
@@ -164,7 +166,9 @@ def unit_test(parser, args, unknown_args):
             import pytest
             return pytest.main(['-h'])
         except ImportError:
-            tty.die('Pytest python module not found. Ensure requirements.txt are installed.')
+            logger.die(
+                'Pytest python module not found. Ensure requirements.txt are installed.'
+            )
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
@@ -188,4 +192,6 @@ def unit_test(parser, args, unknown_args):
                 import pytest
                 return pytest.main(pytest_args)
             except ImportError:
-                tty.die('Pytest python module not found. Ensure requirements.txt are installed.')
+                logger.die(
+                    'Pytest python module not found. Ensure requirements.txt are installed.'
+                )

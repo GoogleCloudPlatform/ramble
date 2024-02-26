@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,6 +15,7 @@ import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import search_files_for_string
 
 
 # everything here uses the mock_workspace_path
@@ -24,7 +25,7 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 workspace = RambleCommand('workspace')
 
 
-def test_wrfv4_dry_run_non_config_spack(mutable_config, mutable_mock_workspace_path):
+def test_wrfv4_exclusions(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
   variables:
@@ -47,7 +48,7 @@ ramble:
                 mode: 'string'
                 match: '.*Timing for main.*'
                 file: '{experiment_run_dir}/rsl.out.0000'
-              env-vars:
+              env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
                   TEST_VAR: '1'
@@ -64,33 +65,50 @@ ramble:
                 - TEST_VAR
               variables:
                 n_nodes: ['1', '2', '4', '8', '16']
+              zips:
+                partitions:
+                - partition
+                - processes_per_node
               matrix:
               - n_nodes
               - env_name
-spack:
-  concretized: true
-  packages:
-    gcc:
-      spack_spec: gcc@8.5.0
-    intel-mpi:
-      spack_spec: intel-mpi@2018.4.274
-      compiler: gcc
-    wrfv4:
-      spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
-      compiler: gcc
-    wrfv4-portable:
-      spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
-        nesting=basic ~chem ~pnetcdf target=x86_64'
-      compiler: gcc
-  environments:
-    wrfv4:
-      packages:
-      - wrfv4
-      - intel-mpi
-    wrfv4-portable:
-      packages:
-      - wrfv4-portable
-      - intel-mpi
+              - partitions
+              exclude:
+                variables:
+                  n_nodes: '1'
+                zips:
+                  partitions:
+                  - partition
+                  - processes_per_node
+                matrix:
+                - env_name
+                - partitions
+                where:
+                - '{n_nodes} == 16'
+  spack:
+    concretized: true
+    packages:
+      gcc:
+        spack_spec: gcc@8.5.0
+      intel-mpi:
+        spack_spec: intel-mpi@2018.4.274
+        compiler: gcc
+      wrfv4:
+        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        compiler: gcc
+      wrfv4-portable:
+        spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
+          nesting=basic ~chem ~pnetcdf target=x86_64'
+        compiler: gcc
+    environments:
+      wrfv4:
+        packages:
+        - wrfv4
+        - intel-mpi
+      wrfv4-portable:
+        packages:
+        - wrfv4-portable
+        - intel-mpi
 """
 
     test_licenses = """
@@ -100,7 +118,7 @@ licenses:
       WRF_LICENSE: port@server
 """
 
-    workspace_name = 'test_end_to_end_wrfv4_non_config_spack'
+    workspace_name = 'test_end_to_end_wrfv4'
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
@@ -128,8 +146,12 @@ licenses:
 
         ws1._re_read()
 
-        output = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-        assert "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz" in output
+        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+        out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+
+        assert search_files_for_string(
+            out_files, 'Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz') # noqa
 
         # Test software directories
         software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
@@ -145,28 +167,42 @@ licenses:
                 file_path = os.path.join(software_path, file)
                 assert os.path.exists(file_path)
 
+            # Create mock spack.lock files
+            lock_file = os.path.join(software_path, 'spack.lock')
+            with open(lock_file, 'w+') as f:
+                f.write('{\n')
+                f.write('\t"test_key": "val"\n')
+                f.write('}\n')
+
         expected_experiments = [
-            'scaling_1_part1_wrfv4',
             'scaling_2_part1_wrfv4',
             'scaling_4_part1_wrfv4',
             'scaling_8_part1_wrfv4',
-            'scaling_16_part1_wrfv4',
-            'scaling_1_part2_wrfv4',
             'scaling_2_part2_wrfv4',
             'scaling_4_part2_wrfv4',
             'scaling_8_part2_wrfv4',
-            'scaling_16_part2_wrfv4',
-            'scaling_1_part1_wrfv4-portable',
             'scaling_2_part1_wrfv4-portable',
             'scaling_4_part1_wrfv4-portable',
             'scaling_8_part1_wrfv4-portable',
-            'scaling_16_part1_wrfv4-portable',
-            'scaling_1_part2_wrfv4-portable',
             'scaling_2_part2_wrfv4-portable',
             'scaling_4_part2_wrfv4-portable',
             'scaling_8_part2_wrfv4-portable',
+        ]
+
+        excluded_experiments = [
+            'scaling_1_part1_wrfv4',
+            'scaling_16_part1_wrfv4',
+            'scaling_1_part2_wrfv4',
+            'scaling_16_part2_wrfv4',
+            'scaling_1_part1_wrfv4-portable',
+            'scaling_16_part1_wrfv4-portable',
+            'scaling_1_part2_wrfv4-portable',
             'scaling_16_part2_wrfv4-portable'
         ]
+
+        for exp in excluded_experiments:
+            exp_dir = os.path.join(ws1.root, 'experiments', 'wrfv4', 'CONUS_12km', exp)
+            assert not os.path.isdir(exp_dir)
 
         # Test experiment directories
         for exp in expected_experiments:
@@ -177,15 +213,13 @@ licenses:
 
             with open(os.path.join(exp_dir, 'full_command'), 'r') as f:
                 data = f.read()
-                # Test the license exists
-                assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
                 assert 'export OMP_NUM_THREADS="1"' in data
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
-                # Test the expected portions of the exection command exist
+                # Test the expected portions of the execution command exist
                 assert "sed -i -e 's/ start_hour.*/ start_hour" in data
                 assert "sed -i -e 's/ restart .*/ restart" in data
                 assert "mpirun" in data
@@ -196,15 +230,13 @@ licenses:
 
             with open(os.path.join(exp_dir, 'execute_experiment'), 'r') as f:
                 data = f.read()
-                # Test the license exists
-                assert "export WRF_LICENSE=port@server" in data
 
                 # Test the required environment variables exist
                 assert 'export OMP_NUM_THREADS="1"' in data
                 assert "export TEST_VAR=1" in data
                 assert 'unset TEST_VAR' in data
 
-                # Test the expected portions of the exection command exist
+                # Test the expected portions of the execution command exist
                 assert "sed -i -e 's/ start_hour.*/ start_hour" in data
                 assert "sed -i -e 's/ restart .*/ restart" in data
                 assert "mpirun" in data
@@ -219,7 +251,8 @@ licenses:
             # Create fake figures of merit.
             with open(os.path.join(exp_dir, 'rsl.out.0000'), 'w+') as f:
                 for i in range(1, 6):
-                    f.write(f'Timing for main {i}{i}.{i}\n')
+                    f.write(f'Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n')
+                f.write('wrf: SUCCESS COMPLETE WRF\n')
 
             # Create files that match archive patterns
             for i in range(0, 5):
@@ -229,8 +262,7 @@ licenses:
                 f = open(new_file, 'w+')
                 f.close()
 
-        output = workspace('analyze', '-f', 'text',
-                           'json', 'yaml', global_args=['-w', workspace_name])
+        workspace('analyze', '-f', 'text', 'json', 'yaml', global_args=['-w', workspace_name])
         text_simlink_results_files = glob.glob(os.path.join(ws1.root, 'results.latest.txt'))
         text_results_files = glob.glob(os.path.join(ws1.root, 'results*.txt'))
         json_results_files = glob.glob(os.path.join(ws1.root, 'results*.json'))
@@ -242,14 +274,14 @@ licenses:
 
         with open(text_results_files[0], 'r') as f:
             data = f.read()
-            assert 'Average Timestep Time = 3.3 s' in data
-            assert 'Cumulative Timestep Time = 16.5 s' in data
-            assert 'Minimum Timestep Time = 1.1 s' in data
-            assert 'Maximum Timestep Time = 5.5 s' in data
+            assert 'Average Timestep Time = 33.3 s' in data
+            assert 'Cumulative Timestep Time = 166.5 s' in data
+            assert 'Minimum Timestep Time = 11.1 s' in data
+            assert 'Maximum Timestep Time = 55.5 s' in data
             assert 'Avg. Max Ratio Time = 0.6' in data
             assert 'Number of timesteps = 5' in data
 
-        output = workspace('archive', global_args=['-w', workspace_name])
+        workspace('archive', global_args=['-w', workspace_name])
 
         assert ws1.latest_archive
         assert os.path.exists(ws1.latest_archive_path)

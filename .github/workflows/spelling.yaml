@@ -1,0 +1,19 @@
+name: ramble spelling
+
+on:
+  pull_request: []
+  push:
+    branches-ignore:
+    - main
+    - gh-pages
+
+jobs:
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Check Spelling
+      uses: crate-ci/typos@548ac37a5de9ce84871bf4db3c9b8c462896d480 # v1.16.24
+      with:
+        files: ./lib/ramble/ramble ./lib/ramble/docs ./examples ./share ./bin ./etc ./var ./README.md
+        config: ./.typos.toml

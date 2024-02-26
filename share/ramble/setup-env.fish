@@ -227,7 +227,7 @@ function check_rmb_flags -d "check ramble flags for h/V flags"
     # Check if inputs contain h or V flags.
     #
 
-    # combine argument array into single string (space seperated), to be passed
+    # combine argument array into single string (space separated), to be passed
     # to regular expression matching (`string match -r`)
     set -l _a "$argv"
 
@@ -246,7 +246,7 @@ end
 
 
 
-function match_flag -d "checks all combinations of flags ocurring inside of a string"
+function match_flag -d "checks all combinations of flags occurring inside of a string"
 
     # Remove leading and trailing spaces -- but we need to insert a "guard" (x)
     # so that eg. `string trim -h` doesn't trigger the help string for `string trim`
@@ -288,7 +288,7 @@ function check_workspace_activate_flags -d "check ramble workspace subcommand fl
     # Check if inputs contain -h/--help, --sh, --csh, or --fish
     #
 
-    # combine argument array into single string (space seperated), to be passed
+    # combine argument array into single string (space separated), to be passed
     # to regular expression matching (`string match -r`)
     set -l _a "$argv"
 
@@ -331,7 +331,7 @@ function check_workspace_deactivate_flags -d "check ramble workspace subcommand 
     # Check if inputs contain --sh, --csh, or --fish
     #
 
-    # combine argument array into single string (space seperated), to be passed
+    # combine argument array into single string (space separated), to be passed
     # to regular expression matching (`string match -r`)
     set -l _a "$argv"
 
@@ -410,7 +410,7 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
 
         # CASE: ramble subcommand is `workspace`. Here we get the ramble runtime to
         # supply the appropriate shell commands for setting the workspace
-        # varibles. These commands are then run by fish (using the `capture_all`
+        # variables. These commands are then run by fish (using the `capture_all`
         # function, instead of a command substitution).
 
         case "workspace"
@@ -521,7 +521,7 @@ set -l stat $status
 
 
 #
-# Delete temprary global variabels allocated in `allocated_rmb_shared`.
+# Delete temporary global variables allocated in `allocated_rmb_shared`.
 #
 
 delete_rmb_shared
@@ -565,7 +565,7 @@ function ramble_pathadd -d "Add path to specified variable (defaults to PATH)"
     #  -> Notes: [1] (cf. EOF).
     if test -d "$pa_new_path"
 
-        # combine argument array into single string (space seperated), to be
+        # combine argument array into single string (space separated), to be
         # passed to regular expression matching (`string match -r`)
         set -l _a "$pa_oldvalue"
 

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -50,12 +50,12 @@ steps:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         missing_req_err=$$?
 
+        error=0
         if [ $$missing_req_err -gt 0 ]; then
           echo " ***** Ramble failed to work when requirements.txt were not installed"
           error=1
         fi
 
-        error=0
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         if [ $$flake_err -gt 0 ]; then
@@ -79,14 +79,6 @@ steps:
         if [ $$license_err -gt 0 ]; then
           echo "License check error = $$license_err"
           echo " ***** License check failed"
-          error=1
-        fi
-
-        # $$ characters are required for cloud-build:
-        # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
-        if [ $$unit_err -gt 0 ]; then
-          echo "Unit error = $$unit_err"
-          echo " ***** Unit tests failed"
           error=1
         fi
 

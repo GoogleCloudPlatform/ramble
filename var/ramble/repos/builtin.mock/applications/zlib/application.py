@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,7 +20,7 @@ class Zlib(SpackApplication):
 
     figure_of_merit('zlib_installed',
                     fom_regex=r'(?P<lib_name>libz.so.*)', group_name='lib_name',
-                    units='', log_file='{log_file}')
+                    units='')
 
     success_criteria('zlib_installed', mode='string',
                      match=r'libz.so', file='{log_file}')

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 workspace = RambleCommand('workspace')
 
 
-def test_deprecated_env_vars(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_exclusive_filtered_vector_workloads(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
   variables:
@@ -32,23 +32,21 @@ ramble:
     partition: 'part1'
     processes_per_node: '16'
     n_threads: '1'
-  env-vars:
-    set:
-      MY_VAR: TEST
   applications:
-    basic:
+    hostname:
       workloads:
-        test_wl:
+        '{application_workload}':
           experiments:
             simple_test:
               variables:
+                application_workload: ['parallel' ,'serial', 'local']
                 n_nodes: 1
   spack:
     concretized: true
     packages: {}
     environments: {}
 """
-    workspace_name = 'test_deprecated_env_vars'
+    workspace_name = 'test_exclusive_filtered_vector_workloads'
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -56,23 +54,25 @@ ramble:
 
         with open(config_path, 'w+') as f:
             f.write(test_config)
+
         ws._re_read()
 
-        out = workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-
-        assert 'The env-vars workspace section is deprecated' in out
+        workspace('setup', '--dry-run', '--exclude-where', '"{workload_name}" == "serial"',
+                  global_args=['-w', workspace_name])
+        workspace('analyze', '--dry-run', '--exclude-where', '"{workload_name}" == "serial"',
+                  global_args=['-w', workspace_name])
+        workspace('archive', '--exclude-where', '"{workload_name}" == "serial"',
+                  global_args=['-w', workspace_name])
 
         experiment_root = ws.experiment_dir
-        exp1_dir = os.path.join(experiment_root, 'basic', 'test_wl', 'simple_test')
-        exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+        expected_workloads = ['parallel', 'local']
+        for workload in expected_workloads:
+            exp1_dir = os.path.join(experiment_root, 'hostname', workload, 'simple_test')
+            exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+            assert os.path.isfile(exp1_script)
 
-        import re
-        export_regex = re.compile(r'export MY_VAR=TEST')
-
-        # Assert experiment 1 has exports before commands
-        with open(exp1_script, 'r') as f:
-            export_found = False
-            for line in f.readlines():
-                if export_regex.search(line):
-                    export_found = True
-            assert export_found
+        not_expected_workloads = ['serial']
+        for workload in not_expected_workloads:
+            exp1_dir = os.path.join(experiment_root, 'hostname', workload, 'simple_test')
+            exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+            assert not os.path.isfile(exp1_script)

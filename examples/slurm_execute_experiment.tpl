@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH -N {n_nodes}
 #SBATCH --ntasks-per-node {processes_per_node}
+#SBATCH -J {application_name}_{workload_name}_{experiment_name}
 
 # This is a template execution script for
 # running the execute pipeline.
@@ -18,12 +19,6 @@
 #   Any experiment parameters will be available as variables as well.
 
 cd {experiment_run_dir}
-
-{spack_setup}
-
-export OMP_NUM_THREADS={n_threads}
-
-scontrol show hostnames ${SLURM_JOB_NODELIST} > hostfile
 
 {command}
 

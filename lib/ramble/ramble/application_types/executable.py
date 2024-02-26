@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,11 +21,4 @@ class ExecutableApplication(ApplicationBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
-        self._setup_phases = [
-            'get_inputs',
-            'make_experiments'
-        ]
-
-        self._analyze_phases = ['analyze_experiments']
-
         self.application_class = 'ExecutableApplication'

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,11 +9,11 @@
 import os
 import six
 
-import llnl.util.tty as tty
 import llnl.util.tty.color as clr
 
 import ramble.repository
 import ramble.error
+from ramble.util.logger import logger
 
 import spack.parse
 
@@ -76,7 +76,7 @@ class SpecParser(spack.parse.Parser):
                 directly into. This is used to avoid construction of a
                 superfluous Spec object in the Spec constructor.
         """
-        tty.debug('Starting parser with spec %s' % (initial_spec))
+        logger.debug(f'Starting parser with spec {initial_spec}')
         super(SpecParser, self).__init__(_lexer)
         self.previous = None
         self._initial = initial_spec
@@ -178,7 +178,7 @@ class Spec(object):
         Keyword Args:
             color (bool): True if returned string is colored
             transform (dict): maps full-string formats to a callable \
-                that accepts a string and returns another one
+                              that accepts a string and returns another one
 
         """
 
@@ -283,19 +283,23 @@ class Spec(object):
     @property
     def application(self):
         if not self._application:
-            self._application = ramble.repository.apps_path.get(self)
+            app_type = ramble.repository.ObjectTypes.applications
+            self._application = ramble.repository.paths[app_type].get(self)
         return self._application
 
     @property
     def application_class(self):
         if not self._application_class:
-            self._application_class = ramble.repository.apps_path.get_obj_class(self.fullname)
+            app_type = ramble.repository.ObjectTypes.applications
+            self._application_class = \
+                ramble.repository.paths[app_type].get_obj_class(self.fullname)
         return self._application_class
 
     @property
     def application_file_path(self):
-        file_dir = ramble.repository.apps_path.dirname_for_object_name(self.fullname)
-        app_file = ramble.repository.apps_path.filename_for_object_name(self.fullname)
+        app_type = ramble.repository.ObjectTypes.applications
+        file_dir = ramble.repository.paths[app_type].dirname_for_object_name(self.fullname)
+        app_file = ramble.repository.paths[app_type].filename_for_object_name(self.fullname)
         return os.path.join(file_dir, app_file)
 
 

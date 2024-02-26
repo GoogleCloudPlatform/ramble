@@ -1,0 +1,25 @@
+[files]
+extend-exclude = [
+    ".git/",
+    # Copy of https://github.com/spack/spack/tree/develop/lib/spack
+    "lib/ramble/external/",
+    "lib/ramble/llnl/",
+    "lib/ramble/spack/",
+]
+ignore-hidden = false
+
+[default]
+extend-ignore-re = [
+    "\\bFOMs",
+]
+
+[default.extend-words]
+"fom" = "fom"
+"namd" = "namd"
+"reord" = "reord"
+
+[default.extend-identifiers]
+"ATPase" = "ATPase"
+"cachable" = "cachable"
+"clen" = "clen"
+"enable_deck_based_FOMs" = "enable_deck_based_FOMs"

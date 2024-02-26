@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,8 +19,11 @@ success_criteria_def = {
     'properties': {
         'name': {'type': 'string'},
         'mode': {'type': 'string'},
-        'match': {'type': 'string'},
-        'file': {'type': 'string'}
+        'match': {'type': 'string', 'default': None},
+        'file': {'type': 'string', 'default': None},
+        'fom_name': {'type': 'string', 'default': None},
+        'fom_context': {'type': 'string', 'default': None},
+        'formula': {'type': 'string', 'default': None}
     },
     'additionalProperties': False,
 }

@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Google LLC
+# Copyright 2022-2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Schema for environment varaibles configuration file.
+"""Schema for environment variables configuration file.
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/env_vars.py
    :lines: 12-
