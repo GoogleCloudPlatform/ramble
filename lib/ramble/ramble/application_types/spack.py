@@ -9,8 +9,7 @@
 import os
 import six
 
-from ramble.language.application_language import register_phase
-from ramble.language.shared_language import register_builtin
+from ramble.language.shared_language import register_builtin, register_phase
 from ramble.application import ApplicationBase, ApplicationError
 import ramble.spack_runner
 import ramble.keywords
@@ -80,7 +79,7 @@ class SpackApplication(ApplicationBase):
     register_phase('software_install_requested_compilers', pipeline='setup',
                    run_after=['software_create_env'])
 
-    def _software_install_requested_compilers(self, workspace):
+    def _software_install_requested_compilers(self, workspace, app_inst=None):
         """Install compilers an application uses"""
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -132,7 +131,7 @@ class SpackApplication(ApplicationBase):
     register_phase('software_create_env', pipeline='mirror')
     register_phase('software_create_env', pipeline='setup')
 
-    def _software_create_env(self, workspace):
+    def _software_create_env(self, workspace, app_inst=None):
         """Create the spack environment for this experiment
 
         Extract all specs this experiment uses, and write the spack environment
@@ -213,7 +212,7 @@ class SpackApplication(ApplicationBase):
     register_phase('software_configure', pipeline='setup',
                    run_after=['software_create_env', 'software_install_requested_compilers'])
 
-    def _software_configure(self, workspace):
+    def _software_configure(self, workspace, app_inst=None):
         """Concretize the spack environment for this experiment
 
         Perform spack's concretize step on the software environment generated
@@ -248,7 +247,7 @@ class SpackApplication(ApplicationBase):
     register_phase('software_install', pipeline='setup',
                    run_after=['software_configure'])
 
-    def _software_install(self, workspace):
+    def _software_install(self, workspace, app_inst=None):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
@@ -275,7 +274,7 @@ class SpackApplication(ApplicationBase):
     register_phase('evaluate_requirements', pipeline='setup',
                    run_after=['software_install'])
 
-    def _evaluate_requirements(self, workspace):
+    def _evaluate_requirements(self, workspace, app_inst=None):
         """Evaluate all requirements for this experiment"""
 
         for mod_inst in self._modifier_instances:
@@ -288,7 +287,7 @@ class SpackApplication(ApplicationBase):
     register_phase('define_package_paths', pipeline='setup',
                    run_after=['software_install', 'evaluate_requirements'])
 
-    def _define_package_paths(self, workspace):
+    def _define_package_paths(self, workspace, app_inst=None):
         """Define variables containing the path to all spack packages
 
         For every spack package defined within an application context, define
@@ -328,7 +327,7 @@ class SpackApplication(ApplicationBase):
 
     register_phase('mirror_software', pipeline='mirror', run_after=['software_create_env'])
 
-    def _mirror_software(self, workspace):
+    def _mirror_software(self, workspace, app_inst=None):
         """Mirror software source for this experiment using spack"""
         import re
 
@@ -390,7 +389,7 @@ class SpackApplication(ApplicationBase):
 
     register_phase('push_to_spack_cache', pipeline='pushtocache', run_after=[])
 
-    def _push_to_spack_cache(self, workspace):
+    def _push_to_spack_cache(self, workspace, app_inst=None):
 
         env_path = self.expander.env_path
         cache_tupl = ('push-to-cache', env_path)

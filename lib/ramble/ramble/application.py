@@ -49,8 +49,8 @@ from ramble.util.logger import logger
 
 from ramble.workspace import namespace
 
-from ramble.language.application_language import ApplicationMeta, register_phase
-from ramble.language.shared_language import SharedMeta, register_builtin
+from ramble.language.application_language import ApplicationMeta
+from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.error import RambleError
 
 from enum import Enum
@@ -164,6 +164,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 self.phase_definitions[pipeline],
                 self
             )
+
+            for mod_inst in self._modifier_instances:
+                # Define phase nodes
+                for phase, phase_node in mod_inst.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].add_node(
+                        phase_node, obj_inst=mod_inst
+                    )
+
+                # Define phase edges
+                for phase, phase_node in mod_inst.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].define_edges(
+                        phase_node, internal_order=True
+                    )
 
     def _long_print(self):
         out_str = []
@@ -340,7 +353,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def get_pipeline_phases(self, pipeline, phase_filters=['*']):
         self.build_modifier_instances()
-        #  self._inject_required_modifier_builtins()
         self.build_phase_order()
 
         if pipeline not in self._pipelines:
@@ -461,9 +473,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         logger.msg(f'  Executing phase {phase}')
         start_time = time.time()
         for mod_inst in self._modifier_instances:
-            mod_inst.run_phase_hook(workspace, phase)
+            mod_inst.run_phase_hook(workspace, pipeline, phase)
         phase_func = phase_node.attribute
-        phase_func(workspace)
+        phase_func(workspace, app_inst=self)
         self._phase_times[phase] = time.time() - start_time
 
     def print_phase_times(self, pipeline, phase_filters=['*']):
@@ -992,7 +1004,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('mirror_inputs', pipeline='mirror')
 
-    def _mirror_inputs(self, workspace):
+    def _mirror_inputs(self, workspace, app_inst=None):
         """Mirror application inputs
 
         Perform mirroring of inputs within this application class.
@@ -1011,7 +1023,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('get_inputs', pipeline='setup')
 
-    def _get_inputs(self, workspace):
+    def _get_inputs(self, workspace, app_inst=None):
         """Download application inputs
 
         Download application inputs into the proper directory within the workspace.
@@ -1063,7 +1075,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('license_includes', pipeline='setup')
 
-    def _license_includes(self, workspace):
+    def _license_includes(self, workspace, app_inst=None):
         logger.debug("Writing License Includes")
         self._prepare_license_path(workspace)
 
@@ -1090,7 +1102,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('make_experiments', pipeline='setup', run_after=['get_inputs'])
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         """Create experiment directories
 
         Create the experiment this application encapsulates. This includes
@@ -1226,7 +1238,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('write_inventory', pipeline='setup', run_after=['make_experiments'])
 
-    def _write_inventory(self, workspace):
+    def _write_inventory(self, workspace, app_inst=None):
         """Build and write an inventory of an experiment
 
         Write an inventory file describing all of the contents of this
@@ -1241,7 +1253,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('archive_experiments', pipeline='archive')
 
-    def _archive_experiments(self, workspace):
+    def _archive_experiments(self, workspace, app_inst=None):
         """Archive an experiment directory
 
         Perform the archiving action on an experiment.
@@ -1290,7 +1302,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('prepare_analysis', pipeline='analyze')
 
-    def _prepare_analysis(self, workspace):
+    def _prepare_analysis(self, workspace, app_inst=None):
         """Prepapre experiment for analysis extraction
 
         This function performs any actions that are necessary before the
@@ -1303,7 +1315,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('analyze_experiments', pipeline='analyze', run_after=['prepare_analysis'])
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         """Perform experiment analysis.
 
         This method will build up the fom_values dictionary. Its structure is:
@@ -1779,7 +1791,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     register_phase('write_status', pipeline='analyze', run_after=['analyze_experiments'])
     register_phase('write_status', pipeline='setup', run_after=['make_experiments'])
 
-    def _write_status(self, workspace):
+    def _write_status(self, workspace, app_inst=None):
         """Phase to write an experiment's ramble_status.json file"""
 
         status_data = {}

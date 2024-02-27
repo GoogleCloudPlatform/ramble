@@ -283,6 +283,78 @@ def register_builtin(name, required=True, injection_method='prepend', depends_on
     return _store_builtin
 
 
+@shared_directive('phase_definitions')
+def register_phase(name, pipeline=None, run_before=[], run_after=[]):
+    """Register a phase
+
+    Phases are portions of a pipeline that will execute when
+    executing a full pipeline.
+
+    Registering a phase allows an object to know what the phases
+    dependencies are, to ensure the execution order is correct.
+
+    If called multiple times, the dependencies are combined together. Only one
+    instance of a phase will show up in the resulting dependency list for a phase.
+
+    Args:
+    - name: The name of the phase. Phases are functions named '_<phase>'.
+    - pipeline: The name of the pipeline this phase should be registered into.
+    - run_before: A list of phase names this phase should run before
+    - run_after: A list of phase names this phase should run after
+    """
+
+    def _execute_register_phase(obj):
+        import ramble.util.graph
+        if pipeline not in obj._pipelines:
+            raise ramble.language.language_base.DirectiveError(
+                'Directive register_phase was '
+                f'given an invalid pipeline "{pipeline}"\n'
+                'Available pipelines are: '
+                f' {obj._pipelines}'
+            )
+
+        if not isinstance(run_before, list):
+            raise ramble.language.language_base.DirectiveError(
+                'Directive register_phase was '
+                'given an invalid type for '
+                'the run_before attribute in object '
+                f'{obj.name}'
+            )
+
+        if not isinstance(run_after, list):
+            raise ramble.language.language_base.DirectiveError(
+                'Directive register_phase was '
+                'given an invalid type for '
+                'the run_after attribute in object '
+                f'{obj.name}'
+            )
+
+        if not hasattr(obj, f'_{name}'):
+            raise ramble.language.language_base.DirectiveError(
+                'Directive register_phase was '
+                f'given an undefined phase {name} '
+                f'in object {obj.name}'
+            )
+
+        if pipeline not in obj.phase_definitions:
+            obj.phase_definitions[pipeline] = {}
+
+        if name in obj.phase_definitions[pipeline]:
+            phase_node = obj.phase_definitions[pipeline][name]
+        else:
+            phase_node = ramble.util.graph.GraphNode(name)
+
+        for before in run_before:
+            phase_node.order_before(before)
+
+        for after in run_after:
+            phase_node.order_after(after)
+
+        obj.phase_definitions[pipeline][name] = phase_node
+
+    return _execute_register_phase
+
+
 @shared_directive(dicts=())
 def maintainers(*names: str):
     """Add a new maintainer directive, to specify maintainers in a declarative way.

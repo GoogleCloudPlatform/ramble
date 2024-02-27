@@ -484,6 +484,8 @@ class ExecutePipeline(Pipeline):
         self.executor = executor
 
     def _execute(self):
+        super()._execute()
+
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             if app_inst.is_template:
                 logger.debug(f'{app_inst.name} is a template. Skipping execution.')

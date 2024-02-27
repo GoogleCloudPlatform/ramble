@@ -29,6 +29,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
     _builtin_name = 'modifier_builtin::{obj_name}::{name}'
     _mod_prefix_builtin = r'modifier_builtin::'
     _language_classes = [ModifierMeta, SharedMeta]
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache', 'execute']
 
     modifier_class = 'ModifierBase'
 
@@ -272,6 +273,11 @@ class ModifierBase(object, metaclass=ModifierMeta):
             for req in self.package_manager_requirements[self._usage_mode]:
                 yield req
 
+    def all_pipeline_phases(self, pipeline):
+        if pipeline in self.phase_definitions:
+            for phase_name, phase_node in self.phase_definitions[pipeline].items():
+                yield phase_name, phase_node
+
     def mode_variables(self):
         """Return a dict of variables that should be defined for the current mode"""
 
@@ -279,20 +285,29 @@ class ModifierBase(object, metaclass=ModifierMeta):
             return self.modifier_variables[self._usage_mode]
         return {}
 
-    def run_phase_hook(self, workspace, hook_name):
+    def run_phase_hook(self, workspace, pipeline, hook_name):
         """Run a modifier hook.
 
         Hooks are internal functions named _{hook_name}.
 
         This is a wrapper to extract the hook function, and execute it
         properly.
+
+        Hooks are only executed if they are not defined as a phase from the
+        modifier.
         """
 
-        hook_func_name = f'_{hook_name}'
-        if hasattr(self, hook_func_name):
-            phase_func = getattr(self, hook_func_name)
+        run_hook = True
+        if pipeline in self.phase_definitions:
+            if hook_name in self.phase_definitions[pipeline]:
+                run_hook = False
 
-            phase_func(workspace)
+        if run_hook:
+            hook_func_name = f'_{hook_name}'
+            if hasattr(self, hook_func_name):
+                phase_func = getattr(self, hook_func_name)
+
+                phase_func(workspace)
 
     def _prepare_analysis(self, workspace):
         """Hook to perform analysis that a modifier defines.

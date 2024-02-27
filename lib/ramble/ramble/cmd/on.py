@@ -42,7 +42,7 @@ def ramble_on(args):
     executor = args.executor if args.executor else '{batch_submit}'
 
     filters = ramble.filters.Filters(
-        phase_filters=[],
+        phase_filters=['*'],
         include_where_filters=args.where,
         exclude_where_filters=args.exclude_where,
         tags=args.filter_tags
