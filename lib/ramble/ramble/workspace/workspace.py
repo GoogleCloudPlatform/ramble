@@ -113,8 +113,6 @@ def default_config_yaml():
 # experiments.
 # As an example, experiments can be defined as follows.
 # applications:
-#   variables:
-#     processes_per_node: '30'
 #   hostname: # Application name, as seen in `ramble list`
 #     variables:
 #       iterations: '5'
