@@ -54,7 +54,8 @@ from ramble.language.shared_language import SharedMeta, register_builtin, regist
 from ramble.error import RambleError
 
 from enum import Enum
-experiment_status = Enum('experiment_status', ['UNKNOWN', 'SETUP', 'SUCCESS', 'FAILED'])
+experiment_status = Enum('experiment_status', ['UNKNOWN', 'SETUP', 'RUNNING',
+                                               'COMPLETE', 'SUCCESS', 'FAILED'])
 
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
@@ -658,6 +659,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             exp_inst = self.experiment_set.get_experiment(exp)
             if exp_inst:
                 exp_inst.chain_order = self.chain_order.copy()
+
+    def define_variable(self, var_name, var_value):
+        self.expander._variables[var_name] = var_value
+        for mod_inst in self._modifier_instances:
+            mod_inst.expander._variables[var_name] = var_value
 
     def build_modifier_instances(self):
         """Built a map of modifier names to modifier instances needed for this
