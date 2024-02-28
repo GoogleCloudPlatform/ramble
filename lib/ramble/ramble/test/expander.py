@@ -69,6 +69,8 @@ def exp_dict():
         (r'\\{experiment_name\\}', r'\{experiment_name\}', set(), 1),
         (r'\\{experiment_name\\}', '{experiment_name}', set(), 2),
         (r'\\{experiment_name\\}', 'baz', set(), 3),
+        ('"2.1.1" in ["2.1.1", "3.1.1", "4.2.1"]', 'True', set(), 1),
+        ('"2.1.2" in ["2.1.1", "3.1.1", "4.2.1"]', 'False', set(), 1),
     ]
 )
 def test_expansions(input, output, no_expand_vars, passes):

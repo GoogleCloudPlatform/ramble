@@ -719,8 +719,9 @@ class Expander(object):
         """Handle in nodes in the ast
 
         Perform extraction of `<variable> in <experiment>` syntax.
-
         Raises an exception if the experiment does not exist.
+
+        Also, evaluated `<value> in [list, of, values]` syntax.
         """
         if isinstance(node.left, ast.Name):
             var_name = self._ast_name(node.left)
@@ -733,6 +734,18 @@ class Expander(object):
                                             f'"{var_name} in {namespace}"')
                     self.__raise_syntax_error(node)
                 return val
+        elif isinstance(node.left, ast.Constant):
+            lhs_value = self.eval_math(node.left)
+
+            found = False
+            for comp in node.comparators:
+                if isinstance(comp, ast.List):
+                    for elt in comp.elts:
+                        rhs_value = self.eval_math(elt)
+                        if lhs_value == rhs_value:
+                            found = True
+            return found
+
         self.__raise_syntax_error(node)
 
     def _eval_binary_ops(self, node):
