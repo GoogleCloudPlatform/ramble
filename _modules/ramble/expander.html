@@ -870,8 +870,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle in nodes in the ast</span>
 
 <span class="sd">        Perform extraction of `&lt;variable&gt; in &lt;experiment&gt;` syntax.</span>
-
 <span class="sd">        Raises an exception if the experiment does not exist.</span>
+
+<span class="sd">        Also, evaluated `&lt;value&gt; in [list, of, values]` syntax.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
             <span class="n">var_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ast_name</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
@@ -884,6 +885,18 @@
                                             <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__raise_syntax_error</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+            <span class="n">lhs_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">comparators</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">List</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">elts</span><span class="p">:</span>
+                        <span class="n">rhs_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">elt</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">lhs_value</span> <span class="o">==</span> <span class="n">rhs_value</span><span class="p">:</span>
+                            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">found</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__raise_syntax_error</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_eval_binary_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
@@ -994,7 +1007,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 27, 2024.
+      <span class="lastupdated">Last updated on Feb 28, 2024.
       </span></p>
   </div>
 
