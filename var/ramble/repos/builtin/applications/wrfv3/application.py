@@ -90,7 +90,7 @@ class Wrfv3(SpackApplication):
     archive_pattern('{experiment_run_dir}/rsl.out.*')
     archive_pattern('{experiment_run_dir}/rsl.error.*')
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         import glob
         import re
         # Generate stats file

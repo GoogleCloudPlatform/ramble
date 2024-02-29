@@ -543,7 +543,7 @@ _ramble_mods_info() {
 }
 
 _ramble_on() {
-    RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help --executor --enable-per-experiment-prints --suppress-run-header --where --exclude-where --filter-tags"
 }
 
 _ramble_python() {
