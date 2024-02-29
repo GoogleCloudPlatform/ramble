@@ -44,11 +44,20 @@ def test_basic_app(mutable_mock_apps_repo):
     assert basic_inst.executables['bar'].mpi
 
     assert 'test_wl' in basic_inst.workloads
-    assert basic_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']
+    assert basic_inst.workloads['test_wl']['executables'] == ['foo']
     assert basic_inst.workloads['test_wl']['inputs'] == ['input']
+
+    exec_graph = basic_inst._get_executable_graph('test_wl')
+    assert exec_graph.get_node('foo') is not None
+    assert exec_graph.get_node('builtin::env_vars') is not None
+
     assert 'test_wl2' in basic_inst.workloads
-    assert basic_inst.workloads['test_wl2']['executables'] == ['builtin::env_vars', 'bar']
+    assert basic_inst.workloads['test_wl2']['executables'] == ['bar']
     assert basic_inst.workloads['test_wl2']['inputs'] == ['input']
+
+    exec_graph = basic_inst._get_executable_graph('test_wl2')
+    assert exec_graph.get_node('bar') is not None
+    assert exec_graph.get_node('builtin::env_vars') is not None
 
     assert 'test_fom' in basic_inst.figures_of_merit
     fom_conf = basic_inst.figures_of_merit['test_fom']
@@ -125,13 +134,6 @@ def test_application_copy_is_deep(mutable_mock_apps_repo, app_name):
 
     copy_inst = src_inst.copy()
 
-    test_attrs = ['_setup_phases', '_analyze_phases', '_archive_phases',
-                  '_mirror_phases']
-
-    # Test Phases
-    for attr in test_attrs:
-        assert getattr(copy_inst, attr) == getattr(src_inst, attr)
-
     # Test variables
     for var, val in src_inst.variables.items():
         assert var in copy_inst.variables.keys()
@@ -184,9 +186,9 @@ def test_required_builtins(mutable_mock_apps_repo, app):
             required_builtins.append(builtin)
 
     for workload, wl_conf in app_inst.workloads.items():
-        if app_inst._workload_exec_key in wl_conf:
-            for builtin in required_builtins:
-                assert builtin in wl_conf[app_inst._workload_exec_key]
+        exec_graph = app_inst._get_executable_graph(workload)
+        for builtin in required_builtins:
+            assert exec_graph.get_node(builtin) is not None
 
 
 def test_register_builtin_app(mutable_mock_apps_repo):
@@ -201,11 +203,12 @@ def test_register_builtin_app(mutable_mock_apps_repo):
             excluded_builtins.append(builtin)
 
     for workload, wl_conf in app_inst.workloads.items():
-        if app_inst._workload_exec_key in wl_conf:
-            for builtin in required_builtins:
-                assert builtin in wl_conf[app_inst._workload_exec_key]
-            for builtin in excluded_builtins:
-                assert builtin not in wl_conf[app_inst._workload_exec_key]
+        exec_graph = app_inst._get_executable_graph(workload)
+
+        for builtin in required_builtins:
+            assert exec_graph.get_node(builtin) is not None
+        for builtin in excluded_builtins:
+            assert exec_graph.get_node(builtin) is None
 
 
 @pytest.mark.parametrize('app', [
@@ -245,8 +248,8 @@ def basic_exp_dict():
     }
 
 
-def test_get_executables_initial(mutable_mock_apps_repo):
-    """_get_executables, test1, workload executables"""
+def test_get_executable_graph_initial(mutable_mock_apps_repo):
+    """_get_executable_graph, test1, workload executables"""
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -260,13 +263,14 @@ def test_get_executables_initial(mutable_mock_apps_repo):
                                                               'inputs': ['input']}}
     executable_application_instance.internals = {}
 
-    executables = executable_application_instance._get_executables()
+    executable_graph = executable_application_instance._get_executable_graph('test_wl2')
+    bar_node = executable_graph.get_node('bar')
 
-    assert 'bar' in executables
+    assert bar_node is not None
 
 
-def test_get_executables_yaml_defined(mutable_mock_apps_repo):
-    """_get_executables, test2, yaml-defined order"""
+def test_get_executable_graph_yaml_defined(mutable_mock_apps_repo):
+    """_get_executable_graph, test2, yaml-defined order"""
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -282,7 +286,7 @@ def test_get_executables_yaml_defined(mutable_mock_apps_repo):
     # Insert namespace.executables into the instance's internals to pass the
     # second part of the function
     defined_internals = {
-        'executables': {
+        'custom_executables': {
             'test_exec': {
                 'template': [
                     'test_exec'
@@ -290,17 +294,23 @@ def test_get_executables_yaml_defined(mutable_mock_apps_repo):
                 'use_mpi': False,
                 'redirect': '{log_file}'
             }
-        }
+        },
+        'executables': [
+            'bar',
+            'test_exec'
+        ]
     }
     executable_application_instance.set_internals(defined_internals)
 
-    executables = executable_application_instance._get_executables()
+    executable_graph = executable_application_instance._get_executable_graph('test_wl')
 
-    assert 'test_exec' in executables
+    test_node = executable_graph.get_node('test_exec')
+
+    assert test_node is not None
 
 
-def test_get_executables_custom_executables(mutable_mock_apps_repo):
-    """_get_executables, test3, custom executables"""
+def test_get_executable_graph_custom_executables(mutable_mock_apps_repo):
+    """_get_executable_graph, test3, custom executables"""
 
     executable_application_instance = mutable_mock_apps_repo.get('basic')
 
@@ -324,13 +334,18 @@ def test_get_executables_custom_executables(mutable_mock_apps_repo):
                 'use_mpi': False,
                 'redirect': '{log_file}',
             }
-        }
+        },
+        'executables': [
+            'test_exec2',
+            'bar'
+        ]
     }
     executable_application_instance.set_internals(defined_internals)
 
-    executable_application_instance._get_executables()
+    executable_graph = executable_application_instance._get_executable_graph('test_wl2')
+    test_node = executable_graph.get_node('test_exec2')
 
-    assert 'test_exec2' in executable_application_instance.executables
+    assert test_node is not None
 
 
 def test_set_input_path(mutable_mock_apps_repo):
@@ -430,7 +445,7 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
 
-    executables = executable_application_instance._get_executables()
+    exec_graph = executable_application_instance._get_executable_graph('test_wl2')
 
     executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
                                                                        {'default': '1'}}}
@@ -441,7 +456,7 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance._set_default_experiment_variables()
 
     executable_application_instance.chain_prepend = []
-    executable_application_instance._define_commands(executables)
+    executable_application_instance._define_commands(exec_graph)
     executable_application_instance._define_formatted_executables()
     assert 'mpirun' in executable_application_instance.variables['command']
 
@@ -507,7 +522,7 @@ ramble:
     executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
 
-    executables = executable_application_instance._get_executables()
+    exec_graph = executable_application_instance._get_executable_graph('test_wl2')
 
     executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
                                                                        {'default': '1'}}}
@@ -515,7 +530,7 @@ ramble:
     executable_application_instance._set_default_experiment_variables()
 
     executable_application_instance.chain_prepend = []
-    executable_application_instance._define_commands(executables)
+    executable_application_instance._define_commands(exec_graph)
     executable_application_instance._define_formatted_executables()
 
     test_answer = "/workspace/experiments/bar/test_wl2/baz/execute_experiment"

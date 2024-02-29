@@ -161,7 +161,7 @@ class Pipeline(object):
                     progress.set_description(
                         f'Processing phase {phase} ({phase_idx}/{len(phase_list)})'
                     )
-                app_inst.run_phase(phase, self.workspace)
+                app_inst.run_phase(self.name, phase, self.workspace)
                 if not disable_progress:
                     progress.update()
             app_inst.print_phase_times(self.name, self.filters.phases)

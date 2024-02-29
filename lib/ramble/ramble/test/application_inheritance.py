@@ -18,14 +18,28 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.executables['bar'].mpi
 
     assert 'test_wl' in app_inst.workloads
-    assert app_inst.workloads['test_wl']['executables'] == ['builtin::env_vars', 'foo']
+    assert app_inst.workloads['test_wl']['executables'] == ['foo']
     assert app_inst.workloads['test_wl']['inputs'] == ['input']
+
+    exec_graph = app_inst._get_executable_graph('test_wl')
+    assert exec_graph.get_node('foo') is not None
+    assert exec_graph.get_node('builtin::env_vars') is not None
+
     assert 'test_wl2' in app_inst.workloads
-    assert app_inst.workloads['test_wl2']['executables'] == ['builtin::env_vars', 'bar']
+    assert app_inst.workloads['test_wl2']['executables'] == ['bar']
     assert app_inst.workloads['test_wl2']['inputs'] == ['input']
+
+    exec_graph = app_inst._get_executable_graph('test_wl2')
+    assert exec_graph.get_node('bar') is not None
+    assert exec_graph.get_node('builtin::env_vars') is not None
+
     assert 'test_wl3' in app_inst.workloads
-    assert app_inst.workloads['test_wl3']['executables'] == ['builtin::env_vars', 'foo']
+    assert app_inst.workloads['test_wl3']['executables'] == ['foo']
     assert app_inst.workloads['test_wl3']['inputs'] == ['inherited_input']
+
+    exec_graph = app_inst._get_executable_graph('test_wl3')
+    assert exec_graph.get_node('foo') is not None
+    assert exec_graph.get_node('builtin::env_vars') is not None
 
     assert 'test_fom' in app_inst.figures_of_merit
     fom_conf = app_inst.figures_of_merit['test_fom']

@@ -35,9 +35,9 @@ class Openfoam(SpackApplication):
     required_package('openfoam-org')
 
     workload('motorbike', executables=['get_inputs', 'configure_mesh', 'surfaceFeatures',
-                                       'blockMesh', 'decomposePar', 'snappyHexMesh',
+                                       'blockMesh', 'decomposePar1', 'snappyHexMesh',
                                        'reconstructParMesh', 'renumberMesh', 'configure_simplefoam',
-                                       'decomposePar', 'patchSummary', 'checkMesh', 'potentialFoam',
+                                       'decomposePar2', 'patchSummary', 'checkMesh', 'potentialFoam',
                                        'simpleFoam'])
 
     workload_variable('input_path', default='$FOAM_TUTORIALS/incompressible/simpleFoam/motorBike',
@@ -170,7 +170,10 @@ class Openfoam(SpackApplication):
     executable('blockMesh', 'runApplication blockMesh',
                use_mpi=False)
 
-    executable('decomposePar', template=['rm log.decomposePar', 'runApplication decomposePar'],
+    executable('decomposePar1', template=['rm log.decomposePar', 'runApplication decomposePar'],
+               use_mpi=False)
+
+    executable('decomposePar2', template=['rm log.decomposePar', 'runApplication decomposePar'],
                use_mpi=False)
 
     executable('snappyHexMesh', 'runParallel snappyHexMesh {hex_flags}', use_mpi=False)

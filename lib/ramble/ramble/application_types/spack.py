@@ -45,7 +45,7 @@ class SpackApplication(ApplicationBase):
     _spec_keys = ['spack_spec', 'compiler_spec', 'compiler']
 
     register_phase('make_experiments', pipeline='setup',
-                   depends_on=['define_package_paths'])
+                   run_after=['define_package_paths'])
 
     def __init__(self, file_path):
         super().__init__(file_path)
@@ -78,7 +78,7 @@ class SpackApplication(ApplicationBase):
         return ''.join(out_str)
 
     register_phase('software_install_requested_compilers', pipeline='setup',
-                   depends_on=['software_create_env'])
+                   run_after=['software_create_env'])
 
     def _software_install_requested_compilers(self, workspace):
         """Install compilers an application uses"""
@@ -211,7 +211,7 @@ class SpackApplication(ApplicationBase):
             logger.die(e)
 
     register_phase('software_configure', pipeline='setup',
-                   depends_on=['software_create_env', 'software_install_requested_compilers'])
+                   run_after=['software_create_env', 'software_install_requested_compilers'])
 
     def _software_configure(self, workspace):
         """Concretize the spack environment for this experiment
@@ -246,7 +246,7 @@ class SpackApplication(ApplicationBase):
             logger.die(e)
 
     register_phase('software_install', pipeline='setup',
-                   depends_on=['software_configure'])
+                   run_after=['software_configure'])
 
     def _software_install(self, workspace):
         """Install application's software using spack"""
@@ -273,7 +273,7 @@ class SpackApplication(ApplicationBase):
             logger.die(e)
 
     register_phase('evaluate_requirements', pipeline='setup',
-                   depends_on=['software_install'])
+                   run_after=['software_install'])
 
     def _evaluate_requirements(self, workspace):
         """Evaluate all requirements for this experiment"""
@@ -286,7 +286,7 @@ class SpackApplication(ApplicationBase):
                 self.spack_runner.validate_command(**expanded_req)
 
     register_phase('define_package_paths', pipeline='setup',
-                   depends_on=['software_install', 'evaluate_requirements'])
+                   run_after=['software_install', 'evaluate_requirements'])
 
     def _define_package_paths(self, workspace):
         """Define variables containing the path to all spack packages
@@ -326,7 +326,7 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
 
-    register_phase('mirror_software', pipeline='mirror', depends_on=['software_create_env'])
+    register_phase('mirror_software', pipeline='mirror', run_after=['software_create_env'])
 
     def _mirror_software(self, workspace):
         """Mirror software source for this experiment using spack"""
@@ -388,7 +388,7 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
 
-    register_phase('push_to_spack_cache', pipeline='pushtocache', depends_on=[])
+    register_phase('push_to_spack_cache', pipeline='pushtocache', run_after=[])
 
     def _push_to_spack_cache(self, workspace):
 
@@ -449,9 +449,9 @@ class SpackApplication(ApplicationBase):
 
         super()._clean_hash_variables(workspace, variables)
 
-    register_builtin('spack_source', required=True)
-    register_builtin('spack_activate', required=True)
-    register_builtin('spack_deactivate', required=False)
+    register_builtin('spack_source', required=True, depends_on=['builtin::env_vars'])
+    register_builtin('spack_activate', required=True, depends_on=['builtin::spack_source'])
+    register_builtin('spack_deactivate', required=False, depends_on=['builtin::spack_source'])
 
     def spack_source(self):
         return self.spack_runner.generate_source_command()

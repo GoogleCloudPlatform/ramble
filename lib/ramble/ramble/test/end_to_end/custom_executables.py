@@ -66,8 +66,8 @@ ramble:
                 - baz
                 executable_injection:
                 - name: before_all
-                  order: before
                 - name: after_all
+                  order: after
                 - name: before_env_vars
                   order: before
                   relative_to: builtin::env_vars
