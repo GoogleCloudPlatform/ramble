@@ -74,6 +74,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.env">ramble.util.env module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.executable">ramble.util.executable module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.file_cache">ramble.util.file_cache module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.graph">ramble.util.graph module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.hashing">ramble.util.hashing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.install_cache">ramble.util.install_cache module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.lock">ramble.util.lock module</a></li>
@@ -100,6 +101,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.experiment_set">ramble.experiment_set module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.fetch_strategy">ramble.fetch_strategy module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.filters">ramble.filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.graphs">ramble.graphs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
@@ -468,6 +470,53 @@ reading.  You can use it like this:</p>
 <p>Returns a WriteTransaction context manager that opens a temporary file
 for writing.  Once the context manager finishes, if nothing went wrong,
 moves the file into place on top of the old file atomically.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ramble.util.graph">
+<span id="ramble-util-graph-module"></span><h2>ramble.util.graph module<a class="headerlink" href="#module-ramble.util.graph" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.util.graph.GraphNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.util.graph.</span></span><span class="sig-name descname"><span class="pre">GraphNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/graph.html#GraphNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.graph.GraphNode" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing a node of a graph, where the node can have an
+attribute attached to it.</p>
+<p>This allows nodes to be added into a graph, have the topological order of
+the graph returned, and be able to refer to the attribute of the original
+node easily.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.graph.GraphNode.order_after">
+<span class="sig-name descname"><span class="pre">order_after</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/graph.html#GraphNode.order_after"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.graph.GraphNode.order_after" title="Link to this definition"></a></dt>
+<dd><p>Adds information that this node should come after another node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – Key of node that should come before this node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.graph.GraphNode.order_before">
+<span class="sig-name descname"><span class="pre">order_before</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/graph.html#GraphNode.order_before"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.graph.GraphNode.order_before" title="Link to this definition"></a></dt>
+<dd><p>Adds information that this node should come before another node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – Key of node that should come after this node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.graph.GraphNode.set_attribute">
+<span class="sig-name descname"><span class="pre">set_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/graph.html#GraphNode.set_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.graph.GraphNode.set_attribute" title="Link to this definition"></a></dt>
+<dd><p>Sets the attribute of a graph node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attr</strong> – An arbitrary attribute to attach to this node.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1159,7 +1208,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 28, 2024.
+      <span class="lastupdated">Last updated on Feb 29, 2024.
       </span></p>
   </div>
 

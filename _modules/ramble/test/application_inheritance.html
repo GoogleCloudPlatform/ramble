@@ -115,14 +115,28 @@
     <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mpi</span>
 
     <span class="k">assert</span> <span class="s1">&#39;test_wl&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span>
-    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span>
+
+    <span class="n">exec_graph</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_get_executable_graph</span><span class="p">(</span><span class="s1">&#39;test_wl&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exec_graph</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">exec_graph</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
     <span class="k">assert</span> <span class="s1">&#39;test_wl2&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span>
-    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl2&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl2&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl2&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span>
+
+    <span class="n">exec_graph</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_get_executable_graph</span><span class="p">(</span><span class="s1">&#39;test_wl2&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exec_graph</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">exec_graph</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
     <span class="k">assert</span> <span class="s1">&#39;test_wl3&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span>
-    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl3&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl3&#39;</span><span class="p">][</span><span class="s1">&#39;executables&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl3&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;inherited_input&#39;</span><span class="p">]</span>
+
+    <span class="n">exec_graph</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_get_executable_graph</span><span class="p">(</span><span class="s1">&#39;test_wl3&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exec_graph</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">exec_graph</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="k">assert</span> <span class="s1">&#39;test_fom&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">figures_of_merit</span>
     <span class="n">fom_conf</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">figures_of_merit</span><span class="p">[</span><span class="s1">&#39;test_fom&#39;</span><span class="p">]</span>
@@ -161,7 +175,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 28, 2024.
+      <span class="lastupdated">Last updated on Feb 29, 2024.
       </span></p>
   </div>
 

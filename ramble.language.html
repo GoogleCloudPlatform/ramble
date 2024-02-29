@@ -88,6 +88,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.experiment_set">ramble.experiment_set module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.fetch_strategy">ramble.fetch_strategy module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.filters">ramble.filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.graphs">ramble.graphs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
@@ -215,7 +216,7 @@ file name.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.register_phase">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">register_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#register_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.register_phase" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">register_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#register_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.register_phase" title="Link to this definition"></a></dt>
 <dd><p>Register a phase</p>
 <p>Phases are portions of a pipeline that will execute when
 executing a full pipeline.</p>
@@ -226,7 +227,8 @@ instance of a phase will show up in the resulting dependency list for a phase.</
 <p>Args:
 - name: The name of the phase. Phases are functions named ‘_&lt;phase&gt;’.
 - pipeline: The name of the pipeline this phase should be registered into.
-- depends_on: A list of phase names this phase depends on</p>
+- run_before: A list of phase names this phase should run before
+- run_after: A list of phase names this phase should run after</p>
 </dd></dl>
 
 <dl class="py function">
@@ -615,7 +617,7 @@ which will control the logic of applying it.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.shared_language.register_builtin">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">register_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#register_builtin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.register_builtin" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">register_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#register_builtin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.register_builtin" title="Link to this definition"></a></dt>
 <dd><p>Register a builtin</p>
 <p>Builtins are methods that return lists of strings. These methods represent
 a way to write python code to generate executables for building up
@@ -719,7 +721,7 @@ in. Accepts globbing.</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 28, 2024.
+      <span class="lastupdated">Last updated on Feb 29, 2024.
       </span></p>
   </div>
 

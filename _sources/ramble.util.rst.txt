@@ -65,6 +65,14 @@ ramble.util.file\_cache module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.graph module
+------------------------
+
+.. automodule:: ramble.util.graph
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.hashing module
 --------------------------
 

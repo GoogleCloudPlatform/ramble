@@ -105,6 +105,14 @@ ramble.filters module
    :undoc-members:
    :show-inheritance:
 
+ramble.graphs module
+--------------------
+
+.. automodule:: ramble.graphs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.keywords module
 ----------------------
 

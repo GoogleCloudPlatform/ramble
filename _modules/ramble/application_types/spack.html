@@ -148,7 +148,7 @@
     <span class="n">_spec_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">]</span>
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">])</span>
+                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
@@ -181,7 +181,7 @@
         <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_str</span><span class="p">)</span>
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
+                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_software_install_requested_compilers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install compilers an application uses&quot;&quot;&quot;</span>
@@ -314,7 +314,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_configure&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">])</span>
+                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_software_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concretize the spack environment for this experiment</span>
@@ -349,7 +349,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_configure&#39;</span><span class="p">])</span>
+                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_configure&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_software_install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install application&#39;s software using spack&quot;&quot;&quot;</span>
@@ -376,7 +376,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">])</span>
+                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_evaluate_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate all requirements for this experiment&quot;&quot;&quot;</span>
@@ -389,7 +389,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">validate_command</span><span class="p">(</span><span class="o">**</span><span class="n">expanded_req</span><span class="p">)</span>
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">])</span>
+                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_define_package_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables containing the path to all spack packages</span>
@@ -429,7 +429,7 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;mirror_software&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;mirror_software&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_mirror_software</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mirror software source for this experiment using spack&quot;&quot;&quot;</span>
@@ -491,7 +491,7 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;push_to_spack_cache&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;pushtocache&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;push_to_spack_cache&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;pushtocache&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[])</span>
 
     <span class="k">def</span> <span class="nf">_push_to_spack_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
 
@@ -555,9 +555,9 @@
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_clean_hash_variables</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
 
-    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_source&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_activate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_deactivate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_source&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">])</span>
+    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_activate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;builtin::spack_source&#39;</span><span class="p">])</span>
+    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_deactivate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;builtin::spack_source&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="SpackApplication.spack_source">
 <a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_source">[docs]</a>
@@ -591,7 +591,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 28, 2024.
+      <span class="lastupdated">Last updated on Feb 29, 2024.
       </span></p>
   </div>
 

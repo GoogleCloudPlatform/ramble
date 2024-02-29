@@ -135,6 +135,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.ApplicationError"><code class="docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.ChainCycleDetectedError"><code class="docutils literal notranslate"><span class="pre">ChainCycleDetectedError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.application.ExecutableNameError"><code class="docutils literal notranslate"><span class="pre">ExecutableNameError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.FormattedExecutableError"><code class="docutils literal notranslate"><span class="pre">FormattedExecutableError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.InvalidChainError"><code class="docutils literal notranslate"><span class="pre">InvalidChainError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.application.InvalidPhaseError"><code class="docutils literal notranslate"><span class="pre">InvalidPhaseError</span></code></a></li>
@@ -494,6 +495,32 @@
 <li class="toctree-l3"><a class="reference internal" href="#ramble.filters.Filters"><code class="docutils literal notranslate"><span class="pre">Filters</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ramble.graphs">ramble.graphs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.graphs.AttributeGraph"><code class="docutils literal notranslate"><span class="pre">AttributeGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.AttributeGraph.add_node"><code class="docutils literal notranslate"><span class="pre">AttributeGraph.add_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.AttributeGraph.define_edges"><code class="docutils literal notranslate"><span class="pre">AttributeGraph.define_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.AttributeGraph.get_node"><code class="docutils literal notranslate"><span class="pre">AttributeGraph.get_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.AttributeGraph.node_type"><code class="docutils literal notranslate"><span class="pre">AttributeGraph.node_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.AttributeGraph.update_graph"><code class="docutils literal notranslate"><span class="pre">AttributeGraph.update_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.AttributeGraph.walk"><code class="docutils literal notranslate"><span class="pre">AttributeGraph.walk()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.graphs.ExecutableGraph"><code class="docutils literal notranslate"><span class="pre">ExecutableGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.ExecutableGraph.inject_executable"><code class="docutils literal notranslate"><span class="pre">ExecutableGraph.inject_executable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.ExecutableGraph.node_type"><code class="docutils literal notranslate"><span class="pre">ExecutableGraph.node_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.ExecutableGraph.supported_injection_orders"><code class="docutils literal notranslate"><span class="pre">ExecutableGraph.supported_injection_orders</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.graphs.GraphCycleError"><code class="docutils literal notranslate"><span class="pre">GraphCycleError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.graphs.GraphError"><code class="docutils literal notranslate"><span class="pre">GraphError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.graphs.PhaseGraph"><code class="docutils literal notranslate"><span class="pre">PhaseGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.PhaseGraph.add_node"><code class="docutils literal notranslate"><span class="pre">PhaseGraph.add_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.PhaseGraph.node_type"><code class="docutils literal notranslate"><span class="pre">PhaseGraph.node_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.graphs.PhaseGraph.update_graph"><code class="docutils literal notranslate"><span class="pre">PhaseGraph.update_graph()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.keywords">ramble.keywords module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.keywords.Keywords"><code class="docutils literal notranslate"><span class="pre">Keywords</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.keywords.Keywords.check_required_keys"><code class="docutils literal notranslate"><span class="pre">Keywords.check_required_keys()</span></code></a></li>
@@ -610,7 +637,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.applies_to_executable"><code class="docutils literal notranslate"><span class="pre">ModifierBase.applies_to_executable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.apply_executable_modifiers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.apply_executable_modifiers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.archive_patterns"><code class="docutils literal notranslate"><span class="pre">ModifierBase.archive_patterns</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.builtin_group"><code class="docutils literal notranslate"><span class="pre">ModifierBase.builtin_group</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.builtins"><code class="docutils literal notranslate"><span class="pre">ModifierBase.builtins</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.copy"><code class="docutils literal notranslate"><span class="pre">ModifierBase.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.default_compilers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.default_compilers</span></code></a></li>
@@ -1438,25 +1464,19 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.builtins"><code class="docutils literal notranslate"><span class="pre">BasicModifier.builtins</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.default_compilers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.env_var_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.environment_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.environment_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figures_of_merit</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modes"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_requirements</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.phase_definitions"><code class="docutils literal notranslate"><span class="pre">BasicModifier.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_vars"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_vars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">BasicModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workload_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workload_variables</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workloads"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1467,26 +1487,20 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.builtins"><code class="docutils literal notranslate"><span class="pre">SpackModifier.builtins</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.default_compilers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.default_compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.env_var_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.environment_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.environment_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figures_of_merit</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modes"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">SpackModifier.package_manager_requirements</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.phase_definitions"><code class="docutils literal notranslate"><span class="pre">SpackModifier.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">SpackModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.required_vars"><code class="docutils literal notranslate"><span class="pre">SpackModifier.required_vars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">SpackModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.uses_spack"><code class="docutils literal notranslate"><span class="pre">SpackModifier.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workload_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workload_variables</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workloads"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1793,6 +1807,15 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.file_cache.FileCache.read_transaction"><code class="docutils literal notranslate"><span class="pre">FileCache.read_transaction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.file_cache.FileCache.remove"><code class="docutils literal notranslate"><span class="pre">FileCache.remove()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.file_cache.FileCache.write_transaction"><code class="docutils literal notranslate"><span class="pre">FileCache.write_transaction()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.graph">ramble.util.graph module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.graph.GraphNode"><code class="docutils literal notranslate"><span class="pre">GraphNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.graph.GraphNode.order_after"><code class="docutils literal notranslate"><span class="pre">GraphNode.order_after()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.graph.GraphNode.order_before"><code class="docutils literal notranslate"><span class="pre">GraphNode.order_before()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.util.html#ramble.util.graph.GraphNode.set_attribute"><code class="docutils literal notranslate"><span class="pre">GraphNode.set_attribute()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2232,7 +2255,7 @@ application instance</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.builtins">
-<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'builtin::env_vars':</span> <span class="pre">{'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'env_vars',</span> <span class="pre">'required':</span> <span class="pre">True}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.builtins" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'builtin::env_vars':</span> <span class="pre">{'depends_on':</span> <span class="pre">[],</span> <span class="pre">'function':</span> <span class="pre">&lt;function</span> <span class="pre">ApplicationBase.env_vars&gt;,</span> <span class="pre">'injection_method':</span> <span class="pre">'prepend',</span> <span class="pre">'name':</span> <span class="pre">'env_vars',</span> <span class="pre">'required':</span> <span class="pre">True}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.builtins" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2407,7 +2430,7 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.phase_definitions">
-<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">['prepare_analysis'],</span> <span class="pre">'prepare_analysis':</span> <span class="pre">[],</span> <span class="pre">'write_status':</span> <span class="pre">['analyze_experiments']},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">[]},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">[]},</span> <span class="pre">'setup':</span> <span class="pre">{'get_inputs':</span> <span class="pre">[],</span> <span class="pre">'license_includes':</span> <span class="pre">[],</span> <span class="pre">'make_experiments':</span> <span class="pre">['get_inputs'],</span> <span class="pre">'write_inventory':</span> <span class="pre">['make_experiments'],</span> <span class="pre">'write_status':</span> <span class="pre">['make_experiments']}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.phase_definitions" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'analyze':</span> <span class="pre">{'analyze_experiments':</span> <span class="pre">analyze_experiments,</span> <span class="pre">'prepare_analysis':</span> <span class="pre">prepare_analysis,</span> <span class="pre">'write_status':</span> <span class="pre">write_status},</span> <span class="pre">'archive':</span> <span class="pre">{'archive_experiments':</span> <span class="pre">archive_experiments},</span> <span class="pre">'mirror':</span> <span class="pre">{'mirror_inputs':</span> <span class="pre">mirror_inputs},</span> <span class="pre">'setup':</span> <span class="pre">{'get_inputs':</span> <span class="pre">get_inputs,</span> <span class="pre">'license_includes':</span> <span class="pre">license_includes,</span> <span class="pre">'make_experiments':</span> <span class="pre">make_experiments,</span> <span class="pre">'write_inventory':</span> <span class="pre">write_inventory,</span> <span class="pre">'write_status':</span> <span class="pre">write_status}}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.phase_definitions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2476,7 +2499,7 @@ experiment_status.UNKNOWN</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.run_phase">
-<span class="sig-name descname"><span class="pre">run_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.run_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.run_phase" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.run_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.run_phase" title="Link to this definition"></a></dt>
 <dd><p>Run a phase, by getting its function pointer</p>
 </dd></dl>
 
@@ -2584,6 +2607,13 @@ experiment_status.UNKNOWN</p>
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">ChainCycleDetectedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ChainCycleDetectedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ChainCycleDetectedError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#ramble.application.ApplicationError" title="ramble.application.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a></p>
 <p>Exception raised when a cycle is detected in a defined experiment chain</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.application.ExecutableNameError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.application.</span></span><span class="sig-name descname"><span class="pre">ExecutableNameError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ExecutableNameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ExecutableNameError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.error.RambleError" title="ramble.error.RambleError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RambleError</span></code></a></p>
+<p>Exception raised when a name collision in executables happens</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -5024,6 +5054,205 @@ file.</p>
 </dd></dl>
 
 </section>
+<section id="module-ramble.graphs">
+<span id="ramble-graphs-module"></span><h2>ramble.graphs module<a class="headerlink" href="#module-ramble.graphs" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.graphs.</span></span><span class="sig-name descname"><span class="pre">AttributeGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#AttributeGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.AttributeGraph" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph.add_node">
+<span class="sig-name descname"><span class="pre">add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#AttributeGraph.add_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.AttributeGraph.add_node" title="Link to this definition"></a></dt>
+<dd><p>Add a node to the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>GraphNode</em>) – Node to add into graph</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph.define_edges">
+<span class="sig-name descname"><span class="pre">define_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#AttributeGraph.define_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.AttributeGraph.define_edges" title="Link to this definition"></a></dt>
+<dd><p>Define graph edges</p>
+<p>Process dependencies, and internal orderings (inside the node object)
+to define new graph edges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>GraphNode</em>) – Node to inject or modify</p></li>
+<li><p><strong>dep_nodes</strong> (<em>list</em><em>(</em><em>GraphNode</em><em>)</em>) – List of nodes that are dependencies</p></li>
+<li><p><strong>internal_order</strong> (<em>Boolean</em>) – True to process internal dependencies,
+False to skip</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph.get_node">
+<span class="sig-name descname"><span class="pre">get_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#AttributeGraph.get_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.AttributeGraph.get_node" title="Link to this definition"></a></dt>
+<dd><p>Given a key, return the node containing this key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – Name of key to find in the graph</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Node representing the key requested. Returns None if</dt><dd><p>the key isn’t found.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(GraphNode)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph.node_type">
+<span class="sig-name descname"><span class="pre">node_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'object'</span></em><a class="headerlink" href="#ramble.graphs.AttributeGraph.node_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph.update_graph">
+<span class="sig-name descname"><span class="pre">update_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#AttributeGraph.update_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.AttributeGraph.update_graph" title="Link to this definition"></a></dt>
+<dd><p>Update the graph with a new node and / or new dependencies.</p>
+<p>Given a node, and list of dependencies, define new edges in the
+graph. If the node is new, also construct a new phase node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>GraphNode</em>) – Node to inject or modify</p></li>
+<li><p><strong>dep_nodes</strong> (<em>list</em><em>(</em><em>GraphNode</em><em>)</em>) – List of nodes that are dependencies</p></li>
+<li><p><strong>internal_order</strong> (<em>Boolean</em>) – True to process internal dependencies,
+False to skip</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.AttributeGraph.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#AttributeGraph.walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.AttributeGraph.walk" title="Link to this definition"></a></dt>
+<dd><p>Walk the graph in topological ordering and yield each node.</p>
+<p>Construct a topological ordering of the current graph, walk it, and
+yield each node one by one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>node (GraphNode)</em> – Each node in the graph</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.graphs.ExecutableGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.graphs.</span></span><span class="sig-name descname"><span class="pre">ExecutableGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exec_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtin_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#ExecutableGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.ExecutableGraph" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.graphs.AttributeGraph" title="ramble.graphs.AttributeGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeGraph</span></code></a></p>
+<p>Graph that handles command executables and builtins</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.ExecutableGraph.inject_executable">
+<span class="sig-name descname"><span class="pre">inject_executable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exec_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injection_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#ExecutableGraph.inject_executable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.ExecutableGraph.inject_executable" title="Link to this definition"></a></dt>
+<dd><p>Inject an executable into the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exec_name</strong> (<em>str</em>) – Name of executable to inject</p></li>
+<li><p><strong>injection_order</strong> (<em>str</em>) – Order for injection. Can be ‘before’ or ‘after’</p></li>
+<li><p><strong>relative</strong> (<em>str</em>) – Name of executable to inject relative to. Can be
+None to inject relative to the whole set of executables.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.graphs.ExecutableGraph.node_type">
+<span class="sig-name descname"><span class="pre">node_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'command</span> <span class="pre">executable'</span></em><a class="headerlink" href="#ramble.graphs.ExecutableGraph.node_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.graphs.ExecutableGraph.supported_injection_orders">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_injection_orders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ramble.graphs.ExecutableGraph.supported_injection_orders" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.graphs.ExecutableGraph.supported_injection_orders.after">
+<span class="sig-name descname"><span class="pre">after</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ramble.graphs.ExecutableGraph.supported_injection_orders.after" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.graphs.ExecutableGraph.supported_injection_orders.before">
+<span class="sig-name descname"><span class="pre">before</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ramble.graphs.ExecutableGraph.supported_injection_orders.before" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.graphs.GraphCycleError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.graphs.</span></span><span class="sig-name descname"><span class="pre">GraphCycleError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#GraphCycleError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.GraphCycleError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.graphs.GraphError" title="ramble.graphs.GraphError"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphError</span></code></a></p>
+<p>Exception raised when a cycle is detected in a graph</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="ramble.graphs.GraphError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.graphs.</span></span><span class="sig-name descname"><span class="pre">GraphError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#GraphError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.GraphError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.error.RambleError" title="ramble.error.RambleError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RambleError</span></code></a></p>
+<p>Exception raised with errors in a graph type</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.graphs.PhaseGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.graphs.</span></span><span class="sig-name descname"><span class="pre">PhaseGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase_definitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#PhaseGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.PhaseGraph" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.graphs.AttributeGraph" title="ramble.graphs.AttributeGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeGraph</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.PhaseGraph.add_node">
+<span class="sig-name descname"><span class="pre">add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#PhaseGraph.add_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.PhaseGraph.add_node" title="Link to this definition"></a></dt>
+<dd><p>Add a new phase node to the graph</p>
+<p>Extract the phase function from the object instance, and inject a new node into the graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>GraphNode</em>) – Phase node to add into graph</p></li>
+<li><p><strong>obj_inst</strong> (<em>Object</em>) – Object that owns the phase</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.graphs.PhaseGraph.node_type">
+<span class="sig-name descname"><span class="pre">node_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'phase'</span></em><a class="headerlink" href="#ramble.graphs.PhaseGraph.node_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.graphs.PhaseGraph.update_graph">
+<span class="sig-name descname"><span class="pre">update_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_inst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/graphs.html#PhaseGraph.update_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.graphs.PhaseGraph.update_graph" title="Link to this definition"></a></dt>
+<dd><p>Update the graph with a new phase and / or new dependencies.</p>
+<p>Given a phase name, and list of dependencies, define new edges in the
+graph. If the phase is new, also construct a new phase node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phase_name</strong> (<em>str</em>) – Name of the phase to inject or modify</p></li>
+<li><p><strong>dependencies</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – List of phase names to inject dependencies on</p></li>
+<li><p><strong>internal_order</strong> (<em>Boolean</em>) – True to process internal dependencies,
+False to skip</p></li>
+<li><p><strong>obj_inst</strong> (<em>object</em>) – Application or modifier instance to extract phase function from</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-ramble.keywords">
 <span id="ramble-keywords-module"></span><h2>ramble.keywords module<a class="headerlink" href="#module-ramble.keywords" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -5670,11 +5899,6 @@ which to push resources.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.archive_patterns">
 <span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.archive_patterns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.builtin_group">
-<span class="sig-name descname"><span class="pre">builtin_group</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'modifier'</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.builtin_group" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -7898,7 +8122,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 28, 2024.
+      <span class="lastupdated">Last updated on Feb 29, 2024.
       </span></p>
   </div>
 

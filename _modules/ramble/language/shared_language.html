@@ -346,7 +346,7 @@
 <div class="viewcode-block" id="register_builtin">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.register_builtin">[docs]</a>
 <span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;builtins&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">register_builtin</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">injection_method</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">register_builtin</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">injection_method</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a builtin</span>
 
 <span class="sd">    Builtins are methods that return lists of strings. These methods represent</span>
@@ -392,7 +392,7 @@
     <span class="k">def</span> <span class="nf">_store_builtin</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">injection_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_injection_methods</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Object </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> has an invalid &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Object </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> defines builtin </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> with an invalid &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;injection method of </span><span class="si">{</span><span class="n">injection_method</span><span class="si">}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;Valid methods are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">supported_injection_methods</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="p">)</span>
@@ -401,7 +401,9 @@
 
         <span class="n">obj</span><span class="o">.</span><span class="n">builtins</span><span class="p">[</span><span class="n">builtin_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
                                       <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="n">required</span><span class="p">,</span>
-                                      <span class="s1">&#39;injection_method&#39;</span><span class="p">:</span> <span class="n">injection_method</span><span class="p">}</span>
+                                      <span class="s1">&#39;injection_method&#39;</span><span class="p">:</span> <span class="n">injection_method</span><span class="p">,</span>
+                                      <span class="s1">&#39;depends_on&#39;</span><span class="p">:</span> <span class="n">depends_on</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                                      <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">)}</span>
     <span class="k">return</span> <span class="n">_store_builtin</span></div>
 
 
@@ -452,7 +454,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 28, 2024.
+      <span class="lastupdated">Last updated on Feb 29, 2024.
       </span></p>
   </div>
 
