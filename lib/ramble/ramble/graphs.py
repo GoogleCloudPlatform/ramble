@@ -29,7 +29,6 @@ class AttributeGraph(object):
     def _make_editable(self):
         """Make this graph editable, and remove any defined ordering"""
         if self._prepared:
-            del self._sorted
             self._sorted = None
             self._prepared = False
 
@@ -372,25 +371,6 @@ class ExecutableGraph(AttributeGraph):
                            f'attempting to inject executable "{exec_name}" '
                            f'relative to a non existing executable "{relative}".')
 
-        if relative is not None and relative not in self.node_definitions:
-            relative_node = self.node_definitions[relative]
-            if relative_node not in cur_exec_order:
-                logger.die('In experiment '
-                           f'"{exp_name}" '
-                           f'attempting to inject executable "{exec_name}" '
-                           f'relative to a non existing executable "{relative}".')
-
-        # If relative is none, determine head and tail nodes to inject properly
-        if relative is None:
-            head_node = cur_exec_order[0]
-            tail_node = cur_exec_order[-1]
-
-            super().update_graph(exec_node)
-            if order == self.supported_injection_orders.before:
-                super().update_graph(head_node, [exec_node])
-            elif order == self.supported_injection_orders.after:
-                super().update_graph(exec_node, [tail_node])
-        else:
             relative_node = self.node_definitions[relative]
             order_index = cur_exec_order.index(relative_node)
 
@@ -402,6 +382,16 @@ class ExecutableGraph(AttributeGraph):
                 super().update_graph(exec_node, [relative_node])
                 if order_index < len(cur_exec_order) - 1:
                     super().update_graph(cur_exec_order[order_index + 1], [exec_node])
+        else:
+            # If relative is none, determine head and tail nodes to inject properly
+            head_node = cur_exec_order[0]
+            tail_node = cur_exec_order[-1]
+
+            super().update_graph(exec_node)
+            if order == self.supported_injection_orders.before:
+                super().update_graph(head_node, [exec_node])
+            elif order == self.supported_injection_orders.after:
+                super().update_graph(exec_node, [tail_node])
 
         # If exec_name is a builtin, inject edges to it's dependencies
         if exec_name in self._builtin_dependencies:
