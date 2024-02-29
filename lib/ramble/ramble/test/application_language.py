@@ -9,6 +9,7 @@
 
 import pytest
 import enum
+import deprecation
 
 from ramble.appkit import *  # noqa
 
@@ -212,6 +213,7 @@ def add_input_file(app_inst, input_num=1, func_type=func_types.directive):
 
 
 # TODO: can this be dried with the modifier language add_compiler?
+@deprecation.fail_if_not_removed
 def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     spec_name = 'Compiler%spec_num'
     spec_spack_spec = f'compiler_base@{spec_num}.0 +var1 ~var2'
@@ -224,11 +226,15 @@ def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     }
 
     if func_type == func_types.directive:
-        define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+        default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
                          compiler_spec=spec_compiler_spec)(app_inst)
+        define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                        compiler_spec=spec_compiler_spec)(app_inst)
     elif func_type == func_types.method:
-        app_inst.define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+        app_inst.default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
                                   compiler_spec=spec_compiler_spec)
+        app_inst.define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                                 compiler_spec=spec_compiler_spec)
     else:
         assert False
 
@@ -242,11 +248,11 @@ def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     }
 
     if func_type == func_types.directive:
-        define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
-                         compiler_spec=spec_compiler_spec)(app_inst)
+        define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: f405
+                        compiler_spec=spec_compiler_spec)(app_inst)
     elif func_type == func_types.method:
         app_inst.define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
-                                  compiler_spec=spec_compiler_spec)
+                                 compiler_spec=spec_compiler_spec)
     else:
         assert False
 

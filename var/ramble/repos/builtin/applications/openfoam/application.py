@@ -19,7 +19,7 @@ class Openfoam(SpackApplication):
 
     tags('cfd', 'fluid', 'dynamics')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('ompi412',
                   spack_spec='openmpi@4.1.2 +legacylaunchers +cxx',

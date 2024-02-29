@@ -18,7 +18,7 @@ class Ior(SpackApplication):
 
     tags('synthetic-benchmarks', 'IO')
 
-    default_compiler('gcc', spack_spec='gcc')
+    define_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
     software_spec('ior', spack_spec='ior', compiler='gcc')
 

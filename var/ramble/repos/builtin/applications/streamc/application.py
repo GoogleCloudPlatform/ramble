@@ -19,7 +19,7 @@ class Streamc(SpackApplication):
 
     tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0')
+    define_compiler('gcc12', spack_spec='gcc@12.2.0')
 
     software_spec('streamc',
                   spack_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
