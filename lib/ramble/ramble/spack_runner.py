@@ -65,7 +65,8 @@ class SpackRunner(object):
                              'mirrors.yaml', 'repos.yaml',
                              'packages.yaml', 'modules.yaml',
                              'config.yaml', 'upstreams.yaml',
-                             'bootstrap.yaml', 'spack.yaml']
+                             'bootstrap.yaml', 'spack.yaml',
+                             'spack_includes.yaml']
 
     def __init__(self, shell='bash', dry_run=False):
         """
