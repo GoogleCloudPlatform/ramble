@@ -45,7 +45,7 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, 'modes')
     assert hasattr(test_mod, 'variable_modifications')
     assert hasattr(test_mod, 'software_specs')
-    assert hasattr(test_mod, 'default_compilers')
+    assert hasattr(test_mod, 'compilers')
     assert hasattr(test_mod, 'required_packages')
     assert hasattr(test_mod, 'success_criteria')
     assert hasattr(test_mod, 'builtins')
@@ -233,7 +233,7 @@ def test_software_spec_directive(mod_class, func_type):
                 assert test_def[attr] == mod_inst.software_specs[spec_name][attr]
 
 
-def add_default_compiler(mod_inst, spec_num=1, func_type=func_types.directive):
+def add_compiler(mod_inst, spec_num=1, func_type=func_types.directive):
     spec_name = f'CompilerPackage{spec_num}'
     spack_spec = 'compiler@1.1 target=x86_64'
     compiler_spec = 'compiler@1.1'
@@ -247,9 +247,9 @@ def add_default_compiler(mod_inst, spec_num=1, func_type=func_types.directive):
     }
 
     if func_type == func_types.directive:
-        default_compiler(spec_name, spack_spec, compiler_spec, compiler)(mod_inst)
+        define_compiler(spec_name, spack_spec, compiler_spec, compiler)(mod_inst)
     elif func_type == func_types.method:
-        mod_inst.default_compiler(spec_name, spack_spec, compiler_spec, compiler)
+        mod_inst.define_compiler(spec_name, spack_spec, compiler_spec, compiler)
     else:
         assert False
 
@@ -258,24 +258,24 @@ def add_default_compiler(mod_inst, spec_num=1, func_type=func_types.directive):
 
 @pytest.mark.parametrize('func_type', func_types)
 @pytest.mark.parametrize('mod_class', mod_types)
-def test_default_compiler_directive(mod_class, func_type):
+def test_define_compiler_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
     mod_inst = test_class('/not/a/path')
     test_defs = []
-    test_defs.append(add_default_compiler(mod_inst, func_type=func_type).copy())
+    test_defs.append(add_compiler(mod_inst, func_type=func_type).copy())
 
     expected_attrs = ['spack_spec', 'compiler_spec', 'compiler']
 
     if mod_inst.uses_spack:
-        assert hasattr(mod_inst, 'default_compilers')
+        assert hasattr(mod_inst, 'compilers')
 
         for test_def in test_defs:
             spec_name = test_def['name']
 
-            assert spec_name in mod_inst.default_compilers
+            assert spec_name in mod_inst.compilers
             for attr in expected_attrs:
-                assert attr in mod_inst.default_compilers[spec_name]
-                assert test_def[attr] == mod_inst.default_compilers[spec_name][attr]
+                assert attr in mod_inst.compilers[spec_name]
+                assert test_def[attr] == mod_inst.compilers[spec_name][attr]
 
 
 def add_required_package(mod_inst, pkg_num=1, func_type=func_types.directive):

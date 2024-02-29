@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import deprecation
+
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
@@ -107,23 +109,42 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
     return _execute_figure_of_merit
 
 
-@shared_directive('default_compilers')
+@shared_directive('compilers')
+@deprecation.deprecated(deprecated_in="(0, 4, 0)", removed_in="(0, 5, 0)",
+                        current_version=str(ramble.ramble_version_info),
+                        details="Use the define_compiler directive instead")
 def default_compiler(name, spack_spec, compiler_spec=None, compiler=None):
-    """Defines the default compiler that will be used with this object
+    """Deprecated: See `define_compiler` instead"""
 
-    Adds a new compiler spec to this object. Software specs should
-    reference a compiler that has been added.
-    """
+    logger.warn('Use of deprecated directive `default_compiler`')
 
     def _execute_default_compiler(obj):
         if hasattr(obj, 'uses_spack') and getattr(obj, 'uses_spack'):
-            obj.default_compilers[name] = {
+            obj.compilers[name] = {
                 'spack_spec': spack_spec,
                 'compiler_spec': compiler_spec,
                 'compiler': compiler
             }
 
     return _execute_default_compiler
+
+@shared_directive('compilers')
+def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
+    """Defines the compiler that will be used with this object
+
+    Adds a new compiler spec to this object. Software specs should
+    reference a compiler that has been added.
+    """
+
+    def _execute_define_compiler(obj):
+        if hasattr(obj, 'uses_spack') and getattr(obj, 'uses_spack'):
+            obj.compilers[name] = {
+                'spack_spec': spack_spec,
+                'compiler_spec': compiler_spec,
+                'compiler': compiler
+            }
+
+    return _execute_define_compiler
 
 
 @shared_directive('software_specs')

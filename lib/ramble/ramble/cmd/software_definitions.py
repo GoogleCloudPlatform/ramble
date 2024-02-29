@@ -60,7 +60,7 @@ def collect_definitions():
 
     The maps are global to this module, and reused in other internal methods.
     """
-    top_level_attrs = ['default_compilers', 'software_specs']
+    top_level_attrs = ['compilers', 'software_specs']
 
     types_to_print = [
         ramble.repository.ObjectTypes.applications

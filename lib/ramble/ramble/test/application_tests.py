@@ -26,7 +26,7 @@ def test_app_features(mutable_mock_apps_repo, app):
     assert hasattr(app_inst, 'executables')
     assert hasattr(app_inst, 'figures_of_merit')
     assert hasattr(app_inst, 'inputs')
-    assert hasattr(app_inst, 'default_compilers')
+    assert hasattr(app_inst, 'compilers')
     assert hasattr(app_inst, 'software_specs')
     assert hasattr(app_inst, 'required_packages')
     assert hasattr(app_inst, 'workload_variables')
