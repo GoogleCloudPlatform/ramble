@@ -73,7 +73,7 @@ class Lulesh(SpackApplication):
                     fom_regex=r'\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
                     group_name='iterations', units='')
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         """
         LULESH requires the number of ranks to be a cube root of an integer.
 
