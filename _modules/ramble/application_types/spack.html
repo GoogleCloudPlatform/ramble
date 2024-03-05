@@ -104,8 +104,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">six</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">register_phase</span>
-<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">register_builtin</span><span class="p">,</span> <span class="n">register_phase</span>
 <span class="kn">from</span> <span class="nn">ramble.application</span> <span class="kn">import</span> <span class="n">ApplicationBase</span><span class="p">,</span> <span class="n">ApplicationError</span>
 <span class="kn">import</span> <span class="nn">ramble.spack_runner</span>
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
@@ -183,7 +182,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
                    <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_software_install_requested_compilers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_install_requested_compilers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install compilers an application uses&quot;&quot;&quot;</span>
         <span class="c1"># See if we cached this already, and if so return</span>
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
@@ -235,7 +234,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">)</span>
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_software_create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the spack environment for this experiment</span>
 
 <span class="sd">        Extract all specs this experiment uses, and write the spack environment</span>
@@ -316,7 +315,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_configure&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
                    <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_software_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concretize the spack environment for this experiment</span>
 
 <span class="sd">        Perform spack&#39;s concretize step on the software environment generated</span>
@@ -351,7 +350,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
                    <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_configure&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_software_install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_software_install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install application&#39;s software using spack&quot;&quot;&quot;</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
@@ -378,7 +377,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
                    <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_evaluate_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_evaluate_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate all requirements for this experiment&quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
@@ -391,7 +390,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
                    <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_define_package_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_define_package_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables containing the path to all spack packages</span>
 
 <span class="sd">        For every spack package defined within an application context, define</span>
@@ -431,7 +430,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;mirror_software&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_mirror_software</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_mirror_software</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mirror software source for this experiment using spack&quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">re</span>
 
@@ -493,7 +492,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;push_to_spack_cache&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;pushtocache&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[])</span>
 
-    <span class="k">def</span> <span class="nf">_push_to_spack_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_push_to_spack_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
         <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;push-to-cache&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
@@ -591,7 +590,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 29, 2024.
+      <span class="lastupdated">Last updated on Mar 05, 2024.
       </span></p>
   </div>
 

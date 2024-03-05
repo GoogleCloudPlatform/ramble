@@ -408,6 +408,81 @@
 
 
 
+<div class="viewcode-block" id="register_phase">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.register_phase">[docs]</a>
+<span class="nd">@shared_directive</span><span class="p">(</span><span class="s1">&#39;phase_definitions&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">register_phase</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_before</span><span class="o">=</span><span class="p">[],</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a phase</span>
+
+<span class="sd">    Phases are portions of a pipeline that will execute when</span>
+<span class="sd">    executing a full pipeline.</span>
+
+<span class="sd">    Registering a phase allows an object to know what the phases</span>
+<span class="sd">    dependencies are, to ensure the execution order is correct.</span>
+
+<span class="sd">    If called multiple times, the dependencies are combined together. Only one</span>
+<span class="sd">    instance of a phase will show up in the resulting dependency list for a phase.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - name: The name of the phase. Phases are functions named &#39;_&lt;phase&gt;&#39;.</span>
+<span class="sd">    - pipeline: The name of the pipeline this phase should be registered into.</span>
+<span class="sd">    - run_before: A list of phase names this phase should run before</span>
+<span class="sd">    - run_after: A list of phase names this phase should run after</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_register_phase</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">ramble.util.graph</span>
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">_pipelines</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveError</span><span class="p">(</span>
+                <span class="s1">&#39;Directive register_phase was &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;given an invalid pipeline &quot;</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;Available pipelines are: &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">_pipelines</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_before</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveError</span><span class="p">(</span>
+                <span class="s1">&#39;Directive register_phase was &#39;</span>
+                <span class="s1">&#39;given an invalid type for &#39;</span>
+                <span class="s1">&#39;the run_before attribute in object &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_after</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveError</span><span class="p">(</span>
+                <span class="s1">&#39;Directive register_phase was &#39;</span>
+                <span class="s1">&#39;given an invalid type for &#39;</span>
+                <span class="s1">&#39;the run_after attribute in object &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_base</span><span class="o">.</span><span class="n">DirectiveError</span><span class="p">(</span>
+                <span class="s1">&#39;Directive register_phase was &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;given an undefined phase </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;in object </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]:</span>
+            <span class="n">phase_node</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">phase_node</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">GraphNode</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">before</span> <span class="ow">in</span> <span class="n">run_before</span><span class="p">:</span>
+            <span class="n">phase_node</span><span class="o">.</span><span class="n">order_before</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">after</span> <span class="ow">in</span> <span class="n">run_after</span><span class="p">:</span>
+            <span class="n">phase_node</span><span class="o">.</span><span class="n">order_after</span><span class="p">(</span><span class="n">after</span><span class="p">)</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">phase_node</span>
+
+    <span class="k">return</span> <span class="n">_execute_register_phase</span></div>
+
+
+
 <div class="viewcode-block" id="maintainers">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.shared_language.maintainers">[docs]</a>
 <span class="nd">@shared_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
@@ -454,7 +529,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 29, 2024.
+      <span class="lastupdated">Last updated on Mar 05, 2024.
       </span></p>
   </div>
 

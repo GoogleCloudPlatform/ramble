@@ -144,12 +144,13 @@
 
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
-<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span><span class="p">,</span> <span class="n">register_phase</span>
-<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">SharedMeta</span><span class="p">,</span> <span class="n">register_builtin</span>
+<span class="kn">from</span> <span class="nn">ramble.language.application_language</span> <span class="kn">import</span> <span class="n">ApplicationMeta</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">SharedMeta</span><span class="p">,</span> <span class="n">register_builtin</span><span class="p">,</span> <span class="n">register_phase</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="n">experiment_status</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;experiment_status&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;UNKNOWN&#39;</span><span class="p">,</span> <span class="s1">&#39;SETUP&#39;</span><span class="p">,</span> <span class="s1">&#39;SUCCESS&#39;</span><span class="p">,</span> <span class="s1">&#39;FAILED&#39;</span><span class="p">])</span>
+<span class="n">experiment_status</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;experiment_status&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;UNKNOWN&#39;</span><span class="p">,</span> <span class="s1">&#39;SETUP&#39;</span><span class="p">,</span> <span class="s1">&#39;RUNNING&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;COMPLETE&#39;</span><span class="p">,</span> <span class="s1">&#39;SUCCESS&#39;</span><span class="p">,</span> <span class="s1">&#39;FAILED&#39;</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="ApplicationBase">
@@ -268,7 +269,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">graphs</span><span class="o">.</span><span class="n">PhaseGraph</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">],</span>
                 <span class="bp">self</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+                <span class="c1"># Define phase nodes</span>
+                <span class="k">for</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phase_node</span> <span class="ow">in</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">all_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+                        <span class="n">phase_node</span><span class="p">,</span> <span class="n">obj_inst</span><span class="o">=</span><span class="n">mod_inst</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Define phase edges</span>
+                <span class="k">for</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phase_node</span> <span class="ow">in</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">all_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">define_edges</span><span class="p">(</span>
+                        <span class="n">phase_node</span><span class="p">,</span> <span class="n">internal_order</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_long_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -478,7 +492,6 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.get_pipeline_phases">[docs]</a>
     <span class="k">def</span> <span class="nf">get_pipeline_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">phase_filters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_modifier_instances</span><span class="p">()</span>
-        <span class="c1">#  self._inject_required_modifier_builtins()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_phase_order</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipelines</span><span class="p">:</span>
@@ -614,9 +627,9 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Executing phase </span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
-            <span class="n">mod_inst</span><span class="o">.</span><span class="n">run_phase_hook</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="n">mod_inst</span><span class="o">.</span><span class="n">run_phase_hook</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
         <span class="n">phase_func</span> <span class="o">=</span> <span class="n">phase_node</span><span class="o">.</span><span class="n">attribute</span>
-        <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
+        <span class="n">phase_func</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span></div>
 
 
@@ -805,6 +818,14 @@
             <span class="n">exp_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">exp_inst</span><span class="p">:</span>
                 <span class="n">exp_inst</span><span class="o">.</span><span class="n">chain_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_order</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ApplicationBase.define_variable">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.define_variable">[docs]</a>
+    <span class="k">def</span> <span class="nf">define_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">var_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_value</span>
+        <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
+            <span class="n">mod_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_value</span></div>
 
 
 <div class="viewcode-block" id="ApplicationBase.build_modifier_instances">
@@ -1161,7 +1182,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;mirror_inputs&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_mirror_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_mirror_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mirror application inputs</span>
 
 <span class="sd">        Perform mirroring of inputs within this application class.</span>
@@ -1180,7 +1201,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;get_inputs&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Download application inputs</span>
 
 <span class="sd">        Download application inputs into the proper directory within the workspace.</span>
@@ -1232,7 +1253,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;license_includes&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_license_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_license_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Writing License Includes&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_license_path</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
 
@@ -1259,7 +1280,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;get_inputs&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_make_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_make_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create experiment directories</span>
 
 <span class="sd">        Create the experiment this application encapsulates. This includes</span>
@@ -1398,7 +1419,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;write_inventory&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_write_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and write an inventory of an experiment</span>
 
 <span class="sd">        Write an inventory file describing all of the contents of this</span>
@@ -1413,7 +1434,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;archive_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;archive&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_archive_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_archive_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Archive an experiment directory</span>
 
 <span class="sd">        Perform the archiving action on an experiment.</span>
@@ -1462,7 +1483,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;prepare_analysis&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;analyze&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_prepare_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_prepare_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepapre experiment for analysis extraction</span>
 
 <span class="sd">        This function performs any actions that are necessary before the</span>
@@ -1475,7 +1496,7 @@
 
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;analyze&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prepare_analysis&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_analyze_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_analyze_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform experiment analysis.</span>
 
 <span class="sd">        This method will build up the fom_values dictionary. Its structure is:</span>
@@ -1963,7 +1984,7 @@
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;write_status&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;analyze&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;analyze_experiments&#39;</span><span class="p">])</span>
     <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;write_status&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_write_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Phase to write an experiment&#39;s ramble_status.json file&quot;&quot;&quot;</span>
 
         <span class="n">status_data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2113,7 +2134,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Feb 29, 2024.
+      <span class="lastupdated">Last updated on Mar 05, 2024.
       </span></p>
   </div>
 
