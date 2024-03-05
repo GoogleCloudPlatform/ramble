@@ -52,6 +52,8 @@ class Pipeline(object):
         self.force_inventory = False
         self.require_inventory = False
         self.action_string = 'Operating on'
+        self.suppress_per_experiment_prints = False
+        self.suppress_run_header = False
 
         dt = self.workspace.date_string()
         log_file = f'{self.name}.{dt}.out'
@@ -133,7 +135,12 @@ class Pipeline(object):
 
     def _execute(self):
         """Hook for executing the pipeline"""
+
         num_exps = self._experiment_set.num_filtered_experiments(self.filters)
+
+        if self.suppress_per_experiment_prints and not self.suppress_run_header:
+            logger.all_msg(f'  Log files for experiments are stored in: {self.log_dir}')
+
         count = 1
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             exp_log_path = app_inst.experiment_log_file(self.log_dir)
@@ -141,16 +148,18 @@ class Pipeline(object):
             experiment_index_value = \
                 app_inst.expander.expand_var_name(app_inst.keywords.experiment_index)
 
-            logger.all_msg(f'Experiment #{idx} ({count}/{num_exps}):')
-            logger.all_msg(f'    name: {exp}')
-            logger.all_msg(f'    root experiment_index: {experiment_index_value}')
-            logger.all_msg(f'    log file: {exp_log_path}')
+            if not self.suppress_per_experiment_prints:
+                logger.all_msg(f'Experiment #{idx} ({count}/{num_exps}):')
+                logger.all_msg(f'    name: {exp}')
+                logger.all_msg(f'    root experiment_index: {experiment_index_value}')
+                logger.all_msg(f'    log file: {exp_log_path}')
 
             logger.add_log(exp_log_path)
 
             phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
 
-            disable_progress = ramble.config.get('config:disable_progress_bar', False)
+            disable_progress = ramble.config.get('config:disable_progress_bar', False) \
+                or self.suppress_per_experiment_prints
             if not disable_progress:
                 progress = tqdm.tqdm(total=len(phase_list),
                                      leave=True,
@@ -170,7 +179,8 @@ class Pipeline(object):
                 progress.close()
 
             logger.remove_log()
-            logger.all_msg(f'  Returning to log file: {logger.active_log()}')
+            if not self.suppress_per_experiment_prints:
+                logger.all_msg(f'  Returning to log file: {logger.active_log()}')
             count += 1
 
     def _complete(self):
@@ -179,17 +189,18 @@ class Pipeline(object):
 
     def run(self):
         """Run the full pipeline"""
-        logger.all_msg('Streaming details to log:')
-        logger.all_msg(f'  {self.log_path}')
-        if self.workspace.dry_run:
-            cprint('@*g{      -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN --}')
+        if not self.suppress_run_header:
+            logger.all_msg('Streaming details to log:')
+            logger.all_msg(f'  {self.log_path}')
+            if self.workspace.dry_run:
+                cprint('@*g{      -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN -- DRY-RUN --}')
 
-        experiment_count = self._experiment_set.num_filtered_experiments(self.filters)
-        experiment_total = self._experiment_set.num_experiments()
-        logger.all_msg(
-            f'  {self.action_string} {experiment_count} out of '
-            f'{experiment_total} experiments:'
-        )
+            experiment_count = self._experiment_set.num_filtered_experiments(self.filters)
+            experiment_total = self._experiment_set.num_experiments()
+            logger.all_msg(
+                f'  {self.action_string} {experiment_count} out of '
+                f'{experiment_total} experiments:'
+            )
 
         logger.add_log(self.log_path)
         self._validate()
@@ -477,13 +488,21 @@ class ExecutePipeline(Pipeline):
 
     name = 'execute'
 
-    def __init__(self, workspace, filters, executor='{batch_submit}'):
+    def __init__(self, workspace, filters, executor='{batch_submit}',
+                 suppress_per_experiment_prints=True, suppress_run_header=False):
         super().__init__(workspace, filters)
         self.action_string = 'Executing'
         self.require_inventory = True
         self.executor = executor
+        self.suppress_per_experiment_prints = suppress_per_experiment_prints
+        self.suppress_run_header = suppress_run_header
 
     def _execute(self):
+        super()._execute()
+
+        if not self.suppress_run_header:
+            logger.all_msg('Running executors...')
+
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             if app_inst.is_template:
                 logger.debug(f'{app_inst.name} is a template. Skipping execution.')

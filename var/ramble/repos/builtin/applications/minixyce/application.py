@@ -136,7 +136,7 @@ class Minixyce(SpackApplication):
                                 regex=state_var_regex,
                                 output_format='{State_Variable}')
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         super()._make_experiments(workspace)
 
         input_path = os.path.join(self.expander.expand_var_name('experiment_run_dir'), 'params.txt')
@@ -147,7 +147,7 @@ class Minixyce(SpackApplication):
             for setting in settings:
                 f.write(setting + ' = ' + self.expander.expand_var_name(setting) + '\n')
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         import os
 
         output_file = os.path.join(self.expander.expand_var_name('experiment_run_dir'),

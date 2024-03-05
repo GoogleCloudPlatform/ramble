@@ -310,7 +310,7 @@ class IntelHpl(SpackApplication):
             # ramble.yaml configurable
             self.variables['DEPTHs'] = pad_value(depth, 'DEPTHs (>=0)')  # vs '0'
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         super()._make_experiments(workspace)
         self._calculate_values(workspace)
 

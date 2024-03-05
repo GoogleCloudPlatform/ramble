@@ -320,7 +320,7 @@ class Namd(SpackApplication):
         units='ns/day'
     )
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         """Generate ns/day metric for the experiment"""
 
         log_path = self.expander.expand_var(self.log_file_str)
