@@ -11,8 +11,8 @@ RUN cd /opt &&  \
     export PATH=$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:${PATH} && \
     . spack/share/spack/setup-env.sh && \
     wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements.txt && \
-    conda install -qy --file /opt/requirements.txt && \
-    conda clean -a
+    conda install -qy pip && \
+    python -m pip install -r /opt/requirements.txt
 
 FROM centos:7
 
