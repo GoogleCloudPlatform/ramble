@@ -529,58 +529,9 @@ Below is an annotated example of the spack dictionary.
           - impi2018
           - gromacs
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Vector and Matrix Packages and Environments:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Package and environment definitions can generate many packages and environments
-following Ramble's
-:ref:`vector<ramble-vector-logic>` / :ref:`matrix<ramble-matrix-logic>` logic.
-
-Below is an example of using this logic within the spack dictionary:
-
-.. code-block:: yaml
-
-    spack:
-      packages:
-        gcc-{ver}:
-          variables:
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: gcc@{ver} target=x86_64
-          compiler_spec: gcc@{ver}
-        intel-mpi-{comp}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: intel-mpi@2018.4.274
-          compiler: {comp}
-        openmpi-{comp}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: openmpi@4.1.4
-          compiler: {comp}
-        wrf-{comp}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-          spack_spec: wrf@4.2
-          compiler: {comp}
-      environments:
-        wrf-{comp}-{mpi}:
-          variables:
-            comp: gcc-{ver}
-            ver: ['9.3.0', '10.3.0', '12.2.0']
-            mpi: [intel-mpi-{comp}, openmpi-{comp}']
-          matrix:
-          - mpi
-          packages:
-          - {mpi}
-          - wrf-{comp}
-
-The above file will generate 3 versions of ``gcc``, 3 versions each of ``wrf``,
-``intel-mpi`` and ``openmpi`` built with each ``gcc`` version, and 6 spack
-environments, with each combination of the 2 ``mpi`` libraries and 3 compilers.
+Packages and environments defined inside the ``spack`` config section are
+merely templates. They will be rendered into explicit environments and packages
+by each individual experiment.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 External Spack Environment Support:
