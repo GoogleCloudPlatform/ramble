@@ -11,6 +11,7 @@ import six
 
 from ramble.language.shared_language import register_builtin, register_phase
 from ramble.application import ApplicationBase, ApplicationError
+from ramble.software_environments import ExternalEnvironment
 import ramble.spack_runner
 import ramble.keywords
 from ramble.util.logger import logger
@@ -100,30 +101,12 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var_name(self.keywords.env_name)
 
-            compilers_to_install = set()
-            root_compilers = []
-            for pkg_name in workspace.software_environments.get_env_packages(app_context):
-                pkg_spec = workspace.software_environments.get_spec(pkg_name)
-                if 'compiler' in pkg_spec:
-                    if pkg_spec['compiler'] not in compilers_to_install:
-                        logger.debug(f' Adding root compiler: {pkg_spec["compiler"]}')
-                        compilers_to_install.add(pkg_spec['compiler'])
-                        root_compilers.append(pkg_spec['compiler'])
+            software_envs = workspace.software_environments
+            software_env = software_envs.render_environment(app_context, self.expander)
 
-            dep_compilers = []
-            for comp_name in root_compilers:
-                cur_spec = workspace.software_environments.get_spec(comp_name)
-                while 'compiler' in cur_spec and cur_spec['compiler'] not in compilers_to_install:
-                    compilers_to_install.add(cur_spec['compiler'])
-                    dep_compilers.append(cur_spec['compiler'])
-                    logger.debug(f' Adding dependency compiler: {cur_spec["compiler"]}')
-                    cur_spec = workspace.software_environments.get_spec(cur_spec['compiler'])
-
-            # Install all compilers, starting with deps:
-            for comp_pkg in reversed(root_compilers + dep_compilers):
-                spec_str = workspace.software_environments.get_spec_string(comp_pkg)
-                logger.debug(f'Installing compiler: {comp_pkg}')
-                self.spack_runner.install_compiler(spec_str)
+            for compiler_spec in software_envs.compiler_specs_for_environment(software_env):
+                logger.debug(f'Installing compiler: {compiler_spec}')
+                self.spack_runner.install_compiler(compiler_spec)
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
@@ -178,13 +161,13 @@ class SpackApplication(ApplicationBase):
                     f.write(self.expander.expand_var(contents))
 
             env_context = self.expander.expand_var_name(self.keywords.env_name)
-            external_spack_env = workspace.external_spack_env(env_context)
-            if external_spack_env:
-                self.spack_runner.copy_from_external_env(external_spack_env)
+            software_envs = workspace.software_environments
+            software_env = software_envs.render_environment(env_context, self.expander)
+            if isinstance(software_env, ExternalEnvironment):
+                self.spack_runner.copy_from_external_env(software_env.external_env)
             else:
-                for pkg_name in workspace.software_environments.get_env_packages(env_context):
-                    spec_str = workspace.software_environments.get_spec_string(pkg_name)
-                    self.spack_runner.add_spec(spec_str)
+                for pkg_spec in software_envs.package_specs_for_environment(software_env):
+                    self.spack_runner.add_spec(pkg_spec)
 
                 self.spack_runner.generate_env_file()
 
@@ -316,10 +299,13 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var_name(self.keywords.env_name)
 
-            for pkg_name in \
-                    workspace.software_environments.get_env_packages(app_context):
-                spec_str = workspace.software_environments.get_spec_string(pkg_name)
-                spack_pkg_name, package_path = self.spack_runner.get_package_path(spec_str)
+            software_environments = workspace.software_environments
+            software_environment = software_environments.render_environment(app_context,
+                                                                            self.expander)
+
+            for pkg_spec in \
+                    software_environments.package_specs_for_environment(software_environment):
+                spack_pkg_name, package_path = self.spack_runner.get_package_path(pkg_spec)
                 self.variables[spack_pkg_name] = package_path
 
         except ramble.spack_runner.RunnerError as e:

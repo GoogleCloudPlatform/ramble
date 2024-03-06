@@ -15,6 +15,19 @@ level4_color = '@*m'
 plain_format = '@.'
 
 
+def level_func(level):
+    if level <= 0:
+        return section_title
+    elif level == 1:
+        return nested_1
+    elif level == 2:
+        return nested_2
+    elif level == 3:
+        return nested_3
+    elif level >= 4:
+        return nested_4
+
+
 def config_title(s):
     return config_color + s + plain_format
 
