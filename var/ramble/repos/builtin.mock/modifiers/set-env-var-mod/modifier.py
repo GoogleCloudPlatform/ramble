@@ -18,4 +18,8 @@ class SetEnvVarMod(BasicModifier):
 
     mode('test', description='This is a test mode')
 
+    modifier_variable('mask_test', default='0x0', description='Test mask var',
+                      modes=['test'], expandable=False)
+
     env_var_modification('test_var', modification='test_val', method='set', mode='test')
+    env_var_modification('mask_env_var', modification='{mask_test}', method='set', mode='test')
