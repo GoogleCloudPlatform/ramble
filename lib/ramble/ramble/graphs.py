@@ -231,7 +231,7 @@ class ExecutableGraph(AttributeGraph):
     node_type = 'command executable'
     supported_injection_orders = enum.Enum('supported_injection_orders', ['before', 'after'])
 
-    def __init__(self, exec_order, executables, builtin_groups, obj_inst):
+    def __init__(self, exec_order, executables, builtin_objects, builtin_groups, obj_inst):
         """Construct a new ExecutableGraph
 
         Executable graphs have node attributes that are either of type
@@ -241,8 +241,10 @@ class ExecutableGraph(AttributeGraph):
             exec_order (list(str)): List of executable names in execution order
             executables (dict): Dictionary of executable definitions.
                                 Keys are executable names, values are CommandExecutables
-            builtins (dict): Dictionary containing definitions of builtins. Keys are names
-                             values are configurations of builtins.
+            builtin_objects (list(object)): List of objects to associate with each builtin
+                                            group (in order)
+            builtins (list(dict)): List of dictionaries containing definitions of builtins.
+                                   Keys are names values are configurations of builtins.
             modifier_builtins (dict): Dictionary containing definitions of modifier builtins.
                                       Keys are names values are configurations of builtins.
                                       Modifier builtins are inserted between application builtins
@@ -260,11 +262,13 @@ class ExecutableGraph(AttributeGraph):
                 super().update_graph(exec_node)
 
         # Define nodes for builtins
-        for builtins in builtin_groups:
+        for builtin_obj, builtins in zip(builtin_objects, builtin_groups):
             for builtin, blt_conf in builtins.items():
                 self._builtin_dependencies[builtin] = blt_conf['depends_on'].copy()
-                exec_node = ramble.util.graph.GraphNode(builtin, blt_conf['function'],
-                                                        obj_inst=obj_inst)
+                blt_func = getattr(builtin_obj, blt_conf['name'])
+                exec_node = ramble.util.graph.GraphNode(builtin,
+                                                        attribute=blt_func,
+                                                        obj_inst=builtin_obj)
                 self.node_definitions[builtin] = exec_node
 
         dep_exec = None

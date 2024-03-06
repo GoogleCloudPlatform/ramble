@@ -278,8 +278,7 @@ def register_builtin(name, required=True, injection_method='prepend', depends_on
         obj.builtins[builtin_name] = {'name': name,
                                       'required': required,
                                       'injection_method': injection_method,
-                                      'depends_on': depends_on.copy(),
-                                      'function': getattr(obj, name)}
+                                      'depends_on': depends_on.copy()}
     return _store_builtin
 
 

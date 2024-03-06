@@ -40,5 +40,8 @@ class TestMod(BasicModifier):
 
     register_builtin('test_builtin', required=True, injection_method='append')
 
+    test_attr = 'test_value'
+
     def test_builtin(self):
-        return ['echo "fom_contextFOM_GOES_HERE" >> {analysis_log}']
+        return ['echo "fom_contextFOM_GOES_HERE" >> {analysis_log}',
+                f'echo "{self.test_attr}"' + ' >> {analysis_log}']
