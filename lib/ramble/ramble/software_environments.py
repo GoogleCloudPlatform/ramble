@@ -439,10 +439,27 @@ class SoftwareEnvironments(object):
         """
         return self.info(indent=0)
 
+    def _deprecated_variables_warn(self):
+        if not hasattr(self, '_warned_deprecated_variables'):
+            self._warned_deprecated_variables = True
+            logger.warn('Variable definitions inside:')
+            logger.warn('  spack:variables')
+            logger.warn('  spack:packages:<name>:variables')
+            logger.warn('  spack:environments:<name>:variables')
+            logger.warn('are deprecated and ignored.')
+            logger.warn('Please remove from your configuration files.')
+
     def _define_templates(self):
         """Process software dictionary to generate templates"""
+
+        if namespace.variables in self._spack_dict:
+            self._deprecated_variables_warn()
+
         if namespace.packages in self._spack_dict:
             for pkg_template, pkg_info in self._spack_dict[namespace.packages].items():
+                if namespace.variables in pkg_info:
+                    self._deprecated_variables_warn()
+
                 spec = pkg_info['spack_spec'] if 'spack_spec' in pkg_info else pkg_info['spec']
                 compiler = pkg_info['compiler'] \
                     if 'compiler' in pkg_info and pkg_info['compiler'] else None
@@ -455,6 +472,8 @@ class SoftwareEnvironments(object):
 
         if namespace.environments in self._spack_dict:
             for env_template, env_info in self._spack_dict[namespace.environments].items():
+                if namespace.variables in env_info:
+                    self._deprecated_variables_warn()
                 if namespace.external_env in env_info and env_info[namespace.external_env]:
                     # External environments are considered rendered
                     new_env = ExternalEnvironment(env_template, env_info[namespace.external_env])
