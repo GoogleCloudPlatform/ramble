@@ -287,6 +287,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             for var, conf in self.workload_variables[workload_name].items():
                 if 'expandable' in conf and not conf['expandable']:
                     self.no_expand_vars.add(var)
+
         self.expander.set_no_expand_vars(self.no_expand_vars)
 
     def set_internals(self, internals):
@@ -701,6 +702,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Validate the new modifiers variables exist
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(self.variables)
+
+        # Ensure no expand vars are set correctly for modifiers
+        for mod_inst in self._modifier_instances:
+            for var in mod_inst.no_expand_vars():
+                self.expander.add_no_expand_var(var)
+                mod_inst.expander.add_no_expand_var(var)
 
     def define_modifier_variables(self):
         """Extract default variable definitions from modifier instances"""
