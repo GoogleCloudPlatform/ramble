@@ -27,7 +27,7 @@ class SoftwarePackage(object):
     """Class to represent a single software package"""
 
     def __init__(self, name: str, spec: str, compiler: str = None,
-                 compiler_spec: str = None, package_manager=None):
+                 compiler_spec: str = None, package_manager: str = 'spack'):
         """Software package constructor
 
         Args:
@@ -45,11 +45,7 @@ class SoftwarePackage(object):
         self.compiler = compiler
         self.compiler_spec = compiler_spec
         self._package_type = 'Rendered'
-
-        if package_manager and hasattr(package_managers, package_manager):
-            self.package_manager = getattr(package_managers, package_manager)
-        else:
-            self.package_manager = package_managers.spack
+        self.package_manager = package_managers[package_manager]
 
     def spec_str(self, all_packages: dict = {}, compiler=False):
         """Return a spec string for this software package
@@ -99,9 +95,7 @@ class SoftwarePackage(object):
             (str): String representation of this package
         """
 
-        indentation = ''
-        for _ in range(0, indent):
-            indentation += ' '
+        indentation = ' ' * indent
         color = rucolor.level_func(color_level)
         out_str  = color(f'{indentation}{self._package_type} package: {self.name}\n')
         out_str += f'{indentation}    Spec: {self.spec.replace("@", "@@")}\n'
@@ -139,7 +133,7 @@ class TemplatePackage(SoftwarePackage):
 
     def __init__(self, name: str, spec: str,
                  compiler: str = None, compiler_spec: str = None,
-                 package_manager=None):
+                 package_manager: str = 'spack'):
         """Template package constructor
 
         Args:
@@ -153,7 +147,7 @@ class TemplatePackage(SoftwarePackage):
         """
         super().__init__(name, spec, compiler=compiler,
                          compiler_spec=compiler_spec,
-                         package_manager=None)
+                         package_manager=package_manager)
         self._rendered_packages = {}
         self._package_type = 'Template'
 
@@ -243,9 +237,7 @@ class SoftwareEnvironment(object):
             (str): information of this environment
         """
 
-        indentation = ''
-        for _ in range(0, indent):
-            indentation += ' '
+        indentation = ' ' * indent
         color = rucolor.level_func(color_level)
         out_str  = color(f'{indentation}{self._environment_type} environment: {self.name}\n')
         out_str += f'{indentation}    Packages:\n'
@@ -283,11 +275,14 @@ class SoftwareEnvironment(object):
         """
         equal = self.name == other.name and len(self._packages) == len(other._packages)
 
-        if equal:
-            for self_pkg, other_pkg in zip(self._packages, other._packages):
-                equal = equal and self_pkg == other_pkg
+        if not equal:
+            return False
 
-        return equal
+        for self_pkg, other_pkg in zip(self._packages, other._packages):
+            if self_pkg != other_pkg:
+                return False
+
+        return True
 
 
 class ExternalEnvironment(SoftwareEnvironment):

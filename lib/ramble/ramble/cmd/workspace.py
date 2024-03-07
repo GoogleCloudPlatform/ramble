@@ -660,9 +660,6 @@ def workspace_info(args):
         color.cprint(rucolor.section_title('Software Stack:'))
         color.cprint(software_environments.info(verbosity=args.verbose, indent=4, color_level=1))
 
-        #  print('All new envs:')
-        #  print(software_environments.new_envs)
-
 #
 # workspace list
 #
