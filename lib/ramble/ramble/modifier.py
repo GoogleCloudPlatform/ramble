@@ -156,9 +156,9 @@ class ModifierBase(object, metaclass=ModifierMeta):
                 out_str.append(f'\t{name} = {config}\n')
             out_str.append('\n')
 
-        if hasattr(self, 'default_compilers'):
+        if hasattr(self, 'compilers'):
             out_str.append(rucolor.section_title('Default Compilers:\n'))
-            for comp_name, comp_def in self.default_compilers.items():
+            for comp_name, comp_def in self.compilers.items():
                 out_str.append(rucolor.nested_2(f'\t{comp_name}:\n'))
                 out_str.append(rucolor.nested_3('\t\tSpack Spec:') +
                                f'{comp_def["spack_spec"].replace("@", "@@")}\n')

@@ -19,7 +19,7 @@ class UfsWeatherModel(SpackApplication):
 
     tags('nwp', 'weather')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('ompi415', spack_spec="openmpi@4.1.5", compiler='gcc9')
 

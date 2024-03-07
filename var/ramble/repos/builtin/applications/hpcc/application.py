@@ -28,7 +28,7 @@ class Hpcc(SpackApplication):
 
     tags('benchmark-app', 'mini-app', 'benchmark', 'DGEMM')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('impi2018',
                   spack_spec='intel-mpi@2018.4.274')

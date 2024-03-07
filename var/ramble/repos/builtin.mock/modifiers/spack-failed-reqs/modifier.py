@@ -17,9 +17,9 @@ class SpackFailedReqs(SpackModifier):
 
     mode('default', description='This is the default mode for the spack-failed-reqs modifier')
 
-    default_compiler('mod_compiler',
-                     spack_spec='mod_compiler@1.1 target=x86_64',
-                     compiler_spec='mod_compiler@1.1')
+    define_compiler('mod_compiler',
+                    spack_spec='mod_compiler@1.1 target=x86_64',
+                    compiler_spec='mod_compiler@1.1')
 
     software_spec('mod_package1',
                   spack_spec='mod_package1@1.1',

@@ -887,9 +887,9 @@ class Workspace(object):
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
 
-            compiler_dicts = [app_inst.default_compilers]
+            compiler_dicts = [app_inst.compilers]
             for mod_inst in app_inst._modifier_instances:
-                compiler_dicts.append(mod_inst.default_compilers)
+                compiler_dicts.append(mod_inst.compilers)
 
             for compiler_dict in compiler_dicts:
                 for comp, info in compiler_dict.items():

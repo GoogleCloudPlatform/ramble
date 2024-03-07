@@ -9,6 +9,7 @@
 
 import pytest
 import enum
+import deprecation
 
 from ramble.appkit import *  # noqa
 
@@ -32,7 +33,7 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, 'inputs')
     assert hasattr(test_app, 'workload_variables')
     assert hasattr(test_app, 'environment_variables')
-    assert hasattr(test_app, 'default_compilers')
+    assert hasattr(test_app, 'compilers')
     assert hasattr(test_app, 'software_specs')
     assert hasattr(test_app, 'required_packages')
     assert hasattr(test_app, 'maintainers')
@@ -211,7 +212,9 @@ def add_input_file(app_inst, input_num=1, func_type=func_types.directive):
     return input_defs
 
 
-def add_default_compiler(app_inst, spec_num=1, func_type=func_types.directive):
+# TODO: can this be dried with the modifier language add_compiler?
+@deprecation.fail_if_not_removed
+def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     spec_name = 'Compiler%spec_num'
     spec_spack_spec = f'compiler_base@{spec_num}.0 +var1 ~var2'
     spec_compiler_spec = 'compiler1_base@{spec_num}'
@@ -225,9 +228,13 @@ def add_default_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     if func_type == func_types.directive:
         default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
                          compiler_spec=spec_compiler_spec)(app_inst)
+        define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                        compiler_spec=spec_compiler_spec)(app_inst)
     elif func_type == func_types.method:
         app_inst.default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
                                   compiler_spec=spec_compiler_spec)
+        app_inst.define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                                 compiler_spec=spec_compiler_spec)
     else:
         assert False
 
@@ -241,11 +248,11 @@ def add_default_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     }
 
     if func_type == func_types.directive:
-        default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
-                         compiler_spec=spec_compiler_spec)(app_inst)
+        define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: f405
+                        compiler_spec=spec_compiler_spec)(app_inst)
     elif func_type == func_types.method:
-        app_inst.default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
-                                  compiler_spec=spec_compiler_spec)
+        app_inst.define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
+                                 compiler_spec=spec_compiler_spec)
     else:
         assert False
 
@@ -371,23 +378,23 @@ def test_input_file_directive(app_class, func_type):
 
 @pytest.mark.parametrize('func_type', func_types)
 @pytest.mark.parametrize('app_class', app_types)
-def test_default_compiler_directive(app_class, func_type):
+def test_define_compiler_directive(app_class, func_type):
     app_inst = app_class('/not/a/path')
     test_defs = {}
     if app_inst.uses_spack:
-        test_defs.update(add_default_compiler(app_inst, 1, func_type=func_type))
-        test_defs.update(add_default_compiler(app_inst, 2, func_type=func_type))
+        test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
+        test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
 
-        assert hasattr(app_inst, 'default_compilers')
+        assert hasattr(app_inst, 'compilers')
         for name, info in test_defs.items():
-            assert name in app_inst.default_compilers
+            assert name in app_inst.compilers
             for key, value in info.items():
-                assert app_inst.default_compilers[name][key] == value
+                assert app_inst.compilers[name][key] == value
     else:
-        test_defs.update(add_default_compiler(app_inst, 1, func_type=func_type))
+        test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
 
-        assert hasattr(app_inst, 'default_compilers')
-        assert not app_inst.default_compilers
+        assert hasattr(app_inst, 'compilers')
+        assert not app_inst.compilers
 
 
 @pytest.mark.parametrize('func_type', func_types)

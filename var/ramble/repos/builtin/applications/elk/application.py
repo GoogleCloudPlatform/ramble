@@ -59,6 +59,6 @@ class Elk(ExecutableApplication):
     for metric in metrics:
         figure_of_merit(metric,
                         log_file=output_file,
-                        fom_regex=f'\s*(?P<metric>{metric})\s+:\s+(?P<value>[0-9]+\.[0-9]*).*',
+                        fom_regex=rf'\s*(?P<metric>{metric})\s+:\s+(?P<value>[0-9]+\.[0-9]*).*',
                         group_name='value', units='s'
                         )

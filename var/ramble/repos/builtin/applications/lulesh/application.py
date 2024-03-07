@@ -19,7 +19,7 @@ class Lulesh(SpackApplication):
 
     tags('proxy-app', 'mini-app')
 
-    default_compiler('gcc13', spack_spec='gcc@13.1.0')
+    define_compiler('gcc13', spack_spec='gcc@13.1.0')
 
     software_spec('impi2018',
                   spack_spec='intel-mpi@2018.4.274')

@@ -19,7 +19,7 @@ class Wrfv3(SpackApplication):
 
     tags('nwp', 'weather')
 
-    default_compiler('gcc8', spack_spec='gcc@8.2.0')
+    define_compiler('gcc8', spack_spec='gcc@8.2.0')
 
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
 
