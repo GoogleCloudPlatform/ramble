@@ -542,6 +542,8 @@ def workspace_info(args):
     # Build experiment set
     experiment_set = ws.build_experiment_set()
 
+    software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
     if args.tags:
         color.cprint('')
         all_tags = experiment_set.all_experiment_tags()
@@ -587,6 +589,10 @@ def workspace_info(args):
 
                 for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
                     app_inst = experiment_set.get_experiment(exp_name)
+                    if app_inst.uses_spack:
+                        software_environments.render_environment(
+                            app_inst.expander.expand_var('{env_name}'), app_inst.expander
+                        )
 
                     if print_header:
                         color.cprint(rucolor.nested_1('  Application: ') +
@@ -650,8 +656,9 @@ def workspace_info(args):
     # Print software stack information
     if args.software:
         color.cprint('')
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-        software_environments.print_environments(verbosity=args.verbose)
+        #  software_environments.print_environments(verbosity=args.verbose)
+        color.cprint(rucolor.section_title('Software Stack:'))
+        color.cprint(software_environments.info(verbosity=args.verbose, indent=4, color_level=1))
 
 #
 # workspace list
