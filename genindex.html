@@ -206,7 +206,13 @@
         <li><a href="ramble.html#ramble.graphs.PhaseGraph.add_node">(ramble.graphs.PhaseGraph method)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironment.add_package">add_package() (ramble.software_environments.SoftwareEnvironment method)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.flake8.add_pattern_exemptions">add_pattern_exemptions() (in module ramble.cmd.flake8)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.TemplateEnvironment.add_rendered_environment">add_rendered_environment() (ramble.software_environments.TemplateEnvironment method)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.TemplatePackage.add_rendered_package">add_rendered_package() (ramble.software_environments.TemplatePackage method)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.add_spec">add_spec() (ramble.spack_runner.SpackRunner method)</a>
 </li>
@@ -246,8 +252,6 @@
 </li>
       <li><a href="ramble.html#ramble.success_criteria.ScopedCriteriaList.all_criteria">all_criteria() (ramble.success_criteria.ScopedCriteriaList method)</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.all_environments">all_environments() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
       <li><a href="ramble.html#ramble.experiment_set.ExperimentSet.all_experiment_tags">all_experiment_tags() (ramble.experiment_set.ExperimentSet method)</a>
 </li>
       <li><a href="ramble.html#ramble.experiment_set.ExperimentSet.all_experiments">all_experiments() (ramble.experiment_set.ExperimentSet method)</a>
@@ -272,6 +276,8 @@
         <li><a href="ramble.html#ramble.repository.RepoPath.all_object_classes">(ramble.repository.RepoPath method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.repository.all_object_names">all_object_names() (in module ramble.repository)</a>
 
       <ul>
@@ -280,19 +286,13 @@
         <li><a href="ramble.html#ramble.repository.RepoPath.all_object_names">(ramble.repository.RepoPath method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.repository.Repo.all_objects">all_objects() (ramble.repository.Repo method)</a>
 
       <ul>
         <li><a href="ramble.html#ramble.repository.RepoPath.all_objects">(ramble.repository.RepoPath method)</a>
 </li>
       </ul></li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.all_packages">all_packages() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.all_raw_environments">all_raw_environments() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.all_raw_packages">all_raw_packages() (ramble.software_environments.SoftwareEnvironments method)</a>
+      <li><a href="ramble.html#ramble.software_environments.TemplateEnvironment.all_packages">all_packages() (ramble.software_environments.TemplateEnvironment method)</a>
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.all_specs">all_specs() (ramble.workspace.Workspace method)</a>
 
@@ -614,6 +614,8 @@
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.compiler_spec">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.compiler_specs_for_environment">compiler_specs_for_environment() (ramble.software_environments.SoftwareEnvironments method)</a>
+</li>
       <li><a href="ramble.util.html#ramble.util.stats.StatsBase.compute">compute() (ramble.util.stats.StatsBase method)</a>
 
       <ul>
@@ -840,6 +842,8 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.default_results">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.define_compiler_packages">define_compiler_packages() (ramble.software_environments.SoftwareEnvironments method)</a>
+</li>
       <li><a href="ramble.util.html#ramble.util.directives.define_directive_methods">define_directive_methods() (in module ramble.util.directives)</a>
 </li>
       <li><a href="ramble.html#ramble.graphs.AttributeGraph.define_edges">define_edges() (ramble.graphs.AttributeGraph method)</a>
@@ -848,10 +852,10 @@
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.attributes.defined_objects">defined_objects() (in module ramble.cmd.attributes)</a>
 </li>
-      <li><a href="ramble.html#ramble.spec.DEP">DEP (in module ramble.spec)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.spec.DEP">DEP (in module ramble.spec)</a>
+</li>
       <li><a href="ramble.html#ramble.fetch_strategy.FsCache.destroy">destroy() (ramble.fetch_strategy.FsCache method)</a>
 
       <ul>
@@ -1120,6 +1124,8 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.external_spack_env">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.software_environments.ExternalEnvironment">ExternalEnvironment (class in ramble.software_environments)</a>
+</li>
       <li><a href="ramble.util.html#ramble.util.matrices.extract_matrices">extract_matrices() (in module ramble.util.matrices)</a>
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.Workspace.extract_success_criteria">extract_success_criteria() (ramble.workspace.Workspace method)</a>
@@ -1352,13 +1358,9 @@
 </li>
       <li><a href="ramble.html#ramble.mirror.Mirror.get_endpoint_url">get_endpoint_url() (ramble.mirror.Mirror method)</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.get_env">get_env() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
       <li><a href="ramble.util.html#ramble.util.env.Env.get_env_append_commands">get_env_append_commands() (ramble.util.env.Env method)</a>
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.get_env_hash_list">get_env_hash_list() (ramble.spack_runner.SpackRunner method)</a>
-</li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.get_env_packages">get_env_packages() (ramble.software_environments.SoftwareEnvironments method)</a>
 </li>
       <li><a href="ramble.util.html#ramble.util.env.Env.get_env_prepend_commands">get_env_prepend_commands() (ramble.util.env.Env method)</a>
 </li>
@@ -1418,10 +1420,6 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.get_spack_dict">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.get_spec">get_spec() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.get_spec_string">get_spec_string() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
       <li><a href="ramble.experimental.html#ramble.experimental.uploader.get_user">get_user() (in module ramble.experimental.uploader)</a>
 </li>
       <li><a href="ramble.html#ramble.config.get_valid_type">get_valid_type() (in module ramble.config)</a>
@@ -1585,6 +1583,16 @@
       <li><a href="ramble.cmd.html#ramble.cmd.info.info">info() (in module ramble.cmd.info)</a>
 
       <ul>
+        <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironment.info">(ramble.software_environments.SoftwareEnvironment method)</a>
+</li>
+        <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.info">(ramble.software_environments.SoftwareEnvironments method)</a>
+</li>
+        <li><a href="ramble.html#ramble.software_environments.SoftwarePackage.info">(ramble.software_environments.SoftwarePackage method)</a>
+</li>
+        <li><a href="ramble.html#ramble.software_environments.TemplateEnvironment.info">(ramble.software_environments.TemplateEnvironment method)</a>
+</li>
+        <li><a href="ramble.html#ramble.software_environments.TemplatePackage.info">(ramble.software_environments.TemplatePackage method)</a>
+</li>
         <li><a href="ramble.util.html#ramble.util.logger.Logger.info">(ramble.util.logger.Logger method)</a>
 </li>
       </ul></li>
@@ -1620,6 +1628,8 @@
 </li>
       <li><a href="ramble.html#ramble.spack_runner.SpackRunner.install_config_name">install_config_name (ramble.spack_runner.SpackRunner attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_answer">intel_aps_answer() (in module ramble.test.modifier_functionality.modifier_helpers)</a>
 </li>
       <li><a href="ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_modifier">intel_aps_modifier() (in module ramble.test.modifier_functionality.modifier_helpers)</a>
@@ -1630,8 +1640,6 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.internal">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ramble.html#ramble.config.InternalConfigScope">InternalConfigScope (class in ramble.config)</a>
 </li>
       <li><a href="ramble.html#ramble.namespace.namespace.internals">internals (ramble.namespace.namespace attribute)</a>
@@ -1760,6 +1768,8 @@
         <li><a href="ramble.html#ramble.expander.VformatDelimiter.left">(ramble.expander.VformatDelimiter attribute)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.util.html#ramble.util.colors.level_func">level_func() (in module ramble.util.colors)</a>
+</li>
       <li><a href="ramble.html#ramble.main.levels">levels (in module ramble.main)</a>
 </li>
       <li><a href="ramble.cmd.html#ramble.cmd.license.lgpl_exceptions">lgpl_exceptions (in module ramble.cmd.license)</a>
@@ -1836,10 +1846,6 @@
         <li><a href="ramble.html#ramble.stage.InputStage.managed_by_ramble">(ramble.stage.InputStage attribute)</a>
 </li>
       </ul></li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.mapped_environments">mapped_environments() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.mapped_packages">mapped_packages() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
       <li><a href="ramble.html#ramble.success_criteria.SuccessCriteria.mark_found">mark_found() (ramble.success_criteria.SuccessCriteria method)</a>
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.FetchStrategy.matches">matches() (ramble.fetch_strategy.FetchStrategy class method)</a>
@@ -2339,6 +2345,10 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.software_environments.package_managers">package_managers (class in ramble.software_environments)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.package_specs_for_environment">package_specs_for_environment() (ramble.software_environments.SoftwareEnvironments method)</a>
+</li>
       <li><a href="ramble.html#ramble.namespace.namespace.packages">packages (ramble.namespace.namespace attribute)</a>
 
       <ul>
@@ -2407,16 +2417,14 @@
 </li>
       <li><a href="ramble.html#ramble.error.RambleError.print_context">print_context() (ramble.error.RambleError method)</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.print_environments">print_environments() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.info.print_info">print_info() (in module ramble.cmd.common.info)</a>
 </li>
       <li><a href="ramble.html#ramble.config.Configuration.print_section">print_section() (ramble.config.Configuration method)</a>
 </li>
-      <li><a href="ramble.html#ramble.main.print_setup_info">print_setup_info() (in module ramble.main)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.html#ramble.main.print_setup_info">print_setup_info() (in module ramble.main)</a>
+</li>
       <li><a href="ramble.cmd.html#ramble.cmd.software_definitions.print_summary">print_summary() (in module ramble.cmd.software_definitions)</a>
 </li>
       <li><a href="ramble.cmd.common.html#ramble.cmd.common.info.print_text_info">print_text_info() (in module ramble.cmd.common.info)</a>
@@ -3045,8 +3053,6 @@
         <li><a href="ramble.test.end_to_end.html#module-ramble.test.end_to_end">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.modifier_functionality
 
@@ -3054,6 +3060,8 @@
         <li><a href="ramble.test.modifier_functionality.html#module-ramble.test.modifier_functionality">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ramble.test.modifier_functionality.modifier_helpers
 
@@ -3320,10 +3328,6 @@
 </li>
       <li><a href="ramble.workspace.html#ramble.workspace.RambleWorkspaceError">RambleWorkspaceError</a>, <a href="ramble.workspace.html#ramble.workspace.workspace.RambleWorkspaceError">[1]</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.raw_environment_info">raw_environment_info() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.raw_package_info">raw_package_info() (ramble.software_environments.SoftwareEnvironments method)</a>
-</li>
       <li><a href="ramble.workspace.html#ramble.workspace.read">read() (in module ramble.workspace)</a>
 
       <ul>
@@ -3362,7 +3366,15 @@
 </li>
       <li><a href="ramble.util.html#ramble.util.web.remove_url">remove_url() (in module ramble.util.web)</a>
 </li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.render_environment">render_environment() (ramble.software_environments.SoftwareEnvironments method)</a>
+
+      <ul>
+        <li><a href="ramble.html#ramble.software_environments.TemplateEnvironment.render_environment">(ramble.software_environments.TemplateEnvironment method)</a>
+</li>
+      </ul></li>
       <li><a href="ramble.html#ramble.renderer.Renderer.render_objects">render_objects() (ramble.renderer.Renderer method)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.TemplatePackage.render_package">render_package() (ramble.software_environments.TemplatePackage method)</a>
 </li>
       <li><a href="ramble.html#ramble.renderer.Renderer">Renderer (class in ramble.renderer)</a>
 </li>
@@ -3674,7 +3686,11 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.software_dir">(ramble.workspace.workspace.Workspace property)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironment">SoftwareEnvironment (class in ramble.software_environments)</a>
+</li>
       <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments">SoftwareEnvironments (class in ramble.software_environments)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwarePackage">SoftwarePackage (class in ramble.software_environments)</a>
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.BundleFetchStrategy.source_id">source_id() (ramble.fetch_strategy.BundleFetchStrategy method)</a>
 
@@ -3703,6 +3719,8 @@
       <li><a href="ramble.html#ramble.namespace.namespace.spack">spack (ramble.namespace.namespace attribute)</a>
 
       <ul>
+        <li><a href="ramble.html#ramble.software_environments.package_managers.spack">(ramble.software_environments.package_managers attribute)</a>
+</li>
         <li><a href="ramble.workspace.html#ramble.workspace.namespace.spack">(ramble.workspace.namespace attribute)</a>
 </li>
       </ul></li>
@@ -3721,6 +3739,8 @@
       <li><a href="ramble.html#ramble.spec.Spec">Spec (class in ramble.spec)</a>
 </li>
       <li><a href="ramble.html#ramble.spec.spec_id_re">spec_id_re (in module ramble.spec)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.SoftwarePackage.spec_str">spec_str() (ramble.software_environments.SoftwarePackage method)</a>
 </li>
       <li><a href="ramble.html#ramble.error.SpecError">SpecError</a>
 </li>
@@ -3802,8 +3822,6 @@
       </ul></li>
       <li><a href="ramble.html#ramble.success_criteria.SuccessCriteria">SuccessCriteria (class in ramble.success_criteria)</a>
 </li>
-      <li><a href="ramble.html#ramble.software_environments.SoftwareEnvironments.supported_confs">supported_confs (ramble.software_environments.SoftwareEnvironments attribute)</a>
-</li>
       <li><a href="ramble.html#ramble.fetch_strategy.SvnFetchStrategy.svn">svn (ramble.fetch_strategy.SvnFetchStrategy property)</a>
 </li>
       <li><a href="ramble.html#ramble.fetch_strategy.SvnFetchStrategy">SvnFetchStrategy (class in ramble.fetch_strategy)</a>
@@ -3844,6 +3862,10 @@
         <li><a href="ramble.workspace.html#ramble.workspace.workspace.Workspace.template_path">(ramble.workspace.workspace.Workspace method)</a>
 </li>
       </ul></li>
+      <li><a href="ramble.html#ramble.software_environments.TemplateEnvironment">TemplateEnvironment (class in ramble.software_environments)</a>
+</li>
+      <li><a href="ramble.html#ramble.software_environments.TemplatePackage">TemplatePackage (class in ramble.software_environments)</a>
+</li>
       <li><a href="ramble.test.html#ramble.test.application_inheritance.test_basic_inheritance">test_basic_inheritance() (in module ramble.test.application_inheritance)</a>
 </li>
       <li><a href="ramble.test.html#ramble.test.success_criteria.test_criteria_list">test_criteria_list() (in module ramble.test.success_criteria)</a>
@@ -3854,10 +3876,10 @@
 </li>
       <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_prepend_command_gen">test_env_var_prepend_command_gen() (in module ramble.test.util.env)</a>
 </li>
-      <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_set_command_gen">test_env_var_set_command_gen() (in module ramble.test.util.env)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_set_command_gen">test_env_var_set_command_gen() (in module ramble.test.util.env)</a>
+</li>
       <li><a href="ramble.test.util.html#ramble.test.util.env.test_env_var_unset_command_gen">test_env_var_unset_command_gen() (in module ramble.test.util.env)</a>
 </li>
       <li><a href="ramble.test.html#ramble.test.success_criteria.test_single_criteria">test_single_criteria() (in module ramble.test.success_criteria)</a>

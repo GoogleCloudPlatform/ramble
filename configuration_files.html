@@ -75,7 +75,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#modifiers-section">Modifiers Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#repos-section">Repos Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spack-section">Spack Section:</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#vector-and-matrix-packages-and-environments">Vector and Matrix Packages and Environments:</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#external-spack-environment-support">External Spack Environment Support:</a></li>
 </ul>
 </li>
@@ -523,54 +522,9 @@ should be bundled into a spack environment.</p>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
 </pre></div>
 </div>
-<section id="vector-and-matrix-packages-and-environments">
-<h3>Vector and Matrix Packages and Environments:<a class="headerlink" href="#vector-and-matrix-packages-and-environments" title="Link to this heading"></a></h3>
-<p>Package and environment definitions can generate many packages and environments
-following Ramble’s
-<a class="reference internal" href="workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector</span></a> / <a class="reference internal" href="workspace_config.html#ramble-matrix-logic"><span class="std std-ref">matrix</span></a> logic.</p>
-<p>Below is an example of using this logic within the spack dictionary:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver} target=x86_64</span>
-<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@{ver}</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi-{comp}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">openmpi-{comp}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2</span>
-<span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span>
-<span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">wrf-{comp}-{mpi}</span><span class="p p-Indicator">:</span>
-<span class="w">      </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">comp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc-{ver}</span>
-<span class="w">        </span><span class="nt">ver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;9.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;10.3.0&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;12.2.0&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="nt">mpi</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">intel-mpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">},</span><span class="w"> </span><span class="nv">openmpi-</span><span class="p p-Indicator">{</span><span class="nv">comp</span><span class="p p-Indicator">}</span><span class="s">&#39;]</span>
-<span class="w">      </span><span class="s">matrix:</span>
-<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">mpi</span>
-<span class="w">      </span><span class="s">packages:</span>
-<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">{mpi}</span>
-<span class="w">      </span><span class="s">-</span><span class="nv"> </span><span class="s">wrf-{comp}</span>
-</pre></div>
-</div>
-<p>The above file will generate 3 versions of <code class="docutils literal notranslate"><span class="pre">gcc</span></code>, 3 versions each of <code class="docutils literal notranslate"><span class="pre">wrf</span></code>,
-<code class="docutils literal notranslate"><span class="pre">intel-mpi</span></code> and <code class="docutils literal notranslate"><span class="pre">openmpi</span></code> built with each <code class="docutils literal notranslate"><span class="pre">gcc</span></code> version, and 6 spack
-environments, with each combination of the 2 <code class="docutils literal notranslate"><span class="pre">mpi</span></code> libraries and 3 compilers.</p>
-</section>
+<p>Packages and environments defined inside the <code class="docutils literal notranslate"><span class="pre">spack</span></code> config section are
+merely templates. They will be rendered into explicit environments and packages
+by each individual experiment.</p>
 <section id="external-spack-environment-support">
 <h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Link to this heading"></a></h3>
 <p><strong>NOTE</strong>: Using external Spack environments is an advanced feature.</p>

@@ -743,22 +743,41 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.software_environments">ramble.software_environments module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.ExternalEnvironment"><code class="docutils literal notranslate"><span class="pre">ExternalEnvironment</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.RambleSoftwareEnvironmentError"><code class="docutils literal notranslate"><span class="pre">RambleSoftwareEnvironmentError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment.add_package"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironment.add_package()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment.info"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironment.info()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.all_environments"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.all_environments()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.all_packages"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.all_packages()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.all_raw_environments"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.all_raw_environments()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.all_raw_packages"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.all_raw_packages()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.get_env"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.get_env()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.get_env_packages"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.get_env_packages()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.get_spec"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.get_spec()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.get_spec_string"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.get_spec_string()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.mapped_environments"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.mapped_environments()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.mapped_packages"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.mapped_packages()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.print_environments"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.print_environments()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.raw_environment_info"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.raw_environment_info()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.raw_package_info"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.raw_package_info()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.supported_confs"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.supported_confs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.compiler_specs_for_environment"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.compiler_specs_for_environment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.define_compiler_packages"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.define_compiler_packages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.info"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.package_specs_for_environment"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.package_specs_for_environment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwareEnvironments.render_environment"><code class="docutils literal notranslate"><span class="pre">SoftwareEnvironments.render_environment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.SoftwarePackage"><code class="docutils literal notranslate"><span class="pre">SoftwarePackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwarePackage.info"><code class="docutils literal notranslate"><span class="pre">SoftwarePackage.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.SoftwarePackage.spec_str"><code class="docutils literal notranslate"><span class="pre">SoftwarePackage.spec_str()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.add_rendered_environment"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.add_rendered_environment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.all_packages"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.all_packages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.info"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.render_environment"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.render_environment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.TemplatePackage"><code class="docutils literal notranslate"><span class="pre">TemplatePackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplatePackage.add_rendered_package"><code class="docutils literal notranslate"><span class="pre">TemplatePackage.add_rendered_package()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplatePackage.info"><code class="docutils literal notranslate"><span class="pre">TemplatePackage.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplatePackage.render_package"><code class="docutils literal notranslate"><span class="pre">TemplatePackage.render_package()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.package_managers"><code class="docutils literal notranslate"><span class="pre">package_managers</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.package_managers.spack"><code class="docutils literal notranslate"><span class="pre">package_managers.spack</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1502,6 +1521,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.util.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.util.html#module-ramble.util.colors">ramble.util.colors module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.colors.config_title"><code class="docutils literal notranslate"><span class="pre">config_title()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.colors.level_func"><code class="docutils literal notranslate"><span class="pre">level_func()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.colors.nested_1"><code class="docutils literal notranslate"><span class="pre">nested_1()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.colors.nested_2"><code class="docutils literal notranslate"><span class="pre">nested_2()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html#ramble.util.colors.nested_3"><code class="docutils literal notranslate"><span class="pre">nested_3()</span></code></a></li>
@@ -6214,6 +6234,13 @@ already constructed Repo objects</p>
 </section>
 <section id="module-ramble.software_environments">
 <span id="ramble-software-environments-module"></span><h2>ramble.software_environments module<a class="headerlink" href="#module-ramble.software_environments" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.software_environments.ExternalEnvironment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">ExternalEnvironment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_or_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#ExternalEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.ExternalEnvironment" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SoftwareEnvironment</span></code></a></p>
+<p>Class representing an externally defined software environment</p>
+</dd></dl>
+
 <dl class="py exception">
 <dt class="sig sig-object py" id="ramble.software_environments.RambleSoftwareEnvironmentError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">RambleSoftwareEnvironmentError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#RambleSoftwareEnvironmentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.RambleSoftwareEnvironmentError" title="Link to this definition"></a></dt>
@@ -6222,92 +6249,331 @@ already constructed Repo objects</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">SoftwareEnvironment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironment" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing a single software environment</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironment.add_package">
+<span class="sig-name descname"><span class="pre">add_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironment.add_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironment.add_package" title="Link to this definition"></a></dt>
+<dd><p>Add a package definition to this environment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>package</strong> (<a class="reference internal" href="#ramble.software_environments.SoftwarePackage" title="ramble.software_environments.SoftwarePackage"><em>SoftwarePackage</em></a>) – Package object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironment.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironment.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironment.info" title="Link to this definition"></a></dt>
+<dd><p>Software environment information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> (<em>int</em>) – Number of spaces to inject as indentation</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Verbosity level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>information of this environment</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">SoftwareEnvironments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to represent a set of software environments</p>
-<p>This class contains logic to take the dictionary representations of
-software environments, and unify their format.</p>
+<p>Class representing a group of software environments</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.all_environments">
-<span class="sig-name descname"><span class="pre">all_environments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.all_environments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.all_environments" title="Link to this definition"></a></dt>
-<dd><p>Yield each environment name</p>
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.compiler_specs_for_environment">
+<span class="sig-name descname"><span class="pre">compiler_specs_for_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.compiler_specs_for_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.compiler_specs_for_environment" title="Link to this definition"></a></dt>
+<dd><p>Iterator over compiler specs for a given environment</p>
+<p>Assumes all compilers have been defined via
+self.define_compiler_packages()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>environment</strong> (<a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><em>SoftwareEnvironment</em></a>) – Environment to extract compiler specs for</p>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str) Spec string for each compiler</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.all_packages">
-<span class="sig-name descname"><span class="pre">all_packages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.all_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.all_packages" title="Link to this definition"></a></dt>
-<dd><p>Yield each package name</p>
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.define_compiler_packages">
+<span class="sig-name descname"><span class="pre">define_compiler_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expander</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.define_compiler_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.define_compiler_packages" title="Link to this definition"></a></dt>
+<dd><p>Define packages for compilers in this environment</p>
+<p>If compilers referenced by (environment) are not defined, create
+definitions for them to properly create compiler specs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>environment</strong> (<a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><em>SoftwareEnvironment</em></a>) – Environment to extract necessary
+compilers from</p></li>
+<li><p><strong>expander</strong> (<em>Expander</em>) – Expander object to use when constructing
+compiler package names</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.all_raw_environments">
-<span class="sig-name descname"><span class="pre">all_raw_environments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.all_raw_environments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.all_raw_environments" title="Link to this definition"></a></dt>
-<dd><p>Yield raw environment names</p>
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.info" title="Link to this definition"></a></dt>
+<dd><p>Information for all packages and environments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> (<em>int</em>) – Number of spaces to indent lines with</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Verbosity level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Representation of all packages and environments</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.all_raw_packages">
-<span class="sig-name descname"><span class="pre">all_raw_packages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.all_raw_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.all_raw_packages" title="Link to this definition"></a></dt>
-<dd><p>Yield each raw package name</p>
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.package_specs_for_environment">
+<span class="sig-name descname"><span class="pre">package_specs_for_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.package_specs_for_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.package_specs_for_environment" title="Link to this definition"></a></dt>
+<dd><p>Iterator over package specs for a given environment</p>
+<p>Assumes all compilers have been defined via
+self.define_compiler_packages()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>environment</strong> (<a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><em>SoftwareEnvironment</em></a>) – Environment to extract package specs for</p>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str) Spec string for each package</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.get_env">
-<span class="sig-name descname"><span class="pre">get_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.get_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.get_env" title="Link to this definition"></a></dt>
-<dd><p>Return a reference to the environment definition</p>
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.render_environment">
+<span class="sig-name descname"><span class="pre">render_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expander</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.render_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.render_environment" title="Link to this definition"></a></dt>
+<dd><p>Render an environment needed by an experiment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env_name</strong> (<em>str</em>) – Name of environment needed by the experiment</p></li>
+<li><p><strong>expander</strong> (<em>Expander</em>) – Expander object from the experiment</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Reference to software environment for</dt><dd><p>the experiment</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment">SoftwareEnvironment</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwarePackage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">SoftwarePackage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'spack'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwarePackage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwarePackage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to represent a single software package</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwarePackage.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwarePackage.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwarePackage.info" title="Link to this definition"></a></dt>
+<dd><p>String representation of package information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> (<em>int</em>) – Number of spaces to indent lines with</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Verbosity level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>String representation of this package</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.get_env_packages">
-<span class="sig-name descname"><span class="pre">get_env_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.get_env_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.get_env_packages" title="Link to this definition"></a></dt>
-<dd><p>Return all of the packages used by an environment</p>
+<dt class="sig sig-object py" id="ramble.software_environments.SoftwarePackage.spec_str">
+<span class="sig-name descname"><span class="pre">spec_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwarePackage.spec_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwarePackage.spec_str" title="Link to this definition"></a></dt>
+<dd><p>Return a spec string for this software package</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_packages</strong> (<em>dict</em>) – Dictionary of all package definitions.
+Used to look up compiler packages.</p></li>
+<li><p><strong>compiler</strong> (<em>boolean</em>) – True of this package is used as a compiler for
+another package. False if this is just a primary package.
+Toggles returning compiler_spec vs. spec in case they are
+different.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>String representation of the spec for this package definition</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">TemplateEnvironment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SoftwareEnvironment</span></code></a></p>
+<p>Class representing a template software environment</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.add_rendered_environment">
+<span class="sig-name descname"><span class="pre">add_rendered_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_environments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.add_rendered_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.add_rendered_environment" title="Link to this definition"></a></dt>
+<dd><p>Add a rendered environment to this template</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>environment</strong> (<a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><em>SoftwareEnvironment</em></a>) – Reference to rendered environment</p></li>
+<li><p><strong>all_environments</strong> (<em>dict</em>) – Dictionary containing all environments</p></li>
+<li><p><strong>all_packages</strong> (<em>dict</em>) – Dictionary containing all packages</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.get_spec">
-<span class="sig-name descname"><span class="pre">get_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.get_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.get_spec" title="Link to this definition"></a></dt>
-<dd><p>Return a single spec given its name</p>
+<dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.all_packages">
+<span class="sig-name descname"><span class="pre">all_packages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.all_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.all_packages" title="Link to this definition"></a></dt>
+<dd><p>Iterator over all packages in this environment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(SoftwarePackage) Each package in this environment</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.get_spec_string">
-<span class="sig-name descname"><span class="pre">get_spec_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.get_spec_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.get_spec_string" title="Link to this definition"></a></dt>
-<dd><p>Return the full spec string given a package name</p>
+<dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.info" title="Link to this definition"></a></dt>
+<dd><p>Software environment information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> (<em>int</em>) – Number of spaces to inject as indentation</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Verbosity level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>information of this environment</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.mapped_environments">
-<span class="sig-name descname"><span class="pre">mapped_environments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_env</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.mapped_environments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.mapped_environments" title="Link to this definition"></a></dt>
-<dd><p>Yield each environment rendered from a raw environment</p>
+<dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.render_environment">
+<span class="sig-name descname"><span class="pre">render_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expander</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.render_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.render_environment" title="Link to this definition"></a></dt>
+<dd><p>Render a SoftwareEnvironment from this TemplateEnvironment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expander</strong> (<em>Expander</em>) – Expander object to use when rendering</p></li>
+<li><p><strong>all_packages</strong> (<em>dict</em>) – All package definitions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(SoftwareEnvironment) Reference to the rendered SoftwareEnvironment</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.software_environments.TemplatePackage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">TemplatePackage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'spack'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplatePackage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplatePackage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.software_environments.SoftwarePackage" title="ramble.software_environments.SoftwarePackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">SoftwarePackage</span></code></a></p>
+<p>Class representing a template software package</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.software_environments.TemplatePackage.add_rendered_package">
+<span class="sig-name descname"><span class="pre">add_rendered_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_package</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplatePackage.add_rendered_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplatePackage.add_rendered_package" title="Link to this definition"></a></dt>
+<dd><p>Add a rendered package to this template’s list of rendered packages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_package</strong> (<a class="reference internal" href="#ramble.software_environments.SoftwarePackage" title="ramble.software_environments.SoftwarePackage"><em>SoftwarePackage</em></a>) – New package definition to add</p></li>
+<li><p><strong>all_packages</strong> (<em>dict</em>) – Dictionary of all package definitions</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.mapped_packages">
-<span class="sig-name descname"><span class="pre">mapped_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_pkg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.mapped_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.mapped_packages" title="Link to this definition"></a></dt>
-<dd><p>Yield each package rendered from a raw package</p>
+<dt class="sig sig-object py" id="ramble.software_environments.TemplatePackage.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplatePackage.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplatePackage.info" title="Link to this definition"></a></dt>
+<dd><p>String representation of package information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> (<em>int</em>) – Number of spaces to indent lines with</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Verbosity level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>String representation of this package</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.print_environments">
-<span class="sig-name descname"><span class="pre">print_environments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.print_environments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.print_environments" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.raw_environment_info">
-<span class="sig-name descname"><span class="pre">raw_environment_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.raw_environment_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.raw_environment_info" title="Link to this definition"></a></dt>
-<dd><p>Return the information for a raw environment</p>
+<dt class="sig sig-object py" id="ramble.software_environments.TemplatePackage.render_package">
+<span class="sig-name descname"><span class="pre">render_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expander</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplatePackage.render_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplatePackage.render_package" title="Link to this definition"></a></dt>
+<dd><p>Render a SoftwarePackage from this TemplatePackage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>expander</strong> (<em>Expander</em>) – Expander to use to render a package from this template</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rendered SoftwarePackage</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<a class="reference internal" href="#ramble.software_environments.SoftwarePackage" title="ramble.software_environments.SoftwarePackage">SoftwarePackage</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.raw_package_info">
-<span class="sig-name descname"><span class="pre">raw_package_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_pkg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#SoftwareEnvironments.raw_package_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.raw_package_info" title="Link to this definition"></a></dt>
-<dd><p>Return the information for a raw package</p>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.software_environments.package_managers">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.software_environments.</span></span><span class="sig-name descname"><span class="pre">package_managers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ramble.software_environments.package_managers" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.software_environments.SoftwareEnvironments.supported_confs">
-<span class="sig-name descname"><span class="pre">supported_confs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['v2']</span></em><a class="headerlink" href="#ramble.software_environments.SoftwareEnvironments.supported_confs" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.software_environments.package_managers.spack">
+<span class="sig-name descname"><span class="pre">spack</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ramble.software_environments.package_managers.spack" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
