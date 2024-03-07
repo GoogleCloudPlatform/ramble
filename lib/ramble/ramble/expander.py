@@ -314,6 +314,14 @@ class Expander(object):
         self._workload_run_dir = None
         self._experiment_run_dir = None
 
+    def add_no_expand_var(self, var: str):
+        """Add a new variable to the no expand set
+
+        Args:
+            var (str): Variable that should not expand
+        """
+        self._no_expand_vars.add(var)
+
     def set_no_expand_vars(self, no_expand_vars):
         self._no_expand_vars = no_expand_vars.copy()
 

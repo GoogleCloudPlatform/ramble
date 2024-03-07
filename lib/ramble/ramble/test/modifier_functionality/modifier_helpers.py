@@ -152,6 +152,7 @@ def env_var_set_modifier_answer():
     ]
     expected_strs = [
         'export test_var=test_val',
+        'export mask_env_var="0x0"'
     ]
     return expected_software, expected_strs
 
