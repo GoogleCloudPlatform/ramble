@@ -64,8 +64,8 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ramble.modifier_types namespace</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-ramble.modifier_types.basic">ramble.modifier_types.basic module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-ramble.modifier_types.spack">ramble.modifier_types.spack module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-modifier-types-basic-module">ramble.modifier_types.basic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-modifier-types-spack-module">ramble.modifier_types.spack module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
@@ -75,8 +75,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-application-module">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.context">ramble.context module</a></li>
@@ -89,8 +89,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modifier-module">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modkit-module">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
@@ -150,214 +150,11 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-ramble.modifier_types.basic">
-<span id="ramble-modifier-types-basic-module"></span><h2>ramble.modifier_types.basic module<a class="headerlink" href="#module-ramble.modifier_types.basic" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.modifier_types.basic.</span></span><span class="sig-name descname"><span class="pre">BasicModifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier_types/basic.html#BasicModifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="ramble.html#ramble.modifier.ModifierBase" title="ramble.modifier.ModifierBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModifierBase</span></code></a></p>
-<p>Specialized class for basic modifiers.</p>
-<p>This class can be used to set up a modifier that does not need additional
-software to be installed.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.archive_patterns">
-<span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.archive_patterns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.builtins">
-<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.builtins" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.default_compilers">
-<span class="sig-name descname"><span class="pre">default_compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.default_compilers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.env_var_modifications">
-<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.env_var_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.executable_modifiers">
-<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.executable_modifiers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.figure_of_merit_contexts">
-<span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.figure_of_merit_contexts" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.figures_of_merit">
-<span class="sig-name descname"><span class="pre">figures_of_merit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.figures_of_merit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.modes">
-<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.modes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.modifier_class">
-<span class="sig-name descname"><span class="pre">modifier_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'BasicModifier'</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.modifier_class" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.modifier_variables">
-<span class="sig-name descname"><span class="pre">modifier_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.modifier_variables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.package_manager_configs">
-<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.package_manager_configs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.package_manager_requirements">
-<span class="sig-name descname"><span class="pre">package_manager_requirements</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.package_manager_requirements" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.phase_definitions">
-<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.phase_definitions" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.required_packages">
-<span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.required_packages" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.required_vars">
-<span class="sig-name descname"><span class="pre">required_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.required_vars" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.software_specs">
-<span class="sig-name descname"><span class="pre">software_specs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.software_specs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.success_criteria">
-<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.success_criteria" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.basic.BasicModifier.variable_modifications">
-<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.basic.BasicModifier.variable_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="ramble-modifier-types-basic-module">
+<h2>ramble.modifier_types.basic module<a class="headerlink" href="#ramble-modifier-types-basic-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-ramble.modifier_types.spack">
-<span id="ramble-modifier-types-spack-module"></span><h2>ramble.modifier_types.spack module<a class="headerlink" href="#module-ramble.modifier_types.spack" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.modifier_types.spack.</span></span><span class="sig-name descname"><span class="pre">SpackModifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier_types/spack.html#SpackModifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="ramble.html#ramble.modifier.ModifierBase" title="ramble.modifier.ModifierBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModifierBase</span></code></a></p>
-<p>Specialized class for modifiers that use spack.</p>
-<p>This class can be used to set up a modifier that uses spack to install
-software for the modifier to work.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.archive_patterns">
-<span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.archive_patterns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.builtins">
-<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.builtins" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.default_compilers">
-<span class="sig-name descname"><span class="pre">default_compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.default_compilers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.env_var_modifications">
-<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.env_var_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.executable_modifiers">
-<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.executable_modifiers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.figure_of_merit_contexts">
-<span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.figure_of_merit_contexts" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.figures_of_merit">
-<span class="sig-name descname"><span class="pre">figures_of_merit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.figures_of_merit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.modes">
-<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.modes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.modifier_class">
-<span class="sig-name descname"><span class="pre">modifier_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SpackModifier'</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.modifier_class" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.modifier_variables">
-<span class="sig-name descname"><span class="pre">modifier_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.modifier_variables" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.package_manager_configs">
-<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.package_manager_configs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.package_manager_requirements">
-<span class="sig-name descname"><span class="pre">package_manager_requirements</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.package_manager_requirements" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.phase_definitions">
-<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.phase_definitions" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.required_packages">
-<span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.required_packages" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.required_vars">
-<span class="sig-name descname"><span class="pre">required_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.required_vars" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.software_specs">
-<span class="sig-name descname"><span class="pre">software_specs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.software_specs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.success_criteria">
-<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.success_criteria" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.uses_spack">
-<span class="sig-name descname"><span class="pre">uses_spack</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.uses_spack" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.modifier_types.spack.SpackModifier.variable_modifications">
-<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier_types.spack.SpackModifier.variable_modifications" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="ramble-modifier-types-spack-module">
+<h2>ramble.modifier_types.spack module<a class="headerlink" href="#ramble-modifier-types-spack-module" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -373,7 +170,7 @@ software for the modifier to work.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 06, 2024.
+      <span class="lastupdated">Last updated on Mar 07, 2024.
       </span></p>
   </div>
 
