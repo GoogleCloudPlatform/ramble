@@ -438,6 +438,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_workload_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_run_dir</span> <span class="o">=</span> <span class="kc">None</span>
 
+<div class="viewcode-block" id="Expander.add_no_expand_var">
+<a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.add_no_expand_var">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_no_expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a new variable to the no expand set</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var (str): Variable that should not expand</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_no_expand_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">var</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Expander.set_no_expand_vars">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.set_no_expand_vars">[docs]</a>
     <span class="k">def</span> <span class="nf">set_no_expand_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_expand_vars</span><span class="p">):</span>

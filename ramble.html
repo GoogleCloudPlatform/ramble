@@ -173,6 +173,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.expander">ramble.expander module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.ApplicationNotDefinedError"><code class="docutils literal notranslate"><span class="pre">ApplicationNotDefinedError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.expander.Expander"><code class="docutils literal notranslate"><span class="pre">Expander</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.add_no_expand_var"><code class="docutils literal notranslate"><span class="pre">Expander.add_no_expand_var()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.application_input_dir"><code class="docutils literal notranslate"><span class="pre">Expander.application_input_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.application_name"><code class="docutils literal notranslate"><span class="pre">Expander.application_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.expander.Expander.application_namespace"><code class="docutils literal notranslate"><span class="pre">Expander.application_namespace</span></code></a></li>
@@ -2620,6 +2621,17 @@ expansion within string.</p>
 <p>The variables can come from workspace variables, software stack variables,
 and experiment variables.</p>
 <p>Additionally, math will be evaluated as part of expansion.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.expander.Expander.add_no_expand_var">
+<span class="sig-name descname"><span class="pre">add_no_expand_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/expander.html#Expander.add_no_expand_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.expander.Expander.add_no_expand_var" title="Link to this definition"></a></dt>
+<dd><p>Add a new variable to the no expand set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>var</strong> (<em>str</em>) – Variable that should not expand</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="ramble.expander.Expander.application_input_dir">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">application_input_dir</span></span><a class="headerlink" href="#ramble.expander.Expander.application_input_dir" title="Link to this definition"></a></dt>
