@@ -589,9 +589,10 @@ def workspace_info(args):
 
                 for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
                     app_inst = experiment_set.get_experiment(exp_name)
-                    software_environments.render_environment(
-                        app_inst.expander.expand_var('{env_name}'), app_inst.expander
-                    )
+                    if app_inst.uses_spack:
+                        software_environments.render_environment(
+                            app_inst.expander.expand_var('{env_name}'), app_inst.expander
+                        )
 
                     if print_header:
                         color.cprint(rucolor.nested_1('  Application: ') +

@@ -15,7 +15,6 @@ import llnl.util.filesystem as fs
 
 import ramble.application
 import ramble.workspace
-from ramble.software_environments import RambleSoftwareEnvironmentError
 from ramble.main import RambleCommand, RambleCommandError
 from ramble.test.dry_run_helpers import search_files_for_string
 import ramble.config
@@ -103,8 +102,18 @@ def check_info_basic(output):
     assert 'Workload' in output
     assert 'Experiment' in output
     assert 'Software Stack' in output
-    assert 'Packages' in output
-    assert 'Environments' in output
+
+
+def check_info_zlib(output):
+    assert 'zlib' in output
+    assert 'ensure_installed' in output
+
+    assert 'Application' in output
+    assert 'Workload' in output
+    assert 'Experiment' in output
+    assert 'Software Stack' in output
+    assert 'Template Package' in output
+    assert 'Template Environment' in output
 
 
 def check_results(ws):
@@ -178,11 +187,22 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
   spack:
     concretized: true
-    packages: {}
-    environments: {}
+    packages:
+      zlib:
+        spack_spec: 'zlib'
+    environments:
+      zlib:
+        packages:
+        - zlib
 """
 
     workspace_name = 'test_info'
@@ -221,10 +241,22 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
   spack:
     concretized: true
-    packages: {}
-    environments: {}
+    packages:
+      zlib:
+        spack_spec: 'zlib'
+    environments:
+      zlib:
+        packages:
+        - zlib
 """
 
     config_file = """
@@ -1681,37 +1713,3 @@ ramble:
     output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
-
-
-def test_invalid_spack_config_errors(capsys):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}'
-  applications:
-    zlib:
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_ranks: '1'
-"""
-
-    workspace_name = 'test_invalid_spack_config_errors'
-    ws1 = ramble.workspace.create(workspace_name)
-    ws1.write()
-
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
-
-    ws1._re_read()
-    with pytest.raises(RambleSoftwareEnvironmentError):
-        ramble.software_environments.SoftwareEnvironments(ws1)
-        captured = capsys.readouterr()
-        assert "Software configuration type invalid is not one of ['v2']" in captured.err
