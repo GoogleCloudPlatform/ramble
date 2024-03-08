@@ -58,6 +58,36 @@ def test_basic_software_environment(request, mutable_mock_workspace_path):
         assert pkg_found
 
 
+def test_software_environments_no_packages(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['environments'] = {
+            'basic-{env_test}': {
+                'packages': ['']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'basic-{env_test}' in software_environments._environment_templates
+
+        variables = {
+            'env_test': 'environment',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic-environment', env_expander)
+        assert rendered_env.name == 'basic-environment'
+
+
 def test_template_software_environments(request, mutable_mock_workspace_path):
     ws_name = request.node.name
 

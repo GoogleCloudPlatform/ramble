@@ -510,13 +510,14 @@ class SoftwareEnvironments(object):
                     new_env = TemplateEnvironment(env_template)
                     if namespace.packages in env_info:
                         for package in env_info[namespace.packages]:
-                            if package not in self._package_templates:
-                                raise RambleSoftwareEnvironmentError(
-                                    f'Environment {env_template} references '
-                                    f'undefined package {package}'
-                                )
-                            pkg_obj = self._package_templates[package]
-                            new_env.add_package(pkg_obj)
+                            if package:
+                                if package not in self._package_templates:
+                                    raise RambleSoftwareEnvironmentError(
+                                        f'Environment {env_template} references '
+                                        f'undefined package {package}'
+                                    )
+                                pkg_obj = self._package_templates[package]
+                                new_env.add_package(pkg_obj)
                     self._environment_templates[env_template] = new_env
 
     def define_compiler_packages(self, environment, expander):
