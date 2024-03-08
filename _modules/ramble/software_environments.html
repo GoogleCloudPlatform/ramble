@@ -436,8 +436,15 @@
 <span class="sd">            name (str): Name of this environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_package_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rendered_environments</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_environment_type</span> <span class="o">=</span> <span class="s1">&#39;Template&#39;</span>
+
+<div class="viewcode-block" id="TemplateEnvironment.add_package_name">
+<a class="viewcode-back" href="../../ramble.html#ramble.software_environments.TemplateEnvironment.add_package_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_package_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_package_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">package</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="TemplateEnvironment.info">
 <a class="viewcode-back" href="../../ramble.html#ramble.software_environments.TemplateEnvironment.info">[docs]</a>
@@ -469,7 +476,8 @@
 
 <div class="viewcode-block" id="TemplateEnvironment.render_environment">
 <a class="viewcode-back" href="../../ramble.html#ramble.software_environments.TemplateEnvironment.render_environment">[docs]</a>
-    <span class="k">def</span> <span class="nf">render_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expander</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">all_packages</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">render_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expander</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">all_package_templates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+                           <span class="n">all_packages</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render a SoftwareEnvironment from this TemplateEnvironment</span>
 
 <span class="sd">        Args:</span>
@@ -483,20 +491,34 @@
 
         <span class="n">new_env</span> <span class="o">=</span> <span class="n">SoftwareEnvironment</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_packages</span><span class="p">:</span>
-            <span class="n">rendered_pkg</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">render_package</span><span class="p">(</span><span class="n">expander</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">env_pkg_template</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_package_names</span><span class="p">:</span>
+            <span class="n">rendered_env_pkg_name</span> <span class="o">=</span> <span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">env_pkg_template</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">all_packages</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">rendered_pkg</span> <span class="o">!=</span> <span class="n">all_packages</span><span class="p">[</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">rendered_env_pkg_name</span><span class="p">:</span>
+                <span class="n">added</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">template_pkg</span> <span class="ow">in</span> <span class="n">all_package_templates</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">rendered_pkg</span> <span class="o">=</span> <span class="n">template_pkg</span><span class="o">.</span><span class="n">render_package</span><span class="p">(</span><span class="n">expander</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">rendered_env_pkg_name</span> <span class="o">==</span> <span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">all_packages</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">rendered_pkg</span> <span class="o">!=</span> <span class="n">all_packages</span><span class="p">[</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
+                                <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> defined multiple times in inconsistent &#39;</span>
+                                    <span class="sa">f</span><span class="s1">&#39;ways.</span><span class="se">\n</span><span class="s1">Package with differences is </span><span class="si">{</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+                                <span class="p">)</span>
+                            <span class="n">rendered_pkg</span> <span class="o">=</span> <span class="n">all_packages</span><span class="p">[</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">all_packages</span><span class="p">[</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">rendered_pkg</span>
+
+                        <span class="n">added</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">template_pkg</span><span class="o">.</span><span class="n">add_rendered_package</span><span class="p">(</span><span class="n">rendered_pkg</span><span class="p">,</span> <span class="n">all_packages</span><span class="p">)</span>
+                        <span class="n">new_env</span><span class="o">.</span><span class="n">add_package</span><span class="p">(</span><span class="n">rendered_pkg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">added</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> defined multiple times in inconsistent ways</span><span class="se">\n</span><span class="s1">&#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;Package with differences </span><span class="si">{</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;Environment template </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> references &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;undefined package </span><span class="si">{</span><span class="n">env_pkg_template</span><span class="si">}</span><span class="s1"> rendered to </span><span class="si">{</span><span class="n">rendered_env_pkg_name</span><span class="si">}</span><span class="s1">&#39;</span>
                     <span class="p">)</span>
-                <span class="n">rendered_pkg</span> <span class="o">=</span> <span class="n">all_packages</span><span class="p">[</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">all_packages</span><span class="p">[</span><span class="n">rendered_pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">rendered_pkg</span>
-
-            <span class="n">new_env</span><span class="o">.</span><span class="n">add_package</span><span class="p">(</span><span class="n">rendered_pkg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_env</span></div>
 
@@ -658,13 +680,7 @@
                     <span class="n">new_env</span> <span class="o">=</span> <span class="n">TemplateEnvironment</span><span class="p">(</span><span class="n">env_template</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">in</span> <span class="n">env_info</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">env_info</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]:</span>
-                            <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_package_templates</span><span class="p">:</span>
-                                <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
-                                    <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="n">env_template</span><span class="si">}</span><span class="s1"> references &#39;</span>
-                                    <span class="sa">f</span><span class="s1">&#39;undefined package </span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="s1">&#39;</span>
-                                <span class="p">)</span>
-                            <span class="n">pkg_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_package_templates</span><span class="p">[</span><span class="n">package</span><span class="p">]</span>
-                            <span class="n">new_env</span><span class="o">.</span><span class="n">add_package</span><span class="p">(</span><span class="n">pkg_obj</span><span class="p">)</span>
+                            <span class="n">new_env</span><span class="o">.</span><span class="n">add_package_name</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_environment_templates</span><span class="p">[</span><span class="n">env_template</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_env</span>
 
 <div class="viewcode-block" id="SoftwareEnvironments.define_compiler_packages">
@@ -834,7 +850,8 @@
         <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">template_def</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_environment_templates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">rendered_name</span> <span class="o">=</span> <span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">rendered_name</span> <span class="o">==</span> <span class="n">env_name</span><span class="p">:</span>
-                <span class="n">rendered_env</span> <span class="o">=</span> <span class="n">template_def</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span><span class="n">expander</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rendered_packages</span><span class="p">)</span>
+                <span class="n">rendered_env</span> <span class="o">=</span> <span class="n">template_def</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span><span class="n">expander</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_package_templates</span><span class="p">,</span>
+                                                               <span class="bp">self</span><span class="o">.</span><span class="n">_rendered_packages</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">rendered_env</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">env_name</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">env_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rendered_environments</span><span class="p">:</span>
@@ -874,7 +891,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 07, 2024.
+      <span class="lastupdated">Last updated on Mar 08, 2024.
       </span></p>
   </div>
 

@@ -764,6 +764,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.add_package_name"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.add_package_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.add_rendered_environment"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.add_rendered_environment()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.all_packages"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.all_packages()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.software_environments.TemplateEnvironment.info"><code class="docutils literal notranslate"><span class="pre">TemplateEnvironment.info()</span></code></a></li>
@@ -6444,6 +6445,11 @@ different.</p></li>
 <dd><p>Bases: <a class="reference internal" href="#ramble.software_environments.SoftwareEnvironment" title="ramble.software_environments.SoftwareEnvironment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SoftwareEnvironment</span></code></a></p>
 <p>Class representing a template software environment</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.add_package_name">
+<span class="sig-name descname"><span class="pre">add_package_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.add_package_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.add_package_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.add_rendered_environment">
 <span class="sig-name descname"><span class="pre">add_rendered_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">environment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_environments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.add_rendered_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.add_rendered_environment" title="Link to this definition"></a></dt>
 <dd><p>Add a rendered environment to this template</p>
@@ -6491,7 +6497,7 @@ different.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.software_environments.TemplateEnvironment.render_environment">
-<span class="sig-name descname"><span class="pre">render_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expander</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.render_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.render_environment" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">render_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expander</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_package_templates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/software_environments.html#TemplateEnvironment.render_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.software_environments.TemplateEnvironment.render_environment" title="Link to this definition"></a></dt>
 <dd><p>Render a SoftwareEnvironment from this TemplateEnvironment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -7491,7 +7497,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 07, 2024.
+      <span class="lastupdated">Last updated on Mar 08, 2024.
       </span></p>
   </div>
 
