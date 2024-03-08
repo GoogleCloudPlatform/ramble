@@ -306,8 +306,12 @@ class TemplateEnvironment(SoftwareEnvironment):
             name (str): Name of this environment
         """
         super().__init__(name)
+        self._package_names = set()
         self._rendered_environments = {}
         self._environment_type = 'Template'
+
+    def add_package_name(self, package: str = None):
+        self._package_names.add(package)
 
     def info(self, indent: int = 0, verbosity: int = 0, color_level: int = 0):
         """Software environment information
@@ -334,7 +338,8 @@ class TemplateEnvironment(SoftwareEnvironment):
 
         return super().info()
 
-    def render_environment(self, expander: object, all_packages: dict):
+    def render_environment(self, expander: object, all_package_templates: dict,
+                           all_packages: dict):
         """Render a SoftwareEnvironment from this TemplateEnvironment
 
         Args:
@@ -348,20 +353,34 @@ class TemplateEnvironment(SoftwareEnvironment):
 
         new_env = SoftwareEnvironment(name)
 
-        for package in self._packages:
-            rendered_pkg = package.render_package(expander)
+        for env_pkg_template in self._package_names:
+            rendered_env_pkg_name = expander.expand_var(env_pkg_template)
 
-            if rendered_pkg.name in all_packages:
-                if rendered_pkg != all_packages[rendered_pkg.name]:
+            if rendered_env_pkg_name:
+                added = False
+                for template_pkg in all_package_templates.values():
+                    rendered_pkg = template_pkg.render_package(expander)
+
+                    if rendered_env_pkg_name == rendered_pkg.name:
+                        if rendered_pkg.name in all_packages:
+                            if rendered_pkg != all_packages[rendered_pkg.name]:
+                                raise RambleSoftwareEnvironmentError(
+                                    f'Environment {name} defined multiple times in inconsistent '
+                                    f'ways.\nPackage with differences is {rendered_pkg.name}'
+                                )
+                            rendered_pkg = all_packages[rendered_pkg.name]
+                        else:
+                            all_packages[rendered_pkg.name] = rendered_pkg
+
+                        added = True
+                        template_pkg.add_rendered_package(rendered_pkg, all_packages)
+                        new_env.add_package(rendered_pkg)
+
+                if not added:
                     raise RambleSoftwareEnvironmentError(
-                        f'Environment {name} defined multiple times in inconsistent ways\n'
-                        f'Package with differences {rendered_pkg.name}'
+                        f'Environment template {self.name} references '
+                        f'undefined package {env_pkg_template} rendered to {rendered_env_pkg_name}'
                     )
-                rendered_pkg = all_packages[rendered_pkg.name]
-            else:
-                all_packages[rendered_pkg.name] = rendered_pkg
-
-            new_env.add_package(rendered_pkg)
 
         return new_env
 
@@ -510,13 +529,7 @@ class SoftwareEnvironments(object):
                     new_env = TemplateEnvironment(env_template)
                     if namespace.packages in env_info:
                         for package in env_info[namespace.packages]:
-                            if package not in self._package_templates:
-                                raise RambleSoftwareEnvironmentError(
-                                    f'Environment {env_template} references '
-                                    f'undefined package {package}'
-                                )
-                            pkg_obj = self._package_templates[package]
-                            new_env.add_package(pkg_obj)
+                            new_env.add_package_name(package)
                     self._environment_templates[env_template] = new_env
 
     def define_compiler_packages(self, environment, expander):
@@ -675,7 +688,8 @@ class SoftwareEnvironments(object):
         for template_name, template_def in self._environment_templates.items():
             rendered_name = expander.expand_var(template_name)
             if rendered_name == env_name:
-                rendered_env = template_def.render_environment(expander, self._rendered_packages)
+                rendered_env = template_def.render_environment(expander, self._package_templates,
+                                                               self._rendered_packages)
 
                 if rendered_env.name == env_name:
                     if env_name in self._rendered_environments:

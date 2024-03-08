@@ -58,6 +58,67 @@ def test_basic_software_environment(request, mutable_mock_workspace_path):
         assert pkg_found
 
 
+def test_software_environments_no_packages(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['environments'] = {
+            'basic-{env_test}': {
+                'packages': ['']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'basic-{env_test}' in software_environments._environment_templates
+
+        variables = {
+            'env_test': 'environment',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic-environment', env_expander)
+        assert rendered_env.name == 'basic-environment'
+
+
+def test_software_environments_no_rendered_packages(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['environments'] = {
+            'basic-{env_test}': {
+                'packages': ['{var_pkg_name}']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'basic-{env_test}' in software_environments._environment_templates
+
+        variables = {
+            'env_test': 'environment',
+            'var_pkg_name': ''
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic-environment', env_expander)
+        assert rendered_env.name == 'basic-environment'
+
+
 def test_template_software_environments(request, mutable_mock_workspace_path):
     ws_name = request.node.name
 
@@ -180,11 +241,20 @@ def test_undefined_package_errors(request, mutable_mock_workspace_path):
             }
         }
 
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        variables = {
+            'env_test': 'environment'
+        }
+
+        env_expander = ramble.expander.Expander(variables, None)
+
         with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as pkg_err:
-            _ = ramble.software_environments.SoftwareEnvironments(ws)
+            _  = software_environments.render_environment('all-basic-environment', env_expander)
 
         err_str = \
-            'Environment all-basic-{env_test} references undefined package foo-basic-{pkg_test}'
+            'Environment template all-basic-{env_test} references undefined ' \
+            + 'package foo-basic-{pkg_test}'
         assert err_str in str(pkg_err)
 
 
