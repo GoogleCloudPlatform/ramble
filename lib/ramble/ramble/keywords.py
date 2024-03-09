@@ -26,6 +26,7 @@ default_keys = {
     'workload_namespace': {'type': key_type.reserved, 'level': output_level.key},
     'simplified_workload_namespace': {'type': key_type.reserved, 'level': output_level.key},
     'license_input_dir': {'type': key_type.reserved, 'level': output_level.variable},
+    'experiments_file': {'type': key_type.reserved, 'level': output_level.key},
     'experiment_name': {'type': key_type.reserved, 'level': output_level.key},
     'experiment_run_dir': {'type': key_type.reserved, 'level': output_level.variable},
     'experiment_status': {'type': key_type.reserved, 'level': output_level.key},
@@ -121,6 +122,26 @@ class Keywords(object):
         if not self.is_valid(key):
             return False
         return self.keys[key]['level'] == output_level.variable
+
+    def all_required_keys(self):
+        """Yield all required keys
+
+        Yields:
+            (str): Key name
+        """
+        for key in self.keys.keys():
+            if self.is_required(key):
+                yield key
+
+    def all_reserved_keys(self):
+        """Yield all reserved keys
+
+        Yields:
+            (str): Key name
+        """
+        for key in self.keys.keys():
+            if self.is_reserved(key):
+                yield key
 
     def check_reserved_keys(self, definitions):
         """Check a dictionary of variable definitions for reserved keywords"""

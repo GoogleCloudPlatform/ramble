@@ -108,7 +108,7 @@ class ExpansionNode(object):
 
     def define_value(self, expansion_dict, allow_passthrough=True,
                      expansion_func=str, evaluation_func=eval,
-                     no_expand_vars=set()):
+                     no_expand_vars=set(), used_vars=set()):
         """Define the value for this node.
 
         Construct the value of self. This builds up a string representation of
@@ -153,6 +153,7 @@ class ExpansionNode(object):
                 required_passthrough = False
 
                 if kw_parts[0] in expansion_dict:
+                    used_vars.add(kw_parts[0])
                     # Exit expansion for variables defined as no_expand
                     if kw_parts[0] in no_expand_vars:
                         self.value = expansion_dict[kw_parts[0]]
@@ -293,6 +294,7 @@ class Expander(object):
 
         self._variables = variables
         self._no_expand_vars = no_expand_vars
+        self._used_variables = set()
 
         self._experiment_set = experiment_set
 
@@ -561,7 +563,8 @@ class Expander(object):
                                   allow_passthrough=allow_passthrough,
                                   expansion_func=self._partial_expand,
                                   evaluation_func=self.perform_math_eval,
-                                  no_expand_vars=self._no_expand_vars)
+                                  no_expand_vars=self._no_expand_vars,
+                                  used_vars=self._used_variables)
 
             return str(str_graph.root.value)
 

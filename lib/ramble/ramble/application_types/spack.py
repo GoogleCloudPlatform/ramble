@@ -77,6 +77,33 @@ class SpackApplication(ApplicationBase):
 
         return ''.join(out_str)
 
+    def build_used_variables(self, workspace):
+        """Build a set of all used variables
+
+        By expanding all necessary portions of this experiment (required /
+        reserved keywords, templates, commands, etc...), determine which
+        variables are used throughout the experiment definition.
+
+        Variables can have list definitions. These are iterated over to ensure
+        variables referenced by any of them are tracked properly.
+
+        Args:
+            workspace (Workspace): Workspace to extract templates from
+
+        Returns:
+            (set): All variable names used by this experiment.
+        """
+        _ = super().build_used_variables(workspace)
+
+        app_context = self.expander.expand_var_name(self.keywords.env_name)
+
+        software_environments = workspace.software_environments
+        software_environments.render_environment(app_context,
+                                                 self.expander,
+                                                 require=False)
+
+        return self.expander._used_variables
+
     register_phase('software_install_requested_compilers', pipeline='setup',
                    run_after=['software_create_env'])
 

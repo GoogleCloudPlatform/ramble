@@ -465,7 +465,7 @@ class Workspace(object):
         self.input_mirror_stats = None
         self.input_mirror_cache = None
         self.software_mirror_cache = None
-        self._software_environments = None
+        self.software_environments = None
         self.hash_inventory = {
             'experiments': [],
             'versions': []

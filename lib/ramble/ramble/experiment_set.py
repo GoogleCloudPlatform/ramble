@@ -247,6 +247,86 @@ class ExperimentSet(object):
         if not n_threads:
             variables[self.keywords.n_threads] = 1
 
+    def _prepare_experiment(self, exp_template_name, variables, context, repeats):
+        """Prepare an experiment instance
+
+        Create an experiment instance based on the input variables, context,
+        repeats, and template name.
+
+        Args:
+            exp_template_name (str): Template name for experiments
+            variables (dict): Dictionary of variables for this experiment
+            context (Context): Context object for this experiment
+            repeats (Repeats): Repeats object for this experiment
+
+        Returns:
+            (Application): Instance of an application class for this experiment
+        """
+        variables[self.keywords.env_path] = \
+            os.path.join(self._workspace.software_dir,
+                         Expander.expansion_str(self.keywords.env_name) + '.' +
+                         Expander.expansion_str(self.keywords.workload_name))
+
+        experiment_suffix = ''
+        # After generating the base experiment, append the index to repeat experiments
+        if repeats.repeat_index:
+            experiment_suffix = f'.{repeats.repeat_index}'
+
+        expander = ramble.expander.Expander(variables, self)
+        self._compute_mpi_vars(expander, variables)
+        final_app_name = expander.expand_var_name(self.keywords.application_name,
+                                                  allow_passthrough=False)
+        final_wl_name = expander.expand_var_name(self.keywords.workload_name,
+                                                 allow_passthrough=False)
+        final_exp_name = expander.expand_var(exp_template_name + experiment_suffix,
+                                             allow_passthrough=False)
+
+        variables[self.keywords.experiment_template_name] = (exp_template_name
+                                                             + experiment_suffix)
+        variables[self.keywords.application_name] = final_app_name
+        variables[self.keywords.workload_name] = final_wl_name
+        variables[self.keywords.experiment_name] = final_exp_name
+        variables[self.keywords.experiment_index] = len(self.experiments) + 1
+
+        experiment_namespace = expander.experiment_namespace
+        variables[self.keywords.experiment_namespace] = experiment_namespace
+
+        variables[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
+                                                         '{experiment_name}.out')
+
+        variables[self.keywords.simplified_application_namespace] = \
+            spack.util.naming.simplify_name(
+                expander.expand_var_name(
+                    self.keywords.application_namespace
+                )
+        )
+        variables[self.keywords.simplified_workload_namespace] = \
+            spack.util.naming.simplify_name(
+                expander.expand_var_name(
+                    self.keywords.workload_namespace
+                )
+        )
+        variables[self.keywords.simplified_experiment_namespace] = \
+            spack.util.naming.simplify_name(
+                expander.expand_var_name(
+                    self.keywords.experiment_namespace
+                )
+        )
+
+        app_inst = ramble.repository.get(final_app_name).copy()
+        app_inst.set_variables(variables, self)
+        app_inst.set_env_variable_sets(context.env_variables)
+        app_inst.set_internals(context.internals)
+        app_inst.set_template(context.is_template)
+        app_inst.repeats = repeats
+        app_inst.set_chained_experiments(context.chained_experiments)
+        app_inst.set_modifiers(context.modifiers)
+        app_inst.set_tags(context.tags)
+        app_inst.set_formatted_executables(context.formatted_executables)
+        app_inst.read_status()
+
+        return app_inst
+
     def _ingest_experiments(self):
         """Ingest experiments based on the current context.
 
@@ -310,6 +390,7 @@ class ExperimentSet(object):
         render_group.zips = final_context.zips
         render_group.matrices = final_context.matrices
         render_group.n_repeats = final_context.n_repeats
+        render_group.used_variables = set()
 
         excluded_experiments = set()
         if final_context.exclude:
@@ -320,7 +401,7 @@ class ExperimentSet(object):
                                         final_context.exclude)
 
             if perform_explicit_exclude:
-                for exclude_exp_vars, _ in renderer.render_objects(exclude_group):
+                for exclude_exp_vars, _ in renderer.render_objects(exclude_group, remove=False):
                     expander = ramble.expander.Expander(exclude_exp_vars, self)
                     self._compute_mpi_vars(expander, exclude_exp_vars)
                     exclude_exp_name = expander.expand_var(experiment_template_name,
@@ -332,89 +413,53 @@ class ExperimentSet(object):
             if namespace.where in final_context.exclude:
                 exclude_where = final_context.exclude[namespace.where]
 
+        tracking_group = ramble.renderer.RenderGroup('experiment', 'create')
+        tracking_group.variables = final_context.variables
+        tracking_group.zips = final_context.zips
+        tracking_group.matrices = final_context.matrices
+        tracking_group.n_repeats = final_context.n_repeats
+        tracking_group.used_variables = set()
+
+        used_variables = set()
+        for tracking_vars, repeats in \
+                renderer.render_objects(render_group, exclude_where=exclude_where,
+                                        remove=False, fatal=False):
+            app_inst = self._prepare_experiment(experiment_template_name,
+                                                tracking_vars, final_context, repeats)
+
+            final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
+
+            exp_used_variables = app_inst.build_used_variables(self._workspace)
+            used_variables = used_variables.union(exp_used_variables)
+        render_group.used_variables = used_variables.copy()
+
         rendered_experiments = set()
         for experiment_vars, repeats in \
                 renderer.render_objects(render_group, exclude_where=exclude_where):
-            experiment_vars[self.keywords.env_path] = \
-                os.path.join(self._workspace.software_dir,
-                             Expander.expansion_str(self.keywords.env_name) + '.' +
-                             Expander.expansion_str(self.keywords.workload_name))
+            app_inst = self._prepare_experiment(experiment_template_name, experiment_vars,
+                                                final_context, repeats)
 
-            experiment_suffix = ''
-            # After generating the base experiment, append the index to repeat experiments
-            if repeats.repeat_index:
-                experiment_suffix = f'.{repeats.repeat_index}'
-
-            expander = ramble.expander.Expander(experiment_vars, self)
-            self._compute_mpi_vars(expander, experiment_vars)
-            final_app_name = expander.expand_var_name(self.keywords.application_name,
-                                                      allow_passthrough=False)
-            final_wl_name = expander.expand_var_name(self.keywords.workload_name,
-                                                     allow_passthrough=False)
-            final_exp_name = expander.expand_var(experiment_template_name + experiment_suffix,
-                                                 allow_passthrough=False)
+            final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
+            final_exp_namespace = \
+                app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
 
             # Skip explicitly excluded experiments
-            if final_exp_name in excluded_experiments:
-                continue
+            if final_exp_name not in excluded_experiments:
+                logger.debug(f'   Final name: {final_exp_namespace}')
 
-            experiment_vars[self.keywords.experiment_template_name] = (experiment_template_name
-                                                                       + experiment_suffix)
-            experiment_vars[self.keywords.application_name] = final_app_name
-            experiment_vars[self.keywords.workload_name] = final_wl_name
-            experiment_vars[self.keywords.experiment_name] = final_exp_name
-            experiment_vars[self.keywords.experiment_index] = len(self.experiments) + 1
+                if final_exp_namespace in rendered_experiments:
+                    logger.die(f'Experiment {final_exp_namespace} is not unique.')
 
-            experiment_namespace = expander.experiment_namespace
-
-            experiment_vars[self.keywords.log_file] = os.path.join('{experiment_run_dir}',
-                                                                   '{experiment_name}.out')
-
-            experiment_vars[self.keywords.simplified_application_namespace] = \
-                spack.util.naming.simplify_name(
-                    expander.expand_var_name(
-                        self.keywords.application_namespace
+                try:
+                    self.keywords.check_required_keys(experiment_vars)
+                except ramble.keywords.RambleKeywordError as e:
+                    raise RambleVariableDefinitionError(
+                        f'In experiment {final_exp_namespace}: {e}'
                     )
-            )
-            experiment_vars[self.keywords.simplified_workload_namespace] = \
-                spack.util.naming.simplify_name(
-                    expander.expand_var_name(
-                        self.keywords.workload_namespace
-                    )
-            )
-            experiment_vars[self.keywords.simplified_experiment_namespace] = \
-                spack.util.naming.simplify_name(
-                    expander.expand_var_name(
-                        self.keywords.experiment_namespace
-                    )
-            )
 
-            logger.debug('   Final name: %s' % final_exp_name)
-
-            if experiment_namespace in rendered_experiments:
-                logger.die(f'Experiment {experiment_namespace} is not unique.')
-            rendered_experiments.add(experiment_namespace)
-
-            try:
-                self.keywords.check_required_keys(experiment_vars)
-            except ramble.keywords.RambleKeywordError as e:
-                raise RambleVariableDefinitionError(
-                    f'In experiment {self.experiment_namespace}: {e}'
-                )
-
-            app_inst = ramble.repository.get(final_app_name)
-            app_inst.set_variables(experiment_vars, self)
-            app_inst.set_env_variable_sets(final_context.env_variables)
-            app_inst.set_internals(final_context.internals)
-            app_inst.set_template(final_context.is_template)
-            app_inst.repeats = repeats
-            app_inst.set_chained_experiments(final_context.chained_experiments)
-            app_inst.set_modifiers(final_context.modifiers)
-            app_inst.set_tags(final_context.tags)
-            app_inst.set_formatted_executables(final_context.formatted_executables)
-            app_inst.read_status()
-            self.experiments[experiment_namespace] = app_inst
-            self.experiment_order.append(experiment_namespace)
+                rendered_experiments.add(final_exp_namespace)
+                self.experiments[final_exp_namespace] = app_inst
+                self.experiment_order.append(final_exp_namespace)
 
     def build_experiment_chains(self):
         base_experiments = self.experiment_order.copy()

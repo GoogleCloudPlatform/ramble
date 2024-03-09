@@ -668,7 +668,7 @@ class SoftwareEnvironments(object):
 
         self._deprecated_warnings()
 
-    def render_environment(self, env_name: str, expander: object):
+    def render_environment(self, env_name: str, expander: object, require=True):
         """Render an environment needed by an experiment
 
         Args:
@@ -707,9 +707,10 @@ class SoftwareEnvironments(object):
                     self._check_environment(rendered_env)
                     return rendered_env
 
-        raise RambleSoftwareEnvironmentError(
-            f'No defined environment matches required name {env_name}'
-        )
+        if require:
+            raise RambleSoftwareEnvironmentError(
+                f'No defined environment matches required name {env_name}'
+            )
 
 
 class RambleSoftwareEnvironmentError(ramble.error.RambleError):
