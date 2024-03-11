@@ -804,10 +804,10 @@
     <span class="k">def</span> <span class="nf">get_package_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the installation directory for a package&quot;&quot;&quot;</span>
         <span class="n">loc_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">]</span>
-        <span class="n">loc_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">loc_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">))</span>
 
         <span class="n">name_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;find&#39;</span><span class="p">,</span> <span class="s1">&#39;--format=</span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">]</span>
-        <span class="n">name_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">name_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">name_args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -817,8 +817,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">name_args</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">loc_args</span><span class="p">)</span>
 
-            <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;dry-run&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="n">package_spec</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;dry-run&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span></div>
 
 
@@ -1037,7 +1037,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 08, 2024.
+      <span class="lastupdated">Last updated on Mar 11, 2024.
       </span></p>
   </div>
 
