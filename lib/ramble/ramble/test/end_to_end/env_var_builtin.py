@@ -125,3 +125,44 @@ ramble:
                 if export_found and cmd3_regex.search(line):
                     cmd_found = True
             assert cmd_found and export_found
+
+
+def test_env_var_from_app_only(mutable_config, mutable_mock_workspace_path, mock_applications):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    partition: 'part1'
+    processes_per_node: '16'
+    n_threads: '1'
+  applications:
+    interleved-env-vars:
+      workloads:
+        test_wl:
+          experiments:
+            simple_test:
+              variables:
+                n_nodes: 1
+  spack:
+    concretized: true
+    packages: {}
+    environments: {}
+"""
+    workspace_name = 'test_env_var_from_app_only'
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, 'w+') as f:
+            f.write(test_config)
+        ws._re_read()
+
+        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+
+        experiment_root = ws.experiment_dir
+        exp1_dir = os.path.join(experiment_root, 'interleved-env-vars', 'test_wl', 'simple_test')
+
+        with open(os.path.join(exp1_dir, 'execute_experiment'), 'r') as f:
+            assert 'FROM_DIRECTIVE' in f.read()
