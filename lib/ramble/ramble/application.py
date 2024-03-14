@@ -909,7 +909,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             n_indentation = 0
             if namespace.indentation in formatted_conf:
-                n_indentation = int(formatted_conf[namespace.indentation]) + 1
+                n_indentation = int(formatted_conf[namespace.indentation])
 
             prefix = ''
             if namespace.prefix in formatted_conf:
@@ -919,9 +919,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if namespace.join_separator in formatted_conf:
                 join_separator = formatted_conf[namespace.join_separator].replace(r'\n', '\n')
 
-            indentation = ''
-            for _ in range(0, n_indentation + 1):
-                indentation += ' '
+            indentation = ' ' * n_indentation
 
             formatted_str = ''
             for cmd in self._command_list:

@@ -86,10 +86,10 @@ ramble:
 
         with open(exp_script, 'r') as f:
             data = f.read()
-            assert ';           from_ws echo' in data
             assert 'from_app echo' in data
-            assert '           from_wl echo' in data
-            assert '          from_exp echo' in data
+            assert ';' + ' ' * 9 + 'from_ws echo' in data
+            assert '\n' + ' ' * 11 + 'from_wl echo' in data
+            assert '\n' + ' ' * 10 + 'from_exp echo' in data
 
 
 def test_redefined_executable_errors(mutable_config, mutable_mock_workspace_path,
