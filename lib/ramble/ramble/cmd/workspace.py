@@ -857,6 +857,6 @@ def setup_parser(subparser):
 
 
 def workspace(parser, args):
-    """Look for a function called environment_<name> and call it."""
+    """Look for a function called workspace_<name> and call it."""
     action = subcommand_functions[args.workspace_command]
     action(args)

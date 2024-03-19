@@ -8,6 +8,9 @@
 
 import os
 import six
+import shutil
+
+import llnl.util.filesystem as fs
 
 from ramble.language.shared_language import register_builtin, register_phase
 from ramble.application import ApplicationBase, ApplicationError
@@ -113,6 +116,7 @@ class SpackApplication(ApplicationBase):
 
     register_phase('software_create_env', pipeline='mirror')
     register_phase('software_create_env', pipeline='setup')
+    register_phase('software_create_env', pipeline='pushdeployment')
 
     def _software_create_env(self, workspace, app_inst=None):
         """Create the spack environment for this experiment
@@ -433,6 +437,31 @@ class SpackApplication(ApplicationBase):
         self.spack_runner.deactivate()
 
         super()._clean_hash_variables(workspace, variables)
+
+    register_phase('deploy_artifacts', pipeline='pushdeployment',
+                   run_after=['software_create_env'])
+
+    def _deploy_artifacts(self, workspace, app_inst=None):
+        super()._deploy_artifacts(workspace)
+        env_path = self.expander.env_path
+
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.set_env(env_path)
+            self.spack_runner.activate()
+
+            repo_path = os.path.join(workspace.named_deployment, 'object_repo')
+
+            for pkg, pkg_def in self.spack_runner.package_definitions():
+                pkg_dir_name = os.path.basename(os.path.dirname(pkg_def))
+                pkg_dir = os.path.join(repo_path, 'packages', pkg_dir_name)
+                fs.mkdirp(pkg_dir)
+                shutil.copyfile(pkg_def, os.path.join(pkg_dir, 'package.py'))
+
+            self.spack_runner.deactivate()
+
+        except ramble.spack_runner.RunnerError as e:
+            logger.die(e)
 
     register_builtin('spack_source', required=True, depends_on=['builtin::env_vars'])
     register_builtin('spack_activate', required=True, depends_on=['builtin::spack_source'])
