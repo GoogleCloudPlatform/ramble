@@ -107,19 +107,18 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
 
 
-def test_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
-    workspace('create', 'test')
+def test_vector_length_mismatch_errors(request, mutable_mock_workspace_path, capsys):
+    ws_name = request.node.name
+    workspace('create', ws_name)
 
-    assert 'test' in workspace('list')
+    assert ws_name in workspace('list')
 
-    with ramble.workspace.read('test') as ws:
+    with ramble.workspace.read(ws_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
         application_context.context_name = 'basic'
         application_context.variables = {
-            'app_var1': '1',
-            'app_var2': '2',
             'n_ranks': '{processes_per_node}*{n_nodes}',
             'mpi_command': '',
             'batch_submit': ''
@@ -128,15 +127,11 @@ def test_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
         workload_context = ramble.context.Context()
         workload_context.context_name = 'test_wl'
         workload_context.variables = {
-            'wl_var1': '1',
-            'wl_var2': ['2'],
-            'processes_per_node': '2'
+            'processes_per_node': ['2', '4', '6']
         }
         experiment_context = ramble.context.Context()
-        experiment_context.context_name = 'series1_{n_ranks}'
+        experiment_context.context_name = 'series1_{n_ranks}_{processes_per_node}'
         experiment_context.variables = {
-            'exp_var1': '1',
-            'exp_var2': '2',
             'n_nodes': ['2', '4']
         }
 
@@ -588,12 +583,13 @@ def test_experiment_names_match(mutable_mock_workspace_path):
             assert exp == app.expander.expand_var('{experiment_namespace}')
 
 
-def test_cross_experiment_variable_references(mutable_mock_workspace_path):
-    workspace('create', 'test')
+def test_cross_experiment_variable_references(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace('create', ws_name)
 
-    assert 'test' in workspace('list')
+    assert ws_name in workspace('list')
 
-    with ramble.workspace.read('test') as ws:
+    with ramble.workspace.read(ws_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -622,6 +618,14 @@ def test_cross_experiment_variable_references(mutable_mock_workspace_path):
             'n_nodes': '2',
             'test_var': 'success'
         }
+        experiment1_context.internals = {
+            'custom_executables': {
+                'echo_test': {'template': 'echo "{test_var}"'},
+            },
+            'executable_injection': [
+                {'name': 'echo_test', 'order': 'after'}
+            ]
+        }
 
         experiment2_context = ramble.context.Context()
         experiment2_context.context_name = 'series2_{n_ranks}'
@@ -630,6 +634,15 @@ def test_cross_experiment_variable_references(mutable_mock_workspace_path):
             'exp_var2': '2',
             'n_nodes': '2',
             'test_var': 'test_var in basic.test_wl.series1_4'
+        }
+
+        experiment2_context.internals = {
+            'custom_executables': {
+                'echo_test': {'template': 'echo "{test_var}"'},
+            },
+            'executable_injection': [
+                {'name': 'echo_test', 'order': 'after'}
+            ]
         }
 
         exp_set.set_application_context(application_context)
@@ -680,17 +693,21 @@ def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path)
             'test_var': 'processes_per_node in basic.test_wl.does_not_exist'
         }
 
+        experiment1_context.internals = {
+            'custom_executables': {
+                'echo_test': {'template': 'echo "{test_var}"'},
+            },
+            'executable_injection': [
+                {'name': 'echo_test', 'order': 'after'}
+            ]
+        }
+
         exp_set.set_application_context(application_context)
         exp_set.set_workload_context(workload_context)
-        exp_set.set_experiment_context(experiment1_context)
-        exp_set.build_experiment_chains()
-
-        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
-
-        exp1_app = exp_set.experiments['basic.test_wl.series1_4']
 
         with pytest.raises(ramble.expander.RambleSyntaxError) as e:
-            exp1_app.expander.expand_var('{test_var}')
+            exp_set.set_experiment_context(experiment1_context)
+
             expected = ('basic.test_wl_does_not_exist does not exist in '
                         f'"{experiment1_context.variables["test_var"]}"')
             assert e.error == expected
@@ -1518,51 +1535,6 @@ def test_single_var_explicit_zip(mutable_mock_workspace_path):
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
 
 
-def test_zip_undefined_var_errors(mutable_mock_workspace_path, capsys):
-    workspace('create', 'test')
-
-    assert 'test' in workspace('list')
-
-    with ramble.workspace.read('test') as ws:
-        exp_set = ramble.experiment_set.ExperimentSet(ws)
-
-        application_context = ramble.context.Context()
-        application_context.context_name = 'basic'
-        application_context.variables = {
-            'app_var1': '1',
-            'app_var2': '2',
-            'n_ranks': '{processes_per_node}*{n_nodes}',
-            'mpi_command': '',
-            'batch_submit': ''
-        }
-
-        workload_context = ramble.context.Context()
-        workload_context.context_name = 'test_wl'
-        workload_context.variables = {
-            'wl_var1': '1',
-            'wl_var2': '2',
-            'processes_per_node': '2'
-        }
-
-        experiment_context = ramble.context.Context()
-        experiment_context.context_name = 'series1_{n_ranks}'
-        experiment_context.variables = {
-            'exp_var1': '1',
-            'exp_var2': '2',
-            'n_nodes': ['2', '4']
-        }
-        experiment_context.zips = {
-            'test_zip': ['foo'],
-        }
-
-        exp_set.set_application_context(application_context)
-        exp_set.set_workload_context(workload_context)
-        with pytest.raises(SystemExit):
-            exp_set.set_experiment_context(experiment_context)
-            captured = capsys.readouterr()
-            assert "An undefined variable foo is defined in zip test_zip" in captured
-
-
 def test_zip_multi_use_var_errors(mutable_mock_workspace_path, capsys):
     workspace('create', 'test')
 
@@ -1638,12 +1610,10 @@ def test_zip_non_list_var_errors(mutable_mock_workspace_path, capsys):
         experiment_context = ramble.context.Context()
         experiment_context.context_name = 'series1_{n_ranks}'
         experiment_context.variables = {
-            'exp_var1': '1',
-            'exp_var2': '2',
             'n_nodes': ['2', '4']
         }
         experiment_context.zips = {
-            'test_zip': ['exp_var1'],
+            'test_zip': ['exp_var1', 'processes_per_node'],
         }
 
         exp_set.set_application_context(application_context)
@@ -1651,7 +1621,8 @@ def test_zip_non_list_var_errors(mutable_mock_workspace_path, capsys):
         with pytest.raises(SystemExit):
             exp_set.set_experiment_context(experiment_context)
             captured = capsys.readouterr()
-            assert 'Variable exp_var1 in zip test_zip does not refer to a vector' in captured
+            assert 'Variable processes_per_node in zip test_zip does not refer to a vector' in \
+                captured
 
 
 def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
@@ -1665,8 +1636,6 @@ def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
         application_context = ramble.context.Context()
         application_context.context_name = 'basic'
         application_context.variables = {
-            'app_var1': '1',
-            'app_var2': '2',
             'n_ranks': '{processes_per_node}*{n_nodes}',
             'mpi_command': '',
             'batch_submit': ''
@@ -1674,21 +1643,17 @@ def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
 
         workload_context = ramble.context.Context()
         workload_context.context_name = 'test_wl'
-        workload_context.variables = {
-            'wl_var1': '1',
-            'wl_var2': '2',
-            'processes_per_node': '2'
-        }
+        workload_context.variables = {}
 
         experiment_context = ramble.context.Context()
         experiment_context.context_name = 'series1_{n_ranks}'
         experiment_context.variables = {
             'exp_var1': '1',
-            'exp_var2': ['2'],
+            'processes_per_node': ['2'],
             'n_nodes': ['2', '4']
         }
         experiment_context.zips = {
-            'test_zip': ['n_nodes', 'exp_var2'],
+            'test_zip': ['n_nodes', 'processes_per_node'],
         }
 
         exp_set.set_application_context(application_context)
@@ -1697,7 +1662,7 @@ def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
             exp_set.set_experiment_context(experiment_context)
             captured = capsys.readouterr()
             assert 'Length mismatch in zip test_zip in experiment series1_{n_ranks}' in captured
-            assert 'Variable exp_var has length 1' in captured
+            assert 'Variable processes_per_node has length 1' in captured
             assert 'Variable n_nodes has length 2' in captured
 
 
@@ -1902,3 +1867,273 @@ def test_vector_experiment_with_multi_where_excludes(mutable_mock_workspace_path
         assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
         assert 'basic.test_wl.series1_10' not in exp_set.experiments.keys()
+
+
+def test_unused_vector_no_error(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = 'basic'
+        application_context.variables = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = 'test_wl'
+        workload_context.variables = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+            'processes_per_node': '2'
+        }
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = 'series1_{n_ranks}'
+        experiment_context.variables = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'other_var': ['1', '2,', '3'],
+            'n_nodes': ['1', '2', '3', '4', '5']
+        }
+        experiment_context.exclude = {
+            'where': [
+                '{n_nodes} < 2',
+                '{n_nodes} > 4'
+            ]
+        }
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+        exp_set.build_experiment_chains()
+
+        assert 'basic.test_wl.series1_2' not in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_10' not in exp_set.experiments.keys()
+
+
+def test_unused_zip_no_error(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = 'basic'
+        application_context.variables = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'n_ranks': '{processes_per_node}*{n_nodes}',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = 'test_wl'
+        workload_context.variables = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+            'processes_per_node': '2'
+        }
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = 'series1_{n_ranks}'
+        experiment_context.variables = {
+            'exp_var1': '1',
+            'exp_var2': '2',
+            'other_var_1': ['1', '2,', '3'],
+            'other_var_2': ['1', '2,', '3'],
+            'n_nodes': ['1', '2', '3', '4', '5']
+        }
+        experiment_context.zips = {
+            'test_zip': ['other_var_1', 'other_var_2'],
+        }
+        experiment_context.exclude = {
+            'where': [
+                '{n_nodes} < 2',
+                '{n_nodes} > 4'
+            ]
+        }
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+        exp_set.build_experiment_chains()
+
+        assert 'basic.test_wl.series1_2' not in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_4' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_6' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_8' in exp_set.experiments.keys()
+        assert 'basic.test_wl.series1_10' not in exp_set.experiments.keys()
+
+
+def test_unused_var_propagates_to_chain(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        expanded_app_context = ramble.context.Context()
+        expanded_app_context.context_name = 'expanded_foms'
+        expanded_app_context.variables = {
+            'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        expanded_wl_context = ramble.context.Context()
+        expanded_wl_context.context_name = 'test_wl'
+        expanded_wl_context.variables = {}
+
+        expanded_exp_context = ramble.context.Context()
+        expanded_exp_context.context_name = 'test'
+        expanded_exp_context.variables = {
+            'n_ranks': '1',
+            'my_var': '2.0'
+        }
+        expanded_exp_context.is_template = True
+
+        exp_set.set_application_context(expanded_app_context)
+        exp_set.set_workload_context(expanded_wl_context)
+        exp_set.set_experiment_context(expanded_exp_context)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = 'basic'
+        application_context.variables = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = 'test_wl'
+        workload_context.variables = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = 'test1'
+        experiment_context.variables = {
+            'n_ranks': '2',
+            'my_var': '5.0'
+        }
+        experiment_context.chained_experiments = [
+            {
+                'name': 'expanded_foms.test_wl.test',
+                'order': 'after_root',
+                'command': '{execute_experiment}',
+                'inherit_variables': ['my_var']
+            },
+        ]
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+        exp_set.build_experiment_chains()
+
+        assert 'basic.test_wl.test1' in exp_set.experiments
+        assert 'basic.test_wl.test1.chain.0.expanded_foms.test_wl.test' in \
+            exp_set.chained_experiments
+
+        app_inst = exp_set.get_experiment('basic.test_wl.test1.chain.0.expanded_foms.test_wl.test')
+
+        assert app_inst.variables['my_var'] == '5.0'
+
+
+def test_custom_executables_track_variables(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        expanded_app_context = ramble.context.Context()
+        expanded_app_context.context_name = 'expanded_foms'
+        expanded_app_context.variables = {
+            'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        expanded_wl_context = ramble.context.Context()
+        expanded_wl_context.context_name = 'test_wl'
+        expanded_wl_context.variables = {}
+
+        expanded_exp_context = ramble.context.Context()
+        expanded_exp_context.context_name = 'test'
+        expanded_exp_context.variables = {
+            'n_ranks': '1',
+            'my_var': '2.0'
+        }
+        expanded_exp_context.is_template = True
+
+        exp_set.set_application_context(expanded_app_context)
+        exp_set.set_workload_context(expanded_wl_context)
+        exp_set.set_experiment_context(expanded_exp_context)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = 'basic'
+        application_context.variables = {
+            'app_var1': '1',
+            'app_var2': '2',
+            'processes_per_node': '1',
+            'mpi_command': '',
+            'batch_submit': ''
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = 'test_wl'
+        workload_context.variables = {
+            'wl_var1': '1',
+            'wl_var2': '2',
+        }
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = 'test1'
+        experiment_context.variables = {
+            'n_ranks': '2',
+            'my_var': '5.0'
+        }
+        experiment_context.chained_experiments = [
+            {
+                'name': 'expanded_foms.test_wl.test',
+                'order': 'after_root',
+                'command': '{execute_experiment}',
+                'inherit_variables': ['my_var']
+            },
+        ]
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+        exp_set.build_experiment_chains()
+
+        assert 'basic.test_wl.test1' in exp_set.experiments
+        assert 'basic.test_wl.test1.chain.0.expanded_foms.test_wl.test' in \
+            exp_set.chained_experiments
+
+        app_inst = exp_set.get_experiment('basic.test_wl.test1.chain.0.expanded_foms.test_wl.test')
+
+        assert app_inst.variables['my_var'] == '5.0'

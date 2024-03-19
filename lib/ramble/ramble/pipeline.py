@@ -72,9 +72,9 @@ class Pipeline(object):
         self.create_simlink(self.log_dir, self.log_dir_latest)
         self.create_simlink(self.log_path, self.log_path_latest)
 
-        self._experiment_set = workspace.build_experiment_set()
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
         self.workspace.software_environments = self._software_environments
+        self._experiment_set = workspace.build_experiment_set()
 
     def _construct_hash(self):
         """Hash all of the experiments, construct workspace inventory"""

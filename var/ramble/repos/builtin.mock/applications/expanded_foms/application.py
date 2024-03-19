@@ -12,7 +12,7 @@ from ramble.appkit import *
 class ExpandedFoms(ExecutableApplication):
     name = "expanded-Foms"
 
-    executable('foo', 'bar', use_mpi=False)
+    executable('foo', template=['bar', 'echo "{my_var}"'], use_mpi=False)
 
     input_file('input', url='file:///tmp/test_file.log',
                description='Not a file', extension='.log')

@@ -51,6 +51,7 @@ class RenderGroup(object):
         self.variables = {}
         self.zips = {}
         self.matrices = []
+        self.used_variables = set()
         self.n_repeats = 0
 
     def copy_contents(self, in_group):
@@ -64,6 +65,9 @@ class RenderGroup(object):
 
         if in_group.matrices:
             self.matrices.extend(in_group.matrices)
+
+        if in_group.used_variables:
+            self.used_variables = in_group.used_variables.copy()
 
     def from_dict(self, name_template, in_dict):
         """Extract RenderGroup definitions from a dictionary
@@ -106,7 +110,7 @@ class RenderGroup(object):
 
 
 class Renderer(object):
-    def render_objects(self, render_group, exclude_where=None):
+    def render_objects(self, render_group, exclude_where=None, remove=True, fatal=True):
         """Render objects based on the input variables and matrices
 
         Internally collects all matrix and vector variables.
@@ -142,9 +146,10 @@ class Renderer(object):
 
         """
         variables = render_group.variables
-        zips = render_group.zips
+        zips = render_group.zips.copy()
         matrices = render_group.matrices
         n_repeats = render_group.n_repeats
+        used_variables = render_group.used_variables.copy()
 
         object_variables = {}
         expander = ramble.expander.Expander(variables, None)
@@ -158,6 +163,36 @@ class Renderer(object):
         defined_zips = {}
         consumed_zips = set()
         matrix_objects = []
+
+        if remove:
+            # Add variables / zips in matrices to used variables
+            if matrices:
+                for matrix in matrices:
+                    for mat_var in matrix:
+                        used_variables.add(mat_var)
+
+            # Update zip definitions based on variables that will be removed
+            # because they are not used
+            if zips:
+                remove_zips = set()
+                for zip_group in zips:
+                    zip_vars = set(zips[zip_group])
+                    for var_name in zips[zip_group]:
+                        if var_name not in used_variables:
+                            zip_vars.remove(var_name)
+                    if len(zip_vars) == 0:
+                        remove_zips.add(zip_group)
+                    else:
+                        zips[zip_group] = list(zip_vars)
+
+                for zip_name in remove_zips:
+                    del zips[zip_name]
+
+            # Remove any variables that are not used by the render group
+            all_vars = set(object_variables.keys())
+            for var in all_vars:
+                if var not in used_variables:
+                    del object_variables[var]
 
         if zips:
             zipped_vars = set()
@@ -343,7 +378,7 @@ class Renderer(object):
                 if len(val) != max_vector_size:
                     length_mismatch = True
 
-            if length_mismatch:
+            if fatal and length_mismatch:
                 err_context = object_variables[render_group.context]
                 err_str = f'Length mismatch in vector variables in {render_group.object} ' \
                           f'{err_context}\n'
@@ -356,7 +391,8 @@ class Renderer(object):
             for i in range(0, max_vector_size):
                 obj_vars = {}
                 for var, val in vector_vars.items():
-                    obj_vars[var] = val[i]
+                    if len(val) > i:
+                        obj_vars[var] = val[i]
 
                 if matrix_objects:
                     for matrix_object in matrix_objects:

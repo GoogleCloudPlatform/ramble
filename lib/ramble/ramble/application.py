@@ -105,6 +105,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.results = {}
         self._phase_times = {}
         self._pipeline_graphs = None
+        self.custom_executables = {}
 
         self.hash_inventory = {
             'application_definition': None,
@@ -131,10 +132,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Deep copy an application instance"""
         new_copy = type(self)(self._file_path)
 
-        new_copy.set_env_variable_sets(self._env_variable_sets.copy())
-        new_copy.set_variables(self.variables.copy(), self.experiment_set)
-        new_copy.set_internals(self.internals.copy())
-        new_copy.set_formatted_executables(self._formatted_executables.copy())
+        if self._env_variable_sets:
+            new_copy.set_env_variable_sets(self._env_variable_sets.copy())
+        if self.variables:
+            new_copy.set_variables(self.variables.copy(), self.experiment_set)
+        if self.internals:
+            new_copy.set_internals(self.internals.copy())
+        if self._formatted_executables:
+            new_copy.set_formatted_executables(self._formatted_executables.copy())
+
         new_copy.set_template(False)
         new_copy.repeats.set_repeats(False, 0)
         new_copy.set_chained_experiments(None)
@@ -413,6 +419,51 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             expanded = self.expander.expand_var(expansion_var)
             color.cprint(f'{indent}  {var} = {val} ==> {expanded}'.replace('@', '@@'))
 
+    def build_used_variables(self, workspace):
+        """Build a set of all used variables
+
+        By expanding all necessary portions of this experiment (required /
+        reserved keywords, templates, commands, etc...), determine which
+        variables are used throughout the experiment definition.
+
+        Variables can have list definitions. These are iterated over to ensure
+        variables referenced by any of them are tracked properly.
+
+        Args:
+            workspace (Workspace): Workspace to extract templates from
+
+        Returns:
+            (set): All variable names used by this experiment.
+        """
+        self.add_expand_vars(workspace)
+
+        # Add all known keywords
+        for key in self.keywords.keys:
+            self.expander._used_variables.add(key)
+            self.expander.expand_var_name(key)
+
+        if self.chained_experiments:
+            for chained_exp in self.chained_experiments:
+                if namespace.inherit_variables in chained_exp:
+                    for var in chained_exp[namespace.inherit_variables]:
+                        self.expander._used_variables.add(var)
+
+        # Add variables from success criteria
+        criteria_list = workspace.success_list
+        for criteria in criteria_list.all_criteria():
+            if criteria.mode == 'fom_comparison':
+                self.expander.expand_var(criteria.formula)
+                self.expander.expand_var(criteria.fom_name)
+                self.expander.expand_var(criteria.fom_context)
+            elif criteria.mode == 'application_function':
+                self.evaluate_success()
+
+        for template_name, template_conf in workspace.all_templates():
+            self.expander._used_variables.add(template_name)
+            self.expander.expand_var(template_conf['contents'])
+
+        return self.expander._used_variables
+
     def print_internals(self, indent=''):
         if not self.internals:
             return
@@ -675,8 +726,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if not self.modifiers:
             return
 
-        if len(self._modifier_instances) > 0:
-            return
+        self._modifier_instances = []
 
         mod_type = ramble.repository.ObjectTypes.modifiers
 
@@ -717,13 +767,14 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Define custom executables
         if namespace.custom_executables in self.internals:
             for name, conf in self.internals[namespace.custom_executables].items():
-                if name in self.executables:
+                if name in self.executables or name in self.custom_executables:
                     experiment_namespace = self.expander.expand_var_name('experiment_namespace')
                     raise ExecutableNameError(f'In experiment {experiment_namespace} '
                                               f'a custom executable "{name}" is defined.\n'
-                                              'However, an executable "{name}" is already defined')
+                                              f'However, an executable "{name}" is already '
+                                              'defined')
 
-                self.executables[name] = ramble.util.executable.CommandExecutable(
+                self.custom_executables[name] = ramble.util.executable.CommandExecutable(
                     name=name,
                     **conf
                 )
@@ -749,7 +800,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             builtin_objects.append(mod_inst)
             all_builtins.append(mod_inst.builtins)
 
-        executable_graph = ramble.graphs.ExecutableGraph(exec_order, self.executables,
+        all_executables = self.executables.copy()
+        all_executables.update(self.custom_executables)
+
+        executable_graph = ramble.graphs.ExecutableGraph(exec_order, all_executables,
                                                          builtin_objects, all_builtins,
                                                          self)
 
@@ -977,6 +1031,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if self._input_fetchers is not None:
             return
+
+        self._input_fetchers = {}
 
         workload_names = [workload] if workload else self.workloads.keys()
 

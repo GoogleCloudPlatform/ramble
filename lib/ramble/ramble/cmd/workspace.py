@@ -539,10 +539,11 @@ def workspace_info(args):
     # Print workspace variables information
     workspace_vars = ws.get_workspace_vars()
 
+    ws.software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+    software_environments = ws.software_environments
+
     # Build experiment set
     experiment_set = ws.build_experiment_set()
-
-    software_environments = ramble.software_environments.SoftwareEnvironments(ws)
 
     if args.tags:
         color.cprint('')
