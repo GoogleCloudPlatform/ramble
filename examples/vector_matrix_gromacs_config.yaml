@@ -23,7 +23,6 @@ ramble:
               - type
               - n_ranks
   spack:
-    concretized: true
     packages:
       gcc9:
         spack_spec: gcc@9.4.0 target=x86_64

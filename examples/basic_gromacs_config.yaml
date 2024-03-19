@@ -38,7 +38,6 @@ ramble:
                 size: '0003'
                 type: 'rf'
   spack:
-    concretized: true
     packages:
       gcc9:
         spack_spec: gcc@9.4.0 target=x86_64

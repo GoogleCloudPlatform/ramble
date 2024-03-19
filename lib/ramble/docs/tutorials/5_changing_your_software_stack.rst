@@ -80,7 +80,6 @@ The relevant portion of the workspace configuration file is:
 .. code-block:: YAML
 
     spack:
-      concretized: true
       packages:
         gcc9:
           spack_spec: gcc@9.4.0 target=x86_64
