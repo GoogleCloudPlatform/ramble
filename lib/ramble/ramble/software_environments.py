@@ -413,7 +413,8 @@ class SoftwareEnvironments(object):
     """Class representing a group of software environments"""
 
     _deprecated_sections = [namespace.variables, namespace.zips,
-                            namespace.matrix, namespace.matrices, namespace.exclude]
+                            namespace.matrix, namespace.matrices,
+                            namespace.exclude, 'concretized']
 
     def __init__(self, workspace):
         """SoftwareEnvironments constructor
@@ -485,9 +486,12 @@ class SoftwareEnvironments(object):
             sections_to_print.append('spack:packages:<name>:exclude')
             sections_to_print.append('spack:environments:<name>:exclude')
 
+        if 'concretized' in self._warn_for_deprecation:
+            sections_to_print.append('spack:concretized')
+
         if not hasattr(self, '_warned_deprecated_variables'):
             self._warned_deprecated_variables = True
-            logger.warn('The following config sections are deprecated and ignore:')
+            logger.warn('The following config sections are deprecated and ignored:')
             for section in sections_to_print:
                 logger.warn(f'    {section}')
             logger.warn('Please remove from your configuration files.')

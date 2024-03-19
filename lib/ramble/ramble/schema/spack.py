@@ -23,7 +23,7 @@ properties = {
         'properties': {
             'concretized': {
                 'type': 'boolean',
-                'default': False
+                'default': None
             },
             'variables': ramble.schema.variables.variables_def,
             'zips': ramble.schema.zips.zips_def,

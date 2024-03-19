@@ -17,6 +17,7 @@ import ramble.application
 import ramble.workspace
 from ramble.main import RambleCommand, RambleCommandError
 from ramble.test.dry_run_helpers import search_files_for_string
+from ramble.namespace import namespace
 import ramble.config
 import ramble.filters
 import ramble.pipeline
@@ -195,7 +196,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages:
       zlib:
         spack_spec: 'zlib'
@@ -249,7 +249,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages:
       zlib:
         spack_spec: 'zlib'
@@ -316,7 +315,6 @@ ramble:
                 n_nodes: '2'
 
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -426,14 +424,56 @@ def test_remove_workspace():
 
 
 def test_concretize_command():
-    ws_name = 'test'
-    workspace('create', ws_name)
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  spack:
+    packages: {}
+    environments: {}
+"""
 
-    with ramble.workspace.read('test') as ws:
-        add_basic(ws)
-        check_basic(ws)
-        workspace('concretize')
-        assert ws.is_concretized()
+    workspace_name = 'test_concretize_command'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    assert search_files_for_string([config_path], 'packages: {}') is True
+    assert search_files_for_string([config_path], 'spack_spec: zlib') is False
+
+    workspace('concretize', global_args=['-w', workspace_name])
+
+    assert search_files_for_string([config_path], 'packages: {}') is False
+    assert search_files_for_string([config_path], 'spack_spec: zlib') is True
 
 
 def test_concretize_nothing():
@@ -445,8 +485,126 @@ def test_concretize_nothing():
         add_basic(ws)
         check_basic(ws)
 
+        assert search_files_for_string([ws.config_file_path], 'packages: {}') is True
+        assert search_files_for_string([ws.config_file_path], 'spack_spec:') is False
+
         ws.concretize()
-        assert ws.is_concretized()
+
+        assert search_files_for_string([ws.config_file_path], 'packages: {}') is True
+        assert search_files_for_string([ws.config_file_path], 'spack_spec:') is False
+
+
+def test_concretize_concrete_config():
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  spack:
+    packages:
+      zlib:
+        spack_spec: 'zlib'
+    environments:
+      zlib:
+        packages:
+        - zlib
+"""
+
+    workspace_name = 'test_concretize_concrete_config'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    with pytest.raises(ramble.workspace.RambleWorkspaceError) as e:
+        workspace('concretize', global_args=['-w', workspace_name])
+        assert 'Cannot concretize an already concretized workspace.' in e
+
+
+def test_force_concretize():
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  spack:
+    packages:
+      zlib-test:
+        spack_spec: 'zlib-test'
+    environments:
+      zlib-test:
+        packages:
+        - zlib-test
+"""
+
+    workspace_name = 'test_force_concretize'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    with pytest.raises(ramble.workspace.RambleWorkspaceError) as e:
+        workspace('concretize', global_args=['-w', workspace_name])
+        assert 'Cannot concretize an already concretized workspace.' in e
+
+    workspace('concretize', '-f', global_args=['-w', workspace_name])
+
+    assert search_files_for_string([config_path], 'zlib:') is True
+    assert search_files_for_string([config_path], 'zlib-test') is False
 
 
 def test_setup_command():
@@ -458,7 +616,6 @@ def test_setup_command():
         check_basic(ws)
 
         workspace('concretize')
-        assert ws.is_concretized()
 
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
@@ -477,7 +634,6 @@ def test_setup_nothing():
         check_basic(ws)
 
         ws.concretize()
-        assert ws.is_concretized()
 
         setup_pipeline = pipeline_cls(ws, filters)
         setup_pipeline.run()
@@ -493,7 +649,6 @@ def test_anlyze_command():
         check_basic(ws)
 
         workspace('concretize')
-        assert ws.is_concretized()
 
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
@@ -517,7 +672,6 @@ def test_analyze_nothing():
         check_basic(ws)
 
         ws.concretize()
-        assert ws.is_concretized()
 
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
@@ -540,8 +694,6 @@ def test_workspace_flag_named():
         check_basic(ws)
 
     workspace('concretize', global_args=flag_args)
-    with ramble.workspace.read(ws_name) as ws:
-        assert ws.is_concretized()
 
     workspace('setup', global_args=flag_args)
     with ramble.workspace.read(ws_name) as ws:
@@ -568,8 +720,6 @@ def test_workspace_flag_anon(tmpdir):
         check_basic(ws)
 
     workspace('concretize', global_args=flag_args)
-    with ramble.workspace.Workspace(ws_path) as ws:
-        assert ws.is_concretized()
 
     workspace('setup', global_args=flag_args)
     with ramble.workspace.Workspace(ws_path) as ws:
@@ -599,7 +749,6 @@ def test_no_workspace_flag():
             workspace('concretize', global_args=flag_args)
         ramble.workspace.activate(ws)
         workspace('concretize')
-        assert ws.is_concretized()
 
         with pytest.raises(RambleCommandError):
             workspace('setup', global_args=flag_args)
@@ -670,7 +819,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -721,7 +869,6 @@ ramble:
                  - n_nodes
                - - idx
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -790,7 +937,6 @@ ramble:
                 n_nodes: [1, 2, 4]
                 idx: [1, 2, 3, 4, 5, 6]
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -839,7 +985,6 @@ ramble:
                 - - n_nodes
                 - - idx
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -884,7 +1029,6 @@ ramble:
               matrices:
                 - - foo
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -928,7 +1072,6 @@ ramble:
               matrices:
                 - - foo
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -973,7 +1116,6 @@ ramble:
                 - - foo
                 - - foo
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1021,7 +1163,6 @@ ramble:
               variables:
                 foo: 1
   spack:
-    concretized: false
     packages: {}
     environments: {}
 """
@@ -1045,15 +1186,22 @@ ramble:
     with config_path.as_cwd():
         write_config(ws_path, test_config)
 
-        workspace('concretize', global_args=workspace_flags)
         with ramble.workspace.Workspace(ws_path) as ws:
-            assert ws.is_concretized()
+            spack_dict = ws.get_spack_dict()
+            print(f'spack_dict before = {spack_dict}')
+
+        workspace('concretize', global_args=workspace_flags)
+
+        with ramble.workspace.Workspace(ws_path) as ws:
+            spack_dict = ws.get_spack_dict()
+            assert spack_dict[namespace.environments]
 
         write_config(ws_path, test_config)
 
         workspace('concretize', global_args=workspace_flags)
         with ramble.workspace.Workspace(ws_path) as ws:
-            assert ws.is_concretized()
+            spack_dict = ws.get_spack_dict()
+            assert spack_dict[namespace.environments]
 
 
 def test_workspace_archive():
@@ -1073,7 +1221,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1163,7 +1310,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1223,7 +1369,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1301,7 +1446,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1384,7 +1528,6 @@ ramble:
               variables:
                 n_nodes: '2'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1467,7 +1610,6 @@ ramble:
           experiments:
             test_experiment: {}
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1532,7 +1674,6 @@ ramble:
   include:
      - '%s'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """ % inc_file
@@ -1568,7 +1709,6 @@ ramble:
           experiments:
             test_experiment: {}
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1631,7 +1771,6 @@ ramble:
                     redirect: '{log_file}'
                     output_capture: '&>'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -1694,7 +1833,6 @@ ramble:
                 - wl_level_cmd
                 - app_level_cmd
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
