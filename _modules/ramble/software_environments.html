@@ -830,7 +830,7 @@
 
 <div class="viewcode-block" id="SoftwareEnvironments.render_environment">
 <a class="viewcode-back" href="../../ramble.html#ramble.software_environments.SoftwareEnvironments.render_environment">[docs]</a>
-    <span class="k">def</span> <span class="nf">render_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expander</span><span class="p">:</span> <span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">render_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expander</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render an environment needed by an experiment</span>
 
 <span class="sd">        Args:</span>
@@ -869,9 +869,10 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_check_environment</span><span class="p">(</span><span class="n">rendered_env</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">rendered_env</span>
 
-        <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;No defined environment matches required name </span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">require</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RambleSoftwareEnvironmentError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;No defined environment matches required name </span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span></div>
 </div>
 
 

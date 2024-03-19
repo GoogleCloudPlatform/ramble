@@ -148,6 +148,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zips</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="RenderGroup.copy_contents">
@@ -162,7 +163,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">zips</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">in_group</span><span class="o">.</span><span class="n">matrices</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">in_group</span><span class="o">.</span><span class="n">used_variables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">used_variables</span> <span class="o">=</span> <span class="n">in_group</span><span class="o">.</span><span class="n">used_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="RenderGroup.from_dict">
@@ -214,7 +218,7 @@
 <span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <div class="viewcode-block" id="Renderer.render_objects">
 <a class="viewcode-back" href="../../ramble.html#ramble.renderer.Renderer.render_objects">[docs]</a>
-    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">render_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render objects based on the input variables and matrices</span>
 
 <span class="sd">        Internally collects all matrix and vector variables.</span>
@@ -250,9 +254,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">variables</span>
-        <span class="n">zips</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">zips</span>
+        <span class="n">zips</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">matrices</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">matrices</span>
         <span class="n">n_repeats</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">n_repeats</span>
+        <span class="n">used_variables</span> <span class="o">=</span> <span class="n">render_group</span><span class="o">.</span><span class="n">used_variables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">object_variables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -266,6 +271,36 @@
         <span class="n">defined_zips</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">consumed_zips</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">matrix_objects</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
+            <span class="c1"># Add variables / zips in matrices to used variables</span>
+            <span class="k">if</span> <span class="n">matrices</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">matrices</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">mat_var</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">:</span>
+                        <span class="n">used_variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mat_var</span><span class="p">)</span>
+
+            <span class="c1"># Update zip definitions based on variables that will be removed</span>
+            <span class="c1"># because they are not used</span>
+            <span class="k">if</span> <span class="n">zips</span><span class="p">:</span>
+                <span class="n">remove_zips</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">zip_group</span> <span class="ow">in</span> <span class="n">zips</span><span class="p">:</span>
+                    <span class="n">zip_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used_variables</span><span class="p">:</span>
+                            <span class="n">zip_vars</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zip_vars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">remove_zips</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">zip_group</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">zips</span><span class="p">[</span><span class="n">zip_group</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">zip_vars</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">zip_name</span> <span class="ow">in</span> <span class="n">remove_zips</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">zips</span><span class="p">[</span><span class="n">zip_name</span><span class="p">]</span>
+
+            <span class="c1"># Remove any variables that are not used by the render group</span>
+            <span class="n">all_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">object_variables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">all_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used_variables</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">zips</span><span class="p">:</span>
             <span class="n">zipped_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -451,7 +486,7 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="n">max_vector_size</span><span class="p">:</span>
                     <span class="n">length_mismatch</span> <span class="o">=</span> <span class="kc">True</span>
 
-            <span class="k">if</span> <span class="n">length_mismatch</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fatal</span> <span class="ow">and</span> <span class="n">length_mismatch</span><span class="p">:</span>
                 <span class="n">err_context</span> <span class="o">=</span> <span class="n">object_variables</span><span class="p">[</span><span class="n">render_group</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
                 <span class="n">err_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Length mismatch in vector variables in </span><span class="si">{</span><span class="n">render_group</span><span class="o">.</span><span class="n">object</span><span class="si">}</span><span class="s1"> &#39;</span> \
                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">err_context</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -464,7 +499,8 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_vector_size</span><span class="p">):</span>
                 <span class="n">obj_vars</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vector_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">obj_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+                        <span class="n">obj_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
                 <span class="k">if</span> <span class="n">matrix_objects</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">matrix_object</span> <span class="ow">in</span> <span class="n">matrix_objects</span><span class="p">:</span>

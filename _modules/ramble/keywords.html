@@ -121,6 +121,7 @@
     <span class="s1">&#39;workload_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
     <span class="s1">&#39;simplified_workload_namespace&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
     <span class="s1">&#39;license_input_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
+    <span class="s1">&#39;experiments_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
     <span class="s1">&#39;experiment_name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
     <span class="s1">&#39;experiment_run_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">},</span>
     <span class="s1">&#39;experiment_status&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">output_level</span><span class="o">.</span><span class="n">key</span><span class="p">},</span>
@@ -238,6 +239,32 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">output_level</span><span class="o">.</span><span class="n">variable</span></div>
+
+
+<div class="viewcode-block" id="Keywords.all_required_keys">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.all_required_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_required_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield all required keys</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            (str): Key name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_required</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">key</span></div>
+
+
+<div class="viewcode-block" id="Keywords.all_reserved_keys">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.all_reserved_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_reserved_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield all reserved keys</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            (str): Key name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_reserved</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">key</span></div>
 
 
 <div class="viewcode-block" id="Keywords.check_reserved_keys">
