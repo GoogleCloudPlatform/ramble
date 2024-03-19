@@ -384,6 +384,12 @@ should be applied.</p>
 <span class="sig-name descname"><span class="pre">default_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.default_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.Workspace.default_results" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.Workspace.deployments_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deployments_dir</span></span><a class="headerlink" href="#ramble.workspace.Workspace.deployments_dir" title="Link to this definition"></a></dt>
+<dd><p>Path to the deployments directory</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.workspace.Workspace.destroy">
 <span class="sig-name descname"><span class="pre">destroy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.destroy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.Workspace.destroy" title="Link to this definition"></a></dt>
@@ -531,6 +537,12 @@ the internal scope stack (so, in reverse, from lowest to highest).</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#ramble.workspace.Workspace.name" title="Link to this definition"></a></dt>
 <dd><p>Human-readable representation of the workspace.</p>
 <p>The name of the workspace is the basename of its path</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.Workspace.named_deployment">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">named_deployment</span></span><a class="headerlink" href="#ramble.workspace.Workspace.named_deployment" title="Link to this definition"></a></dt>
+<dd><p>Path to the specific deployment directory</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1172,6 +1184,12 @@ should be applied.</p>
 <span class="sig-name descname"><span class="pre">default_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.default_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.Workspace.default_results" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace.deployments_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deployments_dir</span></span><a class="headerlink" href="#ramble.workspace.workspace.Workspace.deployments_dir" title="Link to this definition"></a></dt>
+<dd><p>Path to the deployments directory</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace.destroy">
 <span class="sig-name descname"><span class="pre">destroy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#Workspace.destroy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.Workspace.destroy" title="Link to this definition"></a></dt>
@@ -1319,6 +1337,12 @@ the internal scope stack (so, in reverse, from lowest to highest).</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#ramble.workspace.workspace.Workspace.name" title="Link to this definition"></a></dt>
 <dd><p>Human-readable representation of the workspace.</p>
 <p>The name of the workspace is the basename of its path</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.Workspace.named_deployment">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">named_deployment</span></span><a class="headerlink" href="#ramble.workspace.workspace.Workspace.named_deployment" title="Link to this definition"></a></dt>
+<dd><p>Path to the specific deployment directory</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1616,6 +1640,12 @@ effect when there is no active workspace.</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.workspace_deployments_path">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_deployments_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'deployments'</span></em><a class="headerlink" href="#ramble.workspace.workspace.workspace_deployments_path" title="Link to this definition"></a></dt>
+<dd><p>Name of the subdirectory where deployments are stored</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.workspace_experiment_path">
 <span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">workspace_experiment_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'experiments'</span></em><a class="headerlink" href="#ramble.workspace.workspace.workspace_experiment_path" title="Link to this definition"></a></dt>
 <dd><p>Name of subdirectory within workspaces where experiments are stored</p>
@@ -1679,7 +1709,7 @@ are stored</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 14, 2024.
+      <span class="lastupdated">Last updated on Mar 19, 2024.
       </span></p>
   </div>
 

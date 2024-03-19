@@ -68,6 +68,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#activating-a-workspace">Activating a Workspace</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#printing-workspace-information">Printing Workspace Information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#concretizing-a-workspace">Concretizing a Workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#workspace-deployments">Workspace Deployments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparing-a-workspace-deployment">Preparing a Workspace Deployment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pulling-a-workspace-deployment">Pulling a Workspace Deployment</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up-a-workspace">Setting up a Workspace</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#phase-selection">Phase Selection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#filtering-experiments">Filtering Experiments</a></li>
@@ -246,6 +251,52 @@ application definition files, one can use:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>concretize
 </pre></div>
 </div>
+</section>
+<section id="workspace-deployments">
+<h2>Workspace Deployments<a class="headerlink" href="#workspace-deployments" title="Link to this heading"></a></h2>
+<p>A deployment is one mechanism of transferring a configured workspace from one
+location to another. Ramble provides commands to handle creating (and pushing)
+a deployment from a local workspace to a remote location, or pulling a
+deployment from a remote location into a local workspace.</p>
+<p>A deployment is a directory that contains the necessary artifacts required to
+recreate the experiments in the workspace on a separate machine. Deployments
+copy the workspace configuration file, along with creating an object
+repository, containing the application, modifier, and any package manager files
+needed for the experiments (that might not be upstreamed).  This section
+describes the commands that can be used to use deployments.</p>
+<section id="preparing-a-workspace-deployment">
+<h3>Preparing a Workspace Deployment<a class="headerlink" href="#preparing-a-workspace-deployment" title="Link to this heading"></a></h3>
+<p>Once a workspace is configured, it can be used to create a deployment.  To prepare a
+deployment, one can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>deployment<span class="w"> </span>push
+</pre></div>
+</div>
+<p>This will populate a directory named <code class="docutils literal notranslate"><span class="pre">deployments</span></code>, where the default is the
+name of the workspace.</p>
+<p>The name of the created deployment can be controlled using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>deployment<span class="w"> </span>push<span class="w"> </span>-d<span class="w"> </span>&lt;deployment_name&gt;
+</pre></div>
+</div>
+<p>Additionally, Ramble can create a tar of the deployment using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>deployment<span class="w"> </span>push<span class="w"> </span>-t
+</pre></div>
+</div>
+<p>And upload the deployment to a remote URL using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>deployment<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>&lt;remote_url&gt;
+</pre></div>
+</div>
+</section>
+<section id="pulling-a-workspace-deployment">
+<h3>Pulling a Workspace Deployment<a class="headerlink" href="#pulling-a-workspace-deployment" title="Link to this heading"></a></h3>
+<p>To apply a deployment to an existing workspace, the <code class="docutils literal notranslate"><span class="pre">pull</span></code> sub-command can be used. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble workspace pull -p file://path/to/deployment</span>
+</pre></div>
+</div>
+<p>Will overwrite the contents of the currently active workspace with the contents
+from the deployment contained in <code class="docutils literal notranslate"><span class="pre">file://path/to/deployment</span></code>.</p>
+<p>It is important to note that this command is destructive, and there is no way
+to revert a workspace back to its state prior to the pull action.</p>
+</section>
 </section>
 <section id="setting-up-a-workspace">
 <span id="workspace-setup"></span><h2>Setting up a Workspace<a class="headerlink" href="#setting-up-a-workspace" title="Link to this heading"></a></h2>
@@ -520,7 +571,7 @@ of <a class="reference internal" href="configuration_files.html#config-yaml"><sp
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 14, 2024.
+      <span class="lastupdated">Last updated on Mar 19, 2024.
       </span></p>
   </div>
 

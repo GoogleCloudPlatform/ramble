@@ -179,6 +179,9 @@
 <span class="c1">#: Name of the subdirectory where shared/sourale files are stored</span>
 <span class="n">workspace_shared_license_path</span> <span class="o">=</span> <span class="s1">&#39;licenses&#39;</span>
 
+<span class="c1">#: Name of the subdirectory where deployments are stored</span>
+<span class="n">workspace_deployments_path</span> <span class="o">=</span> <span class="s1">&#39;deployments&#39;</span>
+
 <span class="c1">#: regex for validating workspace names</span>
 <span class="n">valid_workspace_name_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\w[\w-]*$&#39;</span>
 
@@ -684,6 +687,8 @@
 
         <span class="c1"># Create a logger to redirect certain prints from screen to log file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">log_output</span><span class="p">(</span><span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">tty</span><span class="o">.</span><span class="n">debug_level</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deployment_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
     <span class="k">def</span> <span class="nf">_re_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reinitialize the workspace object if it has been written (this</span>
@@ -1462,6 +1467,16 @@
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">workspace_shared_path</span><span class="p">)</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">deployments_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the deployments directory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">workspace_deployments_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">named_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the specific deployment directory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deployments_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployment_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shared_license_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the shared license directory&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_dir</span><span class="p">,</span> <span class="n">workspace_shared_license_path</span><span class="p">)</span>
@@ -1844,7 +1859,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 14, 2024.
+      <span class="lastupdated">Last updated on Mar 19, 2024.
       </span></p>
   </div>
 

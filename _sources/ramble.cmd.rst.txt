@@ -57,6 +57,14 @@ ramble.cmd.debug module
    :undoc-members:
    :show-inheritance:
 
+ramble.cmd.deployment module
+----------------------------
+
+.. automodule:: ramble.cmd.deployment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.cmd.edit module
 ----------------------
 

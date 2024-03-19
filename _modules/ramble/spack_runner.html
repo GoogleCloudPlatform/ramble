@@ -204,6 +204,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">compiler_config_dir</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configs_applied</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">installer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_prefix</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s1">:prefix&#39;</span><span class="p">))</span>
@@ -500,8 +501,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">True</span></div>
 
@@ -928,6 +927,25 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="SpackRunner.package_definitions">
+<a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.package_definitions">[docs]</a>
+    <span class="k">def</span> <span class="nf">package_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For each package in this environment, yield the path to its application.py file&quot;&quot;&quot;</span>
+        <span class="n">package_def_name</span> <span class="o">=</span> <span class="s1">&#39;package.py&#39;</span>
+        <span class="n">location_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;-p&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">location_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">yield</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">package_def_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">location_args</span><span class="p">)</span></div>
+
+
     <span class="k">def</span> <span class="nf">_raise_validation_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ValidationFailedError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;Validation of: &quot;spack </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">&quot; failed &#39;</span>
@@ -1037,7 +1055,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 14, 2024.
+      <span class="lastupdated">Last updated on Mar 19, 2024.
       </span></p>
   </div>
 

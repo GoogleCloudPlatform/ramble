@@ -821,6 +821,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.inventory_hash"><code class="docutils literal notranslate"><span class="pre">SpackRunner.inventory_hash()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.load_compiler"><code class="docutils literal notranslate"><span class="pre">SpackRunner.load_compiler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.mirror_environment"><code class="docutils literal notranslate"><span class="pre">SpackRunner.mirror_environment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.package_definitions"><code class="docutils literal notranslate"><span class="pre">SpackRunner.package_definitions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.push_to_spack_cache"><code class="docutils literal notranslate"><span class="pre">SpackRunner.push_to_spack_cache()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.set_compiler_config_dir"><code class="docutils literal notranslate"><span class="pre">SpackRunner.set_compiler_config_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.spack_runner.SpackRunner.set_dry_run"><code class="docutils literal notranslate"><span class="pre">SpackRunner.set_dry_run()</span></code></a></li>
@@ -1099,6 +1100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.debug.setup_parser"><code class="docutils literal notranslate"><span class="pre">setup_parser()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.cmd.html#ramble-cmd-deployment-module">ramble.cmd.deployment module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.cmd.html#module-ramble.cmd.edit">ramble.cmd.edit module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.edit.edit"><code class="docutils literal notranslate"><span class="pre">edit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.cmd.html#ramble.cmd.edit.edit_application"><code class="docutils literal notranslate"><span class="pre">edit_application()</span></code></a></li>
@@ -1761,6 +1763,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.create_mirror"><code class="docutils literal notranslate"><span class="pre">Workspace.create_mirror()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.date_string"><code class="docutils literal notranslate"><span class="pre">Workspace.date_string()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.default_results"><code class="docutils literal notranslate"><span class="pre">Workspace.default_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.deployments_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.deployments_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.destroy"><code class="docutils literal notranslate"><span class="pre">Workspace.destroy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.dump_results"><code class="docutils literal notranslate"><span class="pre">Workspace.dump_results()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.experiment_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.experiment_dir</span></code></a></li>
@@ -1785,6 +1788,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.latest_archive_path"><code class="docutils literal notranslate"><span class="pre">Workspace.latest_archive_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.log_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.log_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.name"><code class="docutils literal notranslate"><span class="pre">Workspace.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.named_deployment"><code class="docutils literal notranslate"><span class="pre">Workspace.named_deployment</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.path"><code class="docutils literal notranslate"><span class="pre">Workspace.path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.shared_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.Workspace.shared_license_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_license_dir</span></code></a></li>
@@ -1893,6 +1897,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.create_mirror"><code class="docutils literal notranslate"><span class="pre">Workspace.create_mirror()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.date_string"><code class="docutils literal notranslate"><span class="pre">Workspace.date_string()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.default_results"><code class="docutils literal notranslate"><span class="pre">Workspace.default_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.deployments_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.deployments_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.destroy"><code class="docutils literal notranslate"><span class="pre">Workspace.destroy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.dump_results"><code class="docutils literal notranslate"><span class="pre">Workspace.dump_results()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.experiment_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.experiment_dir</span></code></a></li>
@@ -1917,6 +1922,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.latest_archive_path"><code class="docutils literal notranslate"><span class="pre">Workspace.latest_archive_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.log_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.log_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.name"><code class="docutils literal notranslate"><span class="pre">Workspace.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.named_deployment"><code class="docutils literal notranslate"><span class="pre">Workspace.named_deployment</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.path"><code class="docutils literal notranslate"><span class="pre">Workspace.path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.Workspace.shared_license_dir"><code class="docutils literal notranslate"><span class="pre">Workspace.shared_license_dir</span></code></a></li>
@@ -1962,6 +1968,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.validate_workspace_name"><code class="docutils literal notranslate"><span class="pre">validate_workspace_name()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_archive_path"><code class="docutils literal notranslate"><span class="pre">workspace_archive_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_config_path"><code class="docutils literal notranslate"><span class="pre">workspace_config_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_deployments_path"><code class="docutils literal notranslate"><span class="pre">workspace_deployments_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_experiment_path"><code class="docutils literal notranslate"><span class="pre">workspace_experiment_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_input_path"><code class="docutils literal notranslate"><span class="pre">workspace_input_path</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html#ramble.workspace.workspace.workspace_log_path"><code class="docutils literal notranslate"><span class="pre">workspace_log_path</span></code></a></li>
@@ -6837,6 +6844,12 @@ compiler to be installed multiple times with different base compilers.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.package_definitions">
+<span class="sig-name descname"><span class="pre">package_definitions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.package_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.package_definitions" title="Link to this definition"></a></dt>
+<dd><p>For each package in this environment, yield the path to its application.py file</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ramble.spack_runner.SpackRunner.push_to_spack_cache">
 <span class="sig-name descname"><span class="pre">push_to_spack_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spack_cache_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/spack_runner.html#SpackRunner.push_to_spack_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.spack_runner.SpackRunner.push_to_spack_cache" title="Link to this definition"></a></dt>
 <dd><p>Push packages for a given env to the spack cache</p>
@@ -7497,7 +7510,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Mar 14, 2024.
+      <span class="lastupdated">Last updated on Mar 19, 2024.
       </span></p>
   </div>
 
