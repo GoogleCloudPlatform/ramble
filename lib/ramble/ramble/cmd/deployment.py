@@ -8,11 +8,11 @@
 
 import os
 import sys
-import urllib.parse
 
 import llnl.util.filesystem as fs
 
 import spack.util.spack_json as sjson
+import spack.util.url as surl
 
 import ramble.cmd
 import ramble.cmd.common.arguments
@@ -106,9 +106,9 @@ def deployment_pull(args):
 
     with ws.write_transaction():
         # Fetch deployment index first:
-        push_cls = ramble.pipeline.PublishDeploymentPipeline
+        push_cls = ramble.pipeline.PushDeploymentPipeline
 
-        remote_index_path = urllib.parse.urljoin(
+        remote_index_path = surl.join(
             args.deployment_path, ramble.pipeline.PushDeploymentPipeline.index_filename
         )
         local_index_path = \
@@ -120,7 +120,7 @@ def deployment_pull(args):
             index_data = sjson.load(f)
 
         for file in index_data[push_cls.index_namespace]:
-            src = urllib.parse.urljoin(args.deployment_path, file)
+            src = surl.join(args.deployment_path, file)
             dest = os.path.join(ws.root, file)
             if os.path.exists(dest):
                 fs.force_remove(dest)
