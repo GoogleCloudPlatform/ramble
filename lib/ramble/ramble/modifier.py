@@ -293,9 +293,11 @@ class ModifierBase(object, metaclass=ModifierMeta):
     def mode_variables(self):
         """Return a dict of variables that should be defined for the current mode"""
 
+        var_dict = {}
         if self._usage_mode in self.modifier_variables:
-            return self.modifier_variables[self._usage_mode]
-        return {}
+            for var, conf in self.modifier_variables[self._usage_mode].items():
+                var_dict[var] = conf['default']
+        return var_dict
 
     def run_phase_hook(self, workspace, pipeline, hook_name):
         """Run a modifier hook.

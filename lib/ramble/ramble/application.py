@@ -236,36 +236,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, 'workloads'):
             out_str.append('\n')
-            for wl_name, wl_conf in self.workloads.items():
-                out_str.append(rucolor.section_title('Workload:') + f' {wl_name}\n')
-                out_str.append('\t' + rucolor.nested_1('Executables: ') +
-                               f'{self._get_exec_order(wl_name)}\n')
-                out_str.append('\t' + rucolor.nested_1('Inputs: ') +
-                               f'{wl_conf["inputs"]}\n')
-                out_str.append('\t' + rucolor.nested_1('Workload Tags: \n'))
-                if 'tags' in wl_conf and wl_conf['tags']:
-                    out_str.append(colified(wl_conf['tags'], indent=8) + '\n')
-
-                if wl_name in self.environment_variables:
-                    out_str.append(rucolor.nested_1('\tEnvironment Variables:\n'))
-                    for var, conf in self.environment_variables[wl_name].items():
-                        indent = '\t\t'
-
-                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
-                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
-                        out_str.append(f'{indent}\tValue: {conf["value"]}\n')
-
-                if wl_name in self.workload_variables:
-                    out_str.append(rucolor.nested_1('\tVariables:\n'))
-                    for var, conf in self.workload_variables[wl_name].items():
-                        indent = '\t\t'
-
-                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
-                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
-                        out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
-                        if 'values' in conf:
-                            out_str.append(f'{indent}\tSuggested Values: {conf["values"]}\n')
-
+            for workload in self.workloads.values():
+                out_str.append(workload.as_str())
             out_str.append('\n')
 
         if hasattr(self, 'builtins'):
@@ -290,10 +262,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.no_expand_vars = set()
         workload_name = self.expander.workload_name
-        if workload_name in self.workload_variables:
-            for var, conf in self.workload_variables[workload_name].items():
-                if 'expandable' in conf and not conf['expandable']:
-                    self.no_expand_vars.add(var)
+        if workload_name in self.workloads:
+            for var in self.workloads[workload_name].variables:
+                if not var.expandable:
+                    self.no_expand_vars.add(var.name)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
 
@@ -324,7 +296,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.experiment_tags = self.tags.copy()
 
         workload_name = self.expander.workload_name
-        self.experiment_tags.extend(self.workloads[workload_name]['tags'])
+        if workload_name in self.workloads:
+            self.experiment_tags.extend(self.workloads[workload_name].tags)
 
         if tags:
             self.experiment_tags.extend(tags)
@@ -789,7 +762,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def _get_executable_graph(self, workload_name):
         """Return executables for add_expand_vars"""
         self._define_custom_executables()
-        exec_order = self.workloads[workload_name]['executables']
+        exec_order = self.workloads[workload_name].executables
         # Use yaml defined executable order, if defined
         if namespace.executables in self.internals:
             exec_order = self.internals[namespace.executables]
@@ -839,24 +812,29 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if they haven't been set already"""
         # Set default experiment variables, if they haven't been set already
         var_sets = []
-        if self.expander.workload_name in self.workload_variables:
-            var_sets.append(self.workload_variables[self.expander.workload_name])
+        if self.expander.workload_name in self.workloads:
+            var_sets.append(self.workloads[self.expander.workload_name].variable_dict())
 
         for mod_inst in self._modifier_instances:
             var_sets.append(mod_inst.mode_variables())
 
         for var_set in var_sets:
-            for var, conf in var_set.items():
+            for var, val in var_set.items():
                 if var not in self.variables.keys():
-                    self.variables[var] = conf['default']
+                    self.variables[var] = val
 
-        if self.expander.workload_name in self.environment_variables:
-            wl_env_vars = self.environment_variables[self.expander.workload_name]
+        if self.expander.workload_name in self.workloads:
+            workload = self.workloads[self.expander.workload_name]
 
-            for name, vals in wl_env_vars.items():
+            for env_var in workload.environment_variables:
+                action = 'set'
+                value = env_var.value
 
-                action = vals['action']
-                value = vals['value']
+                # Since the type coming from the schema can either be None, or
+                # a complex polymorphic type we need to ensure it has a
+                # sensible base structure when it is not given
+                if not self._env_variable_sets:
+                    self._env_variable_sets.append({'set': {}})
 
                 # Since the type coming from the schema can either be None, or
                 # a complex polymorphic type we need to ensure it has a
@@ -866,8 +844,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                 for env_var_set in self._env_variable_sets:
                     if action in env_var_set:
-                        if name not in env_var_set[action].keys():
-                            env_var_set[action][name] = value
+                        if env_var.name not in env_var_set[action].keys():
+                            env_var_set[action][env_var.name] = value
 
     def _define_commands(self, exec_graph):
         """Populate the internal list of commands based on executables
@@ -1046,7 +1024,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for workload_name in workload_names:
             workload = self.workloads[workload_name]
 
-            for input_file in workload['inputs']:
+            for input_file in workload.inputs:
                 if input_file not in self.inputs:
                     logger.die(
                         f'Workload {workload_name} references a non-existent input file '
