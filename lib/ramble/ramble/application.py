@@ -858,6 +858,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 action = vals['action']
                 value = vals['value']
 
+                # Since the type coming from the schema can either be None, or
+                # a complex polymorphic type we need to ensure it has a
+                # sensible base structure when it is not given
+                if not self._env_variable_sets:
+                    self._env_variable_sets.append({'set': {}})
+
                 for env_var_set in self._env_variable_sets:
                     if action in env_var_set:
                         if name not in env_var_set[action].keys():
