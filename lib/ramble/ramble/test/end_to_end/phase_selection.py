@@ -78,7 +78,6 @@ ramble:
               - n_nodes
               - env_name
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0

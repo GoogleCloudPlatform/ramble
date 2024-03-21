@@ -68,7 +68,6 @@ ramble:
               matrix:
               - n_nodes
   spack:
-    concretized: false
     packages: {}
     environments: {}
 """

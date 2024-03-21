@@ -47,7 +47,6 @@ ramble:
                 set:
                   MY_VAR: 'TEST'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

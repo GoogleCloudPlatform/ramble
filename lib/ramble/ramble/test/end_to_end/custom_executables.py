@@ -82,7 +82,6 @@ ramble:
                   MY_VAR: 'TEST'
                   OTHER_ENV_VAR: 'ANOTHER_TEST'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

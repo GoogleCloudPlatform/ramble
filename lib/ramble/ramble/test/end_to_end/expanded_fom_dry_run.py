@@ -43,7 +43,6 @@ ramble:
                 n_nodes: 1
                 n_ranks: 1
   spack:
-    concretized: false
     packages: {}
     environments: {}
 """
