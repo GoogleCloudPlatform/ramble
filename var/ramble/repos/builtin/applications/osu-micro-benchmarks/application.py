@@ -25,16 +25,6 @@ class OsuMicroBenchmarks(SpackApplication):
 
     required_package('osu-micro-benchmarks')
 
-    workload_variable('message-size', default='0:4194304',
-                      description='Message size interval',
-                      workloads=['osu_latency'])
-    workload_variable('iterations', default='1000',
-                      description='iterations per message size',
-                      workloads=['osu_latency'])
-    workload_variable('warmup', default='200',
-                      description='warmup (non-included) iterations',
-                      workloads=['osu_latency'])
-
     # Additional variables not yet included: --buffer-num, --validation,
     #  --validation-warmup, --validation-warmup
 
@@ -65,3 +55,13 @@ class OsuMicroBenchmarks(SpackApplication):
                         group_name='fom',
                         units=unit,
                         contexts=['msg_size'])
+
+    workload_variable('message-size', default='0:4194304',
+                      description='Message size interval',
+                      workloads=['osu_latency'])
+    workload_variable('iterations', default='1000',
+                      description='iterations per message size',
+                      workloads=['osu_latency'])
+    workload_variable('warmup', default='200',
+                      description='warmup (non-included) iterations',
+                      workloads=['osu_latency'])

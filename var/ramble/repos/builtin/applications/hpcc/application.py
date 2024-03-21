@@ -47,11 +47,11 @@ class Hpcc(SpackApplication):
 
     executable('execute', 'hpcc', use_mpi=True)
 
+    workload('standard', executables=['copy-config', 'execute'], input='hpccinf')
+
     workload_variable('config_file', default='https://raw.githubusercontent.com/icl-utk-edu/hpcc/1.5.0/_hpccinf.txt',
                       description='Default config file',
                       workloads=['standard'])
-
-    workload('standard', executables=['copy-config', 'execute'], input='hpccinf')
 
     workload_variable('out_file', default='{experiment_run_dir}/hpccoutf.txt',
                       description='Output file for results',

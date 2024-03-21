@@ -47,6 +47,10 @@ class IntelMpiBenchmarks(SpackApplication):
                '-iter {num_iterations} -multi {multi_val} -map {map_args} {additional_args}',
                use_mpi=True)
 
+    workload('pingpong', executable='pingpong')
+    workload('multi-pingpong', executable='multi-pingpong')
+    workload('collective', executable='collective')
+
     workload_variable('num_cores',
                       default='{{{n_ranks}/2}:0.0f}',
                       description='Number of cores',
@@ -66,10 +70,6 @@ class IntelMpiBenchmarks(SpackApplication):
                '{install_path}/IMB-MPI1 {collective_type} -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -npmin {min_collective_ranks} {additional_args}',
                use_mpi=True)
-
-    workload('pingpong', executable='pingpong')
-    workload('multi-pingpong', executable='multi-pingpong')
-    workload('collective', executable='collective')
 
     # Multiple spack packages (specifically intel-oneapi-mpi) provide the
     # binary we need. It's fairly common to want to decouple the version of MPI

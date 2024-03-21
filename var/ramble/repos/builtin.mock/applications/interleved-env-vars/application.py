@@ -19,12 +19,12 @@ class InterlevedEnvVars(ExecutableApplication):
     input_file('input', url='file:///tmp/test_file.log',
                description='Not a file', extension='.log')
 
-    environment_variable('FROM_DIRECTIVE', 'set', description='Test env var',
-                         workloads=['test_wl', 'test_wl2', 'test_wl3'])
-
     workload('test_wl', executables=['builtin::env_vars', 'foo'], input='input')
     workload('test_wl2', executables=['bar', 'builtin::env_vars'], input='input')
     workload('test_wl3', executables=['baz'], input='input')
+
+    environment_variable('FROM_DIRECTIVE', 'set', description='Test env var',
+                         workloads=['test_wl', 'test_wl2', 'test_wl3'])
 
     workload_variable('my_var', default='1.0',
                       description='Example var',
