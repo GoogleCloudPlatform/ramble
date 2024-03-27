@@ -7,6 +7,10 @@
 # except according to those terms.
 
 from enum import Enum
+try:
+    import deprecation
+except ImportError:
+    print('Please use pip to install the requirements.txt')
 
 import ramble.repository
 import ramble.workspace
@@ -458,6 +462,10 @@ class SoftwareEnvironments(object):
         """
         return self.info(indent=0)
 
+    @deprecation.deprecated(deprecated_in="0.4.0", removed_in="0.5.0",
+                            current_version=str(ramble.ramble_version),
+                            details="These Spack config sections no longer required and will "
+                                    "be removed from the schema in v0.5.0")
     def _deprecated_warnings(self):
         if not self._warn_for_deprecation or hasattr(self, '_warned_deprecation'):
             return
