@@ -58,7 +58,6 @@ ramble:
               variables:
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -115,7 +114,6 @@ ramble:
                 var_exec_name: 'nothing'
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

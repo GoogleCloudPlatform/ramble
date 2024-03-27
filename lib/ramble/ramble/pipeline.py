@@ -118,17 +118,6 @@ class Pipeline(object):
                                    self.workspace.hash_file_name), 'w+') as f:
                 f.write(self.workspace.workspace_hash + '\n')
 
-    def _validate(self):
-        """Perform validation that this pipeline can be executed"""
-        if not self.workspace.is_concretized():
-            error_message = 'Cannot run %s in a ' % self.name + \
-                            'non-conretized workspace\n' + \
-                            'Run `ramble workspace concretize` on this ' + \
-                            'workspace first.\n' + \
-                            'Then ensure its spack configuration is ' + \
-                            'properly configured.'
-            logger.die(error_message)
-
     def _prepare(self):
         """Perform preparation for pipeline execution"""
         pass
@@ -203,7 +192,6 @@ class Pipeline(object):
             )
 
         logger.add_log(self.log_path)
-        self._validate()
         self._prepare()
         self._execute()
         self._complete()

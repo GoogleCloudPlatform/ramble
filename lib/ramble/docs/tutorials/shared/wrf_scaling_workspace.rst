@@ -45,7 +45,6 @@ final configuration from a previous tutorial.
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0

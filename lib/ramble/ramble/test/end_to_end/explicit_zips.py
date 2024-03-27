@@ -80,7 +80,6 @@ ramble:
               - environments
               - partitions
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0

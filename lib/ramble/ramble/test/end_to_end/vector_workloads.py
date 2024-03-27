@@ -42,7 +42,6 @@ ramble:
                 application_workload: ['parallel' ,'serial', 'local']
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

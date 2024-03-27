@@ -38,7 +38,6 @@ ramble:
             test:
               variables: {}
   spack:
-    concretized: true
     packages:
       zlib:
         spack_spec: 'zlib'

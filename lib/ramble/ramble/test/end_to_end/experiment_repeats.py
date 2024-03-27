@@ -61,7 +61,6 @@ ramble:
                 size: '0003'
                 type: 'pme'
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0

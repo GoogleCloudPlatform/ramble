@@ -53,7 +53,6 @@ ramble:
               variables:
                 n_ranks: "{{{var_name}}}"
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0

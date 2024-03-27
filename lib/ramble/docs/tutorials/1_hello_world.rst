@@ -174,7 +174,6 @@ following contents:
                   variables:
                     n_ranks: '1'
       spack:
-        concretized: true
         packages: {}
         environments: {}
 

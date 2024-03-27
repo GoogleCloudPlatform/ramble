@@ -46,7 +46,6 @@ ramble:
               variables:
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -94,7 +93,6 @@ ramble:
                 mpi_command: '{undefined_var}'
                 n_ranks: '1'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

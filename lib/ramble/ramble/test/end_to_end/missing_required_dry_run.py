@@ -42,7 +42,6 @@ ramble:
               variables:
                 n_nodes: '8'
   spack:
-    concretized: true
     packages:
       gcc8:
         spack_spec: gcc@8.2.0 target=x86_64

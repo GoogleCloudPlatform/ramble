@@ -37,7 +37,6 @@ def dry_run_config(section_name, injections, config_path,
     test_dict['spack'] = syaml.syaml_dict()
 
     spack_dict = test_dict['spack']
-    spack_dict['concretized'] = False
     spack_dict['packages'] = syaml.syaml_dict()
     spack_dict['environments'] = syaml.syaml_dict()
 

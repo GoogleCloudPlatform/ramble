@@ -42,7 +42,6 @@ ramble:
                 n_nodes: '1'
                 size: '0000.96'
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0

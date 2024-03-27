@@ -65,7 +65,6 @@ Write the following configuration into the file, save, and exit:
                     n_nodes: 1
                     processes_per_node: 30
       spack:
-        concretized: false
         packages: {}
         environments: {}
 
@@ -94,7 +93,6 @@ will look something like this:
                     n_nodes: 1
                     processes_per_node: 30
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.3.0

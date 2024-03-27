@@ -144,7 +144,6 @@ The resulting configuration file should look like the following.
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -239,7 +238,6 @@ look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -309,7 +307,6 @@ configuration file should look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0

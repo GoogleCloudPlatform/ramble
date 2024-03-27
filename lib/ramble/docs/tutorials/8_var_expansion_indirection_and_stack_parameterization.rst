@@ -95,7 +95,6 @@ final configuration from the previous tutorial.
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -193,7 +192,6 @@ generation as well. The result might look like the following:
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -264,7 +262,6 @@ into the matrix. The result might look like the following:
                   - n_nodes
                   - mpi_name
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -374,7 +371,6 @@ resulting configuration might look like the following:
                   - n_nodes
                   - mpi_name
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -464,7 +460,6 @@ The resulting configuration file might look like the following:
                   - n_nodes
                   - mpi_name
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
