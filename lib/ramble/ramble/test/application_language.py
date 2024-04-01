@@ -9,10 +9,7 @@
 
 import pytest
 import enum
-try:
-    import deprecation
-except ImportError:
-    print('Please use pip to install the requirements.txt')
+import deprecation
 
 from ramble.appkit import *  # noqa
 

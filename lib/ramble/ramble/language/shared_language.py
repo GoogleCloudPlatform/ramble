@@ -6,10 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-try:
-    import deprecation
-except ImportError:
-    print('Please use pip to install the requirements.txt')
+import deprecation
 
 import ramble.language.language_base
 import ramble.language.language_helpers

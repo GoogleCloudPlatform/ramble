@@ -9,8 +9,8 @@
 from enum import Enum
 try:
     import deprecation
-except ImportError:
-    print('Please use pip to install the requirements.txt')
+except ModuleNotFoundError:
+    raise ModuleNotFoundError('Please use pip to install the requirements.txt')
 
 import ramble.repository
 import ramble.workspace

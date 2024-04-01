@@ -341,7 +341,7 @@ def workspace_remove(args):
 def workspace_concretize_setup_parser(subparser):
     """Concretize a workspace"""
     subparser.add_argument(
-        '-f', '--force_concretize',
+        '-f', '--force-concretize',
         dest='force_concretize',
         action='store_true',
         help='Overwrite software environment configuration with defaults defined in application ' +
