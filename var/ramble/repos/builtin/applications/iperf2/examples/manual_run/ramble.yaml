@@ -41,7 +41,6 @@ ramble:
                 variables:
                     additional_flags: "-t 120"
 spack:
-  concretized: true
   compilers:
     gcc9:
       spack_spec: gcc@9.3.0

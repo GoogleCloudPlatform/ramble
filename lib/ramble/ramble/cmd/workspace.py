@@ -340,11 +340,20 @@ def workspace_remove(args):
 
 def workspace_concretize_setup_parser(subparser):
     """Concretize a workspace"""
-    pass
+    subparser.add_argument(
+        '-f', '--force-concretize',
+        dest='force_concretize',
+        action='store_true',
+        help='Overwrite software environment configuration with defaults defined in application ' +
+              'definition',
+        required=False)
 
 
 def workspace_concretize(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace concretize')
+
+    if args.force_concretize:
+        ws.force_concretize = True
 
     logger.debug('Concretizing workspace')
     ws.concretize()

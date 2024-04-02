@@ -471,7 +471,6 @@ environments created from those packages. Its format is as follows:
 .. code-block:: yaml
 
     spack:
-      concretized: [True/False] # Should be false unless defined in a concretized workspace
       [variables: {}]
       packages:
         <package_name>:

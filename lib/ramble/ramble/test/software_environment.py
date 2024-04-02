@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import pytest
+import deprecation
 
 import ramble.workspace
 import ramble.software_environments
@@ -427,3 +428,40 @@ def test_compiler_in_environment_warns(request, mutable_mock_workspace_path, cap
 
         assert 'Environment basic contains packages and their compilers' in captured.err
         assert 'Package: basic, Compiler: test_comp' in captured.err
+
+
+@deprecation.fail_if_not_removed
+def test_deprecation_warning(request, mutable_mock_workspace_path, capsys):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['concretized'] = True
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic'] = {
+            'spack_spec': 'basic@1.1'
+        }
+        spack_dict['environments'] = {
+            'basic': {
+                'packages': ['basic']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+
+        _ = software_environments.render_environment('basic', env_expander)
+        captured = capsys.readouterr()
+
+        print(captured)
+
+        assert 'The following config sections are deprecated' in captured.err
+        assert 'spack:concretized' in captured.err

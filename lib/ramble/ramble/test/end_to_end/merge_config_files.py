@@ -38,7 +38,6 @@ applications:
 
     test_spack = """
 spack:
-  concretized: true
   packages:
     zlib:
       spack_spec: zlib@1.2.12
@@ -56,7 +55,6 @@ ramble:
     n_threads: '1'
   applications: {}
   spack:
-    concretized: false
     packages: {}
     environments: {}
 """

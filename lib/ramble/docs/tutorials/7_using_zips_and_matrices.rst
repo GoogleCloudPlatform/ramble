@@ -112,7 +112,6 @@ the above section. The result should look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -203,7 +202,6 @@ should have the following in your ``ramble.yaml``:
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
@@ -266,7 +264,6 @@ Your final configuration file should look something like:
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0

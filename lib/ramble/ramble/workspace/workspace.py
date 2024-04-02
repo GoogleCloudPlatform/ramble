@@ -138,7 +138,6 @@ ramble:
     processes_per_node: -1
   applications: {}
   spack:
-    concretized: false
     packages: {}
     environments: {}
 """
@@ -456,6 +455,7 @@ class Workspace(object):
         self.dry_run = dry_run
         self.always_print_foms = False
         self.repeat_success_strict = True
+        self.force_concretize = False
 
         self.read_default_template = read_default_template
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
@@ -864,13 +864,17 @@ class Workspace(object):
     def concretize(self):
         spack_dict = self.get_spack_dict()
 
-        if 'concretized' in spack_dict and spack_dict['concretized']:
-            raise RambleWorkspaceError('Cannot conretize an ' +
-                                       'already concretized ' +
-                                       'workspace')
+        if not self.force_concretize:
+            try:
+                if spack_dict[namespace.packages] or spack_dict[namespace.environments]:
+                    raise RambleWorkspaceError('Cannot concretize an already concretized '
+                                               'workspace. To overwrite the current configuration '
+                                               'with the default software configuration, use '
+                                               '\'ramble workspace concretize -f\'.')
+            except KeyError:
+                pass
 
         spack_dict = syaml.syaml_dict()
-        spack_dict['concretized'] = False
 
         if namespace.packages not in spack_dict or \
                 not spack_dict[namespace.packages]:
@@ -952,7 +956,6 @@ class Workspace(object):
                     if spec_name not in app_packages:
                         app_packages.append(spec_name)
 
-        spack_dict['concretized'] = True
         ramble.config.config.update_config('spack', spack_dict,
                                            scope=self.ws_file_config_scope_name())
 
@@ -1361,13 +1364,6 @@ class Workspace(object):
     def _get_application_dict_config(self, key):
         return self.application_configs[key]['yaml'] if key \
             in self.application_configs else None
-
-    def is_concretized(self):
-        spack_dict = self.get_spack_dict()
-        if 'concretized' in spack_dict:
-            return (True if spack_dict['concretized']
-                    else False)
-        return False
 
     def _get_workspace_section(self, section):
         """Return a dict of a workspace section"""

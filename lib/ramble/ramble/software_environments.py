@@ -7,6 +7,10 @@
 # except according to those terms.
 
 from enum import Enum
+try:
+    import deprecation
+except ModuleNotFoundError:
+    raise ModuleNotFoundError('Please use pip to install the requirements.txt')
 
 import ramble.repository
 import ramble.workspace
@@ -413,7 +417,8 @@ class SoftwareEnvironments(object):
     """Class representing a group of software environments"""
 
     _deprecated_sections = [namespace.variables, namespace.zips,
-                            namespace.matrix, namespace.matrices, namespace.exclude]
+                            namespace.matrix, namespace.matrices,
+                            namespace.exclude, 'concretized']
 
     def __init__(self, workspace):
         """SoftwareEnvironments constructor
@@ -457,6 +462,10 @@ class SoftwareEnvironments(object):
         """
         return self.info(indent=0)
 
+    @deprecation.deprecated(deprecated_in="0.4.0", removed_in="0.5.0",
+                            current_version=str(ramble.ramble_version),
+                            details="These Spack config sections no longer required and will "
+                                    "be removed from the schema in v0.5.0")
     def _deprecated_warnings(self):
         if not self._warn_for_deprecation or hasattr(self, '_warned_deprecation'):
             return
@@ -485,9 +494,12 @@ class SoftwareEnvironments(object):
             sections_to_print.append('spack:packages:<name>:exclude')
             sections_to_print.append('spack:environments:<name>:exclude')
 
+        if 'concretized' in self._warn_for_deprecation:
+            sections_to_print.append('spack:concretized')
+
         if not hasattr(self, '_warned_deprecated_variables'):
             self._warned_deprecated_variables = True
-            logger.warn('The following config sections are deprecated and ignore:')
+            logger.warn('The following config sections are deprecated and ignored:')
             for section in sections_to_print:
                 logger.warn(f'    {section}')
             logger.warn('Please remove from your configuration files.')

@@ -486,7 +486,6 @@ ramble:
                 n_nodes: '2'
 
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

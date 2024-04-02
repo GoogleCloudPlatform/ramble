@@ -46,7 +46,6 @@ ramble:
                 n_nodes: '1'
                 test_id: [1, 2]
   spack:
-    concretized: true
     packages:
       zlib:
         spack_spec: zlib

@@ -86,7 +86,6 @@ ramble:
                 where:
                 - '{n_nodes} == 16'
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0

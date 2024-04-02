@@ -41,7 +41,6 @@ ramble:
             test:
               variables: {}
   spack:
-    concretized: true
     packages: {}
     environments:
       zlib-configs:
@@ -94,7 +93,6 @@ ramble:
             test:
               variables: {}
   spack:
-    concretized: true
     packages: {}
     environments:
       zlib-configs:
