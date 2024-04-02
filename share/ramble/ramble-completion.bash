@@ -657,7 +657,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror list ls remove rm"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror tidy list ls remove rm"
     fi
 }
 
@@ -713,6 +713,10 @@ _ramble_workspace_edit() {
 
 _ramble_workspace_mirror() {
     RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --include-phase-dependencies --where --exclude-where"
+}
+
+_ramble_workspace_tidy() {
+    RAMBLE_COMPREPLY="-h --help"
 }
 
 _ramble_workspace_list() {

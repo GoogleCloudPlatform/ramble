@@ -1851,3 +1851,72 @@ ramble:
     output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
+
+
+def test_workspace_tidy():
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib-configs:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_template:
+              template: True
+              variables:
+                n_nodes: '1'
+  spack:
+    concretized: true
+    packages:
+      zlib:
+        spack_spec: zlib
+      zlib-configs:
+        spack_spec: zlib-configs
+      unused:
+        spack_spec: unused
+    environments:
+      zlib:
+        packages:
+        - zlib
+      zlib-configs:
+        packages:
+        - zlib-configs
+      unused:
+        packages:
+        - unused
+"""
+
+    workspace_name = 'test_tidy'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, 'w+') as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    assert search_files_for_string([config_path], 'unused') is True
+    assert search_files_for_string([config_path], 'spack_spec: zlib') is True
+    assert search_files_for_string([config_path], 'spack_spec: zlib-configs') is True
+
+    workspace('tidy', global_args=['-w', workspace_name])
+
+    print(config_path)
+
+    assert search_files_for_string([config_path], 'unused') is False
+    assert search_files_for_string([config_path], 'spack_spec: zlib') is True
+    assert search_files_for_string([config_path], 'spack_spec: zlib-configs') is True

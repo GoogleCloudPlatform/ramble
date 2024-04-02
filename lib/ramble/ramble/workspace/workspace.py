@@ -1148,6 +1148,28 @@ class Workspace(object):
         self.input_mirror_cache = ramble.caches.MirrorCache(self.input_mirror_path)
         self.software_mirror_cache = ramble.caches.MirrorCache(self.software_mirror_path)
 
+    def tidy(self):
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
+        software_environments = self.software_environments
+
+        self.build_experiment_set()
+
+        spack_dict = self.get_spack_dict()
+        package_dict = spack_dict['packages']
+        environments_dict = spack_dict['environments']
+
+        tty.debug('Removing configurations that do not spark joy.')
+        for pkg in software_environments.unused_packages():
+            tty.debug(f'Removing {pkg.name} from Spack packages')
+            package_dict.pop(pkg.name)
+        for env in software_environments.unused_environments():
+            tty.debug(f'Removing {env.name} from Spack environments')
+            environments_dict.pop(env.name)
+
+        ramble.config.config.update_config('spack', spack_dict,
+                                           scope=self.ws_file_config_scope_name())
+
     @property
     def latest_archive_path(self):
         return os.path.join(self.archive_dir, self.latest_archive)

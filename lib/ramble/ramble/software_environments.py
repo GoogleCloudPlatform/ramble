@@ -454,6 +454,26 @@ class SoftwareEnvironments(object):
             out_str += env.info(indent, verbosity=verbosity, color_level=color_level)
         return out_str
 
+    def unused_environments(self):
+        """Iterator over environment templates that do not have any rendered environments
+
+        Yields:
+            (TemplateEnvironment) Each unused template environment in this group
+        """
+        for env in self._environment_templates.values():
+            if not env._rendered_environments:
+                yield env
+
+    def unused_packages(self):
+        """Iterator over package templates that do not have any rendered packages
+
+        Yields:
+            (TemplatePackage) Each unused template package in this group
+        """
+        for pkg in self._package_templates.values():
+            if not pkg._rendered_packages:
+                yield pkg
+
     def __str__(self):
         """String representation of all packages and environments in this object
 

@@ -56,6 +56,7 @@ subcommands = [
     'info',
     'edit',
     'mirror',
+    'tidy',
     ['list', 'ls'],
     ['remove', 'rm'],
 ]
@@ -742,6 +743,18 @@ def workspace_edit(args):
             print(f)
     else:
         editor(*edit_files)
+
+
+def workspace_tidy_setup_parser(subparser):
+    """Tidy a workspace configuration by removing unused software"""
+    pass
+
+
+def workspace_tidy(args):
+    ws = ramble.cmd.require_active_workspace(cmd_name='workspace tidy')
+
+    logger.debug('Tidying workspace')
+    ws.tidy()
 
 
 def workspace_archive_setup_parser(subparser):
