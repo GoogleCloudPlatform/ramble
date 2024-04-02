@@ -31,8 +31,6 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, 'executables')
     assert hasattr(test_app, 'figures_of_merit')
     assert hasattr(test_app, 'inputs')
-    assert hasattr(test_app, 'workload_variables')
-    assert hasattr(test_app, 'environment_variables')
     assert hasattr(test_app, 'compilers')
     assert hasattr(test_app, 'software_specs')
     assert hasattr(test_app, 'required_packages')
@@ -315,13 +313,13 @@ def test_workload_directive(app_class, func_type):
 
     assert hasattr(app_inst, 'workloads')
     assert wl_name in app_inst.workloads
-    assert 'executables' in app_inst.workloads[wl_name]
-    assert 'inputs' in app_inst.workloads[wl_name]
+    assert app_inst.workloads[wl_name].executables is not None
+    assert app_inst.workloads[wl_name].inputs is not None
     for test in test_defs['executables']:
-        assert test in app_inst.workloads[wl_name]['executables']
+        assert app_inst.workloads[wl_name].find_executable(test) is not None
 
     for test in test_defs['inputs']:
-        assert test in app_inst.workloads[wl_name]['inputs']
+        assert app_inst.workloads[wl_name].find_input(test) is not None
 
 
 @pytest.mark.parametrize('func_type', func_types)

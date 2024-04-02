@@ -10,6 +10,7 @@
 import pytest
 
 import ramble.workspace
+import ramble.workload
 
 pytestmark = pytest.mark.usefixtures('mutable_config',
                                      'mutable_mock_workspace_path',
@@ -29,31 +30,45 @@ def test_app_features(mutable_mock_apps_repo, app):
     assert hasattr(app_inst, 'compilers')
     assert hasattr(app_inst, 'software_specs')
     assert hasattr(app_inst, 'required_packages')
-    assert hasattr(app_inst, 'workload_variables')
-    assert hasattr(app_inst, 'environment_variables')
     assert hasattr(app_inst, 'builtins')
 
 
 def test_basic_app(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get('basic')
-    assert 'foo' in basic_inst.executables
-    assert basic_inst.executables['foo'].template == ['bar']
-    assert not basic_inst.executables['foo'].mpi
-    assert 'bar' in basic_inst.executables
-    assert basic_inst.executables['bar'].template == ['baz']
-    assert basic_inst.executables['bar'].mpi
 
     assert 'test_wl' in basic_inst.workloads
-    assert basic_inst.workloads['test_wl']['executables'] == ['foo']
-    assert basic_inst.workloads['test_wl']['inputs'] == ['input']
+    assert len(basic_inst.workloads['test_wl'].executables) == 1
+    foo_exec = basic_inst.workloads['test_wl'].find_executable('foo')
+    assert foo_exec is not None
+    foo_exec = basic_inst.executables[foo_exec]
+    assert foo_exec.template == ['bar']
+    assert not foo_exec.mpi
+
+    assert len(basic_inst.workloads['test_wl'].inputs) == 1
+    example_input = basic_inst.workloads['test_wl'].find_input('input')
+    assert example_input is not None
+
+    assert len(basic_inst.workloads['test_wl'].variables) == 1
+    my_var = basic_inst.workloads['test_wl'].find_variable('my_var')
+    assert my_var is not None
+    assert my_var.default == '1.0'
+    assert my_var.description == 'Example var'
+
+    assert 'test_wl2' in basic_inst.workloads
+    assert len(basic_inst.workloads['test_wl2'].executables) == 1
+    bar_exec = basic_inst.workloads['test_wl2'].find_executable('bar')
+    assert bar_exec is not None
+    bar_exec = basic_inst.executables[bar_exec]
+    assert bar_exec.template == ['baz']
+    assert bar_exec.mpi
+
+    assert len(basic_inst.workloads['test_wl2'].inputs) == 1
+    example_input = basic_inst.workloads['test_wl2'].find_input('input')
+    assert example_input is not None
 
     exec_graph = basic_inst._get_executable_graph('test_wl')
     assert exec_graph.get_node('foo') is not None
     assert exec_graph.get_node('builtin::env_vars') is not None
-
-    assert 'test_wl2' in basic_inst.workloads
-    assert basic_inst.workloads['test_wl2']['executables'] == ['bar']
-    assert basic_inst.workloads['test_wl2']['inputs'] == ['input']
 
     exec_graph = basic_inst._get_executable_graph('test_wl2')
     assert exec_graph.get_node('bar') is not None
@@ -72,14 +87,6 @@ def test_basic_app(mutable_mock_apps_repo):
         'file:///tmp/test_file.log'
     assert basic_inst.inputs['input']['description'] == \
         'Not a file'
-
-    assert 'test_wl' in basic_inst.workload_variables
-    assert 'my_var' in basic_inst.workload_variables['test_wl']
-    assert basic_inst.workload_variables['test_wl']['my_var']['default'] == \
-        '1.0'
-
-    assert basic_inst.workload_variables['test_wl']['my_var']['description'] \
-        == 'Example var'
 
 
 @pytest.mark.parametrize('app_name', ['basic', 'zlib'])
@@ -257,10 +264,10 @@ def test_get_executable_graph_initial(mutable_mock_apps_repo):
 
     # Set up the instance to test just the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input']}}
+    test_wl = ramble.workload.Workload('test_wl', executables=['foo'], inputs=['input'])
+    test_wl2 = ramble.workload.Workload('test_wl2', executables=['bar'], inputs=['input'])
+    executable_application_instance.workloads = {'test_wl': test_wl,
+                                                 'test_wl2': test_wl2}
     executable_application_instance.internals = {}
 
     executable_graph = executable_application_instance._get_executable_graph('test_wl2')
@@ -278,10 +285,10 @@ def test_get_executable_graph_yaml_defined(mutable_mock_apps_repo):
 
     # Set up the instance to pass the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input']}}
+    test_wl = ramble.workload.Workload('test_wl', executables=['foo'], inputs=['input'])
+    test_wl2 = ramble.workload.Workload('test_wl2', executables=['bar'], inputs=['input'])
+    executable_application_instance.workloads = {'test_wl': test_wl,
+                                                 'test_wl2': test_wl2}
 
     # Insert namespace.executables into the instance's internals to pass the
     # second part of the function
@@ -318,10 +325,10 @@ def test_get_executable_graph_custom_executables(mutable_mock_apps_repo):
 
     # Set up the instance to pass the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input']}}
+    test_wl = ramble.workload.Workload('test_wl', executables=['foo'], inputs=['input'])
+    test_wl2 = ramble.workload.Workload('test_wl2', executables=['bar'], inputs=['input'])
+    executable_application_instance.workloads = {'test_wl': test_wl,
+                                                 'test_wl2': test_wl2}
 
     # Insert namespace.executables into the instance's internals to pass the
     # second part of the function
@@ -407,18 +414,16 @@ def test_set_default_experiment_variables(mutable_mock_apps_repo):
     # Set up the instance to pass the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
 
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input']}}
+    test_wl = ramble.workload.Workload('test_wl', executables=['foo'], inputs=['input'])
+    test_wl2 = ramble.workload.Workload('test_wl2', executables=['bar'], inputs=['input'])
+    test_wl2.add_variable(ramble.workload.WorkloadVariable('n_ranks', default='1'))
+    executable_application_instance.workloads = {'test_wl': test_wl,
+                                                 'test_wl2': test_wl2}
 
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs = {'input': {'target_dir': '.'}}
     executable_application_instance.variables = {}
-
-    executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
-                                                                       {'default': '1'}}}
 
     executable_application_instance._set_default_experiment_variables()
 
@@ -435,10 +440,11 @@ def test_define_commands(mutable_mock_apps_repo):
     # Set up the instance to pass the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
 
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input']}}
+    test_wl = ramble.workload.Workload('test_wl', executables=['foo'], inputs=['input'])
+    test_wl2 = ramble.workload.Workload('test_wl2', executables=['bar'], inputs=['input'])
+    test_wl2.add_variable(ramble.workload.WorkloadVariable('n_ranks', default='1'))
+    executable_application_instance.workloads = {'test_wl': test_wl,
+                                                 'test_wl2': test_wl2}
 
     executable_application_instance.internals = {}
 
@@ -446,9 +452,6 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance.variables = {}
 
     exec_graph = executable_application_instance._get_executable_graph('test_wl2')
-
-    executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
-                                                                       {'default': '1'}}}
 
     executable_application_instance.set_formatted_executables(
         {'command': {'join_separator': '\n'}}
@@ -508,13 +511,11 @@ ramble:
     # Set up the instance to pass the initial part of the function
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
 
-    executable_application_instance.workloads = {'test_wl': {'executables': ['foo'],
-                                                             'inputs': ['input']},
-                                                 'test_wl2': {'executables': ['bar'],
-                                                              'inputs': ['input'],
-                                                              'template': ['input'],
-                                                              },
-                                                 }
+    test_wl = ramble.workload.Workload('test_wl', executables=['foo'], inputs=['input'])
+    test_wl2 = ramble.workload.Workload('test_wl2', executables=['bar'], inputs=['input'])
+    test_wl2.add_variable(ramble.workload.WorkloadVariable('n_ranks', default='1'))
+    executable_application_instance.workloads = {'test_wl': test_wl,
+                                                 'test_wl2': test_wl2}
 
     executable_application_instance.internals = {}
 
@@ -522,9 +523,6 @@ ramble:
     executable_application_instance.variables = {}
 
     exec_graph = executable_application_instance._get_executable_graph('test_wl2')
-
-    executable_application_instance.workload_variables = {'test_wl2': {'n_ranks':
-                                                                       {'default': '1'}}}
 
     executable_application_instance._set_default_experiment_variables()
 
