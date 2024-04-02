@@ -15,7 +15,7 @@ class Streamc(SpackApplication):
     '''Define STREAMC application'''
     name = 'streamc'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 

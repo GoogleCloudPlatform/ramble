@@ -15,7 +15,7 @@ class UfsWeatherModel(SpackApplication):
     '''Define FV3 application via ufs-weather-model'''
     name = 'ufs-weather-model'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('nwp', 'weather')
 

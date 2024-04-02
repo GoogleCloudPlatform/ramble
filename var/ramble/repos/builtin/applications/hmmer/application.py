@@ -24,7 +24,7 @@ class Hmmer(SpackApplication):
 
     name = 'hmmer'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('molecular-dynamics', 'hidden-markov-models', 'bio-molecule')
 

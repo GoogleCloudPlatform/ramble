@@ -16,7 +16,7 @@ class Cloverleaf(SpackApplication):
     '''Define CLOVERLEAF application'''
     name = 'cloverleaf'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('cfd', 'fluid', 'dynamics', 'euler', 'miniapp', 'minibenchmark', 'mini-benchmark')
 
