@@ -435,12 +435,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         Returns:
             (set): All variable names used by this experiment.
         """
+        self.build_modifier_instances()
         self.add_expand_vars(workspace)
 
         # Add all known keywords
         for key in self.keywords.keys:
             self.expander._used_variables.add(key)
             self.expander.expand_var_name(key)
+
+        # Add modifier mode variables:
+        for mod_inst in self._modifier_instances:
+            for var in mod_inst.mode_variables().keys():
+                self.expander._used_variables.add(var)
+                self.expander.expand_var_name(var)
 
         if self.chained_experiments:
             for chained_exp in self.chained_experiments:
