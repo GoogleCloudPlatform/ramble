@@ -469,7 +469,7 @@ class SpackApplication(ApplicationBase):
                    run_after=['software_create_env'])
 
     def _deploy_artifacts(self, workspace, app_inst=None):
-        super()._deploy_artifacts(workspace)
+        super()._deploy_artifacts(workspace, app_inst=app_inst)
         env_path = self.expander.env_path
 
         try:
