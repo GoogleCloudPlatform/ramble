@@ -266,6 +266,12 @@ class ArchivePipeline(Pipeline):
         self.archive_prefix = archive_prefix
         self.archive_name = None
 
+        if self.upload_url and not self.create_tar:
+            logger.warn(
+                'Upload URL is currently only supported when using tar format (-t)\n'
+                'Archive will not be uploaded.'
+            )
+
     def _prepare(self):
         import glob
         super()._construct_hash()
@@ -366,6 +372,7 @@ class ArchivePipeline(Pipeline):
                 tar_path = self.workspace.latest_archive_path + tar_extension
                 remote_tar_path = archive_url + '/' + self.workspace.latest_archive + tar_extension
                 _upload_file(tar_path, remote_tar_path)
+                logger.all_msg(f"Archive Uploaded to {remote_tar_path}")
 
 
 class MirrorPipeline(Pipeline):
