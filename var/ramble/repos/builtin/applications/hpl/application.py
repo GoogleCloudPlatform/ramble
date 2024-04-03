@@ -21,7 +21,7 @@ class Hpl(SpackApplication):
     '''Define HPL application'''
     name = 'hpl'
 
-    maintainers('douglasjacobsen', 'dodecatheon')
+    maintainers('douglasjacobsen')
 
     tags('benchmark-app', 'benchmark', 'linpack')
 

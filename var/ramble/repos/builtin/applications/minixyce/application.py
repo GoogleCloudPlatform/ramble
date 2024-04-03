@@ -15,7 +15,7 @@ class Minixyce(SpackApplication):
     '''Define miniXyce application'''
     name = 'minixyce'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark')
 

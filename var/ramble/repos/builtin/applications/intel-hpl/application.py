@@ -21,7 +21,7 @@ class IntelHpl(SpackApplication):
     '''Define HPL application using Intel MKL optimized binary from intel-oneapi-mpi package'''
     name = 'intel-hpl'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('benchmark-app', 'benchmark', 'linpack', 'optimized', 'intel', 'mkl')
 
