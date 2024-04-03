@@ -35,7 +35,7 @@ class Logger(object):
     def add_log(self, path):
         """Add a log to the current log stack
 
-        Opens (with 'w+' permissions) the file provided by the 'path' argument,
+        Opens (with 'a+' permissions) the file provided by the 'path' argument,
         and stores both the path, and the opened stream object in the current stack
         in the active position.
 

@@ -66,12 +66,6 @@ class Pipeline(object):
         self.log_path_latest = os.path.join(self.workspace.log_dir,
                                             f'{self.name}.latest.out')
 
-        fs.mkdirp(self.log_dir)
-
-        # Create simlinks to give known paths
-        self.create_simlink(self.log_dir, self.log_dir_latest)
-        self.create_simlink(self.log_path, self.log_path_latest)
-
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
         self.workspace.software_environments = self._software_environments
         self._experiment_set = workspace.build_experiment_set()
@@ -126,6 +120,11 @@ class Pipeline(object):
         """Hook for executing the pipeline"""
 
         num_exps = self._experiment_set.num_filtered_experiments(self.filters)
+
+        if logger.enabled:
+            fs.mkdirp(self.log_dir)
+            # Also create simlink to give known paths
+            self.create_simlink(self.log_dir, self.log_dir_latest)
 
         if self.suppress_per_experiment_prints and not self.suppress_run_header:
             logger.all_msg(f'  Log files for experiments are stored in: {self.log_dir}')
@@ -192,6 +191,9 @@ class Pipeline(object):
             )
 
         logger.add_log(self.log_path)
+        if logger.enabled:
+            self.create_simlink(self.log_path, self.log_path_latest)
+
         self._prepare()
         self._execute()
         self._complete()
