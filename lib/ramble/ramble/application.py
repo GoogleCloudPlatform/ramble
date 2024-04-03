@@ -1888,7 +1888,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('deploy_artifacts', pipeline='pushdeployment')
 
-    def _deploy_artifacts(self, workspace):
+    def _deploy_artifacts(self, workspace, app_inst=None):
         repo_path = os.path.join(workspace.named_deployment, 'object_repo')
 
         app_dir_name = os.path.basename(os.path.dirname(self._file_path))
