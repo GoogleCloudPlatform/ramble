@@ -191,7 +191,7 @@ class Renderer(object):
             # Remove any variables that are not used by the render group
             all_vars = set(object_variables.keys())
             for var in all_vars:
-                if var not in used_variables:
+                if var not in used_variables and isinstance(object_variables[var], list):
                     del object_variables[var]
 
         if zips:

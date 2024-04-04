@@ -1268,7 +1268,7 @@ def test_chained_invalid_order_errors(mutable_mock_workspace_path, capsys):
             assert "Invalid experiment chain defined:" in captured
 
 
-def test_modifiers_set_correctly(mutable_mock_workspace_path, capsys):
+def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers, capsys):
     workspace('create', 'test')
 
     assert 'test' in workspace('list')
@@ -1287,8 +1287,8 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, capsys):
         }
         application_context.modifiers = [
             {
-                'name': 'test_app_mod',
-                'mode': 'test_app',
+                'name': 'test-mod',
+                'mode': 'app-scope',
                 'on_executable': [
                     'builtin::env_vars'
                 ]
@@ -1303,8 +1303,8 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, capsys):
         }
         workload_context.modifiers = [
             {
-                'name': 'test_wl_mod',
-                'mode': 'test_wl',
+                'name': 'test-mod',
+                'mode': 'wl-scope',
                 'on_executable': [
                     'builtin::env_vars'
                 ]
@@ -1318,8 +1318,8 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, capsys):
         }
         experiment_context.modifiers = [
             {
-                'name': 'test_exp1_mod',
-                'mode': 'test_exp1',
+                'name': 'test-mod',
+                'mode': 'exp-scope',
                 'on_executable': [
                     'builtin::env_vars'
                 ]
@@ -1334,11 +1334,11 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, capsys):
         app_inst = exp_set.experiments['basic.test_wl.test1']
         assert app_inst.modifiers is not None
 
-        expected_modifiers = set(['test_app_mod', 'test_wl_mod', 'test_exp1_mod'])
+        expected_modifier_modes = set(['app-scope', 'wl-scope', 'exp-scope'])
         for mod_def in app_inst.modifiers:
-            assert mod_def['name'] in expected_modifiers
-            expected_modifiers.remove(mod_def['name'])
-        assert len(expected_modifiers) == 0
+            assert mod_def['mode'] in expected_modifier_modes
+            expected_modifier_modes.remove(mod_def['mode'])
+        assert len(expected_modifier_modes) == 0
 
 
 def test_explicit_zips_work(mutable_mock_workspace_path):

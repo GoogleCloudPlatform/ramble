@@ -19,6 +19,13 @@ class TestMod(BasicModifier):
     tags('test')
 
     mode('test', description='This is a test mode')
+    default_mode('test')
+
+    mode('app-scope', description='This is a test mode at the application scope')
+
+    mode('wl-scope', description='This is a test mode at the workload scope')
+
+    mode('exp-scope', description='This is a test mode at the experiment scope')
 
     variable_modification('mpi_command', 'echo "prefix_mpi_command" >> {log_file}; ', method='prepend', modes=['test'])
 
