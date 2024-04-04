@@ -25,7 +25,7 @@ class Nvbandwidth(SpackApplication):
 
     workload_variable('transfer-size', default='1m',
                       description='Transfer Size',
-                      workloads=['multi-file', 'single-file'])
+                      workloads=['all_benchmarks'])
 
     executable(name='nvbandwidth', template='nvbandwidth', use_mpi=False)
 

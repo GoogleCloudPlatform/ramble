@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.workload
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
 import ramble.language.shared_language
@@ -70,26 +71,15 @@ def workload(name, executables=None, executable=None, input=None,
     """
 
     def _execute_workload(app):
-        app.workloads[name] = {
-            'executables': [],
-            'inputs': [],
-            'tags': [],
-        }
-
         all_execs = ramble.language.language_helpers.require_definition(executable,
                                                                         executables,
                                                                         'executable',
                                                                         'executables',
                                                                         'workload')
 
-        app.workloads[name]['executables'] = all_execs.copy()
-
         all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs)
 
-        app.workloads[name]['inputs'] = all_inputs.copy()
-
-        if tags:
-            app.workloads[name]['tags'] = tags.copy()
+        app.workloads[name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
 
     return _execute_workload
 
@@ -159,7 +149,7 @@ def input_file(name, url, description, target_dir='{input_name}', sha256=None, e
     return _execute_input_file
 
 
-@application_directive('workload_variables')
+@application_directive(dicts=())
 def workload_variable(name, default, description, values=None, workload=None,
                       workloads=None, expandable=True, **kwargs):
     """Define a new variable to be used in experiments
@@ -179,21 +169,17 @@ def workload_variable(name, default, description, values=None, workload=None,
                                                                             'workload_variable')
 
         for wl_name in all_workloads:
-            if wl_name not in app.workload_variables:
-                app.workload_variables[wl_name] = {}
-
-            app.workload_variables[wl_name][name] = {
-                'default': default,
-                'description': description,
-                'expandable': expandable
-            }
-            if values:
-                app.workload_variables[wl_name][name]['values'] = values
+            app.workloads[wl_name].add_variable(
+                ramble.workload.WorkloadVariable(
+                    name, default=default, description=description,
+                    values=values, expandable=expandable
+                )
+            )
 
     return _execute_workload_variable
 
 
-@application_directive('environment_variables')
+@application_directive(dicts=())
 def environment_variable(name, value, description, workload=None,
                          workloads=None, **kwargs):
     """Define an environment variable to be used in experiments
@@ -209,14 +195,11 @@ def environment_variable(name, value, description, workload=None,
                                                                             'environment_variable')
 
         for wl_name in all_workloads:
-            if wl_name not in app.environment_variables:
-                app.environment_variables[wl_name] = {}
-
-            app.environment_variables[wl_name][name] = {
-                'value': value,
-                'action': 'set',
-                'description': description,
-            }
+            app.workloads[wl_name].add_environment_variable(
+                ramble.workload.WorkloadEnvironmentVariable(
+                    name, value=value, description=description
+                )
+            )
 
     return _execute_environment_variable
 

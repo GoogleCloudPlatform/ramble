@@ -261,8 +261,8 @@ class IntelHpl(SpackApplication):
             problemSize = blockSize * nBlocks
             usedPercentage = int(problemSize**2 / fullMemWords * 100)
 
-            for var, config in self.workload_variables['standard'].items():
-                self.variables[var] = config['default']
+            for var in self.workloads['standard'].variables:
+                self.variables[var.name] = var.default
 
             pfact = expander.expand_var_name('pfact')
             nbmin = expander.expand_var_name('nbmin')
