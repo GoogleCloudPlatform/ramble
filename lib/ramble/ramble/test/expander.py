@@ -46,7 +46,8 @@ def exp_dict():
         ('{n_nodes}*{processes_per_node}', '4', set(), 1),
         ('2**4', '16', set(), 1),
         ('{((((16-10+2)/4)**2)*4)}', '16.0', set(), 1),
-        ('gromacs +blas', 'gromacs +blas', set(), 1),
+        ('"gromacs +blas"', 'gromacs +blas', set(), 1),
+        ('gromacs +blas', 'gromacs+blas', set(), 1),
         ('range(0, 5)', '[0, 1, 2, 3, 4]', set(), 1),
         ('{decimal.06.var}', 'foo', set(), 1),
         ('{}', '{}', set(), 1),
@@ -73,6 +74,7 @@ def exp_dict():
         ('"2.1.1" in ["2.1.1", "3.1.1", "4.2.1"]', 'True', set(), 1),
         ('"2.1.2" in ["2.1.1", "3.1.1", "4.2.1"]', 'False', set(), 1),
         ('{test_mask}', '0x0', set(['test_mask']), 1),
+        ('intel-mpi-benchmarks == intel-mpi-benchmarks', 'True', set(), 1),
     ]
 )
 def test_expansions(input, output, no_expand_vars, passes):
