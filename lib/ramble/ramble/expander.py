@@ -28,6 +28,15 @@ supported_math_operators = {
     ast.And: operator.and_, ast.Or: operator.or_, ast.Mod: operator.mod
 }
 
+op_str_map = {
+    operator.add: '+', operator.sub: '-',
+    operator.mul: '*', operator.truediv: '/',
+    operator.pow: '**', operator.xor: '^', operator.neg: '-',
+    operator.gt: '>',
+    operator.ge: '>=', operator.lt: '<', operator.le: '<=',
+    operator.and_: 'and', operator.or_: 'or', operator.mod: '%'
+}
+
 supported_scalar_function_pointers = {
     'str': str,
     'int': int,
@@ -769,7 +778,7 @@ class Expander(object):
             right_eval = self.eval_math(node.right)
             op = supported_math_operators[type(node.op)]
             if isinstance(left_eval, six.string_types) or isinstance(right_eval, six.string_types):
-                raise SyntaxError('Unsupported operand type in binary operator')
+                return f'{left_eval}{op_str_map[op]}{right_eval}'
             return op(left_eval, right_eval)
         except TypeError:
             raise SyntaxError('Unsupported operand type in binary operator')
