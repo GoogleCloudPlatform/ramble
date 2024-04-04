@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.workload &mdash; Ramble 0.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+              <div class="version">
+                0.4
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.workload</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.workload</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2024 Google LLC</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
+
+
+<div class="viewcode-block" id="WorkloadVariable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadVariable">[docs]</a>
+<span class="k">class</span> <span class="nc">WorkloadVariable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a variable definition&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for a new variable</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name of variable</span>
+<span class="sd">            default: Default value of variable</span>
+<span class="sd">            description (str): Description of variable</span>
+<span class="sd">            values: List of suggested values for variable</span>
+<span class="sd">            expandable (bool): True if variable can be expanded, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expandable</span> <span class="o">=</span> <span class="n">expandable</span>
+
+<div class="viewcode-block" id="WorkloadVariable.as_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadVariable.as_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary representation of this variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Key is variable name, value is default value of variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="WorkloadVariable.as_str">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadVariable.as_str">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of this variable</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          n_indent (int): Number of spaces to indent string lines with</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str): Representation of this variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_indent</span>
+
+        <span class="n">print_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">]</span>
+
+        <span class="n">out_str</span>  <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_2</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">print_attr</span> <span class="ow">in</span> <span class="n">print_attrs</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">print_attr</span>
+            <span class="k">if</span> <span class="n">print_attr</span> <span class="o">==</span> <span class="s1">&#39;Values&#39;</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Suggested Values&#39;</span>
+            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">print_attr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="n">attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">attr_val</span><span class="p">:</span>
+                <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">attr_val</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">out_str</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WorkloadEnvironmentVariable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadEnvironmentVariable">[docs]</a>
+<span class="k">class</span> <span class="nc">WorkloadEnvironmentVariable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing an environment variable in a workload&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;WorkloadEnvironmentVariable constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name of environment variable</span>
+<span class="sd">            value: Value to set environment variable to</span>
+<span class="sd">            description (str): Description of the environment variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+
+<div class="viewcode-block" id="WorkloadEnvironmentVariable.as_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadEnvironmentVariable.as_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary representation of environment variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): Dictionary with single environment variable in it. Key is</span>
+<span class="sd">                    var name, value is a dict representing the specific action and</span>
+<span class="sd">                    value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">}}</span></div>
+
+
+<div class="viewcode-block" id="WorkloadEnvironmentVariable.as_str">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadEnvironmentVariable.as_str">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of environment variable</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n_indent (int): Number of spaces to indent string representation by</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str): String representing this environment variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_indent</span>
+
+        <span class="n">print_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+
+        <span class="n">out_str</span>  <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_2</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">print_attrs</span><span class="p">:</span>
+            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">attr_val</span><span class="p">:</span>
+                <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">attr_val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">out_str</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Workload">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload">[docs]</a>
+<span class="k">class</span> <span class="nc">Workload</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a single workload&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">executables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">inputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for a workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name of this workload</span>
+<span class="sd">            executables (list(str)): List of executable names for this workload</span>
+<span class="sd">            inputs (list(str)): List of input names for this workload</span>
+<span class="sd">            tags (list(str)): List of tags for this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">attr_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;executables&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">]</span>
+        <span class="n">attr_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">executables</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">tags</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">attr_names</span><span class="p">,</span> <span class="n">attr_vals</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">vals</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">attr_val</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="n">vals</span><span class="p">:</span>
+                    <span class="n">attr_val</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">attr_val</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Workload.as_str">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.as_str">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n_indent (int): Number of spaces to indent string with</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str): Representation of this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;Executables&#39;</span><span class="p">,</span> <span class="s1">&#39;executables&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;Inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;Tags&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">)]</span>
+
+        <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_indent</span>
+
+        <span class="n">out_str</span>  <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">Workload: &#39;</span><span class="p">)</span>
+        <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">: &#39;</span><span class="p">)</span>
+            <span class="n">attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[])</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">attr_val</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    Variables:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                <span class="n">out_str</span> <span class="o">+=</span> <span class="n">var</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">n_indent</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">:</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    Environment Variables:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">env_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">:</span>
+                <span class="n">out_str</span> <span class="o">+=</span> <span class="n">env_var</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">n_indent</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out_str</span></div>
+
+
+<div class="viewcode-block" id="Workload.add_variable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.add_variable">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="n">WorkloadVariable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a variable to this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            variable (WorkloadVariable): New variable to add to this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workload.add_environment_variable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.add_environment_variable">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_environment_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_var</span><span class="p">:</span> <span class="n">WorkloadEnvironmentVariable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an environment variable to this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            env_var (WorkloadEnvironmentVariable): New environment variable to add to this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">env_var</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workload.add_executable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.add_executable">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an executable to this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            executable (str): Name of executable to add to this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workload.add_input">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.add_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an input to this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input (str): Name of input to add to this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workload.add_tag">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.add_tag">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a tag to this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tag (str): Tag to add to this workload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workload.variable_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.variable_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">variable_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary representation of all workload variables for this workload</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): Dictionary with variable names as keys and variable default values as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">var_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="n">var_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">var_dict</span></div>
+
+
+<div class="viewcode-block" id="Workload.environment_variable_dict">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.environment_variable_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">environment_variable_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary representation of all environment variables for this workload</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): Dictionary with all environment variable in it. Keys are</span>
+<span class="sd">                    var name, values are dicts representing the specific actions and</span>
+<span class="sd">                    values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">env_var_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">env_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">:</span>
+            <span class="n">env_var_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">env_var_dict</span></div>
+
+
+<div class="viewcode-block" id="Workload.is_valid">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.is_valid">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if this workload is considered valid</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (bool): True if workload is valid, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Workload.find_executable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.find_executable">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exec_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find an executable in this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exec_name (str): Name of executable to find</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str / None): Name of executable if it exists, None if it is not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">executable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">executable</span> <span class="o">==</span> <span class="n">exec_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">executable</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Workload.find_input">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.find_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find an input in this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_name (str): Name of input to find</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str / None): Name of input if it exists, None if it is not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="n">input_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">input</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Workload.find_variable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.find_variable">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find a variable in this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var_name (str): Name of variable to find</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (WorkloadVariable / None): Variable instance if it exists, None if it is not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">var_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">var</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Workload.find_environment_variable">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.Workload.find_environment_variable">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_environment_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_var_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find an environment variable in this workload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            env_var_name (str): Name of environment variable to find</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (WorkloadEnvironmentVariable / None): Environment variable instance</span>
+<span class="sd">                                                  if it exists, None if it is not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">env_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">env_var</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">env_var_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">env_var</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Apr 04, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

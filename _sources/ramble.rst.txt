@@ -240,3 +240,11 @@ ramble.success\_criteria module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.workload module
+----------------------
+
+.. automodule:: ramble.workload
+   :members:
+   :undoc-members:
+   :show-inheritance:

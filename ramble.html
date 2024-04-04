@@ -866,6 +866,35 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ramble.workload">ramble.workload module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.workload.Workload"><code class="docutils literal notranslate"><span class="pre">Workload</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.add_environment_variable"><code class="docutils literal notranslate"><span class="pre">Workload.add_environment_variable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.add_executable"><code class="docutils literal notranslate"><span class="pre">Workload.add_executable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.add_input"><code class="docutils literal notranslate"><span class="pre">Workload.add_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.add_tag"><code class="docutils literal notranslate"><span class="pre">Workload.add_tag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.add_variable"><code class="docutils literal notranslate"><span class="pre">Workload.add_variable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.as_str"><code class="docutils literal notranslate"><span class="pre">Workload.as_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.environment_variable_dict"><code class="docutils literal notranslate"><span class="pre">Workload.environment_variable_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.find_environment_variable"><code class="docutils literal notranslate"><span class="pre">Workload.find_environment_variable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.find_executable"><code class="docutils literal notranslate"><span class="pre">Workload.find_executable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.find_input"><code class="docutils literal notranslate"><span class="pre">Workload.find_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.find_variable"><code class="docutils literal notranslate"><span class="pre">Workload.find_variable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.is_valid"><code class="docutils literal notranslate"><span class="pre">Workload.is_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.Workload.variable_dict"><code class="docutils literal notranslate"><span class="pre">Workload.variable_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable"><code class="docutils literal notranslate"><span class="pre">WorkloadEnvironmentVariable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable.as_dict"><code class="docutils literal notranslate"><span class="pre">WorkloadEnvironmentVariable.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable.as_str"><code class="docutils literal notranslate"><span class="pre">WorkloadEnvironmentVariable.as_str()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ramble.workload.WorkloadVariable"><code class="docutils literal notranslate"><span class="pre">WorkloadVariable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadVariable.as_dict"><code class="docutils literal notranslate"><span class="pre">WorkloadVariable.as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadVariable.as_str"><code class="docutils literal notranslate"><span class="pre">WorkloadVariable.as_str()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
@@ -6451,6 +6480,288 @@ experiment.</p>
 <dt class="sig sig-object py" id="ramble.success_criteria.SuccessCriteria.reset_found">
 <span class="sig-name descname"><span class="pre">reset_found</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/success_criteria.html#SuccessCriteria.reset_found"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.success_criteria.SuccessCriteria.reset_found" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ramble.workload">
+<span id="ramble-workload-module"></span><h2>ramble.workload module<a class="headerlink" href="#module-ramble.workload" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.workload.Workload">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workload.</span></span><span class="sig-name descname"><span class="pre">Workload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing a single workload</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.add_environment_variable">
+<span class="sig-name descname"><span class="pre">add_environment_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable" title="ramble.workload.WorkloadEnvironmentVariable"><span class="pre">WorkloadEnvironmentVariable</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.add_environment_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.add_environment_variable" title="Link to this definition"></a></dt>
+<dd><p>Add an environment variable to this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>env_var</strong> (<a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable" title="ramble.workload.WorkloadEnvironmentVariable"><em>WorkloadEnvironmentVariable</em></a>) – New environment variable to add to this workload</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.add_executable">
+<span class="sig-name descname"><span class="pre">add_executable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.add_executable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.add_executable" title="Link to this definition"></a></dt>
+<dd><p>Add an executable to this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>executable</strong> (<em>str</em>) – Name of executable to add to this workload</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.add_input">
+<span class="sig-name descname"><span class="pre">add_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.add_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.add_input" title="Link to this definition"></a></dt>
+<dd><p>Add an input to this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input</strong> (<em>str</em>) – Name of input to add to this workload</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.add_tag">
+<span class="sig-name descname"><span class="pre">add_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.add_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.add_tag" title="Link to this definition"></a></dt>
+<dd><p>Add a tag to this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag</strong> (<em>str</em>) – Tag to add to this workload</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.add_variable">
+<span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ramble.workload.WorkloadVariable" title="ramble.workload.WorkloadVariable"><span class="pre">WorkloadVariable</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.add_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.add_variable" title="Link to this definition"></a></dt>
+<dd><p>Add a variable to this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference internal" href="#ramble.workload.WorkloadVariable" title="ramble.workload.WorkloadVariable"><em>WorkloadVariable</em></a>) – New variable to add to this workload</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.as_str">
+<span class="sig-name descname"><span class="pre">as_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.as_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.as_str" title="Link to this definition"></a></dt>
+<dd><p>String representation of this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_indent</strong> (<em>int</em>) – Number of spaces to indent string with</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Representation of this workload</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.environment_variable_dict">
+<span class="sig-name descname"><span class="pre">environment_variable_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.environment_variable_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.environment_variable_dict" title="Link to this definition"></a></dt>
+<dd><p>Dictionary representation of all environment variables for this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Dictionary with all environment variable in it. Keys are</dt><dd><p>var name, values are dicts representing the specific actions and
+values.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.find_environment_variable">
+<span class="sig-name descname"><span class="pre">find_environment_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_var_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.find_environment_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.find_environment_variable" title="Link to this definition"></a></dt>
+<dd><p>Find an environment variable in this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>env_var_name</strong> (<em>str</em>) – Name of environment variable to find</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Environment variable instance</dt><dd><p>if it exists, None if it is not found</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(WorkloadEnvironmentVariable / None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.find_executable">
+<span class="sig-name descname"><span class="pre">find_executable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exec_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.find_executable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.find_executable" title="Link to this definition"></a></dt>
+<dd><p>Find an executable in this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exec_name</strong> (<em>str</em>) – Name of executable to find</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Name of executable if it exists, None if it is not found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str / None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.find_input">
+<span class="sig-name descname"><span class="pre">find_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.find_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.find_input" title="Link to this definition"></a></dt>
+<dd><p>Find an input in this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_name</strong> (<em>str</em>) – Name of input to find</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Name of input if it exists, None if it is not found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str / None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.find_variable">
+<span class="sig-name descname"><span class="pre">find_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.find_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.find_variable" title="Link to this definition"></a></dt>
+<dd><p>Find a variable in this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>var_name</strong> (<em>str</em>) – Name of variable to find</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Variable instance if it exists, None if it is not found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(WorkloadVariable / None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.is_valid" title="Link to this definition"></a></dt>
+<dd><p>Test if this workload is considered valid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if workload is valid, False otherwise</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(bool)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.Workload.variable_dict">
+<span class="sig-name descname"><span class="pre">variable_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#Workload.variable_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.Workload.variable_dict" title="Link to this definition"></a></dt>
+<dd><p>Dictionary representation of all workload variables for this workload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with variable names as keys and variable default values as values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadEnvironmentVariable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workload.</span></span><span class="sig-name descname"><span class="pre">WorkloadEnvironmentVariable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadEnvironmentVariable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadEnvironmentVariable" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing an environment variable in a workload</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadEnvironmentVariable.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadEnvironmentVariable.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadEnvironmentVariable.as_dict" title="Link to this definition"></a></dt>
+<dd><p>Dictionary representation of environment variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Dictionary with single environment variable in it. Key is</dt><dd><p>var name, value is a dict representing the specific action and
+value.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadEnvironmentVariable.as_str">
+<span class="sig-name descname"><span class="pre">as_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadEnvironmentVariable.as_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadEnvironmentVariable.as_str" title="Link to this definition"></a></dt>
+<dd><p>String representation of environment variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_indent</strong> (<em>int</em>) – Number of spaces to indent string representation by</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>String representing this environment variable</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadVariable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.workload.</span></span><span class="sig-name descname"><span class="pre">WorkloadVariable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadVariable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadVariable" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class representing a variable definition</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadVariable.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadVariable.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadVariable.as_dict" title="Link to this definition"></a></dt>
+<dd><p>Dictionary representation of this variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Key is variable name, value is default value of variable</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadVariable.as_str">
+<span class="sig-name descname"><span class="pre">as_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadVariable.as_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadVariable.as_str" title="Link to this definition"></a></dt>
+<dd><p>String representation of this variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_indent</strong> (<em>int</em>) – Number of spaces to indent string lines with</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Representation of this variable</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
