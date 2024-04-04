@@ -1853,8 +1853,8 @@ ramble:
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
 
 
-def test_workspace_tidy():
-    test_config = """
+def test_workspace_simplify():
+    test_ws_config = """
 ramble:
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
@@ -1873,7 +1873,7 @@ ramble:
       workloads:
         ensure_installed:
           experiments:
-            test_template:
+            unused_exp_template:
               template: True
               variables:
                 n_nodes: '1'
@@ -1884,7 +1884,7 @@ ramble:
         spack_spec: zlib
       zlib-configs:
         spack_spec: zlib-configs
-      unused:
+      unused-pkg:
         spack_spec: unused
     environments:
       zlib:
@@ -1893,30 +1893,63 @@ ramble:
       zlib-configs:
         packages:
         - zlib-configs
-      unused:
+      unused-env:
         packages:
-        - unused
+        - unused-pkg
+"""
+    test_app_config = """
+applications:
+  basic:
+    workloads:
+      test_wl:
+        experiments:
+          app_not_in_ws_config:
+            variables:
+              n_ranks: 1
+"""
+    test_spack_config = """
+spack:
+  packages:
+    pkg_not_in_ws_config:
+      spack_spec: 'gcc@10.5.0'
+      compiler_spec: gcc@10.5.0
 """
 
-    workspace_name = 'test_tidy'
+    workspace_name = 'test_simplify'
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    app_config_path = os.path.join(ws1.config_dir, 'applications.yaml')
+    spack_config_path = os.path.join(ws1.config_dir, 'spack.yaml')
 
-    with open(config_path, 'w+') as f:
-        f.write(test_config)
+    with open(ws_config_path, 'w+') as f:
+        f.write(test_ws_config)
+    with open(app_config_path, 'w+') as f:
+        f.write(test_app_config)
+    with open(spack_config_path, 'w+') as f:
+        f.write(test_spack_config)
 
     ws1._re_read()
 
-    assert search_files_for_string([config_path], 'unused') is True
-    assert search_files_for_string([config_path], 'spack_spec: zlib') is True
-    assert search_files_for_string([config_path], 'spack_spec: zlib-configs') is True
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib') is True
+    assert search_files_for_string([ws_config_path], 'unused-pkg') is True
+    assert search_files_for_string([ws_config_path], 'unused-env') is True
+    assert search_files_for_string([ws_config_path], 'unused_exp_template') is True
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib-configs') is True
+    assert search_files_for_string([ws_config_path], 'app_not_in_ws_config') is False
+    assert search_files_for_string([ws_config_path], 'pkg_not_in_ws_config') is False
 
-    workspace('tidy', global_args=['-w', workspace_name])
+    workspace('concretize', '--simplify', global_args=['-w', workspace_name])
 
-    print(config_path)
+    print(ws_config_path)
 
-    assert search_files_for_string([config_path], 'unused') is False
-    assert search_files_for_string([config_path], 'spack_spec: zlib') is True
-    assert search_files_for_string([config_path], 'spack_spec: zlib-configs') is True
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib') is True  # keep used pkg
+    assert search_files_for_string([ws_config_path], 'unused-pkg') is False  # remove unused pkg
+    assert search_files_for_string([ws_config_path], 'unused-env') is False  # remove unused env
+    # remove unused experiment template and associated pkgs/envs
+    assert search_files_for_string([ws_config_path], 'unused_exp_template') is False
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib-configs') is False
+    # ensure apps/pkgs/envs are not merged into workspace config from other config files
+    assert search_files_for_string([ws_config_path], 'app_not_in_ws_config') is False
+    assert search_files_for_string([ws_config_path], 'pkg_not_in_ws_config') is False

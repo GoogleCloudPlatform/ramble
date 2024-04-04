@@ -89,6 +89,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.experiment_set = None
         self.internals = {}
         self.is_template = False
+        self.generated_experiments = []
         self.repeats = ramble.repeats.Repeats()
         self._command_list = []
         self.chained_experiments = None
@@ -131,6 +132,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def copy(self):
         """Deep copy an application instance"""
         new_copy = type(self)(self._file_path)
+        self.generated_experiments.append(new_copy)
 
         if self._env_variable_sets:
             new_copy.set_env_variable_sets(self._env_variable_sets.copy())
