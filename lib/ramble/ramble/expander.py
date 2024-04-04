@@ -597,6 +597,8 @@ class Expander(object):
         except MathEvaluationError as e:
             logger.debug(f'   Math input is: "{in_str}"')
             logger.debug(e)
+        except RambleSyntaxError as e:
+            raise RambleSyntaxError(f'{str(e)} in "{in_str}"')
 
         return in_str
 
@@ -710,6 +712,9 @@ class Expander(object):
         # Extract In nodes, and call their helper
         if len(node.ops) == 1 and isinstance(node.ops[0], ast.In):
             return self._eval_comp_in(node)
+
+        if len(node.ops) == 1 and isinstance(node.ops[0], ast.Is):
+            raise RambleSyntaxError('Encountered unsupported operator `is`')
 
         # Try to evaluate the comparison logic, if not return the node as is.
         try:
