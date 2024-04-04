@@ -747,6 +747,8 @@
         <span class="k">except</span> <span class="n">MathEvaluationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   Math input is: &quot;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">RambleSyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1"> in &quot;</span><span class="si">{</span><span class="n">in_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">in_str</span></div>
 
@@ -864,6 +866,9 @@
         <span class="c1"># Extract In nodes, and call their helper</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="o">.</span><span class="n">In</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_comp_in</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="o">.</span><span class="n">Is</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">RambleSyntaxError</span><span class="p">(</span><span class="s1">&#39;Encountered unsupported operator `is`&#39;</span><span class="p">)</span>
 
         <span class="c1"># Try to evaluate the comparison logic, if not return the node as is.</span>
         <span class="k">try</span><span class="p">:</span>
