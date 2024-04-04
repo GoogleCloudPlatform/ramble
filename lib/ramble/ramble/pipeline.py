@@ -228,14 +228,24 @@ class AnalyzePipeline(Pipeline):
         self.upload_results = upload
 
     def _prepare(self):
-        for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
+
+        # We only want to let the user run analyze if one of the following is true:
+        # - At least one expeirment is set up
+        # - `--dry-run` is enabled
+        found_valid_experiment = False
+        for exp, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
-                if app_inst.get_status() == ramble.application.experiment_status.UNKNOWN.name:
-                    logger.die(
-                        f'Workspace status is {app_inst.get_status()}\n'
-                        'Make sure your workspace is fully setup with\n'
-                        '    ramble workspace setup'
-                    )
+                if app_inst.get_status() != ramble.application.experiment_status.UNKNOWN.name:
+                    found_valid_experiment = True
+
+        if not found_valid_experiment and self._experiment_set.num_experiments() \
+           and not self.workspace.dry_run:
+            logger.die(
+                'No analyzeable experiment detected.'
+                ' Make sure your workspace is setup with\n'
+                '    ramble workspace setup'
+            )
+
         super()._construct_hash()
         super()._prepare()
 
