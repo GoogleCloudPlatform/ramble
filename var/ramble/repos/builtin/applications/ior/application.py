@@ -64,7 +64,7 @@ class Ior(SpackApplication):
 
     access_regex = '(?P<access>(read|write))' + iter_regex
     figure_of_merit_context('iter', regex=access_regex,
-                            output_format='{iter}')
+                            output_format='iter {iter}')
 
     log_str = Expander.expansion_str('log_file')
 

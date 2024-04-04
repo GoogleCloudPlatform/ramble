@@ -203,7 +203,7 @@ class IntelHpl(SpackApplication):
                     group_name='gflops', units='GFLOP/s',
                     contexts=['problem-name'])
 
-    figure_of_merit_context('problem-name', regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n', output_format='{N}-{NB}-{P}-{Q}')
+    figure_of_merit_context('problem-name', regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n', output_format='N-NB-P-Q = {N}-{NB}-{P}-{Q}')
 
     # Integer sqrt
     def _isqrt(self, n):

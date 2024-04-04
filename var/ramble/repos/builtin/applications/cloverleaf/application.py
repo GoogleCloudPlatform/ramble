@@ -82,7 +82,7 @@ class Cloverleaf(SpackApplication):
 
     figure_of_merit_context('step',
                             regex=step_count_regex,
-                            output_format='{step}')
+                            output_format='Step {step}')
 
     step_summary_regex = (r'\s*step:\s+(?P<step>[0-9]+)\s+' +
                           r'(?P<volume>'          + floating_point_regex + r')\s+' +
