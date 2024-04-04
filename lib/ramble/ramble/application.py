@@ -1434,8 +1434,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     if group[1]:
                         context_val[group[1]] = context_match[group[1]]
 
-            context_string = context_format.replace('{', '').replace('}', '') \
-                + ' = ' + context_format.format(**context_val)
+            context_string = context_format.format(**context_val)
             return context_string
 
         fom_values = {}
