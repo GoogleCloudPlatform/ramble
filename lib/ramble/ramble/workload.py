@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import List
 import ramble.util.colors as rucolor
 
 
@@ -113,8 +114,8 @@ class WorkloadEnvironmentVariable(object):
 class Workload(object):
     """Class representing a single workload"""
 
-    def __init__(self, name: str, executables: list[str],
-                 inputs: list[str] = [], tags: list[str] = []):
+    def __init__(self, name: str, executables: List[str],
+                 inputs: List[str] = [], tags: List[str] = []):
         """Constructor for a workload
 
         Args:
