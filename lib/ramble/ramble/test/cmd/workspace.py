@@ -1851,3 +1851,105 @@ ramble:
     output = workspace('info', '-vv', global_args=['-w', workspace_name])
 
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
+
+
+def test_workspace_simplify():
+    test_ws_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib-configs:
+      workloads:
+        ensure_installed:
+          experiments:
+            unused_exp_template:
+              template: True
+              variables:
+                n_nodes: '1'
+  spack:
+    concretized: true
+    packages:
+      zlib:
+        spack_spec: zlib
+      zlib-configs:
+        spack_spec: zlib-configs
+      unused-pkg:
+        spack_spec: unused
+    environments:
+      zlib:
+        packages:
+        - zlib
+      zlib-configs:
+        packages:
+        - zlib-configs
+      unused-env:
+        packages:
+        - unused-pkg
+"""
+    test_app_config = """
+applications:
+  basic:
+    workloads:
+      test_wl:
+        experiments:
+          app_not_in_ws_config:
+            variables:
+              n_ranks: 1
+"""
+    test_spack_config = """
+spack:
+  packages:
+    pkg_not_in_ws_config:
+      spack_spec: 'gcc@10.5.0'
+      compiler_spec: gcc@10.5.0
+"""
+
+    workspace_name = 'test_simplify'
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    app_config_path = os.path.join(ws1.config_dir, 'applications.yaml')
+    spack_config_path = os.path.join(ws1.config_dir, 'spack.yaml')
+
+    with open(ws_config_path, 'w+') as f:
+        f.write(test_ws_config)
+    with open(app_config_path, 'w+') as f:
+        f.write(test_app_config)
+    with open(spack_config_path, 'w+') as f:
+        f.write(test_spack_config)
+
+    ws1._re_read()
+
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib') is True
+    assert search_files_for_string([ws_config_path], 'unused-pkg') is True
+    assert search_files_for_string([ws_config_path], 'unused-env') is True
+    assert search_files_for_string([ws_config_path], 'unused_exp_template') is True
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib-configs') is True
+    assert search_files_for_string([ws_config_path], 'app_not_in_ws_config') is False
+    assert search_files_for_string([ws_config_path], 'pkg_not_in_ws_config') is False
+
+    workspace('concretize', '--simplify', global_args=['-w', workspace_name])
+
+    print(ws_config_path)
+
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib') is True  # keep used pkg
+    assert search_files_for_string([ws_config_path], 'unused-pkg') is False  # remove unused pkg
+    assert search_files_for_string([ws_config_path], 'unused-env') is False  # remove unused env
+    # remove unused experiment template and associated pkgs/envs
+    assert search_files_for_string([ws_config_path], 'unused_exp_template') is False
+    assert search_files_for_string([ws_config_path], 'spack_spec: zlib-configs') is False
+    # ensure apps/pkgs/envs are not merged into workspace config from other config files
+    assert search_files_for_string([ws_config_path], 'app_not_in_ws_config') is False
+    assert search_files_for_string([ws_config_path], 'pkg_not_in_ws_config') is False

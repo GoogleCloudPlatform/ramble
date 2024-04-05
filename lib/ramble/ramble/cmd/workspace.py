@@ -347,16 +347,26 @@ def workspace_concretize_setup_parser(subparser):
         help='Overwrite software environment configuration with defaults defined in application ' +
               'definition',
         required=False)
+    subparser.add_argument(
+        '--simplify',
+        dest='simplify',
+        action='store_true',
+        help='Remove unused software and experiment templates from workspace config',
+        required=False)
 
 
 def workspace_concretize(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace concretize')
 
-    if args.force_concretize:
-        ws.force_concretize = True
+    if args.simplify:
+        logger.debug('Simplifying workspace config')
+        ws.simplify()
+    else:
+        if args.force_concretize:
+            ws.force_concretize = True
 
-    logger.debug('Concretizing workspace')
-    ws.concretize()
+        logger.debug('Concretizing workspace')
+        ws.concretize()
 
 
 def workspace_run_pipeline(args, pipeline):

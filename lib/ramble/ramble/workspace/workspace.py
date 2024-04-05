@@ -1148,6 +1148,62 @@ class Workspace(object):
         self.input_mirror_cache = ramble.caches.MirrorCache(self.input_mirror_path)
         self.software_mirror_cache = ramble.caches.MirrorCache(self.software_mirror_path)
 
+    def simplify(self):
+        # First drop unused experiment templates from app dict so environments aren't rendered
+        app_dict = ramble.config.config.get_config(namespace.application,
+                                                   scope=self.ws_file_config_scope_name())
+
+        # Build experiment sets to determine which templates never get used
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
+        experiment_set = self.build_experiment_set()
+
+        for _, app_inst in experiment_set.template_experiments():
+            if app_inst.is_template and not app_inst.generated_experiments:
+                app = app_inst.expander.application_name
+                wl = app_inst.expander.workload_name
+                exp = app_inst.expander.experiment_name
+
+                try:
+                    app_dict[app][namespace.workload][wl][namespace.experiment].pop(exp)
+                    if not app_dict[app][namespace.workload][wl][namespace.experiment]:
+                        app_dict[app][namespace.workload][wl].pop(namespace.experiment)
+                    if not app_dict[app][namespace.workload][wl]:
+                        app_dict[app][namespace.workload].pop(wl)
+                    if not app_dict[app][namespace.workload]:
+                        app_dict[app].pop(namespace.workload)
+                    if not app_dict[app]:
+                        app_dict.pop(app)
+                except KeyError:
+                    continue
+
+        ramble.config.config.update_config(namespace.application, app_dict,
+                                           scope=self.ws_file_config_scope_name())
+
+        # Regenerate environments without the unused templates to see which env never get rendered
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
+        software_environments = self.software_environments
+        experiment_set = self.build_experiment_set()
+
+        spack_dict = ramble.config.config.get_config(namespace.spack,
+                                                     scope=self.ws_file_config_scope_name())
+        package_dict = spack_dict[namespace.packages]
+        environments_dict = spack_dict[namespace.environments]
+
+        tty.debug('Removing configurations that do not spark joy.')
+        for pkg in software_environments.unused_packages():
+            if pkg.name in package_dict:
+                tty.debug(f'Removing {pkg.name} from Spack packages')
+                package_dict.pop(pkg.name)
+        for env in software_environments.unused_environments():
+            if env.name in environments_dict:
+                tty.debug(f'Removing {env.name} from Spack environments')
+                environments_dict.pop(env.name)
+
+        ramble.config.config.update_config(namespace.spack, spack_dict,
+                                           scope=self.ws_file_config_scope_name())
+
     @property
     def latest_archive_path(self):
         return os.path.join(self.archive_dir, self.latest_archive)
@@ -1399,7 +1455,7 @@ class Workspace(object):
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
-        return ramble.config.config.get_config('spack')
+        return ramble.config.config.get_config(namespace.spack)
 
     def get_applications(self):
         """Get the dictionary of applications"""

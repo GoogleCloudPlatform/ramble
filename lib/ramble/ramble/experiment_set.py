@@ -495,6 +495,17 @@ class ExperimentSet(object):
                 yield exp, inst, count
                 count += 1
 
+    def template_experiments(self):
+        """Iterator over template experiments in this set"""
+
+        for exp, inst in self.experiments.items():
+            if inst.is_template:
+                yield exp, inst
+
+        for exp, inst in self.chained_experiments.items():
+            if inst.is_template:
+                yield exp, inst
+
     def num_experiments(self):
         """Return the number of total experiments in this set"""
         count = 0
