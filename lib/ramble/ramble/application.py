@@ -310,7 +310,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Check if this instance has provided tags.
 
         Args:
-            tags (list): List of strings, where each string is an indivudal tag
+            tags (list): List of strings, where each string is an individual tag
         Returns:
             (bool): True if all tags are in this instance, False otherwise
         """

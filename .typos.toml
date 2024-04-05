@@ -17,6 +17,7 @@ extend-ignore-re = [
 "fom" = "fom"
 "namd" = "namd"
 "reord" = "reord"
+"PN" = "PN" # fixing tPN in IOR
 
 [default.extend-identifiers]
 "ATPase" = "ATPase"
