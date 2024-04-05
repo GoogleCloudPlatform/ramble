@@ -625,6 +625,20 @@
                 <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 
+<div class="viewcode-block" id="ExperimentSet.template_experiments">
+<a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.template_experiments">[docs]</a>
+    <span class="k">def</span> <span class="nf">template_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over template experiments in this set&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">is_template</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span>
+
+        <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chained_experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">is_template</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">exp</span><span class="p">,</span> <span class="n">inst</span></div>
+
+
 <div class="viewcode-block" id="ExperimentSet.num_experiments">
 <a class="viewcode-back" href="../../ramble.html#ramble.experiment_set.ExperimentSet.num_experiments">[docs]</a>
     <span class="k">def</span> <span class="nf">num_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

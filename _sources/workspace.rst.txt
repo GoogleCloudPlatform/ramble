@@ -184,6 +184,16 @@ application definition files, one can use:
 
     $ ramble workspace concretize
 
+To remove any unused software definitions from the workspace configuration,
+as well as unused experiment templates, one can use:
+
+.. code-block:: console
+
+    $ ramble workspace concretize --simplify
+
+Note: This command will also remove comments within the edited section
+of the workspace config file.
+
 ---------------------
 Workspace Deployments
 ---------------------
