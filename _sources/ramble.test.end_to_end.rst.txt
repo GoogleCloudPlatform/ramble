@@ -94,6 +94,14 @@ ramble.test.end\_to\_end.experiment\_repeats module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.experiment\_templates module
+-----------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.experiment_templates
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.explicit\_zips module
 ----------------------------------------------
 
