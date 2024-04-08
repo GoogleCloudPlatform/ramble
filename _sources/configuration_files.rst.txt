@@ -54,31 +54,31 @@ Ramble provides several configuration scopes, which are used to denote
 precedence of configuration options. In precedence order (from lowest to
 highest) Ramble contains the following scopes:
 
-(1) **default**: Stored in ``$(prefix)/etc/ramble/defaults/``. These are the
-default settings provided with Ramble. Users should generally not modify these
-settings, and instead use a higher precedence configuration scope. These
-defaults will change from version to version of Ramble.
-(2) **system**: Store in ``/etc/ramble/``. These are Ramble settings for an
-entire machine. These settings are typically managed by a systems
-administrator, or something with root access on the machine. Settings defined
-in this scope override settings in the **default** scope.
-(3) **site**: Stored in ``$(prefix)/etc/ramble/``. Settings here only affect
-*this instance* of Ramble, and they override both the **default** and
-**system** scopes.
-(4) **user**: Stored in ``~/.ramble/``. Settings here only affect a specific
-user, and override **default**, **system**, and **site** scopes.
-(5) **custom**: Stored in a custom directory, specified by ``--config-scope``.
-If multiple scopes are listed on the command line, they are ordered from lowest
-to highest precedence. Settings here override all previously defined scoped.
-(6) **workspace configs dir**: Stored in ``$(workspace_root)/configs``
-generally as a ``<config_section>.yaml`` file (i.e. ``variables.yaml``). These
-settings apply to a specific workspace, and override all previous configuration
-scopes.
-(7) **workspace configuration file**: Stored in
-``$(workspace_root)/configs/ramble.yaml``. Configuration scopes defined within
-this config file override all previously defined configuration scopes.
-(8) **command line**: Configuration options defined on the command line take
-precedence over all other scopes.
+1. **default**: Stored in ``$(prefix)/etc/ramble/defaults/``. These are the
+   default settings provided with Ramble. Users should generally not modify these
+   settings, and instead use a higher precedence configuration scope. These
+   defaults will change from version to version of Ramble.
+2. **system**: Store in ``/etc/ramble/``. These are Ramble settings for an
+   entire machine. These settings are typically managed by a systems
+   administrator, or something with root access on the machine. Settings defined
+   in this scope override settings in the **default** scope.
+3. **site**: Stored in ``$(prefix)/etc/ramble/``. Settings here only affect
+   *this instance* of Ramble, and they override both the **default** and
+   **system** scopes.
+4. **user**: Stored in ``~/.ramble/``. Settings here only affect a specific
+   user, and override **default**, **system**, and **site** scopes.
+5. **custom**: Stored in a custom directory, specified by ``--config-scope``.
+   If multiple scopes are listed on the command line, they are ordered from lowest
+   to highest precedence. Settings here override all previously defined scoped.
+6. **workspace configs dir**: Stored in ``$(workspace_root)/configs``
+   generally as a ``<config_section>.yaml`` file (i.e. ``variables.yaml``). These
+   settings apply to a specific workspace, and override all previous configuration
+   scopes.
+7. **workspace configuration file**: Stored in
+   ``$(workspace_root)/configs/ramble.yaml``. Configuration scopes defined within
+   this config file override all previously defined configuration scopes.
+8. **command line**: Configuration options defined on the command line take
+   precedence over all other scopes.
 
 Each configuration directory may contain several configuration files, such as
 ``config.yaml``, ``variables.yaml``, or ``modifiers.yaml``. When configurations
@@ -262,9 +262,14 @@ The format of this config section is as follows:
 The above example is general, and intended to show the available functionality
 of configuring environment variables. Below the ``env_vars`` level, one of four
 actions is available. These actions are:
-* ``set`` - Define a variable equal to a given value. Overwrites previously configured values
-* ``append`` - Append the given value to the end of a previous variable definition. Delimited for vars is defined by ``var_separator``, ``paths`` uses ``:``
-* ``prepend`` - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is ``:``
+
+* ``set`` - Define a variable equal to a given value. Overwrites previously
+  configured values
+* ``append`` - Append the given value to the end of a previous variable
+  definition. Delimited for vars is defined by ``var_separator``, ``paths``
+  uses ``:``
+* ``prepend`` - Prepent the given value to the beginning of a previous variable
+  definition. Only supports paths, delimiter is ``:``
 * ``unset`` - Remove a variable definition, if it is set.
 
 .. _formatted-execs-config:

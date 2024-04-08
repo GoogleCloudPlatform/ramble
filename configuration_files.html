@@ -155,31 +155,33 @@ does not cover the <a class="reference internal" href="workspace_config.html#wor
 <p>Ramble provides several configuration scopes, which are used to denote
 precedence of configuration options. In precedence order (from lowest to
 highest) Ramble contains the following scopes:</p>
-<p>(1) <strong>default</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(prefix)/etc/ramble/defaults/</span></code>. These are the
+<ol class="arabic simple">
+<li><p><strong>default</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(prefix)/etc/ramble/defaults/</span></code>. These are the
 default settings provided with Ramble. Users should generally not modify these
 settings, and instead use a higher precedence configuration scope. These
-defaults will change from version to version of Ramble.
-(2) <strong>system</strong>: Store in <code class="docutils literal notranslate"><span class="pre">/etc/ramble/</span></code>. These are Ramble settings for an
+defaults will change from version to version of Ramble.</p></li>
+<li><p><strong>system</strong>: Store in <code class="docutils literal notranslate"><span class="pre">/etc/ramble/</span></code>. These are Ramble settings for an
 entire machine. These settings are typically managed by a systems
 administrator, or something with root access on the machine. Settings defined
-in this scope override settings in the <strong>default</strong> scope.
-(3) <strong>site</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(prefix)/etc/ramble/</span></code>. Settings here only affect
+in this scope override settings in the <strong>default</strong> scope.</p></li>
+<li><p><strong>site</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(prefix)/etc/ramble/</span></code>. Settings here only affect
 <em>this instance</em> of Ramble, and they override both the <strong>default</strong> and
-<strong>system</strong> scopes.
-(4) <strong>user</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">~/.ramble/</span></code>. Settings here only affect a specific
-user, and override <strong>default</strong>, <strong>system</strong>, and <strong>site</strong> scopes.
-(5) <strong>custom</strong>: Stored in a custom directory, specified by <code class="docutils literal notranslate"><span class="pre">--config-scope</span></code>.
+<strong>system</strong> scopes.</p></li>
+<li><p><strong>user</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">~/.ramble/</span></code>. Settings here only affect a specific
+user, and override <strong>default</strong>, <strong>system</strong>, and <strong>site</strong> scopes.</p></li>
+<li><p><strong>custom</strong>: Stored in a custom directory, specified by <code class="docutils literal notranslate"><span class="pre">--config-scope</span></code>.
 If multiple scopes are listed on the command line, they are ordered from lowest
-to highest precedence. Settings here override all previously defined scoped.
-(6) <strong>workspace configs dir</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(workspace_root)/configs</span></code>
+to highest precedence. Settings here override all previously defined scoped.</p></li>
+<li><p><strong>workspace configs dir</strong>: Stored in <code class="docutils literal notranslate"><span class="pre">$(workspace_root)/configs</span></code>
 generally as a <code class="docutils literal notranslate"><span class="pre">&lt;config_section&gt;.yaml</span></code> file (i.e. <code class="docutils literal notranslate"><span class="pre">variables.yaml</span></code>). These
 settings apply to a specific workspace, and override all previous configuration
-scopes.
-(7) <strong>workspace configuration file</strong>: Stored in
+scopes.</p></li>
+<li><p><strong>workspace configuration file</strong>: Stored in
 <code class="docutils literal notranslate"><span class="pre">$(workspace_root)/configs/ramble.yaml</span></code>. Configuration scopes defined within
-this config file override all previously defined configuration scopes.
-(8) <strong>command line</strong>: Configuration options defined on the command line take
-precedence over all other scopes.</p>
+this config file override all previously defined configuration scopes.</p></li>
+<li><p><strong>command line</strong>: Configuration options defined on the command line take
+precedence over all other scopes.</p></li>
+</ol>
 <p>Each configuration directory may contain several configuration files, such as
 <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">variables.yaml</span></code>, or <code class="docutils literal notranslate"><span class="pre">modifiers.yaml</span></code>. When configurations
 conflict, settings from higher-precedence (higher number in the above list)
@@ -318,11 +320,17 @@ what environment variable modifications ramble should inject into experiments.</
 </div>
 <p>The above example is general, and intended to show the available functionality
 of configuring environment variables. Below the <code class="docutils literal notranslate"><span class="pre">env_vars</span></code> level, one of four
-actions is available. These actions are:
-* <code class="docutils literal notranslate"><span class="pre">set</span></code> - Define a variable equal to a given value. Overwrites previously configured values
-* <code class="docutils literal notranslate"><span class="pre">append</span></code> - Append the given value to the end of a previous variable definition. Delimited for vars is defined by <code class="docutils literal notranslate"><span class="pre">var_separator</span></code>, <code class="docutils literal notranslate"><span class="pre">paths</span></code> uses <code class="docutils literal notranslate"><span class="pre">:</span></code>
-* <code class="docutils literal notranslate"><span class="pre">prepend</span></code> - Prepent the given value to the beginning of a previous variable definition. Only supports paths, delimiter is <code class="docutils literal notranslate"><span class="pre">:</span></code>
-* <code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p>
+actions is available. These actions are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">set</span></code> - Define a variable equal to a given value. Overwrites previously
+configured values</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">append</span></code> - Append the given value to the end of a previous variable
+definition. Delimited for vars is defined by <code class="docutils literal notranslate"><span class="pre">var_separator</span></code>, <code class="docutils literal notranslate"><span class="pre">paths</span></code>
+uses <code class="docutils literal notranslate"><span class="pre">:</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prepend</span></code> - Prepent the given value to the beginning of a previous variable
+definition. Only supports paths, delimiter is <code class="docutils literal notranslate"><span class="pre">:</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unset</span></code> - Remove a variable definition, if it is set.</p></li>
+</ul>
 </section>
 <section id="formatted-executables-section">
 <span id="formatted-execs-config"></span><h2>Formatted Executables Section:<a class="headerlink" href="#formatted-executables-section" title="Link to this heading"></a></h2>
