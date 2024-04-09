@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -118,7 +118,7 @@ class LicenseError(object):
 
 def _check_license(lines, path):
     license_lines = [
-        r'Copyright 2022-2024 Google LLC',  # noqa: E501
+        r'Copyright 2022-2024 The Ramble Authors',  # noqa: E501
         r'Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or',  # noqa: E501
         r'https://www.apache.org/licenses/LICENSE-2.0> or the MIT license',  # noqa: E501
         r'<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your',  # noqa: E501
