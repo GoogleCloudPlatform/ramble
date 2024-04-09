@@ -478,7 +478,7 @@ class Configuration(object):
     def file_scopes(self):
         """List of writable scopes with an associated file."""
         return [s for s in self.scopes.values()
-                if (type(s) == ConfigScope
+                if (type(s) == ConfigScope  # noqa: E721
                     or type(s) == SingleFileScope)]
 
     def highest_precedence_scope(self):
