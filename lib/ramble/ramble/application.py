@@ -1400,11 +1400,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """
 
         if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
-            logger.die(
-                f'Workspace status is {self.get_status()}\n'
-                'Make sure your workspace is fully setup with\n'
-                '    ramble workspace setup'
+            logger.warn(
+                f'Experiment has status is {self.get_status()}. Skipping analysis..\n'
             )
+            return
 
         def format_context(context_match, context_format):
 
