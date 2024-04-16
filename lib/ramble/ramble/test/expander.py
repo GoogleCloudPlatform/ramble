@@ -89,6 +89,60 @@ def test_expansions(input, output, no_expand_vars, passes):
 
 
 @pytest.mark.parametrize(
+    'input,output,no_expand_vars,passes',
+    [
+        ('{var1}', 3, set(), 1),
+        ('{var2}', 3, set(), 1),
+        ('{var3}', 3, set(), 1),
+        ('{application_name}', 'foo', set(), 1),
+        ('{n_nodes}', 2, set(), 1),
+        ('{processes_per_node}', 2, set(), 1),
+        ('{n_nodes}*{processes_per_node}', 4, set(), 1),
+        ('2**4', 16, set(), 1),
+        ('{((((16-10+2)/4)**2)*4)}', 16.0, set(), 1),
+        ('"gromacs +blas"', 'gromacs +blas', set(), 1),
+        ('range(0, 5)', [0, 1, 2, 3, 4], set(), 1),
+        ('{decimal.06.var}', 'foo', set(), 1),
+        ('{}', {}, set(), 1),
+        ('{{n_ranks}+2}', 6, set(), 1),
+        ('{{n_ranks}*{var{processes_per_node}}:05d}', '00012', set(), 1),
+        ('{{n_ranks}-1}', 3, set(), 1),
+        ('{{{n_ranks}/2}:0.0f}', 2, set(), 1),
+        ('{size}', 0.96, set(['size']), 1),
+        ('CPU(s)', 'CPU(s)', set(), 1),
+        ('str(1.5)', 1.5, set(), 1),
+        ('int(1.5)', 1, set(), 1),
+        ('float(1.5)', 1.5, set(), 1),
+        ('ceil(0.6)', 1, set(), 1),
+        ('floor(0.6)', 0, set(), 1),
+        ('max(1, 5)', 5, set(), 1),
+        ('min(1, 5)', 1, set(), 1),
+        ('simplify_str("a.b_c")', 'a-b-c', set(), 1),
+        (r'\{experiment_name\}', '{experiment_name}', set(), 1),
+        (r'\{experiment_name\}', 'baz', set(), 2),
+        (r'{\{experiment_name\}}', '{{experiment_name}}', set(), 1),
+        (r'\\{experiment_name\\}', r'\{experiment_name\}', set(), 1),
+        (r'\\{experiment_name\\}', '{experiment_name}', set(), 2),
+        (r'\\{experiment_name\\}', 'baz', set(), 3),
+        ('"2.1.1" in ["2.1.1", "3.1.1", "4.2.1"]', True, set(), 1),
+        ('"2.1.2" in ["2.1.1", "3.1.1", "4.2.1"]', False, set(), 1),
+        ('{test_mask}', 0, set(['test_mask']), 1),
+    ]
+)
+def test_typed_expansions(input, output, no_expand_vars, passes):
+    expansion_vars = exp_dict()
+
+    expander = ramble.expander.Expander(expansion_vars, None, no_expand_vars=no_expand_vars)
+
+    step_input = input
+    for _ in range(0, passes):
+        step_input = expander.expand_var(step_input, typed=True)
+    final_output = step_input
+
+    assert final_output == output
+
+
+@pytest.mark.parametrize(
     'input,output',
     [
         ('application_name', 'foo'),
