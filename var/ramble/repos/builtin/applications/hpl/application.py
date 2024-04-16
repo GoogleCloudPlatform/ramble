@@ -260,7 +260,7 @@ class Hpl(SpackApplication):
             problemSize = blockSize * nBlocks
             usedPercentage = int(problemSize**2 / fullMemWords * 100)
 
-            for var in self.workloads['standard'].variables:
+            for name, var in self.workloads['standard'].variables.items():
                 self.variables[var.name] = var.default
 
             pfact = expander.expand_var_name('pfact')

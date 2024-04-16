@@ -178,7 +178,6 @@ class Workload(object):
         Args:
             executable (str): Name of executable to add to this workload
         """
-        # TODO: should this be a map too? It makes more sense that we'd want 2 colliding to be overwritten in a child class?
         self.executables.append(executable)
 
     def add_input(self, input: str):

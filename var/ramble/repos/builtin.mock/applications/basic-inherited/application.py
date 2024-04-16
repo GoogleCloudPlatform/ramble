@@ -18,3 +18,7 @@ class BasicInherited(BaseBasic):
                description='Again, not a file', extension='.log')
 
     workload('test_wl3', executable='foo', input='inherited_input')
+
+    workload_variable('my_var', default='1.0',
+                      description='Shadowed Example var',
+                      workload='test_wl')

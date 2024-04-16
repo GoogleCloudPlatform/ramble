@@ -60,11 +60,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.inputs['inherited_input']['description'] == \
         'Again, not a file'
 
-    assert 'my_var' in app_inst.workloads['test_wl'].variable_dict()
-    found = False
-    for var in app_inst.workloads['test_wl'].variables:
-        if var.name == 'my_var':
-            found = True
-            assert var.default == '1.0'
-            assert var.description == 'Example var'
-    assert found
+    assert 'my_base_var' in app_inst.workloads['test_wl'].variables
+    assert 'my_var' in app_inst.workloads['test_wl'].variables
+    assert 'Shadowed' in app_inst.workloads['test_wl'].variables['my_var'].description
+    assert app_inst.workloads['test_wl'].variables['my_var'].default == '1.0'
