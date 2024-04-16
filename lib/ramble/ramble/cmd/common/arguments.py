@@ -79,9 +79,9 @@ def specs():
 def repo_type():
     from ramble.repository import default_type, OBJECT_NAMES
     return Args(
-        '-t', '--type', default=default_type.name,
+        '-t', '--type', default='any',
         help=f"type of repositories to manage. Defaults to '{default_type.name}'. "
-        f"Allowed types are {str(OBJECT_NAMES)}",
+        f"Allowed types are {', '.join(OBJECT_NAMES)}, or any",
     )
 
 
