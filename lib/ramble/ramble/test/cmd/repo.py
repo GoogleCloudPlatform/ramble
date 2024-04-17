@@ -28,7 +28,7 @@ def test_create_add_list_remove(mutable_config, tmpdir):
     assert os.path.exists(os.path.join(str(tmpdir), 'applications'))
 
     # Add the new repository and check it appears in the list output
-    repo('add', '--scope=site', str(tmpdir))
+    repo('add', '-t', 'applications', '--scope=site', str(tmpdir))
     output = repo('list', '--scope=site', output=str)
     assert 'mockrepo' in output
 
@@ -47,7 +47,7 @@ def test_create_add_list_remove_flags(mutable_config, tmpdir, subdir):
     assert os.path.exists(os.path.join(str(tmpdir), subdir))
 
     # Add the new repository and check it appears in the list output
-    repo('add', '--scope=site', str(tmpdir))
+    repo('add', '-t', 'applications', '--scope=site', str(tmpdir))
     output = repo('list', '--scope=site', output=str)
     assert 'mockrepo' in output
 

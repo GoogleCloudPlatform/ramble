@@ -89,113 +89,149 @@ def setup_parser(subparser):
 
 def repo_create(args):
     """Create a new repository."""
-    obj_type = ramble.repository.ObjectTypes[args.type]
+    if args.type == 'any':
+        unified_repo = True
+        obj_type = ramble.repository.default_type
+        repo_type = 'applications and modifiers'
+        register_type = ''
+    else:
+        unified_repo = False
+        obj_type = ramble.repository.ObjectTypes[args.type]
+        repo_type = ramble.repository.ObjectTypes[args.type].name
+        register_type = f' -t {repo_type}'
+
     subdir = args.subdirectory
-    if subdir is None:
-        subdir = ramble.repository.type_definitions[obj_type]['dir_name']
 
     full_path, namespace = ramble.repository.create_repo(
-        args.directory, args.namespace, subdir, object_type=obj_type
+        args.directory, args.namespace, subdir, object_type=obj_type,
+        unified_repo=unified_repo
     )
-    logger.msg(f"Created {obj_type.name} repo with namespace '{namespace}'.")
+    logger.msg(f"Created {repo_type} repo with namespace '{namespace}'.")
     logger.msg("To register it with ramble, run this command:",
-               f'ramble repo -t {obj_type.name} add {full_path}')
+               f'ramble repo{register_type} add {full_path}')
 
 
 def repo_add(args):
     """Add a repository to Ramble's configuration."""
     path = args.path
-    obj_type = ramble.repository.ObjectTypes[args.type]
-    type_def = ramble.repository.type_definitions[obj_type]
+    if args.type == 'any':
+        obj_types = ramble.repository.ObjectTypes
+    else:
+        obj_types = [ramble.repository.ObjectTypes[args.type]]
 
-    # real_path is absolute and handles substitution.
-    canon_path = ramble.util.path.canonicalize_path(path)
+    for obj_type in obj_types:
+        type_def = ramble.repository.type_definitions[obj_type]
 
-    # check if the path exists
-    if not os.path.exists(canon_path):
-        logger.die(f"No such file or directory: {path}")
+        # real_path is absolute and handles substitution.
+        canon_path = ramble.util.path.canonicalize_path(path)
 
-    # Make sure the path is a directory.
-    if not os.path.isdir(canon_path):
-        logger.die(f"Not a Ramble repository: {path}")
+        # check if the path exists
+        if not os.path.exists(canon_path):
+            logger.die(f"No such file or directory: {path}")
 
-    # Make sure it's actually a ramble repository by constructing it.
-    repo = ramble.repository.Repo(canon_path, obj_type)
+        # Make sure the path is a directory.
+        if not os.path.isdir(canon_path):
+            logger.die(f"Not a Ramble repository: {path}")
 
-    # If that succeeds, finally add it to the configuration.
-    repos = ramble.config.get(type_def['config_section'], scope=args.scope)
-    if not repos:
-        repos = []
+        # Make sure it's actually a ramble repository by constructing it.
+        repo = ramble.repository.Repo(canon_path, obj_type)
 
-    if repo.root in repos or path in repos:
-        logger.die(f"Repository is already registered with Ramble: {path}")
+        # If that succeeds, finally add it to the configuration.
+        repos = ramble.config.get(type_def['config_section'], scope=args.scope)
+        if not repos:
+            repos = []
 
-    repos.insert(0, canon_path)
-    ramble.config.set(type_def['config_section'], repos, args.scope)
-    logger.msg(f"Added {obj_type.name} repo with namespace '{repo.namespace}'.")
+        if repo.root in repos or path in repos:
+            logger.warn(f"{obj_type.name} repository is already registered with Ramble: {path}")
+        else:
+            repos.insert(0, canon_path)
+            ramble.config.set(type_def['config_section'], repos, args.scope)
+            logger.msg(f"Added {obj_type.name} repo with namespace '{repo.namespace}'.")
 
 
 def repo_remove(args):
     """Remove a repository from Ramble's configuration."""
-    obj_type = ramble.repository.ObjectTypes[args.type]
-    type_def = ramble.repository.type_definitions[obj_type]
+    if args.type == 'any':
+        obj_types = ramble.repository.ObjectTypes
+    else:
+        obj_types = [ramble.repository.ObjectTypes[args.type]]
 
-    repos = ramble.config.get(type_def['config_section'], scope=args.scope)
-    namespace_or_path = args.namespace_or_path
+    repo_removed = [False] * len(obj_types)
 
-    # If the argument is a path, remove that repository from config.
-    canon_path = ramble.util.path.canonicalize_path(namespace_or_path)
-    for repo_path in repos:
-        repo_canon_path = ramble.util.path.canonicalize_path(repo_path)
-        if canon_path == repo_canon_path:
-            repos.remove(repo_path)
-            ramble.config.set(type_def['config_section'], repos, args.scope)
-            logger.msg(f"Removed {obj_type.name} repository {repo_path}")
-            return
+    for obj_idx, obj_type in enumerate(obj_types):
+        type_def = ramble.repository.type_definitions[obj_type]
 
-    # If it is a namespace, remove corresponding repo
-    for path in repos:
-        try:
-            repo = ramble.repository.Repo(path, obj_type)
-            if repo.namespace == namespace_or_path:
-                repos.remove(path)
+        repos = ramble.config.get(type_def['config_section'], scope=args.scope)
+        namespace_or_path = args.namespace_or_path
+
+        obj_complete = False
+        # If the argument is a path, remove that repository from config.
+        canon_path = ramble.util.path.canonicalize_path(namespace_or_path)
+        for repo_path in repos:
+            repo_canon_path = ramble.util.path.canonicalize_path(repo_path)
+            if canon_path == repo_canon_path:
+                repos.remove(repo_path)
                 ramble.config.set(type_def['config_section'], repos, args.scope)
-                logger.msg(f"Removed {obj_type.name} repository {repo.root} "
-                           f"with namespace '{repo.namespace}'.")
-                return
-        except ramble.repository.RepoError:
-            continue
+                logger.msg(f"Removed {obj_type.name} repository {repo_path}")
+                obj_complete = True
+                repo_removed[obj_idx] = True
+                break
 
-    logger.die(
-        f"No {obj_type.name} repository with path or namespace: {namespace_or_path}"
-    )
+        if obj_complete:
+            break
+
+        # If it is a namespace, remove corresponding repo
+        for path in repos:
+            try:
+                repo = ramble.repository.Repo(path, obj_type)
+                if repo.namespace == namespace_or_path:
+                    repos.remove(path)
+                    ramble.config.set(type_def['config_section'], repos, args.scope)
+                    logger.msg(f"Removed {obj_type.name} repository {repo.root} "
+                               f"with namespace '{repo.namespace}'.")
+                    repo_removed[obj_idx] = True
+                    obj_complete = True
+                    break
+            except ramble.repository.RepoError:
+                continue
+
+    if not any(repo_removed):
+        all_types = [str(obj_type.name) for obj_type in obj_types]
+        logger.die(
+            f"No repository for {all_types} with path or namespace: {namespace_or_path}"
+        )
 
 
 def repo_list(args):
     """Show registered repositories and their namespaces."""
-    obj_type = ramble.repository.ObjectTypes[args.type]
-    type_def = ramble.repository.type_definitions[obj_type]
+    if args.type == 'any':
+        obj_types = ramble.repository.ObjectTypes
+    else:
+        obj_types = [ramble.repository.ObjectTypes[args.type]]
 
-    roots = ramble.config.get(type_def['config_section'], scope=args.scope)
-    repos = []
-    for r in roots:
-        try:
-            repos.append(ramble.repository.Repo(r, obj_type))
-        except ramble.repository.RepoError:
-            continue
+    for obj_type in obj_types:
+        type_def = ramble.repository.type_definitions[obj_type]
 
-    if sys.stdout.isatty():
-        msg = f"{len(repos)} {obj_type.name} repository"
-        msg += "y." if len(repos) == 1 else "ies."
-        logger.msg(msg)
+        roots = ramble.config.get(type_def['config_section'], scope=args.scope)
+        repos = []
+        for r in roots:
+            try:
+                repos.append(ramble.repository.Repo(r, obj_type))
+            except ramble.repository.RepoError:
+                continue
 
-    if not repos:
-        return
+        if sys.stdout.isatty():
+            msg = f"{len(repos)} {obj_type.name} repositor"
+            msg += "y." if len(repos) == 1 else "ies."
+            logger.msg(msg)
 
-    max_ns_len = max(len(r.namespace) for r in repos)
-    for repo in repos:
-        fmt = "%%-%ds%%s" % (max_ns_len + 4)
-        print(fmt % (repo.namespace, repo.root))
+        if not repos:
+            return
+
+        max_ns_len = max(len(r.namespace) for r in repos)
+        for repo in repos:
+            fmt = "%%-%ds%%s" % (max_ns_len + 4)
+            print(fmt % (repo.namespace, repo.root))
 
 
 def repo(parser, args):
@@ -205,7 +241,7 @@ def repo(parser, args):
               'remove': repo_remove,
               'rm': repo_remove}
 
-    if args.type not in ramble.repository.OBJECT_NAMES:
+    if args.type != 'any' and args.type not in ramble.repository.OBJECT_NAMES:
         logger.die(f"Repository type '{args.type}' is not valid.")
 
     action[args.repo_command](args)
