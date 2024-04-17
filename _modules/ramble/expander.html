@@ -6,7 +6,7 @@
   <title>ramble.expander &mdash; Ramble 0.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="../../_static/documentation_options.js?v=6c02275b"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -121,15 +121,6 @@
     <span class="n">ast</span><span class="o">.</span><span class="n">Eq</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">NotEq</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Gt</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">GtE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Lt</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">LtE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">And</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Or</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mod</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span>
-<span class="p">}</span>
-
-<span class="n">op_str_map</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
-    <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
-    <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">:</span> <span class="s1">&#39;**&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">:</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
-    <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">:</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span>
-    <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">:</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">:</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">:</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span>
-    <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">:</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">:</span> <span class="s1">&#39;or&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">:</span> <span class="s1">&#39;%&#39;</span>
 <span class="p">}</span>
 
 <span class="n">supported_scalar_function_pointers</span> <span class="o">=</span> <span class="p">{</span>
@@ -937,7 +928,7 @@
             <span class="n">right_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
             <span class="n">op</span> <span class="o">=</span> <span class="n">supported_math_operators</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_eval</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_eval</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-                <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">left_eval</span><span class="si">}{</span><span class="n">op_str_map</span><span class="p">[</span><span class="n">op</span><span class="p">]</span><span class="si">}{</span><span class="n">right_eval</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported operand type in binary operator&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">left_eval</span><span class="p">,</span> <span class="n">right_eval</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s1">&#39;Unsupported operand type in binary operator&#39;</span><span class="p">)</span>
@@ -1035,7 +1026,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Apr 16, 2024.
+      <span class="lastupdated">Last updated on Apr 17, 2024.
       </span></p>
   </div>
 

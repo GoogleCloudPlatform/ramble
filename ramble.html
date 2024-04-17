@@ -7,7 +7,7 @@
   <title>ramble package &mdash; Ramble 0.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
 
   
   <!--[if lt IE 9]>
@@ -17,7 +17,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=6c02275b"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -2461,12 +2461,12 @@ replacing their values in the proper positions in self’s string.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expansion_dict</strong> (<em>dict</em>) – variable definitions to use for expanding</p></li>
-<li><p><strong>matches</strong> (<em>detected</em>) – </p></li>
+<li><p><strong>matches</strong> (<em>detected</em>)</p></li>
 <li><p><strong>allow_passthrough</strong> (<em>bool</em>) – if true, expansion is allowed to fail. if</p></li>
-<li><p><strong>false</strong> – </p></li>
-<li><p><strong>error.</strong> (<em>failed expansion raises an</em>) – </p></li>
+<li><p><strong>false</strong></p></li>
+<li><p><strong>error.</strong> (<em>failed expansion raises an</em>)</p></li>
 <li><p><strong>expansion_func</strong> (<em>func</em>) – function to use for expansion of nested</p></li>
-<li><p><strong>definitions</strong> (<em>variable</em>) – </p></li>
+<li><p><strong>definitions</strong> (<em>variable</em>)</p></li>
 <li><p><strong>evaluation_func</strong> (<em>func</em>) – function to use for evaluating math of strings</p></li>
 <li><p><strong>no_expand_vars</strong> (<em>set</em>) – set of variable names that should never be expanded</p></li>
 </ul>
@@ -5023,7 +5023,7 @@ RepoIndex to update the index <em>just</em> for that object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.repository.ObjectNamespace">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">ObjectNamespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#ObjectNamespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.ObjectNamespace" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">module</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></p>
 <p>Allow lazy loading of modules.</p>
 </dd></dl>
 
@@ -5409,7 +5409,7 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ramble.repository.RepositoryNamespace">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.repository.</span></span><span class="sig-name descname"><span class="pre">RepositoryNamespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/repository.html#RepositoryNamespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.repository.RepositoryNamespace" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">module</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></p>
 <p>Allow lazy loading of modules.</p>
 </dd></dl>
 
@@ -5452,7 +5452,7 @@ isn’t found.  If not, raise an UnknownNamespaceError.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj_name</strong> (<em>str</em>) – name of the object to be removed from the</p></li>
-<li><p><strong>index</strong> – </p></li>
+<li><p><strong>index</strong></p></li>
 </ul>
 </dd>
 </dl>
@@ -6788,7 +6788,7 @@ value.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Apr 16, 2024.
+      <span class="lastupdated">Last updated on Apr 17, 2024.
       </span></p>
   </div>
 
