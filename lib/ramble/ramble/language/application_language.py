@@ -73,11 +73,14 @@ def workload(name, executables=None, executable=None, input=None,
     def _execute_workload(app):
         all_execs = ramble.language.language_helpers.require_definition(executable,
                                                                         executables,
+                                                                        app.executables,
                                                                         'executable',
                                                                         'executables',
                                                                         'workload')
 
-        all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs)
+        all_inputs = ramble.language.language_helpers.merge_definitions(input,
+                                                                        inputs,
+                                                                        app.inputs)
 
         app.workloads[name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
 
@@ -164,6 +167,7 @@ def workload_variable(name, default, description, values=None, workload=None,
     def _execute_workload_variable(app):
         all_workloads = ramble.language.language_helpers.require_definition(workload,
                                                                             workloads,
+                                                                            app.workloads,
                                                                             'workload',
                                                                             'workloads',
                                                                             'workload_variable')
@@ -190,6 +194,7 @@ def environment_variable(name, value, description, workload=None,
     def _execute_environment_variable(app):
         all_workloads = ramble.language.language_helpers.require_definition(workload,
                                                                             workloads,
+                                                                            app.workloads,
                                                                             'workload',
                                                                             'workloads',
                                                                             'environment_variable')

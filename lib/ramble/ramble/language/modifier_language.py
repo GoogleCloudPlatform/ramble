@@ -83,6 +83,7 @@ def variable_modification(name, modification, method='set', mode=None, modes=Non
 
         all_modes = ramble.language.language_helpers.require_definition(mode,
                                                                         modes,
+                                                                        mod.modes,
                                                                         'mode',
                                                                         'modes',
                                                                         'variable_modification')
@@ -180,6 +181,7 @@ def env_var_modification(name, modification=None, method='set', mode=None, modes
 
         all_modes = ramble.language.language_helpers.require_definition(mode,
                                                                         modes,
+                                                                        mod.modes,
                                                                         'mode',
                                                                         'modes',
                                                                         'env_var_modification')
@@ -261,6 +263,7 @@ def modifier_variable(name: str, default, description: str, values: Optional[lis
     def _define_modifier_variable(mod):
         all_modes = ramble.language.language_helpers.require_definition(mode,
                                                                         modes,
+                                                                        mod.modes,
                                                                         'mode',
                                                                         'modes',
                                                                         'modifier_variable')
@@ -305,7 +308,12 @@ def package_manager_requirement(command: str, validation_type: str, modes: list,
             raise DirectiveError(f'package_manager_requirement validation type is '
                                  f'{validation_type} but no regex is given')
 
-        for mode in modes:
+        exp_modes = modes
+        if isinstance(exp_modes, list):
+            exp_modes = ramble.language.language_helpers.expand_patterns(exp_modes,
+                                                                         mod.modes)
+
+        for mode in exp_modes:
             if mode not in mod.package_manager_requirements:
                 mod.package_manager_requirements[mode] = []
 
