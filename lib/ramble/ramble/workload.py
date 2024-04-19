@@ -30,14 +30,6 @@ class WorkloadVariable(object):
         self.values = values.copy() if isinstance(values, list) else [values]
         self.expandable = expandable
 
-    def as_dict(self):
-        """Dictionary representation of this variable
-
-        Returns:
-            dict: Key is variable name, value is default value of variable
-        """
-        return {self.name: self.default}
-
     def as_str(self, n_indent: int = 0):
         """String representation of this variable
 
@@ -79,16 +71,6 @@ class WorkloadEnvironmentVariable(object):
         self.value = value
         self.description = description
 
-    def as_dict(self):
-        """Dictionary representation of environment variable
-
-        Returns:
-            (dict): Dictionary with single environment variable in it. Key is
-                    var name, value is a dict representing the specific action and
-                    value.
-        """
-        return {self.name: {'action': 'set', 'value': self.value}}
-
     def as_str(self, n_indent: int = 0):
         """String representation of environment variable
 
@@ -125,8 +107,8 @@ class Workload(object):
             tags (list(str)): List of tags for this workload
         """
         self.name = name
-        self.variables = []
-        self.environment_variables = []
+        self.variables = {}
+        self.environment_variables = {}
 
         attr_names = ['executables', 'inputs', 'tags']
         attr_vals = [executables, inputs, tags]
@@ -164,12 +146,12 @@ class Workload(object):
 
         if self.variables:
             out_str += rucolor.nested_1(f'{indentation}    Variables:\n')
-            for var in self.variables:
+            for name, var in self.variables.items():
                 out_str += var.as_str(n_indent + 4)
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f'{indentation}    Environment Variables:\n')
-            for env_var in self.environment_variables:
+            for name, env_var in self.environment_variables.items():
                 out_str += env_var.as_str(n_indent + 4)
 
         return out_str
@@ -180,7 +162,7 @@ class Workload(object):
         Args:
             variable (WorkloadVariable): New variable to add to this workload
         """
-        self.variables.append(variable)
+        self.variables[variable.name] = variable
 
     def add_environment_variable(self, env_var: WorkloadEnvironmentVariable):
         """Add an environment variable to this workload
@@ -188,7 +170,7 @@ class Workload(object):
         Args:
             env_var (WorkloadEnvironmentVariable): New environment variable to add to this workload
         """
-        self.environment_variables.append(env_var)
+        self.environment_variables[env_var.name] = env_var
 
     def add_executable(self, executable: str):
         """Add an executable to this workload
@@ -213,30 +195,6 @@ class Workload(object):
             tag (str): Tag to add to this workload
         """
         self.tags.append(tag)
-
-    def variable_dict(self):
-        """Dictionary representation of all workload variables for this workload
-
-        Returns:
-            (dict): Dictionary with variable names as keys and variable default values as values.
-        """
-        var_dict = {}
-        for var in self.variables:
-            var_dict.update(var.as_dict())
-        return var_dict
-
-    def environment_variable_dict(self):
-        """Dictionary representation of all environment variables for this workload
-
-        Returns:
-            (dict): Dictionary with all environment variable in it. Keys are
-                    var name, values are dicts representing the specific actions and
-                    values.
-        """
-        env_var_dict = {}
-        for env_var in self.environment_variables:
-            env_var_dict.update(env_var.as_dict())
-        return env_var_dict
 
     def is_valid(self):
         """Test if this workload is considered valid
@@ -277,7 +235,7 @@ class Workload(object):
                 return input
         return None
 
-    def find_variable(self, var_name):
+    def find_variable(self, name):
         """Find a variable in this workload
 
         Args:
@@ -286,12 +244,12 @@ class Workload(object):
         Returns:
             (WorkloadVariable / None): Variable instance if it exists, None if it is not found
         """
-        for var in self.variables:
-            if var.name == var_name:
-                return var
-        return None
+        if name in self.variables:
+            return self.variables[name]
+        else:
+            return None
 
-    def find_environment_variable(self, env_var_name):
+    def find_environment_variable(self, name):
         """Find an environment variable in this workload
 
         Args:
@@ -301,7 +259,7 @@ class Workload(object):
             (WorkloadEnvironmentVariable / None): Environment variable instance
                                                   if it exists, None if it is not found
         """
-        for env_var in self.environment_variables:
-            if env_var.name == env_var_name:
-                return env_var
-        return None
+        if name in self.environment_variables:
+            return self.environment_variables[name]
+        else:
+            return None

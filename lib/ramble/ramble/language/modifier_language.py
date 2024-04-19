@@ -269,14 +269,10 @@ def modifier_variable(name: str, default, description: str, values: Optional[lis
             if mode_name not in mod.modifier_variables:
                 mod.modifier_variables[mode_name] = {}
 
-            mod.modifier_variables[mode_name][name] = {
-                'default': default,
-                'description': description,
-                'expandable': expandable
-            }
-
-            if values:
-                mod.modifier_variables[mode_name][name]['values'] = values
+            mod.modifier_variables[mode_name][name] = ramble.workload.WorkloadVariable(
+                name, default=default, description=description,
+                values=values, expandable=expandable
+            )
 
     return _define_modifier_variable
 

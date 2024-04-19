@@ -265,7 +265,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.no_expand_vars = set()
         workload_name = self.expander.workload_name
         if workload_name in self.workloads:
-            for var in self.workloads[workload_name].variables:
+            for name, var in self.workloads[workload_name].variables.items():
                 if not var.expandable:
                     self.no_expand_vars.add(var.name)
 
@@ -822,7 +822,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Set default experiment variables, if they haven't been set already
         var_sets = []
         if self.expander.workload_name in self.workloads:
-            var_sets.append(self.workloads[self.expander.workload_name].variable_dict())
+            var_sets.append(self.workloads[self.expander.workload_name].variables)
 
         for mod_inst in self._modifier_instances:
             var_sets.append(mod_inst.mode_variables())
@@ -830,12 +830,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for var_set in var_sets:
             for var, val in var_set.items():
                 if var not in self.variables.keys():
-                    self.variables[var] = val
+                    self.variables[var] = val.default
 
         if self.expander.workload_name in self.workloads:
             workload = self.workloads[self.expander.workload_name]
 
-            for env_var in workload.environment_variables:
+            for name, env_var in workload.environment_variables.items():
                 action = 'set'
                 value = env_var.value
 

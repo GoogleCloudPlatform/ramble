@@ -547,5 +547,5 @@ def test_modifier_variable_directive(mod_class, func_type):
 
         assert mode in mod_inst.modifier_variables
         assert test_def['name'] in mod_inst.modifier_variables[mode]
-        for attr in ['description', 'default']:
-            assert test_def[attr] == mod_inst.modifier_variables[mode][var_name][attr]
+        assert test_def['description'] == mod_inst.modifier_variables[mode][var_name].description
+        assert test_def['default'] == mod_inst.modifier_variables[mode][var_name].default

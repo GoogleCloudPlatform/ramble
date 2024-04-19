@@ -48,7 +48,7 @@ def test_basic_app(mutable_mock_apps_repo):
     example_input = basic_inst.workloads['test_wl'].find_input('input')
     assert example_input is not None
 
-    assert len(basic_inst.workloads['test_wl'].variables) == 1
+    assert len(basic_inst.workloads['test_wl'].variables) == 2
     my_var = basic_inst.workloads['test_wl'].find_variable('my_var')
     assert my_var is not None
     assert my_var.default == '1.0'

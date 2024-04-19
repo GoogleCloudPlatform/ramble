@@ -23,6 +23,10 @@ class Basic(ExecutableApplication):
     workload('test_wl2', executable='bar', input='input')
     workload('working_wl', executable='echo')
 
+    workload_variable('my_base_var', default='0.0',
+                      description='Example var',
+                      workload='test_wl')
+
     workload_variable('my_var', default='1.0',
                       description='Example var',
                       workload='test_wl')
