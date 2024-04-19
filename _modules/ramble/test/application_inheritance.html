@@ -157,14 +157,10 @@
     <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;inherited_input&#39;</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">==</span> \
         <span class="s1">&#39;Again, not a file&#39;</span>
 
-    <span class="k">assert</span> <span class="s1">&#39;my_var&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">variable_dict</span><span class="p">()</span>
-    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;my_var&#39;</span><span class="p">:</span>
-            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">assert</span> <span class="n">var</span><span class="o">.</span><span class="n">default</span> <span class="o">==</span> <span class="s1">&#39;1.0&#39;</span>
-            <span class="k">assert</span> <span class="n">var</span><span class="o">.</span><span class="n">description</span> <span class="o">==</span> <span class="s1">&#39;Example var&#39;</span>
-    <span class="k">assert</span> <span class="n">found</span></div>
+    <span class="k">assert</span> <span class="s1">&#39;my_base_var&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span>
+    <span class="k">assert</span> <span class="s1">&#39;my_var&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span>
+    <span class="k">assert</span> <span class="s1">&#39;Shadowed&#39;</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;my_var&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">description</span>
+    <span class="k">assert</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="s1">&#39;test_wl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;my_var&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="o">==</span> <span class="s1">&#39;1.0&#39;</span></div>
 
 </pre></div>
 
@@ -176,7 +172,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Apr 17, 2024.
+      <span class="lastupdated">Last updated on Apr 19, 2024.
       </span></p>
   </div>
 
