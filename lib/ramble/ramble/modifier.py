@@ -127,10 +127,10 @@ class ModifierBase(object, metaclass=ModifierMeta):
                     indent = '\t\t'
                     for var, conf in self.modifier_variables[mode_name].items():
                         out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
-                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
-                        out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
-                        if 'values' in conf:
-                            out_str.append(f'{indent}\tSuggested Values: {conf["values"]}\n')
+                        out_str.append(f'{indent}\tDescription: {conf.description}\n')
+                        out_str.append(f'{indent}\tDefault: {conf.default}\n')
+                        if conf.values:
+                            out_str.append(f'{indent}\tSuggested Values: {conf.values}\n')
 
                 if mode_name in self.variable_modifications:
                     out_str.append(rucolor.nested_1('\tVariable Modifications:\n'))
@@ -287,17 +287,16 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
         if self._usage_mode in self.modifier_variables:
             for var, var_conf in self.modifier_variables[self._usage_mode].items():
-                if not var_conf['expandable']:
+                if not var_conf.expandable:
                     yield var
 
     def mode_variables(self):
         """Return a dict of variables that should be defined for the current mode"""
 
-        var_dict = {}
         if self._usage_mode in self.modifier_variables:
-            for var, conf in self.modifier_variables[self._usage_mode].items():
-                var_dict[var] = conf['default']
-        return var_dict
+            return self.modifier_variables[self._usage_mode]
+        else:
+            return {}
 
     def run_phase_hook(self, workspace, pipeline, hook_name):
         """Run a modifier hook.
