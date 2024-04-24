@@ -12,14 +12,11 @@
    :lines: 12-
 """  # noqa E501
 
-import ramble.schema.types
-
-
 variables_def = {
     'type': ['object', 'null'],
     'default': {},
     'properties': {},
-    'additionalProperties': ramble.schema.types.array_or_scalar_of_strings_or_nums
+    'additionalProperties': True
 }
 
 properties = {
