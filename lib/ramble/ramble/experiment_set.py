@@ -422,7 +422,7 @@ class ExperimentSet(object):
 
         used_variables = set()
         for tracking_vars, repeats in \
-                renderer.render_objects(render_group, exclude_where=exclude_where,
+                renderer.render_objects(tracking_group, exclude_where=exclude_where,
                                         remove=False, fatal=False):
             app_inst = self._prepare_experiment(experiment_template_name,
                                                 tracking_vars, final_context, repeats)
