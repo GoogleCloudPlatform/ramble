@@ -75,7 +75,7 @@ users to be sure their experiments completed successfully.
 
 When WRF runs, it outputs the time each timestep takes. To begin with, you will
 define a new success criteria within your workspace configuration file that
-validates some timing data is present in the output an experiment. In the
+validates some timing data is present in the output of an experiment. In the
 experiment output, the timing data is prefixed with the string
 ``Timing for main``.
 
@@ -256,3 +256,18 @@ Also, running analyze in debug mode as:
 
 Will print significnatly more output, but you should see where Ramble tests the
 ``timing-present`` and ``correct-timesteps`` success criteria in the output.
+
+Clean the Workspace
+-------------------
+
+Once you are finished with the tutorial content, make sure you deactivate your workspace:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace and all of its content with:
+
+.. code-block:: console
+
+    $ ramble workspace remove success_wrf

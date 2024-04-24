@@ -181,10 +181,10 @@ modifier.
 Advanced Modifiers
 -----------------
 
-Some modifiers have additionally functionality, which can include requiring
+Some modifiers have additional functionality, which can include requiring
 specific software packages to be present. An example of this is the
 ``intel-aps`` modifier, which applies Intel's
-`Application Performan Snapshot<https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide-application-snapshot-linux/2023-0/introducing-application-performance-snapshot.html>`_
+`Application Performance Snapshot <https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide-application-snapshot-linux/2023-0/introducing-application-performance-snapshot.html>`_
 to a workspace's experiments.
 
 To get information about the ``intel-aps`` modifier, execute:
@@ -339,3 +339,18 @@ following:
  * Socket(s) - From ``lscpu``
  * MPI Time - From ``intel-aps``
  * Disk I/O Time - From ``intel-aps``
+
+Clean the Workspace
+-------------------
+
+Once you are finished with the tutorial content, make sure you deactivate your workspace:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace and all of its content with:
+
+.. code-block:: console
+
+    $ ramble workspace remove modifiers_wrf

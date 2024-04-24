@@ -22,7 +22,7 @@ Alternatively, the files can be edited directly with:
 
     $ ramble workspace edit
 
-Within the ``ramble.yaml`` file, write the following contents, which the
+Within the ``ramble.yaml`` file, write the following contents, which is the
 final configuration from a previous tutorial.
 
 .. code-block:: YAML
@@ -65,6 +65,6 @@ The above configuration will execute 2 experiments, comprising a basic scaling
 study on 2 different sets of nodes. This is primarily defined by the use of
 vector experiments, which are documented in the :ref:`vector
 logic<ramble-vector-logic>` portion of the workspace configuration file
-documentation.. Vector experiments were also introduced in the :ref:`vector and
+documentation. Vector experiments were also introduced in the :ref:`vector and
 matrix tutorial <vector_and_matrix_tutorial>`.
 

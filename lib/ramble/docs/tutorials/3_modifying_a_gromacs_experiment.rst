@@ -56,7 +56,7 @@ To get detailed information about where variable definitions come from, you can 
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info --expansions
 
 The experiments section of this command's output might contain the following:
 
@@ -214,7 +214,7 @@ These changes should now be reflected in the output of:
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info -expansions
 
 .. include:: shared/gromacs_execute.rst
 
