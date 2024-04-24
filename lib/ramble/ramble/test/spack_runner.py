@@ -279,33 +279,35 @@ def test_new_compiler_installs(tmpdir, capsys):
 
     import os
 
-    compilers_config = """
+    with tmpdir.as_cwd():
+        compilers_config = """
 compilers::
 - compiler:
     spec: gcc@12.1.0
     paths:
-      cc: /path/to/gcc
-      cxx: /path/to/g++
-      f77: /path/to/gfortran
-      fc: /path/to/gfortran
+      cc: tmpdir_path/gcc
+      cxx: tmpdir_path/g++
+      f77: tmpdir_path/gfortran
+      fc: tmpdir_path/gfortran
     flags: {}
     operating_system: 'ramble'
     target: 'x86_64'
     modules: []
     environment: {}
     extra_rpaths: []
-"""
+""".replace('tmpdir_path', os.path.join(os.getcwd(), 'bin'))
 
-    packages_config = """
+        packages_config = f"""
 packages:
   gcc:
     externals:
     - spec: gcc@12.1.0 languages=c,fortran
-      prefix: /path/to
+      prefix: {os.getcwd()}
     buildable: false
 """
 
-    with tmpdir.as_cwd():
+        os.mkdir(os.path.join(os.getcwd(), 'bin'))
+
         packages_path = os.path.join(os.getcwd(), 'packages.yaml')
         compilers_path = os.path.join(os.getcwd(), 'compilers.yaml')
         # Write spack_configs
