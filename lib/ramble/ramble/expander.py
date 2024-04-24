@@ -13,6 +13,8 @@ import operator
 import math
 import random
 
+from typing import Dict
+
 import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
@@ -461,7 +463,8 @@ class Expander(object):
         except SyntaxError:
             return var
 
-    def expand_var_name(self, var_name, extra_vars=None, allow_passthrough=True):
+    def expand_var_name(self, var_name: str, extra_vars: Dict = None,
+                        allow_passthrough: bool = True, typed: bool = False):
         """Convert a variable name to an expansion string, and expand it
 
         Take a variable name (var) and convert it to an expansion string by
@@ -469,26 +472,30 @@ class Expander(object):
         expand_var, and return the result.
 
         Args:
-            var_name: String name of variable to expand
-            extra_vars: Variable definitions to use with highest precedence
-            allow_passthrough: Whether the string is allowed to have keywords
-                               after expansion
+            var_name (str): String name of variable to expand
+            extra_vars (dict): Variable definitions to use with highest precedence
+            allow_passthrough (bool): Whether the string is allowed to have keywords
+                                      after expansion
+            typed (bool): Whether the return type should be typed or not
         """
         return self.expand_var(self.expansion_str(var_name),
                                extra_vars=extra_vars,
-                               allow_passthrough=allow_passthrough)
+                               allow_passthrough=allow_passthrough,
+                               typed=typed)
 
-    def expand_var(self, var, extra_vars=None, allow_passthrough=True):
+    def expand_var(self, var: str, extra_vars: Dict = None,
+                   allow_passthrough: bool = True, typed: bool = False):
         """Perform expansion of a string
 
         Expand a string by building up a dict of all
         expansion variables.
 
         Args:
-            var: String variable to expand
-            extra_vars: Variable definitions to use with highest precedence
-            allow_passthrough: Whether the string is allowed to have keywords
-                               after expansion
+            var (str): String variable to expand
+            extra_vars (dict): Variable definitions to use with highest precedence
+            allow_passthrough (bool): Whether the string is allowed to have keywords
+                                      after expansion
+            typed (bool): Whether the return type should be typed or not
         """
 
         passthrough_setting = allow_passthrough
@@ -513,6 +520,15 @@ class Expander(object):
                                         f'{e}')
 
         logger.debug(f'END OF EXPAND_VAR STACK {value}')
+        if typed:
+            logger.debug(f'BEGINNING OF TYPING ON {value}')
+            try:
+                value = ast.literal_eval(value)
+                logger.debug(f'END OF TYPING {value}')
+            except ValueError:
+                logger.debug('END OF TYPING Failed with ValueError')
+            except SyntaxError:
+                logger.debug('END OF TYPING Failed with SyntaxError')
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):

@@ -401,7 +401,8 @@ class ExperimentSet(object):
                                         final_context.exclude)
 
             if perform_explicit_exclude:
-                for exclude_exp_vars, _ in renderer.render_objects(exclude_group, remove=False):
+                for exclude_exp_vars, _ in renderer.render_objects(exclude_group,
+                                                                   ignore_used=False):
                     expander = ramble.expander.Expander(exclude_exp_vars, self)
                     self._compute_mpi_vars(expander, exclude_exp_vars)
                     exclude_exp_name = expander.expand_var(experiment_template_name,
@@ -422,8 +423,8 @@ class ExperimentSet(object):
 
         used_variables = set()
         for tracking_vars, repeats in \
-                renderer.render_objects(render_group, exclude_where=exclude_where,
-                                        remove=False, fatal=False):
+                renderer.render_objects(tracking_group, exclude_where=exclude_where,
+                                        ignore_used=False, fatal=False):
             app_inst = self._prepare_experiment(experiment_template_name,
                                                 tracking_vars, final_context, repeats)
 

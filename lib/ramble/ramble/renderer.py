@@ -110,7 +110,7 @@ class RenderGroup(object):
 
 
 class Renderer(object):
-    def render_objects(self, render_group, exclude_where=None, remove=True, fatal=True):
+    def render_objects(self, render_group, exclude_where=None, ignore_used=True, fatal=True):
         """Render objects based on the input variables and matrices
 
         Internally collects all matrix and vector variables.
@@ -164,35 +164,34 @@ class Renderer(object):
         consumed_zips = set()
         matrix_objects = []
 
-        if remove:
+        if ignore_used:
             # Add variables / zips in matrices to used variables
             if matrices:
                 for matrix in matrices:
                     for mat_var in matrix:
                         used_variables.add(mat_var)
 
-            # Update zip definitions based on variables that will be removed
-            # because they are not used
+            # Update zip definitions based on variables that are used.
+            # If a zip has one variable that is used, the entire zip is
+            # considered used.
+            # If a zip contains no used variables, ignore the entire zip.
             if zips:
                 remove_zips = set()
                 for zip_group in zips:
-                    zip_vars = set(zips[zip_group])
+
+                    keep_zip = zip_group in used_variables
                     for var_name in zips[zip_group]:
-                        if var_name not in used_variables:
-                            zip_vars.remove(var_name)
-                    if len(zip_vars) == 0:
-                        remove_zips.add(zip_group)
+                        if var_name in used_variables:
+                            keep_zip = True
+
+                    if keep_zip:
+                        for var_name in zips[zip_group]:
+                            used_variables.add(var_name)
                     else:
-                        zips[zip_group] = list(zip_vars)
+                        remove_zips.add(zip_group)
 
                 for zip_name in remove_zips:
                     del zips[zip_name]
-
-            # Remove any variables that are not used by the render group
-            all_vars = set(object_variables.keys())
-            for var in all_vars:
-                if var not in used_variables and isinstance(object_variables[var], list):
-                    del object_variables[var]
 
         if zips:
             zipped_vars = set()
@@ -367,7 +366,7 @@ class Renderer(object):
         # Extract vector variables
         max_vector_size = 0
         for var, val in object_variables.items():
-            if isinstance(val, list):
+            if isinstance(val, list) and (var in used_variables or not ignore_used):
                 vector_vars[var] = val.copy()
                 max_vector_size = max(len(val), max_vector_size)
 
