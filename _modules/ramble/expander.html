@@ -108,6 +108,8 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">random</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
@@ -599,7 +601,8 @@
 
 <div class="viewcode-block" id="Expander.expand_var_name">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra_vars</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">allow_passthrough</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">typed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a variable name to an expansion string, and expand it</span>
 
 <span class="sd">        Take a variable name (var) and convert it to an expansion string by</span>
@@ -607,29 +610,33 @@
 <span class="sd">        expand_var, and return the result.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            var_name: String name of variable to expand</span>
-<span class="sd">            extra_vars: Variable definitions to use with highest precedence</span>
-<span class="sd">            allow_passthrough: Whether the string is allowed to have keywords</span>
-<span class="sd">                               after expansion</span>
+<span class="sd">            var_name (str): String name of variable to expand</span>
+<span class="sd">            extra_vars (dict): Variable definitions to use with highest precedence</span>
+<span class="sd">            allow_passthrough (bool): Whether the string is allowed to have keywords</span>
+<span class="sd">                                      after expansion</span>
+<span class="sd">            typed (bool): Whether the return type should be typed or not</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">var_name</span><span class="p">),</span>
                                <span class="n">extra_vars</span><span class="o">=</span><span class="n">extra_vars</span><span class="p">,</span>
-                               <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">)</span></div>
+                               <span class="n">allow_passthrough</span><span class="o">=</span><span class="n">allow_passthrough</span><span class="p">,</span>
+                               <span class="n">typed</span><span class="o">=</span><span class="n">typed</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Expander.expand_var">
 <a class="viewcode-back" href="../../ramble.html#ramble.expander.Expander.expand_var">[docs]</a>
-    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra_vars</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">allow_passthrough</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">typed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform expansion of a string</span>
 
 <span class="sd">        Expand a string by building up a dict of all</span>
 <span class="sd">        expansion variables.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            var: String variable to expand</span>
-<span class="sd">            extra_vars: Variable definitions to use with highest precedence</span>
-<span class="sd">            allow_passthrough: Whether the string is allowed to have keywords</span>
-<span class="sd">                               after expansion</span>
+<span class="sd">            var (str): String variable to expand</span>
+<span class="sd">            extra_vars (dict): Variable definitions to use with highest precedence</span>
+<span class="sd">            allow_passthrough (bool): Whether the string is allowed to have keywords</span>
+<span class="sd">                                      after expansion</span>
+<span class="sd">            typed (bool): Whether the return type should be typed or not</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">passthrough_setting</span> <span class="o">=</span> <span class="n">allow_passthrough</span>
@@ -654,6 +661,15 @@
                                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;END OF EXPAND_VAR STACK </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typed</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;BEGINNING OF TYPING ON </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;END OF TYPING </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;END OF TYPING Failed with ValueError&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;END OF TYPING Failed with SyntaxError&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 
@@ -1026,7 +1042,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Apr 19, 2024.
+      <span class="lastupdated">Last updated on Apr 24, 2024.
       </span></p>
   </div>
 

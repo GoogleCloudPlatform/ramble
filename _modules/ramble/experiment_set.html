@@ -522,7 +522,8 @@
                                         <span class="n">final_context</span><span class="o">.</span><span class="n">exclude</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">perform_explicit_exclude</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">exclude_exp_vars</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">exclude_group</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">exclude_exp_vars</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">exclude_group</span><span class="p">,</span>
+                                                                   <span class="n">ignore_used</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
                     <span class="n">expander</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">Expander</span><span class="p">(</span><span class="n">exclude_exp_vars</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_compute_mpi_vars</span><span class="p">(</span><span class="n">expander</span><span class="p">,</span> <span class="n">exclude_exp_vars</span><span class="p">)</span>
                     <span class="n">exclude_exp_name</span> <span class="o">=</span> <span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">experiment_template_name</span><span class="p">,</span>
@@ -543,8 +544,8 @@
 
         <span class="n">used_variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">tracking_vars</span><span class="p">,</span> <span class="n">repeats</span> <span class="ow">in</span> \
-                <span class="n">renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">render_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="n">exclude_where</span><span class="p">,</span>
-                                        <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="n">renderer</span><span class="o">.</span><span class="n">render_objects</span><span class="p">(</span><span class="n">tracking_group</span><span class="p">,</span> <span class="n">exclude_where</span><span class="o">=</span><span class="n">exclude_where</span><span class="p">,</span>
+                                        <span class="n">ignore_used</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="n">app_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_experiment</span><span class="p">(</span><span class="n">experiment_template_name</span><span class="p">,</span>
                                                 <span class="n">tracking_vars</span><span class="p">,</span> <span class="n">final_context</span><span class="p">,</span> <span class="n">repeats</span><span class="p">)</span>
 
@@ -769,7 +770,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Apr 19, 2024.
+      <span class="lastupdated">Last updated on Apr 24, 2024.
       </span></p>
   </div>
 
