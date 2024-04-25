@@ -214,7 +214,7 @@ These changes should now be reflected in the output of:
 
 .. code-block:: console
 
-    $ ramble workspace info -expansions
+    $ ramble workspace info --expansions
 
 .. include:: shared/gromacs_execute.rst
 
