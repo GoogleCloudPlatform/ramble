@@ -72,6 +72,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clean-the-workspace">Clean the Workspace</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="10_using_modifiers.html">10) Modifiers</a></li>
@@ -161,7 +162,7 @@ location can be seen under the <code class="docutils literal notranslate"><span 
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
 </pre></div>
 </div>
-<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which is the
 final configuration from a previous tutorial.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
@@ -202,7 +203,7 @@ final configuration from a previous tutorial.</p>
 study on 2 different sets of nodes. This is primarily defined by the use of
 vector experiments, which are documented in the <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector
 logic</span></a> portion of the workspace configuration file
-documentation.. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
+documentation. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
 matrix tutorial</span></a>.</p>
 </section>
 <section id="id1">
@@ -232,7 +233,7 @@ already define this type of success criteria in order to make it easier for
 users to be sure their experiments completed successfully.</p>
 <p>When WRF runs, it outputs the time each timestep takes. To begin with, you will
 define a new success criteria within your workspace configuration file that
-validates some timing data is present in the output an experiment. In the
+validates some timing data is present in the output of an experiment. In the
 experiment output, the timing data is prefixed with the string
 <code class="docutils literal notranslate"><span class="pre">Timing</span> <span class="pre">for</span> <span class="pre">main</span></code>.</p>
 <p>This success criteria might look like the following:</p>
@@ -408,6 +409,17 @@ data using:</p>
 </div>
 <p>Will print significnatly more output, but you should see where Ramble tests the
 <code class="docutils literal notranslate"><span class="pre">timing-present</span></code> and <code class="docutils literal notranslate"><span class="pre">correct-timesteps</span></code> success criteria in the output.</p>
+</section>
+<section id="clean-the-workspace">
+<h2>Clean the Workspace<a class="headerlink" href="#clean-the-workspace" title="Link to this heading"></a></h2>
+<p>Once you are finished with the tutorial content, make sure you deactivate your workspace:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<p>Additionally, you can remove the workspace and all of its content with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>remove<span class="w"> </span>success_wrf
+</pre></div>
+</div>
 </section>
 </section>
 

@@ -144,7 +144,7 @@ define additional important details such as how many MPI ranks you want in each
 experiment (defined by the ``n_ranks`` variable), or how many MPI ranks should
 execute on each node (defined by the ``processes_per_node`` variable). You
 should add these details as workspace variables within your configuration file.
-For the purposes of this tutorial, we will assume 4 MPI ranks per node and that
+For the purposes of this tutorial, we will assume 16 MPI ranks per node and that
 the number of MPI ranks total will be the number of MPI ranks per node
 multiplied by the number of nodes.
 
@@ -252,3 +252,20 @@ you see fit, and make sure the ``gcc9`` references under ``intel-mpi`` and
 Ramble also supports uploading the analyzed data to online databases, using
 ``ramble workspace analyze --upload``. We will not cover this functionality in
 detail here, but it is very useful for production experiments.
+
+Cleaning the Workspace
+----------------------
+
+After you are finished with the content of this tutorial, make sure you
+deactivate your workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+If you no longer need the workspace materials, remove the entire workspace
+with:
+
+.. code-block:: console
+
+    $ ramble workspace remove scaling_wrf

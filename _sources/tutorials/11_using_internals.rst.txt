@@ -357,3 +357,18 @@ following:
 Examining the experiment run directories, you should see ``start_time`` and
 ``end_time`` in the same places as they were when you ran the explicitly
 defined order experiments.
+
+Clean the Workspace
+-------------------
+
+Once you are finished with the tutorial content, make sure you deactivate your workspace:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace and all of its content with:
+
+.. code-block:: console
+
+    $ ramble workspace remove internals_wrf

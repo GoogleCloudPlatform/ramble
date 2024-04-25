@@ -72,6 +72,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#advanced-modifiers">Advanced Modifiers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clean-the-workspace">Clean the Workspace</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="11_using_internals.html">11) Internals</a></li>
@@ -163,7 +164,7 @@ location can be seen under the <code class="docutils literal notranslate"><span 
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>edit
 </pre></div>
 </div>
-<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which the
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which is the
 final configuration from a previous tutorial.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
@@ -204,7 +205,7 @@ final configuration from a previous tutorial.</p>
 study on 2 different sets of nodes. This is primarily defined by the use of
 vector experiments, which are documented in the <a class="reference internal" href="../workspace_config.html#ramble-vector-logic"><span class="std std-ref">vector
 logic</span></a> portion of the workspace configuration file
-documentation.. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
+documentation. Vector experiments were also introduced in the <a class="reference internal" href="4_using_vectors_and_matrices.html#vector-and-matrix-tutorial"><span class="std std-ref">vector and
 matrix tutorial</span></a>.</p>
 </section>
 <section id="discovering-modifiers">
@@ -343,10 +344,10 @@ modifier.</p>
 </section>
 <section id="advanced-modifiers">
 <h2>Advanced Modifiers<a class="headerlink" href="#advanced-modifiers" title="Link to this heading"></a></h2>
-<p>Some modifiers have additionally functionality, which can include requiring
+<p>Some modifiers have additional functionality, which can include requiring
 specific software packages to be present. An example of this is the
 <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> modifier, which applies Intel’s
-<a href="#id2"><span class="problematic" id="id3">`Application Performan Snapshot&lt;https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide-application-snapshot-linux/2023-0/introducing-application-performance-snapshot.html&gt;`_</span></a>
+<a class="reference external" href="https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide-application-snapshot-linux/2023-0/introducing-application-performance-snapshot.html">Application Performance Snapshot</a>
 to a workspace’s experiments.</p>
 <p>To get information about the <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code> modifier, execute:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>mods<span class="w"> </span>info<span class="w"> </span>intel-aps
@@ -503,6 +504,17 @@ following:</p>
 <li><p>Disk I/O Time - From <code class="docutils literal notranslate"><span class="pre">intel-aps</span></code></p></li>
 </ul>
 </div></blockquote>
+</section>
+<section id="clean-the-workspace">
+<h2>Clean the Workspace<a class="headerlink" href="#clean-the-workspace" title="Link to this heading"></a></h2>
+<p>Once you are finished with the tutorial content, make sure you deactivate your workspace:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<p>Additionally, you can remove the workspace and all of its content with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>remove<span class="w"> </span>modifiers_wrf
+</pre></div>
+</div>
 </section>
 </section>
 

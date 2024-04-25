@@ -210,9 +210,8 @@ final configuration from the previous tutorial.</p>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrfv4</span>
 </pre></div>
 </div>
-<p>The above configuration will execute 6 experiments, comprising a basic scaling
-study on three different sets of nodes across two different platforms. This
-configuration was the final result of the <span class="xref std std-ref">zips_and_matrices</span> tutorial.</p>
+<p>The above configuration will execute 4 experiments, comprising a basic scaling
+study on three different sets of nodes across two different platforms.</p>
 <p>You will expand this definition to perform the same sweep over multiple MPI
 implementations. Over the course of this tutorial, you will learn how to use
 variable expansion and indirection to construct more complex experiments.</p>
@@ -310,7 +309,7 @@ dictionary.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">==&gt; Error: Experiment wrfv4.CONUS_12km.scaling_1_platform1 is not unique.</span>
 </pre></div>
 </div>
-<p>As you have implicitly defined 12 experiments (3 from <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, times 2 from
+<p>As you have implicitly defined 8 experiments (2 from <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>, times 2 from
 <code class="docutils literal notranslate"><span class="pre">platform_config</span></code>, times another 2 from <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>), but you haven’t
 updated the experiment name template. To resolve this, add <code class="docutils literal notranslate"><span class="pre">{mpi_name}</span></code> into
 the experiment name template. Additionally, you may explicitly add <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>
@@ -365,7 +364,7 @@ into the matrix. The result might look like the following:</p>
 </section>
 <section id="variable-expansion-and-indirection">
 <h2>Variable Expansion and Indirection<a class="headerlink" href="#variable-expansion-and-indirection" title="Link to this heading"></a></h2>
-<p>At this stage, you have defined a workspace that will execute 12 experiments.
+<p>At this stage, you have defined a workspace that will execute 8 experiments.
 It is important to point out that different MPI implementations have different
 command line flags for controlling their behavior. The existing <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code>
 should work fine with both Intel MPI, and OpenMPI but to illustrate how

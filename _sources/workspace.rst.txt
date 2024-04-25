@@ -167,7 +167,7 @@ To get basic information, and:
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info -vvv
 
 To get more detailed information, including which variables are defined and
 where they come from.

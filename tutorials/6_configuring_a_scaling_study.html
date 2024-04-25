@@ -67,6 +67,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#configuring-system-details">Configuring System Details</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#applying-the-default-software-configuration">Applying the Default Software Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cleaning-the-workspace">Cleaning the Workspace</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="7_using_zips_and_matrices.html">7) Zips and Matrices</a></li>
@@ -229,7 +230,7 @@ define additional important details such as how many MPI ranks you want in each
 experiment (defined by the <code class="docutils literal notranslate"><span class="pre">n_ranks</span></code> variable), or how many MPI ranks should
 execute on each node (defined by the <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code> variable). You
 should add these details as workspace variables within your configuration file.
-For the purposes of this tutorial, we will assume 4 MPI ranks per node and that
+For the purposes of this tutorial, we will assume 16 MPI ranks per node and that
 the number of MPI ranks total will be the number of MPI ranks per node
 multiplied by the number of nodes.</p>
 <p>Additionally, you need to define <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code> and <code class="docutils literal notranslate"><span class="pre">mpi_command</span></code>
@@ -345,6 +346,19 @@ show the following results:</p>
 <p>Ramble also supports uploading the analyzed data to online databases, using
 <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span> <span class="pre">--upload</span></code>. We will not cover this functionality in
 detail here, but it is very useful for production experiments.</p>
+</section>
+<section id="cleaning-the-workspace">
+<h2>Cleaning the Workspace<a class="headerlink" href="#cleaning-the-workspace" title="Link to this heading"></a></h2>
+<p>After you are finished with the content of this tutorial, make sure you
+deactivate your workspace using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<p>If you no longer need the workspace materials, remove the entire workspace
+with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>remove<span class="w"> </span>scaling_wrf
+</pre></div>
+</div>
 </section>
 </section>
 

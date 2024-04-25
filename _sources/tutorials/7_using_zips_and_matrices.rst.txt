@@ -171,7 +171,7 @@ example:
     - platform_config
     - n_nodes
 
-Would result in 6 experiments. Adding this to you workspace configuration, you
+Would result in 6 experiments. Adding this to your workspace configuration, you
 should have the following in your ``ramble.yaml``:
 
 .. code-block:: YAML
