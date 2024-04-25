@@ -48,6 +48,7 @@ filter available application definitions. For example:
 
 might output the following:
 
+.. rst-class:: hide-copy
 .. code-block:: console
 
     ==> 10 applications
@@ -61,6 +62,7 @@ The ``ramble list`` command also accepts regular expressions. For example:
 
 might output the following:
 
+.. rst-class:: hide-copy
 .. code-block:: console
 
     ==> 5 applications

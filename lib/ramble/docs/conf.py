@@ -130,6 +130,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinxcontrib.programoutput",
     "sphinxcontrib.jquery",
+    "sphinx_copybutton",
 ]
 
 # Set default graphviz options
@@ -396,3 +397,9 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
+
+# sphinx_copybutton
+# Do not copy the prompt, or any console outputs.
+copybutton_exclude = '.gp, .go'
+# Escape hatch for turning off the copy button.
+copybutton_selector = "div:not(.hide-copy) > div.highlight > pre"
