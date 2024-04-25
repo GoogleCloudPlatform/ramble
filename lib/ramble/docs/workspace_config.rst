@@ -1182,7 +1182,7 @@ The ``variables`` keyword is optional. It can be used to override the
 definition of variables from the chained experiment if needed.
 
 Once the experiments are defined, the final order of the chain can be viewed using
-``ramble workspace info -v``.
+``ramble workspace info -vvv``.
 
 **NOTE** When using the ``experiment_index`` variable, all experiments in a
 chain share the same value. This ensures the resulting experiment will be
