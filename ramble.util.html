@@ -88,6 +88,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.spec_utils">ramble.util.spec_utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.stats">ramble.util.stats module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.web">ramble.util.web module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.util.yaml_generation">ramble.util.yaml_generation module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.workspace.html">ramble.workspace package</a></li>
@@ -1203,6 +1204,117 @@ set of visited links.</p>
 <dd></dd></dl>
 
 </section>
+<section id="module-ramble.util.yaml_generation">
+<span id="ramble-util-yaml-generation-module"></span><h2>ramble.util.yaml_generation module<a class="headerlink" href="#module-ramble.util.yaml_generation" title="Link to this heading"></a></h2>
+<p>Module representing utility functions for managing YAML configuration files
+within application definition files</p>
+<p>These functions are intended to help read, write, and manipulate YAML based
+configuration files that an experiment might use as input.</p>
+<p>Workload variables that represent configuration files should be defined using a
+‘.’ delimiter between YAML object names. As an example:</p>
+<p><a href="#id3"><span class="problematic" id="id4">``</span></a>`
+foo:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>bar:</dt><dd><p>baz: 1.0</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<p>Would translate to <cite>foo.bar.baz = 1.0</cite> in Ramble syntax.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.yaml_generation.all_config_options">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.yaml_generation.</span></span><span class="sig-name descname"><span class="pre">all_config_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/yaml_generation.html#all_config_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.yaml_generation.all_config_options" title="Link to this definition"></a></dt>
+<dd><p>Extract all config options from config_data dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_data</strong> (<em>dict</em>) – A config dictionary representing data read from a YAML file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Set containing all detected fully qualified option names</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(set)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.yaml_generation.apply_default_config_values">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.yaml_generation.</span></span><span class="sig-name descname"><span class="pre">apply_default_config_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_config_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/yaml_generation.html#apply_default_config_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.yaml_generation.apply_default_config_values" title="Link to this definition"></a></dt>
+<dd><p>Apply default config values (from config_data) to an experiment</p>
+<p>Process all workloads variables (for the current workload in app_inst). Any
+variable who’s expanded value is equal to default_config_string will have
+its value overwritten to the value in the config_dict dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_data</strong> (<em>dict</em>) – Dictionary of config data read from a YAML file</p></li>
+<li><p><strong>app_inst</strong> (<em>application</em>) – Application instance representing an experiment</p></li>
+<li><p><strong>default_config_string</strong> (<em>str</em>) – String that conveys the default config_data
+should be used in place of the current value.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.yaml_generation.get_config_value">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.yaml_generation.</span></span><span class="sig-name descname"><span class="pre">get_config_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/yaml_generation.html#get_config_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.yaml_generation.get_config_value" title="Link to this definition"></a></dt>
+<dd><p>Get a config option based on dictionary attribute syntax</p>
+<p>Given an option_name of the format: attr1.attr2.attr3 return its value
+from config_data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_data</strong> (<em>dict</em>) – A config dictionary representing data read from a YAML file.</p></li>
+<li><p><strong>option_name</strong> (<em>str</em>) – Name of config option to get</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Value of config option</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Any)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.yaml_generation.read_config_file">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.yaml_generation.</span></span><span class="sig-name descname"><span class="pre">read_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/yaml_generation.html#read_config_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.yaml_generation.read_config_file" title="Link to this definition"></a></dt>
+<dd><p>Read an existing YAML file and return its data as a dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conf_path</strong> (<em>str</em>) – Path to input configuration file to read</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary representation of the data contained in conf_path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.util.yaml_generation.set_config_value">
+<span class="sig-prename descclassname"><span class="pre">ramble.util.yaml_generation.</span></span><span class="sig-name descname"><span class="pre">set_config_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/yaml_generation.html#set_config_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.yaml_generation.set_config_value" title="Link to this definition"></a></dt>
+<dd><p>Set a config option based on dictionary attribute syntax</p>
+<p>Given an option_name of the format: attr1.attr2.attr3 set its value to
+option_value in config_data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_data</strong> (<em>dict</em>) – A config dictionary representing data read from a YAML file.</p></li>
+<li><p><strong>option_name</strong> (<em>str</em>) – Name of config option to set</p></li>
+<li><p><strong>option_value</strong> (<em>any</em>) – Value to set config option to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -1217,7 +1329,7 @@ set of visited links.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Apr 25, 2024.
+      <span class="lastupdated">Last updated on Apr 26, 2024.
       </span></p>
   </div>
 

@@ -152,3 +152,11 @@ ramble.util.web module
    :members:
    :undoc-members:
    :show-inheritance:
+
+ramble.util.yaml\_generation module
+-----------------------------------
+
+.. automodule:: ramble.util.yaml_generation
+   :members:
+   :undoc-members:
+   :show-inheritance:
