@@ -50,7 +50,8 @@ ramble:
               variables:
                 n_nodes: 1
               modifiers:
-                - name: test-mod
+                - name: glob-patterns-mod
+                  mode: test-glob
   spack:
     packages: {}
     environments: {}
@@ -87,6 +88,9 @@ ramble:
         test_env_var_regex = re.compile('env_var_test')
         glob_env_var_regex = re.compile('env_var_glob')
         baz_env_var_regex = re.compile('env_var_baz')
+
+        glob_var_mod_regex = re.compile('var_mod_modified')
+        glob_env_var_mod_regex = re.compile('env_var_mod=modded')
 
         with open(exp1_script, 'r') as f:
             # Check for only 'test' executable command
@@ -149,6 +153,10 @@ ramble:
             glob_env_var_found = False
             baz_env_var_not_found = True
 
+            # Check for modifier globbing
+            glob_var_mod_found = False  # checks both variable modifier and modifier variable
+            glob_env_var_mod_found = False
+
             for line in f.readlines():
                 # Executables
                 if test_cmd_regex.search(line):
@@ -174,6 +182,13 @@ ramble:
                 if baz_env_var_regex.search(line):
                     baz_env_var_not_found = False
 
+                # Modifier
+                if glob_var_mod_regex.search(line):
+                    glob_var_mod_found = True
+                if glob_env_var_mod_regex.search(line):
+                    glob_env_var_mod_found = True
+
             assert test_cmd_found and glob_cmd_found and baz_cmd_not_found
             assert test_wl_var_not_found and glob_wl_var_found and baz_wl_var_not_found
             assert test_env_var_not_found and glob_env_var_found and baz_env_var_not_found
+            assert glob_var_mod_found and glob_env_var_mod_found
