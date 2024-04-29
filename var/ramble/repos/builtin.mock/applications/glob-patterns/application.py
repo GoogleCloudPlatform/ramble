@@ -13,7 +13,7 @@ class GlobPatterns(ExecutableApplication):
     name = "glob-patterns"
 
     executable('test', 'base test {test_var} {glob_var} {baz_var}', use_mpi=False)
-    executable('test-foo', 'test foo {test_var} {glob_var} {baz_var}', use_mpi=False)
+    executable('test-foo', 'test foo {test_var} {glob_var} {baz_var} {mod_var}', use_mpi=False)
     executable('test-bar', 'test bar {test_var} {glob_var} {baz_var}', use_mpi=True)
     executable('baz', 'baz {test_var} {glob_var} {baz_var}', use_mpi=True)
 
@@ -36,6 +36,8 @@ class GlobPatterns(ExecutableApplication):
                          workloads=['test*'])
     environment_variable('env_var_baz', 'set', description='Test env var',
                          workloads=['one_baz_exec'])
+    environment_variable('env_var_mod', 'set', description='Env var to be modified',
+                         workloads=['test_three_exec'])
 
     workload_variable('test_var', default='wl_var_test',
                       description='Example var',
@@ -46,6 +48,9 @@ class GlobPatterns(ExecutableApplication):
     workload_variable('baz_var', default='wl_var_baz',
                       description='Example var',
                       workloads=['one_baz_exec'])
+    workload_variable('var_mod', default='wl_var_mod',
+                      description='Variable to be modified',
+                      workloads=['test_three_exec'])
 
     figure_of_merit('test_fom',
                     fom_regex=r'(?P<test>[0-9]+\.[0-9]+).*seconds.*',
