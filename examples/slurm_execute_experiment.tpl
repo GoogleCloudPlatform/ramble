@@ -20,5 +20,6 @@
 
 cd {experiment_run_dir}
 
-{command}
+scontrol show hostnames > {experiment_run_dir}/hostfile
 
+{command}
