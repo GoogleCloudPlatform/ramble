@@ -530,3 +530,25 @@ def test_env_create_no_view(tmpdir):
                 )
             except ramble.spack_runner.RunnerError as e:
                 pytest.skip('%s' % e)
+
+
+def test_multiword_args(tmpdir, capsys):
+    try:
+        env_path = tmpdir.join('spack-env')
+        with ramble.config.override('config:spack',
+                                    {'install': {'flags': 'install="-multiword -args"'}}):
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            sr.create_env(env_path)
+            sr.activate()
+            sr.add_spec('zlib')
+            sr.concretize()
+
+            sr.install()
+            sr.get_package_path('zlib package_path="-multiword -args"')
+            captured = capsys.readouterr()
+            print(captured.out)
+
+            assert "install=-multiword -args" in captured.out
+            assert "package_path=-multiword -args" in captured.out
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)
