@@ -118,6 +118,14 @@ ramble.test.end\_to\_end.formatted\_executables module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.globbing\_patterns module
+--------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.globbing_patterns
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.gromacs\_size\_expansion module
 --------------------------------------------------------
 

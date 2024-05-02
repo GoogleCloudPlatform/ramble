@@ -222,8 +222,29 @@ the core.</p>
 <section id="module-ramble.language.language_helpers">
 <span id="ramble-language-language-helpers-module"></span><h2>ramble.language.language_helpers module<a class="headerlink" href="#module-ramble.language.language_helpers" title="Link to this heading"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.language_helpers.expand_patterns">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">expand_patterns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_pattern_match</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#expand_patterns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.expand_patterns" title="Link to this definition"></a></dt>
+<dd><p>Expand wildcard patterns within a list of names</p>
+<p>This method takes an input list containing wildcard patterns and expands the
+wildcard with values matching a list of names. Returns a list containing
+matching names and any inputs with zero matches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiple_types</strong> – List of strings for type names, may contain wildcards</p></li>
+<li><p><strong>multiple_pattern_match</strong> – List of strings to match against patterns in multiple_type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of expanded patterns matching the names list plus patterns
+not found in the names list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.language_helpers.merge_definitions">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">merge_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#merge_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.merge_definitions" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">merge_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_pattern_match</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#merge_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.merge_definitions" title="Link to this definition"></a></dt>
 <dd><p>Merge definitions of a type</p>
 <p>This method will merge two optional definitions of single_type and
 multiple_type.</p>
@@ -231,7 +252,8 @@ multiple_type.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>single_type</strong> – Single string for type name</p></li>
-<li><p><strong>multiple_type</strong> – List of strings for type names</p></li>
+<li><p><strong>multiple_type</strong> – List of strings for type names, may contain wildcards</p></li>
+<li><p><strong>multiple_pattern_match</strong> – List of strings to match against patterns in multiple_type</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -242,7 +264,7 @@ multiple_type.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.language_helpers.require_definition">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">require_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directive_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#require_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.require_definition" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">require_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_pattern_match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directive_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#require_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.require_definition" title="Link to this definition"></a></dt>
 <dd><p>Require at least one definition for a type in a directive</p>
 <p>This method will validate that single_type / multiple_type are properly defined.</p>
 <p>It will raise an error if at least one type is not defined, or if
@@ -251,7 +273,8 @@ either are the incorrect type.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>single_type</strong> – Single string for type name</p></li>
-<li><p><strong>multiple_type</strong> – List of strings for type names</p></li>
+<li><p><strong>multiple_type</strong> – List of strings for type names, may contain wildcards</p></li>
+<li><p><strong>multiple_pattern_match</strong> – List of strings to match against patterns in multiple_type</p></li>
 <li><p><strong>single_arg_name</strong> – String name of the single_type argument in the directive</p></li>
 <li><p><strong>multiple_arg_name</strong> – String name of the multiple_type argument in the directive</p></li>
 <li><p><strong>directive_name</strong> – Name of the directive requiring a type</p></li>
@@ -284,7 +307,7 @@ either are the incorrect type.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 01, 2024.
+      <span class="lastupdated">Last updated on May 02, 2024.
       </span></p>
   </div>
 
