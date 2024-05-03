@@ -621,6 +621,24 @@ def test_setup_command():
         assert os.path.exists(ws.root + '/all_experiments')
 
 
+def test_setup_command_with_missing_log_dir():
+    ws_name = "test"
+    workspace("create", ws_name)
+
+    with ramble.workspace.read("test") as ws:
+        add_basic(ws)
+        check_basic(ws)
+        # Missing log directory shouldn't prevent workspace
+        # setup, as long as the workspace is considered valid
+        # by the `is_workspace_dir` check.
+        os.rmdir(ws.log_dir)
+
+        workspace("concretize")
+
+        workspace("setup")
+        assert os.path.exists(ws.root + "/all_experiments")
+
+
 def test_setup_nothing():
     ws_name = 'test'
     workspace('create', ws_name)
