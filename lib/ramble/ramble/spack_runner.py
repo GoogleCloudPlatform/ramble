@@ -29,7 +29,7 @@ from ramble.util.logger import logger
 
 spack_namespace = 'spack'
 
-package_name_regex = re.compile(r"\s*(?P<package_name>[\w][\w-]+).*")
+package_name_regex = re.compile(r"[\s-]*(?P<package_name>[\w][\w-]+).*")
 
 
 class SpackRunner(object):
