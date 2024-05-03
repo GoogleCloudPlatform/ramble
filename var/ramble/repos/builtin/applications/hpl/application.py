@@ -31,7 +31,6 @@ class Hpl(SpackApplication):
 
     software_spec('hpl', spack_spec='hpl@2.3 +openmp', compiler='gcc9')
 
-
     executable('execute', 'xhpl', use_mpi=True)
 
     workload('standard', executables=['execute'])

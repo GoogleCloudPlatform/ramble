@@ -28,7 +28,6 @@ class Hpcg(SpackApplication):
                   spack_spec='hpcg@3.1 +openmp',
                   compiler='gcc9')
 
-
     executable('execute', 'xhpcg', use_mpi=True)
 
     executable('move-log', 'mv HPCG-Benchmark*.txt {out_file}',

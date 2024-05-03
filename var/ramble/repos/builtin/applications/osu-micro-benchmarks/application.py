@@ -23,7 +23,6 @@ class OsuMicroBenchmarks(SpackApplication):
     software_spec('osu-micro-benchmarks', spack_spec='osu-micro-benchmarks',
                   compiler='gcc')
 
-
     # Additional variables not yet included: --buffer-num, --validation,
     #  --validation-warmup, --validation-warmup
 
