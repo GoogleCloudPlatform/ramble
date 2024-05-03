@@ -28,7 +28,6 @@ class Hpcg(SpackApplication):
                   spack_spec='hpcg@3.1 +openmp',
                   compiler='gcc9')
 
-    required_package('hpcg')
 
     executable('execute', 'xhpcg', use_mpi=True)
 

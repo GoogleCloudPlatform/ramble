@@ -26,7 +26,6 @@ class Lammps(SpackApplication):
                   spack_spec='lammps@20220623.4 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth',
                   compiler='gcc9')
 
-    required_package('lammps')
 
     input_file('leonard-jones', url='https://www.lammps.org/inputs/in.lj.txt', expand=False,
                sha256='874b4c63b6fcbb6ede76522df19087acf2f49b6bc96794cf0aa3218c66ff7e06',
