@@ -127,7 +127,7 @@
 
 <span class="n">spack_namespace</span> <span class="o">=</span> <span class="s1">&#39;spack&#39;</span>
 
-<span class="n">package_name_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*(?P&lt;package_name&gt;[\w][\w-]+).*&quot;</span><span class="p">)</span>
+<span class="n">package_name_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\s-]*(?P&lt;package_name&gt;[\w][\w-]+).*&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SpackRunner">
@@ -1058,7 +1058,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 02, 2024.
+      <span class="lastupdated">Last updated on May 03, 2024.
       </span></p>
   </div>
 
