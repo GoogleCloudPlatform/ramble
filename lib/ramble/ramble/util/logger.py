@@ -11,6 +11,7 @@ import llnl.util.tty.log
 import llnl.util.tty.color
 
 from contextlib import contextmanager
+from pathlib import Path
 
 
 class Logger(object):
@@ -43,7 +44,7 @@ class Logger(object):
             path: File path for the new log file
         """
         if isinstance(path, str) and self.enabled:
-            stream = None
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
             stream = llnl.util.tty.log.Unbuffered(open(path, 'a+'))
             self.log_stack.append((path, stream))
 
