@@ -70,14 +70,20 @@ class ModifierBase(object, metaclass=ModifierMeta):
             self._usage_mode = mode
         elif hasattr(self, '_default_usage_mode'):
             self._usage_mode = self._default_usage_mode
-            logger.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+            if len(logger.log_stack) >= 1:
+                logger.msg(
+                    f'    Using default usage mode {self._usage_mode} on modifier {self.name}'
+                )
         else:
             if len(self.modes) > 1 or len(self.modes) == 0:
                 raise InvalidModeError('Cannot auto determine usage '
                                        f'mode for modifier {self.name}')
 
             self._usage_mode = list(self.modes.keys())[0]
-            logger.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+            if len(logger.log_stack) >= 1:
+                logger.msg(
+                    f'    Using default usage mode {self._usage_mode} on modifier {self.name}'
+                )
 
     def set_on_executables(self, on_executables):
         """Set the executables this modifier applies to.
