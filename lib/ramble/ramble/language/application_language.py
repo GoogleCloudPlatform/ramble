@@ -10,7 +10,6 @@ import ramble.workload
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
 import ramble.language.shared_language
-from ramble.schema.types import OUTPUT_CAPTURE
 import ramble.language.language_helpers
 import ramble.success_criteria
 
@@ -88,8 +87,7 @@ def workload(name, executables=None, executable=None, input=None,
 
 
 @application_directive('executables')
-def executable(name, template, use_mpi=False, variables={}, redirect='{log_file}',
-               output_capture=OUTPUT_CAPTURE.DEFAULT, **kwargs):
+def executable(name, template, **kwargs):
     """Adds an executable to this application
 
     Defines a new executable that can be used to configure workloads and
@@ -97,10 +95,13 @@ def executable(name, template, use_mpi=False, variables={}, redirect='{log_file}
 
     Executables may or may not use MPI.
 
-    Args:
-        template: The template command this executable should generate from
-        use_mpi: (Boolean) determines if this executable should be
-                 wrapped with an `mpirun` like command or not.
+    Required Args:
+        name (str): Name of the executable
+        template (list[str] or str): The template command this executable should generate from
+
+    Optional Args:
+        use_mpi or mpi: (Boolean) determines if this executable should be
+                        wrapped with an `mpirun` like command or not.
 
         variables (dict): dictionary of variable definitions to use for this executable only
         redirect (Optional): Sets the path for outputs to be written to.
@@ -113,8 +114,7 @@ def executable(name, template, use_mpi=False, variables={}, redirect='{log_file}
     def _execute_executable(app):
         from ramble.util.executable import CommandExecutable
         app.executables[name] = CommandExecutable(
-            name=name, template=template, use_mpi=use_mpi, redirect=redirect,
-            output_capture=output_capture)
+            name=name, template=template, **kwargs)
 
     return _execute_executable
 
