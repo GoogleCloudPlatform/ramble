@@ -1,4 +1,3 @@
-
 # Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -6,6 +5,8 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+
+import re
 
 from ramble.modkit import *  # noqa: F403
 
@@ -37,13 +38,25 @@ class ConditionalPsm3(BasicModifier):
     required_variable('psm3_mpi')
     required_package('intel-oneapi-mpi')
 
+    modifier_variable(
+        'apply_psm3_exec_regex',
+        default='',
+        description='When the non-empty regex matches with the executable_name, apply psm3 even if mpi is not explicitly used',
+        mode='standard'
+    )
+
     def apply_psm3(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
         pre_cmds = []
         post_cmds = []
 
-        if executable.mpi:
+        exec_regex = self.expander.expand_var_name('apply_psm3_exec_regex')
+        should_apply = executable.mpi or (
+            exec_regex and re.match(exec_regex, executable_name)
+        )
+
+        if should_apply:
             pre_cmds.append(
                 CommandExecutable(f'add-psm3-{executable_name}',
                                   template=[
