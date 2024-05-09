@@ -922,6 +922,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         out_log = self.expander.expand_var(cmd_conf.redirect, exec_vars)
                         output_operator = cmd_conf.output_capture
                         redirect = f' {output_operator} "{out_log}"'
+                        if ramble.config.get('config:shell') in ['bash', 'sh']:
+                            redirect += ' 2>&1'
 
                     for part in cmd_conf.template:
                         command_part = f'{mpi_cmd}{part}{redirect}'
