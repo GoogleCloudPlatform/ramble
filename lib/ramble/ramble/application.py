@@ -1640,6 +1640,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if repeat_success or workspace.always_print_foms:
             logger.debug(f'Calculating statistics for {self.repeats.n_repeats} repeats of '
                          f'{base_exp_name}')
+
+            # Add defined keywords as top level keys
+            for key in self.keywords.keys:
+                if self.keywords.is_key_level(key):
+                    self.results[key] = self.expander.expand_var_name(key)
+
             self.results['RAMBLE_VARIABLES'] = {}
             self.results['RAMBLE_RAW_VARIABLES'] = {}
             for var, val in self.variables.items():
