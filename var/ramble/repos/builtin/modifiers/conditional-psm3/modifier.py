@@ -45,6 +45,13 @@ class ConditionalPsm3(BasicModifier):
         mode='standard'
     )
 
+    modifier_variable(
+        'psm3_log_file',
+        default='{log_file}',
+        description='Log file where PSM3 info writes to, this varies based on applications',
+        mode='standard',
+    )
+
     def apply_psm3(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
@@ -94,3 +101,21 @@ class ConditionalPsm3(BasicModifier):
             )
 
         return pre_cmds, post_cmds
+
+    psm3_build_info_regex = r'.*\sPSM3_IDENTIFY PSM3\s+(?P<version>v[\d.]+)\s+built for\s+(?P<target>.*)$'
+
+    figure_of_merit(
+        'PSM3 version',
+        fom_regex=psm3_build_info_regex,
+        group_name='version',
+        units='',
+        log_file='{psm3_log_file}',
+    )
+
+    figure_of_merit(
+        'PSM3 build target',
+        fom_regex=psm3_build_info_regex,
+        group_name='target',
+        units='',
+        log_file='{psm3_log_file}',
+    )
