@@ -555,7 +555,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                                   f'    Primary experiment {parent_namespace}\n' +
                                                   f'    Chained expeirment name: {exp_name}\n' +
                                                   f'    Chain definition: {str(exp)}')
-                chain_stack.append((exp_name, exp))
+                chain_stack.append((exp_name, exp.copy()))
 
         parent_run_dir = self.expander.expand_var(
             self.expander.expansion_str(self.keywords.experiment_run_dir)
