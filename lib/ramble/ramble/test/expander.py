@@ -127,7 +127,8 @@ def test_expansions(input, output, no_expand_vars, passes):
         ('"2.1.1" in ["2.1.1", "3.1.1", "4.2.1"]', True, set(), 1),
         ('"2.1.2" in ["2.1.1", "3.1.1", "4.2.1"]', False, set(), 1),
         ('{test_mask}', 0, set(['test_mask']), 1),
-    ]
+        ('{var3} // {processes_per_node}', 1, set(), 1),
+    ],
 )
 def test_typed_expansions(input, output, no_expand_vars, passes):
     expansion_vars = exp_dict()
