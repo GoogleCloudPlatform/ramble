@@ -22,12 +22,23 @@ from ramble.util.logger import logger
 import spack.util.naming
 
 supported_math_operators = {
-    ast.Add: operator.add, ast.Sub: operator.sub,
-    ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow:
-    operator.pow, ast.BitXor: operator.xor, ast.USub: operator.neg,
-    ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.Gt: operator.gt,
-    ast.GtE: operator.ge, ast.Lt: operator.lt, ast.LtE: operator.le,
-    ast.And: operator.and_, ast.Or: operator.or_, ast.Mod: operator.mod
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Pow: operator.pow,
+    ast.BitXor: operator.xor,
+    ast.USub: operator.neg,
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.And: operator.and_,
+    ast.Or: operator.or_,
+    ast.Mod: operator.mod,
 }
 
 supported_scalar_function_pointers = {
