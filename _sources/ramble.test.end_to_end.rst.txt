@@ -6,6 +6,14 @@ ramble.test.end\_to\_end namespace
 Submodules
 ----------
 
+ramble.test.end\_to\_end.analyze\_fom\_output module
+----------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.analyze_fom_output
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.chained\_experiment\_var\_inheritance module
 ---------------------------------------------------------------------
 
