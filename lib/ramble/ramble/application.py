@@ -57,6 +57,16 @@ from enum import Enum
 experiment_status = Enum('experiment_status', ['UNKNOWN', 'SETUP', 'RUNNING',
                                                'COMPLETE', 'SUCCESS', 'FAILED'])
 
+_NULL_CONTEXT = 'null'
+
+
+def _get_context_display_name(context):
+    return (
+        f'default ({_NULL_CONTEXT}) context'
+        if context == _NULL_CONTEXT
+        else f'{context} context'
+    )
+
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
@@ -220,7 +230,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if hasattr(self, 'figures_of_merit'):
             out_str.append('\n')
             out_str.append(rucolor.section_title('Figure of merit contexts:\n'))
-            out_str.append(rucolor.nested_1('\t(null) context (default):\n'))
+            out_str.append(rucolor.nested_1(f'\t({_NULL_CONTEXT}) context (default):\n'))
             for name, conf in self.figures_of_merit.items():
                 if len(conf['contexts']) == 0:
                     out_str.append(rucolor.nested_2(f'\t\t{name}\n'))
@@ -1473,10 +1483,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                     for context in fom_conf['contexts']:
                                         context_name = active_contexts[context] \
                                             if context in active_contexts \
-                                            else 'null'
+                                            else _NULL_CONTEXT
                                         fom_contexts.append(context_name)
                                 else:
-                                    fom_contexts.append('null')
+                                    fom_contexts.append(_NULL_CONTEXT)
 
                                 for context in fom_contexts:
                                     if context not in fom_values:
@@ -1534,14 +1544,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             self.results['CONTEXTS'] = []
 
             for context, fom_map in fom_values.items():
-                context_map = {'name': context, 'foms': []}
+                context_map = {
+                    'name': context,
+                    'foms': [],
+                    'display_name': _get_context_display_name(context),
+                }
 
                 for fom_name, fom in fom_map.items():
                     fom_copy = fom.copy()
                     fom_copy['name'] = fom_name
                     context_map['foms'].append(fom_copy)
 
-                if context == 'null':
+                if context == _NULL_CONTEXT:
                     self.results['CONTEXTS'].insert(0, context_map)
                 else:
                     self.results['CONTEXTS'].append(context_map)
@@ -1688,7 +1702,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             # Iterate through the aggregated foms, calculate stats, and insert into results
             for context, fom_dict in repeat_foms.items():
-                context_map = {'name': context, 'foms': []}
+                context_map = {
+                    'name': context,
+                    'foms': [],
+                    'display_name': _get_context_display_name(context),
+                }
 
                 for fom_key, fom_values in fom_dict.items():
                     fom_name = fom_key[0]
