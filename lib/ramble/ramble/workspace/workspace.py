@@ -1065,8 +1065,9 @@ class Workspace(object):
                         if exp['RAMBLE_STATUS'] == 'SUCCESS' or self.always_print_foms:
                             if exp['N_REPEATS'] > 0:  # this is a base exp with summary of repeats
                                 for context in exp['CONTEXTS']:
-                                    f.write('  %s figures of merit:\n' %
-                                            context['name'])
+                                    f.write(
+                                        f'  {context["display_name"]} figures of merit:\n'
+                                    )
 
                                     fom_summary = {}
                                     for fom in context['foms']:
@@ -1086,7 +1087,9 @@ class Workspace(object):
                                             f.write(f'      {fom_val.strip()}\n')
                             else:
                                 for context in exp['CONTEXTS']:
-                                    f.write(f'  {context["name"]} figures of merit:\n')
+                                    f.write(
+                                        f'  {context["display_name"]} figures of merit:\n'
+                                    )
                                     for fom in context['foms']:
                                         name = fom['name']
                                         if fom['origin_type'] == 'modifier':
@@ -1125,6 +1128,12 @@ class Workspace(object):
         logger.all_msg('Results are written to:')
         for out_file in results_written:
             logger.all_msg(f'  {out_file}')
+
+        # Debug print the first written result file.
+        # Directly use tty to avoid cluttering the analyze log.
+        if ramble.config.get('config:debug'):
+            with open(results_written[0], 'r') as f:
+                tty.debug(f'Results from the analysis pipeline:\n{f.read()}')
 
         return filename_base
 
