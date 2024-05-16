@@ -458,7 +458,7 @@ _ramble_license_list_files() {
 }
 
 _ramble_license_verify() {
-    RAMBLE_COMPREPLY="-h --help --root"
+    RAMBLE_COMPREPLY="-h --help --root --modified -m"
 }
 
 _ramble_list() {
