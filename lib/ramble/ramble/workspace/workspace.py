@@ -504,6 +504,10 @@ class Workspace(object):
 
         self.install_cache = ramble.util.install_cache.SetCache()
 
+        # A dict mapping (concretized) package spec to its install prefix.
+        # This can be re-used by all experiments of the workspace.
+        self.pkg_path_cache = {}
+
         self.results = self.default_results()
 
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
