@@ -322,22 +322,36 @@ class SpackApplication(ApplicationBase):
 
         logger.msg('Defining Spack variables')
 
+        cache = workspace.pkg_path_cache
+        app_context = self.expander.expand_var_name(self.keywords.env_name)
+        software_environments = workspace.software_environments
+        software_environment = software_environments.render_environment(
+            app_context, self.expander
+        )
+        # Try to resolve using local cache first
+        unresolved_specs = []
+        for pkg_spec in software_environments.package_specs_for_environment(
+            software_environment
+        ):
+            if pkg_spec in cache:
+                spack_pkg_name, pkg_path = cache.get(pkg_spec)
+                self.variables[spack_pkg_name] = pkg_path
+            else:
+                unresolved_specs.append(pkg_spec)
+        if not unresolved_specs:
+            return
+
         try:
+            logger.debug('Resolving package paths using Spack')
             self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.set_env(self.expander.env_path)
 
             self.spack_runner.activate()
 
-            app_context = self.expander.expand_var_name(self.keywords.env_name)
-
-            software_environments = workspace.software_environments
-            software_environment = software_environments.render_environment(app_context,
-                                                                            self.expander)
-
-            for pkg_spec in \
-                    software_environments.package_specs_for_environment(software_environment):
-                spack_pkg_name, package_path = self.spack_runner.get_package_path(pkg_spec)
-                self.variables[spack_pkg_name] = package_path
+            for pkg_spec in unresolved_specs:
+                spack_pkg_name, pkg_path = self.spack_runner.get_package_path(pkg_spec)
+                self.variables[spack_pkg_name] = pkg_path
+                cache[pkg_spec] = (spack_pkg_name, pkg_path)
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
