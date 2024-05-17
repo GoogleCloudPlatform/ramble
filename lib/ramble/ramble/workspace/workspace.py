@@ -1589,6 +1589,10 @@ class RambleConflictingDefinitionError(RambleWorkspaceError):
     """Error when conflicting software definitions are found"""
 
 
+class RambleActiveWorkspaceError(RambleWorkspaceError):
+    """Error when an invalid workspace is activated"""
+
+
 class RambleMissingApplicationError(RambleWorkspaceError):
     """Error when using an undefined application in an experiment
     specification"""

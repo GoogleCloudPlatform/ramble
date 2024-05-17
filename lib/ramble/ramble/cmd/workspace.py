@@ -193,7 +193,8 @@ def workspace_deactivate(args):
         )
 
     if ramble.workspace.active_workspace() is None:
-        logger.die('No workspace is currently active.')
+        if ramble.workspace.ramble_workspace_var not in os.environ:
+            logger.die('No workspace is currently active.')
 
     cmds = ramble.workspace.shell.deactivate_header(args.shell)
     env_mods = ramble.workspace.shell.deactivate()
