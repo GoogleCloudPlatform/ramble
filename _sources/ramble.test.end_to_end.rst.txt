@@ -38,6 +38,14 @@ ramble.test.end\_to\_end.custom\_executables module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.define\_package\_paths module
+------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.define_package_paths
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.dryrun\_chained\_experiments module
 ------------------------------------------------------------
 
