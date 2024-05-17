@@ -273,13 +273,20 @@ def find_workspace(args):
             # nothing was set; there's no active environment
             if not ws:
                 return None
+            elif not ramble.workspace.is_workspace_dir(ws):
+                env_var = ramble.workspace.ramble_workspace_var
+                raise ramble.workspace.RambleActiveWorkspaceError(
+                    f'The environment variable {env_var} refers to an invalid ramble workspace.'
+                )
 
-    # if we get here, env isn't the name of a spack environment; it has
-    # to be a path to an environment, or there is something wrong.
+    # if we get here, ws isn't the name of a ramble workspace; it has
+    # to be a path to a workspace, or there is something wrong.
     if ramble.workspace.is_workspace_dir(ws):
         return ramble.workspace.Workspace(ws)
 
-    raise ramble.workspace.RambleWorkspaceError('no workspace in %s' % ws)
+    raise ramble.workspace.RambleWorkspaceError(
+        f'No workspace in {ws}'
+    )
 
 
 def find_workspace_path(args):

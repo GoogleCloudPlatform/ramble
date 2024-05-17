@@ -812,6 +812,8 @@ def _main(argv=None):
                 ramble.workspace.shell.activate(ws)
         # print the context but delay this exception so that commands like
         # `ramble config edit` can still work with a bad workspace.
+        except ramble.workspace.RambleActiveWorkspaceError as e:
+            workspace_format_error = e
         except ramble.config.ConfigFormatError as e:
             e.print_context()
             workspace_format_error = e
@@ -861,18 +863,22 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
     edit_cmds = ["workspace", "config"]
-    allowed_subcommands = ['edit', 'list']
+    allowed_subcommands = ['edit', 'list', 'deactivate']
+
     if workspace_format_error:
         raise_error = False
         if cmd_name.strip() in edit_cmds:
-            logger.msg(
-                "Error while reading workspace config. In some cases this can be " +
-                "avoided by passing `-W` to ramble"
-            )
-            raise_error = True
             subcommand = getattr(args, "%s_command" % cmd_name, None)
-            if subcommand in allowed_subcommands:
-                raise_error = False
+
+            if subcommand != "deactivate":
+                raise_error = True
+                logger.msg(
+                    "Error while reading workspace config. In some cases this can be " +
+                    "avoided by passing `-W` to ramble or by running\n" +
+                    "`ramble workspace deactivate`"
+                )
+                if subcommand in allowed_subcommands:
+                    raise_error = False
 
         if raise_error:
             raise workspace_format_error
