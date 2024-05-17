@@ -33,7 +33,9 @@ if [ $? != 0 ]; then
 fi
 
 # verify that the license headers are present
-ramble license verify
+# Only check for modified files as this is for pre-commit.
+# The other PR check ramble-pr-style still verifies all files.
+ramble license verify --modified
 if [ $? != 0 ]; then
   ERROR=1
 fi
