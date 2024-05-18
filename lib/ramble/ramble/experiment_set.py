@@ -262,10 +262,9 @@ class ExperimentSet(object):
         Returns:
             (Application): Instance of an application class for this experiment
         """
-        variables[self.keywords.env_path] = \
-            os.path.join(self._workspace.software_dir,
-                         Expander.expansion_str(self.keywords.env_name) + '.' +
-                         Expander.expansion_str(self.keywords.workload_name))
+        variables[self.keywords.env_path] = os.path.join(
+            self._workspace.software_dir, Expander.expansion_str(self.keywords.env_name)
+        )
 
         experiment_suffix = ''
         # After generating the base experiment, append the index to repeat experiments

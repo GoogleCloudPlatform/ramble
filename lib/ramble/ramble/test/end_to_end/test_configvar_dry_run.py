@@ -91,7 +91,7 @@ ramble:
 
         workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-        software_dir = 'openfoam.motorbike'
+        software_dir = 'openfoam'
         software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
         assert os.path.exists(software_base_dir)
 

@@ -64,7 +64,7 @@ ramble:
 
         workspace('setup', global_args=['-w', workspace_name])
 
-        spack_yaml = os.path.join(ws.software_dir, 'zlib-configs.ensure_installed',
+        spack_yaml = os.path.join(ws.software_dir, 'zlib-configs',
                                   'spack.yaml')
 
         assert os.path.isfile(spack_yaml)
