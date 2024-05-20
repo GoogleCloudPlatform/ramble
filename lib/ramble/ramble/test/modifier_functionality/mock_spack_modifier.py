@@ -40,9 +40,9 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
     ]
 
     software_tests = [
-        ('gromacs.water_bare', 'mod_package1@1.1'),
-        ('gromacs.water_bare', 'mod_package2@1.1'),
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'mod_package1@1.1'),
+        ('gromacs', 'mod_package2@1.1'),
+        ('gromacs', 'gromacs'),
     ]
 
     with ramble.workspace.create(workspace_name) as ws1:

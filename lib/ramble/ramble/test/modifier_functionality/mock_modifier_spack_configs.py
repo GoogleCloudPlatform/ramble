@@ -53,7 +53,7 @@ def test_gromacs_mock_spack_config_mod(mutable_mock_workspace_path,
 
         assert os.path.isfile(exp_script)
 
-        spack_yaml = os.path.join(ws1.software_dir, 'gromacs.water_bare',
+        spack_yaml = os.path.join(ws1.software_dir, 'gromacs',
                                   'spack.yaml')
         assert os.path.isfile(spack_yaml)
 

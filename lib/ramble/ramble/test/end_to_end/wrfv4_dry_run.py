@@ -136,7 +136,7 @@ licenses:
             out_files, 'Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz') # noqa
 
         # Test software directories
-        software_dirs = ['wrfv4.CONUS_12km', 'wrfv4-portable.CONUS_12km']
+        software_dirs = ['wrfv4', 'wrfv4-portable']
         software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
         assert os.path.exists(software_base_dir)
         for software_dir in software_dirs:
