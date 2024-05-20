@@ -36,8 +36,8 @@ ramble:
       ompi412:
         spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
         compiler: gcc9
-      impi2018:
-        spack_spec: intel-mpi@2018.4.274
+      impi2021:
+        spack_spec: intel-oneapi-mpi@2021.11.0
         compiler: gcc9
       openfoam:
         spack_spec: openfoam-org@7
@@ -56,5 +56,5 @@ ramble:
         - openfoam
       wrfv4:
         packages:
-        - impi2018
+        - impi2021
         - wrfv4

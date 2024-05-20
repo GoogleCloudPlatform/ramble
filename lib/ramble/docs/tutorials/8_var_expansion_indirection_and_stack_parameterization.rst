@@ -99,7 +99,7 @@ final configuration from the previous tutorial.
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -195,7 +195,7 @@ generation as well. The result might look like the following:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix
@@ -265,7 +265,7 @@ into the matrix. The result might look like the following:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix
@@ -374,7 +374,7 @@ resulting configuration might look like the following:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix
@@ -463,7 +463,7 @@ The resulting configuration file might look like the following:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix

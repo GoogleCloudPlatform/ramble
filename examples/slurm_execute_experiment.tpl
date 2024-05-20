@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH -N {n_nodes}
 #SBATCH --ntasks-per-node {processes_per_node}
+#SBATCH -p {partition_name}
 #SBATCH -J {application_name}_{workload_name}_{experiment_name}
 
 # This is a template execution script for
