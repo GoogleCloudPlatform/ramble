@@ -238,6 +238,14 @@ ramble.test.end\_to\_end.shared\_context module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.spack\_env\_cache module
+-------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.spack_env_cache
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.tag\_filtering module
 ----------------------------------------------
 

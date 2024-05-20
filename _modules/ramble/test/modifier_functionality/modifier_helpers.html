@@ -168,8 +168,8 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.intel_aps_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">intel_aps_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;intel-oneapi-vtune&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">)</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;intel-oneapi-vtune&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">)</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;aps -c mpi&#39;</span><span class="p">,</span>
@@ -194,7 +194,7 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.lscpu_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">lscpu_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;lscpu&#39;</span><span class="p">,</span>
@@ -218,7 +218,7 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_paths_modifier_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">env_var_append_paths_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;export test_var=&quot;$</span><span class="si">{test_var}</span><span class="s1">:test_val&quot;&#39;</span>
@@ -242,7 +242,7 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_append_vars_modifier_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">env_var_append_vars_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;export test_var=&quot;$</span><span class="si">{test_var}</span><span class="s1">,test_val&quot;&#39;</span><span class="p">,</span>
@@ -266,7 +266,7 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_prepend_paths_modifier_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">env_var_prepend_paths_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;export test_var=&quot;test_val:$</span><span class="si">{test_var}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
@@ -290,7 +290,7 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_set_modifier_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">env_var_set_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;export test_var=test_val&#39;</span><span class="p">,</span>
@@ -315,7 +315,7 @@
 <a class="viewcode-back" href="../../../../ramble.test.modifier_functionality.html#ramble.test.modifier_functionality.modifier_helpers.env_var_unset_modifier_answer">[docs]</a>
 <span class="k">def</span> <span class="nf">env_var_unset_modifier_answer</span><span class="p">():</span>
     <span class="n">expected_software</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;gromacs.water_bare&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;gromacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gromacs&#39;</span><span class="p">),</span>
     <span class="p">]</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;unset test_var&#39;</span><span class="p">,</span>
@@ -332,7 +332,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 18, 2024.
+      <span class="lastupdated">Last updated on May 20, 2024.
       </span></p>
   </div>
 
