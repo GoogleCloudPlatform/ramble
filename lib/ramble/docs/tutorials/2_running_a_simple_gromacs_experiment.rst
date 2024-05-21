@@ -86,8 +86,8 @@ software configuration:
       spack_spec = gcc@9.3.0
 
     Software Specs:
-      impi2018:
-        spack_spec = intel-mpi@2018.4.274
+      impi2021:
+        spack_spec = intel-oneapi-mpi@2021.11.0
       gromacs:
         spack_spec = gromacs@2020.5
         compiler = gcc9

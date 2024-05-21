@@ -148,7 +148,7 @@ The resulting configuration file should look like the following.
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -242,7 +242,7 @@ look like the following:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -311,7 +311,7 @@ configuration file should look like the following:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           aps:
             spack_spec: intel-oneapi-vtune

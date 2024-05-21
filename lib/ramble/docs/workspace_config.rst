@@ -1069,8 +1069,8 @@ variable can be used to submit the same experiment to multiple batch systems.
       packages:
         gcc9:
           spack_spec: gcc@9.3.0 target=x86_64
-        impi2018:
-          spack_spec: intel-mpi@2018.4.274 target=x86_64
+        impi2021:
+          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9
         gromacs:
           spack_spec: gromacs@2022.4
@@ -1078,7 +1078,7 @@ variable can be used to submit the same experiment to multiple batch systems.
       environments:
         gromacs:
           packages:
-          - impi2018
+          - impi2021
           - gromacs
 
 The above example overrides the generated ``batch_submit`` variable to change
