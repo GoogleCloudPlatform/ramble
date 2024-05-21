@@ -13,13 +13,27 @@ steps:
     args:
     - 'build'
     - '-t'
-    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-centos7:latest'
+    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-conda${_CONDA_VER}:latest'
     - '--cache-from'
-    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-centos7:latest'
+    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-conda${_CONDA_VER}:latest'
     - '-f'
-    - 'share/ramble/cloud-build/Dockerfile-centos7'
+    - 'share/ramble/cloud-build/Dockerfile-${_PKG_MANAGER}'
+    - '--build-arg'
+    - 'BASE_IMG=${_BASE_IMG}'
+    - '--build-arg'
+    - 'BASE_VER=${_BASE_VER}'
+    - '--build-arg'
+    - 'SPACK_REF=${_SPACK_REF}'
+    - '--build-arg'
+    - 'CONDA_VER=${_CONDA_VER}'
     - '.'
-images: ['us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-centos7']
+substitutions:
+  _SPACK_REF: v0.21.2
+  _CONDA_VER: 22.11.1
+  _BASE_IMG: centos
+  _BASE_VER: '7'
+  _PKG_MANAGER: 'yum'
+images: ['us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-conda${_CONDA_VER}']
 timeout: 1500s
 options:
   machineType: N1_HIGHCPU_8
