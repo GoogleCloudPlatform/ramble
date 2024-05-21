@@ -302,7 +302,7 @@ def _workspace_create(name_or_path, dir=False,
 def workspace_remove_setup_parser(subparser):
     """remove an existing workspace"""
     subparser.add_argument(
-        'rm_wrkspc', metavar='wrkspc', nargs='+',
+        'rm_wrkspc', metavar='workspace', nargs='+',
         help='workspace(s) to remove')
     arguments.add_common_arguments(subparser, ['yes_to_all'])
 

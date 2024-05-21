@@ -586,7 +586,7 @@ _ramble_repo_create() {
     then
         RAMBLE_COMPREPLY="-h --help -d --subdirectory -t --type"
     else
-        _repos
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -728,7 +728,7 @@ _ramble_workspace_remove() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE_COMREPLY=""
+        _workspaces
     fi
 }
 
@@ -737,6 +737,6 @@ _ramble_workspace_rm() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE_COMREPLY=""
+        _workspaces
     fi
 }
