@@ -20,6 +20,7 @@ from ramble.language.shared_language import SharedMeta, register_builtin  # noqa
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
 import ramble.util.directives
+import ramble.util.class_attributes
 from ramble.util.logger import logger
 
 
@@ -40,6 +41,8 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
     def __init__(self, file_path):
         super().__init__()
+
+        ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
         self._on_executables = ['*']
