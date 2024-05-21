@@ -206,8 +206,8 @@ contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
-<span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">      </span><span class="nt">impi2021</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
@@ -216,7 +216,7 @@ contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE
 <span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2021</span>
 </pre></div>
 </div>
 <p>Note that specifying compilers that Spack doesn’t have installed may take a while.
@@ -248,10 +248,10 @@ environments:</p>
 <span class="go">        gcc9:</span>
 <span class="go">          Spack spec: gcc@9.4.0 target=x86_64</span>
 <span class="go">          Compiler spec: gcc@9.4.0</span>
-<span class="go">    impi2018:</span>
+<span class="go">    impi2021:</span>
 <span class="go">      Rendered Packages:</span>
-<span class="go">        impi2018:</span>
-<span class="go">          Spack spec: intel-mpi@2018.4.274 target=x86_64</span>
+<span class="go">        impi2021:</span>
+<span class="go">          Spack spec: intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="go">          Compiler: gcc9</span>
 <span class="go">    gromacs:</span>
 <span class="go">      Rendered Packages:</span>
@@ -263,7 +263,7 @@ environments:</p>
 <span class="go">      Rendered Environments:</span>
 <span class="go">        gromacs Packages:</span>
 <span class="go">          - gromacs</span>
-<span class="go">          - impi2018</span>
+<span class="go">          - impi2021</span>
 </pre></div>
 </div>
 <p>Currently, this command outputs every package and software environment
@@ -279,8 +279,8 @@ workspace configuration file.</p>
 <span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
-<span class="w">    </span><span class="nt">impi2018</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">    </span><span class="nt">impi2021</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
@@ -289,7 +289,7 @@ workspace configuration file.</p>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2021</span>
 </pre></div>
 </div>
 <p>In this configuration, the <code class="docutils literal notranslate"><span class="pre">packages</span></code> block defines software packages that
@@ -416,8 +416,8 @@ tutorial, your <code class="docutils literal notranslate"><span class="pre">ramb
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
-<span class="w">      </span><span class="nt">impi2018</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274 target=x86_64</span>
+<span class="w">      </span><span class="nt">impi2021</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span><span class="p p-Indicator">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@{gromacs_version}</span>
@@ -426,7 +426,7 @@ tutorial, your <code class="docutils literal notranslate"><span class="pre">ramb
 <span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span><span class="p p-Indicator">:</span>
 <span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2018</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impi2021</span>
 </pre></div>
 </div>
 <p>Using this configuration file, you can examine what changes it would make to
@@ -462,7 +462,7 @@ your workspace through:</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 20, 2024.
+      <span class="lastupdated">Last updated on May 21, 2024.
       </span></p>
   </div>
 

@@ -521,8 +521,8 @@ Below is an annotated example of the spack dictionary.
         gcc9: # Abstract name to refer to this package
           spack_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
           compiler_spec: gcc@9.3.0 # Spack compiler spec for this package
-        impi2018:
-          spack_spec: intel-mpi@2018.4.274 target=x86_64
+        impi2021:
+          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9 # Other package name to use as compiler for this package
         gromacs:
           spack_spec: gromacs@2022.4
@@ -530,7 +530,7 @@ Below is an annotated example of the spack dictionary.
       environments:
         gromacs:
           packages: # List of packages to include in this environment
-          - impi2018
+          - impi2021
           - gromacs
 
 Packages and environments defined inside the ``spack`` config section are

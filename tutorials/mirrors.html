@@ -193,7 +193,7 @@ will look something like this:</p>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-mpi@2018.4.274</span>
+<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
@@ -218,8 +218,8 @@ this mirror in the first place.</p>
 
 <span class="go">==&gt;     Executing phase mirror_inputs</span>
 <span class="go">==&gt;     Executing phase create_spack_env</span>
-<span class="go">==&gt; Concretized intel-mpi@2018.4.274%gcc@&lt;gcc-version&gt;</span>
-<span class="go"> -   &lt;hash&gt;   intel-mpi@2018.4.274%gcc@&lt;version&gt;_etc.</span>
+<span class="go">==&gt; Concretized intel-oneapi-mpi@2021.11.0%gcc@&lt;gcc-version&gt;</span>
+<span class="go"> -   &lt;hash&gt;   intel-oneapi-mpi@2021.11.0%gcc@&lt;version&gt;_etc.</span>
 <span class="go"> -   &lt;etc&gt;        ^(short list of software prerequisistes for intel-mpi)</span>
 
 <span class="go">==&gt; Concretized wrf@4.2%gcc@&lt;version&gt; &lt;wrf options&gt;</span>
@@ -234,8 +234,8 @@ this mirror in the first place.</p>
 <span class="go">==&gt; Concretized wrf@4.2%gcc@&lt;version&gt; &lt;wrf options&gt;</span>
 <span class="go"> -   (long list of software prerequisites for wrf@4.2)</span>
 
-<span class="go">==&gt; Concretized intel-mpi@2018.4.274%gcc@&lt;gcc-version&gt;</span>
-<span class="go"> -   &lt;hash&gt;   intel-mpi@2018.4.274%gcc@&lt;version&gt;_etc.</span>
+<span class="go">==&gt; Concretized intel-oneapi-mpi@2021.11.0%gcc@&lt;gcc-version&gt;</span>
+<span class="go"> -   &lt;hash&gt;   intel-oneapi-mpi@2021.11.0%gcc@&lt;version&gt;_etc.</span>
 <span class="go"> -   &lt;etc&gt;        ^(short list of software prerequisistes for intel-mpi)</span>
 
 <span class="go">==&gt;     Executing phase mirror_software</span>
@@ -630,7 +630,7 @@ the <code class="docutils literal notranslate"><span class="pre">inputs</span></
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 20, 2024.
+      <span class="lastupdated">Last updated on May 21, 2024.
       </span></p>
   </div>
 

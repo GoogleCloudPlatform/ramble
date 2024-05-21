@@ -97,7 +97,7 @@ will look something like this:
           gcc9:
             spack_spec: gcc@9.3.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -125,8 +125,8 @@ this mirror in the first place.
 
     ==>     Executing phase mirror_inputs
     ==>     Executing phase create_spack_env
-    ==> Concretized intel-mpi@2018.4.274%gcc@<gcc-version>
-     -   <hash>   intel-mpi@2018.4.274%gcc@<version>_etc.
+    ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
+     -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==> Concretized wrf@4.2%gcc@<version> <wrf options>
@@ -141,8 +141,8 @@ this mirror in the first place.
     ==> Concretized wrf@4.2%gcc@<version> <wrf options>
      -   (long list of software prerequisites for wrf@4.2)
 
-    ==> Concretized intel-mpi@2018.4.274%gcc@<gcc-version>
-     -   <hash>   intel-mpi@2018.4.274%gcc@<version>_etc.
+    ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
+     -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==>     Executing phase mirror_software
