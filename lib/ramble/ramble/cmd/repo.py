@@ -40,8 +40,12 @@ def setup_parser(subparser):
     create_parser.add_argument(
         'directory', help="directory to create the repo in")
     create_parser.add_argument(
-        'namespace', help="namespace to identify objects "
-        "in the repository. defaults to the directory name", nargs='?')
+        'namespace',
+        metavar='new_namespace',
+        help="namespace to identify objects "
+        "in the repository. defaults to the directory name",
+        nargs='?',
+    )
     create_parser.add_argument(
         '-d', '--subdirectory',
         action='store',
