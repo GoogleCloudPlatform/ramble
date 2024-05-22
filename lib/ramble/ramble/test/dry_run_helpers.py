@@ -7,6 +7,9 @@
 # except according to those terms.
 
 from enum import Enum
+from functools import wraps
+
+import pytest
 
 import spack.util.spack_yaml as syaml
 
@@ -84,3 +87,15 @@ def search_files_for_string(file_list, string):
             if string in f.read():
                 return True
     return False
+
+
+def skip_upon_exception(skipped_exceptions, reason):
+    def _decorator(func):
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except skipped_exceptions as err:
+                raise pytest.skip(f'{reason} with error {err}')
+        return _wrapper
+    return _decorator

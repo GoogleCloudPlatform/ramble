@@ -17,6 +17,7 @@ import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import skip_upon_exception
 
 
 # everything here uses the mock_workspace_path
@@ -27,6 +28,7 @@ workspace = RambleCommand('workspace')
 
 
 @pytest.mark.long
+@skip_upon_exception(FileNotFoundError, 'Expected non-existent file during dry-run')
 def test_known_applications(application, capsys):
     info_cmd = RambleCommand('info')
 
