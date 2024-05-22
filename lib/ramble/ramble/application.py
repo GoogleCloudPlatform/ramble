@@ -45,6 +45,7 @@ import ramble.util.env
 import ramble.util.directives
 import ramble.util.stats
 import ramble.util.graph
+import ramble.util.class_attributes
 from ramble.util.logger import logger
 
 from ramble.workspace import namespace
@@ -88,6 +89,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     def __init__(self, file_path):
         super().__init__()
+
+        ramble.util.class_attributes.convert_class_attributes(self)
 
         self.keywords = ramble.keywords.keywords
 

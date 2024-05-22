@@ -549,3 +549,16 @@ def test_modifier_variable_directive(mod_class, func_type):
         assert test_def['name'] in mod_inst.modifier_variables[mode]
         assert test_def['description'] == mod_inst.modifier_variables[mode][var_name].description
         assert test_def['default'] == mod_inst.modifier_variables[mode][var_name].default
+
+
+@pytest.mark.parametrize('func_type', func_types)
+@pytest.mark.parametrize('mod_class', mod_types)
+def test_modifier_class_attributes(mod_class, func_type):
+    test_class = generate_mod_class(mod_class)
+    mod_inst = test_class('/not/a/path')
+    mod_copy = mod_inst.copy()
+
+    mod_copy.mode('added_mode', description='Mode added to test attributes')
+
+    assert 'added_mode' in mod_copy.modes
+    assert 'added_mode' not in mod_inst.modes

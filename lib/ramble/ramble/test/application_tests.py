@@ -533,3 +533,18 @@ ramble:
     test_answer = "/workspace/experiments/bar/test_wl2/baz/execute_experiment"
     executable_application_instance._derive_variables_for_template_path(ws1)
     assert executable_application_instance.variables['execute_experiment'] == test_answer
+
+
+def test_class_attributes(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
+    basic_copy = basic_inst.copy()
+
+    instances = [basic_inst, basic_copy]
+    for inst in instances:
+        assert hasattr(inst, 'workloads')
+        assert 'test_wl' in inst.workloads
+
+    basic_copy.workload('added_workload', executables=['foo'])
+
+    assert 'added_workload' in basic_copy.workloads
+    assert 'added_workload' not in basic_inst.workloads
