@@ -17,6 +17,14 @@ Subpackages
 Submodules
 ----------
 
+ramble.util.class\_attributes module
+------------------------------------
+
+.. automodule:: ramble.util.class_attributes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.colors module
 -------------------------
 

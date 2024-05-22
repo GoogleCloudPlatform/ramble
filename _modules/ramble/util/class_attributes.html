@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ramble.util.colors &mdash; Ramble 0.4.0 documentation</title>
+  <title>ramble.util.class_attributes &mdash; Ramble 0.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
@@ -86,7 +86,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">ramble.util.colors</li>
+      <li class="breadcrumb-item active">ramble.util.class_attributes</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -95,7 +95,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for ramble.util.colors</h1><div class="highlight"><pre>
+  <h1>Source code for ramble.util.class_attributes</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2022-2024 The Ramble Authors</span>
 <span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -104,70 +104,24 @@
 <span class="c1"># option. This file may not be copied, modified, or distributed</span>
 <span class="c1"># except according to those terms.</span>
 
-<span class="n">config_color</span> <span class="o">=</span> <span class="s1">&#39;@*Y&#39;</span>
-<span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
-<span class="n">level1_color</span> <span class="o">=</span> <span class="s1">&#39;@*g&#39;</span>
-<span class="n">level2_color</span> <span class="o">=</span> <span class="s1">&#39;@*r&#39;</span>
-<span class="n">level3_color</span> <span class="o">=</span> <span class="s1">&#39;@*c&#39;</span>
-<span class="n">level4_color</span> <span class="o">=</span> <span class="s1">&#39;@*m&#39;</span>
-<span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
+<div class="viewcode-block" id="convert_class_attributes">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.class_attributes.convert_class_attributes">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_class_attributes</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert class attributes defined from directives to instance attributes</span>
+<span class="sd">    Class attributes that are valid for conversion are stored in the _directive_names</span>
+<span class="sd">    attribute.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        obj (Object): Input object instance to convert attributes in</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="level_func">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.level_func">[docs]</a>
-<span class="k">def</span> <span class="nf">level_func</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">level</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">section_title</span>
-    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nested_1</span>
-    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nested_2</span>
-    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nested_3</span>
-    <span class="k">elif</span> <span class="n">level</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nested_4</span></div>
-
-
-
-<div class="viewcode-block" id="config_title">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.config_title">[docs]</a>
-<span class="k">def</span> <span class="nf">config_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">config_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
-
-
-
-<div class="viewcode-block" id="section_title">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.section_title">[docs]</a>
-<span class="k">def</span> <span class="nf">section_title</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">header_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
-
-
-
-<div class="viewcode-block" id="nested_1">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.nested_1">[docs]</a>
-<span class="k">def</span> <span class="nf">nested_1</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">level1_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
-
-
-
-<div class="viewcode-block" id="nested_2">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.nested_2">[docs]</a>
-<span class="k">def</span> <span class="nf">nested_2</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">level2_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
-
-
-
-<div class="viewcode-block" id="nested_3">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.nested_3">[docs]</a>
-<span class="k">def</span> <span class="nf">nested_3</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">level3_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
-
-
-
-<div class="viewcode-block" id="nested_4">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.colors.nested_4">[docs]</a>
-<span class="k">def</span> <span class="nf">nested_4</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">level4_color</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="n">plain_format</span></div>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;_directive_names&#39;</span><span class="p">):</span>
+        <span class="n">dir_set</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">var_set</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">_directive_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">dir_set</span> <span class="ow">and</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_set</span><span class="p">:</span>
+                <span class="n">inst_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">inst_val</span><span class="p">)</span></div>
 
 </pre></div>
 
