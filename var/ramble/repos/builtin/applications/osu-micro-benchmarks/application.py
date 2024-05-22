@@ -6,15 +6,20 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+import re
+
 from ramble.appkit import *
 from ramble.expander import Expander
+
+from enum import Enum
 
 
 class OsuMicroBenchmarks(SpackApplication):
     '''Define an OSU micro benchmarks application'''
     name = 'osu-micro-benchmarks'
 
-    maintainers('rfbgo')
+    maintainers('rfbgo', 'douglasjacobsen')
 
     tags('synthetic-benchmarks')
 
@@ -25,18 +30,78 @@ class OsuMicroBenchmarks(SpackApplication):
 
     required_package('osu-micro-benchmarks')
 
-    # Additional variables not yet included: --buffer-num, --validation,
-    #  --validation-warmup, --validation-warmup
-
-    pt2pt = {
-        ('osu_bibw', 'Mb/s'),
-        ('osu_bw', 'Mb/s'),
-        ('osu_latency', 'us'),
-        ('osu_latency_mp', 'us'),
-        ('osu_latency_mt', 'us'),
-        ('osu_mbw_mr', 'Mb/s'),
-        ('osu_multi_lat', 'us'),
-    }
+    all_workloads = [
+        'osu_bibw',
+        'osu_bw',
+        'osu_latency',
+        'osu_latency_mp',
+        'osu_latency_mt',
+        'osu_mbw_mr',
+        'osu_multi_lat',
+        'osu_allgather',
+        'osu_allreduce_persistent',
+        'osu_alltoallw',
+        'osu_bcast_persistent',
+        'osu_iallgather',
+        'osu_ialltoallw',
+        'osu_ineighbor_allgather',
+        'osu_ireduce',
+        'osu_neighbor_allgatherv',
+        'osu_reduce_persistent',
+        'osu_scatterv',
+        'osu_allgather_persistent',
+        'osu_alltoall',
+        'osu_alltoallw_persistent',
+        'osu_gather',
+        'osu_iallgatherv',
+        'osu_ibarrier',
+        'osu_ineighbor_allgatherv',
+        'osu_ireduce_scatter',
+        'osu_neighbor_alltoall',
+        'osu_reduce_scatter',
+        'osu_scatterv_persistent',
+        'osu_allgatherv',
+        'osu_alltoall_persistent',
+        'osu_barrier',
+        'osu_gather_persistent',
+        'osu_iallreduce',
+        'osu_ibcast',
+        'osu_ineighbor_alltoall',
+        'osu_iscatter',
+        'osu_neighbor_alltoallv',
+        'osu_reduce_scatter_persistent',
+        'osu_allgatherv_persistent',
+        'osu_alltoallv',
+        'osu_barrier_persistent',
+        'osu_gatherv',
+        'osu_ialltoall',
+        'osu_igather',
+        'osu_ineighbor_alltoallv',
+        'osu_iscatterv',
+        'osu_neighbor_alltoallw',
+        'osu_scatter',
+        'osu_allreduce',
+        'osu_alltoallv_persistent',
+        'osu_bcast',
+        'osu_gatherv_persistent',
+        'osu_ialltoallv',
+        'osu_igatherv',
+        'osu_ineighbor_alltoallw',
+        'osu_neighbor_allgather',
+        'osu_reduce',
+        'osu_scatter_persistent',
+        'osu_acc_latency',
+        'osu_cas_latency',
+        'osu_fop_latency',
+        'osu_get_acc_latency',
+        'osu_get_bw',
+        'osu_get_latency',
+        'osu_put_bibw',
+        'osu_put_bw',
+        'osu_put_latency',
+        'osu_hello',
+        'osu_init',
+    ]
 
     size_time_regex = r'(?P<msg_size>[0-9.]+)+\s+(?P<fom>[0-9.]+)'
     figure_of_merit_context('msg_size',
@@ -44,24 +109,119 @@ class OsuMicroBenchmarks(SpackApplication):
                             output_format='Message Size: {msg_size}')
 
     log_str = Expander.expansion_str('log_file')
-    for benchmark, unit in pt2pt:
-        executable(name=f'execute-{benchmark}', template=benchmark, use_mpi=True,
-                   redirect=log_str + f'-{benchmark}')
+    for benchmark in all_workloads:
+        executable(name=f'execute-{benchmark}', template=f'{benchmark} ' + '{additional_args}', use_mpi=True)
         workload(benchmark, executable=f'execute-{benchmark}')
 
-        figure_of_merit(f'osu_{benchmark}',
-                        log_file=log_str + f'-{benchmark}',
-                        fom_regex=size_time_regex,
-                        group_name='fom',
-                        units=unit,
-                        contexts=['msg_size'])
+    workload_variable('additional_args', default='',
+                      description='Additional arguments for benchmark',
+                      workloads=all_workloads)
 
-    workload_variable('message-size', default='0:4194304',
-                      description='Message size interval',
-                      workloads=['osu_latency'])
-    workload_variable('iterations', default='1000',
-                      description='iterations per message size',
-                      workloads=['osu_latency'])
-    workload_variable('warmup', default='200',
-                      description='warmup (non-included) iterations',
-                      workloads=['osu_latency'])
+    data_type_regex = r'# Datatype: (?P<type>\S+)\.'
+    figure_of_merit('OMB Datatype', fom_regex=data_type_regex, group_name='type', units='')
+
+    hello_regex = r'This is a test with (?P<nprocs>[0-9]+) processes'
+    figure_of_merit('osu_hello_nprocs', fom_regex=hello_regex, group_name='nprocs', units='')
+
+    init_regex = r'nprocs: (?P<nprocs>[0-9]+), min: (?P<min>[0-9\.]+) ms, max: (?P<max>[0-9\.]+) ms, avg: (?P<avg>[0-9\.]+) ms'
+    figure_of_merit('osu_init_nprocs', fom_regex=init_regex, group_name='nprocs', units='')
+    figure_of_merit('osu_init_min', fom_regex=init_regex, group_name='min', units='ms')
+    figure_of_merit('osu_init_max', fom_regex=init_regex, group_name='max', units='ms')
+    figure_of_merit('osu_init_avg', fom_regex=init_regex, group_name='avg', units='ms')
+
+    fom_types = Enum('fom_types', ['single_lat', 'single_tail_lat',
+                                   'avg_lat', 'avg_tail_lat', 'multi_lat', 'multi_tail_lat',
+                                   'single_bw', 'single_tail_bw', 'multi_bw', 'multi_tail_bw',
+                                   'single_avg_lat', 'single_avg_tail_lat'])
+
+    fom_regex_headers = {
+        fom_types.single_lat: re.compile(r'#\s+Size\s+Latency \(us\)\s*$'),
+        fom_types.single_tail_lat: re.compile(r'# Size\s+Latency \(us\)\s+P50 Tail Lat\(us\)\s+P90 Tail Lat\(us\)\s+P99 Tail Lat\(us\)$'),
+        fom_types.avg_lat: re.compile(r'#\s+Size\s+Avg Latency\(us\)\s*$'),
+        fom_types.avg_tail_lat: re.compile(r'# Size\s+Avg Latency\(us\)\s+P50 Tail Lat\(us\)\s+P90 Tail Lat\(us\)\s+P99 Tail Lat\(us\)$'),
+        fom_types.multi_lat: re.compile(r'#\s+Size\s+Overall\(us\)\s+Compute\(us\)\s+Pure Comm\.\(us\)\s+Overlap\(%\)\s*$'),
+        fom_types.multi_tail_lat: re.compile(r'# Size\s+Overall\(us\)\s+Compute\(us\)\s+Pure Comm\.\(us\)\s+Overlap\(%\)  P50 Tail Lat\(us\)  P90 Tail Lat\(us\)  P99 Tail Lat\(us\)\s*$'),
+        fom_types.single_bw: re.compile(r'# Size\s+Bandwidth \(MB/s\)\s*$'),
+        fom_types.single_tail_bw: re.compile(r'# Size\s+Bandwidth \(MB/s\) P50 Tail BW\(MB/s\) P90 Tail BW\(MB/s\) P99 Tail BW\(MB/s\)\s*$'),
+        fom_types.multi_bw: re.compile(r'# Size\s+MB/s\s+Messages/s\s*$'),
+        fom_types.multi_tail_bw: re.compile(r'# Size\s+MB/s\s+Messages/s P50 Tail BW\(MB/s\) P90 Tail BW\(MB/s\) P99 Tail BW\(MB/s\)\s*$'),
+        fom_types.single_avg_lat: re.compile(r'# Avg Latency\(us\)\s*$'),
+        fom_types.single_avg_tail_lat: re.compile(r'# Avg Latency\(us\)\s+P50 Tail Lat\(us\)\s+P90 Tail Lat\(us\)\s+P99 Tail Lat\(us\)\s*$')
+    }
+
+    group_mapping = {
+        'avg_lat': {'name': 'Latency', 'units': 'us'},
+        'p50_lat': {'name': 'P50 Tail Latency', 'units': 'us'},
+        'p90_lat': {'name': 'P90 Tail Latency', 'units': 'us'},
+        'p99_lat': {'name': 'P99 Tail Latency', 'units': 'us'},
+        'avg_bw': {'name': 'Bandwidth', 'units': 'MB/s'},
+        'p50_bw': {'name': 'P50 Tail Bandwidth', 'units': 'MB/s'},
+        'p90_bw': {'name': 'P90 Tail Bandwidth', 'units': 'MB/s'},
+        'p99_bw': {'name': 'P99 Tail Bandwidth', 'units': 'MB/s'},
+        'overall_lat': {'name': 'Overall', 'units': 'us'},
+        'comp_lat': {'name': 'Computation', 'units': 'us'},
+        'comm_lat': {'name': 'Communication', 'units': 'us'},
+        'overlap': {'name': 'Overlap', 'units': '%'},
+        'msg_rate': {'name': 'Message Rate', 'units': 'Messages/s'},
+    }
+
+    def _add_foms(self, regex: str):
+        """Add figures of merit based on group names from input regular expression
+
+        Args:
+            regex (str): An uncompiled regular expression to use for determining which groups
+                         are going to be extracted.
+        """
+        if regex is None:
+            return
+
+        compiled = re.compile(regex)
+
+        for grp_name, _ in compiled.groupindex.items():
+            if grp_name in self.group_mapping:
+                self.figure_of_merit(self.group_mapping[grp_name]['name'],
+                                     fom_regex=regex,
+                                     group_name=grp_name,
+                                     units=self.group_mapping[grp_name]['units'],
+                                     contexts=['msg_size'])
+
+    def _prepare_analysis(self, workspace, app_inst=None):
+        test_ver_regex = r'# OSU.*Test (?P<ver>v[0-9\.]+)'
+        self.figure_of_merit('OMB Version', fom_regex=test_ver_regex, group_name='ver', units='')
+
+        fom_type = None
+        log_file = self.expander.expand_var_name('log_file')
+        if os.path.isfile(log_file):
+            with open(log_file, 'r') as f:
+                for line in f.readlines():
+                    for test_fom_type in self.fom_types:
+                        if self.fom_regex_headers[test_fom_type].match(line):
+                            fom_type = test_fom_type
+
+                    if fom_type is not None:
+                        break
+
+        fom_regex = None
+        if fom_type == self.fom_types.single_lat:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)+\s+(?P<avg_lat>[0-9\.]+)\s*$'
+            self._add_foms(fom_regex)
+        elif fom_type == self.fom_types.single_tail_lat:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)\s+(?P<avg_lat>[0-9\.]+)\s+(?P<p50_lat>[0-9\.]+)\s+(?P<p90_lat>[0-9\.]+)\s+(?P<p99_lat>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.avg_lat:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)+\s+(?P<avg_lat>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.avg_tail_lat:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)\s+(?P<avg_lat>[0-9\.]+)\s+(?P<p50_lat>[0-9\.]+)\s+(?P<p90_lat>[0-9\.]+)\s+(?P<p99_lat>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.single_bw:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)\s+(?P<avg_bw>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.single_tail_bw:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)\s+(?P<avg_bw>[0-9\.]+)\s+(?P<p50_bw>[0-9\.]+)\s+(?P<p90_bw>[0-9\.]+)\s+(?P<p99_bw>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.multi_bw:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)\s+(?P<avg_bw>[0-9\.]+)\s+(?P<msg_rate>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.multi_tail_bw:
+            fom_regex = r'\s*(?P<msg_size>[0-9]+)\s+(?P<avg_bw>[0-9\.]+)\s+(?P<msg_rate>[0-9\.]+)\s+(?P<p50_bw>[0-9\.]+)\s+(?P<p90_bw>[0-9\.]+)\s+(?P<p99_bw>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.single_avg_lat:
+            fom_regex = r'\s*(?P<avg_lat>[0-9\.]+)\s*$'
+        elif fom_type == self.fom_types.single_avg_tail_lat:
+            fom_regex = r'\s*(?P<avg_lat>[0-9\.]+)\s+(?P<p50_lat>[0-9\.]+)\s+(?P<p90_lat>[0-9\.]+)\s+(?P<p99_lat>[0-9\.]+)\s*$'
+
+        self._add_foms(fom_regex)
