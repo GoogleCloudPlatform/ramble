@@ -924,7 +924,10 @@
                                             <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="n">namespace</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__raise_syntax_error</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">val</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+        <span class="c1"># ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.</span>
+        <span class="c1"># TODO: Remove `or` logic after 3.6 &amp; 3.7 series python are unsupported</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">ast</span><span class="p">,</span> <span class="s1">&#39;Str&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Str</span><span class="p">)):</span>
             <span class="n">lhs_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_math</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
 
             <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1046,7 +1049,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 22, 2024.
+      <span class="lastupdated">Last updated on May 23, 2024.
       </span></p>
   </div>
 
