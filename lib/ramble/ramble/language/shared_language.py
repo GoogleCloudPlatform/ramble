@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import deprecation
-
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria

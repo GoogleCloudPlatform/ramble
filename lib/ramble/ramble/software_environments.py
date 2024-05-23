@@ -7,10 +7,6 @@
 # except according to those terms.
 
 from enum import Enum
-try:
-    import deprecation
-except ModuleNotFoundError:
-    raise ModuleNotFoundError('Please use pip to install the requirements.txt')
 
 import ramble.repository
 import ramble.workspace
@@ -416,10 +412,6 @@ class TemplateEnvironment(SoftwareEnvironment):
 class SoftwareEnvironments(object):
     """Class representing a group of software environments"""
 
-    _deprecated_sections = [namespace.variables, namespace.zips,
-                            namespace.matrix, namespace.matrices,
-                            namespace.exclude, 'concretized']
-
     def __init__(self, workspace):
         """SoftwareEnvironments constructor
 
@@ -433,7 +425,6 @@ class SoftwareEnvironments(object):
         self._package_templates = {}
         self._rendered_packages = {}
         self._rendered_environments = {}
-        self._warn_for_deprecation = set()
 
         self._define_templates()
 
@@ -482,61 +473,11 @@ class SoftwareEnvironments(object):
         """
         return self.info(indent=0)
 
-    @deprecation.deprecated(deprecated_in="0.4.0", removed_in="0.5.0",
-                            current_version=str(ramble.ramble_version),
-                            details="These Spack config sections no longer required and will "
-                                    "be removed from the schema in v0.5.0")
-    def _deprecated_warnings(self):
-        if not self._warn_for_deprecation or hasattr(self, '_warned_deprecation'):
-            return
-
-        sections_to_print = []
-
-        if namespace.variables in self._warn_for_deprecation:
-            sections_to_print.append('spack:variables')
-            sections_to_print.append('spack:packages:<name>:variables')
-            sections_to_print.append('spack:environments:<name>:variables')
-
-        if namespace.zips in self._warn_for_deprecation:
-            sections_to_print.append('spack:zips')
-            sections_to_print.append('spack:packages:<name>:zips')
-            sections_to_print.append('spack:environments:<name>:zips')
-
-        if namespace.matrix in self._warn_for_deprecation:
-            sections_to_print.append('spack:packages:<name>:matrix')
-            sections_to_print.append('spack:environments:<name>:matrix')
-
-        if namespace.matrices in self._warn_for_deprecation:
-            sections_to_print.append('spack:packages:<name>:matrices')
-            sections_to_print.append('spack:environments:<name>:matrices')
-
-        if namespace.exclude in self._warn_for_deprecation:
-            sections_to_print.append('spack:packages:<name>:exclude')
-            sections_to_print.append('spack:environments:<name>:exclude')
-
-        if 'concretized' in self._warn_for_deprecation:
-            sections_to_print.append('spack:concretized')
-
-        if not hasattr(self, '_warned_deprecated_variables'):
-            self._warned_deprecated_variables = True
-            logger.warn('The following config sections are deprecated and ignored:')
-            for section in sections_to_print:
-                logger.warn(f'    {section}')
-            logger.warn('Please remove from your configuration files.')
-
     def _define_templates(self):
         """Process software dictionary to generate templates"""
 
-        for section in self._deprecated_sections:
-            if section in self._spack_dict:
-                self._warn_for_deprecation.add(section)
-
         if namespace.packages in self._spack_dict:
             for pkg_template, pkg_info in self._spack_dict[namespace.packages].items():
-                for section in self._deprecated_sections:
-                    if section in pkg_info:
-                        self._warn_for_deprecation.add(section)
-
                 spec = pkg_info['spack_spec'] if 'spack_spec' in pkg_info else pkg_info['spec']
                 compiler = pkg_info['compiler'] \
                     if 'compiler' in pkg_info and pkg_info['compiler'] else None
@@ -549,9 +490,6 @@ class SoftwareEnvironments(object):
 
         if namespace.environments in self._spack_dict:
             for env_template, env_info in self._spack_dict[namespace.environments].items():
-                for section in self._deprecated_sections:
-                    if section in env_info:
-                        self._warn_for_deprecation.add(section)
                 if namespace.external_env in env_info and env_info[namespace.external_env]:
                     # External environments are considered rendered
                     new_env = ExternalEnvironment(env_template, env_info[namespace.external_env])
@@ -697,8 +635,6 @@ class SoftwareEnvironments(object):
             logger.warn(
                 'This might cause problems when installing the packages.'
             )
-
-        self._deprecated_warnings()
 
     def render_environment(self, env_name: str, expander: object, require=True):
         """Render an environment needed by an experiment
