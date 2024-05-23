@@ -79,6 +79,7 @@ def test_env_concretize_skips_already_concretized_envs(tmpdir, capsys):
         sr.create_env(env_path)
         sr.activate()
         sr.add_spec('zlib')
+        sr.add_spec('intel-oneapi-mpi')
 
         # Generate an initial env file
         sr.generate_env_file()

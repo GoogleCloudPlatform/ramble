@@ -519,7 +519,9 @@ class SpackRunner(object):
         env_file[spack_namespace]['concretizer']['unify'] = True
 
         env_file[spack_namespace]['specs'] = syaml.syaml_list()
-        env_file[spack_namespace]['specs'].extend(self.env_contents)
+        # Ensure the specs content are consistently sorted.
+        # Otherwise the hash checking may artificially miss due to ordering.
+        env_file[spack_namespace]['specs'].extend(sorted(self.env_contents))
 
         env_file[spack_namespace]['include'] = self.includes
 
