@@ -224,13 +224,9 @@ def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     }
 
     if func_type == func_types.directive:
-        default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
-                         compiler_spec=spec_compiler_spec)(app_inst)
         define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
                         compiler_spec=spec_compiler_spec)(app_inst)
     elif func_type == func_types.method:
-        app_inst.default_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
-                                  compiler_spec=spec_compiler_spec)
         app_inst.define_compiler(spec_name, spack_spec=spec_spack_spec,  # noqa: F405
                                  compiler_spec=spec_compiler_spec)
     else:

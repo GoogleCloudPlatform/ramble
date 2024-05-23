@@ -110,25 +110,6 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
 
 
 @shared_directive('compilers')
-@deprecation.deprecated(deprecated_in="0.4.0", removed_in="0.5.0",
-                        current_version=str(ramble.ramble_version),
-                        details="Use the define_compiler directive instead")
-def default_compiler(name, spack_spec, compiler_spec=None, compiler=None):
-    """Deprecated: See `define_compiler` instead"""
-
-    def _execute_default_compiler(obj):
-        logger.warn(f'Use of deprecated directive `default_compiler` in {obj.name}')
-        if hasattr(obj, 'uses_spack') and getattr(obj, 'uses_spack'):
-            obj.compilers[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
-            }
-
-    return _execute_default_compiler
-
-
-@shared_directive('compilers')
 def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
     """Defines the compiler that will be used with this object
 
