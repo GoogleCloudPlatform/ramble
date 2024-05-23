@@ -767,7 +767,10 @@ class Expander(object):
                                             f'"{var_name} in {namespace}"')
                     self.__raise_syntax_error(node)
                 return val
-        elif isinstance(node.left, ast.Constant):
+        # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
+        # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
+        elif isinstance(node.left, ast.Constant) or \
+                (hasattr(ast, 'Str') and isinstance(node.left, ast.Str)):
             lhs_value = self.eval_math(node.left)
 
             found = False
