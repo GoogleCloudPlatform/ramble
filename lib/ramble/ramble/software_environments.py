@@ -482,48 +482,6 @@ class SoftwareEnvironments(object):
         """
         return self.info(indent=0)
 
-    @deprecation.deprecated(deprecated_in="0.4.0", removed_in="0.5.0",
-                            current_version=str(ramble.ramble_version),
-                            details="These Spack config sections no longer required and will "
-                                    "be removed from the schema in v0.5.0")
-    def _deprecated_warnings(self):
-        if not self._warn_for_deprecation or hasattr(self, '_warned_deprecation'):
-            return
-
-        sections_to_print = []
-
-        if namespace.variables in self._warn_for_deprecation:
-            sections_to_print.append('spack:variables')
-            sections_to_print.append('spack:packages:<name>:variables')
-            sections_to_print.append('spack:environments:<name>:variables')
-
-        if namespace.zips in self._warn_for_deprecation:
-            sections_to_print.append('spack:zips')
-            sections_to_print.append('spack:packages:<name>:zips')
-            sections_to_print.append('spack:environments:<name>:zips')
-
-        if namespace.matrix in self._warn_for_deprecation:
-            sections_to_print.append('spack:packages:<name>:matrix')
-            sections_to_print.append('spack:environments:<name>:matrix')
-
-        if namespace.matrices in self._warn_for_deprecation:
-            sections_to_print.append('spack:packages:<name>:matrices')
-            sections_to_print.append('spack:environments:<name>:matrices')
-
-        if namespace.exclude in self._warn_for_deprecation:
-            sections_to_print.append('spack:packages:<name>:exclude')
-            sections_to_print.append('spack:environments:<name>:exclude')
-
-        if 'concretized' in self._warn_for_deprecation:
-            sections_to_print.append('spack:concretized')
-
-        if not hasattr(self, '_warned_deprecated_variables'):
-            self._warned_deprecated_variables = True
-            logger.warn('The following config sections are deprecated and ignored:')
-            for section in sections_to_print:
-                logger.warn(f'    {section}')
-            logger.warn('Please remove from your configuration files.')
-
     def _define_templates(self):
         """Process software dictionary to generate templates"""
 
@@ -697,8 +655,6 @@ class SoftwareEnvironments(object):
             logger.warn(
                 'This might cause problems when installing the packages.'
             )
-
-        self._deprecated_warnings()
 
     def render_environment(self, env_name: str, expander: object, require=True):
         """Render an environment needed by an experiment
