@@ -676,7 +676,9 @@
         <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;concretizer&#39;</span><span class="p">][</span><span class="s1">&#39;unify&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;specs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
-        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;specs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">)</span>
+        <span class="c1"># Ensure the specs content are consistently sorted.</span>
+        <span class="c1"># Otherwise the hash checking may artificially miss due to ordering.</span>
+        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;specs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">))</span>
 
         <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;include&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">includes</span>
 
