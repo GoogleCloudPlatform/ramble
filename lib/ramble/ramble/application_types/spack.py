@@ -335,7 +335,11 @@ class SpackApplication(ApplicationBase):
         ):
             if pkg_spec in cache:
                 spack_pkg_name, pkg_path = cache.get(pkg_spec)
-                self.variables[spack_pkg_name] = pkg_path
+                if spack_pkg_name not in self.variables:
+                    self.variables[spack_pkg_name] = pkg_path
+                else:
+                    logger.msg(f'Variable {spack_pkg_name} defined. ' +
+                               'Skipping extraction from spack')
             else:
                 unresolved_specs.append(pkg_spec)
         if not unresolved_specs:
@@ -350,8 +354,12 @@ class SpackApplication(ApplicationBase):
 
             for pkg_spec in unresolved_specs:
                 spack_pkg_name, pkg_path = self.spack_runner.get_package_path(pkg_spec)
-                self.variables[spack_pkg_name] = pkg_path
-                cache[pkg_spec] = (spack_pkg_name, pkg_path)
+                if spack_pkg_name not in self.variables:
+                    self.variables[spack_pkg_name] = pkg_path
+                    cache[pkg_spec] = (spack_pkg_name, pkg_path)
+                else:
+                    logger.msg(f'Variable {spack_pkg_name} defined. ' +
+                               'Skipping extraction from spack')
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)

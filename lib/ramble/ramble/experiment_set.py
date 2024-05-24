@@ -349,7 +349,7 @@ class ExperimentSet(object):
         for context in self._contexts:
             if context not in no_var_contexts:
                 var_name = f'{context.name}_name'
-                if self._context[context].context_name not in final_context.variables:
+                if var_name not in final_context.variables:
                     final_context.variables[var_name] = self._context[context].context_name
 
         # Set namespaces
