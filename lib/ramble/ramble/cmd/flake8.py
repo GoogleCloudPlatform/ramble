@@ -103,7 +103,7 @@ def changed_files(base=None, untracked=True, all_files=False):
     git = which('git', required=True)
 
     if base is None:
-        base = os.environ.get('TRAVIS_BRANCH', 'develop')
+        base = os.environ.get('GITHUB_BASE_REF', 'develop')
 
     range = "{0}...".format(base)
 
