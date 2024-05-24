@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,7 +19,7 @@ class Wrfv4(SpackApplication):
 
     tags('nwp', 'weather')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('intel-mpi', spack_spec="intel-mpi@2018.4.274",
                   compiler='gcc9')
@@ -96,7 +96,7 @@ class Wrfv4(SpackApplication):
     archive_pattern('{experiment_run_dir}/rsl.out.*')
     archive_pattern('{experiment_run_dir}/rsl.error.*')
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         import glob
         import re
         # Generate stats file

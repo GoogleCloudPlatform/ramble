@@ -1,11 +1,12 @@
-
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+
+import re
 
 from ramble.modkit import *  # noqa: F403
 
@@ -37,13 +38,32 @@ class ConditionalPsm3(BasicModifier):
     required_variable('psm3_mpi')
     required_package('intel-oneapi-mpi')
 
+    modifier_variable(
+        'apply_psm3_exec_regex',
+        default='',
+        description='When the non-empty regex matches with the executable_name, apply psm3 even if mpi is not explicitly used',
+        mode='standard'
+    )
+
+    modifier_variable(
+        'psm3_log_file',
+        default='{log_file}',
+        description='Log file where PSM3 info writes to, this varies based on applications',
+        mode='standard',
+    )
+
     def apply_psm3(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
         pre_cmds = []
         post_cmds = []
 
-        if executable.mpi:
+        exec_regex = self.expander.expand_var_name('apply_psm3_exec_regex')
+        should_apply = executable.mpi or (
+            exec_regex and re.match(exec_regex, executable_name)
+        )
+
+        if should_apply:
             pre_cmds.append(
                 CommandExecutable(f'add-psm3-{executable_name}',
                                   template=[
@@ -81,3 +101,21 @@ class ConditionalPsm3(BasicModifier):
             )
 
         return pre_cmds, post_cmds
+
+    psm3_build_info_regex = r'.*\sPSM3_IDENTIFY PSM3\s+(?P<version>v[\d.]+)\s+built for\s+(?P<target>.*)$'
+
+    figure_of_merit(
+        'PSM3 version',
+        fom_regex=psm3_build_info_regex,
+        group_name='version',
+        units='',
+        log_file='{psm3_log_file}',
+    )
+
+    figure_of_merit(
+        'PSM3 build target',
+        fom_regex=psm3_build_info_regex,
+        group_name='target',
+        units='',
+        log_file='{psm3_log_file}',
+    )

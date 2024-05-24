@@ -17,6 +17,8 @@ extend-ignore-re = [
 "fom" = "fom"
 "namd" = "namd"
 "reord" = "reord"
+"PN" = "PN" # fixing tPN in IOR
+"repositor" = "repositor" # Fixing partial name without singular / plural suffix
 
 [default.extend-identifiers]
 "ATPase" = "ATPase"

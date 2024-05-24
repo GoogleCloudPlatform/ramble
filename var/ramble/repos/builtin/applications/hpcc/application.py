@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -28,7 +28,7 @@ class Hpcc(SpackApplication):
 
     tags('benchmark-app', 'mini-app', 'benchmark', 'DGEMM')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('impi2018',
                   spack_spec='intel-mpi@2018.4.274')
@@ -47,11 +47,11 @@ class Hpcc(SpackApplication):
 
     executable('execute', 'hpcc', use_mpi=True)
 
+    workload('standard', executables=['copy-config', 'execute'], input='hpccinf')
+
     workload_variable('config_file', default='https://raw.githubusercontent.com/icl-utk-edu/hpcc/1.5.0/_hpccinf.txt',
                       description='Default config file',
                       workloads=['standard'])
-
-    workload('standard', executables=['copy-config', 'execute'], input='hpccinf')
 
     workload_variable('out_file', default='{experiment_run_dir}/hpccoutf.txt',
                       description='Output file for results',

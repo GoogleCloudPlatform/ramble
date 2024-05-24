@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -45,7 +45,6 @@ ramble:
               variables:
                 n_nodes: '1'
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0
@@ -78,7 +77,7 @@ ramble:
 
         workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-        software_path = os.path.join(ws1.software_dir, 'wrfv4.CONUS_12km', 'spack.yaml')
+        software_path = os.path.join(ws1.software_dir, 'wrfv4', 'spack.yaml')
         with open(software_path, 'r') as f:
             assert 'intel-oneapi-vtune' in f.read()
 

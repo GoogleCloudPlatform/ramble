@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -84,6 +84,9 @@ workspace_shared_path = 'shared'
 #: Name of the subdirectory where shared/sourale files are stored
 workspace_shared_license_path = 'licenses'
 
+#: Name of the subdirectory where deployments are stored
+workspace_deployments_path = 'deployments'
+
 #: regex for validating workspace names
 valid_workspace_name_re = r'^\w[\w-]*$'
 
@@ -113,8 +116,6 @@ def default_config_yaml():
 # experiments.
 # As an example, experiments can be defined as follows.
 # applications:
-#   variables:
-#     processes_per_node: '30'
 #   hostname: # Application name, as seen in `ramble list`
 #     variables:
 #       iterations: '5'
@@ -137,7 +138,6 @@ ramble:
     processes_per_node: -1
   applications: {}
   spack:
-    concretized: false
     packages: {}
     environments: {}
 """
@@ -455,6 +455,7 @@ class Workspace(object):
         self.dry_run = dry_run
         self.always_print_foms = False
         self.repeat_success_strict = True
+        self.force_concretize = False
 
         self.read_default_template = read_default_template
         self.configs = ramble.config.ConfigScope('workspace', self.config_dir)
@@ -467,7 +468,7 @@ class Workspace(object):
         self.input_mirror_stats = None
         self.input_mirror_cache = None
         self.software_mirror_cache = None
-        self._software_environments = None
+        self.software_environments = None
         self.hash_inventory = {
             'experiments': [],
             'versions': []
@@ -503,6 +504,10 @@ class Workspace(object):
 
         self.install_cache = ramble.util.install_cache.SetCache()
 
+        # A dict mapping (concretized) package spec to its install prefix.
+        # This can be re-used by all experiments of the workspace.
+        self.pkg_path_cache = {}
+
         self.results = self.default_results()
 
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
@@ -523,6 +528,8 @@ class Workspace(object):
 
         # Create a logger to redirect certain prints from screen to log file
         self.logger = log.log_output(echo=False, debug=tty.debug_level())
+
+        self.deployment_name = self.name
 
     def _re_read(self):
         """Reinitialize the workspace object if it has been written (this
@@ -861,13 +868,17 @@ class Workspace(object):
     def concretize(self):
         spack_dict = self.get_spack_dict()
 
-        if 'concretized' in spack_dict and spack_dict['concretized']:
-            raise RambleWorkspaceError('Cannot conretize an ' +
-                                       'already concretized ' +
-                                       'workspace')
+        if not self.force_concretize:
+            try:
+                if spack_dict[namespace.packages] or spack_dict[namespace.environments]:
+                    raise RambleWorkspaceError('Cannot concretize an already concretized '
+                                               'workspace. To overwrite the current configuration '
+                                               'with the default software configuration, use '
+                                               '\'ramble workspace concretize -f\'.')
+            except KeyError:
+                pass
 
         spack_dict = syaml.syaml_dict()
-        spack_dict['concretized'] = False
 
         if namespace.packages not in spack_dict or \
                 not spack_dict[namespace.packages]:
@@ -889,9 +900,9 @@ class Workspace(object):
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
 
-            compiler_dicts = [app_inst.default_compilers]
+            compiler_dicts = [app_inst.compilers]
             for mod_inst in app_inst._modifier_instances:
-                compiler_dicts.append(mod_inst.default_compilers)
+                compiler_dicts.append(mod_inst.compilers)
 
             for compiler_dict in compiler_dicts:
                 for comp, info in compiler_dict.items():
@@ -949,7 +960,6 @@ class Workspace(object):
                     if spec_name not in app_packages:
                         app_packages.append(spec_name)
 
-        spack_dict['concretized'] = True
         ramble.config.config.update_config('spack', spack_dict,
                                            scope=self.ws_file_config_scope_name())
 
@@ -1059,8 +1069,9 @@ class Workspace(object):
                         if exp['RAMBLE_STATUS'] == 'SUCCESS' or self.always_print_foms:
                             if exp['N_REPEATS'] > 0:  # this is a base exp with summary of repeats
                                 for context in exp['CONTEXTS']:
-                                    f.write('  %s figures of merit:\n' %
-                                            context['name'])
+                                    f.write(
+                                        f'  {context["display_name"]} figures of merit:\n'
+                                    )
 
                                     fom_summary = {}
                                     for fom in context['foms']:
@@ -1080,7 +1091,9 @@ class Workspace(object):
                                             f.write(f'      {fom_val.strip()}\n')
                             else:
                                 for context in exp['CONTEXTS']:
-                                    f.write(f'  {context["name"]} figures of merit:\n')
+                                    f.write(
+                                        f'  {context["display_name"]} figures of merit:\n'
+                                    )
                                     for fom in context['foms']:
                                         name = fom['name']
                                         if fom['origin_type'] == 'modifier':
@@ -1120,6 +1133,12 @@ class Workspace(object):
         for out_file in results_written:
             logger.all_msg(f'  {out_file}')
 
+        # Debug print the first written result file.
+        # Directly use tty to avoid cluttering the analyze log.
+        if ramble.config.get('config:debug'):
+            with open(results_written[0], 'r') as f:
+                tty.debug(f'Results from the analysis pipeline:\n{f.read()}')
+
         return filename_base
 
     def create_mirror(self, mirror_root):
@@ -1141,6 +1160,62 @@ class Workspace(object):
         self.input_mirror_stats = MirrorStats()
         self.input_mirror_cache = ramble.caches.MirrorCache(self.input_mirror_path)
         self.software_mirror_cache = ramble.caches.MirrorCache(self.software_mirror_path)
+
+    def simplify(self):
+        # First drop unused experiment templates from app dict so environments aren't rendered
+        app_dict = ramble.config.config.get_config(namespace.application,
+                                                   scope=self.ws_file_config_scope_name())
+
+        # Build experiment sets to determine which templates never get used
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
+        experiment_set = self.build_experiment_set()
+
+        for _, app_inst in experiment_set.template_experiments():
+            if app_inst.is_template and not app_inst.generated_experiments:
+                app = app_inst.expander.application_name
+                wl = app_inst.expander.workload_name
+                exp = app_inst.expander.experiment_name
+
+                try:
+                    app_dict[app][namespace.workload][wl][namespace.experiment].pop(exp)
+                    if not app_dict[app][namespace.workload][wl][namespace.experiment]:
+                        app_dict[app][namespace.workload][wl].pop(namespace.experiment)
+                    if not app_dict[app][namespace.workload][wl]:
+                        app_dict[app][namespace.workload].pop(wl)
+                    if not app_dict[app][namespace.workload]:
+                        app_dict[app].pop(namespace.workload)
+                    if not app_dict[app]:
+                        app_dict.pop(app)
+                except KeyError:
+                    continue
+
+        ramble.config.config.update_config(namespace.application, app_dict,
+                                           scope=self.ws_file_config_scope_name())
+
+        # Regenerate environments without the unused templates to see which env never get rendered
+        self.software_environments = \
+            ramble.software_environments.SoftwareEnvironments(self)
+        software_environments = self.software_environments
+        experiment_set = self.build_experiment_set()
+
+        spack_dict = ramble.config.config.get_config(namespace.spack,
+                                                     scope=self.ws_file_config_scope_name())
+        package_dict = spack_dict[namespace.packages]
+        environments_dict = spack_dict[namespace.environments]
+
+        tty.debug('Removing configurations that do not spark joy.')
+        for pkg in software_environments.unused_packages():
+            if pkg.name in package_dict:
+                tty.debug(f'Removing {pkg.name} from Spack packages')
+                package_dict.pop(pkg.name)
+        for env in software_environments.unused_environments():
+            if env.name in environments_dict:
+                tty.debug(f'Removing {env.name} from Spack environments')
+                environments_dict.pop(env.name)
+
+        ramble.config.config.update_config(namespace.spack, spack_dict,
+                                           scope=self.ws_file_config_scope_name())
 
     @property
     def latest_archive_path(self):
@@ -1247,6 +1322,16 @@ class Workspace(object):
         return os.path.join(self.root, workspace_shared_path)
 
     @property
+    def deployments_dir(self):
+        """Path to the deployments directory"""
+        return os.path.join(self.root, workspace_deployments_path)
+
+    @property
+    def named_deployment(self):
+        """Path to the specific deployment directory"""
+        return os.path.join(self.deployments_dir, self.deployment_name)
+
+    @property
     def shared_license_dir(self):
         """Path to the shared license directory"""
         return os.path.join(self.shared_dir, workspace_shared_license_path)
@@ -1349,13 +1434,6 @@ class Workspace(object):
         return self.application_configs[key]['yaml'] if key \
             in self.application_configs else None
 
-    def is_concretized(self):
-        spack_dict = self.get_spack_dict()
-        if 'concretized' in spack_dict:
-            return (True if spack_dict['concretized']
-                    else False)
-        return False
-
     def _get_workspace_section(self, section):
         """Return a dict of a workspace section"""
         workspace_dict = self._get_workspace_dict()
@@ -1390,7 +1468,7 @@ class Workspace(object):
 
     def get_spack_dict(self):
         """Return the spack dictionary for this workspace"""
-        return ramble.config.config.get_config('spack')
+        return ramble.config.config.get_config(namespace.spack)
 
     def get_applications(self):
         """Get the dictionary of applications"""
@@ -1509,6 +1587,10 @@ class RambleInvalidTemplateNameError(ramble.error.RambleError):
 
 class RambleConflictingDefinitionError(RambleWorkspaceError):
     """Error when conflicting software definitions are found"""
+
+
+class RambleActiveWorkspaceError(RambleWorkspaceError):
+    """Error when an invalid workspace is activated"""
 
 
 class RambleMissingApplicationError(RambleWorkspaceError):

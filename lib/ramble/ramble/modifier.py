@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,6 +20,7 @@ from ramble.language.shared_language import SharedMeta, register_builtin  # noqa
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
 import ramble.util.directives
+import ramble.util.class_attributes
 from ramble.util.logger import logger
 
 
@@ -28,10 +29,8 @@ class ModifierBase(object, metaclass=ModifierMeta):
     uses_spack = False
     _builtin_name = 'modifier_builtin::{obj_name}::{name}'
     _mod_prefix_builtin = r'modifier_builtin::'
-    _mod_builtin_regex = r'modifier_builtin::(?P<modifier>[\w-]+)::'
-    _builtin_required_key = 'required'
-    builtin_group = 'modifier'
     _language_classes = [ModifierMeta, SharedMeta]
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache', 'execute']
 
     modifier_class = 'ModifierBase'
 
@@ -42,6 +41,8 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
     def __init__(self, file_path):
         super().__init__()
+
+        ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
         self._on_executables = ['*']
@@ -72,14 +73,20 @@ class ModifierBase(object, metaclass=ModifierMeta):
             self._usage_mode = mode
         elif hasattr(self, '_default_usage_mode'):
             self._usage_mode = self._default_usage_mode
-            logger.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+            if len(logger.log_stack) >= 1:
+                logger.msg(
+                    f'    Using default usage mode {self._usage_mode} on modifier {self.name}'
+                )
         else:
             if len(self.modes) > 1 or len(self.modes) == 0:
                 raise InvalidModeError('Cannot auto determine usage '
                                        f'mode for modifier {self.name}')
 
             self._usage_mode = list(self.modes.keys())[0]
-            logger.msg(f'    Using default usage mode {self._usage_mode} on modifier {self.name}')
+            if len(logger.log_stack) >= 1:
+                logger.msg(
+                    f'    Using default usage mode {self._usage_mode} on modifier {self.name}'
+                )
 
     def set_on_executables(self, on_executables):
         """Set the executables this modifier applies to.
@@ -129,10 +136,10 @@ class ModifierBase(object, metaclass=ModifierMeta):
                     indent = '\t\t'
                     for var, conf in self.modifier_variables[mode_name].items():
                         out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
-                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
-                        out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
-                        if 'values' in conf:
-                            out_str.append(f'{indent}\tSuggested Values: {conf["values"]}\n')
+                        out_str.append(f'{indent}\tDescription: {conf.description}\n')
+                        out_str.append(f'{indent}\tDefault: {conf.default}\n')
+                        if conf.values:
+                            out_str.append(f'{indent}\tSuggested Values: {conf.values}\n')
 
                 if mode_name in self.variable_modifications:
                     out_str.append(rucolor.nested_1('\tVariable Modifications:\n'))
@@ -158,9 +165,9 @@ class ModifierBase(object, metaclass=ModifierMeta):
                 out_str.append(f'\t{name} = {config}\n')
             out_str.append('\n')
 
-        if hasattr(self, 'default_compilers'):
+        if hasattr(self, 'compilers'):
             out_str.append(rucolor.section_title('Default Compilers:\n'))
-            for comp_name, comp_def in self.default_compilers.items():
+            for comp_name, comp_def in self.compilers.items():
                 out_str.append(rucolor.nested_2(f'\t{comp_name}:\n'))
                 out_str.append(rucolor.nested_3('\t\tSpack Spec:') +
                                f'{comp_def["spack_spec"].replace("@", "@@")}\n')
@@ -275,27 +282,54 @@ class ModifierBase(object, metaclass=ModifierMeta):
             for req in self.package_manager_requirements[self._usage_mode]:
                 yield req
 
+    def all_pipeline_phases(self, pipeline):
+        if pipeline in self.phase_definitions:
+            for phase_name, phase_node in self.phase_definitions[pipeline].items():
+                yield phase_name, phase_node
+
+    def no_expand_vars(self):
+        """Iterator over non-expandable variables in current mode
+
+        Yields:
+            (str): Variable name
+        """
+
+        if self._usage_mode in self.modifier_variables:
+            for var, var_conf in self.modifier_variables[self._usage_mode].items():
+                if not var_conf.expandable:
+                    yield var
+
     def mode_variables(self):
         """Return a dict of variables that should be defined for the current mode"""
 
         if self._usage_mode in self.modifier_variables:
             return self.modifier_variables[self._usage_mode]
-        return {}
+        else:
+            return {}
 
-    def run_phase_hook(self, workspace, hook_name):
+    def run_phase_hook(self, workspace, pipeline, hook_name):
         """Run a modifier hook.
 
         Hooks are internal functions named _{hook_name}.
 
         This is a wrapper to extract the hook function, and execute it
         properly.
+
+        Hooks are only executed if they are not defined as a phase from the
+        modifier.
         """
 
-        hook_func_name = f'_{hook_name}'
-        if hasattr(self, hook_func_name):
-            phase_func = getattr(self, hook_func_name)
+        run_hook = True
+        if pipeline in self.phase_definitions:
+            if hook_name in self.phase_definitions[pipeline]:
+                run_hook = False
 
-            phase_func(workspace)
+        if run_hook:
+            hook_func_name = f'_{hook_name}'
+            if hasattr(self, hook_func_name):
+                phase_func = getattr(self, hook_func_name)
+
+                phase_func(workspace)
 
     def _prepare_analysis(self, workspace):
         """Hook to perform analysis that a modifier defines.

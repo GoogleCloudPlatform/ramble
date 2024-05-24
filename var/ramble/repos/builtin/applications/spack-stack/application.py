@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -100,11 +100,11 @@ class SpackStack(SpackApplication):
         ]
         return cmds
 
-    def _software_install(self, workspace):
+    def _software_install(self, workspace, app_inst=None):
         """This application never installs software during setup."""
         pass
 
-    def _define_package_paths(self, workspace):
+    def _define_package_paths(self, workspace, app_inst=None):
         pass
 
     def evaluate_success(self):

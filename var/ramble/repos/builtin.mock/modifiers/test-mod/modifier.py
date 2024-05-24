@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,6 +19,13 @@ class TestMod(BasicModifier):
     tags('test')
 
     mode('test', description='This is a test mode')
+    default_mode('test')
+
+    mode('app-scope', description='This is a test mode at the application scope')
+
+    mode('wl-scope', description='This is a test mode at the workload scope')
+
+    mode('exp-scope', description='This is a test mode at the experiment scope')
 
     variable_modification('mpi_command', 'echo "prefix_mpi_command" >> {log_file}; ', method='prepend', modes=['test'])
 
@@ -40,5 +47,8 @@ class TestMod(BasicModifier):
 
     register_builtin('test_builtin', required=True, injection_method='append')
 
+    test_attr = 'test_value'
+
     def test_builtin(self):
-        return ['echo "fom_contextFOM_GOES_HERE" >> {analysis_log}']
+        return ['echo "fom_contextFOM_GOES_HERE" >> {analysis_log}',
+                f'echo "{self.test_attr}"' + ' >> {analysis_log}']

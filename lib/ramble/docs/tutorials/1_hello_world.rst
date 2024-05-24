@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -48,6 +48,7 @@ filter available application definitions. For example:
 
 might output the following:
 
+.. rst-class:: hide-copy
 .. code-block:: console
 
     ==> 10 applications
@@ -61,6 +62,7 @@ The ``ramble list`` command also accepts regular expressions. For example:
 
 might output the following:
 
+.. rst-class:: hide-copy
 .. code-block:: console
 
     ==> 5 applications
@@ -174,7 +176,6 @@ following contents:
                   variables:
                     n_ranks: '1'
       spack:
-        concretized: true
         packages: {}
         environments: {}
 

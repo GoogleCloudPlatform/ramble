@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -46,7 +46,6 @@ ramble:
                 n_nodes: '1'
                 test_id: [1, 2]
   spack:
-    concretized: true
     packages:
       zlib:
         spack_spec: zlib

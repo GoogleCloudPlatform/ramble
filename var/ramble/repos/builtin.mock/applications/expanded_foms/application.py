@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,7 +12,7 @@ from ramble.appkit import *
 class ExpandedFoms(ExecutableApplication):
     name = "expanded-Foms"
 
-    executable('foo', 'bar', use_mpi=False)
+    executable('foo', template=['bar', 'echo "{my_var}"'], use_mpi=False)
 
     input_file('input', url='file:///tmp/test_file.log',
                description='Not a file', extension='.log')

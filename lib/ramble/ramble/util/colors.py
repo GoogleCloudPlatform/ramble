@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,6 +13,19 @@ level2_color = '@*r'
 level3_color = '@*c'
 level4_color = '@*m'
 plain_format = '@.'
+
+
+def level_func(level):
+    if level <= 0:
+        return section_title
+    elif level == 1:
+        return nested_1
+    elif level == 2:
+        return nested_2
+    elif level == 3:
+        return nested_3
+    elif level >= 4:
+        return nested_4
 
 
 def config_title(s):

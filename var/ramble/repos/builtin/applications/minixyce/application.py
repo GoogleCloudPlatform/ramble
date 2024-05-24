@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,11 +15,11 @@ class Minixyce(SpackApplication):
     '''Define miniXyce application'''
     name = 'minixyce'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('circuitdesign', 'miniapp', 'mini-app', 'minibenchmark', 'mini-benchmark')
 
-    default_compiler('gcc12', spack_spec="gcc@12.2.0")
+    define_compiler('gcc12', spack_spec="gcc@12.2.0")
 
     software_spec('ompi415cxx', spack_spec='openmpi@4.1.5 +legacylaunchers +cxx',
                   compiler='gcc12')
@@ -136,7 +136,7 @@ class Minixyce(SpackApplication):
                                 regex=state_var_regex,
                                 output_format='{State_Variable}')
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         super()._make_experiments(workspace)
 
         input_path = os.path.join(self.expander.expand_var_name('experiment_run_dir'), 'params.txt')
@@ -147,7 +147,7 @@ class Minixyce(SpackApplication):
             for setting in settings:
                 f.write(setting + ' = ' + self.expander.expand_var_name(setting) + '\n')
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         import os
 
         output_file = os.path.join(self.expander.expand_var_name('experiment_run_dir'),

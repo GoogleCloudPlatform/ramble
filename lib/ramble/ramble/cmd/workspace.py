@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -193,7 +193,8 @@ def workspace_deactivate(args):
         )
 
     if ramble.workspace.active_workspace() is None:
-        logger.die('No workspace is currently active.')
+        if ramble.workspace.ramble_workspace_var not in os.environ:
+            logger.die('No workspace is currently active.')
 
     cmds = ramble.workspace.shell.deactivate_header(args.shell)
     env_mods = ramble.workspace.shell.deactivate()
@@ -301,7 +302,7 @@ def _workspace_create(name_or_path, dir=False,
 def workspace_remove_setup_parser(subparser):
     """remove an existing workspace"""
     subparser.add_argument(
-        'rm_wrkspc', metavar='wrkspc', nargs='+',
+        'rm_wrkspc', metavar='workspace', nargs='+',
         help='workspace(s) to remove')
     arguments.add_common_arguments(subparser, ['yes_to_all'])
 
@@ -340,14 +341,33 @@ def workspace_remove(args):
 
 def workspace_concretize_setup_parser(subparser):
     """Concretize a workspace"""
-    pass
+    subparser.add_argument(
+        '-f', '--force-concretize',
+        dest='force_concretize',
+        action='store_true',
+        help='Overwrite software environment configuration with defaults defined in application ' +
+              'definition',
+        required=False)
+    subparser.add_argument(
+        '--simplify',
+        dest='simplify',
+        action='store_true',
+        help='Remove unused software and experiment templates from workspace config',
+        required=False)
 
 
 def workspace_concretize(args):
     ws = ramble.cmd.require_active_workspace(cmd_name='workspace concretize')
 
-    logger.debug('Concretizing workspace')
-    ws.concretize()
+    if args.simplify:
+        logger.debug('Simplifying workspace config')
+        ws.simplify()
+    else:
+        if args.force_concretize:
+            ws.force_concretize = True
+
+        logger.debug('Concretizing workspace')
+        ws.concretize()
 
 
 def workspace_run_pipeline(args, pipeline):
@@ -539,6 +559,9 @@ def workspace_info(args):
     # Print workspace variables information
     workspace_vars = ws.get_workspace_vars()
 
+    ws.software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+    software_environments = ws.software_environments
+
     # Build experiment set
     experiment_set = ws.build_experiment_set()
 
@@ -587,6 +610,10 @@ def workspace_info(args):
 
                 for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
                     app_inst = experiment_set.get_experiment(exp_name)
+                    if app_inst.uses_spack:
+                        software_environments.render_environment(
+                            app_inst.expander.expand_var('{env_name}'), app_inst.expander
+                        )
 
                     if print_header:
                         color.cprint(rucolor.nested_1('  Application: ') +
@@ -650,8 +677,9 @@ def workspace_info(args):
     # Print software stack information
     if args.software:
         color.cprint('')
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-        software_environments.print_environments(verbosity=args.verbose)
+        #  software_environments.print_environments(verbosity=args.verbose)
+        color.cprint(rucolor.section_title('Software Stack:'))
+        color.cprint(software_environments.info(verbosity=args.verbose, indent=4, color_level=1))
 
 #
 # workspace list
@@ -850,6 +878,6 @@ def setup_parser(subparser):
 
 
 def workspace(parser, args):
-    """Look for a function called environment_<name> and call it."""
+    """Look for a function called workspace_<name> and call it."""
     action = subcommand_functions[args.workspace_command]
     action(args)

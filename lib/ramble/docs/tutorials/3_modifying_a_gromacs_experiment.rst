@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -56,7 +56,7 @@ To get detailed information about where variable definitions come from, you can 
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info --expansions
 
 The experiments section of this command's output might contain the following:
 
@@ -214,7 +214,7 @@ These changes should now be reflected in the output of:
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info --expansions
 
 .. include:: shared/gromacs_execute.rst
 

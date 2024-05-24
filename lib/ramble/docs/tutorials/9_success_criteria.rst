@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -75,7 +75,7 @@ users to be sure their experiments completed successfully.
 
 When WRF runs, it outputs the time each timestep takes. To begin with, you will
 define a new success criteria within your workspace configuration file that
-validates some timing data is present in the output an experiment. In the
+validates some timing data is present in the output of an experiment. In the
 experiment output, the timing data is prefixed with the string
 ``Timing for main``.
 
@@ -120,12 +120,11 @@ configuration file might look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -195,12 +194,11 @@ resulting configuration file might look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -258,3 +256,18 @@ Also, running analyze in debug mode as:
 
 Will print significnatly more output, but you should see where Ramble tests the
 ``timing-present`` and ``correct-timesteps`` success criteria in the output.
+
+Clean the Workspace
+-------------------
+
+Once you are finished with the tutorial content, make sure you deactivate your workspace:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+Additionally, you can remove the workspace and all of its content with:
+
+.. code-block:: console
+
+    $ ramble workspace remove success_wrf

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -29,7 +29,7 @@ from ramble.util.logger import logger
 
 spack_namespace = 'spack'
 
-package_name_regex = re.compile(r"\s*(?P<package_name>[\w][\w-]+).*")
+package_name_regex = re.compile(r"[\s-]*(?P<package_name>[\w][\w-]+).*")
 
 
 class SpackRunner(object):
@@ -65,7 +65,8 @@ class SpackRunner(object):
                              'mirrors.yaml', 'repos.yaml',
                              'packages.yaml', 'modules.yaml',
                              'config.yaml', 'upstreams.yaml',
-                             'bootstrap.yaml', 'spack.yaml']
+                             'bootstrap.yaml', 'spack.yaml',
+                             'spack_includes.yaml']
 
     def __init__(self, shell='bash', dry_run=False):
         """
@@ -106,6 +107,7 @@ class SpackRunner(object):
         self.compiler_config_dir = None
         self.configs = []
         self.configs_applied = False
+        self.env_contents = []
 
         self.installer = self.spack.copy()
         self.installer.add_default_prefix(ramble.config.get(f'{self.install_config_name}:prefix'))
@@ -365,8 +367,6 @@ class SpackRunner(object):
         self.installer.add_default_env(self.env_key, self.env_path)
         self.concretizer.add_default_env(self.env_key, self.env_path)
 
-        self.env_contents = []
-
         self.active = True
 
     def deactivate(self):
@@ -519,7 +519,9 @@ class SpackRunner(object):
         env_file[spack_namespace]['concretizer']['unify'] = True
 
         env_file[spack_namespace]['specs'] = syaml.syaml_list()
-        env_file[spack_namespace]['specs'].extend(self.env_contents)
+        # Ensure the specs content are consistently sorted.
+        # Otherwise the hash checking may artificially miss due to ordering.
+        env_file[spack_namespace]['specs'].extend(sorted(self.env_contents))
 
         env_file[spack_namespace]['include'] = self.includes
 
@@ -635,10 +637,10 @@ class SpackRunner(object):
     def get_package_path(self, package_spec):
         """Return the installation directory for a package"""
         loc_args = ['location', '-i']
-        loc_args.extend(package_spec.split())
+        loc_args.extend(shlex.split(package_spec))
 
         name_args = ['find', '--format={name}']
-        name_args.extend(package_spec.split())
+        name_args.extend(shlex.split(package_spec))
 
         if not self.dry_run:
             name = self._run_command(self.spack, name_args, return_output=True).strip()
@@ -648,8 +650,8 @@ class SpackRunner(object):
             self._dry_run_print(self.spack, name_args)
             self._dry_run_print(self.spack, loc_args)
 
-            name = os.path.join(package_spec.split()[0])
-            location = os.path.join('dry-run', 'path', 'to', package_spec.split()[0])
+            name = os.path.join(shlex.split(package_spec)[0])
+            location = os.path.join('dry-run', 'path', 'to', shlex.split(package_spec)[0])
             return (name, location)
 
     def mirror_environment(self, mirror_path):
@@ -745,6 +747,22 @@ class SpackRunner(object):
                         self._raise_validation_error(command, validation_type)
         else:
             self._dry_run_print(self.spack, args)
+
+    def package_definitions(self):
+        """For each package in this environment, yield the path to its application.py file"""
+        package_def_name = 'package.py'
+        location_args = ['location', '-p']
+
+        self._check_active()
+
+        if not self.dry_run:
+            for pkg in self.env_contents:
+                args = location_args.copy()
+                args.append(pkg)
+                path = self._run_command(self.spack, args, return_output=True).strip()
+                yield pkg, os.path.join(path, package_def_name)
+        else:
+            self._dry_run_print(self.spack, location_args)
 
     def _raise_validation_error(self, command, validation_type):
         raise ValidationFailedError(

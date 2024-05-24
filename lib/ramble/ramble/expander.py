@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,6 +13,8 @@ import operator
 import math
 import random
 
+from typing import Dict
+
 import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
@@ -20,12 +22,23 @@ from ramble.util.logger import logger
 import spack.util.naming
 
 supported_math_operators = {
-    ast.Add: operator.add, ast.Sub: operator.sub,
-    ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow:
-    operator.pow, ast.BitXor: operator.xor, ast.USub: operator.neg,
-    ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.Gt: operator.gt,
-    ast.GtE: operator.ge, ast.Lt: operator.lt, ast.LtE: operator.le,
-    ast.And: operator.and_, ast.Or: operator.or_, ast.Mod: operator.mod
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Pow: operator.pow,
+    ast.BitXor: operator.xor,
+    ast.USub: operator.neg,
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.And: operator.and_,
+    ast.Or: operator.or_,
+    ast.Mod: operator.mod,
 }
 
 supported_scalar_function_pointers = {
@@ -108,7 +121,7 @@ class ExpansionNode(object):
 
     def define_value(self, expansion_dict, allow_passthrough=True,
                      expansion_func=str, evaluation_func=eval,
-                     no_expand_vars=set()):
+                     no_expand_vars=set(), used_vars=set()):
         """Define the value for this node.
 
         Construct the value of self. This builds up a string representation of
@@ -153,6 +166,7 @@ class ExpansionNode(object):
                 required_passthrough = False
 
                 if kw_parts[0] in expansion_dict:
+                    used_vars.add(kw_parts[0])
                     # Exit expansion for variables defined as no_expand
                     if kw_parts[0] in no_expand_vars:
                         self.value = expansion_dict[kw_parts[0]]
@@ -293,6 +307,7 @@ class Expander(object):
 
         self._variables = variables
         self._no_expand_vars = no_expand_vars
+        self._used_variables = set()
 
         self._experiment_set = experiment_set
 
@@ -303,7 +318,6 @@ class Expander(object):
         self._application_namespace = None
         self._workload_namespace = None
         self._experiment_namespace = None
-        self._env_namespace = None
         self._env_path = None
 
         self._application_input_dir = None
@@ -313,6 +327,14 @@ class Expander(object):
         self._application_run_dir = None
         self._workload_run_dir = None
         self._experiment_run_dir = None
+
+    def add_no_expand_var(self, var: str):
+        """Add a new variable to the no expand set
+
+        Args:
+            var (str): Variable that should not expand
+        """
+        self._no_expand_vars.add(var)
 
     def set_no_expand_vars(self, no_expand_vars):
         self._no_expand_vars = no_expand_vars.copy()
@@ -364,15 +386,6 @@ class Expander(object):
                                                        self.experiment_name)
 
         return self._experiment_namespace
-
-    @property
-    def env_namespace(self):
-        if not self._env_namespace:
-            var = self.expansion_str(self._keywords.env_name) + \
-                '.' + self.expansion_str(self._keywords.workload_name)
-            self._env_namespace = self.expand_var(var)
-
-        return self._env_namespace
 
     @property
     def env_path(self):
@@ -451,7 +464,8 @@ class Expander(object):
         except SyntaxError:
             return var
 
-    def expand_var_name(self, var_name, extra_vars=None, allow_passthrough=True):
+    def expand_var_name(self, var_name: str, extra_vars: Dict = None,
+                        allow_passthrough: bool = True, typed: bool = False):
         """Convert a variable name to an expansion string, and expand it
 
         Take a variable name (var) and convert it to an expansion string by
@@ -459,26 +473,30 @@ class Expander(object):
         expand_var, and return the result.
 
         Args:
-            var_name: String name of variable to expand
-            extra_vars: Variable definitions to use with highest precedence
-            allow_passthrough: Whether the string is allowed to have keywords
-                               after expansion
+            var_name (str): String name of variable to expand
+            extra_vars (dict): Variable definitions to use with highest precedence
+            allow_passthrough (bool): Whether the string is allowed to have keywords
+                                      after expansion
+            typed (bool): Whether the return type should be typed or not
         """
         return self.expand_var(self.expansion_str(var_name),
                                extra_vars=extra_vars,
-                               allow_passthrough=allow_passthrough)
+                               allow_passthrough=allow_passthrough,
+                               typed=typed)
 
-    def expand_var(self, var, extra_vars=None, allow_passthrough=True):
+    def expand_var(self, var: str, extra_vars: Dict = None,
+                   allow_passthrough: bool = True, typed: bool = False):
         """Perform expansion of a string
 
         Expand a string by building up a dict of all
         expansion variables.
 
         Args:
-            var: String variable to expand
-            extra_vars: Variable definitions to use with highest precedence
-            allow_passthrough: Whether the string is allowed to have keywords
-                               after expansion
+            var (str): String variable to expand
+            extra_vars (dict): Variable definitions to use with highest precedence
+            allow_passthrough (bool): Whether the string is allowed to have keywords
+                                      after expansion
+            typed (bool): Whether the return type should be typed or not
         """
 
         passthrough_setting = allow_passthrough
@@ -503,6 +521,15 @@ class Expander(object):
                                         f'{e}')
 
         logger.debug(f'END OF EXPAND_VAR STACK {value}')
+        if typed:
+            logger.debug(f'BEGINNING OF TYPING ON {value}')
+            try:
+                value = ast.literal_eval(value)
+                logger.debug(f'END OF TYPING {value}')
+            except ValueError:
+                logger.debug('END OF TYPING Failed with ValueError')
+            except SyntaxError:
+                logger.debug('END OF TYPING Failed with SyntaxError')
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):
@@ -553,7 +580,8 @@ class Expander(object):
                                   allow_passthrough=allow_passthrough,
                                   expansion_func=self._partial_expand,
                                   evaluation_func=self.perform_math_eval,
-                                  no_expand_vars=self._no_expand_vars)
+                                  no_expand_vars=self._no_expand_vars,
+                                  used_vars=self._used_variables)
 
             return str(str_graph.root.value)
 
@@ -577,6 +605,8 @@ class Expander(object):
         except MathEvaluationError as e:
             logger.debug(f'   Math input is: "{in_str}"')
             logger.debug(e)
+        except RambleSyntaxError as e:
+            raise RambleSyntaxError(f'{str(e)} in "{in_str}"')
 
         return in_str
 
@@ -691,6 +721,9 @@ class Expander(object):
         if len(node.ops) == 1 and isinstance(node.ops[0], ast.In):
             return self._eval_comp_in(node)
 
+        if len(node.ops) == 1 and isinstance(node.ops[0], ast.Is):
+            raise RambleSyntaxError('Encountered unsupported operator `is`')
+
         # Try to evaluate the comparison logic, if not return the node as is.
         try:
             cur_left = self.eval_math(node.left)
@@ -719,8 +752,9 @@ class Expander(object):
         """Handle in nodes in the ast
 
         Perform extraction of `<variable> in <experiment>` syntax.
-
         Raises an exception if the experiment does not exist.
+
+        Also, evaluated `<value> in [list, of, values]` syntax.
         """
         if isinstance(node.left, ast.Name):
             var_name = self._ast_name(node.left)
@@ -733,6 +767,21 @@ class Expander(object):
                                             f'"{var_name} in {namespace}"')
                     self.__raise_syntax_error(node)
                 return val
+        # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
+        # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
+        elif isinstance(node.left, ast.Constant) or \
+                (hasattr(ast, 'Str') and isinstance(node.left, ast.Str)):
+            lhs_value = self.eval_math(node.left)
+
+            found = False
+            for comp in node.comparators:
+                if isinstance(comp, ast.List):
+                    for elt in comp.elts:
+                        rhs_value = self.eval_math(elt)
+                        if lhs_value == rhs_value:
+                            found = True
+            return found
+
         self.__raise_syntax_error(node)
 
     def _eval_binary_ops(self, node):

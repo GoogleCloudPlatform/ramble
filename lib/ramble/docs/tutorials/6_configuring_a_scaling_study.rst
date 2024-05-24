@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -144,7 +144,7 @@ define additional important details such as how many MPI ranks you want in each
 experiment (defined by the ``n_ranks`` variable), or how many MPI ranks should
 execute on each node (defined by the ``processes_per_node`` variable). You
 should add these details as workspace variables within your configuration file.
-For the purposes of this tutorial, we will assume 4 MPI ranks per node and that
+For the purposes of this tutorial, we will assume 16 MPI ranks per node and that
 the number of MPI ranks total will be the number of MPI ranks per node
 multiplied by the number of nodes.
 
@@ -223,12 +223,11 @@ look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -253,3 +252,20 @@ you see fit, and make sure the ``gcc9`` references under ``intel-mpi`` and
 Ramble also supports uploading the analyzed data to online databases, using
 ``ramble workspace analyze --upload``. We will not cover this functionality in
 detail here, but it is very useful for production experiments.
+
+Cleaning the Workspace
+----------------------
+
+After you are finished with the content of this tutorial, make sure you
+deactivate your workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+If you no longer need the workspace materials, remove the entire workspace
+with:
+
+.. code-block:: console
+
+    $ ramble workspace remove scaling_wrf

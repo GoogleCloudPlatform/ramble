@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -63,13 +63,15 @@ OBJECT_NAMES = [obj.name for obj in ObjectTypes]
 
 default_type = ObjectTypes.applications
 
+unified_config = 'repo.yaml'
+
 type_definitions = {
     ObjectTypes.applications: {
         'file_name': 'application.py',
         'dir_name': 'applications',
         'abbrev': 'app',
         'config_section': 'repos',
-        'config': 'repo.yaml',
+        'accepted_configs': ['application_repo.yaml', unified_config],
         'singular': 'application',
     },
     ObjectTypes.modifiers: {
@@ -77,7 +79,7 @@ type_definitions = {
         'dir_name': 'modifiers',
         'abbrev': 'mod',
         'config_section': 'modifier_repos',
-        'config': 'modifier_repo.yaml',
+        'accepted_configs': ['modifier_repo.yaml', unified_config],
         'singular': 'modifier',
     }
 }
@@ -271,7 +273,8 @@ class FastObjectChecker(Mapping):
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
                 if not obj_name.startswith('.') and not any(
-                    obj_name == obj_info['config'] for obj_info in type_definitions.values()
+                    obj_name in obj_info['accepted_configs'] for obj_info in
+                    type_definitions.values()
                 ):
                     logger.warn(
                         f'Skipping {self.object_type} '
@@ -807,7 +810,6 @@ class Repo(object):
         self.object_file_name = type_definitions[object_type]['file_name']
         self.object_type = object_type
         self.object_abbrev = type_definitions[object_type]['abbrev']
-        self.config_name = type_definitions[object_type]['config']
         self.base_namespace = f'{global_namespace}.{self.object_abbrev}'
 
         # check and raise BadRepoError on fail.
@@ -816,7 +818,13 @@ class Repo(object):
                 raise BadRepoError(msg)
 
         # Validate repository layout.
-        self.config_file = os.path.join(self.root, self.config_name)
+        self.config_name = None
+        self.config_file = None
+        for config in type_definitions[object_type]['accepted_configs']:
+            config_file = os.path.join(self.root, config)
+            if os.path.exists(config_file):
+                self.config_name = config
+                self.config_file = config_file
         check(os.path.isfile(self.config_file),
               "No %s found in '%s'" % (self.config_name, root))
 
@@ -833,6 +841,7 @@ class Repo(object):
 
         objects_dir = config["subdirectory"] if "subdirectory" in config else \
             type_definitions[object_type]['dir_name']
+
         self.objects_path = os.path.join(self.root, objects_dir)
         check(os.path.isdir(self.objects_path),
               "No directory '%s' found in '%s'" % (objects_dir,
@@ -1199,7 +1208,8 @@ class Repo(object):
 
 def create_repo(root, namespace=None,
                 subdir=type_definitions[default_type]['dir_name'],
-                object_type=default_type):
+                object_type=default_type,
+                unified_repo=True):
     """Create a new repository in root with the specified namespace.
 
        If the namespace is not provided, use basename of root.
@@ -1236,21 +1246,44 @@ def create_repo(root, namespace=None,
             "Cannot create repository in %s: can't access parent!" % root)
 
     try:
-        config_path = os.path.join(root, type_definitions[object_type]['config'])
-        objects_path = os.path.join(root, subdir)
+        object_dirs = []
+        if unified_repo:
+            # If unified, and no subdir, create obj dirs
+            # If unified and subdir, create subdir
+            # If not unified and no subdir, create obj dir
+            # If not unified and subdir, create subdir
+            config_name = unified_config
+            for obj_type in type_definitions.values():
+                objects_path = os.path.join(root, obj_type['dir_name'])
+                object_dirs.append(objects_path)
+        else:
+            config_name = type_definitions[object_type]['accepted_configs'][0]
+            objects_path = os.path.join(root, type_definitions[object_type]['dir_name'])
+            object_dirs.append(objects_path)
 
-        fs.mkdirp(objects_path)
+        if subdir is not None:
+            object_dirs = [os.path.join(root, subdir)]
+
+        for objects_path in object_dirs:
+            fs.mkdirp(objects_path)
+
+        config_path = os.path.join(root, config_name)
         with open(config_path, 'w') as config:
             config.write("repo:\n")
             config.write(f"  namespace: '{namespace}'\n")
-            if subdir != type_definitions[object_type]['dir_name']:
+            if subdir is not None:
                 config.write(f"  subdirectory: '{subdir}'\n")
 
     except (IOError, OSError) as e:
         # try to clean up.
         if existed:
             shutil.rmtree(config_path, ignore_errors=True)
-            shutil.rmtree(objects_path, ignore_errors=True)
+            if unified_repo:
+                for obj_type in type_definitions.values():
+                    objects_path = os.path.join(root, obj_type['dir_name'])
+                    shutil.rmtree(objects_path, ignore_errors=True)
+            else:
+                shutil.rmtree(objects_path, ignore_errors=True)
         else:
             shutil.rmtree(root, ignore_errors=True)
 

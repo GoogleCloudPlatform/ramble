@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,6 +11,7 @@ import llnl.util.tty.log
 import llnl.util.tty.color
 
 from contextlib import contextmanager
+from pathlib import Path
 
 
 class Logger(object):
@@ -35,7 +36,7 @@ class Logger(object):
     def add_log(self, path):
         """Add a log to the current log stack
 
-        Opens (with 'w+' permissions) the file provided by the 'path' argument,
+        Opens (with 'a+' permissions) the file provided by the 'path' argument,
         and stores both the path, and the opened stream object in the current stack
         in the active position.
 
@@ -43,7 +44,7 @@ class Logger(object):
             path: File path for the new log file
         """
         if isinstance(path, str) and self.enabled:
-            stream = None
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
             stream = llnl.util.tty.log.Unbuffered(open(path, 'a+'))
             self.log_stack.append((path, stream))
 

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -60,7 +60,7 @@ def collect_definitions():
 
     The maps are global to this module, and reused in other internal methods.
     """
-    top_level_attrs = ['default_compilers', 'software_specs']
+    top_level_attrs = ['compilers', 'software_specs']
 
     types_to_print = [
         ramble.repository.ObjectTypes.applications

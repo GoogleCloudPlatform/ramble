@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,7 +21,7 @@ class Namd(SpackApplication):
 
     tags('molecular-dynamics', 'charm++', 'task-parallelism')
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0')
+    define_compiler('gcc12', spack_spec='gcc@12.2.0')
 
     software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0')
 
@@ -320,7 +320,7 @@ class Namd(SpackApplication):
         units='ns/day'
     )
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         """Generate ns/day metric for the experiment"""
 
         log_path = self.expander.expand_var(self.log_file_str)

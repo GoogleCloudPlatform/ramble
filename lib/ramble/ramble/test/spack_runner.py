@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -79,6 +79,7 @@ def test_env_concretize_skips_already_concretized_envs(tmpdir, capsys):
         sr.create_env(env_path)
         sr.activate()
         sr.add_spec('zlib')
+        sr.add_spec('intel-oneapi-mpi')
 
         # Generate an initial env file
         sr.generate_env_file()
@@ -279,33 +280,35 @@ def test_new_compiler_installs(tmpdir, capsys):
 
     import os
 
-    compilers_config = """
+    with tmpdir.as_cwd():
+        compilers_config = """
 compilers::
 - compiler:
     spec: gcc@12.1.0
     paths:
-      cc: /path/to/gcc
-      cxx: /path/to/g++
-      f77: /path/to/gfortran
-      fc: /path/to/gfortran
+      cc: tmpdir_path/gcc
+      cxx: tmpdir_path/g++
+      f77: tmpdir_path/gfortran
+      fc: tmpdir_path/gfortran
     flags: {}
     operating_system: 'ramble'
     target: 'x86_64'
     modules: []
     environment: {}
     extra_rpaths: []
-"""
+""".replace('tmpdir_path', os.path.join(os.getcwd(), 'bin'))
 
-    packages_config = """
+        packages_config = f"""
 packages:
   gcc:
     externals:
     - spec: gcc@12.1.0 languages=c,fortran
-      prefix: /path/to
+      prefix: {os.getcwd()}
     buildable: false
 """
 
-    with tmpdir.as_cwd():
+        os.mkdir(os.path.join(os.getcwd(), 'bin'))
+
         packages_path = os.path.join(os.getcwd(), 'packages.yaml')
         compilers_path = os.path.join(os.getcwd(), 'compilers.yaml')
         # Write spack_configs
@@ -528,3 +531,25 @@ def test_env_create_no_view(tmpdir):
                 )
             except ramble.spack_runner.RunnerError as e:
                 pytest.skip('%s' % e)
+
+
+def test_multiword_args(tmpdir, capsys):
+    try:
+        env_path = tmpdir.join('spack-env')
+        with ramble.config.override('config:spack',
+                                    {'install': {'flags': 'install="-multiword -args"'}}):
+            sr = ramble.spack_runner.SpackRunner(dry_run=True)
+            sr.create_env(env_path)
+            sr.activate()
+            sr.add_spec('zlib')
+            sr.concretize()
+
+            sr.install()
+            sr.get_package_path('zlib package_path="-multiword -args"')
+            captured = capsys.readouterr()
+            print(captured.out)
+
+            assert "install=-multiword -args" in captured.out
+            assert "package_path=-multiword -args" in captured.out
+    except ramble.spack_runner.RunnerError as e:
+        pytest.skip('%s' % e)

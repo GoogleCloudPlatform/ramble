@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -112,12 +112,11 @@ the above section. The result should look like the following:
                   variables:
                     n_nodes: [1, 2]
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -172,7 +171,7 @@ example:
     - platform_config
     - n_nodes
 
-Would result in 6 experiments. Adding this to you workspace configuration, you
+Would result in 6 experiments. Adding this to your workspace configuration, you
 should have the following in your ``ramble.yaml``:
 
 .. code-block:: YAML
@@ -203,12 +202,11 @@ should have the following in your ``ramble.yaml``:
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -266,12 +264,11 @@ Your final configuration file should look something like:
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem

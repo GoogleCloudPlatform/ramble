@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -267,7 +267,7 @@ _ramble() {
     then
         RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
-        RAMBLE_COMPREPLY="attributes clean commands config debug edit flake8 help info license list mirror mods on python repo results software-definitions unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config debug deployment edit flake8 help info license list mirror mods on python repo results software-definitions unit-test workspace"
     fi
 }
 
@@ -391,6 +391,23 @@ _ramble_debug_report() {
     RAMBLE_COMPREPLY="-h --help"
 }
 
+_ramble_deployment() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMPREPLY="push pull"
+    fi
+}
+
+_ramble_deployment_push() {
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --deployment-name -d --upload-url -u --phases --include-phase-dependencies --where --exclude-where --filter-tags"
+}
+
+_ramble_deployment_pull() {
+    RAMBLE_COMPREPLY="-h --help --deployment-path -p"
+}
+
 _ramble_edit() {
     if $list_options
     then
@@ -441,7 +458,7 @@ _ramble_license_list_files() {
 }
 
 _ramble_license_verify() {
-    RAMBLE_COMPREPLY="-h --help --root"
+    RAMBLE_COMPREPLY="-h --help --root --modified -m"
 }
 
 _ramble_list() {
@@ -543,7 +560,7 @@ _ramble_mods_info() {
 }
 
 _ramble_on() {
-    RAMBLE_COMPREPLY="-h --help --executor --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help --executor --enable-per-experiment-prints --suppress-run-header --where --exclude-where --filter-tags"
 }
 
 _ramble_python() {
@@ -569,7 +586,7 @@ _ramble_repo_create() {
     then
         RAMBLE_COMPREPLY="-h --help -d --subdirectory -t --type"
     else
-        _repos
+        RAMBLE_COMREPLY=""
     fi
 }
 
@@ -671,7 +688,7 @@ _ramble_workspace_create() {
 }
 
 _ramble_workspace_concretize() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify"
 }
 
 _ramble_workspace_setup() {
@@ -711,7 +728,7 @@ _ramble_workspace_remove() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE_COMREPLY=""
+        _workspaces
     fi
 }
 
@@ -720,6 +737,6 @@ _ramble_workspace_rm() {
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
-        RAMBLE_COMREPLY=""
+        _workspaces
     fi
 }

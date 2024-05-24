@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,7 +19,7 @@ class Openfoam(SpackApplication):
 
     tags('cfd', 'fluid', 'dynamics')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('ompi412',
                   spack_spec='openmpi@4.1.2 +legacylaunchers +cxx',
@@ -35,10 +35,13 @@ class Openfoam(SpackApplication):
     required_package('openfoam-org')
 
     workload('motorbike', executables=['get_inputs', 'configure_mesh', 'surfaceFeatures',
-                                       'blockMesh', 'decomposePar', 'snappyHexMesh',
+                                       'blockMesh', 'decomposePar1', 'snappyHexMesh',
                                        'reconstructParMesh', 'renumberMesh', 'configure_simplefoam',
-                                       'decomposePar', 'patchSummary', 'checkMesh', 'potentialFoam',
+                                       'decomposePar2', 'patchSummary', 'checkMesh', 'potentialFoam',
                                        'simpleFoam'])
+
+    workload('hpc_motorbike', executables=['build_mesh', 'allRun'],
+             input='hpc_motorbike')
 
     workload_variable('input_path', default='$FOAM_TUTORIALS/incompressible/simpleFoam/motorBike',
                       description='Path to the tutorial input',
@@ -54,7 +57,7 @@ class Openfoam(SpackApplication):
                       workloads=['hpc_motorbike', 'motorbike'])
     workload_variable('block_mesh_path', default='system/blockMeshDict',
                       description='Path to block mesh file',
-                      workloads=['hpc_motorike', 'motorbike'])
+                      workloads=['hpc_motorbike', 'motorbike'])
     workload_variable('hex_mesh_path', default='system/snappyHexMeshDict',
                       description='Path to hexh mesh file',
                       workloads=['hpc_motorbike', 'motorbike'])
@@ -103,8 +106,6 @@ class Openfoam(SpackApplication):
                       description='Flags for simpleFoam',
                       workloads=['hpc_motorbike', 'motorbike'])
 
-    workload('hpc_motorbike', executables=['build_mesh', 'allRun'],
-             input='hpc_motorbike')
     workload_variable('size', default='Large',
                       description='Size of HPC motorbike workload. Can be Large, Medium, or Small.',
                       workload='hpc_motorbike')
@@ -170,7 +171,10 @@ class Openfoam(SpackApplication):
     executable('blockMesh', 'runApplication blockMesh',
                use_mpi=False)
 
-    executable('decomposePar', template=['rm log.decomposePar', 'runApplication decomposePar'],
+    executable('decomposePar1', template=['rm log.decomposePar', 'runApplication decomposePar'],
+               use_mpi=False)
+
+    executable('decomposePar2', template=['rm log.decomposePar', 'runApplication decomposePar'],
                use_mpi=False)
 
     executable('snappyHexMesh', 'runParallel snappyHexMesh {hex_flags}', use_mpi=False)

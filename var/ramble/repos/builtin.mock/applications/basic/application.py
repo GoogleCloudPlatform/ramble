@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -22,6 +22,10 @@ class Basic(ExecutableApplication):
     workload('test_wl', executable='foo', input='input')
     workload('test_wl2', executable='bar', input='input')
     workload('working_wl', executable='echo')
+
+    workload_variable('my_base_var', default='0.0',
+                      description='Example var',
+                      workload='test_wl')
 
     workload_variable('my_var', default='1.0',
                       description='Example var',

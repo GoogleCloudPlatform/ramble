@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -95,7 +95,8 @@ class DirectiveMeta(type):
 
             directive_attrs = {
                 '_directive_functions': {},
-                '_directive_classes': {}
+                '_directive_classes': {},
+                '_directive_names': DirectiveMeta._directive_names.copy()
             }
 
             for attr in directive_attrs.keys():

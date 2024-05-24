@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,21 +12,12 @@
    :lines: 12-
 """  # noqa E501
 
-import ramble.schema.variables
-import ramble.schema.applications
-import ramble.schema.zips
 
 #: Properties for inclusion in other schemas
 properties = {
     'spack': {
         'type': 'object',
         'properties': {
-            'concretized': {
-                'type': 'boolean',
-                'default': False
-            },
-            'variables': ramble.schema.variables.variables_def,
-            'zips': ramble.schema.zips.zips_def,
             'packages': {
                 'type': 'object',
                 'additionalProperties': {
@@ -41,11 +32,6 @@ properties = {
                             'type': 'string',
                             'default': None,
                         },
-                        'variables': ramble.schema.variables.variables_def,
-                        'zips': ramble.schema.zips.zips_def,
-                        'matrix': ramble.schema.applications.matrix_def,
-                        'matrices': ramble.schema.applications.matrices_def,
-                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}
@@ -67,11 +53,6 @@ properties = {
                             'items': {'type': 'string'},
                             'default': []
                         },
-                        'variables': ramble.schema.variables.variables_def,
-                        'zips': ramble.schema.zips.zips_def,
-                        'matrix': ramble.schema.applications.matrix_def,
-                        'matrices': ramble.schema.applications.matrices_def,
-                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}

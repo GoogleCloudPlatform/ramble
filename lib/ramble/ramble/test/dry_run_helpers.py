@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -37,7 +37,6 @@ def dry_run_config(section_name, injections, config_path,
     test_dict['spack'] = syaml.syaml_dict()
 
     spack_dict = test_dict['spack']
-    spack_dict['concretized'] = False
     spack_dict['packages'] = syaml.syaml_dict()
     spack_dict['environments'] = syaml.syaml_dict()
 

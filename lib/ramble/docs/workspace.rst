@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -167,7 +167,7 @@ To get basic information, and:
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info -vvv
 
 To get more detailed information, including which variables are defined and
 where they come from.
@@ -184,6 +184,80 @@ application definition files, one can use:
 
     $ ramble workspace concretize
 
+To remove any unused software definitions from the workspace configuration,
+as well as unused experiment templates, one can use:
+
+.. code-block:: console
+
+    $ ramble workspace concretize --simplify
+
+Note: This command will also remove comments within the edited section
+of the workspace config file.
+
+---------------------
+Workspace Deployments
+---------------------
+
+A deployment is one mechanism of transferring a configured workspace from one
+location to another. Ramble provides commands to handle creating (and pushing)
+a deployment from a local workspace to a remote location, or pulling a
+deployment from a remote location into a local workspace. 
+
+A deployment is a directory that contains the necessary artifacts required to
+recreate the experiments in the workspace on a separate machine. Deployments
+copy the workspace configuration file, along with creating an object
+repository, containing the application, modifier, and any package manager files
+needed for the experiments (that might not be upstreamed).  This section
+describes the commands that can be used to use deployments.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Preparing a Workspace Deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Once a workspace is configured, it can be used to create a deployment.  To prepare a
+deployment, one can use:
+
+.. code-block:: console
+
+  $ ramble deployment push
+
+This will populate a directory named ``deployments``, where the default is the
+name of the workspace.
+
+The name of the created deployment can be controlled using:
+
+.. code-block:: console
+
+  $ ramble deployment push -d <deployment_name>
+
+Additionally, Ramble can create a tar of the deployment using:
+
+.. code-block:: console
+
+  $ ramble deployment push -t
+
+And upload the deployment to a remote URL using:
+
+.. code-block:: console
+
+  $ ramble deployment push -u <remote_url>
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pulling a Workspace Deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To apply a deployment to an existing workspace, the ``pull`` sub-command can be used. For example:
+
+.. code-block:: console
+
+  ramble workspace pull -p file://path/to/deployment
+
+Will overwrite the contents of the currently active workspace with the contents
+from the deployment contained in ``file://path/to/deployment``.
+
+It is important to note that this command is destructive, and there is no way
+to revert a workspace back to its state prior to the pull action.
 
 .. _workspace-setup:
 

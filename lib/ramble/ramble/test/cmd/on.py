@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -34,9 +34,6 @@ def test_on_command(mutable_mock_workspace_path):
         ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
 
-        workspace('concretize')
-        assert ws.is_concretized()
-
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
 
@@ -58,9 +55,6 @@ def test_execute_pipeline(mutable_mock_workspace_path):
         ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
 
-        ws.concretize()
-        assert ws.is_concretized()
-
         setup_pipeline = setup_pipeline_class(ws, filters)
         setup_pipeline.run()
         assert os.path.exists(ws.root + '/all_experiments')
@@ -77,9 +71,6 @@ def test_on_where(mutable_mock_workspace_path):
         ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
 
-        workspace('concretize')
-        assert ws.is_concretized()
-
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')
 
@@ -93,9 +84,6 @@ def test_on_executor(mutable_mock_workspace_path):
     with ramble.workspace.read('test') as ws:
         ramble.test.cmd.workspace.add_basic(ws)
         ramble.test.cmd.workspace.check_basic(ws)
-
-        workspace('concretize')
-        assert ws.is_concretized()
 
         workspace('setup')
         assert os.path.exists(ws.root + '/all_experiments')

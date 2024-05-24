@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -25,7 +25,7 @@ class Nvbandwidth(SpackApplication):
 
     workload_variable('transfer-size', default='1m',
                       description='Transfer Size',
-                      workloads=['multi-file', 'single-file'])
+                      workloads=['all_benchmarks'])
 
     executable(name='nvbandwidth', template='nvbandwidth', use_mpi=False)
 

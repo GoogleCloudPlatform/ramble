@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,10 +8,13 @@
 
 import os
 import six
+import shutil
 
-from ramble.language.application_language import register_phase
-from ramble.language.shared_language import register_builtin
+import llnl.util.filesystem as fs
+
+from ramble.language.shared_language import register_builtin, register_phase
 from ramble.application import ApplicationBase, ApplicationError
+from ramble.software_environments import ExternalEnvironment
 import ramble.spack_runner
 import ramble.keywords
 from ramble.util.logger import logger
@@ -39,13 +42,13 @@ class SpackApplication(ApplicationBase):
     """
 
     uses_spack = True
-    _spec_groups = [('default_compilers', 'Default Compilers'),
+    _spec_groups = [('compilers', 'Compilers'),
                     ('mpi_libraries', 'MPI Libraries'),
                     ('software_specs', 'Software Specs')]
     _spec_keys = ['spack_spec', 'compiler_spec', 'compiler']
 
     register_phase('make_experiments', pipeline='setup',
-                   depends_on=['define_package_paths'])
+                   run_after=['define_package_paths'])
 
     def __init__(self, file_path):
         super().__init__(file_path)
@@ -77,10 +80,37 @@ class SpackApplication(ApplicationBase):
 
         return ''.join(out_str)
 
-    register_phase('software_install_requested_compilers', pipeline='setup',
-                   depends_on=['software_create_env'])
+    def build_used_variables(self, workspace):
+        """Build a set of all used variables
 
-    def _software_install_requested_compilers(self, workspace):
+        By expanding all necessary portions of this experiment (required /
+        reserved keywords, templates, commands, etc...), determine which
+        variables are used throughout the experiment definition.
+
+        Variables can have list definitions. These are iterated over to ensure
+        variables referenced by any of them are tracked properly.
+
+        Args:
+            workspace (Workspace): Workspace to extract templates from
+
+        Returns:
+            (set): All variable names used by this experiment.
+        """
+        _ = super().build_used_variables(workspace)
+
+        app_context = self.expander.expand_var_name(self.keywords.env_name)
+
+        software_environments = workspace.software_environments
+        software_environments.render_environment(app_context,
+                                                 self.expander,
+                                                 require=False)
+
+        return self.expander._used_variables
+
+    register_phase('software_install_requested_compilers', pipeline='setup',
+                   run_after=['software_create_env'])
+
+    def _software_install_requested_compilers(self, workspace, app_inst=None):
         """Install compilers an application uses"""
         # See if we cached this already, and if so return
         env_path = self.expander.env_path
@@ -101,38 +131,21 @@ class SpackApplication(ApplicationBase):
 
             app_context = self.expander.expand_var_name(self.keywords.env_name)
 
-            compilers_to_install = set()
-            root_compilers = []
-            for pkg_name in workspace.software_environments.get_env_packages(app_context):
-                pkg_spec = workspace.software_environments.get_spec(pkg_name)
-                if 'compiler' in pkg_spec:
-                    if pkg_spec['compiler'] not in compilers_to_install:
-                        logger.debug(f' Adding root compiler: {pkg_spec["compiler"]}')
-                        compilers_to_install.add(pkg_spec['compiler'])
-                        root_compilers.append(pkg_spec['compiler'])
+            software_envs = workspace.software_environments
+            software_env = software_envs.render_environment(app_context, self.expander)
 
-            dep_compilers = []
-            for comp_name in root_compilers:
-                cur_spec = workspace.software_environments.get_spec(comp_name)
-                while 'compiler' in cur_spec and cur_spec['compiler'] not in compilers_to_install:
-                    compilers_to_install.add(cur_spec['compiler'])
-                    dep_compilers.append(cur_spec['compiler'])
-                    logger.debug(f' Adding dependency compiler: {cur_spec["compiler"]}')
-                    cur_spec = workspace.software_environments.get_spec(cur_spec['compiler'])
-
-            # Install all compilers, starting with deps:
-            for comp_pkg in reversed(root_compilers + dep_compilers):
-                spec_str = workspace.software_environments.get_spec_string(comp_pkg)
-                logger.debug(f'Installing compiler: {comp_pkg}')
-                self.spack_runner.install_compiler(spec_str)
+            for compiler_spec in software_envs.compiler_specs_for_environment(software_env):
+                logger.debug(f'Installing compiler: {compiler_spec}')
+                self.spack_runner.install_compiler(compiler_spec)
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
 
     register_phase('software_create_env', pipeline='mirror')
     register_phase('software_create_env', pipeline='setup')
+    register_phase('software_create_env', pipeline='pushdeployment')
 
-    def _software_create_env(self, workspace):
+    def _software_create_env(self, workspace, app_inst=None):
         """Create the spack environment for this experiment
 
         Extract all specs this experiment uses, and write the spack environment
@@ -179,13 +192,13 @@ class SpackApplication(ApplicationBase):
                     f.write(self.expander.expand_var(contents))
 
             env_context = self.expander.expand_var_name(self.keywords.env_name)
-            external_spack_env = workspace.external_spack_env(env_context)
-            if external_spack_env:
-                self.spack_runner.copy_from_external_env(external_spack_env)
+            software_envs = workspace.software_environments
+            software_env = software_envs.render_environment(env_context, self.expander)
+            if isinstance(software_env, ExternalEnvironment):
+                self.spack_runner.copy_from_external_env(software_env.external_env)
             else:
-                for pkg_name in workspace.software_environments.get_env_packages(env_context):
-                    spec_str = workspace.software_environments.get_spec_string(pkg_name)
-                    self.spack_runner.add_spec(spec_str)
+                for pkg_spec in software_envs.package_specs_for_environment(software_env):
+                    self.spack_runner.add_spec(pkg_spec)
 
                 self.spack_runner.generate_env_file()
 
@@ -211,9 +224,9 @@ class SpackApplication(ApplicationBase):
             logger.die(e)
 
     register_phase('software_configure', pipeline='setup',
-                   depends_on=['software_create_env', 'software_install_requested_compilers'])
+                   run_after=['software_create_env', 'software_install_requested_compilers'])
 
-    def _software_configure(self, workspace):
+    def _software_configure(self, workspace, app_inst=None):
         """Concretize the spack environment for this experiment
 
         Perform spack's concretize step on the software environment generated
@@ -246,9 +259,9 @@ class SpackApplication(ApplicationBase):
             logger.die(e)
 
     register_phase('software_install', pipeline='setup',
-                   depends_on=['software_configure'])
+                   run_after=['software_configure'])
 
-    def _software_install(self, workspace):
+    def _software_install(self, workspace, app_inst=None):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
@@ -273,9 +286,9 @@ class SpackApplication(ApplicationBase):
             logger.die(e)
 
     register_phase('evaluate_requirements', pipeline='setup',
-                   depends_on=['software_install'])
+                   run_after=['software_install'])
 
-    def _evaluate_requirements(self, workspace):
+    def _evaluate_requirements(self, workspace, app_inst=None):
         """Evaluate all requirements for this experiment"""
 
         for mod_inst in self._modifier_instances:
@@ -286,9 +299,9 @@ class SpackApplication(ApplicationBase):
                 self.spack_runner.validate_command(**expanded_req)
 
     register_phase('define_package_paths', pipeline='setup',
-                   depends_on=['software_install', 'evaluate_requirements'])
+                   run_after=['software_install', 'evaluate_requirements'])
 
-    def _define_package_paths(self, workspace):
+    def _define_package_paths(self, workspace, app_inst=None):
         """Define variables containing the path to all spack packages
 
         For every spack package defined within an application context, define
@@ -309,26 +322,43 @@ class SpackApplication(ApplicationBase):
 
         logger.msg('Defining Spack variables')
 
+        cache = workspace.pkg_path_cache
+        app_context = self.expander.expand_var_name(self.keywords.env_name)
+        software_environments = workspace.software_environments
+        software_environment = software_environments.render_environment(
+            app_context, self.expander
+        )
+        # Try to resolve using local cache first
+        unresolved_specs = []
+        for pkg_spec in software_environments.package_specs_for_environment(
+            software_environment
+        ):
+            if pkg_spec in cache:
+                spack_pkg_name, pkg_path = cache.get(pkg_spec)
+                self.variables[spack_pkg_name] = pkg_path
+            else:
+                unresolved_specs.append(pkg_spec)
+        if not unresolved_specs:
+            return
+
         try:
+            logger.debug('Resolving package paths using Spack')
             self.spack_runner.set_dry_run(workspace.dry_run)
             self.spack_runner.set_env(self.expander.env_path)
 
             self.spack_runner.activate()
 
-            app_context = self.expander.expand_var_name(self.keywords.env_name)
-
-            for pkg_name in \
-                    workspace.software_environments.get_env_packages(app_context):
-                spec_str = workspace.software_environments.get_spec_string(pkg_name)
-                spack_pkg_name, package_path = self.spack_runner.get_package_path(spec_str)
-                self.variables[spack_pkg_name] = package_path
+            for pkg_spec in unresolved_specs:
+                spack_pkg_name, pkg_path = self.spack_runner.get_package_path(pkg_spec)
+                self.variables[spack_pkg_name] = pkg_path
+                cache[pkg_spec] = (spack_pkg_name, pkg_path)
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
 
-    register_phase('mirror_software', pipeline='mirror', depends_on=['software_create_env'])
+    register_phase('mirror_software', pipeline='mirror', run_after=['software_create_env'])
 
-    def _mirror_software(self, workspace):
+    def _mirror_software(self, workspace, app_inst=None):
         """Mirror software source for this experiment using spack"""
         import re
 
@@ -388,9 +418,9 @@ class SpackApplication(ApplicationBase):
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
 
-    register_phase('push_to_spack_cache', pipeline='pushtocache', depends_on=[])
+    register_phase('push_to_spack_cache', pipeline='pushtocache', run_after=[])
 
-    def _push_to_spack_cache(self, workspace):
+    def _push_to_spack_cache(self, workspace, app_inst=None):
 
         env_path = self.expander.env_path
         cache_tupl = ('push-to-cache', env_path)
@@ -449,9 +479,34 @@ class SpackApplication(ApplicationBase):
 
         super()._clean_hash_variables(workspace, variables)
 
-    register_builtin('spack_source', required=True)
-    register_builtin('spack_activate', required=True)
-    register_builtin('spack_deactivate', required=False)
+    register_phase('deploy_artifacts', pipeline='pushdeployment',
+                   run_after=['software_create_env'])
+
+    def _deploy_artifacts(self, workspace, app_inst=None):
+        super()._deploy_artifacts(workspace, app_inst=app_inst)
+        env_path = self.expander.env_path
+
+        try:
+            self.spack_runner.set_dry_run(workspace.dry_run)
+            self.spack_runner.set_env(env_path)
+            self.spack_runner.activate()
+
+            repo_path = os.path.join(workspace.named_deployment, 'object_repo')
+
+            for pkg, pkg_def in self.spack_runner.package_definitions():
+                pkg_dir_name = os.path.basename(os.path.dirname(pkg_def))
+                pkg_dir = os.path.join(repo_path, 'packages', pkg_dir_name)
+                fs.mkdirp(pkg_dir)
+                shutil.copyfile(pkg_def, os.path.join(pkg_dir, 'package.py'))
+
+            self.spack_runner.deactivate()
+
+        except ramble.spack_runner.RunnerError as e:
+            logger.die(e)
+
+    register_builtin('spack_source', required=True, depends_on=['builtin::env_vars'])
+    register_builtin('spack_activate', required=True, depends_on=['builtin::spack_source'])
+    register_builtin('spack_deactivate', required=False, depends_on=['builtin::spack_source'])
 
     def spack_source(self):
         return self.spack_runner.generate_source_command()

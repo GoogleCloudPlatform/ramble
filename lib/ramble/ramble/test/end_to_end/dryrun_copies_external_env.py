@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -52,7 +52,6 @@ ramble:
               variables:
                 n_nodes: '1'
   spack:
-    concretized: true
     packages: {{}}
     environments:
       wrfv4:
@@ -78,7 +77,7 @@ ramble:
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
 
-        env_file = os.path.join(ws.software_dir, 'wrfv4.CONUS_12km', 'spack.yaml')
+        env_file = os.path.join(ws.software_dir, 'wrfv4', 'spack.yaml')
 
         assert os.path.exists(env_file)
 

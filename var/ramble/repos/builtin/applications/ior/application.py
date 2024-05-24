@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -18,7 +18,7 @@ class Ior(SpackApplication):
 
     tags('synthetic-benchmarks', 'IO')
 
-    default_compiler('gcc', spack_spec='gcc')
+    define_compiler('gcc', spack_spec='gcc')
     software_spec('openmpi', spack_spec='openmpi')
     software_spec('ior', spack_spec='ior', compiler='gcc')
 
@@ -64,7 +64,7 @@ class Ior(SpackApplication):
 
     access_regex = '(?P<access>(read|write))' + iter_regex
     figure_of_merit_context('iter', regex=access_regex,
-                            output_format='{iter}')
+                            output_format='iter {iter}')
 
     log_str = Expander.expansion_str('log_file')
 

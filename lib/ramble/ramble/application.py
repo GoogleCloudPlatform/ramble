@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,7 +15,6 @@ import textwrap
 import string
 import shutil
 import fnmatch
-import enum
 import time
 from typing import List
 
@@ -29,6 +28,7 @@ import spack.util.environment
 import spack.util.compression
 
 import ramble.config
+import ramble.graphs
 import ramble.stage
 import ramble.mirror
 import ramble.fetch_strategy
@@ -44,29 +44,40 @@ import ramble.util.hashing
 import ramble.util.env
 import ramble.util.directives
 import ramble.util.stats
+import ramble.util.graph
+import ramble.util.class_attributes
 from ramble.util.logger import logger
 
 from ramble.workspace import namespace
 
-from ramble.language.application_language import ApplicationMeta, register_phase
-from ramble.language.shared_language import SharedMeta, register_builtin
+from ramble.language.application_language import ApplicationMeta
+from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.error import RambleError
 
 from enum import Enum
-experiment_status = Enum('experiment_status', ['UNKNOWN', 'SETUP', 'SUCCESS', 'FAILED'])
+experiment_status = Enum('experiment_status', ['UNKNOWN', 'SETUP', 'RUNNING',
+                                               'COMPLETE', 'SUCCESS', 'FAILED'])
+
+_NULL_CONTEXT = 'null'
+
+
+def _get_context_display_name(context):
+    return (
+        f'default ({_NULL_CONTEXT}) context'
+        if context == _NULL_CONTEXT
+        else f'{context} context'
+    )
 
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
     uses_spack = False
     _builtin_name = 'builtin::{name}'
-    _exec_prefix_builtin = 'builtin::'
-    _mod_prefix_builtin = 'modifier_builtin::'
     _builtin_required_key = 'required'
-    _workload_exec_key = 'executables'
     _inventory_file_name = 'ramble_inventory.json'
     _status_file_name = 'ramble_status.json'
-    _pipelines = ['analyze', 'archive', 'mirror', 'setup', 'pushtocache', 'execute']
+    _pipelines = ['analyze', 'archive', 'mirror', 'setup',
+                  'pushdeployment', 'pushtocache', 'execute']
     _language_classes = [ApplicationMeta, SharedMeta]
 
     #: Lists of strings which contains GitHub usernames of attributes.
@@ -79,6 +90,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
 
+        ramble.util.class_attributes.convert_class_attributes(self)
+
         self.keywords = ramble.keywords.keywords
 
         self._vars_are_expanded = False
@@ -87,8 +100,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.variables = None
         self.no_expand_vars = None
         self.experiment_set = None
-        self.internals = None
+        self.internals = {}
         self.is_template = False
+        self.generated_experiments = []
         self.repeats = ramble.repeats.Repeats()
         self._command_list = []
         self.chained_experiments = None
@@ -96,7 +110,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.chain_prepend = []
         self.chain_append = []
         self.chain_commands = {}
-        self._env_variable_sets = None
+        self._env_variable_sets = []
         self.modifiers = []
         self.experiment_tags = []
         self._modifier_instances = []
@@ -104,6 +118,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self._input_fetchers = None
         self.results = {}
         self._phase_times = {}
+        self._pipeline_graphs = None
+        self.custom_executables = {}
 
         self.hash_inventory = {
             'application_definition': None,
@@ -120,23 +136,26 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.application_class = 'ApplicationBase'
 
         self._verbosity = 'short'
-        self._inject_required_builtins()
 
         self.license_path = ''
         self.license_file = ''
-
-        self.build_phase_order()
 
         ramble.util.directives.define_directive_methods(self)
 
     def copy(self):
         """Deep copy an application instance"""
         new_copy = type(self)(self._file_path)
+        self.generated_experiments.append(new_copy)
 
-        new_copy.set_env_variable_sets(self._env_variable_sets.copy())
-        new_copy.set_variables(self.variables.copy(), self.experiment_set)
-        new_copy.set_internals(self.internals.copy())
-        new_copy.set_formatted_executables(self._formatted_executables.copy())
+        if self._env_variable_sets:
+            new_copy.set_env_variable_sets(self._env_variable_sets.copy())
+        if self.variables:
+            new_copy.set_variables(self.variables.copy(), self.experiment_set)
+        if self.internals:
+            new_copy.set_internals(self.internals.copy())
+        if self._formatted_executables:
+            new_copy.set_formatted_executables(self._formatted_executables.copy())
+
         new_copy.set_template(False)
         new_copy.repeats.set_repeats(False, 0)
         new_copy.set_chained_experiments(None)
@@ -156,120 +175,31 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         return True
 
     def build_phase_order(self):
-        for pipeline in self._pipelines:
-            pipeline_phases = []
+        if self._pipeline_graphs is not None:
+            return
 
+        self._pipeline_graphs = {}
+        for pipeline in self._pipelines:
             if pipeline not in self.phase_definitions:
                 self.phase_definitions[pipeline] = {}
 
-            # Detect cycles
-            for phase in self.phase_definitions[pipeline].keys():
+            self._pipeline_graphs[pipeline] = ramble.graphs.PhaseGraph(
+                self.phase_definitions[pipeline],
+                self
+            )
 
-                phase_stack = [phase]
-                phases_touched = set()
-                while phase_stack:
-                    cur_phase = phase_stack.pop()
+            for mod_inst in self._modifier_instances:
+                # Define phase nodes
+                for phase, phase_node in mod_inst.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].add_node(
+                        phase_node, obj_inst=mod_inst
+                    )
 
-                    if cur_phase in phases_touched:
-                        raise PhaseCycleDetectedError(
-                            'Cycle detected when ordering phases in '
-                            f'application {self.name}\n'
-                            f'Phase {phase} ultimately depends on itself.'
-                        )
-
-                    for dep_phase in self.phase_definitions[pipeline][cur_phase]:
-                        if dep_phase not in self.phase_definitions[pipeline].keys():
-                            raise InvalidPhaseError(f'In application {self.name}, phase '
-                                                    f'{dep_phase} is a dependency of '
-                                                    f'phase {phase} but is not defined.')
-                        phase_stack.append(dep_phase)
-
-            phases_to_add = [phase for phase in self.phase_definitions[pipeline].keys()]
-
-            while phases_to_add:
-                cur_phase = phases_to_add.pop(0)
-
-                earliest_idx = 0
-                for dep_phase in self.phase_definitions[pipeline][cur_phase]:
-                    if dep_phase not in pipeline_phases:
-                        earliest_idx = None
-                        break
-                    else:
-                        earliest_idx = max(earliest_idx, pipeline_phases.index(dep_phase) + 1)
-
-                if earliest_idx is None:
-                    phases_to_add.append(cur_phase)
-                elif earliest_idx == 0 or earliest_idx == len(pipeline_phases):
-                    pipeline_phases.append(cur_phase)
-                else:
-                    pipeline_phases.insert(earliest_idx, cur_phase)
-
-            setattr(self, f'_{pipeline}_phases', pipeline_phases)
-
-    def _inject_required_builtins(self):
-        required_builtins = []
-        for builtin, blt_conf in self.builtins.items():
-            if blt_conf[self._builtin_required_key]:
-                required_builtins.append(builtin)
-
-        for workload, wl_conf in self.workloads.items():
-            if self._workload_exec_key in wl_conf:
-                # Insert in reverse order, to make sure they are correctly ordered.
-                for builtin in reversed(required_builtins):
-                    blt_conf = self.builtins[builtin]
-                    if builtin not in wl_conf[self._workload_exec_key]:
-                        if blt_conf['injection_method'] == 'prepend':
-                            wl_conf[self._workload_exec_key].insert(0, builtin)
-                        else:
-                            wl_conf[self._workload_exec_key].append(builtin)
-
-    def _inject_required_modifier_builtins(self):
-        """Inject builtins defined as required from each modifier into this
-        application instance."""
-        if not self.modifiers or len(self._modifier_instances) == 0:
-            return
-
-        required_prepend_builtins = []
-        required_append_builtins = []
-
-        mod_regex = re.compile(ramble.modifier.ModifierBase._mod_builtin_regex +
-                               r'(?P<func>.*)')
-        for mod_inst in self._modifier_instances:
-            for builtin, blt_conf in mod_inst.builtins.items():
-                if blt_conf[self._builtin_required_key]:
-                    blt_match = mod_regex.match(builtin)
-
-                    # Each builtin should only be added once.
-                    added = False
-
-                    if blt_conf['injection_method'] == 'prepend':
-                        if builtin not in required_prepend_builtins:
-                            required_prepend_builtins.append(builtin)
-                            added = True
-                    else:  # Append
-                        if builtin not in required_append_builtins:
-                            required_append_builtins.append(builtin)
-                            added = True
-
-                    # Only update if the builtin was added to a list.
-                    if added:
-                        self._modifier_builtins[builtin] = {
-                            'func': getattr(mod_inst,
-                                            blt_match.group("func"))
-                        }
-
-        for workload, wl_conf in self.workloads.items():
-            if self._workload_exec_key in wl_conf:
-                # Insert prepend builtins in reverse order, to make sure they
-                # are correctly ordered.
-                for builtin in reversed(required_prepend_builtins):
-                    if builtin not in wl_conf[self._workload_exec_key]:
-                        wl_conf[self._workload_exec_key].insert(0, builtin)
-
-                # Append builtins can be inserted in their correct order.
-                for builtin in required_append_builtins:
-                    if builtin not in wl_conf[self._workload_exec_key]:
-                        wl_conf[self._workload_exec_key].append(builtin)
+                # Define phase edges
+                for phase, phase_node in mod_inst.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].define_edges(
+                        phase_node, internal_order=True
+                    )
 
     def _long_print(self):
         out_str = []
@@ -294,21 +224,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             out_str.append(colified(self.tags, tty=True))
             out_str.append('\n')
 
-        if hasattr(self, '_setup_phases'):
+        for pipeline in self._pipelines:
             out_str.append('\n')
-            out_str.append(rucolor.section_title('Setup Pipeline Phases:\n'))
-            out_str.append(colified(self._setup_phases, tty=True))
-
-        if hasattr(self, '_analyze_phases'):
-            out_str.append('\n')
-            out_str.append(rucolor.section_title('Analyze Pipeline Phases:\n'))
-            out_str.append(colified(self._analyze_phases, tty=True))
+            out_str.append(rucolor.section_title(f'Pipeline "{pipeline}" Phases:\n'))
+            out_str.append(colified(self.get_pipeline_phases(pipeline), tty=True))
 
         # Print all FOMs without a context
         if hasattr(self, 'figures_of_merit'):
             out_str.append('\n')
             out_str.append(rucolor.section_title('Figure of merit contexts:\n'))
-            out_str.append(rucolor.nested_1('\t(null) context (default):\n'))
+            out_str.append(rucolor.nested_1(f'\t({_NULL_CONTEXT}) context (default):\n'))
             for name, conf in self.figures_of_merit.items():
                 if len(conf['contexts']) == 0:
                     out_str.append(rucolor.nested_2(f'\t\t{name}\n'))
@@ -326,36 +251,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         if hasattr(self, 'workloads'):
             out_str.append('\n')
-            for wl_name, wl_conf in self.workloads.items():
-                out_str.append(rucolor.section_title('Workload:') + f' {wl_name}\n')
-                out_str.append('\t' + rucolor.nested_1('Executables: ') +
-                               f'{wl_conf["executables"]}\n')
-                out_str.append('\t' + rucolor.nested_1('Inputs: ') +
-                               f'{wl_conf["inputs"]}\n')
-                out_str.append('\t' + rucolor.nested_1('Workload Tags: \n'))
-                if 'tags' in wl_conf and wl_conf['tags']:
-                    out_str.append(colified(wl_conf['tags'], indent=8) + '\n')
-
-                if wl_name in self.environment_variables:
-                    out_str.append(rucolor.nested_1('\tEnvironment Variables:\n'))
-                    for var, conf in self.environment_variables[wl_name].items():
-                        indent = '\t\t'
-
-                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
-                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
-                        out_str.append(f'{indent}\tValue: {conf["value"]}\n')
-
-                if wl_name in self.workload_variables:
-                    out_str.append(rucolor.nested_1('\tVariables:\n'))
-                    for var, conf in self.workload_variables[wl_name].items():
-                        indent = '\t\t'
-
-                        out_str.append(rucolor.nested_2(f'{indent}{var}:\n'))
-                        out_str.append(f'{indent}\tDescription: {conf["description"]}\n')
-                        out_str.append(f'{indent}\tDefault: {conf["default"]}\n')
-                        if 'values' in conf:
-                            out_str.append(f'{indent}\tSuggested Values: {conf["values"]}\n')
-
+            for workload in self.workloads.values():
+                out_str.append(workload.as_str())
             out_str.append('\n')
 
         if hasattr(self, 'builtins'):
@@ -380,10 +277,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.no_expand_vars = set()
         workload_name = self.expander.workload_name
-        if workload_name in self.workload_variables:
-            for var, conf in self.workload_variables[workload_name].items():
-                if 'expandable' in conf and not conf['expandable']:
-                    self.no_expand_vars.add(var)
+        if workload_name in self.workloads:
+            for name, var in self.workloads[workload_name].variables.items():
+                if not var.expandable:
+                    self.no_expand_vars.add(var.name)
+
         self.expander.set_no_expand_vars(self.no_expand_vars)
 
     def set_internals(self, internals):
@@ -413,7 +311,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.experiment_tags = self.tags.copy()
 
         workload_name = self.expander.workload_name
-        self.experiment_tags.extend(self.workloads[workload_name]['tags'])
+        if workload_name in self.workloads:
+            self.experiment_tags.extend(self.workloads[workload_name].tags)
 
         if tags:
             self.experiment_tags.extend(tags)
@@ -426,7 +325,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Check if this instance has provided tags.
 
         Args:
-            tags (list): List of strings, where each string is an indivudal tag
+            tags (list): List of strings, where each string is an individual tag
         Returns:
             (bool): True if all tags are in this instance, False otherwise
         """
@@ -450,31 +349,42 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             '.out'
 
     def get_pipeline_phases(self, pipeline, phase_filters=['*']):
+        self.build_modifier_instances()
+        self.build_phase_order()
+
         if pipeline not in self._pipelines:
             logger.die(f'Requested pipeline {pipeline} is not valid.\n',
                        f'\tAvailable pipelinese are {self._pipelines}')
 
         phases = set()
-        if hasattr(self, f'_{pipeline}_phases'):
-            for phase in getattr(self, f'_{pipeline}_phases'):
+        if pipeline in self._pipeline_graphs:
+            for phase in self._pipeline_graphs[pipeline].walk():
                 for phase_filter in phase_filters:
-                    if fnmatch.fnmatch(phase, phase_filter):
+                    if fnmatch.fnmatch(phase.key, phase_filter):
                         phases.add(phase)
-        else:
-            logger.die(f'Pipeline {pipeline} is not defined in application {self.name}')
 
         include_phase_deps = ramble.config.get('config:include_phase_dependencies')
         if include_phase_deps:
             phases_for_deps = list(phases)
             while phases_for_deps:
                 cur_phase = phases_for_deps.pop(0)
-                for dep_phase in self.phase_definitions[pipeline][cur_phase]:
-                    if dep_phase not in phases:
-                        phases_for_deps.append(dep_phase)
-                        phases.add(dep_phase)
+                for phase in phases:
+                    if phase is not cur_phase and phase not in phases:
+                        if cur_phase.key in phase._order_before:
+                            phases_for_deps.append(phase)
+                            phases.add(phase)
 
-        return [phase for phase in getattr(self, f'_{pipeline}_phases')
-                if phase in phases]
+                for dep_phase_name in cur_phase._order_after:
+                    dep_node = self._pipeline_graphs[pipeline].get_node(dep_phase_name)
+                    if dep_node not in phases:
+                        phases_for_deps.append(dep_node)
+                        phases.add(dep_node)
+
+        phase_order = []
+        for node in self._pipeline_graphs[pipeline].walk():
+            if node in phases:
+                phase_order.append(node.key)
+        return phase_order
 
     def _short_print(self):
         return [self.name]
@@ -496,6 +406,58 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             expansion_var = self.expander.expansion_str(var)
             expanded = self.expander.expand_var(expansion_var)
             color.cprint(f'{indent}  {var} = {val} ==> {expanded}'.replace('@', '@@'))
+
+    def build_used_variables(self, workspace):
+        """Build a set of all used variables
+
+        By expanding all necessary portions of this experiment (required /
+        reserved keywords, templates, commands, etc...), determine which
+        variables are used throughout the experiment definition.
+
+        Variables can have list definitions. These are iterated over to ensure
+        variables referenced by any of them are tracked properly.
+
+        Args:
+            workspace (Workspace): Workspace to extract templates from
+
+        Returns:
+            (set): All variable names used by this experiment.
+        """
+        self.build_modifier_instances()
+        self.add_expand_vars(workspace)
+
+        # Add all known keywords
+        for key in self.keywords.keys:
+            self.expander._used_variables.add(key)
+            self.expander.expand_var_name(key)
+
+        # Add modifier mode variables:
+        for mod_inst in self._modifier_instances:
+            for var in mod_inst.mode_variables().keys():
+                self.expander._used_variables.add(var)
+                self.expander.expand_var_name(var)
+
+        if self.chained_experiments:
+            for chained_exp in self.chained_experiments:
+                if namespace.inherit_variables in chained_exp:
+                    for var in chained_exp[namespace.inherit_variables]:
+                        self.expander._used_variables.add(var)
+
+        # Add variables from success criteria
+        criteria_list = workspace.success_list
+        for criteria in criteria_list.all_criteria():
+            if criteria.mode == 'fom_comparison':
+                self.expander.expand_var(criteria.formula)
+                self.expander.expand_var(criteria.fom_name)
+                self.expander.expand_var(criteria.fom_context)
+            elif criteria.mode == 'application_function':
+                self.evaluate_success()
+
+        for template_name, template_conf in workspace.all_templates():
+            self.expander._used_variables.add(template_name)
+            self.expander.expand_var(template_conf['contents'])
+
+        return self.expander._used_variables
 
     def print_internals(self, indent=''):
         if not self.internals:
@@ -542,10 +504,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         return results.getvalue()
 
     # Phase execution helpers
-    def run_phase(self, phase, workspace):
+    def run_phase(self, pipeline, phase, workspace):
         """Run a phase, by getting its function pointer"""
-        self.build_modifier_instances()
-        self._inject_required_modifier_builtins()
         self.add_expand_vars(workspace)
         if self.is_template:
             logger.debug(f'{self.name} is a template. Skipping phases')
@@ -554,14 +514,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             logger.debug(f'{self.name} is a repeat base. Skipping phases')
             return
 
-        if hasattr(self, f'_{phase}'):
-            logger.msg(f'  Executing phase {phase}')
-            start_time = time.time()
-            for mod_inst in self._modifier_instances:
-                mod_inst.run_phase_hook(workspace, phase)
-            phase_func = getattr(self, f'_{phase}')
-            phase_func(workspace)
-            self._phase_times[phase] = time.time() - start_time
+        phase_node = self._pipeline_graphs[pipeline].get_node(phase)
+
+        if phase_node is None:
+            logger.die(f'Phase {phase} is not defined in pipeline {pipeline}')
+
+        logger.msg(f'  Executing phase {phase}')
+        start_time = time.time()
+        for mod_inst in self._modifier_instances:
+            mod_inst.run_phase_hook(workspace, pipeline, phase)
+        phase_func = phase_node.attribute
+        phase_func(workspace, app_inst=self)
+        self._phase_times[phase] = time.time() - start_time
 
     def print_phase_times(self, pipeline, phase_filters=['*']):
         """Print phase execution times by pipeline phase order
@@ -604,7 +568,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                                   f'    Primary experiment {parent_namespace}\n' +
                                                   f'    Chained expeirment name: {exp_name}\n' +
                                                   f'    Chain definition: {str(exp)}')
-                chain_stack.append((exp_name, exp))
+                chain_stack.append((exp_name, exp.copy()))
 
         parent_run_dir = self.expander.expand_var(
             self.expander.expansion_str(self.keywords.experiment_run_dir)
@@ -744,6 +708,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if exp_inst:
                 exp_inst.chain_order = self.chain_order.copy()
 
+    def define_variable(self, var_name, var_value):
+        self.expander._variables[var_name] = var_value
+        for mod_inst in self._modifier_instances:
+            mod_inst.expander._variables[var_name] = var_value
+
     def build_modifier_instances(self):
         """Built a map of modifier names to modifier instances needed for this
            application instance
@@ -752,8 +721,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if not self.modifiers:
             return
 
-        if len(self._modifier_instances) > 0:
-            return
+        self._modifier_instances = []
 
         mod_type = ramble.repository.ObjectTypes.modifiers
 
@@ -781,98 +749,72 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(self.variables)
 
+        # Ensure no expand vars are set correctly for modifiers
+        for mod_inst in self._modifier_instances:
+            for var in mod_inst.no_expand_vars():
+                self.expander.add_no_expand_var(var)
+                mod_inst.expander.add_no_expand_var(var)
+
     def define_modifier_variables(self):
         """Extract default variable definitions from modifier instances"""
 
-    def _get_executables(self):
-        """Return executables for add_expand_vars"""
-
-        executables = self.workloads[self.expander.workload_name]['executables']
-
-        # Use yaml defined executable order, if defined
-        if namespace.executables in self.internals:
-            executables = self.internals[namespace.executables]
-
+    def _define_custom_executables(self):
         # Define custom executables
         if namespace.custom_executables in self.internals:
             for name, conf in self.internals[namespace.custom_executables].items():
-                self.executables[name] = ramble.util.executable.CommandExecutable(
+                if name in self.executables or name in self.custom_executables:
+                    experiment_namespace = self.expander.expand_var_name('experiment_namespace')
+                    raise ExecutableNameError(f'In experiment {experiment_namespace} '
+                                              f'a custom executable "{name}" is defined.\n'
+                                              f'However, an executable "{name}" is already '
+                                              'defined')
+
+                self.custom_executables[name] = ramble.util.executable.CommandExecutable(
                     name=name,
                     **conf
                 )
 
+    def _get_exec_order(self, workload_name):
+        graph = self._get_executable_graph(workload_name)
+        order = []
+        for node in graph.walk():
+            order.append(node.key)
+        return order
+
+    def _get_executable_graph(self, workload_name):
+        """Return executables for add_expand_vars"""
+        self._define_custom_executables()
+        exec_order = self.workloads[workload_name].executables
+        # Use yaml defined executable order, if defined
+        if namespace.executables in self.internals:
+            exec_order = self.internals[namespace.executables]
+
+        builtin_objects = [self]
+        all_builtins = [self.builtins]
+        for mod_inst in self._modifier_instances:
+            builtin_objects.append(mod_inst)
+            all_builtins.append(mod_inst.builtins)
+
+        all_executables = self.executables.copy()
+        all_executables.update(self.custom_executables)
+
+        executable_graph = ramble.graphs.ExecutableGraph(exec_order, all_executables,
+                                                         builtin_objects, all_builtins,
+                                                         self)
+
         # Perform executable injection
         if namespace.executable_injection in self.internals:
-
-            supported_orders = enum.Enum('supported_orders', ['before', 'after'])
-
-            # Order can be 'before' or 'after.
-            # If `relative_to` is not set, then before adds to be the beginning of the list
-            #                  and after (default) adds to the end of the list
-            # If `relative_to` IS set, then before adds before the first instance of
-            #                  the executable in the list
-            #                  and after (default) adds after the last instance of the
-            #                  executable in the list
-            # If `relative_to` is set, and the executable name is not found, raise a fatal error.
             for exec_injection in self.internals[namespace.executable_injection]:
                 exec_name = exec_injection['name']
-
-                injection_order = supported_orders.after
+                order = 'before'
                 if 'order' in exec_injection:
-                    if not hasattr(supported_orders, exec_injection['order']):
-                        logger.die('In experiment '
-                                   f'"{self.expander.experiment_namespace}" '
-                                   f'injection order of executable "{exec_name}" is set to an '
-                                   f'invalid value of "{injection_order}".\n'
-                                   f'Valid values are {supported_orders}.')
-
-                    injection_order = getattr(supported_orders, exec_injection['order'])
-
-                relative = None
+                    order = exec_injection['order']
+                relative_to = None
                 if 'relative_to' in exec_injection:
-                    relative = exec_injection['relative_to']
+                    relative_to = exec_injection['relative_to']
+                executable_graph.inject_executable(exec_name, order, relative_to)
 
-                if exec_name not in self.executables:
-                    logger.die('In experiment '
-                               f'"{self.expander.experiment_namespace}" '
-                               f'attempting to inject a non existing executable "{exec_name}".')
-
-                if relative is not None and relative not in executables:
-                    logger.die('In experiment '
-                               f'"{self.expander.experiment_namespace}" '
-                               f'attempting to inject executable "{exec_name}" '
-                               f'relative to a non existing executable "{relative}".')
-
-                if relative is None:
-                    if injection_order == supported_orders.before:
-                        executables.insert(0, exec_name)
-                    elif injection_order == supported_orders.after:
-                        executables.append(exec_name)
-                else:
-
-                    found = False
-                    if injection_order == supported_orders.before:
-                        relative_index = 0
-                        increment = 1
-                    elif injection_order == supported_orders.after:
-                        relative_index = len(executables) - 1
-                        increment = -1
-
-                    while not found and relative_index <= len(executables) \
-                            and relative_index >= 0:
-                        if executables[relative_index] == relative:
-                            found = True
-                        else:
-                            relative_index += increment
-
-                    if injection_order == supported_orders.before:
-                        injection_index = relative_index
-                    elif injection_order == supported_orders.after:
-                        injection_index = relative_index + 1
-
-                    executables.insert(injection_index, exec_name)
-
-        return executables
+        return executable_graph
 
     def _set_input_path(self):
         """Put input_path into self.variables[input_file] for add_expand_vars"""
@@ -892,31 +834,42 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if they haven't been set already"""
         # Set default experiment variables, if they haven't been set already
         var_sets = []
-        if self.expander.workload_name in self.workload_variables:
-            var_sets.append(self.workload_variables[self.expander.workload_name])
+        if self.expander.workload_name in self.workloads:
+            var_sets.append(self.workloads[self.expander.workload_name].variables)
 
         for mod_inst in self._modifier_instances:
             var_sets.append(mod_inst.mode_variables())
 
         for var_set in var_sets:
-            for var, conf in var_set.items():
+            for var, val in var_set.items():
                 if var not in self.variables.keys():
-                    self.variables[var] = conf['default']
+                    self.variables[var] = val.default
 
-        if self.expander.workload_name in self.environment_variables:
-            wl_env_vars = self.environment_variables[self.expander.workload_name]
+        if self.expander.workload_name in self.workloads:
+            workload = self.workloads[self.expander.workload_name]
 
-            for name, vals in wl_env_vars.items():
+            for name, env_var in workload.environment_variables.items():
+                action = 'set'
+                value = env_var.value
 
-                action = vals['action']
-                value = vals['value']
+                # Since the type coming from the schema can either be None, or
+                # a complex polymorphic type we need to ensure it has a
+                # sensible base structure when it is not given
+                if not self._env_variable_sets:
+                    self._env_variable_sets.append({'set': {}})
+
+                # Since the type coming from the schema can either be None, or
+                # a complex polymorphic type we need to ensure it has a
+                # sensible base structure when it is not given
+                if not self._env_variable_sets:
+                    self._env_variable_sets.append({'set': {}})
 
                 for env_var_set in self._env_variable_sets:
                     if action in env_var_set:
-                        if name not in env_var_set[action].keys():
-                            env_var_set[action][name] = value
+                        if env_var.name not in env_var_set[action].keys():
+                            env_var_set[action][env_var.name] = value
 
-    def _define_commands(self, executables):
+    def _define_commands(self, exec_graph):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -933,55 +886,36 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # ensure all log files are purged and set up
         logs = set()
-        builtin_regex = re.compile(r'%s(?P<func>.*)' % self._exec_prefix_builtin)
-        modifier_regex = re.compile(ramble.modifier.ModifierBase._mod_prefix_builtin +
-                                    r'(?P<func>.*)')
-        for executable in executables:
-            if not builtin_regex.search(executable) and \
-                    not modifier_regex.search(executable):
-                command_config = self.executables[executable]
-                if command_config.redirect:
-                    logs.add(command_config.redirect)
+
+        for exec_node in exec_graph.walk():
+            if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
+                exec_cmd = exec_node.attribute
+                if exec_cmd.redirect:
+                    logs.add(exec_cmd.redirect)
 
         for log in logs:
             self._command_list.append('rm -f "%s"' % log)
             self._command_list.append('touch "%s"' % log)
 
-        for executable in executables:
-            builtin_match = builtin_regex.match(executable)
+        for exec_node in exec_graph.walk():
+            exec_vars = {'executable_name': exec_node.key}
 
-            exec_vars = {'executable_name': executable}
-            if executable in self.executables:
-                exec_vars.update(self.executables[executable].variables)
+            if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
+                exec_vars.update(exec_node.attribute.variables)
 
             for mod in self._modifier_instances:
-                if mod.applies_to_executable(executable):
+                if mod.applies_to_executable(exec_node.key):
                     exec_vars.update(mod.modded_variables(self))
 
-            if builtin_match:
-                # Process builtin executables
-
-                # Get internal method:
-                func_name = f'{builtin_match.group("func")}'
-                func = getattr(self, func_name)
-                func_cmds = func()
-                for cmd in func_cmds:
-                    self._command_list.append(self.expander.expand_var(cmd, exec_vars))
-            elif executable in self._modifier_builtins.keys():
-                builtin_def = self._modifier_builtins[executable]
-                func = builtin_def['func']
-                func_cmds = func()
-                for cmd in func_cmds:
-                    self._command_list.append(self.expander.expand_var(cmd, exec_vars))
-            else:
+            if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
                 # Process directive defined executables
-                base_command = self.executables[executable].copy()
+                base_command = exec_node.attribute.copy()
                 pre_commands = []
                 post_commands = []
 
                 for mod in self._modifier_instances:
-                    if mod.applies_to_executable(executable):
-                        pre_cmd, post_cmd = mod.apply_executable_modifiers(executable,
+                    if mod.applies_to_executable(exec_node.key):
+                        pre_cmd, post_cmd = mod.apply_executable_modifiers(exec_node.key,
                                                                            base_command,
                                                                            app_inst=self)
                         pre_commands.extend(pre_cmd)
@@ -1001,11 +935,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         out_log = self.expander.expand_var(cmd_conf.redirect, exec_vars)
                         output_operator = cmd_conf.output_capture
                         redirect = f' {output_operator} "{out_log}"'
+                        if ramble.config.get('config:shell') in ['bash', 'sh']:
+                            redirect += ' 2>&1'
 
                     for part in cmd_conf.template:
                         command_part = f'{mpi_cmd}{part}{redirect}'
                         self._command_list.append(self.expander.expand_var(command_part,
                                                                            exec_vars))
+
+            else:  # All Builtins
+                func = exec_node.attribute
+                func_cmds = func()
+                for cmd in func_cmds:
+                    self._command_list.append(self.expander.expand_var(cmd, exec_vars))
 
         # Inject all appended chained experiments
         for chained_exp in self.chain_append:
@@ -1030,7 +972,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             n_indentation = 0
             if namespace.indentation in formatted_conf:
-                n_indentation = int(formatted_conf[namespace.indentation]) + 1
+                n_indentation = int(formatted_conf[namespace.indentation])
 
             prefix = ''
             if namespace.prefix in formatted_conf:
@@ -1040,9 +982,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if namespace.join_separator in formatted_conf:
                 join_separator = formatted_conf[namespace.join_separator].replace(r'\n', '\n')
 
-            indentation = ''
-            for _ in range(0, n_indentation + 1):
-                indentation += ' '
+            indentation = ' ' * n_indentation
 
             formatted_str = ''
             for cmd in self._command_list:
@@ -1081,10 +1021,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """
         if not self._vars_are_expanded:
             self._validate_experiment()
-            executables = self._get_executables()
+            exec_graph = self._get_executable_graph(self.expander.workload_name)
             self._set_default_experiment_variables()
             self._set_input_path()
-            self._define_commands(executables)
+            self._define_commands(exec_graph)
             self._define_formatted_executables()
 
             self._derive_variables_for_template_path(workspace)
@@ -1100,13 +1040,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if self._input_fetchers is not None:
             return
 
+        self._input_fetchers = {}
+
         workload_names = [workload] if workload else self.workloads.keys()
 
         inputs = {}
         for workload_name in workload_names:
             workload = self.workloads[workload_name]
 
-            for input_file in workload['inputs']:
+            for input_file in workload.inputs:
                 if input_file not in self.inputs:
                     logger.die(
                         f'Workload {workload_name} references a non-existent input file '
@@ -1141,7 +1083,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('mirror_inputs', pipeline='mirror')
 
-    def _mirror_inputs(self, workspace):
+    def _mirror_inputs(self, workspace, app_inst=None):
         """Mirror application inputs
 
         Perform mirroring of inputs within this application class.
@@ -1160,7 +1102,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('get_inputs', pipeline='setup')
 
-    def _get_inputs(self, workspace):
+    def _get_inputs(self, workspace, app_inst=None):
         """Download application inputs
 
         Download application inputs into the proper directory within the workspace.
@@ -1212,7 +1154,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('license_includes', pipeline='setup')
 
-    def _license_includes(self, workspace):
+    def _license_includes(self, workspace, app_inst=None):
         logger.debug("Writing License Includes")
         self._prepare_license_path(workspace)
 
@@ -1237,9 +1179,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             if cmd:
                                 f.write(cmd + '\n')
 
-    register_phase('make_experiments', pipeline='setup', depends_on=['get_inputs'])
+    register_phase('make_experiments', pipeline='setup', run_after=['get_inputs'])
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         """Create experiment directories
 
         Create the experiment this application encapsulates. This includes
@@ -1373,9 +1315,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
 
-    register_phase('write_inventory', pipeline='setup', depends_on=['make_experiments'])
+    register_phase('write_inventory', pipeline='setup', run_after=['make_experiments'])
 
-    def _write_inventory(self, workspace):
+    def _write_inventory(self, workspace, app_inst=None):
         """Build and write an inventory of an experiment
 
         Write an inventory file describing all of the contents of this
@@ -1390,7 +1332,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('archive_experiments', pipeline='archive')
 
-    def _archive_experiments(self, workspace):
+    def _archive_experiments(self, workspace, app_inst=None):
         """Archive an experiment directory
 
         Perform the archiving action on an experiment.
@@ -1439,7 +1381,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
     register_phase('prepare_analysis', pipeline='analyze')
 
-    def _prepare_analysis(self, workspace):
+    def _prepare_analysis(self, workspace, app_inst=None):
         """Prepapre experiment for analysis extraction
 
         This function performs any actions that are necessary before the
@@ -1450,9 +1392,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """
         pass
 
-    register_phase('analyze_experiments', pipeline='analyze', depends_on=['prepare_analysis'])
+    register_phase('analyze_experiments', pipeline='analyze', run_after=['prepare_analysis'])
 
-    def _analyze_experiments(self, workspace):
+    def _analyze_experiments(self, workspace, app_inst=None):
         """Perform experiment analysis.
 
         This method will build up the fom_values dictionary. Its structure is:
@@ -1473,11 +1415,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """
 
         if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
-            logger.die(
-                f'Workspace status is {self.get_status()}\n'
-                'Make sure your workspace is fully setup with\n'
-                '    ramble workspace setup'
+            logger.warn(
+                f'Experiment has status is {self.get_status()}. Skipping analysis..\n'
             )
+            return
 
         def format_context(context_match, context_format):
 
@@ -1487,8 +1428,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     if group[1]:
                         context_val[group[1]] = context_match[group[1]]
 
-            context_string = context_format.replace('{', '').replace('}', '') \
-                + ' = ' + context_format.format(**context_val)
+            context_string = context_format.format(**context_val)
             return context_string
 
         fom_values = {}
@@ -1548,10 +1488,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                     for context in fom_conf['contexts']:
                                         context_name = active_contexts[context] \
                                             if context in active_contexts \
-                                            else 'null'
+                                            else _NULL_CONTEXT
                                         fom_contexts.append(context_name)
                                 else:
-                                    fom_contexts.append('null')
+                                    fom_contexts.append(_NULL_CONTEXT)
 
                                 for context in fom_contexts:
                                     if context not in fom_values:
@@ -1609,14 +1549,18 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             self.results['CONTEXTS'] = []
 
             for context, fom_map in fom_values.items():
-                context_map = {'name': context, 'foms': []}
+                context_map = {
+                    'name': context,
+                    'foms': [],
+                    'display_name': _get_context_display_name(context),
+                }
 
                 for fom_name, fom in fom_map.items():
                     fom_copy = fom.copy()
                     fom_copy['name'] = fom_name
                     context_map['foms'].append(fom_copy)
 
-                if context == 'null':
+                if context == _NULL_CONTEXT:
                     self.results['CONTEXTS'].insert(0, context_map)
                 else:
                     self.results['CONTEXTS'].append(context_map)
@@ -1715,6 +1659,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if repeat_success or workspace.always_print_foms:
             logger.debug(f'Calculating statistics for {self.repeats.n_repeats} repeats of '
                          f'{base_exp_name}')
+
+            # Add defined keywords as top level keys
+            for key in self.keywords.keys:
+                if self.keywords.is_key_level(key):
+                    self.results[key] = self.expander.expand_var_name(key)
+
             self.results['RAMBLE_VARIABLES'] = {}
             self.results['RAMBLE_RAW_VARIABLES'] = {}
             for var, val in self.variables.items():
@@ -1757,7 +1707,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             # Iterate through the aggregated foms, calculate stats, and insert into results
             for context, fom_dict in repeat_foms.items():
-                context_map = {'name': context, 'foms': []}
+                context_map = {
+                    'name': context,
+                    'foms': [],
+                    'display_name': _get_context_display_name(context),
+                }
 
                 for fom_key, fom_values in fom_dict.items():
                     fom_name = fom_key[0]
@@ -1925,10 +1879,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Get the status of this experiment"""
         return self.variables[self.keywords.experiment_status]
 
-    register_phase('write_status', pipeline='analyze', depends_on=['analyze_experiments'])
-    register_phase('write_status', pipeline='setup', depends_on=['make_experiments'])
+    register_phase('write_status', pipeline='analyze', run_after=['analyze_experiments'])
+    register_phase('write_status', pipeline='setup', run_after=['make_experiments'])
 
-    def _write_status(self, workspace):
+    def _write_status(self, workspace, app_inst=None):
         """Phase to write an experiment's ramble_status.json file"""
 
         status_data = {}
@@ -1945,6 +1899,22 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if os.path.exists(exp_dir):
             with open(status_path, 'w+') as f:
                 spack.util.spack_json.dump(status_data, f)
+
+    register_phase('deploy_artifacts', pipeline='pushdeployment')
+
+    def _deploy_artifacts(self, workspace, app_inst=None):
+        repo_path = os.path.join(workspace.named_deployment, 'object_repo')
+
+        app_dir_name = os.path.basename(os.path.dirname(self._file_path))
+        app_dir = os.path.join(repo_path, 'applications', app_dir_name)
+        fs.mkdirp(app_dir)
+        shutil.copyfile(self._file_path, os.path.join(app_dir, 'application.py'))
+
+        for mod_inst in self._modifier_instances:
+            mod_dir_name = os.path.basename(os.path.dirname(mod_inst._file_path))
+            mod_dir = os.path.join(repo_path, 'modifiers', mod_dir_name)
+            fs.mkdirp(mod_dir)
+            shutil.copyfile(mod_inst._file_path, os.path.join(mod_dir, 'modifier.py'))
 
     register_builtin('env_vars', required=True)
 
@@ -2003,6 +1973,12 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 class ApplicationError(RambleError):
     """
     Exception that is raised by applications
+    """
+
+
+class ExecutableNameError(RambleError):
+    """
+    Exception raised when a name collision in executables happens
     """
 
 

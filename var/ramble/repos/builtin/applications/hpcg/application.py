@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,7 +19,7 @@ class Hpcg(SpackApplication):
 
     tags('benchmark-app', 'mini-app', 'benchmark')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('impi2018',
                   spack_spec='intel-mpi@2018.4.274')
@@ -83,7 +83,7 @@ class Hpcg(SpackApplication):
                     fom_regex=r'Final Summary::HPCG 2\.4 rating.*=(?P<rating>[0-9]+\.*[0-9]*)',
                     group_name='rating', units='')
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         super()._make_experiments(workspace)
 
         input_path = os.path.join(self.expander.expand_var_name('experiment_run_dir'),

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,11 +21,11 @@ class Hpl(SpackApplication):
     '''Define HPL application'''
     name = 'hpl'
 
-    maintainers('douglasjacobsen', 'dodecatheon')
+    maintainers('douglasjacobsen')
 
     tags('benchmark-app', 'benchmark', 'linpack')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('impi_2018', spack_spec='intel-mpi@2018.4.274')
 
@@ -202,7 +202,7 @@ class Hpl(SpackApplication):
                     group_name='gflops', units='GFLOP/s',
                     contexts=['problem-name'])
 
-    figure_of_merit_context('problem-name', regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n', output_format='{N}-{NB}-{P}-{Q}')
+    figure_of_merit_context('problem-name', regex=r'.*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>[0-9].*)\n', output_format='N-NB-P-Q = {N}-{NB}-{P}-{Q}')
 
     # Integer sqrt
     def _isqrt(self, n):
@@ -260,8 +260,8 @@ class Hpl(SpackApplication):
             problemSize = blockSize * nBlocks
             usedPercentage = int(problemSize**2 / fullMemWords * 100)
 
-            for var, config in self.workload_variables['standard'].items():
-                self.variables[var] = config['default']
+            for name, var in self.workloads['standard'].variables.items():
+                self.variables[var.name] = var.default
 
             pfact = expander.expand_var_name('pfact')
             nbmin = expander.expand_var_name('nbmin')
@@ -309,7 +309,7 @@ class Hpl(SpackApplication):
             # ramble.yaml configurable
             self.variables['DEPTHs'] = pad_value(depth, 'DEPTHs (>=0)')  # vs '0'
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         super()._make_experiments(workspace)
         self._calculate_values(workspace)
 

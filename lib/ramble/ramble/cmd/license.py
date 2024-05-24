@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -65,20 +65,30 @@ lgpl_exceptions = [
 ]
 
 
-def _all_ramble_files(root=ramble.paths.prefix):
+def _get_modified_files(root):
+    """Get a list of modified files in the current repository."""
+    diff_args = ['-C', root, 'diff', 'HEAD', '--name-only']
+    files = git(*diff_args, output=str).split()
+    return files
+
+
+def _all_ramble_files(root=ramble.paths.prefix, modified_only=False):
     """Generates root-relative paths of all files in the ramble repository."""
-    visited = set()
-    for cur_root, folders, files in os.walk(root):
-        for filename in files:
-            path = os.path.realpath(os.path.join(cur_root, filename))
+    if modified_only:
+        yield from _get_modified_files(root)
+    else:
+        visited = set()
+        for cur_root, folders, files in os.walk(root):
+            for filename in files:
+                path = os.path.realpath(os.path.join(cur_root, filename))
 
-            if path not in visited:
-                yield os.path.relpath(path, root)
-                visited.add(path)
+                if path not in visited:
+                    yield os.path.relpath(path, root)
+                    visited.add(path)
 
 
-def _licensed_files(root=ramble.paths.prefix):
-    for relpath in _all_ramble_files(root):
+def _licensed_files(root=ramble.paths.prefix, modified_only=False):
+    for relpath in _all_ramble_files(root, modified_only=modified_only):
         if any(regex.match(relpath) for regex in licensed_files):
             yield relpath
 
@@ -118,7 +128,7 @@ class LicenseError(object):
 
 def _check_license(lines, path):
     license_lines = [
-        r'Copyright 2022-2024 Google LLC',  # noqa: E501
+        r'Copyright 2022-2024 The Ramble Authors',  # noqa: E501
         r'Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or',  # noqa: E501
         r'https://www.apache.org/licenses/LICENSE-2.0> or the MIT license',  # noqa: E501
         r'<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your',  # noqa: E501
@@ -178,7 +188,7 @@ def verify(args):
 
     license_errors = LicenseError()
 
-    for relpath in _licensed_files(args.root):
+    for relpath in _licensed_files(args.root, modified_only=args.modified):
         path = os.path.join(args.root, relpath)
         with open(path) as f:
             lines = [line for line in f][:license_lines]
@@ -203,6 +213,13 @@ def setup_parser(subparser):
     verify_parser.add_argument(
         '--root', action='store', default=ramble.paths.prefix,
         help='scan a different prefix for license issues')
+    verify_parser.add_argument(
+        '--modified',
+        '-m',
+        action='store_true',
+        default=False,
+        help='verify only the modified files as outputted by `git ls-files --modified`',
+    )
 
 
 def license(parser, args):

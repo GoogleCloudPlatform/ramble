@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -48,10 +48,10 @@ environments:
             gcc9:
               Spack spec: gcc@9.4.0 target=x86_64
               Compiler spec: gcc@9.4.0
-        impi2018:
+        impi2021:
           Rendered Packages:
-            impi2018:
-              Spack spec: intel-mpi@2018.4.274 target=x86_64
+            impi2021:
+              Spack spec: intel-oneapi-mpi@2021.11.0 target=x86_64
               Compiler: gcc9
         gromacs:
           Rendered Packages:
@@ -63,7 +63,7 @@ environments:
           Rendered Environments:
             gromacs Packages:
               - gromacs
-              - impi2018
+              - impi2021
 
 
 Currently, this command outputs every package and software environment
@@ -80,13 +80,12 @@ The relevant portion of the workspace configuration file is:
 .. code-block:: YAML
 
     spack:
-      concretized: true
       packages:
         gcc9:
           spack_spec: gcc@9.4.0 target=x86_64
           compiler_spec: gcc@9.4.0
-        impi2018:
-          spack_spec: intel-mpi@2018.4.274 target=x86_64
+        impi2021:
+          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9
         gromacs:
           spack_spec: gromacs@2021.6
@@ -95,7 +94,7 @@ The relevant portion of the workspace configuration file is:
         gromacs:
           packages:
           - gromacs
-          - impi2018
+          - impi2021
 
 In this configuration, the ``packages`` block defines software packages that
 can be used to build experiment environments out of. The ``environments`` block

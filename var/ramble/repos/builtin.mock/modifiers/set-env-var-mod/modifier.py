@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -18,4 +18,8 @@ class SetEnvVarMod(BasicModifier):
 
     mode('test', description='This is a test mode')
 
+    modifier_variable('mask_test', default='0x0', description='Test mask var',
+                      modes=['test'], expandable=False)
+
     env_var_modification('test_var', modification='test_val', method='set', mode='test')
+    env_var_modification('mask_env_var', modification='{mask_test}', method='set', mode='test')

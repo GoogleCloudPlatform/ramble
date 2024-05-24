@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -58,7 +58,6 @@ ramble:
               variables:
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
@@ -86,10 +85,10 @@ ramble:
 
         with open(exp_script, 'r') as f:
             data = f.read()
-            assert ';           from_ws echo' in data
             assert 'from_app echo' in data
-            assert '           from_wl echo' in data
-            assert '          from_exp echo' in data
+            assert ';' + ' ' * 9 + 'from_ws echo' in data
+            assert '\n' + ' ' * 11 + 'from_wl echo' in data
+            assert '\n' + ' ' * 10 + 'from_exp echo' in data
 
 
 def test_redefined_executable_errors(mutable_config, mutable_mock_workspace_path,
@@ -115,7 +114,6 @@ ramble:
                 var_exec_name: 'nothing'
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

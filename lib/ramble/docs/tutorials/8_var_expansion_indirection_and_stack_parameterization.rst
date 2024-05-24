@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -95,12 +95,11 @@ final configuration from the previous tutorial.
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -112,9 +111,8 @@ final configuration from the previous tutorial.
             - intel-mpi
             - wrfv4
 
-The above configuration will execute 6 experiments, comprising a basic scaling
-study on three different sets of nodes across two different platforms. This
-configuration was the final result of the :ref:`zips_and_matrices` tutorial.
+The above configuration will execute 4 experiments, comprising a basic scaling
+study on three different sets of nodes across two different platforms.
 
 You will expand this definition to perform the same sweep over multiple MPI
 implementations. Over the course of this tutorial, you will learn how to use
@@ -193,12 +191,11 @@ generation as well. The result might look like the following:
                   - platform_config
                   - n_nodes
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix
@@ -228,7 +225,7 @@ Should result in the following error:
 
     ==> Error: Experiment wrfv4.CONUS_12km.scaling_1_platform1 is not unique.
 
-As you have implicitly defined 12 experiments (3 from ``n_nodes``, times 2 from
+As you have implicitly defined 8 experiments (2 from ``n_nodes``, times 2 from
 ``platform_config``, times another 2 from ``mpi_name``), but you haven't
 updated the experiment name template. To resolve this, add ``{mpi_name}`` into
 the experiment name template. Additionally, you may explicitly add ``mpi_name``
@@ -264,12 +261,11 @@ into the matrix. The result might look like the following:
                   - n_nodes
                   - mpi_name
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix
@@ -286,7 +282,7 @@ into the matrix. The result might look like the following:
 Variable Expansion and Indirection
 ----------------------------------
 
-At this stage, you have defined a workspace that will execute 12 experiments.
+At this stage, you have defined a workspace that will execute 8 experiments.
 It is important to point out that different MPI implementations have different
 command line flags for controlling their behavior. The existing ``mpi_command``
 should work fine with both Intel MPI, and OpenMPI but to illustrate how
@@ -374,12 +370,11 @@ resulting configuration might look like the following:
                   - n_nodes
                   - mpi_name
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix
@@ -464,12 +459,11 @@ The resulting configuration file might look like the following:
                   - n_nodes
                   - mpi_name
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
             spack_spec: openmpi@3.1.6 +orterunprefix

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -56,8 +56,8 @@ def intel_aps_modifier():
 
 def intel_aps_answer():
     expected_software = [
-        ('gromacs.water_bare', 'intel-oneapi-vtune'),
-        ('gromacs.water_bare', 'gromacs')
+        ('gromacs', 'intel-oneapi-vtune'),
+        ('gromacs', 'gromacs')
     ]
     expected_strs = [
         'aps -c mpi',
@@ -76,7 +76,7 @@ def lscpu_modifier():
 
 def lscpu_answer():
     expected_software = [
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'gromacs'),
     ]
     expected_strs = [
         'lscpu',
@@ -94,7 +94,7 @@ def env_var_append_paths_modifier():
 
 def env_var_append_paths_modifier_answer():
     expected_software = [
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'gromacs'),
     ]
     expected_strs = [
         'export test_var="${test_var}:test_val"'
@@ -112,7 +112,7 @@ def env_var_append_vars_modifier():
 
 def env_var_append_vars_modifier_answer():
     expected_software = [
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'gromacs'),
     ]
     expected_strs = [
         'export test_var="${test_var},test_val"',
@@ -130,7 +130,7 @@ def env_var_prepend_paths_modifier():
 
 def env_var_prepend_paths_modifier_answer():
     expected_software = [
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'gromacs'),
     ]
     expected_strs = [
         'export test_var="test_val:${test_var}"',
@@ -148,10 +148,11 @@ def env_var_set_modifier():
 
 def env_var_set_modifier_answer():
     expected_software = [
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'gromacs'),
     ]
     expected_strs = [
         'export test_var=test_val',
+        'export mask_env_var="0x0"'
     ]
     return expected_software, expected_strs
 
@@ -166,7 +167,7 @@ def env_var_unset_modifier():
 
 def env_var_unset_modifier_answer():
     expected_software = [
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'gromacs'),
     ]
     expected_strs = [
         'unset test_var',

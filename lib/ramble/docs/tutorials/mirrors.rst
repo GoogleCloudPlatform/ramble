@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -65,7 +65,6 @@ Write the following configuration into the file, save, and exit:
                     n_nodes: 1
                     processes_per_node: 30
       spack:
-        concretized: false
         packages: {}
         environments: {}
 
@@ -94,12 +93,11 @@ will look something like this:
                     n_nodes: 1
                     processes_per_node: 30
       spack:
-        concretized: true
         packages:
           gcc9:
             spack_spec: gcc@9.3.0
           intel-mpi:
-            spack_spec: intel-mpi@2018.4.274
+            spack_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
             spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
@@ -127,8 +125,8 @@ this mirror in the first place.
 
     ==>     Executing phase mirror_inputs
     ==>     Executing phase create_spack_env
-    ==> Concretized intel-mpi@2018.4.274%gcc@<gcc-version>
-     -   <hash>   intel-mpi@2018.4.274%gcc@<version>_etc.
+    ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
+     -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==> Concretized wrf@4.2%gcc@<version> <wrf options>
@@ -143,8 +141,8 @@ this mirror in the first place.
     ==> Concretized wrf@4.2%gcc@<version> <wrf options>
      -   (long list of software prerequisites for wrf@4.2)
 
-    ==> Concretized intel-mpi@2018.4.274%gcc@<gcc-version>
-     -   <hash>   intel-mpi@2018.4.274%gcc@<version>_etc.
+    ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
+     -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==>     Executing phase mirror_software

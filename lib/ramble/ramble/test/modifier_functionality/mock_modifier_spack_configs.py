@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -53,7 +53,7 @@ def test_gromacs_mock_spack_config_mod(mutable_mock_workspace_path,
 
         assert os.path.isfile(exp_script)
 
-        spack_yaml = os.path.join(ws1.software_dir, 'gromacs.water_bare',
+        spack_yaml = os.path.join(ws1.software_dir, 'gromacs',
                                   'spack.yaml')
         assert os.path.isfile(spack_yaml)
 

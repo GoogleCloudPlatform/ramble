@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -22,6 +22,9 @@ class InterlevedEnvVars(ExecutableApplication):
     workload('test_wl', executables=['builtin::env_vars', 'foo'], input='input')
     workload('test_wl2', executables=['bar', 'builtin::env_vars'], input='input')
     workload('test_wl3', executables=['baz'], input='input')
+
+    environment_variable('FROM_DIRECTIVE', 'set', description='Test env var',
+                         workloads=['test_wl', 'test_wl2', 'test_wl3'])
 
     workload_variable('my_var', default='1.0',
                       description='Example var',

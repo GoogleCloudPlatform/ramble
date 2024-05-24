@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -478,7 +478,7 @@ class Configuration(object):
     def file_scopes(self):
         """List of writable scopes with an associated file."""
         return [s for s in self.scopes.values()
-                if (type(s) == ConfigScope
+                if (type(s) == ConfigScope  # noqa: E721
                     or type(s) == SingleFileScope)]
 
     def highest_precedence_scope(self):

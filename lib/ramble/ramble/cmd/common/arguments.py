@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -79,9 +79,9 @@ def specs():
 def repo_type():
     from ramble.repository import default_type, OBJECT_NAMES
     return Args(
-        '-t', '--type', default=default_type.name,
+        '-t', '--type', default='any',
         help=f"type of repositories to manage. Defaults to '{default_type.name}'. "
-        f"Allowed types are {str(OBJECT_NAMES)}",
+        f"Allowed types are {', '.join(OBJECT_NAMES)}, or any",
     )
 
 

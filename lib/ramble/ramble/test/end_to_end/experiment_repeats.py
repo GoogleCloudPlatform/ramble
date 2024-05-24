@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -61,7 +61,6 @@ ramble:
                 size: '0003'
                 type: 'pme'
   spack:
-    concretized: true
     packages:
       gcc:
         spack_spec: gcc@8.5.0
@@ -110,7 +109,7 @@ ramble:
             out_files, 'Would download https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz') # noqa
 
         # Test software directories
-        software_dirs = ['gromacs.water_gmx50', 'gromacs.water_bare']
+        software_dirs = ['gromacs']
         software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
         assert os.path.exists(software_base_dir)
         for software_dir in software_dirs:

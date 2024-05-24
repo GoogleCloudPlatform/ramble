@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -18,7 +18,7 @@ class Lammps(SpackApplication):
 
     tags('molecular-dynamics')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
 
@@ -91,7 +91,7 @@ class Lammps(SpackApplication):
                       workloads=['lj', 'eam'])
     workload_variable('timesteps', default='100',
                       description='Number of timesteps',
-                      workloads=['lj', 'eam', 'polymer-chain-melt', 'chute', 'rhodo'])
+                      workloads=['lj', 'eam', 'chain', 'chute', 'rhodo'])
 
     workload_variable('input_path', default='{workload_input_dir}/in.{workload_name}.txt',
                       description='Path for the workload input file.',

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,12 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 import pytest
 
 import ramble.workspace
 import ramble.software_environments
 import ramble.renderer
+import ramble.expander
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures('mutable_config',
@@ -22,8 +22,8 @@ pytestmark = pytest.mark.usefixtures('mutable_config',
 workspace  = RambleCommand('workspace')
 
 
-def test_basic_software_environment(mutable_mock_workspace_path):
-    ws_name = 'test_basic_software_environment'
+def test_basic_software_environment(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
     workspace('create', ws_name)
 
     assert ws_name in workspace('list')
@@ -43,14 +43,24 @@ def test_basic_software_environment(mutable_mock_workspace_path):
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
 
-        assert len(software_environments._packages.keys()) == 1
-        assert 'basic' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic' in software_environments._environments['basic']['packages']
+        assert 'basic' in software_environments._environment_templates
+        assert 'basic' in software_environments._package_templates
+
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic', env_expander)
+        assert rendered_env.name == 'basic'
+        pkg_found = False
+        for pkg in rendered_env._packages:
+            if pkg.name == 'basic':
+                pkg_found = True
+        assert pkg_found
 
 
-def test_package_vector_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_package_vector_expansion'
+def test_software_environments_no_packages(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
     workspace('create', ws_name)
 
     assert ws_name in workspace('list')
@@ -59,30 +69,28 @@ def test_package_vector_expansion(mutable_mock_workspace_path):
         spack_dict = ws.get_spack_dict()
 
         spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4']
-            }
-        }
         spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic-x86_64', 'basic-x86_64_v4']
+            'basic-{env_test}': {
+                'packages': ['']
             }
         }
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
 
-        assert len(software_environments._packages.keys()) == 2
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-x86_64_v4' in software_environments._environments['basic']['packages']
+        assert 'basic-{env_test}' in software_environments._environment_templates
+
+        variables = {
+            'env_test': 'environment',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic-environment', env_expander)
+        assert rendered_env.name == 'basic-environment'
 
 
-def test_package_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
-    ws_name = 'test_package_vector_expansion'
+def test_software_environments_no_rendered_packages(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
     workspace('create', ws_name)
 
     assert ws_name in workspace('list')
@@ -91,31 +99,69 @@ def test_package_vector_length_mismatch_errors(mutable_mock_workspace_path, caps
         spack_dict = ws.get_spack_dict()
 
         spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1']
+        spack_dict['environments'] = {
+            'basic-{env_test}': {
+                'packages': ['{var_pkg_name}']
             }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'basic-{env_test}' in software_environments._environment_templates
+
+        variables = {
+            'env_test': 'environment',
+            'var_pkg_name': ''
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic-environment', env_expander)
+        assert rendered_env.name == 'basic-environment'
+
+
+def test_template_software_environments(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic-{pkg_test}'] = {
+            'spack_spec': 'basic@1.1'
         }
         spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic-x86_64', 'basic-x86_64_v4']
+            'basic-{env_test}': {
+                'packages': ['basic-{pkg_test}']
             }
         }
 
-        with pytest.raises(SystemExit):
-            ramble.software_environments.SoftwareEnvironments(ws)
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
 
-            captured = capsys.readouterr()
+        assert 'basic-{env_test}' in software_environments._environment_templates
+        assert 'basic-{pkg_test}' in software_environments._package_templates
 
-            assert 'Length mismatch in vector variables in package basic-{arch}' in captured
-            assert 'Variable arch has length 2' in captured
-            assert 'Variable ver has length 1' in captured
+        variables = {
+            'env_test': 'environment',
+            'pkg_test': 'package',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        rendered_env = software_environments.render_environment('basic-environment', env_expander)
+        assert rendered_env.name == 'basic-environment'
+        pkg_found = False
+        for pkg in rendered_env._packages:
+            if pkg.name == 'basic-package':
+                pkg_found = True
+        assert pkg_found
 
 
-def test_package_matrix_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_package_matrix_expansion'
+def test_multi_template_software_environments(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
     workspace('create', ws_name)
 
     assert ws_name in workspace('list')
@@ -124,552 +170,229 @@ def test_package_matrix_expansion(mutable_mock_workspace_path):
         spack_dict = ws.get_spack_dict()
 
         spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
+        spack_dict['packages']['basic1-{pkg_test}'] = {
+            'spack_spec': 'basic@1.1'
+        }
+        spack_dict['packages']['basic2-{pkg_test}'] = {
+            'spack_spec': 'basic@1.1'
+        }
+        spack_dict['environments'] = {
+            'all-basic-{env_test}': {
+                'packages': ['basic1-{pkg_test}', 'basic2-{pkg_test}']
             },
-            'matrix': ['arch', 'ver']
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': [
-                    'basic-1.1-x86_64',
-                    'basic-2.0-x86_64',
-                    'basic-1.1-x86_64_v4',
-                    'basic-2.0-x86_64_v4',
-                ]
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 4
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-1.1-x86_64_v4' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64_v4' in software_environments._environments['basic']['packages']
-
-
-def test_package_matrices_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_package_matrices_expansion'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
+            'basic1-{env_test}': {
+                'packages': ['basic1-{pkg_test}']
             },
-            'matrices': [['arch'], ['ver']]
+            'basic2-{env_test}': {
+                'packages': ['basic2-{pkg_test}']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'all-basic-{env_test}' in software_environments._environment_templates
+        assert 'basic1-{env_test}' in software_environments._environment_templates
+        assert 'basic2-{env_test}' in software_environments._environment_templates
+        assert 'basic1-{pkg_test}' in software_environments._package_templates
+        assert 'basic2-{pkg_test}' in software_environments._package_templates
+
+        variables = {
+            'env_test': 'environment',
+            'pkg_test': 'package',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        env_tests = {
+            'all-basic-environment': ['basic1-package', 'basic2-package'],
+            'basic1-environment': ['basic1-package'],
+            'basic2-environment': ['basic2-package']
+        }
+
+        for env_name, env_packages in env_tests.items():
+            rendered_env = software_environments.render_environment(env_name, env_expander)
+            assert rendered_env.name == env_name
+
+            assert len(rendered_env._packages) == len(env_packages)
+            for pkg_name in env_packages:
+                pkg_found = False
+                for pkg in rendered_env._packages:
+                    if pkg.name == pkg_name:
+                        pkg_found = True
+                assert pkg_found
+
+
+def test_undefined_package_errors(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic-{pkg_test}'] = {
+            'spack_spec': 'basic@{pkg_ver}'
+        }
+        spack_dict['environments'] = {
+            'all-basic-{env_test}': {
+                'packages': ['foo-basic-{pkg_test}']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        variables = {
+            'env_test': 'environment'
+        }
+
+        env_expander = ramble.expander.Expander(variables, None)
+
+        with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as pkg_err:
+            _  = software_environments.render_environment('all-basic-environment', env_expander)
+
+        err_str = \
+            'Environment template all-basic-{env_test} references undefined ' \
+            + 'package foo-basic-{pkg_test}'
+        assert err_str in str(pkg_err)
+
+
+def test_invalid_packages_error(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic-{pkg_test}'] = {
+            'spack_spec': 'basic@{pkg_ver}'
+        }
+        spack_dict['environments'] = {
+            'all-basic-{env_test}': {
+                'packages': ['basic-{pkg_test}']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'all-basic-{env_test}' in software_environments._environment_templates
+        assert 'basic-{pkg_test}' in software_environments._package_templates
+
+        variables = {
+            'env_test': 'environment',
+            'pkg_test': 'package',
+            'pkg_ver': '1.1',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        _ = software_environments.render_environment('all-basic-environment', env_expander)
+
+        with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as pkg_err:
+            variables = {
+                'env_test': 'environment',
+                'pkg_test': 'package',
+                'pkg_ver': '1.4',
+            }
+            env_expander = ramble.expander.Expander(variables, None)
+
+            _ = software_environments.render_environment('all-basic-environment',
+                                                         env_expander)
+        assert 'Package basic-package defined multiple times' in str(pkg_err)
+
+
+def test_invalid_environment_error(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic1-{pkg_test}'] = {
+            'spack_spec': 'basic@1.1'
+        }
+        spack_dict['packages']['basic2-{pkg_test}'] = {
+            'spack_spec': 'basic@1.1'
+        }
+        spack_dict['environments'] = {
+            'all-basic-{env_test}': {
+                'packages': ['basic1-{pkg_test}', 'basic2-{pkg_test}']
+            }
+        }
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'all-basic-{env_test}' in software_environments._environment_templates
+        assert 'basic1-{pkg_test}' in software_environments._package_templates
+        assert 'basic2-{pkg_test}' in software_environments._package_templates
+
+        variables = {
+            'env_test': 'environment',
+            'pkg_test': 'package',
+        }
+        env_expander = ramble.expander.Expander(variables, None)
+
+        _ = software_environments.render_environment('all-basic-environment', env_expander)
+
+        variables = {
+            'env_test': 'environment',
+            'pkg_test': 'other-package'
+        }
+
+        env_expander = ramble.expander.Expander(variables, None)
+
+        with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as env_err:
+            _ = software_environments.render_environment('all-basic-environment', env_expander)
+
+        assert 'Environment all-basic-environment defined multiple times' in str(env_err)
+
+
+def test_undefined_compiler_errors(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+
+    workspace('create', ws_name)
+
+    assert ws_name in workspace('list')
+
+    with ramble.workspace.read(ws_name) as ws:
+        spack_dict = ws.get_spack_dict()
+
+        spack_dict['packages'] = {}
+        spack_dict['packages']['basic'] = {
+            'spack_spec': 'basic@1.1',
+            'compiler': 'foo_comp'
         }
         spack_dict['environments'] = {
             'basic': {
-                'packages': [
-                    'basic-1.1-x86_64',
-                    'basic-2.0-x86_64_v4',
-                ]
+                'packages': ['basic']
             }
         }
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
 
-        assert len(software_environments._packages.keys()) == 2
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64_v4' in software_environments._environments['basic']['packages']
+        assert 'basic' in software_environments._environment_templates
+        assert 'basic' in software_environments._package_templates
 
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
 
-def test_package_matrix_vector_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_package_matrix_vector_expansion'
-    workspace('create', ws_name)
+        with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) \
+                as comp_err:
+            _ = software_environments.render_environment('basic', env_expander)
+        assert 'Compiler foo_comp used, but not defined' in str(comp_err)
 
-    assert ws_name in workspace('list')
 
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+def test_compiler_in_environment_warns(request, mutable_mock_workspace_path, capsys):
+    ws_name = request.node.name
 
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
-            },
-            'matrices': [['arch']]
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': [
-                    'basic-1.1-x86_64',
-                    'basic-2.0-x86_64',
-                    'basic-1.1-x86_64_v4',
-                    'basic-2.0-x86_64_v4',
-                ]
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 4
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-1.1-x86_64_v4' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64_v4' in software_environments._environments['basic']['packages']
-
-
-def test_environment_vector_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_environment_vector_expansion'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4']
-            }
-        }
-        spack_dict['environments'] = {
-            'basic-{arch}': {
-                'packages': ['basic-{arch}'],
-                'variables': {
-                    'arch': ['x86_64', 'x86_64_v4']
-                }
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert len(software_environments._environments.keys()) == 2
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-x86_64' in software_environments._environments.keys()
-        assert 'basic-x86_64_v4' in software_environments._environments.keys()
-        assert len(software_environments._environments['basic-x86_64']['packages']) == 1
-        assert 'basic-x86_64' in software_environments._environments['basic-x86_64']['packages']
-        assert len(software_environments._environments['basic-x86_64_v4']['packages']) == 1
-        assert 'basic-x86_64_v4' in \
-            software_environments._environments['basic-x86_64_v4']['packages']
-
-
-def test_environment_vector_length_mismatch_errors(mutable_mock_workspace_path, capsys):
-    ws_name = 'test_environment_vector_expansion'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4']
-            }
-        }
-        spack_dict['environments'] = {
-            'basic-{ver}-{arch}': {
-                'packages': ['basic-{arch}'],
-                'variables': {
-                    'arch': ['x86_64', 'x86_64_v4'],
-                    'ver': ['1.1']
-                }
-            }
-        }
-
-        with pytest.raises(SystemExit):
-            ramble.software_environments.SoftwareEnvironments(ws)
-
-            captured = capsys.readouterr()
-
-            assert 'Length mismatch in vector variables in environment basic-{ver}-{arch}' \
-                in captured
-            assert 'Variable arch has length 2' in captured
-            assert 'Variable ver has length 1' in captured
-
-
-def test_environment_matrix_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_environment_matrix_expansion'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
-            },
-            'matrix': ['arch', 'ver']
-        }
-        spack_dict['environments'] = {
-            'basic-{ver}-{arch}': {
-                'packages': [
-                    'basic-{ver}-{arch}'
-                ],
-                'variables': {
-                    'arch': ['x86_64', 'x86_64_v4'],
-                    'ver': ['1.1', '2.0']
-                },
-                'matrix': ['arch', 'ver']
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 4
-        assert len(software_environments._environments.keys()) == 4
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments.keys()
-        assert 'basic-2.0-x86_64' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._environments.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in \
-            software_environments._environments['basic-1.1-x86_64']['packages']
-        assert 'basic-2.0-x86_64' in \
-            software_environments._environments['basic-2.0-x86_64']['packages']
-        assert 'basic-1.1-x86_64_v4' in \
-            software_environments._environments['basic-1.1-x86_64_v4']['packages']
-        assert 'basic-2.0-x86_64_v4' in \
-            software_environments._environments['basic-2.0-x86_64_v4']['packages']
-
-
-def test_environment_matrices_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_environment_matrices_expansion'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
-            },
-            'matrix': ['arch', 'ver']
-        }
-        spack_dict['environments'] = {
-            'basic-{ver}-{arch}': {
-                'packages': [
-                    'basic-{ver}-{arch}'
-                ],
-                'variables': {
-                    'arch': ['x86_64', 'x86_64_v4'],
-                    'ver': ['1.1', '2.0']
-                },
-                'matrices': [['arch'], ['ver']]
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 4
-        assert len(software_environments._environments.keys()) == 2
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in \
-            software_environments._environments['basic-1.1-x86_64']['packages']
-        assert 'basic-2.0-x86_64_v4' in \
-            software_environments._environments['basic-2.0-x86_64_v4']['packages']
-
-
-def test_environment_vector_matrix_expansion(mutable_mock_workspace_path):
-    ws_name = 'test_environment_vector_matrix_expansion'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
-            },
-            'matrices': [['ver']]
-        }
-        spack_dict['environments'] = {
-            'basic-{ver}-{arch}': {
-                'packages': [
-                    'basic-{ver}-{arch}'
-                ],
-                'variables': {
-                    'arch': ['x86_64', 'x86_64_v4'],
-                    'ver': ['1.1', '2.0']
-                },
-                'matrices': [['ver']]
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 4
-        assert len(software_environments._environments.keys()) == 4
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments.keys()
-        assert 'basic-2.0-x86_64' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._environments.keys()
-        assert 'basic-2.0-x86_64_v4' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in \
-            software_environments._environments['basic-1.1-x86_64']['packages']
-        assert 'basic-2.0-x86_64' in \
-            software_environments._environments['basic-2.0-x86_64']['packages']
-        assert 'basic-1.1-x86_64_v4' in \
-            software_environments._environments['basic-1.1-x86_64_v4']['packages']
-        assert 'basic-2.0-x86_64_v4' in \
-            software_environments._environments['basic-2.0-x86_64_v4']['packages']
-
-
-def test_package_vector_expansion_spack_level(mutable_mock_workspace_path):
-    ws_name = 'test_package_vector_expansion_spack_level'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['variables'] = {}
-        spack_dict['variables']['arch'] = ['x86_64', 'x86_64_v4']
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}'
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic-x86_64', 'basic-x86_64_v4']
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-x86_64_v4' in software_environments._environments['basic']['packages']
-
-
-def test_package_vector_expansion_workspace_level(mutable_mock_workspace_path):
-    ws_name = 'test_package_vector_expansion_spack_level'
-    workspace('create', ws_name)
-
-    test_config = """
-ramble:
-  variables:
-    arch: ['x86_64', 'x86_64_v4']
-  applications: {}
-  spack: {}
-"""
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        with open(os.path.join(ws.config_dir, 'ramble.yaml'), 'w+') as f:
-            f.write(test_config)
-
-        ws._re_read()
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}'
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic-x86_64', 'basic-x86_64_v4']
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-x86_64_v4' in software_environments._environments['basic']['packages']
-
-
-def test_package_vector_expansion_multi_level(mutable_mock_workspace_path):
-    ws_name = 'test_package_vector_expansion_multi_level'
-    workspace('create', ws_name)
-
-    test_config = """
-ramble:
-  variables:
-    arch: ['x86_64', 'x86_64_v4']
-  applications: {}
-  spack: {}
-"""
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        with open(os.path.join(ws.config_dir, 'ramble.yaml'), 'w+') as f:
-            f.write(test_config)
-
-        ws._re_read()
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['variables'] = {}
-        spack_dict['variables']['test'] = ['test1', 'test2']
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}-{test}-{pkg_level}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-            'variables': {
-                'pkg_level': ['ll1', 'll2'],
-            }
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic-x86_64-test1-ll1', 'basic-x86_64_v4-test2-ll2']
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert 'basic-x86_64-test1-ll1' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4-test2-ll2' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-x86_64-test1-ll1' in software_environments._environments['basic']['packages']
-        assert 'basic-x86_64_v4-test2-ll2' in \
-            software_environments._environments['basic']['packages']
-
-
-def test_environment_vector_expansion_spack_level(mutable_mock_workspace_path):
-    ws_name = 'test_environment_vector_expansion_spack_level'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['variables'] = {}
-        spack_dict['variables']['arch'] = ['x86_64', 'x86_64_v4']
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-        }
-        spack_dict['environments'] = {
-            'basic-{arch}': {
-                'packages': ['basic-{arch}'],
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert len(software_environments._environments.keys()) == 2
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-x86_64' in software_environments._environments.keys()
-        assert 'basic-x86_64_v4' in software_environments._environments.keys()
-        assert len(software_environments._environments['basic-x86_64']['packages']) == 1
-        assert 'basic-x86_64' in software_environments._environments['basic-x86_64']['packages']
-        assert len(software_environments._environments['basic-x86_64_v4']['packages']) == 1
-        assert 'basic-x86_64_v4' in \
-            software_environments._environments['basic-x86_64_v4']['packages']
-
-
-def test_environment_vector_expansion_workspace_level(mutable_mock_workspace_path):
-    ws_name = 'test_environment_vector_expansion_workspace_level'
-    workspace('create', ws_name)
-
-    test_config = """
-ramble:
-  variables:
-    arch: ['x86_64', 'x86_64_v4']
-  applications: {}
-  spack: {}
-"""
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        with open(os.path.join(ws.config_dir, 'ramble.yaml'), 'w+') as f:
-            f.write(test_config)
-
-        ws._re_read()
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-        }
-        spack_dict['environments'] = {
-            'basic-{arch}': {
-                'packages': ['basic-{arch}'],
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert len(software_environments._environments.keys()) == 2
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-x86_64' in software_environments._environments.keys()
-        assert 'basic-x86_64_v4' in software_environments._environments.keys()
-        assert len(software_environments._environments['basic-x86_64']['packages']) == 1
-        assert 'basic-x86_64' in software_environments._environments['basic-x86_64']['packages']
-        assert len(software_environments._environments['basic-x86_64_v4']['packages']) == 1
-        assert 'basic-x86_64_v4' in \
-            software_environments._environments['basic-x86_64_v4']['packages']
-
-
-def test_environment_warns_with_pkg_compiler(mutable_mock_workspace_path, capsys):
-    ws_name = 'test_environment_warns_with_pkg_compiler'
     workspace('create', ws_name)
 
     assert ws_name in workspace('list')
@@ -679,7 +402,7 @@ def test_environment_warns_with_pkg_compiler(mutable_mock_workspace_path, capsys
 
         spack_dict['packages'] = {}
         spack_dict['packages']['test_comp'] = {
-            'spack_spec': 'test_comp@1.1'
+            'spack_spec': 'comp@2.1'
         }
         spack_dict['packages']['basic'] = {
             'spack_spec': 'basic@1.1',
@@ -687,174 +410,20 @@ def test_environment_warns_with_pkg_compiler(mutable_mock_workspace_path, capsys
         }
         spack_dict['environments'] = {
             'basic': {
-                'packages': [
-                    'basic',
-                    'test_comp'
-                ],
+                'packages': ['basic', 'test_comp']
             }
         }
 
-        ramble.software_environments.SoftwareEnvironments(ws)
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert 'basic' in software_environments._environment_templates
+        assert 'basic' in software_environments._package_templates
+
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+
+        _ = software_environments.render_environment('basic', env_expander)
         captured = capsys.readouterr()
 
-        assert 'Environment basic contains packages and their compilers ' + \
-               'in the package list. These include:' in captured.err
-
+        assert 'Environment basic contains packages and their compilers' in captured.err
         assert 'Package: basic, Compiler: test_comp' in captured.err
-
-
-def test_package_vector_expansion_exclusions(mutable_mock_workspace_path):
-    ws_name = 'test_package_vector_expansion_exclusions'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4']
-            },
-            'exclude': {
-                'variables': {
-                    'arch': 'x86_64_v4'
-                }
-            }
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic-x86_64']
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 1
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-x86_64_v4' not in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' not in software_environments._environments['basic']['packages']
-
-
-def test_package_matrix_expansion_exclusions(mutable_mock_workspace_path):
-    ws_name = 'test_package_matrix_expansion_exclusions'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{ver}-{arch}'] = {
-            'spack_spec': 'basic@{ver} target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4'],
-                'ver': ['1.1', '2.0']
-            },
-            'matrix': ['arch', 'ver'],
-            'exclude': {
-                'variables': {
-                    'arch': ['x86_64_v4'],
-                    'ver': ['2.0'],
-                },
-                'matrix': ['arch', 'ver'],
-            }
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': [
-                    'basic-1.1-x86_64',
-                    'basic-2.0-x86_64',
-                    'basic-1.1-x86_64_v4',
-                ]
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 3
-        assert 'basic-1.1-x86_64' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64' in software_environments._packages.keys()
-        assert 'basic-1.1-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-2.0-x86_64_v4' not in software_environments._packages.keys()
-        assert 'basic' in software_environments._environments.keys()
-        assert 'basic-1.1-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64' in software_environments._environments['basic']['packages']
-        assert 'basic-1.1-x86_64_v4' in software_environments._environments['basic']['packages']
-        assert 'basic-2.0-x86_64_v4' not in \
-            software_environments._environments['basic']['packages']
-
-
-def test_environment_vector_expansion_exclusion(mutable_mock_workspace_path):
-    ws_name = 'test_package_vector_expansion_exclusions'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic-{arch}'] = {
-            'spack_spec': 'basic@1.1 target={arch}',
-            'variables': {
-                'arch': ['x86_64', 'x86_64_v4']
-            },
-        }
-        spack_dict['environments'] = {
-            'basic-{arch}': {
-                'packages': ['basic-{arch}'],
-                'variables': {
-                    'arch': ['x86_64', 'x86_64_v4']
-                },
-                'exclude': {
-                    'variables': {
-                        'arch': 'x86_64_v4'
-                    }
-                }
-            }
-        }
-
-        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
-
-        assert len(software_environments._packages.keys()) == 2
-        assert len(software_environments._environments.keys()) == 1
-        assert 'basic-x86_64' in software_environments._packages.keys()
-        assert 'basic-x86_64_v4' in software_environments._packages.keys()
-        assert 'basic-x86_64' in software_environments._environments.keys()
-        assert 'basic-x86_64_v4' not in software_environments._environments.keys()
-        assert 'basic-x86_64' in software_environments._environments['basic-x86_64']['packages']
-
-
-def test_environment_with_missing_package_errors(mutable_mock_workspace_path, capsys):
-    ws_name = 'test_environment_with_missing_package_errors'
-    workspace('create', ws_name)
-
-    assert ws_name in workspace('list')
-
-    with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
-
-        spack_dict['packages'] = {}
-        spack_dict['packages']['basic'] = {
-            'spack_spec': 'basic@1.1',
-        }
-        spack_dict['environments'] = {
-            'basic': {
-                'packages': ['basic', 'undefined_package']
-            }
-        }
-
-        with pytest.raises(SystemExit):
-            ramble.software_environments.SoftwareEnvironments(ws)
-            output = capsys.readouterr()
-
-            assert 'Error: Environment basic refers to the following packages' in output
-            assert 'undefined_package' in output
-            assert 'Please make sure all packages are defined before using this environment' \
-                in output

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -130,6 +130,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinxcontrib.programoutput",
     "sphinxcontrib.jquery",
+    "sphinx_copybutton",
 ]
 
 # Set default graphviz options
@@ -396,3 +397,9 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
+
+# sphinx_copybutton
+# Do not copy the prompt, or any console outputs.
+copybutton_exclude = '.gp, .go'
+# Escape hatch for turning off the copy button.
+copybutton_selector = "div:not(.hide-copy) > div.highlight > pre"

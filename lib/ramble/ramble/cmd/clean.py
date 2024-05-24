@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -61,15 +61,20 @@ def clean(parser, args):
 
     if args.python_cache:
         logger.msg('Removing python cache files')
-        for directory in [lib_path, var_path]:
-            for root, dirs, files in os.walk(directory):
-                for f in files:
-                    if f.endswith('.pyc') or f.endswith('.pyo'):
-                        fname = os.path.join(root, f)
-                        logger.debug(f'Removing {fname}')
-                        os.remove(fname)
-                for d in dirs:
-                    if d == '__pycache__':
-                        dname = os.path.join(root, d)
-                        logger.debug(f'Removing {dname}')
-                        shutil.rmtree(dname)
+        remove_python_caches()
+
+
+def remove_python_caches():
+    logger.msg('Removing python cache files')
+    for directory in [lib_path, var_path]:
+        for root, dirs, files in os.walk(directory):
+            for f in files:
+                if f.endswith('.pyc') or f.endswith('.pyo'):
+                    fname = os.path.join(root, f)
+                    logger.debug(f'Removing {fname}')
+                    os.remove(fname)
+            for d in dirs:
+                if d == '__pycache__':
+                    dname = os.path.join(root, d)
+                    logger.debug(f'Removing {dname}')
+                    shutil.rmtree(dname)

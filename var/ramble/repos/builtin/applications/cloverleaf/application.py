@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -16,11 +16,11 @@ class Cloverleaf(SpackApplication):
     '''Define CLOVERLEAF application'''
     name = 'cloverleaf'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('cfd', 'fluid', 'dynamics', 'euler', 'miniapp', 'minibenchmark', 'mini-benchmark')
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0')
+    define_compiler('gcc12', spack_spec='gcc@12.2.0')
 
     software_spec('ompi414', spack_spec='openmpi@4.1.4 +legacylaunchers +cxx',
                   compiler='gcc12')
@@ -82,7 +82,7 @@ class Cloverleaf(SpackApplication):
 
     figure_of_merit_context('step',
                             regex=step_count_regex,
-                            output_format='{step}')
+                            output_format='Step {step}')
 
     step_summary_regex = (r'\s*step:\s+(?P<step>[0-9]+)\s+' +
                           r'(?P<volume>'          + floating_point_regex + r')\s+' +

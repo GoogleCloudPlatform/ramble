@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -1069,8 +1069,8 @@ variable can be used to submit the same experiment to multiple batch systems.
       packages:
         gcc9:
           spack_spec: gcc@9.3.0 target=x86_64
-        impi2018:
-          spack_spec: intel-mpi@2018.4.274 target=x86_64
+        impi2021:
+          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9
         gromacs:
           spack_spec: gromacs@2022.4
@@ -1078,7 +1078,7 @@ variable can be used to submit the same experiment to multiple batch systems.
       environments:
         gromacs:
           packages:
-          - impi2018
+          - impi2021
           - gromacs
 
 The above example overrides the generated ``batch_submit`` variable to change
@@ -1182,7 +1182,7 @@ The ``variables`` keyword is optional. It can be used to override the
 definition of variables from the chained experiment if needed.
 
 Once the experiments are defined, the final order of the chain can be viewed using
-``ramble workspace info -v``.
+``ramble workspace info -vvv``.
 
 **NOTE** When using the ``experiment_index`` variable, all experiments in a
 chain share the same value. This ensures the resulting experiment will be

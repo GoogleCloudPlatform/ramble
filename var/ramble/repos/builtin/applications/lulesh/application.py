@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,7 +19,7 @@ class Lulesh(SpackApplication):
 
     tags('proxy-app', 'mini-app')
 
-    default_compiler('gcc13', spack_spec='gcc@13.1.0')
+    define_compiler('gcc13', spack_spec='gcc@13.1.0')
 
     software_spec('impi2018',
                   spack_spec='intel-mpi@2018.4.274')
@@ -73,7 +73,7 @@ class Lulesh(SpackApplication):
                     fom_regex=r'\s*Iteration count\s+=\s+(?P<iterations>[0-9]+)',
                     group_name='iterations', units='')
 
-    def _make_experiments(self, workspace):
+    def _make_experiments(self, workspace, app_inst=None):
         """
         LULESH requires the number of ranks to be a cube root of an integer.
 

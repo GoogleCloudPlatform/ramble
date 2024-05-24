@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -28,7 +28,7 @@ def test_create_add_list_remove(mutable_config, tmpdir):
     assert os.path.exists(os.path.join(str(tmpdir), 'applications'))
 
     # Add the new repository and check it appears in the list output
-    repo('add', '--scope=site', str(tmpdir))
+    repo('add', '-t', 'applications', '--scope=site', str(tmpdir))
     output = repo('list', '--scope=site', output=str)
     assert 'mockrepo' in output
 
@@ -47,7 +47,7 @@ def test_create_add_list_remove_flags(mutable_config, tmpdir, subdir):
     assert os.path.exists(os.path.join(str(tmpdir), subdir))
 
     # Add the new repository and check it appears in the list output
-    repo('add', '--scope=site', str(tmpdir))
+    repo('add', '-t', 'applications', '--scope=site', str(tmpdir))
     output = repo('list', '--scope=site', output=str)
     assert 'mockrepo' in output
 

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -66,8 +66,8 @@ ramble:
                 - baz
                 executable_injection:
                 - name: before_all
-                  order: before
                 - name: after_all
+                  order: after
                 - name: before_env_vars
                   order: before
                   relative_to: builtin::env_vars
@@ -82,7 +82,6 @@ ramble:
                   MY_VAR: 'TEST'
                   OTHER_ENV_VAR: 'ANOTHER_TEST'
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """

@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -51,6 +51,7 @@ class RenderGroup(object):
         self.variables = {}
         self.zips = {}
         self.matrices = []
+        self.used_variables = set()
         self.n_repeats = 0
 
     def copy_contents(self, in_group):
@@ -64,6 +65,9 @@ class RenderGroup(object):
 
         if in_group.matrices:
             self.matrices.extend(in_group.matrices)
+
+        if in_group.used_variables:
+            self.used_variables = in_group.used_variables.copy()
 
     def from_dict(self, name_template, in_dict):
         """Extract RenderGroup definitions from a dictionary
@@ -106,7 +110,7 @@ class RenderGroup(object):
 
 
 class Renderer(object):
-    def render_objects(self, render_group, exclude_where=None):
+    def render_objects(self, render_group, exclude_where=None, ignore_used=True, fatal=True):
         """Render objects based on the input variables and matrices
 
         Internally collects all matrix and vector variables.
@@ -142,9 +146,10 @@ class Renderer(object):
 
         """
         variables = render_group.variables
-        zips = render_group.zips
+        zips = render_group.zips.copy()
         matrices = render_group.matrices
         n_repeats = render_group.n_repeats
+        used_variables = render_group.used_variables.copy()
 
         object_variables = {}
         expander = ramble.expander.Expander(variables, None)
@@ -158,6 +163,35 @@ class Renderer(object):
         defined_zips = {}
         consumed_zips = set()
         matrix_objects = []
+
+        if ignore_used:
+            # Add variables / zips in matrices to used variables
+            if matrices:
+                for matrix in matrices:
+                    for mat_var in matrix:
+                        used_variables.add(mat_var)
+
+            # Update zip definitions based on variables that are used.
+            # If a zip has one variable that is used, the entire zip is
+            # considered used.
+            # If a zip contains no used variables, ignore the entire zip.
+            if zips:
+                remove_zips = set()
+                for zip_group in zips:
+
+                    keep_zip = zip_group in used_variables
+                    for var_name in zips[zip_group]:
+                        if var_name in used_variables:
+                            keep_zip = True
+
+                    if keep_zip:
+                        for var_name in zips[zip_group]:
+                            used_variables.add(var_name)
+                    else:
+                        remove_zips.add(zip_group)
+
+                for zip_name in remove_zips:
+                    del zips[zip_name]
 
         if zips:
             zipped_vars = set()
@@ -332,7 +366,7 @@ class Renderer(object):
         # Extract vector variables
         max_vector_size = 0
         for var, val in object_variables.items():
-            if isinstance(val, list):
+            if isinstance(val, list) and (var in used_variables or not ignore_used):
                 vector_vars[var] = val.copy()
                 max_vector_size = max(len(val), max_vector_size)
 
@@ -343,7 +377,7 @@ class Renderer(object):
                 if len(val) != max_vector_size:
                     length_mismatch = True
 
-            if length_mismatch:
+            if fatal and length_mismatch:
                 err_context = object_variables[render_group.context]
                 err_str = f'Length mismatch in vector variables in {render_group.object} ' \
                           f'{err_context}\n'
@@ -356,7 +390,8 @@ class Renderer(object):
             for i in range(0, max_vector_size):
                 obj_vars = {}
                 for var, val in vector_vars.items():
-                    obj_vars[var] = val[i]
+                    if len(val) > i:
+                        obj_vars[var] = val[i]
 
                 if matrix_objects:
                     for matrix_object in matrix_objects:

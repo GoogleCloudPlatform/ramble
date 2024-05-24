@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,11 +15,11 @@ class UfsWeatherModel(SpackApplication):
     '''Define FV3 application via ufs-weather-model'''
     name = 'ufs-weather-model'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('nwp', 'weather')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
 
     software_spec('ompi415', spack_spec="openmpi@4.1.5", compiler='gcc9')
 

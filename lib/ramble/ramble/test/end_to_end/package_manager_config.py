@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -38,7 +38,6 @@ ramble:
             test:
               variables: {}
   spack:
-    concretized: true
     packages:
       zlib:
         spack_spec: 'zlib'
@@ -60,7 +59,7 @@ ramble:
 
         workspace('setup', '--dry-run', global_args=['-w', workspace_name])
 
-        spack_yaml = os.path.join(ws.software_dir, 'zlib-configs.ensure_installed',
+        spack_yaml = os.path.join(ws.software_dir, 'zlib-configs',
                                   'spack.yaml')
 
         assert os.path.isfile(spack_yaml)

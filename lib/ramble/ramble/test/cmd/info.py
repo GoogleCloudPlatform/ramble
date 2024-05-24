@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -54,8 +54,8 @@ def test_info_fields(app_query, parser, info_lines):
 
     expected_fields = (
         'Description:',
-        'Setup Pipeline Phases:',
-        'Analyze Pipeline Phases:',
+        'Pipeline "setup" Phases:',
+        'Pipeline "analyze" Phases:',
         'Tags:'
     )
 
@@ -73,8 +73,8 @@ def test_info_fields(app_query, parser, info_lines):
 def test_spack_info_software(app_query):
     expected_fields = (
         'Description:',
-        'Setup Pipeline Phases:',
-        'Analyze Pipeline Phases:',
+        'Pipeline "setup" Phases:',
+        'Pipeline "analyze" Phases:',
         'Tags:',
         'spack_spec =',
         'compiler =',
@@ -92,8 +92,8 @@ def test_spack_info_software(app_query):
 def test_mock_spack_info_software(mock_applications, app_query):
     expected_fields = (
         'Description:',
-        'Setup Pipeline Phases:',
-        'Analyze Pipeline Phases:',
+        'Pipeline "setup" Phases:',
+        'Pipeline "analyze" Phases:',
         'Tags:',
         'Package Manager Configs:',
         'spack_spec =',

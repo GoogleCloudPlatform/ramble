@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -40,9 +40,9 @@ def test_gromacs_dry_run_mock_spack_mod(mutable_mock_workspace_path,
     ]
 
     software_tests = [
-        ('gromacs.water_bare', 'mod_package1@1.1'),
-        ('gromacs.water_bare', 'mod_package2@1.1'),
-        ('gromacs.water_bare', 'gromacs'),
+        ('gromacs', 'mod_package1@1.1'),
+        ('gromacs', 'mod_package2@1.1'),
+        ('gromacs', 'gromacs'),
     ]
 
     with ramble.workspace.create(workspace_name) as ws1:

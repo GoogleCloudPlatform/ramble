@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -24,17 +24,6 @@ pasting the commands. This is to help show situations you might run into when
 trying to use Ramble on your own, and illustrate how you might fix them.
 
 .. include:: shared/gromacs_workspace.rst
-
-Activate the Workspace
-----------------------
-
-As you are using a pre-existing workspace, ensure it is activated (NOTE: you
-only need to run this if you do not currently have the workspace active).
-
-.. code-block:: console
-
-    $ ramble workspace activate basic_gromacs
-
 
 Experiment Descriptions
 -----------------------
@@ -70,7 +59,7 @@ To get detailed information about where variable definitions come from, you can 
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info --expansions
 
 The experiments section of this command's output might contain the following:
 
@@ -154,7 +143,7 @@ These changes should now be reflected in the output of:
 
 .. code-block:: console
 
-    $ ramble workspace info -v
+    $ ramble workspace info -vvv
 
 Using Vector Variables
 ----------------------
@@ -377,7 +366,7 @@ cross product of the ``app_workload`` and ``type`` variable definitions. Since
 each has a length of two, the result would be a matrix with four elements in
 it.
 
-After saving an exiting this file, the resulting experiments can be seen using the:
+After saving and exiting this file, the resulting experiments can be seen using the:
 
 .. code-block:: console
 
@@ -445,3 +434,20 @@ Which should contain the following output:
           Experiment: gromacs.water_gmx50.rf_4ranks
 
 .. include:: shared/gromacs_execute.rst
+
+Cleaning the Workspace
+----------------------
+
+After you are finished with the content of this tutorial, make sure you
+deactivate your workspace using:
+
+.. code-block:: console
+
+    $ ramble workspace deactivate
+
+If you no longer need the workspace materials, remove the entire workspace
+with:
+
+.. code-block:: console
+
+    $ ramble workspace remove basic_gromacs

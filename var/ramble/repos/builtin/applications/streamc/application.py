@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,11 +15,11 @@ class Streamc(SpackApplication):
     '''Define STREAMC application'''
     name = 'streamc'
 
-    maintainers('dodecatheon')
+    maintainers('rfbgo')
 
     tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 
-    default_compiler('gcc12', spack_spec='gcc@12.2.0')
+    define_compiler('gcc12', spack_spec='gcc@12.2.0')
 
     software_spec('streamc',
                   spack_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',

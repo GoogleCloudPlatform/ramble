@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Google LLC
+# Copyright 2022-2024 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -29,7 +29,7 @@ class IntelMpiBenchmarks(SpackApplication):
 
     tags('micro-benchmark', 'benchmark', 'mpi')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', spack_spec='gcc@9.3.0')
     software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
     software_spec('intel-mpi-benchmarks',
                   spack_spec='intel-mpi-benchmarks@2019.6',
@@ -46,6 +46,10 @@ class IntelMpiBenchmarks(SpackApplication):
                '{install_path}/IMB-MPI1 Pingpong -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -multi {multi_val} -map {map_args} {additional_args}',
                use_mpi=True)
+
+    workload('pingpong', executable='pingpong')
+    workload('multi-pingpong', executable='multi-pingpong')
+    workload('collective', executable='collective')
 
     workload_variable('num_cores',
                       default='{{{n_ranks}/2}:0.0f}',
@@ -66,10 +70,6 @@ class IntelMpiBenchmarks(SpackApplication):
                '{install_path}/IMB-MPI1 {collective_type} -msglog {msglog_min}:{msglog_max} '
                '-iter {num_iterations} -npmin {min_collective_ranks} {additional_args}',
                use_mpi=True)
-
-    workload('pingpong', executable='pingpong')
-    workload('multi-pingpong', executable='multi-pingpong')
-    workload('collective', executable='collective')
 
     # Multiple spack packages (specifically intel-oneapi-mpi) provide the
     # binary we need. It's fairly common to want to decouple the version of MPI

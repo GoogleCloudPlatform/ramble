@@ -1,4 +1,4 @@
-.. Copyright 2022-2024 Google LLC
+.. Copyright 2022-2024 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -265,7 +265,7 @@ directives that are intended to be package manager specific. As an example,
 there are directives for Spack defined by:
 
 * :meth:`ramble.language.shared_language.software_spec`
-* :meth:`ramble.language.shared_language.default_compiler`
+* :meth:`ramble.language.shared_language.define_compiler`
 * :meth:`ramble.language.shared_language.required_package`
 
 These provide Ramble with information about how Spack could install and require
