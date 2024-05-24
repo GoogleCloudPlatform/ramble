@@ -265,6 +265,7 @@ directives that are intended to be package manager specific. As an example,
 there are directives for Spack defined by:
 
 * :meth:`ramble.language.shared_language.software_spec`
+* :meth:`ramble.language.shared_language.define_compiler`
 * :meth:`ramble.language.shared_language.required_package`
 
 These provide Ramble with information about how Spack could install and require
