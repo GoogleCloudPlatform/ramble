@@ -7,6 +7,8 @@
 # except according to those terms.
 
 from typing import List
+import copy
+
 import ramble.util.colors as rucolor
 
 
@@ -62,6 +64,9 @@ class WorkloadVariable(object):
                 out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
         return out_str
 
+    def copy(self):
+        return copy.deepcopy(self)
+
 
 class WorkloadEnvironmentVariable(object):
     """Class representing an environment variable in a workload"""
@@ -98,6 +103,9 @@ class WorkloadEnvironmentVariable(object):
             if attr_val:
                 out_str += f'{indentation}    {name}: {attr_val.replace("@", "@@")}\n'
         return out_str
+
+    def copy(self):
+        return copy.deepcopy(self)
 
 
 class Workload(object):

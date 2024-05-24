@@ -504,6 +504,21 @@ def test_class_attributes(mutable_mock_apps_repo):
     assert executable_application_instance.variables['execute_experiment'] == test_answer
 
 
+def test_class_attributes(mutable_mock_apps_repo):
+    basic_inst = mutable_mock_apps_repo.get('basic')
+    basic_copy = basic_inst.copy()
+
+    instances = [basic_inst, basic_copy]
+    for inst in instances:
+        assert hasattr(inst, 'workloads')
+        assert 'test_wl' in inst.workloads
+
+    basic_copy.workload('added_workload', executables=['foo'])
+
+    assert 'added_workload' in basic_copy.workloads
+    assert 'added_workload' not in basic_inst.workloads
+
+
 def test_workload_groups(mutable_mock_apps_repo):
     workload_group_inst = mutable_mock_apps_repo.get('workload-groups')
 
@@ -516,6 +531,11 @@ def test_workload_groups(mutable_mock_apps_repo):
     assert my_var is not None
     assert my_var.default == '2.0'
     assert my_var.description == 'Test workload vars and groups'
+
+    my_mixed_var_wl = workload_group_inst.workloads['test_wl'].find_variable('test_var_mixed')
+    assert my_mixed_var_wl is not None
+    assert my_mixed_var_wl.default == '3.0'
+    assert my_mixed_var_wl.description == 'Test vars for workload and groups'
 
 
 def test_workload_groups_inherited(mutable_mock_apps_repo):
@@ -535,3 +555,8 @@ def test_workload_groups_inherited(mutable_mock_apps_repo):
     assert my_var is not None
     assert my_var.default == '2.0'
     assert my_var.description == 'Test workload vars and groups'
+
+    for wl in ['test_wl', 'test_wl3']:
+        my_mixed_var_wl = wlgi_inst.workloads[wl].find_variable('test_var_mixed')
+        assert my_mixed_var_wl is not None
+        assert my_mixed_var_wl.default == '3.0'

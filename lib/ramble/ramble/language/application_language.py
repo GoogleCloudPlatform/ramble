@@ -75,7 +75,12 @@ def workload(
             executable, executables, app.executables, "executable", "executables", "workload"
         )
 
-        all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs, app.inputs)
+        all_inputs = ramble.language.language_helpers.merge_definitions(input,
+                                                                        inputs,
+                                                                        app.inputs,
+                                                                        'input',
+                                                                        'inputs',
+                                                                        'workload')
 
         app.workloads[name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
 
@@ -94,12 +99,11 @@ def workload_group(name, workloads=[], mode=None, **kwargs):
         workloads: A list of workloads to be grouped
     """
 
-    def _execute_workload(app):
-        # TODO where is it best to validate the workloads
-        if mode == 'append':  # TODO: dry magic enum string
-            app.workload_groups[name] += workloads
+    def _execute_workload_groups(app):
+        if mode == 'append':
+            app.workload_groups[name].update(set(workloads))
         else:
-            app.workload_groups[name] = workloads
+            app.workload_groups[name] = set(workloads)
 
         # Apply any existing variables in the group to the workload
         for workload in workloads:
@@ -107,7 +111,7 @@ def workload_group(name, workloads=[], mode=None, **kwargs):
                 for var in app.workload_group_vars[name]:
                     app.workloads[workload].add_variable(var)
 
-    return _execute_workload
+    return _execute_workload_groups
 
 
 @application_directive('executables')
@@ -197,46 +201,37 @@ def workload_variable(name, default, description, values=None, workload=None,
     """
 
     def _execute_workload_variable(app):
-        if (workload is not None or workloads is not None) and workload_group is None:
-            all_workloads =  \
-                ramble.language.language_helpers.require_definition(workload,
-                                                                    workloads,
-                                                                    app.workloads,
-                                                                    'workload',
-                                                                    'workloads',
-                                                                    'workload_variable')
+        # Always apply passes workload/workloads
+        all_workloads =  \
+            ramble.language.language_helpers.merge_definitions(workload,
+                                                               workloads,
+                                                               app.workloads,
+                                                               'workload',
+                                                               'workloads',
+                                                               'workload_variable')
 
-            for wl_name in all_workloads:
-                app.workloads[wl_name].add_variable(
-                    ramble.workload.WorkloadVariable(
-                        name, default=default, description=description,
-                        values=values, expandable=expandable
-                    )
-                )
+        workload_var = ramble.workload.WorkloadVariable(
+            name, default=default, description=description,
+            values=values, expandable=expandable)
 
-        elif workload is None and workloads is None and workload_group is not None:
-            # Find workload group, and iterate it
+        for wl_name in all_workloads:
+            app.workloads[wl_name].add_variable(workload_var.copy())
+
+        if workload_group is not None:
             workload_group_list = app.workload_groups[workload_group]
 
-            # TODO: better place to init this?
             if workload_group not in app.workload_group_vars:
                 app.workload_group_vars[workload_group] = []
 
             # Track which vars we add to, to allow us to re-apply during inheritance
-
-            # TODO: dry this add with above?
-            workload_var = ramble.workload.WorkloadVariable(
-                name, default=default, description=description,
-                values=values, expandable=expandable)
-
-            app.workload_group_vars[workload_group].append(workload_var)
+            app.workload_group_vars[workload_group].append(workload_var.copy())
 
             for wl_name in workload_group_list:
                 # Apply the variable
-                app.workloads[wl_name].add_variable(workload_var)
-        else:  # workload/workloads is not None and workload_group is not None:
-            raise DirectiveError('A workload variable may set either' +
-                                 '`workloads` or `workload_group` but not both')
+                app.workloads[wl_name].add_variable(workload_var.copy())
+
+        if not all_workloads and workload_group is None:
+            raise DirectiveError('A workload or workload group is required')
 
     return _execute_workload_variable
 

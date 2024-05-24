@@ -30,3 +30,9 @@ class WorkloadGroups(ExecutableApplication):
     workload_variable('test_var', default='2.0',
                       description='Test workload vars and groups',
                       workload_group='test_wlg')
+
+    # Test passing both groups an explicit workloads
+    workload_variable('test_var_mixed', default='3.0',
+                      description='Test vars for workload and groups',
+                      workload='test_wl',
+                      workload_group='test_wlg')
