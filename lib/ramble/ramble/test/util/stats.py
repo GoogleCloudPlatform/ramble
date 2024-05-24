@@ -19,11 +19,9 @@ import ramble.util.stats
         (ramble.util.stats.StatsMean(), [-2, 0, 2, 5.5], 's', (1.4, 's', 'summary::mean')),
         (ramble.util.stats.StatsMedian(), [-2, 0, 2, 5.5], 's', (1.0, 's', 'summary::median')),
         (ramble.util.stats.StatsVar(), [-2, 0, 2, 5.5], 's', (10.2, 's^2', 'summary::variance')),
-        (ramble.util.stats.StatsVar(), [3], 's', ('variance requires at least two data points',
-                                                  '', 'summary::variance')),
+        (ramble.util.stats.StatsVar(), [3], 's', ('NA', '', 'summary::variance')),
         (ramble.util.stats.StatsStdev(), [-2, 0, 2, 5.5], 's', (3.2, 's', 'summary::stdev')),
-        (ramble.util.stats.StatsStdev(), [3], 's', ('variance requires at least two data points',
-                                                    '', 'summary::stdev')),
+        (ramble.util.stats.StatsStdev(), [3], 's', ('NA', '', 'summary::stdev')),
         (ramble.util.stats.StatsCountValues(), [-2, 0, 2, 5.5], 's',
             (4, 'repeats', 'summary::n_successful_repeats')),
     ]
