@@ -12,21 +12,12 @@
    :lines: 12-
 """  # noqa E501
 
-import ramble.schema.variables
-import ramble.schema.applications
-import ramble.schema.zips
 
 #: Properties for inclusion in other schemas
 properties = {
     'spack': {
         'type': 'object',
         'properties': {
-            'concretized': {
-                'type': 'boolean',
-                'default': None
-            },
-            'variables': ramble.schema.variables.variables_def,
-            'zips': ramble.schema.zips.zips_def,
             'packages': {
                 'type': 'object',
                 'additionalProperties': {
@@ -41,11 +32,6 @@ properties = {
                             'type': 'string',
                             'default': None,
                         },
-                        'variables': ramble.schema.variables.variables_def,
-                        'zips': ramble.schema.zips.zips_def,
-                        'matrix': ramble.schema.applications.matrix_def,
-                        'matrices': ramble.schema.applications.matrices_def,
-                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}
@@ -67,11 +53,6 @@ properties = {
                             'items': {'type': 'string'},
                             'default': []
                         },
-                        'variables': ramble.schema.variables.variables_def,
-                        'zips': ramble.schema.zips.zips_def,
-                        'matrix': ramble.schema.applications.matrix_def,
-                        'matrices': ramble.schema.applications.matrices_def,
-                        'exclude': ramble.schema.applications.exclude_def,
                     },
                     'additionalProperties': False,
                     'default': {}

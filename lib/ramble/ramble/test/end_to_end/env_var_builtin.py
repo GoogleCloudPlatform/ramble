@@ -144,7 +144,6 @@ ramble:
               variables:
                 n_nodes: 1
   spack:
-    concretized: true
     packages: {}
     environments: {}
 """
