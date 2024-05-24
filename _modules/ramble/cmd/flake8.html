@@ -207,7 +207,7 @@
     <span class="n">git</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TRAVIS_BRANCH&#39;</span><span class="p">,</span> <span class="s1">&#39;develop&#39;</span><span class="p">)</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;GITHUB_BASE_REF&#39;</span><span class="p">,</span> <span class="s1">&#39;develop&#39;</span><span class="p">)</span>
 
     <span class="nb">range</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
 
