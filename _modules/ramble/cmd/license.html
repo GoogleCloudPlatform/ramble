@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.cmd.license &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../cmd.html">ramble.cmd</a></li>
+      <li class="breadcrumb-item active">ramble.cmd.license</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.cmd.license</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2024 The Ramble Authors</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">ramble.paths</span>
+<span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">spack.util.executable</span> <span class="kn">import</span> <span class="n">which</span>
+
+<span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;list and check license headers on files in ramble&#39;</span>
+<span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;developer&quot;</span>
+<span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
+
+<span class="c1">#: need the git command to check new files</span>
+<span class="n">git</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;git&#39;</span><span class="p">)</span>
+
+<span class="c1">#: SPDX license id must appear in the first &lt;license_lines&gt; lines of a file</span>
+<span class="n">license_lines</span> <span class="o">=</span> <span class="mi">9</span>
+
+<span class="c1">#: Ramble&#39;s license identifier</span>
+<span class="n">apache2_mit_spdx</span> <span class="o">=</span> <span class="s2">&quot;(Apache-2.0 OR MIT)&quot;</span>
+
+<span class="c1">#: regular expressions for licensed files.</span>
+<span class="n">licensed_files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ramble scripts</span>
+    <span class="sa">r</span><span class="s1">&#39;^bin/ramble$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^bin/ramble-python$&#39;</span><span class="p">,</span>
+
+    <span class="c1"># all of ramble core</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/ramble/.*\.py$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/ramble/.*\.sh$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/llnl/.*\.py$&#39;</span><span class="p">,</span>
+
+    <span class="c1"># rst files in documentation</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/docs/(?!command_index|ramble|llnl).*\.rst$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/docs/.*\.py$&#39;</span><span class="p">,</span>
+
+    <span class="c1"># 2 files in external</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/external/__init__.py$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^lib/ramble/external/ordereddict_backport.py$&#39;</span><span class="p">,</span>
+
+    <span class="c1"># shell scripts in share</span>
+    <span class="sa">r</span><span class="s1">&#39;^share/ramble/.*\.sh$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^share/ramble/.*\.bash$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^share/ramble/.*\.csh$&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;^share/ramble/qa/run-[^/]*$&#39;</span><span class="p">,</span>
+
+    <span class="c1"># all applications</span>
+    <span class="sa">r</span><span class="s1">&#39;^var/ramble/repos/.*/application.py$&#39;</span>
+<span class="p">]</span>
+
+<span class="c1">#: licensed files that can have LGPL language in them</span>
+<span class="c1">#: so far, just this command -- so it can find LGPL things elsewhere</span>
+<span class="n">lgpl_exceptions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">r</span><span class="s1">&#39;lib/ramble/ramble/cmd/license.py&#39;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s1">&#39;lib/ramble/ramble/test/cmd/license.py&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_modified_files</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of modified files in the current repository.&quot;&quot;&quot;</span>
+    <span class="n">diff_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="s1">&#39;--name-only&#39;</span><span class="p">]</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">git</span><span class="p">(</span><span class="o">*</span><span class="n">diff_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">files</span>
+
+
+<span class="k">def</span> <span class="nf">_all_ramble_files</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">modified_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates root-relative paths of all files in the ramble repository.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">modified_only</span><span class="p">:</span>
+        <span class="k">yield from</span> <span class="n">_get_modified_files</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">cur_root</span><span class="p">,</span> <span class="n">folders</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur_root</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
+                    <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_licensed_files</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">modified_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">relpath</span> <span class="ow">in</span> <span class="n">_all_ramble_files</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">modified_only</span><span class="o">=</span><span class="n">modified_only</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">regex</span> <span class="ow">in</span> <span class="n">licensed_files</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">relpath</span>
+
+
+<div class="viewcode-block" id="list_files">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.list_files">[docs]</a>
+<span class="k">def</span> <span class="nf">list_files</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;list files in ramble that should have license headers&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">relpath</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_licensed_files</span><span class="p">()):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">ramble_root</span><span class="p">,</span> <span class="n">relpath</span><span class="p">))</span></div>
+
+
+
+<span class="c1"># Error codes for license verification. All values are chosen such that</span>
+<span class="c1"># bool(value) evaluates to True</span>
+<span class="n">OLD_LICENSE</span><span class="p">,</span> <span class="n">SPDX_MISMATCH</span><span class="p">,</span> <span class="n">GENERAL_MISMATCH</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LicenseError">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.LicenseError">[docs]</a>
+<span class="k">class</span> <span class="nc">LicenseError</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LicenseError.add_error">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.LicenseError.add_error">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span><span class="p">[</span><span class="n">error</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="LicenseError.has_errors">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.LicenseError.has_errors">[docs]</a>
+    <span class="k">def</span> <span class="nf">has_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="LicenseError.error_messages">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.LicenseError.error_messages">[docs]</a>
+    <span class="k">def</span> <span class="nf">error_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span><span class="p">[</span><span class="n">GENERAL_MISMATCH</span><span class="p">]</span>
+        <span class="n">spdx_mismatch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span><span class="p">[</span><span class="n">SPDX_MISMATCH</span><span class="p">]</span>
+        <span class="n">old_license</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_counts</span><span class="p">[</span><span class="n">OLD_LICENSE</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> improperly licensed files&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total</span><span class="p">),</span>
+            <span class="s1">&#39;files with wrong SPDX-License-Identifier:   </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">spdx_mismatch</span><span class="p">,</span>
+            <span class="s1">&#39;files with old license header:              </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">old_license</span><span class="p">,</span>
+            <span class="s1">&#39;files not containing expected license:      </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">missing</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span> <span class="nf">_check_license</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">license_lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">r</span><span class="s1">&#39;Copyright 2022-2024 The Ramble Authors&#39;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+        <span class="sa">r</span><span class="s1">&#39;Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or&#39;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+        <span class="sa">r</span><span class="s1">&#39;https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license&#39;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+        <span class="sa">r</span><span class="s1">&#39;&lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your&#39;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+        <span class="sa">r</span><span class="s1">&#39;option. This file may not be copied, modified, or distributed&#39;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+        <span class="sa">r</span><span class="s1">&#39;except according to those terms.&#39;</span>  <span class="c1"># noqa: E501</span>
+    <span class="p">]</span>
+
+    <span class="n">strict_date</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Copyright 2024&#39;</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[\s#\.]*&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">license_line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">license_lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">license_line</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="c1"># The first line of the license contains the copyright date.</span>
+                <span class="c1"># We allow it to be out of date but print a warning if it is</span>
+                <span class="c1"># out of date.</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">strict_date</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">: copyright date mismatch&#39;</span><span class="p">)</span>
+                <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">license_lines</span><span class="p">)</span> <span class="ow">and</span> <span class="n">found</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">found</span><span class="p">)):</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">old_license</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;This program is free software&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">: has old LGPL license header&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">OLD_LICENSE</span>
+
+    <span class="c1"># If the SPDX identifier is present, then there is a mismatch (since it</span>
+    <span class="c1"># did not match the above regex)</span>
+    <span class="k">def</span> <span class="nf">wrong_spdx_identifier</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;SPDX-License-Identifier: ([^\n]*)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">and</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">apache2_mit_spdx</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">: SPDX license identifier mismatch&#39;</span>
+                  <span class="s1">&#39;(expecting </span><span class="si">{1}</span><span class="s1">, found </span><span class="si">{2}</span><span class="s1">)&#39;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">apache2_mit_spdx</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">SPDX_MISMATCH</span>
+
+    <span class="n">checks</span> <span class="o">=</span> <span class="p">[</span><span class="n">old_license</span><span class="p">,</span> <span class="n">wrong_spdx_identifier</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">check</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">error</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">: the license does not match the expected format&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">GENERAL_MISMATCH</span>
+
+
+<div class="viewcode-block" id="verify">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.verify">[docs]</a>
+<span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;verify that files in ramble have the right license header&quot;&quot;&quot;</span>
+
+    <span class="n">license_errors</span> <span class="o">=</span> <span class="n">LicenseError</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">relpath</span> <span class="ow">in</span> <span class="n">_licensed_files</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">modified_only</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">modified</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">relpath</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">][:</span><span class="n">license_lines</span><span class="p">]</span>
+
+        <span class="n">error</span> <span class="o">=</span> <span class="n">_check_license</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">license_errors</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">license_errors</span><span class="o">.</span><span class="n">has_errors</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="o">*</span><span class="n">license_errors</span><span class="o">.</span><span class="n">error_messages</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;No license issues found.&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;license_command&#39;</span><span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;list-files&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">list_files</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                  <span class="n">description</span><span class="o">=</span><span class="n">list_files</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+    <span class="n">verify_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;verify&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">verify</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                                  <span class="n">description</span><span class="o">=</span><span class="n">verify</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">verify_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--root&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;scan a different prefix for license issues&#39;</span><span class="p">)</span>
+    <span class="n">verify_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--modified&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;-m&#39;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;verify only the modified files as outputted by `git ls-files --modified`&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="license">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.license.license">[docs]</a>
+<span class="k">def</span> <span class="nf">license</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">git</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;ramble license requires git in your environment&#39;</span><span class="p">)</span>
+
+    <span class="n">licensed_files</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span> <span class="k">for</span> <span class="n">regex</span> <span class="ow">in</span> <span class="n">licensed_files</span><span class="p">]</span>
+
+    <span class="n">commands</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;list-files&#39;</span><span class="p">:</span> <span class="n">list_files</span><span class="p">,</span>
+        <span class="s1">&#39;verify&#39;</span><span class="p">:</span> <span class="n">verify</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">commands</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">license_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 24, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

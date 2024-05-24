@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.language.modifier_language &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.language.modifier_language</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.language.modifier_language</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2024 The Ramble Authors</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">ramble.language.language_helpers</span>
+<span class="kn">import</span> <span class="nn">ramble.language.language_base</span>
+<span class="kn">import</span> <span class="nn">ramble.language.shared_language</span>
+<span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
+
+
+<div class="viewcode-block" id="ModifierMeta">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.ModifierMeta">[docs]</a>
+<span class="k">class</span> <span class="nc">ModifierMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">shared_language</span><span class="o">.</span><span class="n">SharedMeta</span><span class="p">):</span>
+    <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">_directives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+
+<span class="n">modifier_directive</span> <span class="o">=</span> <span class="n">ModifierMeta</span><span class="o">.</span><span class="n">directive</span>
+
+
+<div class="viewcode-block" id="mode">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.mode">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;modes&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a new mode for this modifier.</span>
+
+<span class="sd">    Modes allow a modifier to bundle a set of modifications together.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_mode</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_mode</span></div>
+
+
+
+<div class="viewcode-block" id="default_mode">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.default_mode">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">default_mode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a default mode for this modifier.</span>
+
+<span class="sd">    The default mode will be used if modifier mode is not specified in an experiment.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_default_mode</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;default_mode directive given an invalid mode for modifier &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">. Valid modes are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">_default_usage_mode</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">return</span> <span class="n">_execute_default_mode</span></div>
+
+
+
+<div class="viewcode-block" id="variable_modification">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.variable_modification">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;variable_modifications&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">variable_modification</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">modification</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">modes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a new variable modification for a mode in this modifier.</span>
+
+<span class="sd">    A variable modification will apply a change to a defined variable within an experiment.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: The variable to modify</span>
+<span class="sd">        modification: The value to modify &#39;name&#39; with</span>
+<span class="sd">        method: How the modification should be applied</span>
+<span class="sd">        mode: Single mode to group this modification into</span>
+<span class="sd">        modes: List of modes to group this modification into</span>
+
+<span class="sd">    Supported values are &#39;append&#39;, &#39;prepend&#39;, and &#39;set&#39;:</span>
+
+<span class="sd">      &#39;append&#39; will add the modification to the end of &#39;name&#39;</span>
+
+<span class="sd">      &#39;prepend&#39; will add the modification to the beginning of &#39;name&#39;</span>
+
+<span class="sd">      &#39;set&#39; (Default) will overwrite &#39;name&#39; with the modification</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_variable_modification</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="n">supported_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;prepend&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;variable_modification directive given an invalid method.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;  Valid methods are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">supported_methods</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">all_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span>
+                                                                        <span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;modes&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;variable_modification&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">variable_modifications</span><span class="p">:</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">variable_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">mod</span><span class="o">.</span><span class="n">variable_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;modification&#39;</span><span class="p">:</span> <span class="n">modification</span><span class="p">,</span>
+                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">method</span><span class="p">,</span>
+            <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_variable_modification</span></div>
+
+
+
+<div class="viewcode-block" id="executable_modifier">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.executable_modifier">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;executable_modifiers&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">executable_modifier</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register an executable modifier</span>
+
+<span class="sd">    Executable modifiers can modify various aspects of non-builtin application</span>
+<span class="sd">    executable definitions.</span>
+
+<span class="sd">    These behave similarly to builtins, in that a python method defines the</span>
+<span class="sd">    actual modifications</span>
+
+<span class="sd">    For example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      executable_modifier(&#39;write_exec_name&#39;)</span>
+
+<span class="sd">      def write_exec_name(self, executable_name, executable, app_inst=None):</span>
+<span class="sd">        prepend_execs = []</span>
+<span class="sd">        append_execs = [ExecutableCommand(</span>
+<span class="sd">            template=&#39;echo &quot;{executable_name}&quot;&#39;,</span>
+<span class="sd">            mpi=False,</span>
+<span class="sd">            redirect=&#39;{log_file}&#39;,</span>
+<span class="sd">            output_capture=OUTPUT_CAPTURE.DEFAULT</span>
+<span class="sd">        )]</span>
+
+<span class="sd">        return prepend_execs, append_execs</span>
+
+<span class="sd">    Would append the `echo &quot;{executable_name}&quot;` to every non-builtin executable</span>
+<span class="sd">    in an experiment.</span>
+
+<span class="sd">    Executable modifiers are allowed to modify the input executable in place.</span>
+<span class="sd">    Executable modifiers must return two lists of executables.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      prepend_execs: List of executables to inject before the base executable</span>
+<span class="sd">      append_execs: List of executables to inject after the base executable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_executable_modifier</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">executable_modifiers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">return</span> <span class="n">_executable_modifier</span></div>
+
+
+
+<div class="viewcode-block" id="env_var_modification">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.env_var_modification">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;env_var_modifications&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">env_var_modification</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">modification</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">modes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define an environment variable modifier</span>
+
+<span class="sd">    Environment variable modifications modify the values of environment</span>
+<span class="sd">    variables within the application instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: The name of the environment variable that will be modified</span>
+<span class="sd">        modification: The value of the modification</span>
+<span class="sd">        method: The method of the modification.</span>
+<span class="sd">        mode: Name of mode this env_var_modification should apply in</span>
+<span class="sd">        modes: List of mode names this env_var_modification should apply in</span>
+
+<span class="sd">    Supported values for method are:</span>
+<span class="sd">    set: Defines the variable to equal the modification value</span>
+
+<span class="sd">    unset: Removes any definition of the variable from the environment</span>
+
+<span class="sd">    prepend: Prepends the modification to the beginning of the variable.</span>
+<span class="sd">    Always uses the separator &#39;:&#39;</span>
+
+<span class="sd">    append: Appends the modification value to the end of the value. Allows a</span>
+<span class="sd">    keyword argument of &#39;separator&#39; to define the delimiter between values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_env_var_modification</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="n">supported_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;unset&#39;</span><span class="p">,</span> <span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;prepend&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;env_var_modification directive given an invalid method of &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1">. Supported methods are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">supported_methods</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;unset&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">modification</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;env_var_modification directive with method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                 <span class="s1">&#39;requires a value for the modification argument.&#39;</span><span class="p">)</span>
+
+        <span class="n">all_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span>
+                                                                        <span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;modes&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;env_var_modification&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">:</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Set requires a dict, everything else requires a list.</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">]:</span>
+                    <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">method</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">modification</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">]:</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># If unset, exit early</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;unset&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">method</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">append_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">separator</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;append&#39;</span> <span class="ow">and</span> <span class="s1">&#39;separator&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">separator</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;separator&#39;</span><span class="p">]</span>
+
+        <span class="n">append_name</span> <span class="o">=</span> <span class="s1">&#39;paths&#39;</span>
+        <span class="k">if</span> <span class="n">separator</span> <span class="o">!=</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
+            <span class="n">append_name</span> <span class="o">=</span> <span class="s1">&#39;vars&#39;</span>
+            <span class="n">append_dict</span><span class="p">[</span><span class="s1">&#39;var-separator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">separator</span>
+
+        <span class="n">append_dict</span><span class="p">[</span><span class="n">append_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">append_dict</span><span class="p">[</span><span class="n">append_name</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">modification</span>
+
+        <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+            <span class="n">mod</span><span class="o">.</span><span class="n">env_var_modifications</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">method</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">append_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">_env_var_modification</span></div>
+
+
+
+<div class="viewcode-block" id="required_variable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.required_variable">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;required_vars&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">required_variable</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">results_level</span><span class="o">=</span><span class="s1">&#39;variable&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mark a var as being required</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        var: Value to mark as required</span>
+<span class="sd">        results_level (str): &#39;variable&#39; or &#39;key&#39;. If &#39;key&#39; variable is promoted to</span>
+<span class="sd">                             a key within JSON or YAML formatted results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_mark_required_var</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">required_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+                                  <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_mark_required_var</span></div>
+
+
+
+<div class="viewcode-block" id="modifier_variable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.modifier_variable">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;modifier_variables&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">modifier_variable</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">modes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">expandable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a variable for this modifier</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name of variable to define</span>
+<span class="sd">        default: Default value of variable definition</span>
+<span class="sd">        description (str): Description of variable&#39;s purpose</span>
+<span class="sd">        values (list): Optional list of suggested values for this variable</span>
+<span class="sd">        mode (str): Single mode this variable is used in</span>
+<span class="sd">        modes (list): List of modes this variable is used in</span>
+<span class="sd">        expandable (bool): True if the variable should be expanded, False if not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_define_modifier_variable</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="n">all_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span>
+                                                                        <span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;modes&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;modifier_variable&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mode_name</span> <span class="ow">in</span> <span class="n">all_modes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">modifier_variables</span><span class="p">:</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">modifier_variables</span><span class="p">[</span><span class="n">mode_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">mod</span><span class="o">.</span><span class="n">modifier_variables</span><span class="p">[</span><span class="n">mode_name</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workload</span><span class="o">.</span><span class="n">WorkloadVariable</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">expandable</span><span class="o">=</span><span class="n">expandable</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_define_modifier_variable</span></div>
+
+
+
+<div class="viewcode-block" id="package_manager_requirement">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.package_manager_requirement">[docs]</a>
+<span class="nd">@modifier_directive</span><span class="p">(</span><span class="s1">&#39;package_manager_requirements&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">package_manager_requirement</span><span class="p">(</span><span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">modes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                                <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a requirement for the modifier&#39;s package manager</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        command: Package manager command to execute, when evaluating the requirement</span>
+<span class="sd">        validation_type: Type of validation to perform on output of command.</span>
+<span class="sd">                         Valid types are: &#39;empty&#39;, &#39;not_empty&#39;, &#39;contains_regex&#39;,</span>
+<span class="sd">                         &#39;does_not_contain_regex&#39;</span>
+<span class="sd">        modes: List of usage modes this requirement should apply to</span>
+<span class="sd">        regex: Regular expression to use when validation_type is either &#39;contains_regex&#39;</span>
+<span class="sd">               or &#39;does_no_contain_regex&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_new_package_manager_requirement</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+
+        <span class="n">regex_validations</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;contains_regex&#39;</span><span class="p">,</span> <span class="s1">&#39;does_not_contain_regex&#39;</span><span class="p">]</span>
+        <span class="n">validation_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">,</span> <span class="s1">&#39;not_empty&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">regex_validations</span>
+
+        <span class="k">if</span> <span class="n">validation_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">validation_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;package_manager_requirement directive given an invalid &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;validation_type of </span><span class="si">{</span><span class="n">validation_type</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;Valid values are </span><span class="si">{</span><span class="n">validation_types</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">validation_type</span> <span class="ow">in</span> <span class="n">regex_validations</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">regex</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;package_manager_requirement validation type is &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">validation_type</span><span class="si">}</span><span class="s1"> but no regex is given&#39;</span><span class="p">)</span>
+
+        <span class="n">exp_modes</span> <span class="o">=</span> <span class="n">modes</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exp_modes</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">exp_modes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">expand_patterns</span><span class="p">(</span><span class="n">exp_modes</span><span class="p">,</span>
+                                                                         <span class="n">mod</span><span class="o">.</span><span class="n">modes</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">exp_modes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">package_manager_requirements</span><span class="p">:</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">package_manager_requirements</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">mod</span><span class="o">.</span><span class="n">package_manager_requirements</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">command</span><span class="p">,</span>
+                <span class="s1">&#39;validation_type&#39;</span><span class="p">:</span> <span class="n">validation_type</span><span class="p">,</span>
+                <span class="s1">&#39;regex&#39;</span><span class="p">:</span> <span class="n">regex</span><span class="p">,</span>
+            <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">_new_package_manager_requirement</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 24, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

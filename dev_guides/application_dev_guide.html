@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Application Definition Developers Guide &mdash; Ramble 0.4.0 documentation</title>
+  <title>Application Definition Developers Guide &mdash; Ramble 0.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
@@ -17,7 +17,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=6c02275b"></script>
+        <script src="../_static/documentation_options.js?v=1dd76d02"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -40,7 +40,7 @@
             
           </a>
               <div class="version">
-                0.4
+                0.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -245,7 +245,7 @@ variables, as in:</p>
 <h3>Executables<a class="headerlink" href="#executables" title="Link to this heading"></a></h3>
 <p>A named executable in Ramble is one or more commands that should be executed
 together within an experiment. Ramble contains a directive for defining named
-executables <code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.executable()</span></code></p>
+executables <a class="reference internal" href="../ramble.language.html#ramble.language.application_language.executable" title="ramble.language.application_language.executable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.executable()</span></code></a></p>
 <p>Having performed a test execution in <a class="reference internal" href="#example-execution"><span class="std std-ref">Testing Execution</span></a>, you should be
 able to transcribe the execution commands into <code class="docutils literal notranslate"><span class="pre">executable</span></code> statements.</p>
 <p>It is important to make sure every step needed to go from a vanilla input file
@@ -256,7 +256,7 @@ to performing an experiment is captured in named executables though.</p>
 <p>A named input file in Ramble describes a URL, a SHA256 checksum, and some
 additional information about a file that a workload will require for its
 experiments. The <code class="docutils literal notranslate"><span class="pre">input_file</span></code> directive 
-(<code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.input_file()</span></code>) can be used to
+(<a class="reference internal" href="../ramble.language.html#ramble.language.application_language.input_file" title="ramble.language.application_language.input_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.input_file()</span></code></a>) can be used to
 define a named input file in an application definition file.</p>
 <p>After collecting the input files needed for the workloads you are defining (as
 in <a class="reference internal" href="#experiment-input-files"><span class="std std-ref">Collecting Inputs</span></a>), each input file can be written as its own
@@ -266,7 +266,7 @@ in <a class="reference internal" href="#experiment-input-files"><span class="std
 <h3>Workloads<a class="headerlink" href="#workloads" title="Link to this heading"></a></h3>
 <p>Having used <code class="docutils literal notranslate"><span class="pre">executable</span></code> and <code class="docutils literal notranslate"><span class="pre">input_file</span></code> directives, these can now be
 pieced together into a workload, using the <code class="docutils literal notranslate"><span class="pre">workload</span></code> directive
-(<code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.workload()</span></code>).</p>
+(<a class="reference internal" href="../ramble.language.html#ramble.language.application_language.workload" title="ramble.language.application_language.workload"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.workload()</span></code></a>).</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">workload</span></code> directive is used to define a named workload from which
 experiments can be generated. A workload in Ramble is defined as the pairing of
 one or more named executables with zero or more named input files. Defining a
@@ -280,7 +280,7 @@ on the named application.</p>
 should be exposed that can allow a parameter study or help abstract the
 definition of the workload (such as executable commands). Each workload can
 have an arbitrary number of workload variables, defined by
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.workload_variable()</span></code>.</p>
+<a class="reference internal" href="../ramble.language.html#ramble.language.application_language.workload_variable" title="ramble.language.application_language.workload_variable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.application_language.workload_variable()</span></code></a>.</p>
 <p>Each variable has a default value, which can be override within a
 <a class="reference internal" href="../workspace_config.html#workspace-config"><span class="std std-ref">Workspace Configuration File</span></a>.</p>
 </section>
@@ -291,7 +291,7 @@ successfully or not. This information is extracted when <code class="docutils li
 <span class="pre">analyze</span></code> is executed to help convey if the extract figures of merti should be
 considered valid or not.</p>
 <p>Applications can define any number of named success criteria, using
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.success_criteria()</span></code>. For an experiment
+<a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.success_criteria" title="ramble.language.shared_language.success_criteria"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.success_criteria()</span></code></a>. For an experiment
 to be considered successful, all of its success criteria must resolve to
 <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <p>The simplest success criteria is a basic string match that requires a specific
@@ -306,7 +306,7 @@ experiment. They are allowed to relate to any metric of interest, whether it is
 a physical quantity (such as total mass or energy), or a performance quantity
 (such as wallclock time), or some other application output.</p>
 <p>Each figure of merit is defined by
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.figure_of_merit()</span></code> and contains
+<a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.figure_of_merit" title="ramble.language.shared_language.figure_of_merit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.figure_of_merit()</span></code></a> and contains
 information about where the metric can be found, what the units of the metric
 are, and how to extract it from a given output file.</p>
 </section>
@@ -317,7 +317,7 @@ timestep it was collected from). To augment a figure of merit with this
 additional information, Ramble has the ability to define a figure of merit
 context. Each context represents a grouping of figures of merit that are
 collected together. A figure of merit context can be defined using
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.figure_of_merit_context()</span></code>.</p>
+<a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.figure_of_merit_context" title="ramble.language.shared_language.figure_of_merit_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.figure_of_merit_context()</span></code></a>.</p>
 </section>
 </section>
 <section id="package-manager-directives">
@@ -326,9 +326,9 @@ collected together. A figure of merit context can be defined using
 directives that are intended to be package manager specific. As an example,
 there are directives for Spack defined by:</p>
 <ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.software_spec()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.default_compiler()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.required_package()</span></code></p></li>
+<li><p><a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.software_spec" title="ramble.language.shared_language.software_spec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.software_spec()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.define_compiler" title="ramble.language.shared_language.define_compiler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.define_compiler()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ramble.language.html#ramble.language.shared_language.required_package" title="ramble.language.shared_language.required_package"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ramble.language.shared_language.required_package()</span></code></a></p></li>
 </ul>
 <p>These provide Ramble with information about how Spack could install and require
 packages. For more information, see the above reference.</p>

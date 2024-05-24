@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.language.application_language &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.language.application_language</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.language.application_language</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2024 The Ramble Authors</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">ramble.workload</span>
+<span class="kn">import</span> <span class="nn">ramble.language.language_base</span>
+<span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
+<span class="kn">import</span> <span class="nn">ramble.language.shared_language</span>
+<span class="kn">import</span> <span class="nn">ramble.language.language_helpers</span>
+<span class="kn">import</span> <span class="nn">ramble.success_criteria</span>
+
+
+<span class="sd">&quot;&quot;&quot;This package contains directives that can be used within a package.</span>
+
+<span class="sd">Directives are functions that can be called inside a package</span>
+<span class="sd">definition to modify the package, for example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      class Gromacs(SpackApplication):</span>
+<span class="sd">          # Workload directive:</span>
+<span class="sd">          workload(&#39;water_bare&#39;, executables=[&#39;pre-process&#39;, &#39;execute-gen&#39;],</span>
+<span class="sd">               input=&#39;water_bare_hbonds&#39;)</span>
+
+<span class="sd">In the above example, &#39;workload&#39; is a ramble directive</span>
+
+<span class="sd">There are many available directives, the majority of which are implemented here.</span>
+
+<span class="sd">Some examples include:</span>
+
+<span class="sd">  workload</span>
+<span class="sd">  executable</span>
+<span class="sd">  figure_of_merit</span>
+<span class="sd">  figure_of_merit_context</span>
+<span class="sd">  input_file</span>
+
+<span class="sd">For a full list see below, or consult the existing application definitions for</span>
+<span class="sd">examples</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="ApplicationMeta">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.ApplicationMeta">[docs]</a>
+<span class="k">class</span> <span class="nc">ApplicationMeta</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">shared_language</span><span class="o">.</span><span class="n">SharedMeta</span><span class="p">):</span>
+    <span class="n">_directive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">_directives_to_be_executed</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+
+<span class="n">application_directive</span> <span class="o">=</span> <span class="n">ApplicationMeta</span><span class="o">.</span><span class="n">directive</span>
+
+
+<div class="viewcode-block" id="workload">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;workloads&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">workload</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">executables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">executable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a workload to this application</span>
+
+<span class="sd">    Defines a new workload that can be used within the context of</span>
+<span class="sd">    its application.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        executable: The name of an executable to be used</span>
+<span class="sd">        executables: A list of executable names to be used</span>
+<span class="sd">        input (Optional): The name of an input be used</span>
+<span class="sd">        inputs (Optional): A list of input names that will be used</span>
+
+<span class="sd">    Either executable, or executables is a required input argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_workload</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="n">all_execs</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span>
+                                                                        <span class="n">executables</span><span class="p">,</span>
+                                                                        <span class="n">app</span><span class="o">.</span><span class="n">executables</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;executable&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;executables&#39;</span><span class="p">,</span>
+                                                                        <span class="s1">&#39;workload&#39;</span><span class="p">)</span>
+
+        <span class="n">all_inputs</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">merge_definitions</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span>
+                                                                        <span class="n">inputs</span><span class="p">,</span>
+                                                                        <span class="n">app</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+
+        <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workload</span><span class="o">.</span><span class="n">Workload</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">all_execs</span><span class="p">,</span> <span class="n">all_inputs</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_execute_workload</span></div>
+
+
+
+<div class="viewcode-block" id="executable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.executable">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;executables&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">executable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds an executable to this application</span>
+
+<span class="sd">    Defines a new executable that can be used to configure workloads and</span>
+<span class="sd">    experiments with.</span>
+
+<span class="sd">    Executables may or may not use MPI.</span>
+
+<span class="sd">    Required Args:</span>
+<span class="sd">        name (str): Name of the executable</span>
+<span class="sd">        template (list[str] or str): The template command this executable should generate from</span>
+
+<span class="sd">    Optional Args:</span>
+<span class="sd">        use_mpi or mpi: (Boolean) determines if this executable should be</span>
+<span class="sd">                        wrapped with an `mpirun` like command or not.</span>
+
+<span class="sd">        variables (dict): dictionary of variable definitions to use for this executable only</span>
+<span class="sd">        redirect (Optional): Sets the path for outputs to be written to.</span>
+<span class="sd">                             defaults to {log_file}</span>
+<span class="sd">        output_capture (Optional): Declare which ouptu (stdout, stderr, both) to</span>
+<span class="sd">                                   capture. Defaults to stdout</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_executable</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">ramble.util.executable</span> <span class="kn">import</span> <span class="n">CommandExecutable</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">executables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">CommandExecutable</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_execute_executable</span></div>
+
+
+
+<div class="viewcode-block" id="input_file">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.input_file">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">input_file</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">target_dir</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{input_name}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">sha256</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds an input file definition to this application</span>
+
+<span class="sd">    Defines a new input file.</span>
+<span class="sd">    An input file must define it&#39;s name, and a url where the input can be</span>
+<span class="sd">    fetched from.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url: Path to the input file / archive</span>
+<span class="sd">        description: Description of this input file</span>
+<span class="sd">        target_dir (Optional): The directory where the archive will be</span>
+<span class="sd">                               expanded. Defaults to &#39;input&#39;</span>
+<span class="sd">        sha256 (Optional): The expected sha256 checksum for the input file</span>
+<span class="sd">        extension (Optional): The extension to use for the input, if it isn&#39;t part of the</span>
+<span class="sd">                              file name.</span>
+<span class="sd">        expand (Optional): Whether the input should be expanded or not. Defaults to True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_input_file</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+            <span class="s1">&#39;target_dir&#39;</span><span class="p">:</span> <span class="n">target_dir</span><span class="p">,</span>
+            <span class="s1">&#39;sha256&#39;</span><span class="p">:</span> <span class="n">sha256</span><span class="p">,</span>
+            <span class="s1">&#39;extension&#39;</span><span class="p">:</span> <span class="n">extension</span><span class="p">,</span>
+            <span class="s1">&#39;expand&#39;</span><span class="p">:</span> <span class="n">expand</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_execute_input_file</span></div>
+
+
+
+<div class="viewcode-block" id="workload_variable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.workload_variable">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">workload_variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">workloads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a new variable to be used in experiments</span>
+
+<span class="sd">    Defines a new variable that can be defined within the</span>
+<span class="sd">    experiments.yaml config file, to control various aspects of</span>
+<span class="sd">    an experiment.</span>
+
+<span class="sd">    These are specific to each workload.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_workload_variable</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="n">all_workloads</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span>
+                                                                            <span class="n">workloads</span><span class="p">,</span>
+                                                                            <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workload&#39;</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workloads&#39;</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workload_variable&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">wl_name</span> <span class="ow">in</span> <span class="n">all_workloads</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">wl_name</span><span class="p">]</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span>
+                <span class="n">ramble</span><span class="o">.</span><span class="n">workload</span><span class="o">.</span><span class="n">WorkloadVariable</span><span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                    <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">expandable</span><span class="o">=</span><span class="n">expandable</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_execute_workload_variable</span></div>
+
+
+
+<div class="viewcode-block" id="environment_variable">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.environment_variable">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="n">dicts</span><span class="o">=</span><span class="p">())</span>
+<span class="k">def</span> <span class="nf">environment_variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">workload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">workloads</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define an environment variable to be used in experiments</span>
+
+<span class="sd">    These can be specific to workloads.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_environment_variable</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="n">all_workloads</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">language_helpers</span><span class="o">.</span><span class="n">require_definition</span><span class="p">(</span><span class="n">workload</span><span class="p">,</span>
+                                                                            <span class="n">workloads</span><span class="p">,</span>
+                                                                            <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workload&#39;</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;workloads&#39;</span><span class="p">,</span>
+                                                                            <span class="s1">&#39;environment_variable&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">wl_name</span> <span class="ow">in</span> <span class="n">all_workloads</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="n">wl_name</span><span class="p">]</span><span class="o">.</span><span class="n">add_environment_variable</span><span class="p">(</span>
+                <span class="n">ramble</span><span class="o">.</span><span class="n">workload</span><span class="o">.</span><span class="n">WorkloadEnvironmentVariable</span><span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_execute_environment_variable</span></div>
+
+
+
+<div class="viewcode-block" id="register_phase">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.application_language.register_phase">[docs]</a>
+<span class="nd">@application_directive</span><span class="p">(</span><span class="s1">&#39;phase_definitions&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">register_phase</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_before</span><span class="o">=</span><span class="p">[],</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a phase</span>
+
+<span class="sd">    Phases are portions of a pipeline that will execute when</span>
+<span class="sd">    executing a full pipeline.</span>
+
+<span class="sd">    Registering a phase allows an application to know what the phases</span>
+<span class="sd">    dependencies are, to ensure the execution order is correct.</span>
+
+<span class="sd">    If called multiple times, the dependencies are combined together. Only one</span>
+<span class="sd">    instance of a phase will show up in the resulting dependency list for a phase.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - name: The name of the phase. Phases are functions named &#39;_&lt;phase&gt;&#39;.</span>
+<span class="sd">    - pipeline: The name of the pipeline this phase should be registered into.</span>
+<span class="sd">    - run_before: A list of phase names this phase should run before</span>
+<span class="sd">    - run_after: A list of phase names this phase should run after</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_execute_register_phase</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">ramble.util.graph</span>
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">_pipelines</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;Directive register_phase was &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;given an invalid pipeline &quot;</span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="s1">&#39;Available pipelines are: &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">_pipelines</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_before</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;Directive register_phase was &#39;</span>
+                                 <span class="s1">&#39;given an invalid type for &#39;</span>
+                                 <span class="s1">&#39;the run_before attribute in application &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_after</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;Directive register_phase was &#39;</span>
+                                 <span class="s1">&#39;given an invalid type for &#39;</span>
+                                 <span class="s1">&#39;the run_after attribute in application &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="s1">&#39;Directive register_phase was &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;given an undefined phase </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;in application </span><span class="si">{</span><span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]:</span>
+            <span class="n">phase_node</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">phase_node</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">GraphNode</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">before</span> <span class="ow">in</span> <span class="n">run_before</span><span class="p">:</span>
+            <span class="n">phase_node</span><span class="o">.</span><span class="n">order_before</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">after</span> <span class="ow">in</span> <span class="n">run_after</span><span class="p">:</span>
+            <span class="n">phase_node</span><span class="o">.</span><span class="n">order_after</span><span class="p">(</span><span class="n">after</span><span class="p">)</span>
+
+        <span class="n">app</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">phase_node</span>
+
+    <span class="k">return</span> <span class="n">_execute_register_phase</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 24, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

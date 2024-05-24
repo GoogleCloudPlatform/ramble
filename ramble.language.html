@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ramble.language namespace &mdash; Ramble 0.4.0 documentation</title>
+  <title>ramble.language namespace &mdash; Ramble 0.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
@@ -17,7 +17,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=6c02275b"></script>
+        <script src="_static/documentation_options.js?v=1dd76d02"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -41,7 +41,7 @@
             
           </a>
               <div class="version">
-                0.4
+                0.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -66,11 +66,11 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ramble.language namespace</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble-language-application-language-module">ramble.language.application_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.application_language">ramble.language.application_language module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_base">ramble.language.language_base module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_helpers">ramble.language.language_helpers module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble-language-modifier-language-module">ramble.language.modifier_language module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble-language-shared-language-module">ramble.language.shared_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.modifier_language">ramble.language.modifier_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.shared_language">ramble.language.shared_language module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
@@ -81,8 +81,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-application-module">ramble.application module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.context">ramble.context module</a></li>
@@ -93,17 +93,17 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.filters">ramble.filters module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.graphs">ramble.graphs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.keywords">ramble.keywords module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-main-module">ramble.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modifier-module">ramble.modifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modkit-module">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repeats">ramble.repeats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-software-environments-module">ramble.software_environments module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spec">ramble.spec module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.stage">ramble.stage module</a></li>
@@ -157,8 +157,118 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="ramble-language-application-language-module">
-<h2>ramble.language.application_language module<a class="headerlink" href="#ramble-language-application-language-module" title="Link to this heading"></a></h2>
+<section id="module-ramble.language.application_language">
+<span id="ramble-language-application-language-module"></span><h2>ramble.language.application_language module<a class="headerlink" href="#module-ramble.language.application_language" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.language.application_language.ApplicationMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">ApplicationMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#ApplicationMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.ApplicationMeta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.shared_language.SharedMeta" title="ramble.language.shared_language.SharedMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMeta</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.environment_variable">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">environment_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workloads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#environment_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.environment_variable" title="Link to this definition"></a></dt>
+<dd><p>Define an environment variable to be used in experiments</p>
+<p>These can be specific to workloads.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.executable">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">executable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#executable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.executable" title="Link to this definition"></a></dt>
+<dd><p>Adds an executable to this application</p>
+<p>Defines a new executable that can be used to configure workloads and
+experiments with.</p>
+<p>Executables may or may not use MPI.</p>
+<dl>
+<dt>Required Args:</dt><dd><p>name (str): Name of the executable
+template (list[str] or str): The template command this executable should generate from</p>
+</dd>
+<dt>Optional Args:</dt><dd><dl class="simple">
+<dt>use_mpi or mpi: (Boolean) determines if this executable should be</dt><dd><p>wrapped with an <cite>mpirun</cite> like command or not.</p>
+</dd>
+</dl>
+<p>variables (dict): dictionary of variable definitions to use for this executable only
+redirect (Optional): Sets the path for outputs to be written to.</p>
+<blockquote>
+<div><p>defaults to {log_file}</p>
+</div></blockquote>
+<dl class="simple">
+<dt>output_capture (Optional): Declare which ouptu (stdout, stderr, both) to</dt><dd><p>capture. Defaults to stdout</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.input_file">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">input_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{input_name}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sha256</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#input_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.input_file" title="Link to this definition"></a></dt>
+<dd><p>Adds an input file definition to this application</p>
+<p>Defines a new input file.
+An input file must define it’s name, and a url where the input can be
+fetched from.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – Path to the input file / archive</p></li>
+<li><p><strong>description</strong> – Description of this input file</p></li>
+<li><p><strong>target_dir</strong> (<em>Optional</em>) – The directory where the archive will be
+expanded. Defaults to ‘input’</p></li>
+<li><p><strong>sha256</strong> (<em>Optional</em>) – The expected sha256 checksum for the input file</p></li>
+<li><p><strong>extension</strong> (<em>Optional</em>) – The extension to use for the input, if it isn’t part of the
+file name.</p></li>
+<li><p><strong>expand</strong> (<em>Optional</em>) – Whether the input should be expanded or not. Defaults to True</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.register_phase">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">register_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#register_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.register_phase" title="Link to this definition"></a></dt>
+<dd><p>Register a phase</p>
+<p>Phases are portions of a pipeline that will execute when
+executing a full pipeline.</p>
+<p>Registering a phase allows an application to know what the phases
+dependencies are, to ensure the execution order is correct.</p>
+<p>If called multiple times, the dependencies are combined together. Only one
+instance of a phase will show up in the resulting dependency list for a phase.</p>
+<p>Args:
+- name: The name of the phase. Phases are functions named ‘_&lt;phase&gt;’.
+- pipeline: The name of the pipeline this phase should be registered into.
+- run_before: A list of phase names this phase should run before
+- run_after: A list of phase names this phase should run after</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.workload">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">workload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#workload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.workload" title="Link to this definition"></a></dt>
+<dd><p>Adds a workload to this application</p>
+<p>Defines a new workload that can be used within the context of
+its application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executable</strong> – The name of an executable to be used</p></li>
+<li><p><strong>executables</strong> – A list of executable names to be used</p></li>
+<li><p><strong>input</strong> (<em>Optional</em>) – The name of an input be used</p></li>
+<li><p><strong>inputs</strong> (<em>Optional</em>) – A list of input names that will be used</p></li>
+</ul>
+</dd>
+</dl>
+<p>Either executable, or executables is a required input argument.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.workload_variable">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">workload_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workloads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#workload_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.workload_variable" title="Link to this definition"></a></dt>
+<dd><p>Define a new variable to be used in experiments</p>
+<p>Defines a new variable that can be defined within the
+experiments.yaml config file, to control various aspects of
+an experiment.</p>
+<p>These are specific to each workload.</p>
+</dd></dl>
+
 </section>
 <section id="module-ramble.language.language_base">
 <span id="ramble-language-language-base-module"></span><h2>ramble.language.language_base module<a class="headerlink" href="#module-ramble.language.language_base" title="Link to this heading"></a></h2>
@@ -287,11 +397,364 @@ either are the incorrect type.</p>
 </dd></dl>
 
 </section>
-<section id="ramble-language-modifier-language-module">
-<h2>ramble.language.modifier_language module<a class="headerlink" href="#ramble-language-modifier-language-module" title="Link to this heading"></a></h2>
+<section id="module-ramble.language.modifier_language">
+<span id="ramble-language-modifier-language-module"></span><h2>ramble.language.modifier_language module<a class="headerlink" href="#module-ramble.language.modifier_language" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.ModifierMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">ModifierMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#ModifierMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.ModifierMeta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.shared_language.SharedMeta" title="ramble.language.shared_language.SharedMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMeta</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.default_mode">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">default_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#default_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.default_mode" title="Link to this definition"></a></dt>
+<dd><p>Define a default mode for this modifier.</p>
+<p>The default mode will be used if modifier mode is not specified in an experiment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.env_var_modification">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">env_var_modification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'set'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#env_var_modification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.env_var_modification" title="Link to this definition"></a></dt>
+<dd><p>Define an environment variable modifier</p>
+<p>Environment variable modifications modify the values of environment
+variables within the application instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the environment variable that will be modified</p></li>
+<li><p><strong>modification</strong> – The value of the modification</p></li>
+<li><p><strong>method</strong> – The method of the modification.</p></li>
+<li><p><strong>mode</strong> – Name of mode this env_var_modification should apply in</p></li>
+<li><p><strong>modes</strong> – List of mode names this env_var_modification should apply in</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported values for method are:
+set: Defines the variable to equal the modification value</p>
+<p>unset: Removes any definition of the variable from the environment</p>
+<p>prepend: Prepends the modification to the beginning of the variable.
+Always uses the separator ‘:’</p>
+<p>append: Appends the modification value to the end of the value. Allows a
+keyword argument of ‘separator’ to define the delimiter between values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.executable_modifier">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">executable_modifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#executable_modifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.executable_modifier" title="Link to this definition"></a></dt>
+<dd><p>Register an executable modifier</p>
+<p>Executable modifiers can modify various aspects of non-builtin application
+executable definitions.</p>
+<p>These behave similarly to builtins, in that a python method defines the
+actual modifications</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">executable_modifier</span><span class="p">(</span><span class="s1">&#39;write_exec_name&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">write_exec_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable_name</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="n">prepend_execs</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">append_execs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ExecutableCommand</span><span class="p">(</span>
+      <span class="n">template</span><span class="o">=</span><span class="s1">&#39;echo &quot;</span><span class="si">{executable_name}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+      <span class="n">mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+      <span class="n">redirect</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
+      <span class="n">output_capture</span><span class="o">=</span><span class="n">OUTPUT_CAPTURE</span><span class="o">.</span><span class="n">DEFAULT</span>
+  <span class="p">)]</span>
+
+  <span class="k">return</span> <span class="n">prepend_execs</span><span class="p">,</span> <span class="n">append_execs</span>
+</pre></div>
+</div>
+<p>Would append the <cite>echo “{executable_name}”</cite> to every non-builtin executable
+in an experiment.</p>
+<p>Executable modifiers are allowed to modify the input executable in place.
+Executable modifiers must return two lists of executables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of executables to inject before the base executable
+append_execs: List of executables to inject after the base executable</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>prepend_execs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.mode">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.mode" title="Link to this definition"></a></dt>
+<dd><p>Define a new mode for this modifier.</p>
+<p>Modes allow a modifier to bundle a set of modifications together.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.modifier_variable">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">modifier_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#modifier_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.modifier_variable" title="Link to this definition"></a></dt>
+<dd><p>Define a variable for this modifier</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of variable to define</p></li>
+<li><p><strong>default</strong> – Default value of variable definition</p></li>
+<li><p><strong>description</strong> (<em>str</em>) – Description of variable’s purpose</p></li>
+<li><p><strong>values</strong> (<em>list</em>) – Optional list of suggested values for this variable</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Single mode this variable is used in</p></li>
+<li><p><strong>modes</strong> (<em>list</em>) – List of modes this variable is used in</p></li>
+<li><p><strong>expandable</strong> (<em>bool</em>) – True if the variable should be expanded, False if not.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.package_manager_requirement">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#package_manager_requirement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.package_manager_requirement" title="Link to this definition"></a></dt>
+<dd><p>Define a requirement for the modifier’s package manager</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> – Package manager command to execute, when evaluating the requirement</p></li>
+<li><p><strong>validation_type</strong> – Type of validation to perform on output of command.
+Valid types are: ‘empty’, ‘not_empty’, ‘contains_regex’,
+‘does_not_contain_regex’</p></li>
+<li><p><strong>modes</strong> – List of usage modes this requirement should apply to</p></li>
+<li><p><strong>regex</strong> – Regular expression to use when validation_type is either ‘contains_regex’
+or ‘does_no_contain_regex’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.required_variable">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">required_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variable'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#required_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.required_variable" title="Link to this definition"></a></dt>
+<dd><p>Mark a var as being required</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Value to mark as required</p></li>
+<li><p><strong>results_level</strong> (<em>str</em>) – ‘variable’ or ‘key’. If ‘key’ variable is promoted to
+a key within JSON or YAML formatted results.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.modifier_language.variable_modification">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">variable_modification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modification</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'set'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#variable_modification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.variable_modification" title="Link to this definition"></a></dt>
+<dd><p>Define a new variable modification for a mode in this modifier.</p>
+<p>A variable modification will apply a change to a defined variable within an experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The variable to modify</p></li>
+<li><p><strong>modification</strong> – The value to modify ‘name’ with</p></li>
+<li><p><strong>method</strong> – How the modification should be applied</p></li>
+<li><p><strong>mode</strong> – Single mode to group this modification into</p></li>
+<li><p><strong>modes</strong> – List of modes to group this modification into</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported values are ‘append’, ‘prepend’, and ‘set’:</p>
+<blockquote>
+<div><p>‘append’ will add the modification to the end of ‘name’</p>
+<p>‘prepend’ will add the modification to the beginning of ‘name’</p>
+<p>‘set’ (Default) will overwrite ‘name’ with the modification</p>
+</div></blockquote>
+</dd></dl>
+
 </section>
-<section id="ramble-language-shared-language-module">
-<h2>ramble.language.shared_language module<a class="headerlink" href="#ramble-language-shared-language-module" title="Link to this heading"></a></h2>
+<section id="module-ramble.language.shared_language">
+<span id="ramble-language-shared-language-module"></span><h2>ramble.language.shared_language module<a class="headerlink" href="#module-ramble.language.shared_language" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.language.shared_language.SharedMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">SharedMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#SharedMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.SharedMeta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.language_base.DirectiveMeta" title="ramble.language.language_base.DirectiveMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectiveMeta</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.archive_pattern">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">archive_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#archive_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.archive_pattern" title="Link to this definition"></a></dt>
+<dd><p>Adds a file pattern to be archived in addition to figure of merit logs</p>
+<p>Defines a new file pattern that will be archived during workspace archival.
+Archival will only happen for files that match the pattern when archival
+is being performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern</strong> – Pattern that refers to files to archive</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.define_compiler">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">define_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#define_compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.define_compiler" title="Link to this definition"></a></dt>
+<dd><p>Defines the compiler that will be used with this object</p>
+<p>Adds a new compiler spec to this object. Software specs should
+reference a compiler that has been added.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.figure_of_merit">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#figure_of_merit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.figure_of_merit" title="Link to this definition"></a></dt>
+<dd><p>Adds a figure of merit to track for this object</p>
+<p>Defines a new figure of merit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the figure of merit</p></li>
+<li><p><strong>log_file</strong> – File the figure of merit can be extracted from</p></li>
+<li><p><strong>fom_regex</strong> – A regular expression using named groups to extract the FOM</p></li>
+<li><p><strong>group_name</strong> – The name of the group that the FOM should be pulled from</p></li>
+<li><p><strong>units</strong> – The units associated with the FOM</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.figure_of_merit_context">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">figure_of_merit_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#figure_of_merit_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.figure_of_merit_context" title="Link to this definition"></a></dt>
+<dd><p>Defines a context for figures of merit</p>
+<p>Defines a new context to contain figures of merit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – High level name of the context. Can be referred to in
+the figure of merit</p></li>
+<li><p><strong>regex</strong> – Regular expression, using group names, to match a context.</p></li>
+<li><p><strong>output_format</strong> – String, using python keywords {group_name} to extract
+group names from context regular expression.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.maintainers">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">maintainers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#maintainers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.maintainers" title="Link to this definition"></a></dt>
+<dd><p>Add a new maintainer directive, to specify maintainers in a declarative way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>names</strong> – GitHub username for the maintainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.package_manager_config">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#package_manager_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.package_manager_config" title="Link to this definition"></a></dt>
+<dd><p>Defines a config option to set within a package manager</p>
+<p>Define a new config which will be passed to a package manager. The
+resulting experiment instance will pass the config to the package manager,
+which will control the logic of applying it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.register_builtin">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">register_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#register_builtin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.register_builtin" title="Link to this definition"></a></dt>
+<dd><p>Register a builtin</p>
+<p>Builtins are methods that return lists of strings. These methods represent
+a way to write python code to generate executables for building up
+workloads.</p>
+<p>Manual injection of a builtins can be performed through modifying the
+execution order in the internals config section.</p>
+<p>Modifier builtins are named:
+<cite>modifier_builtin::modifier_name::method_name</cite>.</p>
+<p>Application modifiers are named:
+<cite>builtin::method_name</cite></p>
+<p>As an example, if the following builtin was defined:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;example_builtin&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">example_builtin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
+<p>Its fully qualified name would be:
+* <cite>modifier_builtin::test-modifier::example_builtin</cite> when defined in a
+modifier named <cite>test-modifier</cite>
+* <cite>builtin::example_builtin</cite> when defined in an application</p>
+<p>The ‘required’ attribute marks a builtin as required for all workloads. This
+will ensure the builtin is added to the workload if it is not explicitly
+added. If required builtins are not explicitly added to a workload, they
+are injected  into the list of executables, based on the injection_method
+attribute.</p>
+<p>The ‘injection_method’ attribute controls where the builtin will be
+injected into the executable list.
+Options are:
+- ‘prepend’ – This builtin will be injected at the beginning of the executable list
+- ‘append’ – This builtin will be injected at the end of the executable list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.register_phase">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">register_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#register_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.register_phase" title="Link to this definition"></a></dt>
+<dd><p>Register a phase</p>
+<p>Phases are portions of a pipeline that will execute when
+executing a full pipeline.</p>
+<p>Registering a phase allows an object to know what the phases
+dependencies are, to ensure the execution order is correct.</p>
+<p>If called multiple times, the dependencies are combined together. Only one
+instance of a phase will show up in the resulting dependency list for a phase.</p>
+<p>Args:
+- name: The name of the phase. Phases are functions named ‘_&lt;phase&gt;’.
+- pipeline: The name of the pipeline this phase should be registered into.
+- run_before: A list of phase names this phase should run before
+- run_after: A list of phase names this phase should run after</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.required_package">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">required_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#required_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.required_package" title="Link to this definition"></a></dt>
+<dd><p>Defines a new spack package that is required for this object
+to function properly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.software_spec">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">software_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#software_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.software_spec" title="Link to this definition"></a></dt>
+<dd><p>Defines a new software spec needed for this object.</p>
+<p>Adds a new software spec (for spack to use) that this object
+needs to execute properly.</p>
+<p>Only adds specs to object that use spack.</p>
+<p>Specs can be described as an mpi spec, which means they
+will depend on the MPI library within the resulting spack
+environment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.success_criteria">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">success_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_file}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fom_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'null'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.success_criteria" title="Link to this definition"></a></dt>
+<dd><p>Defines a success criteria used by experiments of this object</p>
+<p>Adds a new success criteria to this object definition.</p>
+<p>These will be checked during the analyze step to see if a job exited properly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of this success criteria</p></li>
+<li><p><strong>mode</strong> – The type of success criteria that will be validated
+Valid values are: ‘string’, ‘application_function’, and ‘fom_comparison’</p></li>
+<li><p><strong>match</strong> – For mode=’string’. Value to check indicate success (if found, it
+would mark success)</p></li>
+<li><p><strong>file</strong> – For mode=’string’. File success criteria should be located in</p></li>
+<li><p><strong>fom_name</strong> – For mode=’fom_comparison’. Name of fom for a criteria.
+Accepts globbing.</p></li>
+<li><p><strong>fom_context</strong> – For mode=’fom_comparison’. Context the fom is contained
+in. Accepts globbing.</p></li>
+<li><p><strong>formula</strong> – For mode=’fom_comparison’. Formula to use to evaluate success.
+‘{value}’ keyword is set as the value of the FOM.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.shared_language.tags">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.tags" title="Link to this definition"></a></dt>
+<dd><p>Add a new tag directive, to specify tags in a declarative way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> – Value to mark as a tag</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 

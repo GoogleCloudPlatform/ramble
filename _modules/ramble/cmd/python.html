@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.cmd.python &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../cmd.html">ramble.cmd</a></li>
+      <li class="breadcrumb-item active">ramble.cmd.python</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.cmd.python</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2024 The Ramble Authors</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">code</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">runpy</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
+
+<span class="kn">import</span> <span class="nn">ramble</span>
+
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;launch an interpreter as ramble would launch a command&quot;</span>
+<span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;developer&quot;</span>
+<span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
+
+
+<div class="viewcode-block" id="setup_parser">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.python.setup_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-V&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--version&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;python_version&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print the Python version number and exit&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;python_command&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;command to execute&quot;</span><span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-u&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;unbuffered&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;for compatibility with xdist, do not use without adding -u to the interpreter&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;python_interpreter&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;python interpreter&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;ipython&quot;</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run library module as a script&quot;</span>
+    <span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--path&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;show_path&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show path to python interpreter that ramble uses&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;python_args&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;file to run plus arguments&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="python">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.python.python">[docs]</a>
+<span class="k">def</span> <span class="nf">python</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">python_version</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">())</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">show_path</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">module</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ramble-python&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">unknown_args</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">python_args</span>
+        <span class="n">runpy</span><span class="o">.</span><span class="n">run_module</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;__main__&quot;</span><span class="p">,</span> <span class="n">alter_sys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">unknown_args</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Unknown arguments:&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unknown_args</span><span class="p">))</span>
+
+    <span class="c1"># Unexpected behavior from supplying both</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">python_command</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">python_args</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;You can only specify a command OR script, but not both.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Run user choice of interpreter</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">python_interpreter</span> <span class="o">==</span> <span class="s2">&quot;ipython&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">ipython_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">python_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ipython_interpreter">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.python.ipython_interpreter">[docs]</a>
+<span class="k">def</span> <span class="nf">ipython_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ipython interpreter is intended to be interactive, so it doesn&#39;t</span>
+<span class="sd">    support running a script or arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">IPython</span>  <span class="c1"># type: ignore[import]</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">tty</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;ipython is not installed, install and try again.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;PYTHONSTARTUP&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">startup_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PYTHONSTARTUP&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">startup_file</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">startup_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">startup</span><span class="p">:</span>
+                <span class="n">exec</span><span class="p">(</span><span class="n">startup</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="c1"># IPython can also support running a script OR command, not both</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">python_args</span><span class="p">:</span>
+        <span class="n">IPython</span><span class="o">.</span><span class="n">start_ipython</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">python_args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">python_command</span><span class="p">:</span>
+        <span class="n">IPython</span><span class="o">.</span><span class="n">start_ipython</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">python_command</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;Ramble version </span><span class="si">%s</span><span class="se">\n</span><span class="s2">Python </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">ramble</span><span class="o">.</span><span class="n">ramble_version</span><span class="p">,</span>
+            <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">(),</span>
+            <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+            <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;__main__&quot;</span>  <span class="c1"># noqa: F841</span>
+        <span class="n">IPython</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="s2">&quot;__main__&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="python_interpreter">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.python.python_interpreter">[docs]</a>
+<span class="k">def</span> <span class="nf">python_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A python interpreter is the default interpreter&quot;&quot;&quot;</span>
+    <span class="c1"># Fake a main python shell by setting __name__ to __main__.</span>
+    <span class="n">console</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">InteractiveConsole</span><span class="p">({</span><span class="s2">&quot;__name__&quot;</span><span class="p">:</span> <span class="s2">&quot;__main__&quot;</span><span class="p">,</span> <span class="s2">&quot;ramble&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="p">})</span>
+    <span class="k">if</span> <span class="s2">&quot;PYTHONSTARTUP&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">startup_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PYTHONSTARTUP&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">startup_file</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">startup_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">startup</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">runsource</span><span class="p">(</span><span class="n">startup</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">startup_file</span><span class="p">,</span> <span class="s2">&quot;exec&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">python_command</span><span class="p">:</span>
+        <span class="n">propagate_exceptions_from</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">runsource</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">python_command</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">python_args</span><span class="p">:</span>
+        <span class="n">propagate_exceptions_from</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">python_args</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">python_args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">runsource</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">args</span><span class="o">.</span><span class="n">python_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;exec&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Provides readline support, allowing user to use arrow keys</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;import readline&quot;</span><span class="p">)</span>
+        <span class="c1"># Provide tabcompletion</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;from rlcompleter import Completer&quot;</span><span class="p">)</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;readline.set_completer(Completer(locals()).complete)&quot;</span><span class="p">)</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s1">&#39;readline.parse_and_bind(&quot;tab: complete&quot;)&#39;</span><span class="p">)</span>
+
+        <span class="n">console</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span>
+            <span class="s2">&quot;Ramble version </span><span class="si">%s</span><span class="se">\n</span><span class="s2">Python </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span>
+                <span class="n">ramble</span><span class="o">.</span><span class="n">ramble_version</span><span class="p">,</span>
+                <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">(),</span>
+                <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+                <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="propagate_exceptions_from">
+<a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.python.propagate_exceptions_from">[docs]</a>
+<span class="k">def</span> <span class="nf">propagate_exceptions_from</span><span class="p">(</span><span class="n">console</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set sys.excepthook to let uncaught exceptions return 1 to the shell.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        console (code.InteractiveConsole): the console that needs a change in sys.excepthook</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;import sys&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;_wrapped_hook = sys.excepthook&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;def _hook(exc_type, exc_value, exc_tb):&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;    _wrapped_hook(exc_type, exc_value, exc_tb)&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;    sys.exit(1)&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;sys.excepthook = _hook&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on May 24, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
