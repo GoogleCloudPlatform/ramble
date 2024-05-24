@@ -444,7 +444,11 @@
         <span class="p">):</span>
             <span class="k">if</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
                 <span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkg_spec</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_path</span>
+                <span class="k">if</span> <span class="n">spack_pkg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_path</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">spack_pkg_name</span><span class="si">}</span><span class="s1"> defined. &#39;</span> <span class="o">+</span>
+                               <span class="s1">&#39;Skipping extraction from spack&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">unresolved_specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pkg_spec</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">unresolved_specs</span><span class="p">:</span>
@@ -459,8 +463,12 @@
 
             <span class="k">for</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="n">unresolved_specs</span><span class="p">:</span>
                 <span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">pkg_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">get_package_path</span><span class="p">(</span><span class="n">pkg_spec</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_path</span>
-                <span class="n">cache</span><span class="p">[</span><span class="n">pkg_spec</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">pkg_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">spack_pkg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_path</span>
+                    <span class="n">cache</span><span class="p">[</span><span class="n">pkg_spec</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">pkg_path</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">spack_pkg_name</span><span class="si">}</span><span class="s1"> defined. &#39;</span> <span class="o">+</span>
+                               <span class="s1">&#39;Skipping extraction from spack&#39;</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
