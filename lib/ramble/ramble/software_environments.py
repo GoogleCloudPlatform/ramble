@@ -497,7 +497,8 @@ class SoftwareEnvironments(object):
 
         if namespace.packages in self._spack_dict:
             for pkg_template, pkg_info in self._spack_dict[namespace.packages].items():
-                spec = pkg_info["spack_spec"] if "spack_spec" in pkg_info else pkg_info["spec"]
+
+                spec = pkg_info["pkg_spec"] if "pkg_spec" in pkg_info else pkg_info["spec"]
                 compiler = (
                     pkg_info["compiler"]
                     if "compiler" in pkg_info and pkg_info["compiler"]
