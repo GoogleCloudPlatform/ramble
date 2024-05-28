@@ -930,8 +930,18 @@ use either <code class="docutils literal notranslate"><span class="pre">$var</sp
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsBase.get_unit">
+<span class="sig-name descname"><span class="pre">get_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsBase.get_unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsBase.get_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsBase.min_count">
+<span class="sig-name descname"><span class="pre">min_count</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ramble.util.stats.StatsBase.min_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ramble.util.stats.StatsBase.report">
-<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsBase.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsBase.report" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsBase.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsBase.report" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -945,14 +955,14 @@ use either <code class="docutils literal notranslate"><span class="pre">$var</sp
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsCountValues.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsCountValues.compute" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues.get_unit">
+<span class="sig-name descname"><span class="pre">get_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsCountValues.get_unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsCountValues.get_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'n_successful_repeats'</span></em><a class="headerlink" href="#ramble.util.stats.StatsCountValues.name" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.util.stats.StatsCountValues.report">
-<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsCountValues.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsCountValues.report" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1031,13 +1041,13 @@ use either <code class="docutils literal notranslate"><span class="pre">$var</sp
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stdev'</span></em><a class="headerlink" href="#ramble.util.stats.StatsStdev.name" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.min_count">
+<span class="sig-name descname"><span class="pre">min_count</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ramble.util.stats.StatsStdev.min_count" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.report">
-<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsStdev.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsStdev.report" title="Link to this definition"></a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsStdev.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stdev'</span></em><a class="headerlink" href="#ramble.util.stats.StatsStdev.name" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1051,14 +1061,19 @@ use either <code class="docutils literal notranslate"><span class="pre">$var</sp
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsVar.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsVar.compute" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsVar.get_unit">
+<span class="sig-name descname"><span class="pre">get_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsVar.get_unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsVar.get_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.util.stats.StatsVar.min_count">
+<span class="sig-name descname"><span class="pre">min_count</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ramble.util.stats.StatsVar.min_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.util.stats.StatsVar.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'variance'</span></em><a class="headerlink" href="#ramble.util.stats.StatsVar.name" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ramble.util.stats.StatsVar.report">
-<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/util/stats.html#StatsVar.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.util.stats.StatsVar.report" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1346,7 +1361,7 @@ option_value in config_data.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 24, 2024.
+      <span class="lastupdated">Last updated on May 28, 2024.
       </span></p>
   </div>
 

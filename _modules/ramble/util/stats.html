@@ -136,16 +136,27 @@
 <div class="viewcode-block" id="StatsBase">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsBase">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">min_count</span> <span class="o">=</span> <span class="mi">1</span>
+
 <div class="viewcode-block" id="StatsBase.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsBase.compute">[docs]</a>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="StatsBase.get_unit">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsBase.get_unit">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unit</span></div>
+
+
 <div class="viewcode-block" id="StatsBase.report">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsBase.report">[docs]</a>
-    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="n">units</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_count</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span></div>
 </div>
 
 
@@ -206,27 +217,18 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsVar">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsVar</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;variance&#39;</span>
+    <span class="n">min_count</span> <span class="o">=</span> <span class="mi">2</span>
+
+<div class="viewcode-block" id="StatsVar.get_unit">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsVar.get_unit">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">^2&#39;</span></div>
+
 
 <div class="viewcode-block" id="StatsVar.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsVar.compute">[docs]</a>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">statistics</span><span class="o">.</span><span class="n">variance</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="n">max_decimal_places</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="StatsVar.report">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsVar.report">[docs]</a>
-    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-        <span class="n">var</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">new_units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-            <span class="n">new_units</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s1">^2&#39;</span>
-        <span class="k">except</span> <span class="n">statistics</span><span class="o">.</span><span class="n">StatisticsError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="n">new_units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-        <span class="k">return</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">new_units</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 </div>
 
 
@@ -235,27 +237,12 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsStdev">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsStdev</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;stdev&#39;</span>
+    <span class="n">min_count</span> <span class="o">=</span> <span class="mi">2</span>
 
 <div class="viewcode-block" id="StatsStdev.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsStdev.compute">[docs]</a>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">statistics</span><span class="o">.</span><span class="n">stdev</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="n">max_decimal_places</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="StatsStdev.report">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsStdev.report">[docs]</a>
-    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-        <span class="n">var</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">new_units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-            <span class="n">new_units</span> <span class="o">=</span> <span class="n">units</span>
-        <span class="k">except</span> <span class="n">statistics</span><span class="o">.</span><span class="n">StatisticsError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="n">new_units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-        <span class="k">return</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">new_units</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 </div>
 
 
@@ -271,10 +258,10 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="StatsCountValues.report">
-<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCountValues.report">[docs]</a>
-    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="s1">&#39;repeats&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="StatsCountValues.get_unit">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCountValues.get_unit">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;repeats&#39;</span></div>
 </div>
 
 
@@ -296,7 +283,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 24, 2024.
+      <span class="lastupdated">Last updated on May 28, 2024.
       </span></p>
   </div>
 
