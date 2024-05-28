@@ -30,11 +30,19 @@ def max_decimal_places(list):
 
 
 class StatsBase(object):
+    min_count = 1
+
     def compute(self, values):
         pass
 
-    def report(self, values, units):
-        return (self.compute(values), units, f'summary::{self.name}')
+    def get_unit(self, unit):
+        return unit
+
+    def report(self, values, unit):
+        label = f'summary::{self.name}'
+        if len(values) < self.min_count:
+            return ('NA', '', label)
+        return (self.compute(values), self.get_unit(unit), label)
 
 
 class StatsMin(StatsBase):
@@ -67,42 +75,21 @@ class StatsMedian(StatsBase):
 
 class StatsVar(StatsBase):
     name = 'variance'
+    min_count = 2
+
+    def get_unit(self, unit):
+        return f'{unit}^2'
 
     def compute(self, values):
         return round(statistics.variance(values), max_decimal_places(values))
 
-    def report(self, values, units):
-        var = ''
-        new_units = ''
-
-        try:
-            var = self.compute(values)
-            new_units = f'{units}^2'
-        except statistics.StatisticsError as e:
-            var = str(e)
-            new_units = ''
-
-        return (var, new_units, f'summary::{self.name}')
-
 
 class StatsStdev(StatsBase):
     name = 'stdev'
+    min_count = 2
 
     def compute(self, values):
         return round(statistics.stdev(values), max_decimal_places(values))
-
-    def report(self, values, units):
-        var = ''
-        new_units = ''
-
-        try:
-            var = self.compute(values)
-            new_units = units
-        except statistics.StatisticsError as e:
-            var = str(e)
-            new_units = ''
-
-        return (var, new_units, f'summary::{self.name}')
 
 
 class StatsCountValues(StatsBase):
@@ -111,8 +98,8 @@ class StatsCountValues(StatsBase):
     def compute(self, values):
         return len(values)
 
-    def report(self, values, units):
-        return (self.compute(values), 'repeats', f'summary::{self.name}')
+    def get_unit(self, unit):
+        return 'repeats'
 
 
 all_stats = [StatsMin(),
