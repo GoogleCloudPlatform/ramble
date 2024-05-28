@@ -111,7 +111,7 @@ the above section. The result should look like the following:
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0
@@ -201,7 +201,7 @@ should have the following in your ``ramble.yaml``:
                   matrix:
                   - platform_config
                   - n_nodes
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0
@@ -263,7 +263,7 @@ Your final configuration file should look something like:
                   matrix:
                   - platform_config
                   - n_nodes
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0

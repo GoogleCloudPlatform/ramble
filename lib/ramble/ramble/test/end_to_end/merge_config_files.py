@@ -35,8 +35,8 @@ applications:
               n_ranks: '1'
 """
 
-    test_spack = """
-spack:
+    test_software = """
+software:
   packages:
     zlib:
       pkg_spec: zlib@1.2.12
@@ -53,7 +53,7 @@ ramble:
     processes_per_node: '16'
     n_threads: '1'
   applications: {}
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -69,16 +69,16 @@ ramble:
         ws._re_read()
 
         applications_file = os.path.join(ws.root, "applications_test.yaml")
-        spack_file = os.path.join(ws.root, "spack_test.yaml")
+        software_file = os.path.join(ws.root, "software_test.yaml")
 
         with open(applications_file, "w+") as f:
             f.write(test_applications)
 
-        with open(spack_file, "w+") as f:
-            f.write(test_spack)
+        with open(software_file, "w+") as f:
+            f.write(test_software)
 
         config("add", "-f", applications_file, global_args=["-w", workspace_name])
-        config("add", "-f", spack_file, global_args=["-w", workspace_name])
+        config("add", "-f", software_file, global_args=["-w", workspace_name])
 
         ws._re_read()
 

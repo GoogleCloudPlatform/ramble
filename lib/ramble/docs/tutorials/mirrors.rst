@@ -64,11 +64,11 @@ Write the following configuration into the file, save, and exit:
                   variables:
                     n_nodes: 1
                     processes_per_node: 30
-      spack:
+      software:
         packages: {}
         environments: {}
 
-Run ``ramble workspace concretize`` to fill in the spack section. The result
+Run ``ramble workspace concretize`` to fill in the software section. The result
 will look something like this:
 
 .. code-block:: yaml
@@ -92,7 +92,7 @@ will look something like this:
                   variables:
                     n_nodes: 1
                     processes_per_node: 30
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.3.0
@@ -124,7 +124,7 @@ this mirror in the first place.
     $ ramble workspace mirror -d $HOME/wrfv4_mirror
 
     ==>     Executing phase mirror_inputs
-    ==>     Executing phase create_spack_env
+    ==>     Executing phase software_create_env
     ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
      -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
@@ -134,7 +134,7 @@ this mirror in the first place.
 
     ==>     Executing phase mirror_software
     ==>     Executing phase mirror_inputs
-    ==>     Executing phase create_spack_env
+    ==>     Executing phase software_create_env
     ==> Created environment in <workspace_dirs path>/wrfv4_mirror_test/software/wrfv4.CONUS_12km
     ==> You can activate this environment with:
     ==>   spack env activate <workspace_dirs path>/wrfv4_mirror_test/software/wrfv4.CONUS_12km

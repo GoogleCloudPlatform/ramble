@@ -59,7 +59,7 @@ ramble:
                 n_threads: '1'
                 size: '0003'
                 type: 'pme'
-  spack:
+  software:
     packages:
       gcc:
         pkg_spec: gcc@8.5.0

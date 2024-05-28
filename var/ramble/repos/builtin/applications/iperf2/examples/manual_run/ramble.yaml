@@ -40,7 +40,7 @@ ramble:
             test_server:
                 variables:
                     additional_flags: "-t 120"
-spack:
+software:
   compilers:
     gcc9:
       pkg_spec: gcc@9.3.0

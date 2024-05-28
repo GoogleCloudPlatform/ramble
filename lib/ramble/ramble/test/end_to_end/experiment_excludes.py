@@ -84,7 +84,7 @@ ramble:
                 - partitions
                 where:
                 - '{n_nodes} == 16'
-  spack:
+  software:
     packages:
       gcc:
         pkg_spec: gcc@8.5.0

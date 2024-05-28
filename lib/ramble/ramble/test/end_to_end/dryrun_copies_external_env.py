@@ -50,7 +50,7 @@ ramble:
             test{{n_nodes}}_{{env_name}}:
               variables:
                 n_nodes: '1'
-  spack:
+  software:
     packages: {{}}
     environments:
       wrfv4:

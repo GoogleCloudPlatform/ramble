@@ -40,7 +40,7 @@ ramble:
               variables:
                 n_nodes: '1'
                 size: '0000.96'
-  spack:
+  software:
     packages:
       gcc:
         pkg_spec: gcc@8.5.0

@@ -43,7 +43,7 @@ ramble:
             test{n_nodes}_{env_name}:
               variables:
                 n_nodes: '1'
-  spack:
+  software:
     packages:
       gcc8:
         pkg_spec: gcc@8.5.0

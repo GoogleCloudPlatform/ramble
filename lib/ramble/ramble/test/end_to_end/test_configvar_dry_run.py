@@ -51,7 +51,7 @@ ramble:
             "{}_test_{{{var_name}}}":
               variables:
                 n_ranks: "{{{var_name}}}"
-  spack:
+  software:
     packages:
       gcc:
         pkg_spec: gcc@8.5.0

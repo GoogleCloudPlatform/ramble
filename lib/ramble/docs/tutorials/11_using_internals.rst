@@ -137,7 +137,7 @@ the following:
                         use_mpi: false
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0
@@ -243,7 +243,7 @@ configuration file should look like the following:
                     - end_time
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0
@@ -334,7 +334,7 @@ following:
                       relative_to: execute
                   variables:
                     n_nodes: [1, 2, 4]
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0

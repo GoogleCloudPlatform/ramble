@@ -28,7 +28,7 @@ ramble:
                 #^-- (partition, processes_per_node, n_nodes) ->
                                 #(part1, 16, openfoam-skx, 2), (part1, 16, openfoam-skx, 4)
                                 #(part2, 32, openfoam-zen2, 2), (part2, 32, openfoam-zen2, 4)
-  spack:
+  software:
     packages:
       gcc9:
         pkg_spec: gcc@9.3.0 target=x86_64

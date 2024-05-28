@@ -199,7 +199,7 @@ suggested starting place for the experiments. To apply this to your workspace, u
 
     $ ramble workspace concretize
 
-This will fill out the ``spack`` dictionary within your workspace configuration
+This will fill out the ``software`` dictionary within your workspace configuration
 file. After executing this command, your workspace configuration file might
 look like the following:
 
@@ -222,7 +222,7 @@ look like the following:
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0

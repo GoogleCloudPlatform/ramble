@@ -56,7 +56,7 @@ ramble:
                   join_separator: '\n'
               variables:
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -113,7 +113,7 @@ ramble:
               variables:
                 var_exec_name: 'nothing'
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """

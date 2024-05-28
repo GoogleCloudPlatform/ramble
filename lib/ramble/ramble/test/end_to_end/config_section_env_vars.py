@@ -42,7 +42,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """

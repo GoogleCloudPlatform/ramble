@@ -36,7 +36,7 @@ Currently, Ramble supports the following configuration sections:
 * :ref:`modifier_repos <modifier-repos-config>`
 * :ref:`modifiers <modifiers-config>`
 * :ref:`repos <repos-config>`
-* :ref:`spack <spack-config>`
+* :ref:`software <software-config>`
 * :ref:`success_criteria <success-criteria-config>`
 * :ref:`variables <variables-config>`
 
@@ -464,18 +464,18 @@ be searched for when looking for application definitions. Its format is as follo
     - 'path/to/repo'
 
 
-.. _spack-config:
+.. _software-config:
 
 --------------
-Spack Section:
+Software Section:
 --------------
 
-The spack config section is used to define package definitions, and software
+The software config section is used to define package definitions, and software
 environments created from those packages. Its format is as follows:
 
 .. code-block:: yaml
 
-    spack:
+    software:
       [variables: {}]
       packages:
         <package_name>:
@@ -497,26 +497,27 @@ environments created from those packages. Its format is as follows:
         <external_env_name>:
           external_spack_env: 'name_or_path_to_spack_env'
 
-The packages dictionary houses ramble descriptions of spack packages that can
-be used to construct environments with. A package is defined as software that
-spack should install for the user. These have one required attribute, and two
-optional attributes. The ``pkg_spec`` attribute is required to be defined,
-and should be the spec passed to ``spack install`` on the command line for the
-package. Optionally, a package can define a ``compiler_spec`` attribute, which
-will be the spec used when this package is used as a compiler for another
-package. Packages can also optionally define a ``compiler`` attribute, which
-is the name of another package that should be used as it's compiler.
+The packages dictionary houses ramble descriptions of software packages that
+can be used to construct environments with. A package is defined as software
+that the defined package manager should install for the user. These have one
+required attribute, and two optional attributes. The ``pkg_spec`` attribute is
+required to be defined, and should be the arguments passed to the package
+manager's ``install`` subcommand. Optionally, a package can define a
+``compiler_spec`` attribute, which will be the spec used when this package is
+used as a compiler for another package. Packages can also optionally define a
+``compiler`` attribute, which is the name of another package that should be
+used as it's compiler.
 
-The environments dictionary contains descriptions of spack environments that
+The environments dictionary contains descriptions of groups of packages that
 Ramble might generate based on the requested experiments. Environments are
 defined as a list of packages (in the aforementioned packages dictionary) that
-should be bundled into a spack environment.
+should be bundled into a shared environment within the package manager.
 
-Below is an annotated example of the spack dictionary.
+Below is an annotated example of the software dictionary.
 
 .. code-block:: yaml
 
-    spack:
+    software:
       packages:
         gcc9: # Abstract name to refer to this package
           pkg_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
@@ -533,9 +534,21 @@ Below is an annotated example of the spack dictionary.
           - impi2021
           - gromacs
 
-Packages and environments defined inside the ``spack`` config section are
+Packages and environments defined inside the ``software`` config section are
 merely templates. They will be rendered into explicit environments and packages
 by each individual experiment.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Specific Packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When selecting package managers within Ramble experiments, the default spec a
+package manager will use is contained in the ``pkg_spec`` attribute. If
+multiple package managers will use the same package definition, specs for each
+can be defined using the ``<package_manager>_pkg_spec`` syntax. This syntax can
+be used on the ``compiler`` and ``compiler_spec`` attributes as well, if the
+package manager supports selecting a specific compiler.
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 External Spack Environment Support:
@@ -552,7 +565,7 @@ This section shows how this feature can be used.
 
 .. code-block:: yaml
 
-    spack:
+    software:
       environments:
         gromacs:
           external_spack_env: name_or_path_to_spack_env

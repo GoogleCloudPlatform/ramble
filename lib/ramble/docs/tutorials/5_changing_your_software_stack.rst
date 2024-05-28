@@ -79,7 +79,7 @@ The relevant portion of the workspace configuration file is:
 
 .. code-block:: YAML
 
-    spack:
+    software:
       packages:
         gcc9:
           pkg_spec: gcc@9.4.0 target=x86_64
@@ -105,7 +105,7 @@ Each environment has a ``packages`` block, which contains a list of package
 names that are defined in the higher level ``packages`` block.
 
 These are further documented in the
-:ref:`Spack configuration section<spack-config>` documentation.
+:ref:`Software configuration section<software-config>` documentation.
 
 Changing Software Definitions
 -----------------------------

@@ -67,7 +67,7 @@ ramble:
               matrix:
               - n_nodes
               - env_name
-  spack:
+  software:
     packages:
       gcc:
         pkg_spec: gcc@8.5.0

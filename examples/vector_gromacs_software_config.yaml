@@ -25,7 +25,7 @@ ramble:
               - type
               - n_ranks
               - gromacs_version
-  spack:
+  software:
     packages:
       gcc9:
         pkg_spec: gcc@9.4.0 target=x86_64

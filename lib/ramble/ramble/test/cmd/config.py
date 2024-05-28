@@ -148,27 +148,29 @@ env_vars:
     )
 
 
-def test_merged_spack_section(mock_low_high_config):
+# DEPRECATED: Remove `spack` when removed
+@pytest.mark.parametrize("section_key", ["spack", "software"])
+def test_merged_software_section(mock_low_high_config, section_key):
     low_path = mock_low_high_config.scopes["low"].path
     high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, "spack.yaml"), "w") as f:
+    with open(os.path.join(low_path, f"{section_key}.yaml"), "w") as f:
         f.write(
-            """\
-spack:
+            f"""\
+{section_key}:
   packages:
     gcc:
       pkg_spec: gcc@4.8.5
 """
         )
 
-    with open(os.path.join(high_path, "spack.yaml"), "w") as f:
+    with open(os.path.join(high_path, f"{section_key}.yaml"), "w") as f:
         f.write(
-            """\
-spack:
+            f"""\
+{section_key}:
   packages:
     zlib:
       pkg_spec: zlib
@@ -177,8 +179,8 @@ spack:
         )
 
     assert (
-        config("get", "spack").strip()
-        == """spack:
+        config("get", section_key).strip()
+        == f"""{section_key}:
   packages:
     zlib:
       pkg_spec: zlib
@@ -338,7 +340,7 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_a
             "applications",
             "variables",
             "env_vars",
-            "spack",
+            "software",
             "mpi_command",
             "batch_submit",
         ]

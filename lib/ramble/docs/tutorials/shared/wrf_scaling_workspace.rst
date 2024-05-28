@@ -44,7 +44,7 @@ final configuration from a previous tutorial.
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
             pkg_spec: gcc@9.4.0

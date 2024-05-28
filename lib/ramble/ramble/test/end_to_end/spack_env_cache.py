@@ -52,7 +52,7 @@ ramble:
             test4:
               variables:
                 n_nodes: '1'
-  spack:
+  software:
     packages:
       intel-mpi:
         pkg_spec: intel-oneapi-mpi@2021.11.0

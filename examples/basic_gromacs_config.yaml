@@ -37,7 +37,7 @@ ramble:
                 n_threads: '1'
                 size: '0003'
                 type: 'rf'
-  spack:
+  software:
     packages:
       gcc9:
         pkg_spec: gcc@9.4.0 target=x86_64

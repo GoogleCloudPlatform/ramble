@@ -47,7 +47,7 @@ ramble:
             test2:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gromacs:
         pkg_spec: gromacs
@@ -114,7 +114,7 @@ ramble:
             test2:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gromacs:
         pkg_spec: gromacs

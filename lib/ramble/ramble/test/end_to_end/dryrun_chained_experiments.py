@@ -80,7 +80,7 @@ ramble:
                 order: 'before_root'
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gcc:
         pkg_spec: gcc@9.3.0 target=x86_64

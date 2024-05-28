@@ -39,7 +39,7 @@ ramble:
               variables:
                 n_nodes: 1
                 n_ranks: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """

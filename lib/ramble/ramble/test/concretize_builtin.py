@@ -22,7 +22,7 @@ workspace = RambleCommand("workspace")
 def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace_path):
     """
     Verify that concretizing an application with required set to True
-    does not insert a required statement into spack spec.
+    does not insert a required statement into software dict.
     """
 
     test_config = """
@@ -66,7 +66,7 @@ ramble:
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes
-  spack:
+  software:
     packages: {}
     environments: {}
 """

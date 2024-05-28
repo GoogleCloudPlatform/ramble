@@ -439,7 +439,7 @@ class SoftwareEnvironments(object):
         """
 
         self._workspace = workspace
-        self._spack_dict = workspace.get_spack_dict().copy()
+        self._software_dict = workspace.get_software_dict().copy()
         self._environment_templates = {}
         self._package_templates = {}
         self._rendered_packages = {}
@@ -495,9 +495,8 @@ class SoftwareEnvironments(object):
     def _define_templates(self):
         """Process software dictionary to generate templates"""
 
-        if namespace.packages in self._spack_dict:
-            for pkg_template, pkg_info in self._spack_dict[namespace.packages].items():
-
+        if namespace.packages in self._software_dict:
+            for pkg_template, pkg_info in self._software_dict[namespace.packages].items():
                 spec = pkg_info["pkg_spec"] if "pkg_spec" in pkg_info else pkg_info["spec"]
                 compiler = (
                     pkg_info["compiler"]
@@ -514,8 +513,8 @@ class SoftwareEnvironments(object):
                 )
                 self._package_templates[pkg_template] = new_pkg
 
-        if namespace.environments in self._spack_dict:
-            for env_template, env_info in self._spack_dict[namespace.environments].items():
+        if namespace.environments in self._software_dict:
+            for env_template, env_info in self._software_dict[namespace.environments].items():
                 if namespace.external_env in env_info and env_info[namespace.external_env]:
                     # External environments are considered rendered
                     new_env = ExternalEnvironment(env_template, env_info[namespace.external_env])

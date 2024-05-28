@@ -314,12 +314,10 @@ class SpackApplication(ApplicationBase):
 
         As an example:
         <ramble.yaml>
-        spack:
-          applications:
-            wrfv4:
-              wrf:
-                base: wrf
-                version: 4.2.2
+        software:
+          packages:
+            wrf:
+              pkg_spec: wrf@4.2.2
 
         Would define a variable `wrf` that contains the installation path of
         wrf@4.2.2

@@ -23,7 +23,7 @@ workspace = RambleCommand("workspace")
 
 
 def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
-    """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
+    """Tests tty.die at end of ramble.application_types.spack._create_software_env"""
     test_config = """
 ramble:
   variables:
@@ -40,7 +40,7 @@ ramble:
             eight_node:
               variables:
                 n_nodes: '8'
-  spack:
+  software:
     packages:
       gcc8:
         pkg_spec: gcc@8.2.0 target=x86_64
