@@ -55,9 +55,9 @@ ramble:
   spack:
     packages:
       intel-mpi:
-        spack_spec: intel-oneapi-mpi@2021.11.0
+        pkg_spec: intel-oneapi-mpi@2021.11.0
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
     environments:
       gromacs:
         packages:

@@ -19,15 +19,15 @@ class UfsWeatherModel(SpackApplication):
 
     tags('nwp', 'weather')
 
-    define_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', pkg_spec='gcc@9.3.0')
 
-    software_spec('ompi415', spack_spec="openmpi@4.1.5", compiler='gcc9')
+    software_spec('ompi415', pkg_spec="openmpi@4.1.5", compiler='gcc9')
 
-    software_spec('python39', spack_spec="python@3.9.15", compiler='gcc9')
-    software_spec('esmf', spack_spec="esmf@8.0.1", compiler='gcc9')
+    software_spec('python39', pkg_spec="python@3.9.15", compiler='gcc9')
+    software_spec('esmf', pkg_spec="esmf@8.0.1", compiler='gcc9')
 
     software_spec('ufs-weather-model',
-                  spack_spec='ufs-weather-model@2.0.0 +avx2 +openmp', compiler='gcc9')
+                  pkg_spec='ufs-weather-model@2.0.0 +avx2 +openmp', compiler='gcc9')
 
     required_package('ufs-weather-model')
 

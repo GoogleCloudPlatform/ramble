@@ -94,15 +94,15 @@ ramble:
   spack:
     packages:
       gcc:
-        spack_spec: gcc@9.3.0 target=x86_64
+        pkg_spec: gcc@9.3.0 target=x86_64
       impi2018:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       imb:
-        spack_spec: intel-mpi-benchmarks
+        pkg_spec: intel-mpi-benchmarks
         compiler: gcc
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
         compiler: gcc
     environments:
       intel-mpi-benchmarks:

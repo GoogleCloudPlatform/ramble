@@ -31,7 +31,7 @@ class TestMod(BasicModifier):
 
     variable_modification('analysis_log', '{experiment_run_dir}/test_analysis.log', method='set', modes=['test'])
 
-    software_spec('analysis_spec', spack_spec='analysis_pkg@1.1', compiler='gcc')
+    software_spec('analysis_spec', pkg_spec='analysis_pkg@1.1', compiler='gcc')
 
     fom_regex = r'(?P<context>fom_context)(?P<fom>.*)'
 

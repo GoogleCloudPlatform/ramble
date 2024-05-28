@@ -42,12 +42,13 @@ class SpackApplication(ApplicationBase):
     """
 
     uses_spack = True
+
     _spec_groups = [
         ("compilers", "Compilers"),
         ("mpi_libraries", "MPI Libraries"),
         ("software_specs", "Software Specs"),
     ]
-    _spec_keys = ["spack_spec", "compiler_spec", "compiler"]
+    _spec_keys = ["pkg_spec", "compiler_spec", "compiler"]
 
     register_phase("make_experiments", pipeline="setup", run_after=["define_package_paths"])
 

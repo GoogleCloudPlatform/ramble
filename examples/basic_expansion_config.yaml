@@ -31,22 +31,22 @@ ramble:
   spack:
     packages:
       gcc9:
-        spack_spec: gcc@9.3.0 target=x86_64
+        pkg_spec: gcc@9.3.0 target=x86_64
         compiler_spec: gcc@9.3.0
       ompi412:
-        spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
+        pkg_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
         compiler: gcc9
       impi2021:
-        spack_spec: intel-oneapi-mpi@2021.11.0
+        pkg_spec: intel-oneapi-mpi@2021.11.0
         compiler: gcc9
       openfoam:
-        spack_spec: openfoam-org@7
+        pkg_spec: openfoam-org@7
         compiler: gcc9
       flex:
-        spack_spec: flex@2.6.4
+        pkg_spec: flex@2.6.4
         compiler: gcc9
       wrfv4:
-        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
         compiler: gcc9
     environments:
       openfoam:

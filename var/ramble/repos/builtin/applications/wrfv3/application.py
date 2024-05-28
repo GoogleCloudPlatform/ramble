@@ -19,12 +19,12 @@ class Wrfv3(SpackApplication):
 
     tags('nwp', 'weather')
 
-    define_compiler('gcc8', spack_spec='gcc@8.2.0')
+    define_compiler('gcc8', pkg_spec='gcc@8.2.0')
 
-    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
+    software_spec('impi2018', pkg_spec='intel-mpi@2018.4.274')
 
     software_spec('wrfv3',
-                  spack_spec='wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf',
+                  pkg_spec='wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf',
                   compiler='gcc8')
 
     required_package('wrf')

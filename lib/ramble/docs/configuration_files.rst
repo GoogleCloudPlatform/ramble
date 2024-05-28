@@ -479,8 +479,8 @@ environments created from those packages. Its format is as follows:
       [variables: {}]
       packages:
         <package_name>:
-          spack_spec: 'spack_spec_for_package'
-          compiler_spec: 'Compiler spec, if different from spack_spec' # Default: None
+          pkg_spec: 'pkg_spec_for_package'
+          compiler_spec: 'Compiler spec, if different from pkg_spec' # Default: None
           compiler: 'package_name_to_use_as_compiler' # Default: None
           [variables: {}]
           [matrix:]
@@ -500,7 +500,7 @@ environments created from those packages. Its format is as follows:
 The packages dictionary houses ramble descriptions of spack packages that can
 be used to construct environments with. A package is defined as software that
 spack should install for the user. These have one required attribute, and two
-optional attributes. The ``spack_spec`` attribute is required to be defined,
+optional attributes. The ``pkg_spec`` attribute is required to be defined,
 and should be the spec passed to ``spack install`` on the command line for the
 package. Optionally, a package can define a ``compiler_spec`` attribute, which
 will be the spec used when this package is used as a compiler for another
@@ -519,13 +519,13 @@ Below is an annotated example of the spack dictionary.
     spack:
       packages:
         gcc9: # Abstract name to refer to this package
-          spack_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
+          pkg_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
           compiler_spec: gcc@9.3.0 # Spack compiler spec for this package
         impi2021:
-          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
+          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9 # Other package name to use as compiler for this package
         gromacs:
-          spack_spec: gromacs@2022.4
+          pkg_spec: gromacs@2022.4
           compiler: gcc9
       environments:
         gromacs:

@@ -31,19 +31,19 @@ ramble:
   spack:
     packages:
       gcc9:
-        spack_spec: gcc@9.3.0 target=x86_64
+        pkg_spec: gcc@9.3.0 target=x86_64
         compiler_spec: gcc@9.3.0
       ompi412:
-        spack_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
+        pkg_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
         compiler: gcc9
       openfoam-skx:
-        spack_spec: openfoam-org@7 target=cascadelake
+        pkg_spec: openfoam-org@7 target=cascadelake
         compiler: gcc9
       openfoam-zen2:
-        spack_spec: openfoam-org@7 target=zen2
+        pkg_spec: openfoam-org@7 target=zen2
         compiler: gcc9
       flex:
-        spack_spec: flex@2.6.4
+        pkg_spec: flex@2.6.4
         compiler: gcc9
     environments:
       openfoam-skx:

@@ -97,12 +97,12 @@ final configuration from the previous tutorial.
       spack:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -134,7 +134,7 @@ like the following:
 
     packages:
       openmpi:
-        spack_spec: openmpi@3.1.6 +orterunprefix
+        pkg_spec: openmpi@3.1.6 +orterunprefix
 
 In the definition of the Intel MPI package above, you'll see we originally
 specified a ``compiler`` attribute (with the value of ``gcc9``). This can be
@@ -193,14 +193,14 @@ generation as well. The result might look like the following:
       spack:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -263,14 +263,14 @@ into the matrix. The result might look like the following:
       spack:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -372,14 +372,14 @@ resulting configuration might look like the following:
       spack:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -461,14 +461,14 @@ The resulting configuration file might look like the following:
       spack:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:

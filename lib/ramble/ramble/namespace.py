@@ -50,7 +50,7 @@ class namespace:
     # v2 configs
     packages = "packages"
     environments = "environments"
-    spack_spec = "spack_spec"
+    pkg_spec = "pkg_spec"
     compiler_spec = "compiler_spec"
     compiler = "compiler"
 

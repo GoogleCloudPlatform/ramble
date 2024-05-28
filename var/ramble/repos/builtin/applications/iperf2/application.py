@@ -17,10 +17,10 @@ class Iperf2(SpackApplication):
 
     maintainers('rfbgo')
 
-    define_compiler('gcc9', spack_spec='gcc@9.3.0')
+    define_compiler('gcc9', pkg_spec='gcc@9.3.0')
 
     software_spec('iperf2',
-                  spack_spec='iperf2@2.0.12',
+                  pkg_spec='iperf2@2.0.12',
                   compiler='gcc9')
 
     required_package('iperf2')

@@ -43,10 +43,10 @@ ramble:
 spack:
   compilers:
     gcc9:
-      spack_spec: gcc@9.3.0
+      pkg_spec: gcc@9.3.0
   mpi_libraries: {}
   applications:
     iperf2:
       iperf2:
-        spack_spec: iperf2@2.0.12
+        pkg_spec: iperf2@2.0.12
         compiler: gcc9

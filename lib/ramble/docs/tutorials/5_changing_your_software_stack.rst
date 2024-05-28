@@ -82,13 +82,13 @@ The relevant portion of the workspace configuration file is:
     spack:
       packages:
         gcc9:
-          spack_spec: gcc@9.4.0 target=x86_64
+          pkg_spec: gcc@9.4.0 target=x86_64
           compiler_spec: gcc@9.4.0
         impi2021:
-          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
+          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9
         gromacs:
-          spack_spec: gromacs@2021.6
+          pkg_spec: gromacs@2021.6
           compiler: gcc9
       environments:
         gromacs:
@@ -170,10 +170,10 @@ Adding Package Variants
 
 So far, we have only explored changing the version a package used. More
 complicated changes to the Spack specs can be made by adding variant
-definitions. This can be directly added to the ``spack_spec`` lines within the
+definitions. This can be directly added to the ``pkg_spec`` lines within the
 package definitions in a workspace's ``ramble.yaml``.
 
-The ``spack_spec`` attribute can be parameterized with variable definitions
+The ``pkg_spec`` attribute can be parameterized with variable definitions
 also, to allow a wide range of variants to be explored with a single
 configuration.
 

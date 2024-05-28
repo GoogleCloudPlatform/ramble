@@ -905,9 +905,9 @@ class Workspace(object):
                 for comp, info in compiler_dict.items():
                     if comp not in packages_dict:
                         packages_dict[comp] = syaml.syaml_dict()
-                        packages_dict[comp]["spack_spec"] = info["spack_spec"]
+                        packages_dict[comp]["pkg_spec"] = info["pkg_spec"]
                         ramble.config.add(
-                            f'spack:packages:{comp}:spack_spec:{info["spack_spec"]}',
+                            f'spack:packages:{comp}:pkg_spec:{info["pkg_spec"]}',
                             scope=self.ws_file_config_scope_name(),
                         )
                         if "compiler_spec" in info and info["compiler_spec"]:
@@ -946,7 +946,7 @@ class Workspace(object):
                     logger.debug(f"    Found spec: {spec_name}")
                     if spec_name not in packages_dict:
                         packages_dict[spec_name] = syaml.syaml_dict()
-                        packages_dict[spec_name]["spack_spec"] = info["spack_spec"]
+                        packages_dict[spec_name]["pkg_spec"] = info["pkg_spec"]
                         if "compiler_spec" in info and info["compiler_spec"]:
                             packages_dict[spec_name]["compiler_spec"] = info["compiler_spec"]
                         if "compiler" in info and info["compiler"]:

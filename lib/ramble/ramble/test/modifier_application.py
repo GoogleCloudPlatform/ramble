@@ -46,15 +46,15 @@ ramble:
   spack:
     packages:
       gcc:
-        spack_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.0
       intel-mpi:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       wrfv4:
-        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
         compiler: gcc
       intel-oneapi-vtune:
-        spack_spec: intel-oneapi-vtune
+        pkg_spec: intel-oneapi-vtune
     environments:
       wrfv4:
         packages:

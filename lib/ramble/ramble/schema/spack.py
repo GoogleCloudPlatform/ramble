@@ -23,7 +23,7 @@ properties = {
                 "additionalProperties": {
                     "type": "object",
                     "properties": {
-                        "spack_spec": {"type": "string"},
+                        "pkg_spec": {"type": "string"},
                         "compiler_spec": {
                             "type": "string",
                             "default": None,
@@ -80,21 +80,16 @@ def update(data):
     Replicate this into a `software` section instead.
     """
 
-    old_data = data.copy()
-
     pkg_keymap = {
         "spack_spec": "pkg_spec",
-        "compiler": "compiler",
-        "compiler_spec": "compiler_spec",
     }
 
-    if "packages" in old_data:
-        for pkg_name, pkg_def in old_data["packages"].items():
+    if "packages" in data:
+        for pkg_name in data["packages"]:
+
             for key, newkey in pkg_keymap.items():
-                if key in pkg_def:
-                    if key in data["packages"][pkg_name]:
-                        del data["packages"][pkg_name][key]
+                if key in data["packages"][pkg_name] and newkey not in data["packages"][pkg_name]:
                     changed = True
-                    data["packages"][pkg_name][newkey] = pkg_def[key]
+                    data["packages"][pkg_name][newkey] = data["packages"][pkg_name][key]
 
     return changed

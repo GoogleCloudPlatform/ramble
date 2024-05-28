@@ -39,7 +39,7 @@ applications:
 spack:
   packages:
     zlib:
-      spack_spec: zlib@1.2.12
+      pkg_spec: zlib@1.2.12
   environments:
     zlib:
       packages:
@@ -84,7 +84,8 @@ ramble:
 
         with open(config_path, "r") as f:
             data = f.read()
+
             assert "ensure_installed" in data
             assert "test_experiment" in data
             assert "zlib" in data
-            assert "spack_spec: zlib@1.2.12" in data
+            assert "pkg_spec: zlib@1.2.12" in data

@@ -39,7 +39,7 @@ ramble:
   spack:
     packages:
       zlib:
-        spack_spec: 'zlib'
+        pkg_spec: 'zlib'
     environments:
       zlib-configs:
         packages:

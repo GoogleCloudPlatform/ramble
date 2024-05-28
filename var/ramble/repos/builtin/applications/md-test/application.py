@@ -18,12 +18,12 @@ class MdTest(SpackApplication):
 
     tags('synthetic-benchmarks', 'IO')
 
-    define_compiler('gcc', spack_spec='gcc')
-    software_spec('openmpi', spack_spec='openmpi')
+    define_compiler('gcc', pkg_spec='gcc')
+    software_spec('openmpi', pkg_spec='openmpi')
 
     # The IOR spack package also includes MDTest, but we implement it as a
     # separate application in ramble
-    software_spec('ior', spack_spec='ior', compiler='gcc')
+    software_spec('ior', pkg_spec='ior', compiler='gcc')
 
     required_package('ior')
 

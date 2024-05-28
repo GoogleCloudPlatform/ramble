@@ -24,9 +24,9 @@ level = "long"
 definitions = {}
 conflicts = {}
 used_by = {}
-specs = {"spack_spec": {}, "compiler_spec": {}}
+specs = {"pkg_spec": {}, "compiler_spec": {}}
 spec_headers = {
-    "spack_spec": "Software Packages",
+    "pkg_spec": "Software Packages",
     "compiler_spec": "Compiler Definitions",
 }
 
@@ -120,7 +120,7 @@ def print_conflicts():
 
             color.cprint(f'{nested_1("Package")}: {pkg_name}:')
             color.cprint("\tDefined as:")
-            for attr in ["spack_spec", "compiler_spec", "compiler"]:
+            for attr in ["pkg_spec", "compiler_spec", "compiler"]:
                 if attr in definitions[pkg_name]:
                     attr_def = definitions[pkg_name][attr]
                     if attr_def:

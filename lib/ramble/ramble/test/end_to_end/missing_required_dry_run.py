@@ -43,13 +43,13 @@ ramble:
   spack:
     packages:
       gcc8:
-        spack_spec: gcc@8.2.0 target=x86_64
+        pkg_spec: gcc@8.2.0 target=x86_64
         compiler_spec: gcc@8.2.0
       impi2018:
-        spack_spec: intel-mpi@2018.4.274 target=x86_64
+        pkg_spec: intel-mpi@2018.4.274 target=x86_64
         compiler: gcc8
       wrfv3:
-        spack_spec: my_wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
+        pkg_spec: my_wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
         compiler: gcc8
     environments:
       wrfv3:

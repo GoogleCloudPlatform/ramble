@@ -921,7 +921,7 @@ As an example:
       spack:
         packages:
           grm:
-            spack_spec: gromacs@2023.1
+            pkg_spec: gromacs@2023.1
         environments:
           grm_env:
             packages:
@@ -930,7 +930,7 @@ As an example:
 Defines a software environment named ``grm_env``. The default environment used
 has the same name as the application the experiment is generated from. In
 experiments which use this ``grm_env`` environment, a variable is defined
-named: ``gromacs``, as that is the package named defined by the ``spack_spec``
+named: ``gromacs``, as that is the package named defined by the ``pkg_spec``
 attribute of the ``grm`` package definition. This variable contains the path to
 the installation location for the ``gromacs`` package.
 
@@ -1005,15 +1005,15 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
     spack:
       packages:
         gcc9:
-          spack_spec: gcc@9.3.0 target=x86_64
+          pkg_spec: gcc@9.3.0 target=x86_64
         mpich:
-          spack_spec: mpich@4.0.2 target=x86_64
+          pkg_spec: mpich@4.0.2 target=x86_64
           compiler: gcc9
         ompi:
-          spack_spec: openmpi@4.1.4 target=x86_64
+          pkg_spec: openmpi@4.1.4 target=x86_64
           compiler: gcc9
         gromacs:
-          spack_spec: gromacs@2022.4
+          pkg_spec: gromacs@2022.4
           compiler: gcc9
       environments:
         gromacs-{mpi}:
@@ -1068,12 +1068,12 @@ variable can be used to submit the same experiment to multiple batch systems.
     spack:
       packages:
         gcc9:
-          spack_spec: gcc@9.3.0 target=x86_64
+          pkg_spec: gcc@9.3.0 target=x86_64
         impi2021:
-          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
+          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9
         gromacs:
-          spack_spec: gromacs@2022.4
+          pkg_spec: gromacs@2022.4
           compiler: gcc9
       environments:
         gromacs:

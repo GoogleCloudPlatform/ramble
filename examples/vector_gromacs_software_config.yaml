@@ -28,13 +28,13 @@ ramble:
   spack:
     packages:
       gcc9:
-        spack_spec: gcc@9.4.0 target=x86_64
+        pkg_spec: gcc@9.4.0 target=x86_64
         compiler_spec: gcc@9.4.0
       impi2021:
-        spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
+        pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
         compiler: gcc9
       gromacs-{gromacs_version}:
-        spack_spec: gromacs@{gromacs_version}
+        pkg_spec: gromacs@{gromacs_version}
         compiler: gcc9
     environments:
       gromacs-{gromacs_version}:

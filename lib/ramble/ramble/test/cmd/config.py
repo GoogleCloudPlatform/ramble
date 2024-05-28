@@ -161,7 +161,7 @@ def test_merged_spack_section(mock_low_high_config):
 spack:
   packages:
     gcc:
-      spack_spec: gcc@4.8.5
+      pkg_spec: gcc@4.8.5
 """
         )
 
@@ -171,7 +171,7 @@ spack:
 spack:
   packages:
     zlib:
-      spack_spec: zlib
+      pkg_spec: zlib
       compiler: gcc
 """
         )
@@ -181,10 +181,10 @@ spack:
         == """spack:
   packages:
     zlib:
-      spack_spec: zlib
+      pkg_spec: zlib
       compiler: gcc
     gcc:
-      spack_spec: gcc@4.8.5"""
+      pkg_spec: gcc@4.8.5"""
     )
 
 
