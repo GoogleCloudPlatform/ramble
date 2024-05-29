@@ -89,16 +89,13 @@ pattern_exemptions = {
 pattern_exemptions = dict(
     (
         re.compile(file_pattern),
-        dict(
-            (code, [re.compile(p) for p in patterns])
-            for code, patterns in error_dict.items()
-        ),
+        dict((code, [re.compile(p) for p in patterns]) for code, patterns in error_dict.items()),
     )
     for file_pattern, error_dict in pattern_exemptions.items()
 )
 
-
-tool_names = ["flake8"]
+# Tools run in the given order, with flake8 as the last check.
+tool_names = ["black", "flake8"]
 
 tools = {}
 
@@ -221,9 +218,17 @@ def setup_parser(subparser):
         action="append",
         help="specify tools to skip (choose from %s)" % ",".join(tool_names),
     )
-    subparser.add_argument(
-        "files", nargs=argparse.REMAINDER, help="specific files to check"
-    )
+    subparser.add_argument("files", nargs=argparse.REMAINDER, help="specific files to check")
+
+
+def print_tool_header(tool, file_list):
+    print("=======================================================")
+    print(f"{tool}: running {tool} checks on ramble.")
+    print()
+    print("Modified files:")
+    for filename in file_list:
+        print(f"  {filename.strip()}")
+    print("=======================================================")
 
 
 def print_tool_result(tool, returncode):
@@ -241,9 +246,7 @@ def print_output(output, args):
         # print results relative to current working directory
         def cwd_relative(path):
             return "{0}: [".format(
-                os.path.relpath(
-                    os.path.join(ramble.paths.prefix, path.group(1)), os.getcwd()
-                )
+                os.path.relpath(os.path.join(ramble.paths.prefix, path.group(1)), os.getcwd())
             )
 
         for line in output.split("\n"):
@@ -335,13 +338,7 @@ def run_flake8(flake8_cmd, file_list, args):
     temp = tempfile.mkdtemp()
     returncode = 1
     try:
-        print("=======================================================")
-        print("flake8: running flake8 code checks on ramble.")
-        print()
-        print("Modified files:")
-        for filename in file_list:
-            print(f"  {filename.strip()}")
-        print("=======================================================")
+        print_tool_header("flake8", file_list)
 
         # run flake8 on the temporary tree, once for core, once for apps
         application_file_list = [f for f in file_list if is_application(f)]
@@ -413,12 +410,27 @@ def run_flake8(flake8_cmd, file_list, args):
     return returncode
 
 
+@tool("black")
+def run_black(black_cmd, file_list, args):
+    print_tool_header("black", file_list)
+    black_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
+    if not args.fix:
+        black_args += ("--check", "--diff")
+    black_args += tuple(file_list)
+
+    output = black_cmd(*black_args, fail_on_error=False, output=str, error=str)
+    returncode = black_cmd.returncode
+    print_output(output, args)
+    print_tool_result("black", returncode)
+    return returncode
+
+
 def validate_toolset(arg_value):
     """Validate --tool and --skip arguments (sets of optionally comma-separated tools)."""
     tools = set(",".join(arg_value).split(","))  # allow args like 'black,flake8'
     for tool in tools:
         if tool not in tool_names:
-            print(f"Invaild tool: {tool}, choose from: {', '.join(tool_names)}")
+            print(f"Invalid tool: {tool}, choose from: {', '.join(tool_names)}")
     return tools
 
 
@@ -427,9 +439,7 @@ def style(parser, args):
     if file_list:
 
         def prefix_relative(path):
-            return os.path.relpath(
-                os.path.abspath(os.path.realpath(path)), ramble.paths.prefix
-            )
+            return os.path.relpath(os.path.abspath(os.path.realpath(path)), ramble.paths.prefix)
 
         file_list = [prefix_relative(p) for p in file_list]
 
@@ -469,9 +479,7 @@ def style(parser, args):
 
         for tool_name in tools_to_run:
             print(f"Running {tool_name} check")
-            returncode |= tools[tool_name](
-                which(tool_name, required=True), file_list, args
-            )
+            returncode |= tools[tool_name](which(tool_name, required=True), file_list, args)
 
     if returncode != 0:
         print("style checks found errors.")

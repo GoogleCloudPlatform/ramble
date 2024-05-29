@@ -267,7 +267,7 @@ _ramble() {
     then
         RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo -k --insecure -l --enable-locks -L --disable-locks -m --mock -p --profile --sorted-profile --lines -v --verbose --stacktrace -V --version --print-shell-vars"
     else
-        RAMBLE_COMPREPLY="attributes clean commands config debug deployment edit flake8 help info license list mirror mods on python repo results software-definitions unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config debug deployment edit flake8 help info license list mirror mods on python repo results software-definitions style unit-test workspace"
     fi
 }
 
@@ -641,6 +641,15 @@ _ramble_results_upload() {
 
 _ramble_software_definitions() {
     RAMBLE_COMPREPLY="-h --help -s --summary -c --conflicts -e --error-on-conflict"
+}
+
+_ramble_style() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -b --base -a --all -o --output -r --root-relative -U --no-untracked -f --fix -k --keep-temp -t --tool -s --skip"
+    else
+        RAMBLE_COMREPLY=""
+    fi
 }
 
 _ramble_unit_test() {
