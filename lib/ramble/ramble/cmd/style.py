@@ -41,6 +41,30 @@ exclude_directories = [ramble.paths.external_path]
 #: max line length we're enforcing (note: this duplicates what's in .flake8)
 max_line_length = 99
 
+common_object_exemptions = {
+    # Exempt lines with urls and descriptions from overlong line errors.
+    "E501": [
+        r"^\s*homepage\s*=",
+        r"^\s*url\s*=",
+        r"^\s*git\s*=",
+        r"^\s*svn\s*=",
+        r"^\s*hg\s*=",
+        r"^\s*list_url\s*=",
+        r"^\s*version\(",
+        r"^\s*variant\(",
+        r"^\s*provides\(",
+        r"^\s*extends\(",
+        r"^\s*depends_on\(",
+        r"^\s*conflicts\(",
+        r"^\s*resource\(",
+        r"^\s*patch\(",
+    ],
+    # Exempt '@when' decorated functions from redefinition errors.
+    "F811": [
+        r"^\s*@when\(.*\)",
+    ],
+}
+
 #: This is a dict that maps:
 #:  filename pattern ->
 #:     flake8 exemption code ->
@@ -54,27 +78,14 @@ pattern_exemptions = {
         # Allow 'from ramble.appkit import *' in applications,
         # but no other wildcards
         "F403": [r"^from ramble.appkit import \*$"],
-        # Exempt lines with urls and descriptions from overlong line errors.
-        "E501": [
-            r"^\s*homepage\s*=",
-            r"^\s*url\s*=",
-            r"^\s*git\s*=",
-            r"^\s*svn\s*=",
-            r"^\s*hg\s*=",
-            r"^\s*list_url\s*=",
-            r"^\s*version\(",
-            r"^\s*variant\(",
-            r"^\s*provides\(",
-            r"^\s*extends\(",
-            r"^\s*depends_on\(",
-            r"^\s*conflicts\(",
-            r"^\s*resource\(",
-            r"^\s*patch\(",
-        ],
-        # Exempt '@when' decorated functions from redefinition errors.
-        "F811": [
-            r"^\s*@when\(.*\)",
-        ],
+        **common_object_exemptions,
+    },
+    # exemptions applied only to modifier.py files.
+    r"modifier.py$": {
+        # Allow 'from ramble.modkit import *' in applications,
+        # but no other wildcards
+        "F403": [r"^from ramble.modkit import \*$"],
+        **common_object_exemptions,
     },
     # exemptions applied to all files.
     r".py$": {
