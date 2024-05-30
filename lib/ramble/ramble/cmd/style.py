@@ -25,8 +25,8 @@ section = "developer"
 level = "long"
 
 
-def is_application(f):
-    """Whether flake8 should consider a file as a core file or a application.
+def is_object(f):
+    """Whether flake8 should consider a file as a core file or an object (application or modifier).
 
     We run flake8 with different exceptions for the core and for
     applications, since we allow `from ramble import *` and poking globals
@@ -341,8 +341,8 @@ def run_flake8(flake8_cmd, file_list, args):
         print_tool_header("flake8", file_list)
 
         # run flake8 on the temporary tree, once for core, once for apps
-        application_file_list = [f for f in file_list if is_application(f)]
-        primary_file_list = [f for f in file_list if not is_application(f)]
+        application_file_list = [f for f in file_list if is_object(f)]
+        primary_file_list = [f for f in file_list if not is_object(f)]
 
         # filter files into a temporary directory with exemptions added.
         # TODO: DRY this duplication
