@@ -169,6 +169,14 @@ ramble.cmd.software\_definitions module
    :undoc-members:
    :show-inheritance:
 
+ramble.cmd.style module
+-----------------------
+
+.. automodule:: ramble.cmd.style
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.cmd.unit\_test module
 ----------------------------
 

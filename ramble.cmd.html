@@ -101,6 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.repo">ramble.cmd.repo module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.results">ramble.cmd.results module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.software_definitions">ramble.cmd.software_definitions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.style">ramble.cmd.style module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.unit_test">ramble.cmd.unit_test module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-cmd-workspace-module">ramble.cmd.workspace module</a></li>
 </ul>
@@ -1219,6 +1220,117 @@ where detected conflicts have occurred.</p>
 </dd></dl>
 
 </section>
+<section id="module-ramble.cmd.style">
+<span id="ramble-cmd-style-module"></span><h2>ramble.cmd.style module<a class="headerlink" href="#module-ramble.cmd.style" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.add_pattern_exemptions">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">add_pattern_exemptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#add_pattern_exemptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.add_pattern_exemptions" title="Link to this definition"></a></dt>
+<dd><p>Add a flake8 exemption to a line.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.changed_files">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">changed_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">untracked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#changed_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.changed_files" title="Link to this definition"></a></dt>
+<dd><p>Get list of changed files in the Ramble repository.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="ramble.cmd.style.exclude_directories">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">exclude_directories</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['/home/runner/work/ramble/ramble/lib/ramble/docs/_ramble_root/lib/ramble/external']</span></em><a class="headerlink" href="#ramble.cmd.style.exclude_directories" title="Link to this definition"></a></dt>
+<dd><p>List of directories to exclude from checks.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.filter_file">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">filter_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#filter_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.filter_file" title="Link to this definition"></a></dt>
+<dd><p>Filter a single file through all the patterns in pattern_exemptions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.is_object">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">is_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#is_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.is_object" title="Link to this definition"></a></dt>
+<dd><p>Whether flake8 should consider a file as a core file or an object (application or modifier).</p>
+<p>We run flake8 with different exceptions for the core and for
+applications, since we allow <cite>from ramble import *</cite> and poking globals
+into applications.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="ramble.cmd.style.max_line_length">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">max_line_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">99</span></em><a class="headerlink" href="#ramble.cmd.style.max_line_length" title="Link to this definition"></a></dt>
+<dd><p>this duplicates what’s in .flake8)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>max line length we’re enforcing (note</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="ramble.cmd.style.pattern_exemptions">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">pattern_exemptions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{re.compile('.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('(https?|ftp|file)\\:'),</span> <span class="pre">re.compile('([\\\'&quot;])[0-9a-fA-F]{32,}\\1')]},</span> <span class="pre">re.compile('application.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.appkit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]},</span> <span class="pre">re.compile('modifier.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.modkit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]}}</span></em><a class="headerlink" href="#ramble.cmd.style.pattern_exemptions" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>This is a dict that maps:</dt><dd><dl class="simple">
+<dt>filename pattern -&gt;</dt><dd><dl class="simple">
+<dt>flake8 exemption code -&gt;</dt><dd><p>list of patterns, for which matching lines should have codes applied.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>For each file, if the filename pattern matches, we’ll add per-line
+exemptions if any patterns in the sub-dict match.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.print_output">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">print_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#print_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.print_output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.print_tool_header">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">print_tool_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#print_tool_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.print_tool_header" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.print_tool_result">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">print_tool_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returncode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#print_tool_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.print_tool_result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.run_black">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">run_black</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">black_cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#run_black"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.run_black" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.run_flake8">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">run_flake8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flake8_cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#run_flake8"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.run_flake8" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.setup_parser">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.setup_parser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.style">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#style"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.style" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.cmd.style.tool">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">tool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.tool" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.cmd.style.validate_toolset">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">validate_toolset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/style.html#validate_toolset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.style.validate_toolset" title="Link to this definition"></a></dt>
+<dd><p>Validate –tool and –skip arguments (sets of optionally comma-separated tools).</p>
+</dd></dl>
+
+</section>
 <section id="module-ramble.cmd.unit_test">
 <span id="ramble-cmd-unit-test-module"></span><h2>ramble.cmd.unit_test module<a class="headerlink" href="#module-ramble.cmd.unit_test" title="Link to this heading"></a></h2>
 <dl class="py function">
@@ -1263,7 +1375,7 @@ they show up in the short help, so we have to reassemble things here.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 28, 2024.
+      <span class="lastupdated">Last updated on May 30, 2024.
       </span></p>
   </div>
 
