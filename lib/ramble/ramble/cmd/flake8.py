@@ -8,6 +8,7 @@
 
 from __future__ import print_function
 
+import deprecation
 import re
 import os
 import sys
@@ -21,7 +22,10 @@ import ramble.paths
 from spack.util.executable import which, ProcessError
 
 
-description = "runs source code style checks on Ramble. requires flake8"
+description = (
+    "(Deprecated, please use `ramble style` instead)"
+    "runs source code style checks on Ramble. requires flake8"
+)
 section = "developer"
 level = "long"
 
@@ -265,6 +269,12 @@ def setup_parser(subparser):
     subparser.add_argument("files", nargs=argparse.REMAINDER, help="specific files to check")
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.0",
+    removed_in="0.6.0",
+    current_version=str(ramble.ramble_version),
+    details="Use the `ramble style` command instead",
+)
 def flake8(parser, args):
     flake8_cmd = which("flake8", required=True)
     print(flake8_cmd)
