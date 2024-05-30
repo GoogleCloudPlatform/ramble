@@ -15,11 +15,11 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-./share/ramble/qa/run-flake8-tests &> /dev/null
+./share/ramble/qa/run-style-tests &> /dev/null
 
 if [ $? != 0 ]; then
-    echo "Flake8 tests failed."
-    echo "Please run $ramble_root/share/ramble/qa/run-flake8-tests"
+    echo "style tests failed."
+    echo "Please run $ramble_root/share/ramble/qa/run-style-tests"
     echo "And ensure tests are passing before committing"
     exit 1
 fi
