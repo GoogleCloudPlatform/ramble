@@ -19,75 +19,67 @@ import ramble.schema.variables
 
 
 custom_executables_def = {
-    'type': 'object',
-    'properties': {},
-    'additionalProperties': {
-        'type': 'object',
-        'default': {
-            'template': [],
-            'use_mpi': False,
-            'redirect': '{log_file}',
-            'variables': {},
-            'output_capture': ramble.schema.types.OUTPUT_CAPTURE.DEFAULT
+    "type": "object",
+    "properties": {},
+    "additionalProperties": {
+        "type": "object",
+        "default": {
+            "template": [],
+            "use_mpi": False,
+            "redirect": "{log_file}",
+            "variables": {},
+            "output_capture": ramble.schema.types.OUTPUT_CAPTURE.DEFAULT,
         },
-        'properties': union_dicts(
+        "properties": union_dicts(
             {
-                'template': ramble.schema.types.array_or_scalar_of_strings_or_nums,
-                'use_mpi': {'type': 'boolean'},
-                'redirect': ramble.schema.types.string_or_num,
+                "template": ramble.schema.types.array_or_scalar_of_strings_or_nums,
+                "use_mpi": {"type": "boolean"},
+                "redirect": ramble.schema.types.string_or_num,
             },
             ramble.schema.variables.properties,
         ),
     },
-    'default': {},
+    "default": {},
 }
 
 executables_def = ramble.schema.types.array_of_strings_or_nums
 
 executable_injection_def = {
-    'type': 'array',
-    'default': [],
-    'items': {
-        'type': 'object',
-        'default': {},
-        'properties': {
-            'name': {
-                'type': 'string'
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "default": {},
+        "properties": {
+            "name": {"type": "string"},
+            "order": {
+                "type": "string",
+                "default": "after",
             },
-            'order': {
-                'type': 'string',
-                'default': 'after',
-            }
         },
-        'additionalProperties': {
-            'relative_to': {
-                'type': 'string'
-            }
-        }
-    }
+        "additionalProperties": {"relative_to": {"type": "string"}},
+    },
 }
 
 internals_def = {
-    'type': 'object',
-    'default': {},
-    'properties': {
-        'custom_executables': custom_executables_def,
-        'executables': executables_def,
-        'executable_injection': executable_injection_def,
+    "type": "object",
+    "default": {},
+    "properties": {
+        "custom_executables": custom_executables_def,
+        "executables": executables_def,
+        "executable_injection": executable_injection_def,
     },
-    'additionalProperties': False
+    "additionalProperties": False,
 }
 
 #: Properties for inclusion in other schemas
-properties = {
-    'internals': internals_def
-}
+properties = {"internals": internals_def}
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble internals configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble internals configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

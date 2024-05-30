@@ -11,44 +11,42 @@ from enum import Enum
 import ramble.error
 from ramble.util.logger import logger
 
-key_type = Enum('type', ['reserved', 'optional', 'required'])
-output_level = Enum('level', ['key', 'variable'])
+key_type = Enum("type", ["reserved", "optional", "required"])
+output_level = Enum("level", ["key", "variable"])
 default_keys = {
-    'workspace_name': {'type': key_type.reserved, 'level': output_level.variable},
-    'application_name': {'type': key_type.reserved, 'level': output_level.key},
-    'application_run_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'application_input_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'application_namespace': {'type': key_type.reserved, 'level': output_level.key},
-    'simplified_application_namespace': {'type': key_type.reserved, 'level': output_level.key},
-    'workload_name': {'type': key_type.reserved, 'level': output_level.key},
-    'workload_run_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'workload_input_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'workload_namespace': {'type': key_type.reserved, 'level': output_level.key},
-    'simplified_workload_namespace': {'type': key_type.reserved, 'level': output_level.key},
-    'license_input_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'experiments_file': {'type': key_type.reserved, 'level': output_level.key},
-    'experiment_name': {'type': key_type.reserved, 'level': output_level.key},
-    'experiment_run_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'experiment_status': {'type': key_type.reserved, 'level': output_level.key},
-    'experiment_index': {'type': key_type.reserved, 'level': output_level.variable},
-    'experiment_namespace': {'type': key_type.reserved, 'level': output_level.key},
-    'simplified_experiment_namespace': {'type': key_type.reserved, 'level': output_level.key},
-    'log_dir': {'type': key_type.reserved, 'level': output_level.variable},
-    'log_file': {'type': key_type.reserved, 'level': output_level.variable},
-    'err_file': {'type': key_type.reserved, 'level': output_level.variable},
-    'env_path': {'type': key_type.reserved, 'level': output_level.variable},
-    'input_name': {'type': key_type.reserved, 'level': output_level.variable},
-
-    'spec_name': {'type': key_type.optional, 'level': output_level.variable},
-    'env_name': {'type': key_type.optional, 'level': output_level.variable},
-
-    'n_ranks': {'type': key_type.required, 'level': output_level.key},
-    'n_nodes': {'type': key_type.required, 'level': output_level.key},
-    'processes_per_node': {'type': key_type.required, 'level': output_level.key},
-    'n_threads': {'type': key_type.required, 'level': output_level.key},
-    'batch_submit': {'type': key_type.required, 'level': output_level.variable},
-    'mpi_command': {'type': key_type.required, 'level': output_level.variable},
-    'experiment_template_name': {'type': key_type.required, 'level': output_level.key},
+    "workspace_name": {"type": key_type.reserved, "level": output_level.variable},
+    "application_name": {"type": key_type.reserved, "level": output_level.key},
+    "application_run_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "application_input_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "application_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "simplified_application_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "workload_name": {"type": key_type.reserved, "level": output_level.key},
+    "workload_run_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "workload_input_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "workload_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "simplified_workload_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "license_input_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "experiments_file": {"type": key_type.reserved, "level": output_level.key},
+    "experiment_name": {"type": key_type.reserved, "level": output_level.key},
+    "experiment_run_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "experiment_status": {"type": key_type.reserved, "level": output_level.key},
+    "experiment_index": {"type": key_type.reserved, "level": output_level.variable},
+    "experiment_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "simplified_experiment_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "log_dir": {"type": key_type.reserved, "level": output_level.variable},
+    "log_file": {"type": key_type.reserved, "level": output_level.variable},
+    "err_file": {"type": key_type.reserved, "level": output_level.variable},
+    "env_path": {"type": key_type.reserved, "level": output_level.variable},
+    "input_name": {"type": key_type.reserved, "level": output_level.variable},
+    "spec_name": {"type": key_type.optional, "level": output_level.variable},
+    "env_name": {"type": key_type.optional, "level": output_level.variable},
+    "n_ranks": {"type": key_type.required, "level": output_level.key},
+    "n_nodes": {"type": key_type.required, "level": output_level.key},
+    "processes_per_node": {"type": key_type.required, "level": output_level.key},
+    "n_threads": {"type": key_type.required, "level": output_level.key},
+    "batch_submit": {"type": key_type.required, "level": output_level.variable},
+    "mpi_command": {"type": key_type.required, "level": output_level.variable},
+    "experiment_template_name": {"type": key_type.required, "level": output_level.key},
 }
 
 
@@ -78,6 +76,7 @@ class Keywords(object):
                   are presented in the variables section. These may include application
                   specific inputs to further configure the experiment.
     """
+
     def __init__(self, extra_keys={}):
         # Merge in additional Keys:
         self.keys = default_keys.copy()
@@ -97,31 +96,31 @@ class Keywords(object):
         """Check if a key is reserved"""
         if not self.is_valid(key):
             return False
-        return self.keys[key]['type'] == key_type.reserved
+        return self.keys[key]["type"] == key_type.reserved
 
     def is_optional(self, key):
         """Check if a key is optional"""
         if not self.is_valid(key):
             return False
-        return self.keys[key]['type'] == key_type.optional
+        return self.keys[key]["type"] == key_type.optional
 
     def is_required(self, key):
         """Check if a key is required"""
         if not self.is_valid(key):
             return False
-        return self.keys[key]['type'] == key_type.required
+        return self.keys[key]["type"] == key_type.required
 
     def is_key_level(self, key):
         """Check if key is part of the key level"""
         if not self.is_valid(key):
             return False
-        return self.keys[key]['level'] == output_level.key
+        return self.keys[key]["level"] == output_level.key
 
     def is_variable_level(self, key):
         """Check if key is part of the variable level"""
         if not self.is_valid(key):
             return False
-        return self.keys[key]['level'] == output_level.variable
+        return self.keys[key]["level"] == output_level.variable
 
     def all_required_keys(self):
         """Yield all required keys
@@ -150,8 +149,9 @@ class Keywords(object):
 
         for definition in definitions.keys():
             if self.is_reserved(definition):
-                raise RambleKeywordError(f'Keyword "{definition}" has been defined, ' +
-                                         'but is reserved by ramble.')
+                raise RambleKeywordError(
+                    f'Keyword "{definition}" has been defined, ' + "but is reserved by ramble."
+                )
 
     def check_required_keys(self, definitions):
         """Check a dictionary of variable definitions for all required keywords"""
@@ -170,8 +170,9 @@ class Keywords(object):
         if len(required_set) > 0:
             for key in required_set:
                 logger.warn(f'Required key "{key}" is not defined')
-            raise RambleKeywordError('One or more required keys ' +
-                                     'are not defined within an experiment.')
+            raise RambleKeywordError(
+                "One or more required keys " + "are not defined within an experiment."
+            )
 
 
 class RambleKeywordError(ramble.error.RambleError):

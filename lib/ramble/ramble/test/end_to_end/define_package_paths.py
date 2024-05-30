@@ -18,15 +18,15 @@ from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    'mutable_config',
-    'mutable_mock_workspace_path',
+    "mutable_config",
+    "mutable_mock_workspace_path",
 )
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def _spack_loc_log_line(pkg_spec):
-    return f'with args: [\'location\', \'-i\', \'{pkg_spec}\']'
+    return f"with args: ['location', '-i', '{pkg_spec}']"
 
 
 def test_define_package_paths():
@@ -59,38 +59,38 @@ ramble:
         - gromacs
         - intel-mpi
 """
-    workspace_name = 'test-define-package-paths'
+    workspace_name = "test-define-package-paths"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
+    with open(config_path, "w+") as f:
         f.write(test_config)
 
     ws._re_read()
 
     workspace(
-        'setup',
-        '--dry-run',
-        global_args=['-w', workspace_name],
+        "setup",
+        "--dry-run",
+        global_args=["-w", workspace_name],
     )
 
     # test1 should attempt to invoke `spack location -i` on dep packages.
-    test1_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test1.out')
-    gromacs_log_line = _spack_loc_log_line('gromacs')
-    impi_log_line = _spack_loc_log_line('intel-oneapi-mpi@2021.11.0')
-    with open(test1_log, 'r') as f:
+    test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
+    gromacs_log_line = _spack_loc_log_line("gromacs")
+    impi_log_line = _spack_loc_log_line("intel-oneapi-mpi@2021.11.0")
+    with open(test1_log, "r") as f:
         content = f.read()
-        assert 'Executing phase define_package_paths' in content
+        assert "Executing phase define_package_paths" in content
         assert content.count(gromacs_log_line) == 1
         assert content.count(impi_log_line) == 1
 
     # test2 should use cached paths without invoking spack.
-    test2_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test2.out')
-    with open(test2_log, 'r') as f:
+    test2_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test2.out")
+    with open(test2_log, "r") as f:
         content = f.read()
-        assert 'Executing phase define_package_paths' in content
+        assert "Executing phase define_package_paths" in content
         assert gromacs_log_line not in content
         assert impi_log_line not in content
 
@@ -126,38 +126,38 @@ ramble:
         - gromacs
         - intel-mpi
 """
-    workspace_name = 'test-define-package-paths'
+    workspace_name = "test-define-package-paths"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
+    with open(config_path, "w+") as f:
         f.write(test_config)
 
     ws._re_read()
 
     workspace(
-        'setup',
-        '--dry-run',
-        global_args=['-w', workspace_name],
+        "setup",
+        "--dry-run",
+        global_args=["-w", workspace_name],
     )
 
     # test1 should attempt to invoke `spack location -i` on dep packages.
     # However this will not be cached in practice.
-    test1_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test1.out')
-    gromacs_log_line = _spack_loc_log_line('gromacs')
-    impi_log_line = _spack_loc_log_line('intel-oneapi-mpi@2021.11.0')
-    with open(test1_log, 'r') as f:
+    test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
+    gromacs_log_line = _spack_loc_log_line("gromacs")
+    impi_log_line = _spack_loc_log_line("intel-oneapi-mpi@2021.11.0")
+    with open(test1_log, "r") as f:
         content = f.read()
-        assert 'Executing phase define_package_paths' in content
+        assert "Executing phase define_package_paths" in content
         assert content.count(gromacs_log_line) == 1
         assert content.count(impi_log_line) == 1
 
     # test2 should not use a path, as test1 has a variable for the path defined
-    test2_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test2.out')
-    with open(test2_log, 'r') as f:
+    test2_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test2.out")
+    with open(test2_log, "r") as f:
         content = f.read()
-        assert 'Executing phase define_package_paths' in content
+        assert "Executing phase define_package_paths" in content
         assert gromacs_log_line in content
         assert impi_log_line not in content

@@ -17,10 +17,9 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_custom_executables(mutable_config, mutable_mock_workspace_path, mock_applications):
@@ -85,26 +84,27 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = 'test_custom_executables'
+    workspace_name = "test_custom_executables"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
         experiment_root = ws.experiment_dir
-        exp_dir = os.path.join(experiment_root, 'interleved-env-vars', 'test_wl3', 'simple_test')
-        exp_script = os.path.join(exp_dir, 'execute_experiment')
+        exp_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl3", "simple_test")
+        exp_script = os.path.join(exp_dir, "execute_experiment")
 
         import re
-        custom_regex = re.compile('lscpu >>')
-        export_regex = re.compile(r'export MY_VAR=TEST')
-        cmd_regex = re.compile('foo >>')
+
+        custom_regex = re.compile("lscpu >>")
+        export_regex = re.compile(r"export MY_VAR=TEST")
+        cmd_regex = re.compile("foo >>")
 
         inject_order_regex = [
             re.compile('echo "before all"'),
@@ -114,7 +114,7 @@ ramble:
         ]
 
         # Assert command order is: lscpu -> export -> foo
-        with open(exp_script, 'r') as f:
+        with open(exp_script, "r") as f:
             custom_found = False
             cmd_found = False
             export_found = False

@@ -23,15 +23,13 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 @pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
-def test_dryrun_chained_experiments(mutable_config,
-                                    mutable_mock_workspace_path):
+def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:
   variables:
@@ -118,13 +116,13 @@ ramble:
 
     filters = ramble.filters.Filters()
 
-    workspace_name = 'test_dryrun_chained_experiments'
+    workspace_name = "test_dryrun_chained_experiments"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -133,84 +131,92 @@ ramble:
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
 
-        template_dir = os.path.join(ws.experiment_dir, 'intel-mpi-benchmarks')
+        template_dir = os.path.join(ws.experiment_dir, "intel-mpi-benchmarks")
         assert not os.path.exists(template_dir)
 
-        parent_dir = os.path.join(ws.experiment_dir, 'gromacs', 'water_bare',
-                                  'parent_test')
-        script = os.path.join(parent_dir, 'execute_experiment')
+        parent_dir = os.path.join(ws.experiment_dir, "gromacs", "water_bare", "parent_test")
+        script = os.path.join(parent_dir, "execute_experiment")
         assert os.path.exists(script)
 
         # Check all chained experiments are referenced
-        with open(script, 'r') as f:
+        with open(script, "r") as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
-            chained_script = os.path.join(parent_dir, 'chained_experiments',
-                                          f'{chain_idx}' +
-                                          r'.intel-mpi-benchmarks.collective.collective_chain',
-                                          'execute_experiment')
+            chained_script = os.path.join(
+                parent_dir,
+                "chained_experiments",
+                f"{chain_idx}" + r".intel-mpi-benchmarks.collective.collective_chain",
+                "execute_experiment",
+            )
             assert os.path.exists(chained_script)
             assert chained_script in parent_script_data
 
             # Check that experiment 1 has n_ranks = 4 instead of 2
             if chain_idx == 3:
-                with open(chained_script, 'r') as f:
-                    assert 'mpirun -n 4' in f.read()
+                with open(chained_script, "r") as f:
+                    assert "mpirun -n 4" in f.read()
 
         expected_order = [
-            re.compile(r'.*3.intel-mpi-benchmarks.collective.collective_chain.*'),
-            re.compile(r'.*5.intel-mpi-benchmarks.collective.collective_chain.*'),
-            re.compile(r'.*4.intel-mpi-benchmarks.pingpong.pingpong_chain.*'),
-            re.compile(r'.*2.intel-mpi-benchmarks.pingpong.pingpong_chain.*'),
-            re.compile(r'.*1.intel-mpi-benchmarks.collective.collective_chain.*'),
-            re.compile(r'.*0.intel-mpi-benchmarks.pingpong.pingpong_chain.*')
+            re.compile(r".*3.intel-mpi-benchmarks.collective.collective_chain.*"),
+            re.compile(r".*5.intel-mpi-benchmarks.collective.collective_chain.*"),
+            re.compile(r".*4.intel-mpi-benchmarks.pingpong.pingpong_chain.*"),
+            re.compile(r".*2.intel-mpi-benchmarks.pingpong.pingpong_chain.*"),
+            re.compile(r".*1.intel-mpi-benchmarks.collective.collective_chain.*"),
+            re.compile(r".*0.intel-mpi-benchmarks.pingpong.pingpong_chain.*"),
         ]
 
         # Check prepend / append order is correct
-        with open(script, 'r') as f:
+        with open(script, "r") as f:
 
             for line in f.readlines():
                 if expected_order[0].match(line):
                     expected_order.pop(0)
 
         # Ensure results contain chain information, and properly extract figures of merit
-        chain_exp_name = r'3.intel-mpi-benchmarks.collective.collective_chain'
-        output_path_3 = os.path.join(parent_dir, 'chained_experiments',
-                                     chain_exp_name,
-                                     f'gromacs.water_bare.parent_test.chain.{chain_exp_name}.out')
+        chain_exp_name = r"3.intel-mpi-benchmarks.collective.collective_chain"
+        output_path_3 = os.path.join(
+            parent_dir,
+            "chained_experiments",
+            chain_exp_name,
+            f"gromacs.water_bare.parent_test.chain.{chain_exp_name}.out",
+        )
 
-        with open(output_path_3, 'w+') as f:
+        with open(output_path_3, "w+") as f:
             f.write(mock_output_data)
 
-        analyze_pipeline = analyze_cls(ws, filters, output_formats=['json', 'yaml'])
+        analyze_pipeline = analyze_cls(ws, filters, output_formats=["json", "yaml"])
         analyze_pipeline.run()
 
-        base_name = r'gromacs.water_bare.parent_test'
-        collective_name = r'intel-mpi-benchmarks.collective.collective_chain'
-        pingpong_name = r'intel-mpi-benchmarks.pingpong.pingpong_chain'
+        base_name = r"gromacs.water_bare.parent_test"
+        collective_name = r"intel-mpi-benchmarks.collective.collective_chain"
+        pingpong_name = r"intel-mpi-benchmarks.pingpong.pingpong_chain"
 
-        chain_def = [f'{base_name}.chain.3.{collective_name}',
-                     f'{base_name}.chain.5.{collective_name}',
-                     f'{base_name}',
-                     f'{base_name}.chain.4.{pingpong_name}',
-                     f'{base_name}.chain.2.{pingpong_name}',
-                     f'{base_name}.chain.1.{collective_name}',
-                     f'{base_name}.chain.0.{pingpong_name}',
-                     ]
+        chain_def = [
+            f"{base_name}.chain.3.{collective_name}",
+            f"{base_name}.chain.5.{collective_name}",
+            f"{base_name}",
+            f"{base_name}.chain.4.{pingpong_name}",
+            f"{base_name}.chain.2.{pingpong_name}",
+            f"{base_name}.chain.1.{collective_name}",
+            f"{base_name}.chain.0.{pingpong_name}",
+        ]
 
-        names = ['results.latest.json', 'results.latest.yaml']
+        names = ["results.latest.json", "results.latest.yaml"]
         loaders = [sjson.load, syaml.load]
         for name, loader in zip(names, loaders):
-            with open(os.path.join(ws.root, name), 'r') as f:
+            with open(os.path.join(ws.root, name), "r") as f:
                 data = loader(f)
 
-                assert 'experiments' in data
+                assert "experiments" in data
 
-                for exp_def in data['experiments']:
-                    if exp_def['name'] == r'gromacs.water_bare.parent_test.' + \
-                            r'chain.3.intel-mpi-benchmarks.collective.collective_chain':
-                        assert exp_def['RAMBLE_STATUS'] == 'SUCCESS'
+                for exp_def in data["experiments"]:
+                    if (
+                        exp_def["name"]
+                        == r"gromacs.water_bare.parent_test."
+                        + r"chain.3.intel-mpi-benchmarks.collective.collective_chain"
+                    ):
+                        assert exp_def["RAMBLE_STATUS"] == "SUCCESS"
                     else:
-                        assert exp_def['RAMBLE_STATUS'] == 'FAILED'
-                    assert exp_def['EXPERIMENT_CHAIN'] == chain_def
+                        assert exp_def["RAMBLE_STATUS"] == "FAILED"
+                    assert exp_def["EXPERIMENT_CHAIN"] == chain_def

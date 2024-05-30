@@ -29,6 +29,7 @@ class PrefixedExecutable(spack.util.executable.Executable):
 
     def copy(self):
         from copy import deepcopy
+
         new_exec = deepcopy(self)
         new_exec.returncode = None
         return new_exec
@@ -62,8 +63,18 @@ class CommandExecutable(object):
     generally used to group one or more commands together into an executable
     name.
     """
-    def __init__(self, name, template, use_mpi=False, mpi=False, variables={},
-                 redirect='{log_file}', output_capture=OUTPUT_CAPTURE.DEFAULT, **kwargs):
+
+    def __init__(
+        self,
+        name,
+        template,
+        use_mpi=False,
+        mpi=False,
+        variables={},
+        redirect="{log_file}",
+        output_capture=OUTPUT_CAPTURE.DEFAULT,
+        **kwargs,
+    ):
         """Create a CommandExecutable instance
 
         Args:
@@ -82,8 +93,9 @@ class CommandExecutable(object):
         elif isinstance(template, list):
             self.template = template.copy()
         else:
-            raise CommandExecutableError('Command executable is given an '
-                                         f'invalid template type of {type(template)}')
+            raise CommandExecutableError(
+                "Command executable is given an " f"invalid template type of {type(template)}"
+            )
 
         self.name = name
         self.mpi = use_mpi or mpi
@@ -93,20 +105,26 @@ class CommandExecutable(object):
 
     def copy(self):
         """Replicate a CommandExecutable instance"""
-        new_inst = type(self)(self.name, self.template, mpi=self.mpi,
-                              redirect=self.redirect,
-                              variables=self.variables,
-                              output_capture=self.output_capture)
+        new_inst = type(self)(
+            self.name,
+            self.template,
+            mpi=self.mpi,
+            redirect=self.redirect,
+            variables=self.variables,
+            output_capture=self.output_capture,
+        )
         return new_inst
 
     def __str__(self):
         """String representation of CommandExecutable instance"""
-        self_str = f'exec: {self.name}:\n' + \
-                   f'    template: {str(self.template)}\n' + \
-                   f'    mpi: {self.mpi}\n' +\
-                   f'    variables: {self.variables}\n' +\
-                   f'    redirect: {self.redirect}\n' +\
-                   f'    output_capture: {self.output_capture}\n'
+        self_str = (
+            f"exec: {self.name}:\n"
+            + f"    template: {str(self.template)}\n"
+            + f"    mpi: {self.mpi}\n"
+            + f"    variables: {self.variables}\n"
+            + f"    redirect: {self.redirect}\n"
+            + f"    output_capture: {self.output_capture}\n"
+        )
 
         return self_str
 

@@ -12,10 +12,13 @@ import itertools
 class Filters(object):
     """Object containing filters for limiting various operations in Ramble"""
 
-    def __init__(self, phase_filters=['*'],
-                 include_where_filters=None,
-                 exclude_where_filters=None,
-                 tags=None):
+    def __init__(
+        self,
+        phase_filters=["*"],
+        include_where_filters=None,
+        exclude_where_filters=None,
+        tags=None,
+    ):
         """Create a new filter instance"""
 
         self.phases = phase_filters

@@ -19,11 +19,11 @@ from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    'mutable_config',
-    'mutable_mock_workspace_path',
+    "mutable_config",
+    "mutable_mock_workspace_path",
 )
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_analyze_fom_output():
@@ -45,25 +45,25 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = 'test-fom-output'
+    workspace_name = "test-fom-output"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
+    with open(config_path, "w+") as f:
         f.write(test_config)
 
     ws._re_read()
 
-    workspace('setup', '--dry-run', global_args=['-w', workspace_name])
-    exp_out = os.path.join(ws.experiment_dir, 'hostname', 'local', 'test', 'test.out')
-    with open(exp_out, 'w+') as f:
-        f.write('test-user.c.googlers.com\n')
-    workspace('analyze', global_args=['-w', workspace_name])
-    result_file = glob.glob(os.path.join(ws.root, 'results.latest.txt'))[0]
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
+    with open(exp_out, "w+") as f:
+        f.write("test-user.c.googlers.com\n")
+    workspace("analyze", global_args=["-w", workspace_name])
+    result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
 
-    with open(result_file, 'r') as f:
+    with open(result_file, "r") as f:
         content = f.read()
-        assert 'default (null) context figures of merit' in content
-        assert 'possible hostname = test-user.c.googlers.com' in content
+        assert "default (null) context figures of merit" in content
+        assert "possible hostname = test-user.c.googlers.com" in content

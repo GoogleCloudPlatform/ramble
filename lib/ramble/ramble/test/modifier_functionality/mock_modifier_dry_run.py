@@ -17,33 +17,33 @@ from ramble.modifier import InvalidModeError
 from ramble.language.language_base import DirectiveError
 from ramble.main import RambleCommand
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 @pytest.mark.parametrize(
-    'scope',
+    "scope",
     [
         SCOPES.workspace,
         SCOPES.application,
         SCOPES.workload,
         SCOPES.experiment,
-    ]
+    ],
 )
-def test_gromacs_dry_run_mock_mods(mutable_mock_workspace_path,
-                                   mutable_applications,
-                                   mock_modifier,
-                                   mock_modifiers,
-                                   scope):
-    workspace_name = 'test_gromacs_dry_run_mock_mods'
+def test_gromacs_dry_run_mock_mods(
+    mutable_mock_workspace_path, mutable_applications, mock_modifier, mock_modifiers, scope
+):
+    workspace_name = "test_gromacs_dry_run_mock_mods"
 
     test_modifiers = [
         (scope, modifier_helpers.named_modifier(mock_modifier)),
     ]
 
     expected_failures = {
-        'multiple-modes-no-default': {'error': InvalidModeError, 'msg': 'Cannot auto determine'},
-        'invalid-builtin-injection': {'error': DirectiveError,
-                                      'msg': 'has an invalid injection method of'},
+        "multiple-modes-no-default": {"error": InvalidModeError, "msg": "Cannot auto determine"},
+        "invalid-builtin-injection": {
+            "error": DirectiveError,
+            "msg": "has an invalid injection method of",
+        },
     }
 
     with ramble.workspace.create(workspace_name) as ws1:
@@ -51,18 +51,19 @@ def test_gromacs_dry_run_mock_mods(mutable_mock_workspace_path,
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        dry_run_config('modifiers', test_modifiers, config_path, 'gromacs', 'water_bare')
+        dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 
         ws1._re_read()
 
         if mock_modifier in expected_failures:
-            with pytest.raises(expected_failures[mock_modifier]['error']) as err:
-                workspace('concretize', global_args=['-D', ws1.root])
-                assert expected_failures[mock_modifier]['msg'] in err
+            with pytest.raises(expected_failures[mock_modifier]["error"]) as err:
+                workspace("concretize", global_args=["-D", ws1.root])
+                assert expected_failures[mock_modifier]["msg"] in err
         else:
-            workspace('concretize', global_args=['-D', ws1.root])
-            workspace('setup', '--dry-run', global_args=['-D', ws1.root])
-            exp_script = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
-                                      'test_exp', 'execute_experiment')
+            workspace("concretize", global_args=["-D", ws1.root])
+            workspace("setup", "--dry-run", global_args=["-D", ws1.root])
+            exp_script = os.path.join(
+                ws1.experiment_dir, "gromacs", "water_bare", "test_exp", "execute_experiment"
+            )
 
             assert os.path.isfile(exp_script)

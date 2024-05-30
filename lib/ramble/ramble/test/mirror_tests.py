@@ -23,32 +23,36 @@ import ramble.filters
 
 import spack.util.executable
 
-pytestmark = [pytest.mark.skipif(sys.platform == "win32",
-                                 reason="does not run on windows"),
-              pytest.mark.usefixtures('tmpdir',
-                                      'tmpdir_factory',
-                                      'mutable_config',
-                                      'mutable_mock_workspace_path',
-                                      'mutable_mock_apps_repo')]
+pytestmark = [
+    pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows"),
+    pytest.mark.usefixtures(
+        "tmpdir",
+        "tmpdir_factory",
+        "mutable_config",
+        "mutable_mock_workspace_path",
+        "mutable_mock_apps_repo",
+    ),
+]
 
 
 class MockFetcher(object):
     """Mock fetcher object which implements the necessary functionality for
-       testing MirrorCache
+    testing MirrorCache
     """
+
     @staticmethod
     def archive(dst):
-        with open(dst, 'w'):
+        with open(dst, "w"):
             pass
 
 
-@pytest.mark.regression('14067')
+@pytest.mark.regression("14067")
 def test_mirror_cache_symlinks(tmpdir):
     """Confirm that the cosmetic symlink created in the mirror cache (which may
-       be relative) targets the storage path correctly.
+    be relative) targets the storage path correctly.
     """
-    cosmetic_path = 'zlib/zlib-1.2.11.tar.gz'
-    global_path = '_uboyt-cache/archive/c3/c3e5.tar.gz'
+    cosmetic_path = "zlib/zlib-1.2.11.tar.gz"
+    global_path = "_uboyt-cache/archive/c3/c3e5.tar.gz"
     cache = ramble.caches.MirrorCache(str(tmpdir))
     reference = ramble.mirror.MirrorReference(cosmetic_path, global_path)
 
@@ -56,59 +60,55 @@ def test_mirror_cache_symlinks(tmpdir):
     cache.symlink(reference)
 
     link_target = resolve_link_target_relative_to_the_link(
-        os.path.join(cache.root, reference.cosmetic_path))
+        os.path.join(cache.root, reference.cosmetic_path)
+    )
     assert os.path.exists(link_target)
-    assert (os.path.normpath(link_target) ==
-            os.path.join(cache.root, reference.storage_path))
+    assert os.path.normpath(link_target) == os.path.join(cache.root, reference.storage_path)
 
 
 # Create an archive for the test input, with the correct file name
 def create_archive(archive_dir, app_class):
-    tar = spack.util.executable.which('tar', required=True)
+    tar = spack.util.executable.which("tar", required=True)
 
     app_class._inputs_and_fetchers()
 
     for input_name, conf in app_class._input_fetchers.items():
-        if conf['expand']:
+        if conf["expand"]:
             archive_dir.ensure(input_name, dir=True)
-            archive_name = os.path.basename(conf['fetcher'].url)
-            test_file_path = str(archive_dir.join(input_name, 'input-file'))
-            with open(test_file_path, 'w+') as f:
-                f.write('Input File\n')
+            archive_name = os.path.basename(conf["fetcher"].url)
+            test_file_path = str(archive_dir.join(input_name, "input-file"))
+            with open(test_file_path, "w+") as f:
+                f.write("Input File\n")
 
             with archive_dir.as_cwd():
-                tar('-czf', archive_name, input_name)
-                with open(archive_name, 'rb') as f:
+                tar("-czf", archive_name, input_name)
+                with open(archive_name, "rb") as f:
                     bytes = f.read()
-                    conf['fetcher'].digest = hashlib.sha256(bytes).hexdigest()
-                    app_class.inputs[conf['input_name']]['sha256'] = conf['fetcher'].digest
+                    conf["fetcher"].digest = hashlib.sha256(bytes).hexdigest()
+                    app_class.inputs[conf["input_name"]]["sha256"] = conf["fetcher"].digest
         else:
-            with open(input_name, 'w+') as f:
-                f.write('Input file\n')
+            with open(input_name, "w+") as f:
+                f.write("Input file\n")
 
-            with open(input_name, 'rb') as f:
+            with open(input_name, "rb") as f:
                 bytes = f.read()
-                conf['fetcher'].digest = hashlib.sha256(bytes).hexdigest()
-                app_class.inputs[conf['input_name']]['sha256'] = conf['fetcher'].digest
+                conf["fetcher"].digest = hashlib.sha256(bytes).hexdigest()
+                app_class.inputs[conf["input_name"]]["sha256"] = conf["fetcher"].digest
 
 
 def check_mirror(mirror_path, app_name, app_class):
     app_class._inputs_and_fetchers()
 
     for input_name, conf in app_class._input_fetchers.items():
-        test_name = f'{input_name}'
-        fetcher = conf['fetcher']
+        test_name = f"{input_name}"
+        fetcher = conf["fetcher"]
         if fetcher.extension:
-            test_name = f'{test_name}.{fetcher.extension}'
-        assert os.path.exists(os.path.join(mirror_path, 'inputs', app_name, test_name))
+            test_name = f"{test_name}.{fetcher.extension}"
+        assert os.path.exists(os.path.join(mirror_path, "inputs", app_name, test_name))
 
 
-@pytest.mark.parametrize('app_name', [
-    'input-test'
-])
-def test_mirror_create(tmpdir,
-                       mutable_mock_workspace_path,
-                       app_name, tmpdir_factory):
+@pytest.mark.parametrize("app_name", ["input-test"])
+def test_mirror_create(tmpdir, mutable_mock_workspace_path, app_name, tmpdir_factory):
 
     test_config = f"""
 ramble:
@@ -130,8 +130,8 @@ ramble:
     environments: {{}}
 """
 
-    archive_dir = tmpdir_factory.mktemp('mock-archives-dir')
-    mirror_dir = tmpdir_factory.mktemp(f'mock-{app_name}-mirror')
+    archive_dir = tmpdir_factory.mktemp("mock-archives-dir")
+    mirror_dir = tmpdir_factory.mktemp(f"mock-{app_name}-mirror")
 
     pipeline_type = ramble.pipeline.pipelines.mirror
 
@@ -140,22 +140,20 @@ ramble:
 
     with archive_dir.as_cwd():
         app_type = ramble.repository.ObjectTypes.applications
-        app_class = ramble.repository.paths[app_type].get_obj_class(app_name)('test')
+        app_class = ramble.repository.paths[app_type].get_obj_class(app_name)("test")
         app_class.set_variables({}, None)
         create_archive(archive_dir, app_class)
 
         # Create workspace
-        ws_name = f'workspace-mirror-{app_name}'
+        ws_name = f"workspace-mirror-{app_name}"
 
         with ramble.workspace.create(ws_name) as workspace:
             workspace.write()
             config_path = os.path.join(workspace.config_dir, ramble.workspace.config_file_name)
-            with open(config_path, 'w+') as f:
+            with open(config_path, "w+") as f:
                 f.write(test_config)
             workspace._re_read()
-            mirror_pipeline = mirror_pipeline_cls(workspace,
-                                                  filters,
-                                                  mirror_path=str(mirror_dir))
+            mirror_pipeline = mirror_pipeline_cls(workspace, filters, mirror_path=str(mirror_dir))
             mirror_pipeline.run()
 
         check_mirror(str(mirror_dir), app_name, app_class)

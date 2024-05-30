@@ -17,10 +17,9 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_exclusive_filtered_vector_workloads(mutable_config, mutable_mock_workspace_path):
@@ -45,33 +44,47 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = 'test_exclusive_filtered_vector_workloads'
+    workspace_name = "test_exclusive_filtered_vector_workloads"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws._re_read()
 
-        workspace('setup', '--dry-run', '--exclude-where', '"{workload_name}" == "serial"',
-                  global_args=['-w', workspace_name])
-        workspace('analyze', '--dry-run', '--exclude-where', '"{workload_name}" == "serial"',
-                  global_args=['-w', workspace_name])
-        workspace('archive', '--exclude-where', '"{workload_name}" == "serial"',
-                  global_args=['-w', workspace_name])
+        workspace(
+            "setup",
+            "--dry-run",
+            "--exclude-where",
+            '"{workload_name}" == "serial"',
+            global_args=["-w", workspace_name],
+        )
+        workspace(
+            "analyze",
+            "--dry-run",
+            "--exclude-where",
+            '"{workload_name}" == "serial"',
+            global_args=["-w", workspace_name],
+        )
+        workspace(
+            "archive",
+            "--exclude-where",
+            '"{workload_name}" == "serial"',
+            global_args=["-w", workspace_name],
+        )
 
         experiment_root = ws.experiment_dir
-        expected_workloads = ['parallel', 'local']
+        expected_workloads = ["parallel", "local"]
         for workload in expected_workloads:
-            exp1_dir = os.path.join(experiment_root, 'hostname', workload, 'simple_test')
-            exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+            exp1_dir = os.path.join(experiment_root, "hostname", workload, "simple_test")
+            exp1_script = os.path.join(exp1_dir, "execute_experiment")
             assert os.path.isfile(exp1_script)
 
-        not_expected_workloads = ['serial']
+        not_expected_workloads = ["serial"]
         for workload in not_expected_workloads:
-            exp1_dir = os.path.join(experiment_root, 'hostname', workload, 'simple_test')
-            exp1_script = os.path.join(exp1_dir, 'execute_experiment')
+            exp1_dir = os.path.join(experiment_root, "hostname", workload, "simple_test")
+            exp1_script = os.path.join(exp1_dir, "execute_experiment")
             assert not os.path.isfile(exp1_script)

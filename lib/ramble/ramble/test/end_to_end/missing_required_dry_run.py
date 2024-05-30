@@ -17,10 +17,9 @@ from ramble.main import RambleCommand, RambleCommandError
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
@@ -59,19 +58,17 @@ ramble:
         - wrfv3
 """
 
-    workspace_name = 'test_missing_required_dry_run'
+    workspace_name = "test_missing_required_dry_run"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
         with pytest.raises(RambleCommandError):
-            captured = workspace('setup',
-                                 '--dry-run',
-                                 global_args=['-w', workspace_name])
+            captured = workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
             assert "Software spec wrf is not defined in environment wrfv3" in captured

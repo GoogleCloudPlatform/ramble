@@ -16,193 +16,134 @@ import spack.schema.config
 
 #: Properties for inclusion in other schemas
 properties = {
-    'config': {
-        **spack.schema.config.properties['config']
+    "config": {**spack.schema.config.properties["config"]},
+}
+
+properties["config"]["shell"] = {"type": "string", "enum": ["sh", "bash", "csh", "tcsh", "fish"]}
+
+properties["config"]["spack"] = {
+    "type": "object",
+    "default": {"install": {"flags": "--reuse"}, "concretize": {"flags": "--reuse"}},
+    "properties": {
+        "global": {
+            "type": "object",
+            "default": {"flags": ""},
+            "properties": {"flags": {"type": "string", "default": ""}},
+            "additionalProperties": False,
+        },
+        "install": {
+            "type": "object",
+            "default": {
+                "flags": "--reuse",
+                "prefix": "",
+            },
+            "properties": {
+                "flags": {
+                    "type": "string",
+                    "default": "--reuse",
+                },
+                "prefix": {"type": "string", "default": ""},
+            },
+            "additionalProperties": False,
+        },
+        "concretize": {
+            "type": "object",
+            "default": {
+                "flags": "--reuse",
+                "prefix": "",
+            },
+            "properties": {
+                "flags": {
+                    "type": "string",
+                    "default": "--reuse",
+                },
+                "prefix": {"type": "string", "default": ""},
+            },
+            "additionalProperties": False,
+        },
+        "compiler_find": {
+            "type": "object",
+            "default": {
+                "flags": "",
+                "prefix": "",
+            },
+            "properties": {
+                "flags": {
+                    "type": "string",
+                    "default": "",
+                },
+                "prefix": {"type": "string", "default": ""},
+            },
+        },
+        "buildcache": {
+            "type": "object",
+            "default": {
+                "flags": "",
+                "prefix": "",
+            },
+            "properties": {
+                "flags": {
+                    "type": "string",
+                    "default": "",
+                },
+                "prefix": {"type": "string", "default": ""},
+            },
+            "additionalProperties": False,
+        },
+        "env_create": {
+            "type": "object",
+            "default": {
+                "flags": "",
+            },
+            "properties": {
+                "flags": {
+                    "type": "string",
+                    "default": "",
+                },
+            },
+            "additionalProperties": False,
+        },
+    },
+    "additionalProperties": False,
+}
+
+properties["config"]["spack"]["flags"] = {}
+
+properties["config"]["input_cache"] = {"type": "string", "default": "$ramble/var/ramble/cache"}
+
+properties["config"]["workspace_dirs"] = {
+    "type": "string",
+    "default": "$ramble/var/ramble/workspaces",
+}
+
+properties["config"]["upload"] = {
+    "type": "object",
+    "properties": {
+        "uri": {"type": "string", "default": ""},
+        "type": {"type": "string", "default": "BigQuery"},
     },
 }
 
-properties['config']['shell'] = {
-    'type': 'string',
-    'enum': ['sh', 'bash', 'csh', 'tcsh', 'fish']
-}
+properties["config"]["user"] = {"type": "string", "default": ""}
 
-properties['config']['spack'] = {
-    'type': 'object',
-    'default': {
-        'install': {
-            'flags': '--reuse'
-        },
-        'concretize': {
-            'flags': '--reuse'
-        }
-    },
-    'properties': {
-        'global': {
-            'type': 'object',
-            'default': {
-                'flags': ''
-            },
-            'properties': {
-                'flags': {
-                    'type': 'string',
-                    'default': ''
-                }
-            },
-            'additionalProperties': False,
-        },
-        'install': {
-            'type': 'object',
-            'default': {
-                'flags': '--reuse',
-                'prefix': '',
-            },
-            'properties': {
-                'flags': {
-                    'type': 'string',
-                    'default': '--reuse',
-                },
-                'prefix': {
-                    'type': 'string',
-                    'default': ''
-                }
-            },
-            'additionalProperties': False
-        },
-        'concretize': {
-            'type': 'object',
-            'default': {
-                'flags': '--reuse',
-                'prefix': '',
-            },
-            'properties': {
-                'flags': {
-                    'type': 'string',
-                    'default': '--reuse',
-                },
-                'prefix': {
-                    'type': 'string',
-                    'default': ''
-                }
-            },
-            'additionalProperties': False
-        },
-        'compiler_find': {
-            'type': 'object',
-            'default': {
-                'flags': '',
-                'prefix': '',
-            },
-            'properties': {
-                'flags': {
-                    'type': 'string',
-                    'default': '',
-                },
-                'prefix': {
-                    'type': 'string',
-                    'default': ''
-                }
-            },
-        },
-        'buildcache': {
-            'type': 'object',
-            'default': {
-                'flags': '',
-                'prefix': '',
-            },
-            'properties': {
-                'flags': {
-                    'type': 'string',
-                    'default': '',
-                },
-                'prefix': {
-                    'type': 'string',
-                    'default': ''
-                }
-            },
-            'additionalProperties': False
-        },
-        'env_create': {
-            'type': 'object',
-            'default': {
-                'flags': '',
-            },
-            'properties': {
-                'flags': {
-                    'type': 'string',
-                    'default': '',
-                },
-            },
-            'additionalProperties': False
-        },
-    },
-    'additionalProperties': False,
-}
+properties["config"]["disable_passthrough"] = {"type": "boolean", "default": False}
 
-properties['config']['spack']['flags'] = {
-}
+properties["config"]["disable_progress_bar"] = {"type": "boolean", "default": False}
 
-properties['config']['input_cache'] = {
-    'type': 'string',
-    'default': '$ramble/var/ramble/cache'
-}
+properties["config"]["disable_logger"] = {"type": "boolean", "default": False}
 
-properties['config']['workspace_dirs'] = {
-    'type': 'string',
-    'default': '$ramble/var/ramble/workspaces'
-}
+properties["config"]["n_repeats"] = {"type": "string", "default": "0"}
 
-properties['config']['upload'] = {
-    'type': 'object',
-    'properties': {
-        'uri': {
-            'type': 'string',
-            'default': ''
-        },
-        'type': {
-            'type': 'string',
-            'default': 'BigQuery'
-        },
-    }
-}
-
-properties['config']['user'] = {
-    'type': 'string',
-    'default': ''
-}
-
-properties['config']['disable_passthrough'] = {
-    'type': 'boolean',
-    'default': False
-}
-
-properties['config']['disable_progress_bar'] = {
-    'type': 'boolean',
-    'default': False
-}
-
-properties['config']['disable_logger'] = {
-    'type': 'boolean',
-    'default': False
-}
-
-properties['config']['n_repeats'] = {
-    'type': 'string',
-    'default': '0'
-}
-
-properties['config']['repeat_success_strict'] = {
-    'type': 'boolean',
-    'default': True
-}
+properties["config"]["repeat_success_strict"] = {"type": "boolean", "default": True}
 
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble core configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties,
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble core configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }
 
 
@@ -223,24 +164,24 @@ def update(data):
 
     # Convert `spack_flags` to `spack:command_flags`
 
-    spack_flags = data.get('spack_flags', None)
+    spack_flags = data.get("spack_flags", None)
     if isinstance(spack_flags, dict):
-        if data.get('spack', None) is None:
-            data['spack'] = {'flags': {}}
+        if data.get("spack", None) is None:
+            data["spack"] = {"flags": {}}
 
-        global_args = spack_flags.get('global_args', None)
+        global_args = spack_flags.get("global_args", None)
         if global_args is not None:
-            data['spack']['global'] = {'flags': global_args}
+            data["spack"]["global"] = {"flags": global_args}
 
-        install_flags = spack_flags.get('install', None)
+        install_flags = spack_flags.get("install", None)
         if install_flags is not None:
-            data['spack']['install'] = {'flags': install_flags}
+            data["spack"]["install"] = {"flags": install_flags}
 
-        concretize_flags = spack_flags.get('concretize', None)
+        concretize_flags = spack_flags.get("concretize", None)
         if concretize_flags is not None:
-            data['spack']['concretize'] = {'flags': concretize_flags}
+            data["spack"]["concretize"] = {"flags": concretize_flags}
 
-        del data['spack_flags']
+        del data["spack_flags"]
         changed = True
 
     return changed

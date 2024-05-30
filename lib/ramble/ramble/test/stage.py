@@ -29,15 +29,15 @@ from ramble.stage import InputStage, StageComposite, ResourceStage
 import ramble.stage
 
 # The following values are used for common fetch and stage mocking fixtures:
-_archive_base = 'test-files'
-_archive_fn = '%s.tar.gz' % _archive_base
-_extra_fn = 'extra.sh'
-_hidden_fn = '.hidden'
-_readme_fn = 'README.txt'
+_archive_base = "test-files"
+_archive_fn = "%s.tar.gz" % _archive_base
+_extra_fn = "extra.sh"
+_hidden_fn = ".hidden"
+_readme_fn = "README.txt"
 
-_extra_contents = '#!/bin/sh\n'
-_hidden_contents = ''
-_readme_contents = 'hello world!\n'
+_extra_contents = "#!/bin/sh\n"
+_hidden_contents = ""
+_readme_contents = "hello world!\n"
 
 # TODO: Replace the following with an enum once guarantee supported (or
 # include enum34 for python versions < 3.4.
@@ -75,7 +75,7 @@ _include_extra = 3
 @pytest.fixture
 def clear_stage_root(monkeypatch):
     """Ensure spack.stage._stage_root is not set at test start."""
-    monkeypatch.setattr(spack.stage, '_stage_root', None)
+    monkeypatch.setattr(spack.stage, "_stage_root", None)
     yield
 
 
@@ -175,7 +175,7 @@ def check_setup(stage, stage_name, archive):
 @pytest.fixture
 def tmp_build_stage_dir(tmpdir, clear_stage_root):
     """Use a temporary test directory for the stage root."""
-    test_path = str(tmpdir.join('stage'))
+    test_path = str(tmpdir.join("stage"))
     yield tmpdir, test_path
     # shutil.rmtree(test_path)
 
@@ -183,6 +183,7 @@ def tmp_build_stage_dir(tmpdir, clear_stage_root):
 @pytest.fixture
 def mock_stage_archive(tmp_build_stage_dir):
     """Create the directories and files for the staged mock archive."""
+
     # Mock up a stage area that looks like this:
     #
     # tmpdir/                test_files_dir
@@ -200,12 +201,12 @@ def mock_stage_archive(tmp_build_stage_dir):
         # Create the archive directory and associated file
         archive_dir = tmpdir.join(_archive_base)
         archive = tmpdir.join(_archive_fn)
-        archive_url = 'file://' + str(archive)
+        archive_url = "file://" + str(archive)
         archive_dir.ensure(dir=True)
 
         # Create the optional files as requested and make sure expanded
         # archive peers are included.
-        tar_args = ['czf', str(_archive_fn), _archive_base]
+        tar_args = ["czf", str(_archive_fn), _archive_base]
         for _include in expected_file_list:
             if _include == _include_hidden:
                 # The hidden file case stands in for the way Mac OS X tar files
@@ -230,14 +231,13 @@ def mock_stage_archive(tmp_build_stage_dir):
 
         # Create the archive file
         with tmpdir.as_cwd():
-            tar = spack.util.executable.which('tar', required=True)
+            tar = spack.util.executable.which("tar", required=True)
             tar(*tar_args)
 
-        Archive = collections.namedtuple(
-            'Archive', ['url', 'tmpdir', 'stage_path', 'archive_dir']
+        Archive = collections.namedtuple("Archive", ["url", "tmpdir", "stage_path", "archive_dir"])
+        return Archive(
+            url=archive_url, tmpdir=tmpdir, stage_path=test_stage_path, archive_dir=archive_dir
         )
-        return Archive(url=archive_url, tmpdir=tmpdir,
-                       stage_path=test_stage_path, archive_dir=archive_dir)
 
     return create_stage_archive
 
@@ -245,7 +245,7 @@ def mock_stage_archive(tmp_build_stage_dir):
 @pytest.fixture
 def mock_noexpand_resource(tmpdir):
     """Set up a non-expandable resource in the tmpdir prior to staging."""
-    test_resource = tmpdir.join('resource-no-expand.sh')
+    test_resource = tmpdir.join("resource-no-expand.sh")
     test_resource.write("an example resource")
     return str(test_resource)
 
@@ -260,48 +260,46 @@ def mock_expand_resource(tmpdir):
     #         resource-file.txt  resource contents (contains 'test content')
     #     resource.tar.gz        archive of resource content
     #
-    subdir = 'resource-expand'
+    subdir = "resource-expand"
     resource_dir = tmpdir.join(subdir)
     resource_dir.ensure(dir=True)
 
-    archive_name = 'resource.tar.gz'
+    archive_name = "resource.tar.gz"
     archive = tmpdir.join(archive_name)
-    archive_url = 'file://' + str(archive)
+    archive_url = "file://" + str(archive)
 
-    filename = 'resource-file.txt'
+    filename = "resource-file.txt"
     test_file = resource_dir.join(filename)
-    test_file.write('test content\n')
+    test_file.write("test content\n")
 
     with tmpdir.as_cwd():
-        tar = spack.util.executable.which('tar', required=True)
-        tar('czf', str(archive_name), subdir)
+        tar = spack.util.executable.which("tar", required=True)
+        tar("czf", str(archive_name), subdir)
 
-    MockResource = collections.namedtuple(
-        'MockResource', ['url', 'files'])
+    MockResource = collections.namedtuple("MockResource", ["url", "files"])
 
     return MockResource(archive_url, [filename])
 
 
 @pytest.fixture
-def composite_stage_with_expanding_resource(
-        mock_stage_archive, mock_expand_resource):
+def composite_stage_with_expanding_resource(mock_stage_archive, mock_expand_resource):
     """Sets up a composite for expanding resources prior to staging."""
     composite_stage = StageComposite()
     archive = mock_stage_archive()
-    root_stage = InputStage(archive.url, name='composite-input-stage',
-                            path=archive.stage_path)
+    root_stage = InputStage(archive.url, name="composite-input-stage", path=archive.stage_path)
     composite_stage.append(root_stage)
 
-    test_resource_fetcher = ramble.fetch_strategy.from_kwargs(
-        url=mock_expand_resource.url)
+    test_resource_fetcher = ramble.fetch_strategy.from_kwargs(url=mock_expand_resource.url)
     # Specify that the resource files are to be placed in the 'resource-dir'
     # directory
-    test_resource = Resource(
-        'test_resource', test_resource_fetcher, '', 'resource-dir')
+    test_resource = Resource("test_resource", test_resource_fetcher, "", "resource-dir")
     resource_stage = ResourceStage(
-        test_resource_fetcher, root_stage, test_resource,
-        name='composite-resource-stage',
-        path=os.path.join(archive.stage_path, 'resource-stage'))
+        test_resource_fetcher,
+        root_stage,
+        test_resource,
+        name="composite-resource-stage",
+        path=os.path.join(archive.stage_path, "resource-stage"),
+    )
     composite_stage.append(resource_stage)
     return composite_stage, root_stage, resource_stage, mock_expand_resource
 
@@ -309,26 +307,30 @@ def composite_stage_with_expanding_resource(
 @pytest.fixture
 def failing_search_fn():
     """Returns a search function that fails! Always!"""
+
     def _mock():
         raise Exception("This should not have been called")
+
     return _mock
 
 
 @pytest.fixture
 def failing_fetch_strategy():
     """Returns a fetch strategy that fails."""
+
     class FailingFetchStrategy(ramble.fetch_strategy.FetchStrategy):
         def fetch(self):
             raise ramble.fetch_strategy.FailedDownloadError(
-                "<non-existent URL>",
-                "This implementation of FetchStrategy always fails"
+                "<non-existent URL>", "This implementation of FetchStrategy always fails"
             )
+
     return FailingFetchStrategy()
 
 
 @pytest.fixture
 def search_fn():
     """Returns a search function that always succeeds."""
+
     class _Mock(object):
         performed_search = False
 
@@ -355,8 +357,7 @@ def check_stage_dir_perms(prefix, path):
     # Skip processing prefix ancestors since no guarantee they will be in the
     # required group (e.g. $TEMPDIR on HPC machines).
     skip = prefix if prefix.endswith(os.sep) else prefix + os.sep
-    group_paths, user_node, user_paths = partition_path(path.replace(skip, ""),
-                                                        user)
+    group_paths, user_node, user_paths = partition_path(path.replace(skip, ""), user)
 
     for p in group_paths:
         p_status = os.stat(os.path.join(prefix, p))
@@ -376,63 +377,71 @@ def check_stage_dir_perms(prefix, path):
 
 class TestStage(object):
 
-    stage_name = 'ramble-test-stage'
+    stage_name = "ramble-test-stage"
 
     def test_setup_and_destroy_name_with_tmp(self, mock_stage_archive):
         archive = mock_stage_archive()
-        with InputStage(archive.url, name=self.stage_name,
-                        path=archive.stage_path, keep=False) as stage:
+        with InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        ) as stage:
             check_setup(stage, self.stage_name, archive)
         check_destroy(stage, self.stage_name)
 
     def test_setup_and_destroy_name_without_tmp(self, mock_stage_archive):
         archive = mock_stage_archive()
-        with InputStage(archive.url, name=self.stage_name,
-                        path=archive.stage_path, keep=False) as stage:
+        with InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        ) as stage:
             check_setup(stage, self.stage_name, archive)
         check_destroy(stage, self.stage_name)
 
     def test_setup_no_name_fails(self, mock_stage_archive):
         archive = mock_stage_archive()
         with pytest.raises(ramble.stage.StageError):
-            with ramble.stage.InputStage(archive.url, name=None,
-                                         path=archive.stage_path,
-                                         keep=False) as stage:
+            with ramble.stage.InputStage(
+                archive.url, name=None, path=archive.stage_path, keep=False
+            ) as stage:
                 check_setup(stage, self.stage_name, archive)
             check_destroy(stage, self.stage_name)
 
-    def test_noexpand_stage_file(
-            self, mock_noexpand_resource, tmpdir):
+    def test_noexpand_stage_file(self, mock_noexpand_resource, tmpdir):
         """When creating a stage with a nonexpanding URL, the 'archive_file'
         property of the stage should refer to the path of that file.
         """
         test_noexpand_fetcher = ramble.fetch_strategy.from_kwargs(
-            url='file://' + mock_noexpand_resource, expand=False)
+            url="file://" + mock_noexpand_resource, expand=False
+        )
         stage_path = tmpdir.join(self.stage_name)
-        with InputStage(test_noexpand_fetcher, name=self.stage_name,
-                        path=stage_path, keep=False) as stage:
+        with InputStage(
+            test_noexpand_fetcher, name=self.stage_name, path=stage_path, keep=False
+        ) as stage:
             stage.fetch()
             stage.expand_archive()
             assert os.path.exists(stage.archive_file)
 
     @pytest.mark.disable_clean_stage_check
     def test_composite_stage_with_noexpand_resource(
-            self, mock_stage_archive, mock_noexpand_resource):
+        self, mock_stage_archive, mock_noexpand_resource
+    ):
         archive = mock_stage_archive()
         composite_stage = StageComposite()
-        root_stage = InputStage(archive.url, name=self.stage_name,
-                                path=archive.stage_path, keep=False)
+        root_stage = InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        )
         composite_stage.append(root_stage)
 
-        resource_dst_name = 'resource-dst-name.sh'
+        resource_dst_name = "resource-dst-name.sh"
         test_resource_fetcher = ramble.fetch_strategy.from_kwargs(
-            url='file://' + mock_noexpand_resource, expand=False)
-        test_resource = Resource(
-            'test_resource', test_resource_fetcher, resource_dst_name, None)
+            url="file://" + mock_noexpand_resource, expand=False
+        )
+        test_resource = Resource("test_resource", test_resource_fetcher, resource_dst_name, None)
         resource_stage = ResourceStage(
-            test_resource_fetcher, root_stage, test_resource,
-            name='test-resource-stage',
-            path=os.path.join(archive.stage_path, 'resource-stage'))
+            test_resource_fetcher,
+            root_stage,
+            test_resource,
+            name="test-resource-stage",
+            path=os.path.join(archive.stage_path, "resource-stage"),
+        )
         composite_stage.append(resource_stage)
 
         composite_stage.create()
@@ -440,15 +449,14 @@ class TestStage(object):
         composite_stage.expand_archive()
         assert composite_stage.expanded  # Archive is expanded
 
-        assert os.path.exists(
-            os.path.join(composite_stage.source_path, resource_dst_name))
+        assert os.path.exists(os.path.join(composite_stage.source_path, resource_dst_name))
 
     @pytest.mark.disable_clean_stage_check
-    def test_composite_stage_with_expand_resource(
-            self, composite_stage_with_expanding_resource):
+    def test_composite_stage_with_expand_resource(self, composite_stage_with_expanding_resource):
 
         composite_stage, root_stage, resource_stage, mock_resource = (
-            composite_stage_with_expanding_resource)
+            composite_stage_with_expanding_resource
+        )
 
         composite_stage.create()
         composite_stage.fetch()
@@ -457,8 +465,7 @@ class TestStage(object):
         assert composite_stage.expanded  # Archive is expanded
 
         for fname in mock_resource.files:
-            file_path = os.path.join(
-                root_stage.source_path, 'resource-dir', fname)
+            file_path = os.path.join(root_stage.source_path, "resource-dir", fname)
             assert os.path.exists(file_path)
 
         # Perform a little cleanup
@@ -466,7 +473,8 @@ class TestStage(object):
 
     @pytest.mark.disable_clean_stage_check
     def test_composite_stage_with_expand_resource_default_placement(
-            self, composite_stage_with_expanding_resource):
+        self, composite_stage_with_expanding_resource
+    ):
         """For a resource which refers to a compressed archive which expands
         to a directory, check that by default the resource is placed in
         the source_path of the root stage with the name of the decompressed
@@ -474,7 +482,8 @@ class TestStage(object):
         """
 
         composite_stage, root_stage, resource_stage, mock_resource = (
-            composite_stage_with_expanding_resource)
+            composite_stage_with_expanding_resource
+        )
 
         resource_stage.resource.placement = None
 
@@ -483,42 +492,46 @@ class TestStage(object):
         composite_stage.expand_archive()
 
         for fname in mock_resource.files:
-            file_path = os.path.join(
-                root_stage.source_path, 'resource-expand', fname)
+            file_path = os.path.join(root_stage.source_path, "resource-expand", fname)
             assert os.path.exists(file_path)
 
         # Perform a little cleanup
         shutil.rmtree(root_stage.path)
 
-    @pytest.mark.parametrize('debug', [False, True])
+    @pytest.mark.parametrize("debug", [False, True])
     def test_fetch(self, mock_stage_archive, debug):
         archive = mock_stage_archive()
-        with ramble.config.override('config:debug', debug):
-            with InputStage(archive.url, name=self.stage_name,
-                            path=archive.stage_path, keep=False) as stage:
+        with ramble.config.override("config:debug", debug):
+            with InputStage(
+                archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+            ) as stage:
                 stage.fetch()
                 check_setup(stage, self.stage_name, archive)
                 check_fetch(stage, self.stage_name)
             check_destroy(stage, self.stage_name)
 
-    def test_no_search_if_default_succeeds(
-            self, mock_stage_archive, failing_search_fn):
+    def test_no_search_if_default_succeeds(self, mock_stage_archive, failing_search_fn):
         archive = mock_stage_archive()
-        stage = InputStage(archive.url, name=self.stage_name,
-                           search_fn=failing_search_fn,
-                           path=archive.stage_path, keep=False)
+        stage = InputStage(
+            archive.url,
+            name=self.stage_name,
+            search_fn=failing_search_fn,
+            path=archive.stage_path,
+            keep=False,
+        )
         with stage:
             stage.fetch()
         check_destroy(stage, self.stage_name)
 
-    def test_no_search_mirror_only(
-            self, failing_fetch_strategy, failing_search_fn, tmpdir):
+    def test_no_search_mirror_only(self, failing_fetch_strategy, failing_search_fn, tmpdir):
         stage_path = tmpdir.join(self.stage_name)
-        stage = InputStage(failing_fetch_strategy,
-                           name=self.stage_name,
-                           path=stage_path,
-                           keep=False,
-                           search_fn=failing_search_fn)
+        stage = InputStage(
+            failing_fetch_strategy,
+            name=self.stage_name,
+            path=stage_path,
+            keep=False,
+            search_fn=failing_search_fn,
+        )
         with stage:
             try:
                 stage.fetch(mirror_only=True)
@@ -527,21 +540,26 @@ class TestStage(object):
         check_destroy(stage, self.stage_name)
 
     @pytest.mark.parametrize(
-        "err_msg,expected", [('Fetch from fetch.test.com',
-                              'Fetch from fetch.test.com'),
-                             (None, 'All fetchers failed')])
-    def test_search_if_default_fails(self, failing_fetch_strategy, search_fn,
-                                     err_msg, expected, tmpdir):
+        "err_msg,expected",
+        [
+            ("Fetch from fetch.test.com", "Fetch from fetch.test.com"),
+            (None, "All fetchers failed"),
+        ],
+    )
+    def test_search_if_default_fails(
+        self, failing_fetch_strategy, search_fn, err_msg, expected, tmpdir
+    ):
         stage_path = tmpdir.join(self.stage_name)
-        stage = InputStage(failing_fetch_strategy,
-                           name=self.stage_name,
-                           path=stage_path,
-                           keep=False,
-                           search_fn=search_fn)
+        stage = InputStage(
+            failing_fetch_strategy,
+            name=self.stage_name,
+            path=stage_path,
+            keep=False,
+            search_fn=search_fn,
+        )
 
         with stage:
-            with pytest.raises(ramble.fetch_strategy.FetchError,
-                               match=expected):
+            with pytest.raises(ramble.fetch_strategy.FetchError, match=expected):
                 stage.fetch(mirror_only=False, err_msg=err_msg)
 
         check_destroy(stage, self.stage_name)
@@ -549,22 +567,28 @@ class TestStage(object):
 
     def test_ensure_one_stage_entry(self, mock_stage_archive):
         archive = mock_stage_archive()
-        with InputStage(archive.url, name=self.stage_name,
-                        path=archive.stage_path, keep=False) as stage:
+        with InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        ) as stage:
             stage.fetch()
             stage_path = stage.path
             ramble.fetch_strategy._ensure_one_stage_entry(stage_path)
         check_destroy(stage, self.stage_name)
 
-    @pytest.mark.parametrize("expected_file_list", [
-                             [],
-                             [_include_readme],
-                             [_include_extra, _include_readme],
-                             [_include_hidden, _include_readme]])
+    @pytest.mark.parametrize(
+        "expected_file_list",
+        [
+            [],
+            [_include_readme],
+            [_include_extra, _include_readme],
+            [_include_hidden, _include_readme],
+        ],
+    )
     def test_expand_archive(self, expected_file_list, mock_stage_archive):
         archive = mock_stage_archive(expected_file_list)
-        with InputStage(archive.url, name=self.stage_name,
-                        path=archive.stage_path, keep=False) as stage:
+        with InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        ) as stage:
             stage.fetch()
             check_setup(stage, self.stage_name, archive)
             check_fetch(stage, self.stage_name)
@@ -575,8 +599,9 @@ class TestStage(object):
     def test_expand_archive_extra_expand(self, mock_stage_archive):
         """Test expand with an extra expand after expand (i.e., no-op)."""
         archive = mock_stage_archive()
-        with InputStage(archive.url, name=self.stage_name,
-                        path=archive.stage_path, keep=False) as stage:
+        with InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        ) as stage:
             stage.fetch()
             check_setup(stage, self.stage_name, archive)
             check_fetch(stage, self.stage_name)
@@ -587,8 +612,9 @@ class TestStage(object):
 
     def test_restage(self, mock_stage_archive):
         archive = mock_stage_archive()
-        with InputStage(archive.url, name=self.stage_name,
-                        path=archive.stage_path, keep=False) as stage:
+        with InputStage(
+            archive.url, name=self.stage_name, path=archive.stage_path, keep=False
+        ) as stage:
             stage.fetch()
             stage.expand_archive()
 
@@ -596,21 +622,20 @@ class TestStage(object):
                 check_expand_archive(stage, self.stage_name, [_include_readme])
 
                 # Try to make a file in the old archive dir
-                with open('foobar', 'w') as file:
+                with open("foobar", "w") as file:
                     file.write("this file is to be destroyed.")
 
-            assert 'foobar' in os.listdir(stage.source_path)
+            assert "foobar" in os.listdir(stage.source_path)
 
             # Make sure the file is not there after restage.
             stage.restage()
             check_fetch(stage, self.stage_name)
-            assert 'foobar' not in os.listdir(stage.source_path)
+            assert "foobar" not in os.listdir(stage.source_path)
         check_destroy(stage, self.stage_name)
 
     def test_no_keep_without_exceptions(self, mock_stage_archive):
         archive = mock_stage_archive()
-        stage = InputStage(archive.url, name=self.stage_name,
-                           path=archive.stage_path, keep=False)
+        stage = InputStage(archive.url, name=self.stage_name, path=archive.stage_path, keep=False)
         with stage:
             pass
         check_destroy(stage, self.stage_name)
@@ -618,8 +643,7 @@ class TestStage(object):
     @pytest.mark.disable_clean_stage_check
     def test_keep_without_exceptions(self, mock_stage_archive):
         archive = mock_stage_archive()
-        stage = InputStage(archive.url, name=self.stage_name,
-                           path=archive.stage_path, keep=True)
+        stage = InputStage(archive.url, name=self.stage_name, path=archive.stage_path, keep=True)
         with stage:
             pass
         path = stage.path
@@ -631,8 +655,7 @@ class TestStage(object):
             pass
 
         archive = mock_stage_archive()
-        stage = InputStage(archive.url, name=self.stage_name,
-                           path=archive.stage_path, keep=False)
+        stage = InputStage(archive.url, name=self.stage_name, path=archive.stage_path, keep=False)
         try:
             with stage:
                 raise ThisMustFailHere()
@@ -647,8 +670,7 @@ class TestStage(object):
             pass
 
         archive = mock_stage_archive()
-        stage = InputStage(archive.url, name=self.stage_name,
-                           path=archive.stage_path, keep=True)
+        stage = InputStage(archive.url, name=self.stage_name, path=archive.stage_path, keep=True)
         try:
             with stage:
                 raise ThisMustFailHere()
@@ -660,20 +682,19 @@ class TestStage(object):
     def test_input_path_available(self, mock_stage_archive):
         """Ensure input path available but does not exist on instantiation."""
         archive = mock_stage_archive()
-        stage = InputStage(archive.url, name=self.stage_name,
-                           path=archive.stage_path, keep=False)
+        stage = InputStage(archive.url, name=self.stage_name, path=archive.stage_path, keep=False)
 
         source_path = stage.source_path
         assert source_path
         assert source_path.endswith(ramble.stage._input_subdir)
         assert not os.path.exists(source_path)
 
-    @pytest.mark.skipif(os.getuid() == 0, reason='user is root')
+    @pytest.mark.skipif(os.getuid() == 0, reason="user is root")
     def test_first_accessible_path(self, tmpdir):
         """Test _first_accessible_path names."""
-        ramble_dir = tmpdir.join('paths')
+        ramble_dir = tmpdir.join("paths")
         name = str(ramble_dir)
-        files = [os.path.join(os.path.sep, 'no', 'such', 'path'), name]
+        files = [os.path.join(os.path.sep, "no", "such", "path"), name]
 
         # Ensure the tmpdir path is returned since the user should have access
         path = ramble.stage._first_accessible_path(files)
@@ -682,7 +703,7 @@ class TestStage(object):
         check_stage_dir_perms(str(tmpdir), path)
 
         # Ensure an existing path is returned
-        ramble_subdir = ramble_dir.join('existing').ensure(dir=True)
+        ramble_subdir = ramble_dir.join("existing").ensure(dir=True)
         subdir = str(ramble_subdir)
         path = ramble.stage._first_accessible_path([subdir])
         assert path == subdir
@@ -690,7 +711,7 @@ class TestStage(object):
         # Ensure a path with a `$user` node has the right permissions
         # for its subdirectories.
         user = getpass.getuser()
-        user_dir = ramble_dir.join(user, 'has', 'paths')
+        user_dir = ramble_dir.join(user, "has", "paths")
         user_path = str(user_dir)
         path = ramble.stage._first_accessible_path([user_path])
         assert path == user_path
@@ -701,7 +722,7 @@ class TestStage(object):
 
     def test_create_stage_root(self, tmpdir, no_path_access):
         """Test _create_stage_root permissions."""
-        test_dir = tmpdir.join('path')
+        test_dir = tmpdir.join("path")
         test_path = str(test_dir)
 
         try:
@@ -759,7 +780,7 @@ class TestStage(object):
         #      m.setattr(os, 'stat', _stat)
         #      spack.stage.create_stage_root(user_path)
         #      assert os.stat(user_path).st_uid != os.getuid()
-        monkeypatch.setattr(os, 'stat', _stat)
+        monkeypatch.setattr(os, "stat", _stat)
         spack.stage.create_stage_root(user_path)
 
         # The following check depends on the patched os.stat as a poor
@@ -771,29 +792,31 @@ class TestStage(object):
         assert ramble.stage._resolve_paths([]) == []
 
         # resolved path without user appends user
-        paths = [os.path.join(os.path.sep, 'a', 'b', 'c')]
+        paths = [os.path.join(os.path.sep, "a", "b", "c")]
         user = getpass.getuser()
         can_paths = [os.path.join(paths[0], user)]
         assert ramble.stage._resolve_paths(paths) == can_paths
 
         # resolved path with node including user does not append user
-        paths = [os.path.join(os.path.sep, 'spack-{0}'.format(user), 'stage')]
+        paths = [os.path.join(os.path.sep, "spack-{0}".format(user), "stage")]
         assert ramble.stage._resolve_paths(paths) == paths
 
-        tempdir = '$tempdir'
+        tempdir = "$tempdir"
         can_tempdir = canonicalize_path(tempdir)
         user = getpass.getuser()
         temp_has_user = user in can_tempdir.split(os.sep)
-        paths = [os.path.join(tempdir, 'stage'),
-                 os.path.join(tempdir, '$user'),
-                 os.path.join(tempdir, '$user', '$user'),
-                 os.path.join(tempdir, '$user', 'stage', '$user')]
+        paths = [
+            os.path.join(tempdir, "stage"),
+            os.path.join(tempdir, "$user"),
+            os.path.join(tempdir, "$user", "$user"),
+            os.path.join(tempdir, "$user", "stage", "$user"),
+        ]
 
         res_paths = [canonicalize_path(p) for p in paths]
         if temp_has_user:
             res_paths[1] = can_tempdir
             res_paths[2] = os.path.join(can_tempdir, user)
-            res_paths[3] = os.path.join(can_tempdir, 'stage', user)
+            res_paths[3] = os.path.join(can_tempdir, "stage", user)
         else:
             res_paths[0] = os.path.join(res_paths[0], user)
 
@@ -808,7 +831,9 @@ class TestStage(object):
     def test_stage_constructor_with_path(self, tmpdir):
         """Ensure Stage constructor with a path uses it."""
         testpath = str(tmpdir)
-        with InputStage('file:///does-not-exist', name=self.stage_name, path=testpath, keep=False) as stage:
+        with InputStage(
+            "file:///does-not-exist", name=self.stage_name, path=testpath, keep=False
+        ) as stage:
             assert stage.path == testpath
 
 
@@ -817,11 +842,11 @@ def test_stage_create_replace_path(tmp_build_stage_dir):
     _, test_stage_path = tmp_build_stage_dir
     mkdirp(test_stage_path)
 
-    nondir = os.path.join(test_stage_path, 'afile')
+    nondir = os.path.join(test_stage_path, "afile")
     touch(nondir)
     path = str(nondir)
 
-    stage = InputStage(path, name='', path=path)
+    stage = InputStage(path, name="", path=path)
     stage.create()
 
     # Ensure the stage path is "converted" to a directory
@@ -832,7 +857,7 @@ def test_cannot_access(capsys):
     """Ensure can_access dies with the expected error."""
     with pytest.raises(SystemExit):
         # It's far more portable to use a non-existent filename.
-        spack.stage.ensure_access('/no/such/file')
+        spack.stage.ensure_access("/no/such/file")
 
     captured = capsys.readouterr()
-    assert 'Insufficient permissions' in str(captured)
+    assert "Insufficient permissions" in str(captured)

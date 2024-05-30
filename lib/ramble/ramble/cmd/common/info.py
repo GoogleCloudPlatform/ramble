@@ -12,8 +12,8 @@ import llnl.util.tty.color as color
 
 import ramble.repository
 
-header_color = '@*b'
-plain_format = '@.'
+header_color = "@*b"
+plain_format = "@."
 
 
 def setup_info_parser(subparser, object_type):
@@ -26,12 +26,12 @@ def section_title(s):
 
 
 def print_text_info(obj):
-    obj._verbosity = 'long'
+    obj._verbosity = "long"
     color.cprint(str(obj))
 
 
 def print_info(args, object_type):
     obj_def = ramble.repository.type_definitions[object_type]
-    obj_name = getattr(args, obj_def['singular'])
+    obj_name = getattr(args, obj_def["singular"])
     obj = ramble.repository.get(obj_name, object_type=object_type)
     print_text_info(obj)

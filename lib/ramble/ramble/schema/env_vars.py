@@ -17,14 +17,14 @@ import ramble.schema.licenses
 
 #: Properties for inclusion in other schemas
 properties = {
-    'env_vars': ramble.schema.licenses.env_var_actions,
+    "env_vars": ramble.schema.licenses.env_var_actions,
 }
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble environment variable configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble environment variable configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

@@ -16,11 +16,11 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 @pytest.mark.parametrize(
-    'scopes',
+    "scopes",
     [
         [SCOPES.workspace, SCOPES.workspace],
         [SCOPES.workspace, SCOPES.application],
@@ -38,20 +38,21 @@ workspace = RambleCommand('workspace')
         [SCOPES.experiment, SCOPES.application],
         [SCOPES.experiment, SCOPES.workload],
         [SCOPES.experiment, SCOPES.experiment],
-    ]
+    ],
 )
 @pytest.mark.parametrize(
-    'factories,answers',
+    "factories,answers",
     [
         (
             [modifier_helpers.intel_aps_modifier, modifier_helpers.lscpu_modifier],
-            [modifier_helpers.intel_aps_answer, modifier_helpers.lscpu_answer]),
-    ]
+            [modifier_helpers.intel_aps_answer, modifier_helpers.lscpu_answer],
+        ),
+    ],
 )
-def test_gromacs_multi_modifier_dry_run(mutable_mock_workspace_path,
-                                        mutable_applications,
-                                        scopes, factories, answers):
-    workspace_name = 'test_gromacs_multi_modifier_dry_run'
+def test_gromacs_multi_modifier_dry_run(
+    mutable_mock_workspace_path, mutable_applications, scopes, factories, answers
+):
+    workspace_name = "test_gromacs_multi_modifier_dry_run"
 
     test_modifiers = []
 
@@ -72,19 +73,20 @@ def test_gromacs_multi_modifier_dry_run(mutable_mock_workspace_path,
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        dry_run_config('modifiers', test_modifiers, config_path, 'gromacs', 'water_bare')
+        dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 
         ws1._re_read()
 
-        workspace('concretize', global_args=['-D', ws1.root])
-        workspace('setup', '--dry-run', global_args=['-D', ws1.root])
+        workspace("concretize", global_args=["-D", ws1.root])
+        workspace("setup", "--dry-run", global_args=["-D", ws1.root])
 
         # Test software directories
         software_base_dir = ws1.software_dir
 
         modifier_helpers.check_software_env(software_base_dir, software_tests)
 
-        exp_script = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
-                                  'test_exp', 'execute_experiment')
+        exp_script = os.path.join(
+            ws1.experiment_dir, "gromacs", "water_bare", "test_exp", "execute_experiment"
+        )
 
         modifier_helpers.check_execute_script(exp_script, script_tests)

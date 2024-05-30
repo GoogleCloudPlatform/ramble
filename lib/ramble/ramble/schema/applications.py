@@ -26,90 +26,75 @@ import ramble.schema.modifiers
 import ramble.schema.zips
 
 
-matrix_def = {
-    'type': 'array',
-    'default': [],
-    'items': {'type': 'string'}
-}
+matrix_def = {"type": "array", "default": [], "items": {"type": "string"}}
 
 matrices_def = {
-    'type': 'array',
-    'default': [],
-    'items': {
-        'anyOf': [
+    "type": "array",
+    "default": [],
+    "items": {
+        "anyOf": [
             matrix_def,
             {
-                'type': 'object',
-                'default': {},
-                'properties': {},
-                'additionalProperties': matrix_def
-            }
+                "type": "object",
+                "default": {},
+                "properties": {},
+                "additionalProperties": matrix_def,
+            },
         ]
-    }
+    },
 }
 
 variable_list = {
-    'type': 'array',
-    'default': [],
-    'items': {
-        'type': 'string',
-    }
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "string",
+    },
 }
 
 chained_experiment_def = {
-    'type': 'array',
-    'default': [],
-    'items': {
-        'type': 'object',
-        'default': {},
-        'properties': union_dicts(
+    "type": "array",
+    "default": [],
+    "items": {
+        "type": "object",
+        "default": {},
+        "properties": union_dicts(
             {
-                'name': {'type': 'string'},
-                'command': {'type': 'string'},
-                'order': {'type': 'string'},
-                'inherit_variables': variable_list,
+                "name": {"type": "string"},
+                "command": {"type": "string"},
+                "order": {"type": "string"},
+                "inherit_variables": variable_list,
             },
-            ramble.schema.variables.properties
+            ramble.schema.variables.properties,
         ),
-        'additionalProperties': False
-    }
+        "additionalProperties": False,
+    },
 }
 
 where_def = {
-    'type': 'array',
-    'items': {'type': 'string'},
-    'default': [],
+    "type": "array",
+    "items": {"type": "string"},
+    "default": [],
 }
 
 exclude_def = {
-    'type': 'object',
-    'default': {},
-    'properties': union_dicts(
+    "type": "object",
+    "default": {},
+    "properties": union_dicts(
         ramble.schema.variables.properties,
         ramble.schema.zips.properties,
         {
-            'matrix': matrix_def,
-            'matrices': matrices_def,
-            'where': where_def,
-        }
+            "matrix": matrix_def,
+            "matrices": matrices_def,
+            "where": where_def,
+        },
     ),
-    'additionalProperties': False
+    "additionalProperties": False,
 }
 
-tags_def = {
-    'type': 'array',
-    'default': [],
-    'items': {
-        'type': 'string'
-    }
-}
+tags_def = {"type": "array", "default": [], "items": {"type": "string"}}
 
-repeats_def = union_dicts(
-    ramble.schema.types.string_or_num,
-    {
-        'default': 0
-    }
-)
+repeats_def = union_dicts(ramble.schema.types.string_or_num, {"default": 0})
 
 sub_props = union_dicts(
     ramble.schema.variables.properties,
@@ -120,71 +105,71 @@ sub_props = union_dicts(
     ramble.schema.zips.properties,
     ramble.schema.formatted_executables.properties,
     {
-        'chained_experiments': chained_experiment_def,
-        'template': {'type': 'boolean'},
-        'tags': tags_def,
-    }
+        "chained_experiments": chained_experiment_def,
+        "template": {"type": "boolean"},
+        "tags": tags_def,
+    },
 )
 
 #: Properties for inclusion in other schemas
 properties = {
-    'applications': {
-        'type': 'object',
-        'default': {},
-        'properties': {},
-        'additionalProperties': {
-            'type': 'object',
-            'default': '{}',
-            'additionalProperties': False,
-            'properties': union_dicts(
+    "applications": {
+        "type": "object",
+        "default": {},
+        "properties": {},
+        "additionalProperties": {
+            "type": "object",
+            "default": "{}",
+            "additionalProperties": False,
+            "properties": union_dicts(
                 sub_props,
                 {
-                    'workloads': {
-                        'type': 'object',
-                        'default': {},
-                        'properties': {},
-                        'additionalProperties': {
-                            'type': 'object',
-                            'default': {},
-                            'additionalProperties': False,
-                            'properties': union_dicts(
+                    "workloads": {
+                        "type": "object",
+                        "default": {},
+                        "properties": {},
+                        "additionalProperties": {
+                            "type": "object",
+                            "default": {},
+                            "additionalProperties": False,
+                            "properties": union_dicts(
                                 sub_props,
                                 {
-                                    'experiments': {
-                                        'type': 'object',
-                                        'default': {},
-                                        'properties': {},
-                                        'additionalProperties': {
-                                            'type': 'object',
-                                            'default': {},
-                                            'additionalProperties': False,
-                                            'properties': union_dicts(
+                                    "experiments": {
+                                        "type": "object",
+                                        "default": {},
+                                        "properties": {},
+                                        "additionalProperties": {
+                                            "type": "object",
+                                            "default": {},
+                                            "additionalProperties": False,
+                                            "properties": union_dicts(
                                                 sub_props,
                                                 {
-                                                    'matrix': matrix_def,
-                                                    'matrices': matrices_def,
-                                                    'success_criteria': success_list_def,
-                                                    'exclude': exclude_def,
-                                                    'n_repeats': repeats_def,
-                                                }
-                                            )
-                                        }
+                                                    "matrix": matrix_def,
+                                                    "matrices": matrices_def,
+                                                    "success_criteria": success_list_def,
+                                                    "exclude": exclude_def,
+                                                    "n_repeats": repeats_def,
+                                                },
+                                            ),
+                                        },
                                     }
-                                }
-                            )
-                        }
+                                },
+                            ),
+                        },
                     }
-                }
-            )
-        }
+                },
+            ),
+        },
     }
 }
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble application configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble application configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

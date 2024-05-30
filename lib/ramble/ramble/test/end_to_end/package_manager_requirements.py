@@ -17,10 +17,9 @@ from ramble.main import RambleCommand
 import ramble.spack_runner
 
 
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_package_manager_requirements_zlib(mock_applications, mock_modifiers):
@@ -52,27 +51,26 @@ ramble:
     except ramble.spack_runner.RunnerError as e:
         pytest.skip(e)
 
-    workspace_name = 'test_package_manager_requirements_zlib'
+    workspace_name = "test_package_manager_requirements_zlib"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
-        workspace('setup', global_args=['-w', workspace_name])
+        workspace("setup", global_args=["-w", workspace_name])
 
-        spack_yaml = os.path.join(ws.software_dir, 'zlib-configs',
-                                  'spack.yaml')
+        spack_yaml = os.path.join(ws.software_dir, "zlib-configs", "spack.yaml")
 
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml, 'r') as f:
+        with open(spack_yaml, "r") as f:
             data = f.read()
-            assert 'config:' in data
-            assert 'debug: true' in data
+            assert "config:" in data
+            assert "debug: true" in data
 
 
 def test_package_manager_requirements_error(mock_applications, mock_modifiers):
@@ -104,17 +102,17 @@ ramble:
     except ramble.spack_runner.RunnerError as e:
         pytest.skip(e)
 
-    workspace_name = 'test_package_manager_requirements_error'
+    workspace_name = "test_package_manager_requirements_error"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
         with pytest.raises(ramble.spack_runner.ValidationFailedError) as e:
-            workspace('setup', global_args=['-w', workspace_name])
+            workspace("setup", global_args=["-w", workspace_name])
 
             assert 'Validation of: "spack list not-a-package" failed' in e

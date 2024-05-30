@@ -60,36 +60,53 @@ def setup_parser(subparser):
     # Various types of Spack files that can be edited
     # Edits package files by default
     excl_args.add_argument(
-        '-a', '--application-type', dest='path', action='store_const',
+        "-a",
+        "--application-type",
+        dest="path",
+        action="store_const",
         const=ramble.paths.application_types_path,
-        help="Edit the application type with the supplied name.")
+        help="Edit the application type with the supplied name.",
+    )
     excl_args.add_argument(
-        '-c', '--command', dest='path', action='store_const',
+        "-c",
+        "--command",
+        dest="path",
+        action="store_const",
         const=ramble.paths.command_path,
-        help="edit the command with the supplied name")
+        help="edit the command with the supplied name",
+    )
     excl_args.add_argument(
-        '-d', '--docs', dest='path', action='store_const',
-        const=os.path.join(ramble.paths.lib_path, 'docs'),
-        help="edit the docs with the supplied name")
+        "-d",
+        "--docs",
+        dest="path",
+        action="store_const",
+        const=os.path.join(ramble.paths.lib_path, "docs"),
+        help="edit the docs with the supplied name",
+    )
     excl_args.add_argument(
-        '-t', '--test', dest='path', action='store_const',
+        "-t",
+        "--test",
+        dest="path",
+        action="store_const",
         const=ramble.paths.test_path,
-        help="edit the test with the supplied name")
+        help="edit the test with the supplied name",
+    )
     excl_args.add_argument(
-        '-m', '--module', dest='path', action='store_const',
+        "-m",
+        "--module",
+        dest="path",
+        action="store_const",
         const=ramble.paths.module_path,
-        help="edit the main ramble module with the supplied name")
+        help="edit the main ramble module with the supplied name",
+    )
 
     # Options for editing applications
     excl_args.add_argument(
-        '-r', '--repo', default=None,
-        help="path to repo to edit application in")
-    excl_args.add_argument(
-        '-N', '--namespace', default=None,
-        help="namespace of package to edit")
+        "-r", "--repo", default=None, help="path to repo to edit application in"
+    )
+    excl_args.add_argument("-N", "--namespace", default=None, help="namespace of package to edit")
 
-    subparser.add_argument(
-        'application', nargs='?', default=None, help="application name")
+    subparser.add_argument("application", nargs="?", default=None, help="application name")
 
 
 def edit(parser, args):
@@ -108,15 +125,14 @@ def edit(parser, args):
 
             path = os.path.join(path, name)
             if not os.path.exists(path):
-                files = glob.glob(path + '*')
-                blacklist = ['.pyc', '~']  # blacklist binaries and backups
-                files = list(filter(
-                    lambda x: all(s not in x for s in blacklist), files))
+                files = glob.glob(path + "*")
+                blacklist = [".pyc", "~"]  # blacklist binaries and backups
+                files = list(filter(lambda x: all(s not in x for s in blacklist), files))
                 if len(files) > 1:
-                    m = 'Multiple files exist with the name {0}.'.format(name)
-                    m += ' Please specify a suffix. Files are:\n\n'
+                    m = "Multiple files exist with the name {0}.".format(name)
+                    m += " Please specify a suffix. Files are:\n\n"
                     for f in files:
-                        m += '        ' + os.path.basename(f) + '\n'
+                        m += "        " + os.path.basename(f) + "\n"
                     logger.die(m)
                 if not files:
                     logger.die(f"No file for '{name}' was found in {path}")

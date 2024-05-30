@@ -15,6 +15,7 @@ class GraphNode(object):
     the graph returned, and be able to refer to the attribute of the original
     node easily.
     """
+
     def __init__(self, key, attribute=None, obj_inst=None):
         """Construct a graph node
 
@@ -60,7 +61,7 @@ class GraphNode(object):
         Returns:
             str: Text representation of the node
         """
-        return f'{self.key}'
+        return f"{self.key}"
 
     def __str__(self):
         """Return a string representation of the node
@@ -68,7 +69,7 @@ class GraphNode(object):
         Returns:
             str: Text representation of the node
         """
-        return f'{self.key}'
+        return f"{self.key}"
 
     def __hash__(self):
         """Hash a node based on it's key

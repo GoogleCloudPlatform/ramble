@@ -21,6 +21,7 @@ class Logger(object):
     Namely, this class provides a stack of log files, and allows errors to be
     printed to all log files instead of only one.
     """
+
     def __init__(self):
         """Construct a a logger instance
 
@@ -45,7 +46,7 @@ class Logger(object):
         """
         if isinstance(path, str) and self.enabled:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
-            stream = llnl.util.tty.log.Unbuffered(open(path, 'a+'))
+            stream = llnl.util.tty.log.Unbuffered(open(path, "a+"))
             self.log_stack.append((path, stream))
 
     def remove_log(self):
@@ -103,8 +104,8 @@ class Logger(object):
                 stream_index = index
             else:
                 tty.die(
-                    f'Error: Requested stream index of {index} is outside of '
-                    f'the stream range of 0 - {len(self.log_stack)}'
+                    f"Error: Requested stream index of {index} is outside of "
+                    f"the stream range of 0 - {len(self.log_stack)}"
                 )
 
         else:
@@ -112,7 +113,7 @@ class Logger(object):
                 stream_index = len(self.log_stack) - 1
 
         if stream_index is not None:
-            kwargs['stream'] = self.log_stack[stream_index][1]
+            kwargs["stream"] = self.log_stack[stream_index][1]
 
         kwargs.update(default_kwargs)
 
@@ -121,8 +122,8 @@ class Logger(object):
     @contextmanager
     def configure_colors(self, **kwargs):
         old_value = llnl.util.tty.color.get_color_when()
-        if 'stream' in kwargs:
-            llnl.util.tty.color.set_color_when('never')
+        if "stream" in kwargs:
+            llnl.util.tty.color.set_color_when("never")
         yield
         llnl.util.tty.color.set_color_when(old_value)
 
@@ -177,7 +178,7 @@ class Logger(object):
         print). Perform this action for the active log only.
         """
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        if 'stream' in st_kwargs:
+        if "stream" in st_kwargs:
             with self.configure_colors(**st_kwargs):
                 tty.warn(*args, **st_kwargs)
 

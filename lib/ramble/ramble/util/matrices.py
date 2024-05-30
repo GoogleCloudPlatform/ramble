@@ -31,9 +31,11 @@ def extract_matrices(action, name, in_dict):
             # Extract named matrices
             if isinstance(matrix, dict):
                 if len(matrix.keys()) != 1:
-                    logger.die(f'While performing {action} with {name} '
-                               ' each list element may only contain '
-                               '1 matrix in a matrices definition.')
+                    logger.die(
+                        f"While performing {action} with {name} "
+                        " each list element may only contain "
+                        "1 matrix in a matrices definition."
+                    )
 
                 for name, val in matrix.items():
                     matrices.append(val)

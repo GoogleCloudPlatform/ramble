@@ -13,21 +13,19 @@
 """  # noqa E501
 
 variables_def = {
-    'type': ['object', 'null'],
-    'default': {},
-    'properties': {},
-    'additionalProperties': True
+    "type": ["object", "null"],
+    "default": {},
+    "properties": {},
+    "additionalProperties": True,
 }
 
-properties = {
-    'variables': variables_def
-}
+properties = {"variables": variables_def}
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble variables configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble variables configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

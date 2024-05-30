@@ -39,19 +39,20 @@ def _can_access(path, perms):
 def pytest_addoption(parser):
     group = parser.getgroup("Ramble specific command line options")
     group.addoption(
-        '--fast', action='store_true', default=False,
-        help='runs only "fast" unit tests, instead of the whole suite')
+        "--fast",
+        action="store_true",
+        default=False,
+        help='runs only "fast" unit tests, instead of the whole suite',
+    )
 
 
 def pytest_collection_modifyitems(config, items):
-    if not config.getoption('--fast'):
+    if not config.getoption("--fast"):
         # --fast not given, run all the tests
         return
 
-    slow_tests = ['db', 'network', 'maybeslow']
-    skip_as_slow = pytest.mark.skip(
-        reason='skipped slow test [--fast command line option given]'
-    )
+    slow_tests = ["db", "network", "maybeslow"]
+    skip_as_slow = pytest.mark.skip(reason="skipped slow test [--fast command line option given]")
     for item in items:
         if any(x in item.keywords for x in slow_tests):
             item.add_marker(skip_as_slow)
@@ -60,7 +61,7 @@ def pytest_collection_modifyitems(config, items):
 #
 # These fixtures are applied to all tests
 #
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def no_chdir():
     """Ensure that no test changes Ramble's working directory.
 
@@ -126,67 +127,71 @@ def working_env():
 #
 # Test-specific fixtures
 #
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mock_apps_repo_path():
     obj_type = ramble.repository.ObjectTypes.applications
     yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mock_mods_repo_path():
     obj_type = ramble.repository.ObjectTypes.modifiers
     yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_apps_repo_path():
     obj_type = ramble.repository.ObjectTypes.applications
     yield ramble.repository.Repo(ramble.paths.builtin_path, obj_type)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_mods_repo_path():
     obj_type = ramble.repository.ObjectTypes.modifiers
     yield ramble.repository.Repo(ramble.paths.builtin_path, obj_type)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mock_applications(mock_apps_repo_path):
     """Use the 'builtin.mock' repository for applications instead of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.applications
-    with ramble.repository.use_repositories(mock_apps_repo_path, object_type=obj_type) \
-            as mock_apps_repo:
+    with ramble.repository.use_repositories(
+        mock_apps_repo_path, object_type=obj_type
+    ) as mock_apps_repo:
         yield mock_apps_repo
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mock_modifiers(mock_mods_repo_path):
     """Use the 'builtin.mock' repository for modifiersinstead of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.modifiers
-    with ramble.repository.use_repositories(mock_mods_repo_path, object_type=obj_type) \
-            as mock_mods_repo:
+    with ramble.repository.use_repositories(
+        mock_mods_repo_path, object_type=obj_type
+    ) as mock_mods_repo:
         yield mock_mods_repo
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_applications(mutable_apps_repo_path):
     """Use the 'builtin.mock' repository for modifiers instead of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.applications
-    with ramble.repository.use_repositories(mutable_apps_repo_path, object_type=obj_type) \
-            as apps_repo:
+    with ramble.repository.use_repositories(
+        mutable_apps_repo_path, object_type=obj_type
+    ) as apps_repo:
         yield apps_repo
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_modifiers(mutable_mods_repo_path):
     """Use the 'builtin.mock' repository for modifiers instead of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.modifiers
-    with ramble.repository.use_repositories(mutable_mods_repo_path, object_type=obj_type) \
-            as mods_repo:
+    with ramble.repository.use_repositories(
+        mutable_mods_repo_path, object_type=obj_type
+    ) as mods_repo:
         yield mods_repo
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_mock_apps_repo(mock_apps_repo_path):
     """Function-scoped mock applications, for tests that need to modify them."""
     obj_type = ramble.repository.ObjectTypes.applications
@@ -195,7 +200,7 @@ def mutable_mock_apps_repo(mock_apps_repo_path):
         yield mock_repo_path
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_mock_mods_repo(mock_mods_repo_path):
     """Function-scoped mock modifiers, for tests that need to modify them."""
     obj_type = ramble.repository.ObjectTypes.modifiers
@@ -204,42 +209,40 @@ def mutable_mock_mods_repo(mock_mods_repo_path):
         yield mock_repo_path
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def default_config():
     """Isolates the default configuration from the user configs.
 
     This ensures we can test the real default configuration without having
     tests fail when the user overrides the defaults that we test against."""
-    defaults_path = os.path.join(ramble.paths.etc_path, 'ramble', 'defaults')
+    defaults_path = os.path.join(ramble.paths.etc_path, "ramble", "defaults")
     with ramble.config.use_configuration(defaults_path) as defaults_config:
         yield defaults_config
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def configuration_dir(tmpdir_factory, linux_os):
     """Copies mock configuration files in a temporary directory. Returns the
     directory path.
     """
-    tmpdir = tmpdir_factory.mktemp('configurations')
+    tmpdir = tmpdir_factory.mktemp("configurations")
 
     # <test_path>/data/config has mock config yaml files in it
     # copy these to the site config.
-    test_config = py.path.local(ramble.paths.test_path).join('data', 'config')
-    test_config.copy(tmpdir.join('site'))
+    test_config = py.path.local(ramble.paths.test_path).join("data", "config")
+    test_config.copy(tmpdir.join("site"))
 
     # Create temporary 'defaults', 'site' and 'user' folders
-    tmpdir.ensure('user', dir=True)
+    tmpdir.ensure("user", dir=True)
 
     # Slightly modify config.yaml
-    solver = os.environ.get('SPACK_TEST_SOLVER', 'original')
-    config_yaml = test_config.join('config.yaml')
-    modules_root = tmpdir_factory.mktemp('share')
-    tcl_root = modules_root.ensure('modules', dir=True)
-    lmod_root = modules_root.ensure('lmod', dir=True)
-    content = ''.join(config_yaml.read()).format(
-        solver, str(tcl_root), str(lmod_root)
-    )
-    t = tmpdir.join('site', 'config.yaml')
+    solver = os.environ.get("SPACK_TEST_SOLVER", "original")
+    config_yaml = test_config.join("config.yaml")
+    modules_root = tmpdir_factory.mktemp("share")
+    tcl_root = modules_root.ensure("modules", dir=True)
+    lmod_root = modules_root.ensure("lmod", dir=True)
+    content = "".join(config_yaml.read()).format(solver, str(tcl_root), str(lmod_root))
+    t = tmpdir.join("site", "config.yaml")
     t.write(content)
     yield tmpdir
 
@@ -247,64 +250,66 @@ def configuration_dir(tmpdir_factory, linux_os):
     shutil.rmtree(str(tmpdir))
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def linux_os():
     """Returns a named tuple with attributes 'name' and 'version'
     representing the OS.
     """
     platform = spack.platforms.host()
-    name, version = 'debian', '6'
-    if platform.name == 'linux':
-        current_os = platform.operating_system('default_os')
+    name, version = "debian", "6"
+    if platform.name == "linux":
+        current_os = platform.operating_system("default_os")
         name, version = current_os.name, current_os.version
-    LinuxOS = collections.namedtuple('LinuxOS', ['name', 'version'])
+    LinuxOS = collections.namedtuple("LinuxOS", ["name", "version"])
     return LinuxOS(name=name, version=version)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def mock_configuration_scopes(configuration_dir):
     """Create a persistent Configuration object from the configuration_dir."""
-    defaults = ramble.config.InternalConfigScope(
-        '_builtin', ramble.config.config_defaults
-    )
+    defaults = ramble.config.InternalConfigScope("_builtin", ramble.config.config_defaults)
     test_scopes = [defaults]
     test_scopes += [
         ramble.config.ConfigScope(name, str(configuration_dir.join(name)))
-        for name in ['site', 'system', 'user']]
-    test_scopes.append(ramble.config.InternalConfigScope('command_line'))
+        for name in ["site", "system", "user"]
+    ]
+    test_scopes.append(ramble.config.InternalConfigScope("command_line"))
 
     yield test_scopes
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def config(mock_configuration_scopes):
     """This fixture activates/deactivates the mock configuration."""
     with ramble.config.use_configuration(*mock_configuration_scopes) as config:
         yield config
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_config(tmpdir_factory, configuration_dir):
     """Like config, but tests can modify the configuration."""
-    mutable_dir = tmpdir_factory.mktemp('mutable_config').join('tmp')
+    mutable_dir = tmpdir_factory.mktemp("mutable_config").join("tmp")
     configuration_dir.copy(mutable_dir)
 
-    defaults = ramble.config.InternalConfigScope('_builtin',
-                                                 ramble.config.config_defaults)
-    scopes  = [defaults]
-    scopes += [ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
-               for name in ['site', 'system', 'user']]
+    defaults = ramble.config.InternalConfigScope("_builtin", ramble.config.config_defaults)
+    scopes = [defaults]
+    scopes += [
+        ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
+        for name in ["site", "system", "user"]
+    ]
 
     with ramble.config.use_configuration(*scopes) as cfg:
         yield cfg
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_empty_config(tmpdir_factory, configuration_dir):
     """Empty configuration that can be modified by the tests."""
-    mutable_dir = tmpdir_factory.mktemp('mutable_config').join('tmp')
-    scopes = [ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
-              for name in ['site', 'system', 'user']]
+    mutable_dir = tmpdir_factory.mktemp("mutable_config").join("tmp")
+    scopes = [
+        ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
+        for name in ["site", "system", "user"]
+    ]
 
     with ramble.config.use_configuration(*scopes) as cfg:
         yield cfg
@@ -313,20 +318,19 @@ def mutable_empty_config(tmpdir_factory, configuration_dir):
 @pytest.fixture()
 def mock_low_high_config(tmpdir):
     """Mocks two configuration scopes: 'low' and 'high'."""
-    scopes = [ramble.config.ConfigScope(name, str(tmpdir.join(name)))
-              for name in ['low', 'high']]
+    scopes = [ramble.config.ConfigScope(name, str(tmpdir.join(name))) for name in ["low", "high"]]
 
     with ramble.config.use_configuration(*scopes) as config:
         yield config
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def _store_dir_and_cache(tmpdir_factory):
     """Returns the directory where to build the mock database and
     where to cache it.
     """
-    store = tmpdir_factory.mktemp('mock_store')
-    cache = tmpdir_factory.mktemp('mock_store_cache')
+    store = tmpdir_factory.mktemp("mock_store")
+    cache = tmpdir_factory.mktemp("mock_store_cache")
     return store, cache
 
 
@@ -335,7 +339,7 @@ class MockLayout(object):
         self.root = root
 
     def path_for_spec(self, spec):
-        return '/'.join([self.root, spec.name])
+        return "/".join([self.root, spec.name])
 
     def check_installed(self, spec):
         return True
@@ -373,25 +377,16 @@ class ConfigUpdate(object):
         self.monkeypatch = monkeypatch
 
     def __call__(self, filename):
-        file = os.path.join(self.root_for_conf, filename + '.yaml')
+        file = os.path.join(self.root_for_conf, filename + ".yaml")
         with open(file) as f:
             mock_config = MockConfig(syaml.load_config(f), self.writer_key)
 
+        self.monkeypatch.setattr(ramble.modules.common, "configuration", mock_config.configuration)
         self.monkeypatch.setattr(
-            ramble.modules.common,
-            'configuration',
-            mock_config.configuration
+            self.writer_mod, "configuration", mock_config.writer_configuration
         )
-        self.monkeypatch.setattr(
-            self.writer_mod,
-            'configuration',
-            mock_config.writer_configuration
-        )
-        self.monkeypatch.setattr(
-            self.writer_mod,
-            'configuration_registry',
-            {}
-        )
+        self.monkeypatch.setattr(self.writer_mod, "configuration_registry", {})
+
 
 ##########
 # Class and fixture to work around problems raising exceptions in directives,
@@ -404,7 +399,7 @@ class ConfigUpdate(object):
 
 class MockBundle(object):
     has_code = False
-    name = 'mock-bundle'
+    name = "mock-bundle"
     versions = {}
 
 
@@ -432,9 +427,9 @@ def mock_executable(tmpdir):
     """
     import jinja2
 
-    def _factory(name, output, subdir=('bin',)):
+    def _factory(name, output, subdir=("bin",)):
         f = tmpdir.ensure(*subdir, dir=True).join(name)
-        t = jinja2.Template('#!/bin/bash\n{{ output }}\n')
+        t = jinja2.Template("#!/bin/bash\n{{ output }}\n")
         f.write(t.render(output=output))
         f.chmod(0o755)
         return str(f)
@@ -442,38 +437,38 @@ def mock_executable(tmpdir):
     return _factory
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
     """Fixture for mocking the internal ramble workspaces directory."""
-    mock_path = tmpdir_factory.mktemp('mock-workspace-path')
-    with ramble.config.override('config:workspace_dirs', str(mock_path)):
+    mock_path = tmpdir_factory.mktemp("mock-workspace-path")
+    with ramble.config.override("config:workspace_dirs", str(mock_path)):
         yield mock_path
 
 
 @pytest.fixture
 def no_path_access(monkeypatch):
-    monkeypatch.setattr(os, 'access', _can_access)
+    monkeypatch.setattr(os, "access", _can_access)
+
 
 ##########
 # Fake archives and repositories
 ##########
 
 
-@pytest.fixture(scope='session', params=[('.tar.gz', 'z')])
+@pytest.fixture(scope="session", params=[(".tar.gz", "z")])
 def mock_archive(request, tmpdir_factory):
     """Creates a very simple archive directory with a configure script and a
     makefile that installs to a prefix. Tars it up into an archive.
     """
-    tar = spack.util.executable.which('tar', required=True)
+    tar = spack.util.executable.which("tar", required=True)
 
-    tmpdir = tmpdir_factory.mktemp('mock-archive-dir')
+    tmpdir = tmpdir_factory.mktemp("mock-archive-dir")
     tmpdir.ensure(ramble.stage._input_subdir, dir=True)
     repodir = tmpdir.join(ramble.stage._input_subdir)
 
     # Create the configure script
-    configure_path = str(tmpdir.join(ramble.stage._input_subdir,
-                                     'configure'))
-    with open(configure_path, 'w') as f:
+    configure_path = str(tmpdir.join(ramble.stage._input_subdir, "configure"))
+    with open(configure_path, "w") as f:
         f.write(
             "#!/bin/sh\n"
             "prefix=$(echo $1 | sed 's/--prefix=//')\n"
@@ -489,29 +484,26 @@ def mock_archive(request, tmpdir_factory):
 
     # Archive it
     with tmpdir.as_cwd():
-        archive_name = '{0}{1}'.format(ramble.stage._input_subdir,
-                                       request.param[0])
-        tar('-c{0}f'.format(request.param[1]), archive_name,
-            ramble.stage._input_subdir)
+        archive_name = "{0}{1}".format(ramble.stage._input_subdir, request.param[0])
+        tar("-c{0}f".format(request.param[1]), archive_name, ramble.stage._input_subdir)
 
-    Archive = collections.namedtuple('Archive',
-                                     ['url', 'path', 'archive_file',
-                                      'expanded_archive_basedir'])
+    Archive = collections.namedtuple(
+        "Archive", ["url", "path", "archive_file", "expanded_archive_basedir"]
+    )
     archive_file = str(tmpdir.join(archive_name))
-    url = ('file://' + archive_file)
+    url = "file://" + archive_file
 
     # Return the url
     yield Archive(
         url=url,
         archive_file=archive_file,
         path=str(repodir),
-        expanded_archive_basedir=ramble.stage._input_subdir)
+        expanded_archive_basedir=ramble.stage._input_subdir,
+    )
 
 
-@pytest.fixture(scope='function')
-def install_mockery_mutable_config(
-        mutable_config, mock_applications
-):
+@pytest.fixture(scope="function")
+def install_mockery_mutable_config(mutable_config, mock_applications):
     """Hooks fake applications and config directory into Ramble.
 
     This is specifically for tests which want to use 'install_mockery' but
@@ -519,7 +511,7 @@ def install_mockery_mutable_config(
     'mutable config'): 'install_mockery' does not support this.
     """
     # We use a fake package, so temporarily disable checksumming
-    with ramble.config.override('config:checksum', False):
+    with ramble.config.override("config:checksum", False):
         yield
 
 
@@ -533,7 +525,7 @@ class MockCache(object):
 
 class MockCacheFetcher(object):
     def fetch(self):
-        raise FetchError('Mock cache always fails for tests')
+        raise FetchError("Mock cache always fails for tests")
 
     def __str__(self):
         return "[mock fetch cache]"
@@ -544,7 +536,7 @@ def mock_fetch_cache(monkeypatch):
     """Substitutes ramble.paths.fetch_cache with a mock object that does nothing
     and raises on fetch.
     """
-    monkeypatch.setattr(ramble.caches, 'fetch_cache', MockCache())
+    monkeypatch.setattr(ramble.caches, "fetch_cache", MockCache())
 
 
 @pytest.fixture()
@@ -559,26 +551,28 @@ def mock_fetch(mock_archive, monkeypatch):
 def pytest_generate_tests(metafunc):
     if "application" in metafunc.fixturenames:
         from ramble.main import RambleCommand
-        list_cmd = RambleCommand('list')
+
+        list_cmd = RambleCommand("list")
 
         all_applications = []
-        repo_apps = list_cmd().split('\n')
+        repo_apps = list_cmd().split("\n")
 
         for app_str in repo_apps:
-            if app_str != '':
+            if app_str != "":
                 all_applications.append(app_str.strip())
 
         metafunc.parametrize("application", all_applications)
 
     if "modifier" in metafunc.fixturenames:
         from ramble.main import RambleCommand
-        mods_cmd = RambleCommand('mods')
+
+        mods_cmd = RambleCommand("mods")
 
         all_modifiers = []
-        repo_mods = mods_cmd('list').split('\n')
+        repo_mods = mods_cmd("list").split("\n")
 
         for mod_str in repo_mods:
-            if mod_str != '':
+            if mod_str != "":
                 all_modifiers.append(mod_str.strip())
 
         metafunc.parametrize("modifier", all_modifiers)
@@ -593,15 +587,16 @@ def pytest_generate_tests(metafunc):
 
         metafunc.parametrize("mock_modifier", all_modifiers)
 
-    if 'config_section' in metafunc.fixturenames:
+    if "config_section" in metafunc.fixturenames:
         from ramble.main import RambleCommand
-        config_cmd = RambleCommand('config')
+
+        config_cmd = RambleCommand("config")
 
         all_sections = []
-        config_sections = config_cmd('list').split(' ')
+        config_sections = config_cmd("list").split(" ")
 
         for section_str in config_sections:
-            if section_str != '':
+            if section_str != "":
                 all_sections.append(section_str.strip())
 
-        metafunc.parametrize('config_section', all_sections)
+        metafunc.parametrize("config_section", all_sections)

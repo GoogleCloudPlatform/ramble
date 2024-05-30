@@ -17,16 +17,13 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
-ramble_on = RambleCommand('on')
+workspace = RambleCommand("workspace")
+ramble_on = RambleCommand("on")
 
 
-def test_repeat_success_strict(mutable_config,
-                               mutable_mock_workspace_path,
-                               mock_applications):
+def test_repeat_success_strict(mutable_config, mutable_mock_workspace_path, mock_applications):
     test_config = """
 ramble:
   config:
@@ -49,51 +46,53 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = 'test_repeat_success_strict'
+    workspace_name = "test_repeat_success_strict"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
-        workspace('setup', global_args=['-w', workspace_name])
-        ramble_on(global_args=['-w', workspace_name])
-        workspace('analyze', global_args=['-w', workspace_name])
+        workspace("setup", global_args=["-w", workspace_name])
+        ramble_on(global_args=["-w", workspace_name])
+        workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, 'results.latest.txt'), 'r') as f:
+        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
             data = f.read()
             print(data)
-            assert 'FAILED' not in data
-            assert 'summary::n_successful_repeats = 2 repeats' in data
+            assert "FAILED" not in data
+            assert "summary::n_successful_repeats = 2 repeats" in data
 
         # Write mock output to fail one of the experiments
-        result_path = os.path.join(ws.experiment_dir, 'basic', 'working_wl',
-                                   'test_exp.1', 'test_exp.1.out')
-        with open(result_path, 'w+') as f:
-            f.write('')
+        result_path = os.path.join(
+            ws.experiment_dir, "basic", "working_wl", "test_exp.1", "test_exp.1.out"
+        )
+        with open(result_path, "w+") as f:
+            f.write("")
 
-        workspace('analyze', global_args=['-w', workspace_name])
+        workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, 'results.latest.txt'), 'r') as f:
+        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
             data = f.read()
             print(data)
-            assert 'SUCCESS' in data
-            assert 'FAILED' in data
-            assert 'summary::n_successful_repeats = 1 repeats' in data
+            assert "SUCCESS" in data
+            assert "FAILED" in data
+            assert "summary::n_successful_repeats = 1 repeats" in data
 
         # Write mock output to fail the second experiment
-        result_path = os.path.join(ws.experiment_dir, 'basic', 'working_wl',
-                                   'test_exp.2', 'test_exp.2.out')
-        with open(result_path, 'w+') as f:
-            f.write('')
+        result_path = os.path.join(
+            ws.experiment_dir, "basic", "working_wl", "test_exp.2", "test_exp.2.out"
+        )
+        with open(result_path, "w+") as f:
+            f.write("")
 
-        workspace('analyze', global_args=['-w', workspace_name])
+        workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, 'results.latest.txt'), 'r') as f:
+        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
             data = f.read()
             print(data)
-            assert 'SUCCESS' not in data
-            assert 'summary::n_successful_repeats' not in data
+            assert "SUCCESS" not in data
+            assert "summary::n_successful_repeats" not in data

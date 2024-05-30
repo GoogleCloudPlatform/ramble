@@ -26,14 +26,14 @@ else:
     from collections import Sequence
 
 
-__all__ = ['DirectiveMeta', 'DirectiveError']
+__all__ = ["DirectiveMeta", "DirectiveError"]
 
 
 #: These are variant names used by ramble internally; applications can't use
 #: them
 reserved_names = []
 
-namespaces = ['ramble.app', 'ramble.mod']
+namespaces = ["ramble.app", "ramble.mod"]
 
 
 class DirectiveMeta(type):
@@ -94,9 +94,9 @@ class DirectiveMeta(type):
                 setattr(cls, d, {})
 
             directive_attrs = {
-                '_directive_functions': {},
-                '_directive_classes': {},
-                '_directive_names': DirectiveMeta._directive_names.copy()
+                "_directive_functions": {},
+                "_directive_classes": {},
+                "_directive_names": DirectiveMeta._directive_names.copy(),
             }
 
             for attr in directive_attrs.keys():
@@ -161,7 +161,7 @@ class DirectiveMeta(type):
 
         """
         if isinstance(dicts, string_types):
-            dicts = (dicts, )
+            dicts = (dicts,)
 
         if not isinstance(dicts, Sequence):
             message = "dicts arg must be list, tuple, or string. Found {0}"
@@ -187,8 +187,7 @@ class DirectiveMeta(type):
                             remove_directives(a)
                     else:
                         # Remove directives args from the exec queue
-                        remove = next(
-                            (d for d in directives if d is arg), None)
+                        remove = next((d for d in directives if d is arg), None)
                         if remove is not None:
                             directives.remove(remove)
 
@@ -204,7 +203,7 @@ class DirectiveMeta(type):
                 # ...so if it is not a sequence make it so
                 values = result
                 if not isinstance(values, Sequence):
-                    values = (values, )
+                    values = (values,)
 
                 DirectiveMeta._directives_to_be_executed.extend(values)
 

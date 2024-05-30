@@ -13,8 +13,15 @@ import ramble.util.colors as rucolor
 class WorkloadVariable(object):
     """Class representing a variable definition"""
 
-    def __init__(self, name: str, default=None, description: str = None,
-                 values=None, expandable: bool = True, **kwargs):
+    def __init__(
+        self,
+        name: str,
+        default=None,
+        description: str = None,
+        values=None,
+        expandable: bool = True,
+        **kwargs,
+    ):
         """Constructor for a new variable
 
         Args:
@@ -39,15 +46,15 @@ class WorkloadVariable(object):
         Returns:
             (str): Representation of this variable
         """
-        indentation = ' ' * n_indent
+        indentation = " " * n_indent
 
-        print_attrs = ['Description', 'Default', 'Values']
+        print_attrs = ["Description", "Default", "Values"]
 
-        out_str  = rucolor.nested_2(f'{indentation}{self.name}:\n')
+        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
         for print_attr in print_attrs:
             name = print_attr
-            if print_attr == 'Values':
-                name = 'Suggested Values'
+            if print_attr == "Values":
+                name = "Suggested Values"
             attr_name = print_attr.lower()
 
             attr_val = getattr(self, attr_name, None)
@@ -80,11 +87,11 @@ class WorkloadEnvironmentVariable(object):
         Returns:
             (str): String representing this environment variable
         """
-        indentation = ' ' * n_indent
+        indentation = " " * n_indent
 
-        print_attrs = ['Description', 'Value']
+        print_attrs = ["Description", "Value"]
 
-        out_str  = rucolor.nested_2(f'{indentation}{self.name}:\n')
+        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
         for name in print_attrs:
             attr_name = name.lower()
             attr_val = getattr(self, attr_name, None)
@@ -96,8 +103,9 @@ class WorkloadEnvironmentVariable(object):
 class Workload(object):
     """Class representing a single workload"""
 
-    def __init__(self, name: str, executables: List[str],
-                 inputs: List[str] = [], tags: List[str] = []):
+    def __init__(
+        self, name: str, executables: List[str], inputs: List[str] = [], tags: List[str] = []
+    ):
         """Constructor for a workload
 
         Args:
@@ -110,7 +118,7 @@ class Workload(object):
         self.variables = {}
         self.environment_variables = {}
 
-        attr_names = ['executables', 'inputs', 'tags']
+        attr_names = ["executables", "inputs", "tags"]
         attr_vals = [executables, inputs, tags]
 
         for attr, vals in zip(attr_names, attr_vals):
@@ -131,26 +139,24 @@ class Workload(object):
         Returns:
             (str): Representation of this workload
         """
-        attrs = [('Executables', 'executables'),
-                 ('Inputs', 'inputs'),
-                 ('Tags', 'tags')]
+        attrs = [("Executables", "executables"), ("Inputs", "inputs"), ("Tags", "tags")]
 
-        indentation = ' ' * n_indent
+        indentation = " " * n_indent
 
-        out_str  = rucolor.section_title(f'{indentation}Workload: ')
-        out_str += f'{self.name}\n'
+        out_str = rucolor.section_title(f"{indentation}Workload: ")
+        out_str += f"{self.name}\n"
         for attr in attrs:
-            out_str += rucolor.nested_1(f'{indentation}    {attr[0]}: ')
+            out_str += rucolor.nested_1(f"{indentation}    {attr[0]}: ")
             attr_val = getattr(self, attr[1], [])
-            out_str += f'{attr_val}\n'
+            out_str += f"{attr_val}\n"
 
         if self.variables:
-            out_str += rucolor.nested_1(f'{indentation}    Variables:\n')
+            out_str += rucolor.nested_1(f"{indentation}    Variables:\n")
             for name, var in self.variables.items():
                 out_str += var.as_str(n_indent + 4)
 
         if self.environment_variables:
-            out_str += rucolor.nested_1(f'{indentation}    Environment Variables:\n')
+            out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
             for name, env_var in self.environment_variables.items():
                 out_str += env_var.as_str(n_indent + 4)
 

@@ -39,9 +39,14 @@ def merge_definitions(single_type, multiple_type, multiple_pattern_match):
     return all_types
 
 
-def require_definition(single_type, multiple_type, multiple_pattern_match,
-                       single_arg_name, multiple_arg_name,
-                       directive_name):
+def require_definition(
+    single_type,
+    multiple_type,
+    multiple_pattern_match,
+    single_arg_name,
+    multiple_arg_name,
+    directive_name,
+):
     """Require at least one definition for a type in a directive
 
     This method will validate that single_type / multiple_type are properly defined.
@@ -62,18 +67,24 @@ def require_definition(single_type, multiple_type, multiple_pattern_match,
     """
 
     if not (single_type or multiple_type):
-        raise DirectiveError(f'Directive {directive_name} requires at least one of '
-                             f'{single_arg_name} or {multiple_arg_name} to be defined.')
+        raise DirectiveError(
+            f"Directive {directive_name} requires at least one of "
+            f"{single_arg_name} or {multiple_arg_name} to be defined."
+        )
 
     if single_type and not isinstance(single_type, six.string_types):
-        raise DirectiveError(f'Directive {directive_name} was given an invalid type '
-                             f'for the {single_arg_name} argument. '
-                             f'Type was {type(single_type)}')
+        raise DirectiveError(
+            f"Directive {directive_name} was given an invalid type "
+            f"for the {single_arg_name} argument. "
+            f"Type was {type(single_type)}"
+        )
 
     if multiple_type and not isinstance(multiple_type, list):
-        raise DirectiveError(f'Directive {directive_name} was given an invalid type '
-                             f'for the {multiple_arg_name} argument. '
-                             f'Type was {type(multiple_type)}')
+        raise DirectiveError(
+            f"Directive {directive_name} was given an invalid type "
+            f"for the {multiple_arg_name} argument. "
+            f"Type was {type(multiple_type)}"
+        )
 
     return merge_definitions(single_type, multiple_type, multiple_pattern_match)
 

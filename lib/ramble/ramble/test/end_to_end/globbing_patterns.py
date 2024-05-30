@@ -17,17 +17,14 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_globbing_patterns(
-        mutable_config,
-        mutable_mock_workspace_path,
-        mock_applications,
-        mock_modifiers):
+    mutable_config, mutable_mock_workspace_path, mock_applications, mock_modifiers
+):
     test_config = """
 ramble:
   variables:
@@ -56,43 +53,46 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = 'test_globbing_patterns'
+    workspace_name = "test_globbing_patterns"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
         experiment_root = ws.experiment_dir
-        exp1_dir = os.path.join(experiment_root, 'glob-patterns', 'test_one_exec',
-                                'test_no_wildcards_one_exec')
-        exp1_script = os.path.join(exp1_dir, 'execute_experiment')
-        exp2_dir = os.path.join(experiment_root, 'glob-patterns', 'test_three_exec',
-                                'test_wildcard_3_execs')
-        exp2_script = os.path.join(exp2_dir, 'execute_experiment')
+        exp1_dir = os.path.join(
+            experiment_root, "glob-patterns", "test_one_exec", "test_no_wildcards_one_exec"
+        )
+        exp1_script = os.path.join(exp1_dir, "execute_experiment")
+        exp2_dir = os.path.join(
+            experiment_root, "glob-patterns", "test_three_exec", "test_wildcard_3_execs"
+        )
+        exp2_script = os.path.join(exp2_dir, "execute_experiment")
 
         import re
-        test_cmd_regex = re.compile('base test .*>>')
-        glob_cmd_regex = re.compile('test foo .*>>')
-        baz_regex = re.compile('baz .*>>')
 
-        test_wl_var_regex = re.compile('wl_var_test')
-        glob_wl_var_regex = re.compile('wl_var_glob')
-        baz_wl_var_regex = re.compile('wl_var_baz')
+        test_cmd_regex = re.compile("base test .*>>")
+        glob_cmd_regex = re.compile("test foo .*>>")
+        baz_regex = re.compile("baz .*>>")
 
-        test_env_var_regex = re.compile('env_var_test')
-        glob_env_var_regex = re.compile('env_var_glob')
-        baz_env_var_regex = re.compile('env_var_baz')
+        test_wl_var_regex = re.compile("wl_var_test")
+        glob_wl_var_regex = re.compile("wl_var_glob")
+        baz_wl_var_regex = re.compile("wl_var_baz")
 
-        glob_var_mod_regex = re.compile('var_mod_modified')
-        glob_env_var_mod_regex = re.compile('env_var_mod=modded')
+        test_env_var_regex = re.compile("env_var_test")
+        glob_env_var_regex = re.compile("env_var_glob")
+        baz_env_var_regex = re.compile("env_var_baz")
 
-        with open(exp1_script, 'r') as f:
+        glob_var_mod_regex = re.compile("var_mod_modified")
+        glob_env_var_mod_regex = re.compile("env_var_mod=modded")
+
+        with open(exp1_script, "r") as f:
             # Check for only 'test' executable command
             test_cmd_found = False
             glob_cmd_not_found = True
@@ -137,7 +137,7 @@ ramble:
             assert test_wl_var_found and glob_wl_var_found and baz_wl_var_not_found
             assert test_env_var_found and glob_env_var_found and baz_env_var_not_found
 
-        with open(exp2_script, 'r') as f:
+        with open(exp2_script, "r") as f:
             # Check for executables matching 'test*' glob pattern
             test_cmd_found = False
             glob_cmd_found = False

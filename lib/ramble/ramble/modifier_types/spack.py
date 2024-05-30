@@ -17,7 +17,7 @@ class SpackModifier(ModifierBase):
     software for the modifier to work.
     """
 
-    modifier_class = 'SpackModifier'
+    modifier_class = "SpackModifier"
     uses_spack = True
 
     def __init__(self, file_path):

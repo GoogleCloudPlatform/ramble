@@ -15,10 +15,7 @@ description = "list and get information on available modifiers"
 section = "basic"
 level = "short"
 
-subcommands = [
-    ['list', 'ls'],
-    'info'
-]
+subcommands = [["list", "ls"], "info"]
 
 mod_type = ramble.repository.ObjectTypes.modifiers
 
@@ -36,8 +33,7 @@ def mods_info(args):
 
 def mods_list_setup_parser(subparser):
     """List available modifiers"""
-    ramble.cmd.common.list.setup_list_parser(subparser,
-                                             mod_type)
+    ramble.cmd.common.list.setup_list_parser(subparser, mod_type)
 
 
 def mods_list(args):
@@ -49,8 +45,7 @@ subcommand_functions = {}
 
 
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar='SUBCOMMAND',
-                                  dest='mods_command')
+    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="mods_command")
 
     for name in subcommands:
         if isinstance(name, (list, tuple)):
@@ -59,18 +54,21 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = 'mods_%s' % name
+        function_name = "mods_%s" % name
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = 'mods_%s_setup_parser' % name
+        setup_parser_cmd_name = "mods_%s_setup_parser" % name
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(
-            name, aliases=aliases, help=setup_parser_cmd.__doc__,
-            description=setup_parser_cmd.__doc__)
+            name,
+            aliases=aliases,
+            help=setup_parser_cmd.__doc__,
+            description=setup_parser_cmd.__doc__,
+        )
         setup_parser_cmd(subsubparser)
 
 

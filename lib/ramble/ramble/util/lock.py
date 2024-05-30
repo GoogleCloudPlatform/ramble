@@ -25,9 +25,10 @@ class Lock(llnl.util.lock.Lock):
     ``llnl.util.lock`` so that all the lock API calls will succeed, but
     the actual locking mechanism can be disabled via ``_enable_locks``.
     """
+
     def __init__(self, *args, **kwargs):
         super(Lock, self).__init__(*args, **kwargs)
-        self._enable = ramble.config.get('config:locks', True)
+        self._enable = ramble.config.get("config:locks", True)
 
     def _lock(self, op, timeout=0):
         if self._enable:
@@ -67,15 +68,15 @@ def check_lock_safety(path):
         writable = None
         if (mode & stat.S_IWGRP) and (uid != gid):
             # ramble is group-writeable and the group is not the owner
-            writable = 'group'
-        elif (mode & stat.S_IWOTH):
+            writable = "group"
+        elif mode & stat.S_IWOTH:
             # ramble is world-writeable
-            writable = 'world'
+            writable = "world"
 
         if writable:
-            msg = "Refusing to disable locks: ramble is {0}-writable.".format(
-                writable)
+            msg = "Refusing to disable locks: ramble is {0}-writable.".format(writable)
             long_msg = (
                 "Running a shared ramble without locks is unsafe. You must "
-                "restrict permissions on {0} or enable locks.").format(path)
+                "restrict permissions on {0} or enable locks."
+            ).format(path)
             raise ramble.error.RambleError(msg, long_msg)

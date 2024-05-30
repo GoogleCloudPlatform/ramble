@@ -52,47 +52,42 @@ from ramble.error import RambleError
 stat_names = pstats.Stats.sort_arg_dict_default
 
 #: top-level aliases for Ramble commands
-aliases = {
-    'rm': 'remove'
-}
+aliases = {"rm": "remove"}
 
 #: help levels in order of detail (i.e., number of commands shown)
-levels = ['short', 'long']
+levels = ["short", "long"]
 
 #: intro text for help at different levels
 intro_by_level = {
-    'short': 'These are common ramble commands:',
-    'long':  'Complete list of ramble commands:',
+    "short": "These are common ramble commands:",
+    "long": "Complete list of ramble commands:",
 }
 
 #: control top-level ramble options shown in basic vs. advanced help
-options_by_level = {
-    'short': ['h', 'k', 'V', 'color'],
-    'long': 'all'
-}
+options_by_level = {"short": ["h", "k", "V", "color"], "long": "all"}
 
 #: Longer text for each section, to show in help
 section_descriptions = {
-    'admin':       'administration',
-    'basic':       'query applications',
-    'config':      'configuration',
-    'developer':   'developer',
-    'help':        'more help',
-    'system':      'system',
+    "admin": "administration",
+    "basic": "query applications",
+    "config": "configuration",
+    "developer": "developer",
+    "help": "more help",
+    "system": "system",
 }
 
 #: preferential command order for some sections (e.g., build pipeline is
 #: in execution order, not alphabetical)
 section_order = {
-    'basic': ['list', 'info', 'find'],
+    "basic": ["list", "info", "find"],
 }
 
 #: Properties that commands are required to set.
-required_command_properties = ['level', 'section', 'description']
+required_command_properties = ["level", "section", "description"]
 
 #: Recorded directory where ramble command was originally invoked
 ramble_working_dir = None
-ramble_ld_library_path = os.environ.get('LD_LIBRARY_PATH', '')
+ramble_ld_library_path = os.environ.get("LD_LIBRARY_PATH", "")
 
 
 def set_working_dir():
@@ -122,7 +117,7 @@ def get_version():
     git_hash = get_git_hash(path=ramble.paths.prefix)
 
     if git_hash:
-        version += f' ({git_hash})'
+        version += f" ({git_hash})"
 
     return version
 
@@ -133,6 +128,7 @@ def get_git_hash(path=ramble.paths.prefix):
     Outputs '<git commit sha>'.
     """
     import spack.util.git
+
     git_path = os.path.join(path, ".git")
     if os.path.exists(git_path):
         git = spack.util.git.git()
@@ -182,22 +178,21 @@ def index_commands():
 class RambleHelpFormatter(argparse.RawTextHelpFormatter):
     def _format_actions_usage(self, actions, groups):
         """Formatter with more concise usage strings."""
-        usage = super(
-            RambleHelpFormatter, self)._format_actions_usage(actions, groups)
+        usage = super(RambleHelpFormatter, self)._format_actions_usage(actions, groups)
 
         # Eliminate any occurrence of two or more consecutive spaces
-        usage = re.sub(r'[ ]{2,}', ' ', usage)
+        usage = re.sub(r"[ ]{2,}", " ", usage)
 
         # compress single-character flags that are not mutually exclusive
         # at the beginning of the usage string
-        chars = ''.join(re.findall(r'\[-(.)\]', usage))
-        usage = re.sub(r'\[-.\] ?', '', usage)
+        chars = "".join(re.findall(r"\[-(.)\]", usage))
+        usage = re.sub(r"\[-.\] ?", "", usage)
         if chars:
-            usage = '[-%s] %s' % (chars, usage)
+            usage = "[-%s] %s" % (chars, usage)
         return usage.strip()
 
     def add_arguments(self, actions):
-        actions = sorted(actions, key=operator.attrgetter('option_strings'))
+        actions = sorted(actions, key=operator.attrgetter("option_strings"))
         super(RambleHelpFormatter, self).add_arguments(actions)
 
 
@@ -219,7 +214,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         # Create a list of subcommand actions. Argparse internals are nasty!
         # Note: you can only call _get_subactions() once.  Even nastier!
-        if not hasattr(self, 'actions'):
+        if not hasattr(self, "actions"):
             self.actions = self._subparsers._actions[-1]._get_subactions()
 
         # make a set of commands not yet added.
@@ -236,8 +231,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
             cmd_set = set(c for c in commands)
 
             # make a dict of commands of interest
-            cmds = dict((a.dest, a) for a in self.actions
-                        if a.dest in cmd_set)
+            cmds = dict((a.dest, a) for a in self.actions if a.dest in cmd_set)
 
             # add commands to a group in order, and add the group
             group = argparse._ArgumentGroup(self, title=title)
@@ -249,9 +243,10 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         # select only the options for the particular level we're showing.
         show_options = options_by_level[level]
-        if show_options != 'all':
-            opts = dict((opt.option_strings[0].strip('-'), opt)
-                        for opt in self._optionals._group_actions)
+        if show_options != "all":
+            opts = dict(
+                (opt.option_strings[0].strip("-"), opt) for opt in self._optionals._group_actions
+            )
 
             new_actions = [opts[letter] for letter in show_options]
             self._optionals._group_actions = new_actions
@@ -259,8 +254,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
         # custom, more concise usage for top level
         help_options = self._optionals._group_actions
         help_options = help_options + [self._positionals._group_actions[-1]]
-        formatter.add_usage(
-            self.usage, help_options, self._mutually_exclusive_groups)
+        formatter.add_usage(self.usage, help_options, self._mutually_exclusive_groups)
 
         # description
         formatter.add_text(self.description)
@@ -273,8 +267,8 @@ class RambleArgumentParser(argparse.ArgumentParser):
         sections = index[level]
 
         for section in sorted(sections):
-            if section == 'help' or section == 'secret':
-                continue   # Cover help in the epilog.
+            if section == "help" or section == "secret":
+                continue  # Cover help in the epilog.
 
             group_description = section_descriptions.get(section, section)
 
@@ -283,12 +277,10 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
             # add commands whose order we care about first.
             if section in section_order:
-                commands.extend(cmd for cmd in section_order[section]
-                                if cmd in to_display)
+                commands.extend(cmd for cmd in section_order[section] if cmd in to_display)
 
             # add rest in alphabetical order.
-            commands.extend(cmd for cmd in sorted(sections[section])
-                            if cmd not in commands)
+            commands.extend(cmd for cmd in sorted(sections[section]) if cmd not in commands)
 
             # add the group to the parser
             add_subcommand_group(group_description, commands)
@@ -297,25 +289,29 @@ class RambleArgumentParser(argparse.ArgumentParser):
         add_group(self._optionals)
 
         # epilog
-        formatter.add_text("""\
+        formatter.add_text(
+            """\
 {help}:
   ramble help --all       list all commands and options
   ramble help <command>   help on a specific command
   ramble help --spec      help on the application specification syntax
   ramble docs             open https://ramble.rtfd.io/ in a browser
-""".format(help=section_descriptions['help']))
+""".format(
+                help=section_descriptions["help"]
+            )
+        )
 
         # determine help from format above
         return formatter.format_help()
 
     def add_subparsers(self, **kwargs):
         """Ensure that sensible defaults are propagated to subparsers"""
-        kwargs.setdefault('metavar', 'SUBCOMMAND')
+        kwargs.setdefault("metavar", "SUBCOMMAND")
 
         # From Python 3.7 we can require a subparser, earlier versions
         # of argparse will error because required=True is unknown
         if sys.version_info[:2] > (3, 6):
-            kwargs.setdefault('required', True)
+            kwargs.setdefault("required", True)
 
         sp = super(RambleArgumentParser, self).add_subparsers(**kwargs)
         # This monkey patching is needed for Python 3.5 and 3.6, which support
@@ -326,20 +322,20 @@ class RambleArgumentParser(argparse.ArgumentParser):
         old_add_parser = sp.add_parser
 
         def add_parser(name, **kwargs):
-            kwargs.setdefault('formatter_class', RambleHelpFormatter)
+            kwargs.setdefault("formatter_class", RambleHelpFormatter)
             return old_add_parser(name, **kwargs)
+
         sp.add_parser = add_parser
         return sp
 
     def add_command(self, cmd_name):
         """Add one subcommand to this parser."""
         # lazily initialize any subparsers
-        if not hasattr(self, 'subparsers'):
+        if not hasattr(self, "subparsers"):
             # remove the dummy "command" argument.
-            if self._actions[-1].dest == 'command':
+            if self._actions[-1].dest == "command":
                 self._remove_action(self._actions[-1])
-            self.subparsers = self.add_subparsers(metavar='COMMAND',
-                                                  dest="command")
+            self.subparsers = self.add_subparsers(metavar="COMMAND", dest="command")
 
         # each command module implements a parser() function, to which we
         # pass its subparser for setup.
@@ -349,15 +345,15 @@ class RambleArgumentParser(argparse.ArgumentParser):
         alias_list = [k for k, v in aliases.items() if v == cmd_name]
 
         subparser = self.subparsers.add_parser(
-            cmd_name, aliases=alias_list,
-            help=module.description, description=module.description)
+            cmd_name, aliases=alias_list, help=module.description, description=module.description
+        )
         module.setup_parser(subparser)
 
         # return the callable function for the command
         return ramble.cmd.get_command(cmd_name)
 
-    def format_help(self, level='short'):
-        if self.prog == 'ramble':
+    def format_help(self, level="short"):
+        if self.prog == "ramble":
             # use format_help_sections for the main ramble parser, but not
             # for subparsers
             return self.format_help_sections(level)
@@ -368,117 +364,185 @@ class RambleArgumentParser(argparse.ArgumentParser):
     def _check_value(self, action, value):
         # converted value must be one of the choices (if specified)
         if action.choices is not None and value not in action.choices:
-            cols = llnl.util.tty.colify.colified(
-                sorted(action.choices), indent=4, tty=True
-            )
-            msg = 'invalid choice: %r choose from:\n%s' % (value, cols)
+            cols = llnl.util.tty.colify.colified(sorted(action.choices), indent=4, tty=True)
+            msg = "invalid choice: %r choose from:\n%s" % (value, cols)
             raise argparse.ArgumentError(action, msg)
 
 
 def make_argument_parser(**kwargs):
     """Create an basic argument parser without any subcommands added."""
     parser = RambleArgumentParser(
-        formatter_class=RambleHelpFormatter, add_help=False,
-        description=(
-            "A flexible benchmark experiment manager."),
-        **kwargs)
+        formatter_class=RambleHelpFormatter,
+        add_help=False,
+        description=("A flexible benchmark experiment manager."),
+        **kwargs,
+    )
 
     # stat names in groups of 7, for nice wrapping.
     stat_lines = list(zip(*(iter(stat_names),) * 7))
 
     parser.add_argument(
-        '-h', '--help',
-        dest='help', action='store_const', const='short', default=None,
-        help="show this help message and exit")
+        "-h",
+        "--help",
+        dest="help",
+        action="store_const",
+        const="short",
+        default=None,
+        help="show this help message and exit",
+    )
     parser.add_argument(
-        '-H', '--all-help',
-        dest='help', action='store_const', const='long', default=None,
-        help="show help for all commands (same as ramble help --all)")
+        "-H",
+        "--all-help",
+        dest="help",
+        action="store_const",
+        const="long",
+        default=None,
+        help="show help for all commands (same as ramble help --all)",
+    )
     parser.add_argument(
-        '--color', action='store',
-        default=os.environ.get('RAMBLE_COLOR', 'auto'),
-        choices=('always', 'never', 'auto'),
-        help="when to colorize output (default: auto)")
+        "--color",
+        action="store",
+        default=os.environ.get("RAMBLE_COLOR", "auto"),
+        choices=("always", "never", "auto"),
+        help="when to colorize output (default: auto)",
+    )
     parser.add_argument(
-        '-c', '--config', default=None, action="append", dest="config_vars",
-        help="add one or more custom, one off config settings.")
+        "-c",
+        "--config",
+        default=None,
+        action="append",
+        dest="config_vars",
+        help="add one or more custom, one off config settings.",
+    )
     parser.add_argument(
-        '-C', '--config-scope', dest='config_scopes', action='append',
-        metavar='DIR', help="add a custom configuration scope")
+        "-C",
+        "--config-scope",
+        dest="config_scopes",
+        action="append",
+        metavar="DIR",
+        help="add a custom configuration scope",
+    )
     parser.add_argument(
-        '-d', '--debug', action='count', default=0,
-        help="write out debug messages "
-             "(more d's for more verbosity: -d, -dd, -ddd, etc.)")
+        "-d",
+        "--debug",
+        action="count",
+        default=0,
+        help="write out debug messages " "(more d's for more verbosity: -d, -dd, -ddd, etc.)",
+    )
     parser.add_argument(
-        '--disable-passthrough', action='store_true',
-        help="disable passthrough of expansion variables for debugging")
+        "--disable-passthrough",
+        action="store_true",
+        help="disable passthrough of expansion variables for debugging",
+    )
     parser.add_argument(
-        '-N', '--disable-logger', action='store_true',
-        help="disable the ramble logger. All output will be printed to stdout.")
+        "-N",
+        "--disable-logger",
+        action="store_true",
+        help="disable the ramble logger. All output will be printed to stdout.",
+    )
     parser.add_argument(
-        '-P', '--disable-progress-bar', action='store_true',
-        help="disable the progress bars while setting up experiments.")
+        "-P",
+        "--disable-progress-bar",
+        action="store_true",
+        help="disable the progress bars while setting up experiments.",
+    )
 
-    parser.add_argument(
-        '--timestamp', action='store_true',
-        help="Add a timestamp to tty output")
-    parser.add_argument(
-        '--pdb', action='store_true',
-        help="run ramble under the pdb debugger")
+    parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to tty output")
+    parser.add_argument("--pdb", action="store_true", help="run ramble under the pdb debugger")
 
     workspace_group = parser.add_mutually_exclusive_group()
     workspace_group.add_argument(
-        '-w', '--workspace', dest='workspace', metavar='WRKSPC', action='store',
-        help="run with a specific workspace (see ramble workspace)")
+        "-w",
+        "--workspace",
+        dest="workspace",
+        metavar="WRKSPC",
+        action="store",
+        help="run with a specific workspace (see ramble workspace)",
+    )
     workspace_group.add_argument(
-        '-D', '--workspace-dir', dest='workspace_dir', metavar='DIR', action='store',
-        help="run with a workspace directory (ignore named workspaces)")
+        "-D",
+        "--workspace-dir",
+        dest="workspace_dir",
+        metavar="DIR",
+        action="store",
+        help="run with a workspace directory (ignore named workspaces)",
+    )
     workspace_group.add_argument(
-        '-W', '--no-workspace', dest='no_workspace', action='store_true',
-        help="run without any workspaces activated (see ramble workspace)")
+        "-W",
+        "--no-workspace",
+        dest="no_workspace",
+        action="store_true",
+        help="run without any workspaces activated (see ramble workspace)",
+    )
     parser.add_argument(
-        '--use-workspace-repo', action='store_true',
-        help="when running in a workspace, use its application repository")
+        "--use-workspace-repo",
+        action="store_true",
+        help="when running in a workspace, use its application repository",
+    )
 
     parser.add_argument(
-        '-k', '--insecure', action='store_true',
-        help="do not check ssl certificates when downloading")
+        "-k",
+        "--insecure",
+        action="store_true",
+        help="do not check ssl certificates when downloading",
+    )
     parser.add_argument(
-        '-l', '--enable-locks', action='store_true', dest='locks',
-        default=None, help="use filesystem locking (default)")
+        "-l",
+        "--enable-locks",
+        action="store_true",
+        dest="locks",
+        default=None,
+        help="use filesystem locking (default)",
+    )
     parser.add_argument(
-        '-L', '--disable-locks', action='store_false', dest='locks',
-        help="do not use filesystem locking (unsafe)")
+        "-L",
+        "--disable-locks",
+        action="store_false",
+        dest="locks",
+        help="do not use filesystem locking (unsafe)",
+    )
     parser.add_argument(
-        '-m', '--mock', action='store_true',
-        help="use mock applications instead of real ones")
+        "-m", "--mock", action="store_true", help="use mock applications instead of real ones"
+    )
     # TODO (dwj): Do we need this?
     # parser.add_argument(
     #   # '-b', '--bootstrap', action='store_true',
     #   # help="use bootstrap configuration (bootstrap store, config, externals)")
     parser.add_argument(
-        '-p', '--profile', action='store_true', dest='ramble_profile',
-        help="profile execution using cProfile")
+        "-p",
+        "--profile",
+        action="store_true",
+        dest="ramble_profile",
+        help="profile execution using cProfile",
+    )
     parser.add_argument(
-        '--sorted-profile', default=None, metavar="STAT",
-        help="profile and sort by one or more of:\n[%s]" %
-        ',\n '.join([', '.join(line) for line in stat_lines]))
+        "--sorted-profile",
+        default=None,
+        metavar="STAT",
+        help="profile and sort by one or more of:\n[%s]"
+        % ",\n ".join([", ".join(line) for line in stat_lines]),
+    )
     parser.add_argument(
-        '--lines', default=20, action='store',
-        help="lines of profile output or 'all' (default: 20)")
+        "--lines",
+        default=20,
+        action="store",
+        help="lines of profile output or 'all' (default: 20)",
+    )
     parser.add_argument(
-        '-v', '--verbose', action='store_true',
-        help="print additional output during builds")
+        "-v", "--verbose", action="store_true", help="print additional output during builds"
+    )
     parser.add_argument(
-        '--stacktrace', action='store_true',
-        default='RAMBLE_STACKTRACE' in os.environ,
-        help="add stacktraces to all printed statements")
+        "--stacktrace",
+        action="store_true",
+        default="RAMBLE_STACKTRACE" in os.environ,
+        help="add stacktraces to all printed statements",
+    )
     parser.add_argument(
-        '-V', '--version', action='store_true',
-        help='show version number and exit')
+        "-V", "--version", action="store_true", help="show version number and exit"
+    )
     parser.add_argument(
-        '--print-shell-vars', action='store',
-        help="print info needed by setup-env.[c]sh")
+        "--print-shell-vars", action="store", help="print info needed by setup-env.[c]sh"
+    )
 
     return parser
 
@@ -504,7 +568,7 @@ def setup_main_options(args):
     if args.debug:
         ramble.error.debug = args.debug
         spack.util.debug.register_interrupt_handler()
-        ramble.config.set('config:debug', True, scope='command_line')
+        ramble.config.set("config:debug", True, scope="command_line")
         spack.util.environment.tracing_enabled = True
 
     if args.timestamp:
@@ -514,25 +578,25 @@ def setup_main_options(args):
     if args.locks is not None:
         if args.locks is False:
             spack.util.lock.check_lock_safety(ramble.paths.prefix)
-        ramble.config.set('config:locks', args.locks, scope='command_line')
+        ramble.config.set("config:locks", args.locks, scope="command_line")
 
     # override disable_passthrough configuration if passed on command line
     if args.disable_passthrough:
-        ramble.config.set('config:disable_passthrough', True, scope='command_line')
+        ramble.config.set("config:disable_passthrough", True, scope="command_line")
 
     if args.disable_logger:
-        ramble.config.set('config:disable_logger', True, scope='command_line')
+        ramble.config.set("config:disable_logger", True, scope="command_line")
 
-    logger.enabled = not ramble.config.get('config:disable_logger', False)
+    logger.enabled = not ramble.config.get("config:disable_logger", False)
 
     if args.disable_progress_bar:
-        ramble.config.set('config:disable_progress_bar', True, scope='command_line')
+        ramble.config.set("config:disable_progress_bar", True, scope="command_line")
 
     if args.mock:
         import spack.util.spack_yaml as syaml
 
         for obj in ramble.repository.ObjectTypes:
-            obj_section = ramble.repository.type_definitions[obj]['config_section']
+            obj_section = ramble.repository.type_definitions[obj]["config_section"]
             key = syaml.syaml_str(obj_section)
             key.override = True
 
@@ -540,16 +604,17 @@ def setup_main_options(args):
                 [(key, [ramble.paths.mock_builtin_path])]
             )
 
-            ramble.repository.paths[obj] = \
-                ramble.repository.create(ramble.config.config, object_type=obj)
+            ramble.repository.paths[obj] = ramble.repository.create(
+                ramble.config.config, object_type=obj
+            )
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:
         logger.warn("You asked for --insecure. Will NOT check SSL certificates.")
-        ramble.config.set('config:verify_ssl', False, scope='command_line')
+        ramble.config.set("config:verify_ssl", False, scope="command_line")
 
     # Use the ramble config command to handle parsing the config strings
-    for config_var in (args.config_vars or []):
+    for config_var in args.config_vars or []:
         ramble.config.add(fullpath=config_var, scope="command_line")
 
     # when to use color (takes always, auto, or never)
@@ -564,9 +629,9 @@ def allows_unknown_args(command):
     args in.
     """
     info = dict(inspect.getmembers(command))
-    varnames = info['__code__'].co_varnames
-    argcount = info['__code__'].co_argcount
-    return (argcount == 3 and varnames[2] == 'unknown_args')
+    varnames = info["__code__"].co_varnames
+    argcount = info["__code__"].co_argcount
+    return argcount == 3 and varnames[2] == "unknown_args"
 
 
 def _invoke_command(command, parser, args, unknown_args):
@@ -593,6 +658,7 @@ class RambleCommand(object):
     Use this to invoke Ramble commands directly from Python and check
     their output.
     """
+
     def __init__(self, command_name):
         """Create a new RambleCommand that invokes ``command_name`` when called.
 
@@ -625,12 +691,11 @@ class RambleCommand(object):
         self.returncode = None
         self.error = None
 
-        prepend = kwargs['global_args'] if 'global_args' in kwargs else []
+        prepend = kwargs["global_args"] if "global_args" in kwargs else []
 
-        args, unknown = self.parser.parse_known_args(
-            prepend + [self.command_name] + list(argv))
+        args, unknown = self.parser.parse_known_args(prepend + [self.command_name] + list(argv))
 
-        fail_on_error = kwargs.get('fail_on_error', True)
+        fail_on_error = kwargs.get("fail_on_error", True)
 
         # activate a workspace if one was specified on the command line
 
@@ -644,8 +709,7 @@ class RambleCommand(object):
         out = StringIO()
         try:
             with log_output(out):
-                self.returncode = _invoke_command(
-                    self.command, self.parser, args, unknown)
+                self.returncode = _invoke_command(self.command, self.parser, args, unknown)
 
         except SystemExit as e:
             self.returncode = e.code
@@ -660,18 +724,18 @@ class RambleCommand(object):
         if fail_on_error and self.returncode not in (None, 0):
             self._log_command_output(out)
             raise RambleCommandError(
-                "Command exited with code %d: %s(%s)" % (
-                    self.returncode, self.command_name,
-                    ', '.join("'%s'" % a for a in argv)))
+                "Command exited with code %d: %s(%s)"
+                % (self.returncode, self.command_name, ", ".join("'%s'" % a for a in argv))
+            )
 
         return out.getvalue()
 
     def _log_command_output(self, out):
         if tty.is_verbose():
-            fmt = self.command_name + ': {0}'
-            for ln in out.getvalue().split('\n'):
+            fmt = self.command_name + ": {0}"
+            for ln in out.getvalue().split("\n"):
                 if len(ln) > 0:
-                    logger.verbose(fmt.format(ln.replace('==> ', '')))
+                    logger.verbose(fmt.format(ln.replace("==> ", "")))
 
 
 def _profile_wrapper(command, parser, args, unknown_args):
@@ -680,14 +744,14 @@ def _profile_wrapper(command, parser, args, unknown_args):
     try:
         nlines = int(args.lines)
     except ValueError:
-        if args.lines != 'all':
-            logger.die(f'Invalid number for --lines: {args.lines}')
+        if args.lines != "all":
+            logger.die(f"Invalid number for --lines: {args.lines}")
         nlines = -1
 
     # allow comma-separated list of fields
-    sortby = ['time']
+    sortby = ["time"]
     if args.sorted_profile:
-        sortby = args.sorted_profile.split(',')
+        sortby = args.sorted_profile.split(",")
         for stat in sortby:
             if stat not in stat_names:
                 logger.die(f"Invalid sort field: {stat}")
@@ -717,15 +781,15 @@ def print_setup_info(*info):
     This is in ``main.py`` to make it fast; the setup scripts need to
     invoke ramble in login scripts, and it needs to be quick.
     """
-    shell = 'csh' if 'csh' in info else 'sh'
+    shell = "csh" if "csh" in info else "sh"
 
     def shell_set(var, value):
-        if shell == 'sh':
+        if shell == "sh":
             print("%s='%s'" % (var, value))
-        elif shell == 'csh':
+        elif shell == "csh":
             print("set %s = '%s'" % (var, value))
         else:
-            logger.die('shell must be sh or csh')
+            logger.die("shell must be sh or csh")
 
 
 def _main(argv=None):
@@ -757,7 +821,7 @@ def _main(argv=None):
     # avoid loading all the modules from ramble.cmd when we don't need
     # them, which reduces startup latency.
     parser = make_argument_parser()
-    parser.add_argument('command', nargs=argparse.REMAINDER)
+    parser.add_argument("command", nargs=argparse.REMAINDER)
     args, unknown = parser.parse_known_args(argv)
 
     # Recover stored LD_LIBRARY_PATH variables from ramble shell function
@@ -766,11 +830,9 @@ def _main(argv=None):
     # Ramble clears these variables before building and installing applications,
     # but needs to know the prior state for commands like
     # `ramble workspace activate that modify the user environment.
-    recovered_vars = (
-        'LD_LIBRARY_PATH', 'DYLD_LIBRARY_PATH', 'DYLD_FALLBACK_LIBRARY_PATH'
-    )
+    recovered_vars = ("LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH")
     for var in recovered_vars:
-        stored_var_name = 'RAMBLE_%s' % var
+        stored_var_name = "RAMBLE_%s" % var
         if stored_var_name in os.environ:
             os.environ[var] = os.environ[stored_var_name]
 
@@ -827,7 +889,7 @@ def _main(argv=None):
     # Things that require configuration should go below here
     # ------------------------------------------------------------------------
     if args.print_shell_vars:
-        print_setup_info(*args.print_shell_vars.split(','))
+        print_setup_info(*args.print_shell_vars.split(","))
         return 0
 
     # At this point we've considered all the options to ramble itself, so we
@@ -863,7 +925,7 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
     edit_cmds = ["workspace", "config"]
-    allowed_subcommands = ['edit', 'list', 'deactivate']
+    allowed_subcommands = ["edit", "list", "deactivate"]
 
     if workspace_format_error:
         raise_error = False
@@ -873,9 +935,9 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
             if subcommand != "deactivate":
                 raise_error = True
                 logger.msg(
-                    "Error while reading workspace config. In some cases this can be " +
-                    "avoided by passing `-W` to ramble or by running\n" +
-                    "`ramble workspace deactivate`"
+                    "Error while reading workspace config. In some cases this can be "
+                    + "avoided by passing `-W` to ramble or by running\n"
+                    + "`ramble workspace deactivate`"
                 )
                 if subcommand in allowed_subcommands:
                     raise_error = False
@@ -891,8 +953,8 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
         _profile_wrapper(command, parser, args, unknown)
     elif args.pdb:
         import pdb
-        pdb.runctx('_invoke_command(command, parser, args, unknown)',
-                   globals(), locals())
+
+        pdb.runctx("_invoke_command(command, parser, args, unknown)", globals(), locals())
         return 0
     else:
         return _invoke_command(command, parser, args, unknown)
@@ -919,9 +981,9 @@ def main(argv=None):
         e.die()  # gracefully die on any RambleErrors
 
     except KeyboardInterrupt:
-        if ramble.config.get('config:debug'):
+        if ramble.config.get("config:debug"):
             raise
-        sys.stderr.write('\n')
+        sys.stderr.write("\n")
         logger.error("Keyboard interrupt.")
         if sys.version_info >= (3, 5):
             return signal.SIGINT.value
@@ -929,12 +991,12 @@ def main(argv=None):
             return signal.SIGINT
 
     except SystemExit as e:
-        if ramble.config.get('config:debug'):
+        if ramble.config.get("config:debug"):
             traceback.print_exc()
         return e.code
 
     except Exception as e:
-        if ramble.config.get('config:debug'):
+        if ramble.config.get("config:debug"):
             raise
         logger.error(e)
         return 3

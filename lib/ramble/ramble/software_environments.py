@@ -20,14 +20,20 @@ from ramble.util.logger import logger
 import ramble.util.matrices
 import ramble.util.colors as rucolor
 
-package_managers = Enum("package_managers", ['spack'])
+package_managers = Enum("package_managers", ["spack"])
 
 
 class SoftwarePackage(object):
     """Class to represent a single software package"""
 
-    def __init__(self, name: str, spec: str, compiler: str = None,
-                 compiler_spec: str = None, package_manager: str = 'spack'):
+    def __init__(
+        self,
+        name: str,
+        spec: str,
+        compiler: str = None,
+        compiler_spec: str = None,
+        package_manager: str = "spack",
+    ):
         """Software package constructor
 
         Args:
@@ -44,7 +50,7 @@ class SoftwarePackage(object):
         self.spec = spec
         self.compiler = compiler
         self.compiler_spec = compiler_spec
-        self._package_type = 'Rendered'
+        self._package_type = "Rendered"
         self.package_manager = package_managers[package_manager]
 
     def spec_str(self, all_packages: dict = {}, compiler=False):
@@ -62,7 +68,7 @@ class SoftwarePackage(object):
             (str): String representation of the spec for this package definition
         """
 
-        out_str = ''
+        out_str = ""
         if self.package_manager == package_managers.spack:
             if compiler and self.compiler_spec:
                 out_str = self.compiler_spec
@@ -73,13 +79,12 @@ class SoftwarePackage(object):
                 return out_str
 
             if self.compiler in all_packages:
-                out_str += ' %' + all_packages[self.compiler].spec_str(all_packages, compiler=True)
+                out_str += " %" + all_packages[self.compiler].spec_str(all_packages, compiler=True)
             elif self.compiler:
-                out_str += f' (built with {self.compiler})'
+                out_str += f" (built with {self.compiler})"
         else:
             raise RambleSoftwareEnvironmentError(
-                f'Package {self.name} uses an unknown '
-                f'package manager {self.package_manager}'
+                f"Package {self.name} uses an unknown " f"package manager {self.package_manager}"
             )
 
         return out_str
@@ -95,12 +100,12 @@ class SoftwarePackage(object):
             (str): String representation of this package
         """
 
-        indentation = ' ' * indent
+        indentation = " " * indent
         color = rucolor.level_func(color_level)
-        out_str  = color(f'{indentation}{self._package_type} package: {self.name}\n')
+        out_str = color(f"{indentation}{self._package_type} package: {self.name}\n")
         out_str += f'{indentation}    Spec: {self.spec.replace("@", "@@")}\n'
         if self.compiler:
-            out_str += f'{indentation}    Compiler: {self.compiler}\n'
+            out_str += f"{indentation}    Compiler: {self.compiler}\n"
         if self.compiler_spec:
             out_str += f'{indentation}    Compiler Spec: {self.compiler_spec.replace("@", "@@")}\n'
         return out_str
@@ -124,16 +129,25 @@ class SoftwarePackage(object):
             (boolean): True if packages are the same, False otherwise
         """
 
-        return self.name == other.name and self.spec == other.spec and \
-            self.compiler == other.compiler and self.compiler_spec == other.compiler_spec
+        return (
+            self.name == other.name
+            and self.spec == other.spec
+            and self.compiler == other.compiler
+            and self.compiler_spec == other.compiler_spec
+        )
 
 
 class TemplatePackage(SoftwarePackage):
     """Class representing a template software package"""
 
-    def __init__(self, name: str, spec: str,
-                 compiler: str = None, compiler_spec: str = None,
-                 package_manager: str = 'spack'):
+    def __init__(
+        self,
+        name: str,
+        spec: str,
+        compiler: str = None,
+        compiler_spec: str = None,
+        package_manager: str = "spack",
+    ):
         """Template package constructor
 
         Args:
@@ -145,11 +159,15 @@ class TemplatePackage(SoftwarePackage):
                                           is used as a compiler
             package_manager (optional str): Name of package manager for this package
         """
-        super().__init__(name, spec, compiler=compiler,
-                         compiler_spec=compiler_spec,
-                         package_manager=package_manager)
+        super().__init__(
+            name,
+            spec,
+            compiler=compiler,
+            compiler_spec=compiler_spec,
+            package_manager=package_manager,
+        )
         self._rendered_packages = {}
-        self._package_type = 'Template'
+        self._package_type = "Template"
 
     def info(self, indent: int = 0, verbosity: int = 0, color_level: int = 0):
         """String representation of package information
@@ -165,8 +183,9 @@ class TemplatePackage(SoftwarePackage):
         out_str = super().info(indent, verbosity, color_level)
         new_indent = indent + 4
         for pkg in self._rendered_packages.values():
-            out_str += pkg.info(indent=new_indent, verbosity=verbosity,
-                                color_level=color_level + 1)
+            out_str += pkg.info(
+                indent=new_indent, verbosity=verbosity, color_level=color_level + 1
+            )
         return out_str
 
     def render_package(self, expander: object):
@@ -188,12 +207,12 @@ class TemplatePackage(SoftwarePackage):
         if new_pkg.name in self._rendered_packages:
             if new_pkg != self._rendered_packages[name]:
                 raise RambleSoftwareEnvironmentError(
-                    f'Package {new_pkg.name} defined multiple times with '
-                    'inconsistent definitions.\n'
-                    'New definition is:\n'
-                    f'{new_pkg}'
-                    'Old definition is:\n'
-                    f'{self._rendered_packages[name]}'
+                    f"Package {new_pkg.name} defined multiple times with "
+                    "inconsistent definitions.\n"
+                    "New definition is:\n"
+                    f"{new_pkg}"
+                    "Old definition is:\n"
+                    f"{self._rendered_packages[name]}"
                 )
             return self._rendered_packages[name]
         else:
@@ -224,7 +243,7 @@ class SoftwareEnvironment(object):
 
         self.name = name
         self._packages = []
-        self._environment_type = 'Rendered'
+        self._environment_type = "Rendered"
 
     def info(self, indent: int = 0, verbosity: int = 0, color_level: int = 0):
         """Software environment information
@@ -237,15 +256,15 @@ class SoftwareEnvironment(object):
             (str): information of this environment
         """
 
-        indentation = ' ' * indent
+        indentation = " " * indent
         color = rucolor.level_func(color_level)
-        out_str  = color(f'{indentation}{self._environment_type} environment: {self.name}\n')
-        out_str += f'{indentation}    Packages:\n'
+        out_str = color(f"{indentation}{self._environment_type} environment: {self.name}\n")
+        out_str += f"{indentation}    Packages:\n"
         for pkg in self._packages:
             if verbosity >= 1:
                 out_str += f'{indentation}    - {pkg.name} = {pkg.spec_str().replace("@", "@@")}\n'
             else:
-                out_str += f'{indentation}    - {pkg.name}\n'
+                out_str += f"{indentation}    - {pkg.name}\n"
         return out_str
 
     def __str__(self):
@@ -289,9 +308,7 @@ class ExternalEnvironment(SoftwareEnvironment):
     """Class representing an externally defined software environment"""
 
     def __init__(self, name: str, name_or_path: str):
-        """Constructor for external software environment
-
-        """
+        """Constructor for external software environment"""
         super().__init__(name)
         self.external_env = name_or_path
 
@@ -308,7 +325,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         super().__init__(name)
         self._package_names = set()
         self._rendered_environments = {}
-        self._environment_type = 'Template'
+        self._environment_type = "Template"
 
     def add_package_name(self, package: str = None):
         self._package_names.add(package)
@@ -338,8 +355,9 @@ class TemplateEnvironment(SoftwareEnvironment):
 
         return super().info()
 
-    def render_environment(self, expander: object, all_package_templates: dict,
-                           all_packages: dict):
+    def render_environment(
+        self, expander: object, all_package_templates: dict, all_packages: dict
+    ):
         """Render a SoftwareEnvironment from this TemplateEnvironment
 
         Args:
@@ -365,8 +383,8 @@ class TemplateEnvironment(SoftwareEnvironment):
                         if rendered_pkg.name in all_packages:
                             if rendered_pkg != all_packages[rendered_pkg.name]:
                                 raise RambleSoftwareEnvironmentError(
-                                    f'Environment {name} defined multiple times in inconsistent '
-                                    f'ways.\nPackage with differences is {rendered_pkg.name}'
+                                    f"Environment {name} defined multiple times in inconsistent "
+                                    f"ways.\nPackage with differences is {rendered_pkg.name}"
                                 )
                             rendered_pkg = all_packages[rendered_pkg.name]
                         else:
@@ -378,14 +396,15 @@ class TemplateEnvironment(SoftwareEnvironment):
 
                 if not added:
                     raise RambleSoftwareEnvironmentError(
-                        f'Environment template {self.name} references '
-                        f'undefined package {env_pkg_template} rendered to {rendered_env_pkg_name}'
+                        f"Environment template {self.name} references "
+                        f"undefined package {env_pkg_template} rendered to {rendered_env_pkg_name}"
                     )
 
         return new_env
 
-    def add_rendered_environment(self, environment: object, all_environments: dict,
-                                 all_packages: dict):
+    def add_rendered_environment(
+        self, environment: object, all_environments: dict, all_packages: dict
+    ):
         """Add a rendered environment to this template
 
         Args:
@@ -438,7 +457,7 @@ class SoftwareEnvironments(object):
         Returns:
             (str): Representation of all packages and environments
         """
-        out_str = ''
+        out_str = ""
         for pkg in self._package_templates.values():
             out_str += pkg.info(indent, verbosity=verbosity, color_level=color_level)
         for env in self._environment_templates.values():
@@ -478,11 +497,17 @@ class SoftwareEnvironments(object):
 
         if namespace.packages in self._spack_dict:
             for pkg_template, pkg_info in self._spack_dict[namespace.packages].items():
-                spec = pkg_info['spack_spec'] if 'spack_spec' in pkg_info else pkg_info['spec']
-                compiler = pkg_info['compiler'] \
-                    if 'compiler' in pkg_info and pkg_info['compiler'] else None
-                compiler_spec = pkg_info['compiler_spec'] \
-                    if 'compiler_spec' in pkg_info and pkg_info['compiler_spec'] else None
+                spec = pkg_info["spack_spec"] if "spack_spec" in pkg_info else pkg_info["spec"]
+                compiler = (
+                    pkg_info["compiler"]
+                    if "compiler" in pkg_info and pkg_info["compiler"]
+                    else None
+                )
+                compiler_spec = (
+                    pkg_info["compiler_spec"]
+                    if "compiler_spec" in pkg_info and pkg_info["compiler_spec"]
+                    else None
+                )
                 new_pkg = TemplatePackage(
                     pkg_template, spec, compiler=compiler, compiler_spec=compiler_spec
                 )
@@ -525,24 +550,27 @@ class SoftwareEnvironments(object):
                         if rendered_name == cur_compiler:
                             rendered_pkg = template_def.render_package(expander)
 
-                            if cur_compiler in self._rendered_packages and \
-                                    rendered_pkg != self._rendered_packages[cur_compiler]:
+                            if (
+                                cur_compiler in self._rendered_packages
+                                and rendered_pkg != self._rendered_packages[cur_compiler]
+                            ):
                                 raise RambleSoftwareEnvironmentError(
-                                    f'Package {rendered_pkg.name} defined '
-                                    'multiple times in inconsistent ways'
+                                    f"Package {rendered_pkg.name} defined "
+                                    "multiple times in inconsistent ways"
                                 )
                             added = True
-                            template_def.add_rendered_package(rendered_pkg,
-                                                              self._rendered_packages)
+                            template_def.add_rendered_package(
+                                rendered_pkg, self._rendered_packages
+                            )
                             self._rendered_packages[rendered_pkg.name] = rendered_pkg
 
                             if rendered_pkg.compiler:
                                 cur_compiler = rendered_pkg.compiler
                     if not added:
                         raise RambleSoftwareEnvironmentError(
-                            f'Compiler {pkg.compiler} used, but not '
-                            f'defined in environment {environment.name} '
-                            f'by package {pkg.name}'
+                            f"Compiler {pkg.compiler} used, but not "
+                            f"defined in environment {environment.name} "
+                            f"by package {pkg.name}"
                         )
 
     def compiler_specs_for_environment(self, environment: object):
@@ -563,9 +591,9 @@ class SoftwareEnvironments(object):
             if pkg.compiler:
                 if pkg.compiler not in self._rendered_packages:
                     raise RambleSoftwareEnvironmentError(
-                        f'Compiler {pkg.compiler} used, but not '
-                        f'defined in environment {environment.name} '
-                        f'by package {pkg.name}'
+                        f"Compiler {pkg.compiler} used, but not "
+                        f"defined in environment {environment.name} "
+                        f"by package {pkg.name}"
                     )
 
                 root_compilers.append(pkg.compiler)
@@ -584,8 +612,7 @@ class SoftwareEnvironments(object):
 
         for comp in reversed(root_compilers + dep_compilers):
             comp_pkg = self._rendered_packages[comp]
-            yield comp_pkg.spec_str(all_packages=self._rendered_packages,
-                                    compiler=False)
+            yield comp_pkg.spec_str(all_packages=self._rendered_packages, compiler=False)
 
     def package_specs_for_environment(self, environment: object):
         """Iterator over package specs for a given environment
@@ -621,20 +648,16 @@ class SoftwareEnvironments(object):
             if pkg.compiler and pkg.compiler in pkg_names:
                 compiler_warnings.append((pkg.name, pkg.compiler))
 
-        logger.debug(f' Used compilers: {used_compilers}')
-        logger.debug(f' Compiler warnings: {compiler_warnings}')
+        logger.debug(f" Used compilers: {used_compilers}")
+        logger.debug(f" Compiler warnings: {compiler_warnings}")
         if compiler_warnings:
             logger.warn(
-                f'Environment {environment.name} contains packages and their '
-                'compilers in the package list. These include:'
+                f"Environment {environment.name} contains packages and their "
+                "compilers in the package list. These include:"
             )
             for pkg_name, comp_name in compiler_warnings:
-                logger.warn(
-                    f'    Package: {pkg_name}, Compiler: {comp_name}'
-                )
-            logger.warn(
-                'This might cause problems when installing the packages.'
-            )
+                logger.warn(f"    Package: {pkg_name}, Compiler: {comp_name}")
+            logger.warn("This might cause problems when installing the packages.")
 
     def render_environment(self, env_name: str, expander: object, require=True):
         """Render an environment needed by an experiment
@@ -656,28 +679,29 @@ class SoftwareEnvironments(object):
         for template_name, template_def in self._environment_templates.items():
             rendered_name = expander.expand_var(template_name)
             if rendered_name == env_name:
-                rendered_env = template_def.render_environment(expander, self._package_templates,
-                                                               self._rendered_packages)
+                rendered_env = template_def.render_environment(
+                    expander, self._package_templates, self._rendered_packages
+                )
 
                 if rendered_env.name == env_name:
                     if env_name in self._rendered_environments:
                         if rendered_env != self._rendered_environments[env_name]:
                             raise RambleSoftwareEnvironmentError(
-                                f'Environment {env_name} defined multiple times '
-                                'in inconsistent ways'
+                                f"Environment {env_name} defined multiple times "
+                                "in inconsistent ways"
                             )
                         rendered_env = self._rendered_environments[env_name]
 
-                    template_def.add_rendered_environment(rendered_env,
-                                                          self._rendered_environments,
-                                                          self._rendered_packages)
+                    template_def.add_rendered_environment(
+                        rendered_env, self._rendered_environments, self._rendered_packages
+                    )
                     self.define_compiler_packages(rendered_env, expander)
                     self._check_environment(rendered_env)
                     return rendered_env
 
         if require:
             raise RambleSoftwareEnvironmentError(
-                f'No defined environment matches required name {env_name}'
+                f"No defined environment matches required name {env_name}"
             )
 
 

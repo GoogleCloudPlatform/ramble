@@ -33,81 +33,85 @@ def setup_parser(subparser):
 
     # User can only choose one
     subparser.add_argument(
-        '--scope', choices=scopes, metavar=scopes_metavar,
-        help="configuration scope to read/modify")
-
-    sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='config_command')
-
-    get_parser = sp.add_parser('get', help='print configuration values')
-    get_parser.add_argument('section',
-                            help="configuration section to print. "
-                                 "options: %(choices)s",
-                            nargs='?',
-                            metavar='section',
-                            choices=ramble.config.section_schemas)
-
-    blame_parser = sp.add_parser(
-        'blame', help='print configuration annotated with source file:line')
-    blame_parser.add_argument('section',
-                              help="configuration section to print. "
-                              "options: %(choices)s",
-                              metavar='section',
-                              choices=ramble.config.section_schemas)
-
-    edit_parser = sp.add_parser('edit', help='edit configuration file. ' +
-                                'Defaults to ramble.yaml with an activated workspace')
-    edit_parser.add_argument('section',
-                             help="configuration section to edit. "
-                                  "options: %(choices)s",
-                             metavar='section',
-                             nargs='?',
-                             choices=ramble.config.section_schemas)
-    edit_parser.add_argument(
-        '--print-file', action='store_true',
-        help="print the file name that would be edited")
-
-    sp.add_parser('list', help='list configuration sections')
-
-    add_parser = sp.add_parser('add', help='add configuration parameters')
-    add_parser.add_argument(
-        'path', nargs='?',
-        help="colon-separated path to config that should be added,"
-        " e.g. 'config:default:true'")
-    add_parser.add_argument(
-        '-f', '--file',
-        help="file from which to set all config values"
+        "--scope",
+        choices=scopes,
+        metavar=scopes_metavar,
+        help="configuration scope to read/modify",
     )
 
-    remove_parser = sp.add_parser('remove', aliases=['rm'],
-                                  help='remove configuration parameters')
+    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="config_command")
+
+    get_parser = sp.add_parser("get", help="print configuration values")
+    get_parser.add_argument(
+        "section",
+        help="configuration section to print. " "options: %(choices)s",
+        nargs="?",
+        metavar="section",
+        choices=ramble.config.section_schemas,
+    )
+
+    blame_parser = sp.add_parser(
+        "blame", help="print configuration annotated with source file:line"
+    )
+    blame_parser.add_argument(
+        "section",
+        help="configuration section to print. " "options: %(choices)s",
+        metavar="section",
+        choices=ramble.config.section_schemas,
+    )
+
+    edit_parser = sp.add_parser(
+        "edit",
+        help="edit configuration file. " + "Defaults to ramble.yaml with an activated workspace",
+    )
+    edit_parser.add_argument(
+        "section",
+        help="configuration section to edit. " "options: %(choices)s",
+        metavar="section",
+        nargs="?",
+        choices=ramble.config.section_schemas,
+    )
+    edit_parser.add_argument(
+        "--print-file", action="store_true", help="print the file name that would be edited"
+    )
+
+    sp.add_parser("list", help="list configuration sections")
+
+    add_parser = sp.add_parser("add", help="add configuration parameters")
+    add_parser.add_argument(
+        "path",
+        nargs="?",
+        help="colon-separated path to config that should be added," " e.g. 'config:default:true'",
+    )
+    add_parser.add_argument("-f", "--file", help="file from which to set all config values")
+
+    remove_parser = sp.add_parser("remove", aliases=["rm"], help="remove configuration parameters")
     remove_parser.add_argument(
-        'path',
+        "path",
         help="colon-separated path to config that should be removed,"
-        " e.g. 'config:default:true'")
+        " e.g. 'config:default:true'",
+    )
 
     # Make the add parser available later
     setup_parser.add_parser = add_parser
 
-    update = sp.add_parser(
-        'update', help='update configuration files to the latest format'
-    )
-    ramble.cmd.common.arguments.add_common_arguments(update, ['yes_to_all'])
-    update.add_argument('section', help='section to update')
+    update = sp.add_parser("update", help="update configuration files to the latest format")
+    ramble.cmd.common.arguments.add_common_arguments(update, ["yes_to_all"])
+    update.add_argument("section", help="section to update")
 
     revert = sp.add_parser(
-        'revert',
-        help='revert configuration files to their state before update'
+        "revert", help="revert configuration files to their state before update"
     )
-    ramble.cmd.common.arguments.add_common_arguments(revert, ['yes_to_all'])
-    revert.add_argument('section', help='section to update')
+    ramble.cmd.common.arguments.add_common_arguments(revert, ["yes_to_all"])
+    revert.add_argument("section", help="section to update")
 
 
 def _get_scope_and_section(args):
     """Extract config scope and section from arguments."""
-    logger.debug(f' Args = {str(args)}')
+    logger.debug(f" Args = {str(args)}")
     scope = args.scope
-    section = getattr(args, 'section', None)
-    path = getattr(args, 'path', None)
+    section = getattr(args, "section", None)
+    path = getattr(args, "path", None)
 
     # w/no args and an active workspace, point to workspace config
     if not section:
@@ -121,7 +125,7 @@ def _get_scope_and_section(args):
 
     # special handling for commands that take value instead of section
     if path:
-        section = path[:path.find(':')] if ':' in path else path
+        section = path[: path.find(":")] if ":" in path else path
         if not scope:
             scope = ramble.config.default_modify_scope(section)
 
@@ -139,19 +143,16 @@ def config_get(args):
     if section is not None:
         ramble.config.config.print_section(section)
 
-    elif scope and scope.startswith('workspace:'):
+    elif scope and scope.startswith("workspace:"):
         config_file = ramble.config.config.get_config_filename(scope, section)
         if os.path.exists(config_file):
             with open(config_file) as f:
                 print(f.read())
         else:
-            logger.die(f'workspace has no {ramble.workspace.config_file_name} file')
+            logger.die(f"workspace has no {ramble.workspace.config_file_name} file")
 
     else:
-        logger.die(
-            '`ramble config get` requires a section argument '
-            'or an active workspace.'
-        )
+        logger.die("`ramble config get` requires a section argument " "or an active workspace.")
 
 
 def config_blame(args):
@@ -175,8 +176,7 @@ def config_edit(args):
         scope, section = _get_scope_and_section(args)
         if not scope and not section:
             logger.die(
-                '`ramble config edit` requires a section argument '
-                'or an active workspace.'
+                "`ramble config edit` requires a section argument " "or an active workspace."
             )
         config_file = ramble.config.config.get_config_filename(scope, section)
 
@@ -194,7 +194,7 @@ def config_list(args):
 
     Used primarily for shell tab completion scripts.
     """
-    print(' '.join(list(ramble.config.section_schemas)))
+    print(" ".join(list(ramble.config.section_schemas)))
 
 
 def config_add(args):
@@ -221,11 +221,11 @@ def config_remove(args):
     This is a stateful operation that edits the config files."""
     scope, _ = _get_scope_and_section(args)
 
-    path, _, value = args.path.rpartition(':')
+    path, _, value = args.path.rpartition(":")
     existing = ramble.config.get(path, scope=scope)
 
     if not isinstance(existing, (list, dict)):
-        path, _, value = path.rpartition(':')
+        path, _, value = path.rpartition(":")
         existing = ramble.config.get(path, scope=scope)
 
     value = syaml.load(value)
@@ -238,7 +238,7 @@ def config_remove(args):
         existing.pop(value, None)
     else:
         # This should be impossible to reach
-        raise ramble.config.ConfigError('Config has nested non-dict values')
+        raise ramble.config.ConfigError("Config has nested non-dict values")
 
     ramble.config.set(path, existing, scope)
 
@@ -263,31 +263,33 @@ def config_update(args):
 
     cannot_overwrite, skip_system_scope = [], False
     for scope in updates:
-        cfg_file = ramble.config.config.get_config_filename(
-            scope.name, args.section
-        )
+        cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
         scope_dir = scope.path
         can_be_updated = _can_update_config_file(scope_dir, cfg_file)
         if not can_be_updated:
-            if scope.name == 'system':
+            if scope.name == "system":
                 skip_system_scope = True
-                msg = ('Not enough permissions to write to "system" scope. '
-                       f'Skipping update at that location [cfg={cfg_file}]')
+                msg = (
+                    'Not enough permissions to write to "system" scope. '
+                    f"Skipping update at that location [cfg={cfg_file}]"
+                )
                 logger.warn(msg)
                 continue
             cannot_overwrite.append((scope, cfg_file))
 
     if cannot_overwrite:
-        msg = 'Detected permission issues with the following scopes:\n\n'
+        msg = "Detected permission issues with the following scopes:\n\n"
         for scope, cfg_file in cannot_overwrite:
-            msg += '\t[scope={0}, cfg={1}]\n'.format(scope.name, cfg_file)
-        msg += ('\nEither ensure that you have sufficient permissions to '
-                'modify these files or do not include these scopes in the '
-                'update.')
+            msg += "\t[scope={0}, cfg={1}]\n".format(scope.name, cfg_file)
+        msg += (
+            "\nEither ensure that you have sufficient permissions to "
+            "modify these files or do not include these scopes in the "
+            "update."
+        )
         logger.die(msg)
 
     if skip_system_scope:
-        updates = [x for x in updates if x.name != 'system']
+        updates = [x for x in updates if x.name != "system"]
 
     # Report if there are no updates to be done
     if not updates:
@@ -296,40 +298,38 @@ def config_update(args):
 
     proceed = True
     if not args.yes_to_all:
-        msg = ('The following configuration files are going to be updated to'
-               ' the latest schema format:\n\n')
+        msg = (
+            "The following configuration files are going to be updated to"
+            " the latest schema format:\n\n"
+        )
         for scope in updates:
-            cfg_file = ramble.config.config.get_config_filename(
-                scope.name, args.section
-            )
-            msg += '\t[scope={0}, file={1}]\n'.format(scope.name, cfg_file)
-        msg += ('\nIf the configuration files are updated, versions of Ramble '
-                'that are older than this version may not be able to read '
-                'them. Ramble stores backups of the updated files which can '
-                'be retrieved with "ramble config revert"')
+            cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
+            msg += "\t[scope={0}, file={1}]\n".format(scope.name, cfg_file)
+        msg += (
+            "\nIf the configuration files are updated, versions of Ramble "
+            "that are older than this version may not be able to read "
+            "them. Ramble stores backups of the updated files which can "
+            'be retrieved with "ramble config revert"'
+        )
         logger.msg(msg)
-        proceed = tty.get_yes_or_no('Do you want to proceed?', default=False)
+        proceed = tty.get_yes_or_no("Do you want to proceed?", default=False)
 
     if not proceed:
-        logger.die('Operation aborted.')
+        logger.die("Operation aborted.")
 
     # Get a function to update the format
     update_fn = ramble.config.ensure_latest_format_fn(args.section)
     for scope in updates:
-        cfg_file = ramble.config.config.get_config_filename(
-            scope.name, args.section
-        )
+        cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
         with open(cfg_file) as f:
             data = syaml.load_config(f) or {}
             data = data.pop(args.section, {})
         update_fn(data)
 
         # Make a backup copy and rewrite the file
-        bkp_file = cfg_file + '.bkp'
+        bkp_file = cfg_file + ".bkp"
         shutil.copy(cfg_file, bkp_file)
-        ramble.config.config.update_config(
-            args.section, data, scope=scope.name, force=True
-        )
+        ramble.config.config.update_config(args.section, data, scope=scope.name, force=True)
         logger.msg(f'File "{cfg_file}" updated [backup={bkp_file}]')
 
 
@@ -341,16 +341,14 @@ def _can_revert_update(scope_dir, cfg_file, bkp_file):
 
 
 def config_revert(args):
-    scopes = [args.scope] if args.scope else [
-        x.name for x in ramble.config.config.file_scopes
-    ]
+    scopes = [args.scope] if args.scope else [x.name for x in ramble.config.config.file_scopes]
 
     # Search for backup files in the configuration scopes
-    Entry = collections.namedtuple('Entry', ['scope', 'cfg', 'bkp'])
+    Entry = collections.namedtuple("Entry", ["scope", "cfg", "bkp"])
     to_be_restored, cannot_overwrite = [], []
     for scope in scopes:
         cfg_file = ramble.config.config.get_config_filename(scope, args.section)
-        bkp_file = cfg_file + '.bkp'
+        bkp_file = cfg_file + ".bkp"
 
         # If the backup files doesn't exist move to the next scope
         if not os.path.exists(bkp_file):
@@ -369,25 +367,26 @@ def config_revert(args):
 
     # Report errors if we can't revert a configuration
     if cannot_overwrite:
-        msg = 'Detected permission issues with the following scopes:\n\n'
+        msg = "Detected permission issues with the following scopes:\n\n"
         for e in cannot_overwrite:
-            msg += '\t[scope={0.scope}, cfg={0.cfg}, bkp={0.bkp}]\n'.format(e)
-        msg += ('\nEither ensure to have the right permissions before retrying'
-                ' or be more specific on the scope to revert.')
+            msg += "\t[scope={0.scope}, cfg={0.cfg}, bkp={0.bkp}]\n".format(e)
+        msg += (
+            "\nEither ensure to have the right permissions before retrying"
+            " or be more specific on the scope to revert."
+        )
         logger.die(msg)
 
     proceed = True
     if not args.yes_to_all:
-        msg = ('The following scopes will be restored from the corresponding'
-               ' backup files:\n')
+        msg = "The following scopes will be restored from the corresponding" " backup files:\n"
         for entry in to_be_restored:
-            msg += '\t[scope={0.scope}, bkp={0.bkp}]\n'.format(entry)
-        msg += 'This operation cannot be undone.'
+            msg += "\t[scope={0.scope}, bkp={0.bkp}]\n".format(entry)
+        msg += "This operation cannot be undone."
         logger.msg(msg)
-        proceed = tty.get_yes_or_no('Do you want to proceed?', default=False)
+        proceed = tty.get_yes_or_no("Do you want to proceed?", default=False)
 
     if not proceed:
-        logger.die('Operation aborted.')
+        logger.die("Operation aborted.")
 
     for _, cfg_file, bkp_file in to_be_restored:
         shutil.copy(bkp_file, cfg_file)
@@ -397,14 +396,14 @@ def config_revert(args):
 
 def config(parser, args):
     action = {
-        'get': config_get,
-        'blame': config_blame,
-        'edit': config_edit,
-        'list': config_list,
-        'add': config_add,
-        'rm': config_remove,
-        'remove': config_remove,
-        'update': config_update,
-        'revert': config_revert
+        "get": config_get,
+        "blame": config_blame,
+        "edit": config_edit,
+        "list": config_list,
+        "add": config_add,
+        "rm": config_remove,
+        "remove": config_remove,
+        "update": config_update,
+        "revert": config_revert,
     }
     action[args.config_command](args)

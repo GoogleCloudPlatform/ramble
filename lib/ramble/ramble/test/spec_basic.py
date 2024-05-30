@@ -13,13 +13,13 @@ from ramble.spec import Spec
 class TestSpec(object):
 
     def test_spec_examples(self):
-        app_name = 'test_application'
+        app_name = "test_application"
         test_spec = Spec(app_name)
 
         assert test_spec.name == app_name
 
     def test_spec_copy(self):
-        app_name = 'copy_application'
+        app_name = "copy_application"
         main_spec = Spec(app_name)
         copy_spec = main_spec.copy()
 

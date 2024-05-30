@@ -16,10 +16,9 @@ import ramble.software_environments
 from ramble.main import RambleCommand
 
 
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_package_manager_config_zlib(mock_applications):
@@ -47,24 +46,23 @@ ramble:
         - zlib
 """
 
-    workspace_name = 'test_package_manager_config_zlib'
+    workspace_name = "test_package_manager_config_zlib"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-        spack_yaml = os.path.join(ws.software_dir, 'zlib-configs',
-                                  'spack.yaml')
+        spack_yaml = os.path.join(ws.software_dir, "zlib-configs", "spack.yaml")
 
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml, 'r') as f:
+        with open(spack_yaml, "r") as f:
             data = f.read()
-            assert 'config:' in data
-            assert 'debug: true' in data
+            assert "config:" in data
+            assert "debug: true" in data

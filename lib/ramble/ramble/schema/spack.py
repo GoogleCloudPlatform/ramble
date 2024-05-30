@@ -15,61 +15,57 @@
 
 #: Properties for inclusion in other schemas
 properties = {
-    'spack': {
-        'type': 'object',
-        'properties': {
-            'packages': {
-                'type': 'object',
-                'additionalProperties': {
-                    'type': 'object',
-                    'properties': {
-                        'spack_spec': {'type': 'string'},
-                        'compiler_spec': {
-                            'type': 'string',
-                            'default': None,
+    "spack": {
+        "type": "object",
+        "properties": {
+            "packages": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                        "spack_spec": {"type": "string"},
+                        "compiler_spec": {
+                            "type": "string",
+                            "default": None,
                         },
-                        'compiler': {
-                            'type': 'string',
-                            'default': None,
+                        "compiler": {
+                            "type": "string",
+                            "default": None,
                         },
                     },
-                    'additionalProperties': False,
-                    'default': {}
+                    "additionalProperties": False,
+                    "default": {},
                 },
             },
-            'environments': {
-                'type': 'object',
-                'properties': {},
-                'default': {},
-                'additionalProperties': {
-                    'type': 'object',
-                    'properties': {
-                        'external_spack_env': {
-                            'type': 'string',
-                            'default': None,
+            "environments": {
+                "type": "object",
+                "properties": {},
+                "default": {},
+                "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                        "external_spack_env": {
+                            "type": "string",
+                            "default": None,
                         },
-                        'packages': {
-                            'type': 'array',
-                            'items': {'type': 'string'},
-                            'default': []
-                        },
+                        "packages": {"type": "array", "items": {"type": "string"}, "default": []},
                     },
-                    'additionalProperties': False,
-                    'default': {}
-                }
-            }
+                    "additionalProperties": False,
+                    "default": {},
+                },
+            },
         },
-        'default': {},
-        'additionalProperties': False,
+        "default": {},
+        "additionalProperties": False,
     }
 }
 
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Spack software configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties,
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Spack software configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

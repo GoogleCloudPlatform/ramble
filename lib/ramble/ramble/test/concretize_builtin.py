@@ -14,10 +14,9 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace_path):
@@ -74,13 +73,13 @@ ramble:
 
     import re
 
-    workspace_name = 'test_concretize_does_not_set_required'
+    workspace_name = "test_concretize_does_not_set_required"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws._re_read()
@@ -90,9 +89,9 @@ ramble:
         ws._re_read()
 
         req_test = True
-        with open(config_path, 'r') as f:
+        with open(config_path, "r") as f:
             for line in f.readlines():
-                if re.match(r'^[^#]*required', line):
+                if re.match(r"^[^#]*required", line):
                     req_test = False
                     break
             assert req_test

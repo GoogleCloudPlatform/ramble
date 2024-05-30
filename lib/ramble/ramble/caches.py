@@ -26,9 +26,9 @@ def _misc_cache():
     Currently the ``misc_cache`` stores indexes for virtual dependency
     providers and for which packages provide which tags.
     """
-    path = ramble.config.get('config:misc_cache')
+    path = ramble.config.get("config:misc_cache")
     if not path:
-        path = os.path.join(ramble.paths.user_config_path, 'cache')
+        path = os.path.join(ramble.paths.user_config_path, "cache")
     path = ramble.util.path.canonicalize_path(path)
 
     return ramble.util.file_cache.FileCache(path)
@@ -44,7 +44,7 @@ def fetch_cache_location():
     This prevents Ramble from repeatedly fetch the same files when
     using them within multiple workspaces.
     """
-    path = ramble.config.get('config:input_cache')
+    path = ramble.config.get("config:input_cache")
     if not path:
         path = ramble.paths.default_fetch_cache_path
     path = ramble.util.path.canonicalize_path(path)
@@ -75,9 +75,7 @@ class MirrorCache(object):
 
         cosmetic_path = os.path.join(self.root, mirror_ref.cosmetic_path)
         storage_path = os.path.join(self.root, mirror_ref.storage_path)
-        relative_dst = os.path.relpath(
-            storage_path,
-            start=os.path.dirname(cosmetic_path))
+        relative_dst = os.path.relpath(storage_path, start=os.path.dirname(cosmetic_path))
 
         if not os.path.exists(cosmetic_path):
             if os.path.lexists(cosmetic_path):

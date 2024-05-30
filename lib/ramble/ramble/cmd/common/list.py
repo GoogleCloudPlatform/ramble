@@ -51,8 +51,8 @@ def filter_by_name(objs, args, object_type):
     if args.filter:
         res = []
         for f in args.filter:
-            if '*' not in f and '?' not in f:
-                r = fnmatch.translate('*' + f + '*')
+            if "*" not in f and "?" not in f:
+                r = fnmatch.translate("*" + f + "*")
             else:
                 r = fnmatch.translate(f)
 
@@ -60,6 +60,7 @@ def filter_by_name(objs, args, object_type):
             res.append(rc)
 
         if args.search_description:
+
             def match(p, f):
                 if f.match(p):
                     return True
@@ -68,9 +69,12 @@ def filter_by_name(objs, args, object_type):
                 if obj.__doc__:
                     return f.match(obj.__doc__)
                 return False
+
         else:
+
             def match(p, f):
                 return f.match(p)
+
         objs = [obj for obj in objs if any(match(obj, f) for f in res)]
 
     return sorted(objs, key=lambda s: s.lower())
@@ -88,10 +92,12 @@ def name_only(objs, out, object_type):
 def github_url(objs, object_type):
     """Link to an object file on github."""
     obj_def = ramble.repository.type_definitions[object_type]
-    url = 'https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/' + \
-          f'{obj_def["dir_name"]}/' + \
-          '{0}' + \
-          f'/{obj_def["file_name"]}'
+    url = (
+        "https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/"
+        + f'{obj_def["dir_name"]}/'
+        + "{0}"
+        + f'/{obj_def["file_name"]}'
+    )
     return url.format(objs.name)
 
 
@@ -111,18 +117,21 @@ def version_json(obj_names, out, object_type):
     """Print all objects with their latest versions."""
     objs = [ramble.repository.get(name, object_type=object_type) for name in obj_names]
 
-    out.write('[\n')
+    out.write("[\n")
 
     # output name and latest version for each object
-    obj_latest = ",\n".join([
-        '  {{"name": "{0}"\n'
-        '}}'.format(
-            obj.name,
-        ) for obj in objs
-    ])
+    obj_latest = ",\n".join(
+        [
+            '  {{"name": "{0}"\n'
+            "}}".format(
+                obj.name,
+            )
+            for obj in objs
+        ]
+    )
     out.write(obj_latest)
     # important: no trailing comma in JSON arrays
-    out.write('\n]\n')
+    out.write("\n]\n")
 
 
 @formatter
@@ -147,31 +156,34 @@ def html(obj_names, out, object_type):
     def head(n, span_id, title, anchor=None):
         if anchor is None:
             anchor = title
-        out.write(('<span id="id%d"></span>'
-                   '<h1>%s<a class="headerlink" href="#%s" '
-                   'title="Permalink to this headline">&para;</a>'
-                   '</h1>\n') % (span_id, title, anchor))
+        out.write(
+            (
+                '<span id="id%d"></span>'
+                '<h1>%s<a class="headerlink" href="#%s" '
+                'title="Permalink to this headline">&para;</a>'
+                "</h1>\n"
+            )
+            % (span_id, title, anchor)
+        )
 
     # Start with the number of objects, skipping the title and intro
     # blurb, which we maintain in the RST file.
-    out.write('<p>\n')
+    out.write("<p>\n")
     out.write(f'Ramble currently has {len(objs)} mainline {obj_def["dir_name"]}:\n')
-    out.write('</p>\n')
+    out.write("</p>\n")
 
     # Table of links to all objects
     out.write('<table border="1" class="docutils">\n')
     out.write('<tbody valign="top">\n')
     for i, row in enumerate(rows_for_ncols(obj_names, 3)):
-        out.write('<tr class="row-odd">\n' if i % 2 == 0 else
-                  '<tr class="row-even">\n')
+        out.write('<tr class="row-odd">\n' if i % 2 == 0 else '<tr class="row-even">\n')
         for name in row:
-            out.write('<td>\n')
-            out.write('<a class="reference internal" href="#%s">%s</a></td>\n'
-                      % (name, name))
-            out.write('</td>\n')
-        out.write('</tr>\n')
-    out.write('</tbody>\n')
-    out.write('</table>\n')
+            out.write("<td>\n")
+            out.write('<a class="reference internal" href="#%s">%s</a></td>\n' % (name, name))
+            out.write("</td>\n")
+        out.write("</tr>\n")
+    out.write("</tbody>\n")
+    out.write("</table>\n")
     out.write('<hr class="docutils"/>\n')
 
     # Output some text for each objects.
@@ -193,14 +205,14 @@ def html(obj_names, out, object_type):
         out.write('<dd><ul class="first last simple">\n')
         out.write(
             (
-                '<li>'
+                "<li>"
                 '<a class="reference external" '
                 f'href="{github_url(obj, object_type)}">'
                 f'{obj.name}/{obj_def["file_name"]}</a>'  # noqa: E501
-                '</li>\n'
+                "</li>\n"
             )
         )
-        out.write('</ul></dd>\n')
+        out.write("</ul></dd>\n")
 
         # if obj.versions:
         #     out.write('<dt>Versions:</dt>\n')
@@ -210,34 +222,47 @@ def html(obj_names, out, object_type):
         #     out.write('\n')
         #     out.write('</dd>\n')
 
-        out.write('<dt>Description:</dt>\n')
-        out.write('<dd>\n')
+        out.write("<dt>Description:</dt>\n")
+        out.write("<dd>\n")
         out.write(escape(obj.format_doc(indent=2), True))
-        out.write('\n')
-        out.write('</dd>\n')
-        out.write('</dl>\n')
+        out.write("\n")
+        out.write("</dd>\n")
+        out.write("</dl>\n")
 
         out.write('<hr class="docutils"/>\n')
-        out.write('</div>\n')
+        out.write("</div>\n")
 
 
 def setup_list_parser(subparser, object_type):
     object_def = ramble.repository.type_definitions[object_type]
 
     subparser.add_argument(
-        'filter', nargs=argparse.REMAINDER,
-        help='optional case-insensitive glob patterns to filter results')
+        "filter",
+        nargs=argparse.REMAINDER,
+        help="optional case-insensitive glob patterns to filter results",
+    )
     subparser.add_argument(
-        '-d', '--search-description', action='store_true', default=False,
-        help='filtering will also search the description for a match')
+        "-d",
+        "--search-description",
+        action="store_true",
+        default=False,
+        help="filtering will also search the description for a match",
+    )
     subparser.add_argument(
-        '--format', default='name_only', choices=formatters,
-        help='format to be used to print the output [default: name_only]')
+        "--format",
+        default="name_only",
+        choices=formatters,
+        help="format to be used to print the output [default: name_only]",
+    )
     subparser.add_argument(
-        '--update', metavar='FILE', default=None, action='store',
-        help=f'write output to the specified file, if any {object_def["singular"]} is newer')
+        "--update",
+        metavar="FILE",
+        default=None,
+        action="store",
+        help=f'write output to the specified file, if any {object_def["singular"]} is newer',
+    )
 
-    arguments.add_common_arguments(subparser, ['tags'])
+    arguments.add_common_arguments(subparser, ["tags"])
 
 
 def perform_list(args, object_type):
@@ -251,21 +276,19 @@ def perform_list(args, object_type):
 
     # Filter by tags
     if args.tags:
-        objects_with_tags = set(
-            ramble.repository.paths[object_type].objects_with_tags(*args.tags))
+        objects_with_tags = set(ramble.repository.paths[object_type].objects_with_tags(*args.tags))
         sorted_objects = set(sorted_objects) & objects_with_tags
         sorted_objects = sorted(sorted_objects)
 
     if args.update:
         # change output stream if user asked for update
         if os.path.exists(args.update):
-            if os.path.getmtime(args.update) > \
-                    ramble.repository.paths[object_type].last_mtime():
-                logger.msg(f'File is up to date: {args.update}')
+            if os.path.getmtime(args.update) > ramble.repository.paths[object_type].last_mtime():
+                logger.msg(f"File is up to date: {args.update}")
                 return
 
-        logger.msg(f'Updating file: {args.update}')
-        with open(args.update, 'w') as f:
+        logger.msg(f"Updating file: {args.update}")
+        with open(args.update, "w") as f:
             formatter(sorted_objects, f, object_type)
 
     else:

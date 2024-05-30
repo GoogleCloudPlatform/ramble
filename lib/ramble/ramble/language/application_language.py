@@ -52,9 +52,10 @@ class ApplicationMeta(ramble.language.shared_language.SharedMeta):
 application_directive = ApplicationMeta.directive
 
 
-@application_directive('workloads')
-def workload(name, executables=None, executable=None, input=None,
-             inputs=None, tags=None, **kwargs):
+@application_directive("workloads")
+def workload(
+    name, executables=None, executable=None, input=None, inputs=None, tags=None, **kwargs
+):
     """Adds a workload to this application
 
     Defines a new workload that can be used within the context of
@@ -70,23 +71,18 @@ def workload(name, executables=None, executable=None, input=None,
     """
 
     def _execute_workload(app):
-        all_execs = ramble.language.language_helpers.require_definition(executable,
-                                                                        executables,
-                                                                        app.executables,
-                                                                        'executable',
-                                                                        'executables',
-                                                                        'workload')
+        all_execs = ramble.language.language_helpers.require_definition(
+            executable, executables, app.executables, "executable", "executables", "workload"
+        )
 
-        all_inputs = ramble.language.language_helpers.merge_definitions(input,
-                                                                        inputs,
-                                                                        app.inputs)
+        all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs, app.inputs)
 
         app.workloads[name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
 
     return _execute_workload
 
 
-@application_directive('executables')
+@application_directive("executables")
 def executable(name, template, **kwargs):
     """Adds an executable to this application
 
@@ -113,15 +109,23 @@ def executable(name, template, **kwargs):
 
     def _execute_executable(app):
         from ramble.util.executable import CommandExecutable
-        app.executables[name] = CommandExecutable(
-            name=name, template=template, **kwargs)
+
+        app.executables[name] = CommandExecutable(name=name, template=template, **kwargs)
 
     return _execute_executable
 
 
-@application_directive('inputs')
-def input_file(name, url, description, target_dir='{input_name}', sha256=None, extension=None,
-               expand=True, **kwargs):
+@application_directive("inputs")
+def input_file(
+    name,
+    url,
+    description,
+    target_dir="{input_name}",
+    sha256=None,
+    extension=None,
+    expand=True,
+    **kwargs,
+):
     """Adds an input file definition to this application
 
     Defines a new input file.
@@ -141,20 +145,28 @@ def input_file(name, url, description, target_dir='{input_name}', sha256=None, e
 
     def _execute_input_file(app):
         app.inputs[name] = {
-            'url': url,
-            'description': description,
-            'target_dir': target_dir,
-            'sha256': sha256,
-            'extension': extension,
-            'expand': expand
+            "url": url,
+            "description": description,
+            "target_dir": target_dir,
+            "sha256": sha256,
+            "extension": extension,
+            "expand": expand,
         }
 
     return _execute_input_file
 
 
 @application_directive(dicts=())
-def workload_variable(name, default, description, values=None, workload=None,
-                      workloads=None, expandable=True, **kwargs):
+def workload_variable(
+    name,
+    default,
+    description,
+    values=None,
+    workload=None,
+    workloads=None,
+    expandable=True,
+    **kwargs,
+):
     """Define a new variable to be used in experiments
 
     Defines a new variable that can be defined within the
@@ -165,18 +177,18 @@ def workload_variable(name, default, description, values=None, workload=None,
     """
 
     def _execute_workload_variable(app):
-        all_workloads = ramble.language.language_helpers.require_definition(workload,
-                                                                            workloads,
-                                                                            app.workloads,
-                                                                            'workload',
-                                                                            'workloads',
-                                                                            'workload_variable')
+        all_workloads = ramble.language.language_helpers.require_definition(
+            workload, workloads, app.workloads, "workload", "workloads", "workload_variable"
+        )
 
         for wl_name in all_workloads:
             app.workloads[wl_name].add_variable(
                 ramble.workload.WorkloadVariable(
-                    name, default=default, description=description,
-                    values=values, expandable=expandable
+                    name,
+                    default=default,
+                    description=description,
+                    values=values,
+                    expandable=expandable,
                 )
             )
 
@@ -184,20 +196,16 @@ def workload_variable(name, default, description, values=None, workload=None,
 
 
 @application_directive(dicts=())
-def environment_variable(name, value, description, workload=None,
-                         workloads=None, **kwargs):
+def environment_variable(name, value, description, workload=None, workloads=None, **kwargs):
     """Define an environment variable to be used in experiments
 
     These can be specific to workloads.
     """
 
     def _execute_environment_variable(app):
-        all_workloads = ramble.language.language_helpers.require_definition(workload,
-                                                                            workloads,
-                                                                            app.workloads,
-                                                                            'workload',
-                                                                            'workloads',
-                                                                            'environment_variable')
+        all_workloads = ramble.language.language_helpers.require_definition(
+            workload, workloads, app.workloads, "workload", "workloads", "environment_variable"
+        )
 
         for wl_name in all_workloads:
             app.workloads[wl_name].add_environment_variable(
@@ -209,7 +217,7 @@ def environment_variable(name, value, description, workload=None,
     return _execute_environment_variable
 
 
-@application_directive('phase_definitions')
+@application_directive("phase_definitions")
 def register_phase(name, pipeline=None, run_before=[], run_after=[]):
     """Register a phase
 
@@ -231,28 +239,37 @@ def register_phase(name, pipeline=None, run_before=[], run_after=[]):
 
     def _execute_register_phase(app):
         import ramble.util.graph
+
         if pipeline not in app._pipelines:
-            raise DirectiveError('Directive register_phase was '
-                                 f'given an invalid pipeline "{pipeline}"\n'
-                                 'Available pipelines are: '
-                                 f' {app._pipelines}')
+            raise DirectiveError(
+                "Directive register_phase was "
+                f'given an invalid pipeline "{pipeline}"\n'
+                "Available pipelines are: "
+                f" {app._pipelines}"
+            )
 
         if not isinstance(run_before, list):
-            raise DirectiveError('Directive register_phase was '
-                                 'given an invalid type for '
-                                 'the run_before attribute in application '
-                                 f'{app.name}')
+            raise DirectiveError(
+                "Directive register_phase was "
+                "given an invalid type for "
+                "the run_before attribute in application "
+                f"{app.name}"
+            )
 
         if not isinstance(run_after, list):
-            raise DirectiveError('Directive register_phase was '
-                                 'given an invalid type for '
-                                 'the run_after attribute in application '
-                                 f'{app.name}')
+            raise DirectiveError(
+                "Directive register_phase was "
+                "given an invalid type for "
+                "the run_after attribute in application "
+                f"{app.name}"
+            )
 
-        if not hasattr(app, f'_{name}'):
-            raise DirectiveError('Directive register_phase was '
-                                 f'given an undefined phase {name} '
-                                 f'in application {app.name}')
+        if not hasattr(app, f"_{name}"):
+            raise DirectiveError(
+                "Directive register_phase was "
+                f"given an undefined phase {name} "
+                f"in application {app.name}"
+            )
 
         if pipeline not in app.phase_definitions:
             app.phase_definitions[pipeline] = {}

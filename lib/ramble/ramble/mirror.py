@@ -61,15 +61,13 @@ class Mirror(object):
     to them.  These two URLs are usually the same.
     """
 
-    def __init__(self, fetch_url, push_url=None,
-                 name=None):
+    def __init__(self, fetch_url, push_url=None, name=None):
         self._fetch_url = fetch_url
         self._push_url = push_url
         self._name = name
 
     def __eq__(self, other):
-        return (self._fetch_url == other._fetch_url and
-                self._push_url == other._push_url)
+        return self._fetch_url == other._fetch_url and self._push_url == other._push_url
 
     def to_json(self, stream=None):
         return spack.util.spack_json.dump(self.to_dict(), stream)
@@ -100,51 +98,52 @@ class Mirror(object):
             )
 
     def to_dict(self):
-        return syaml_dict([
-            ('fetch', self._fetch_url),
-            ('push', self._push_url or self._fetch_url)])
+        return syaml_dict(
+            [("fetch", self._fetch_url), ("push", self._push_url or self._fetch_url)]
+        )
 
     @staticmethod
     def from_dict(d, name=None):
         if isinstance(d, six.string_types):
             return Mirror(d, name=name)
         else:
-            return Mirror(d['fetch'], d['push'], name=name)
+            return Mirror(d["fetch"], d["push"], name=name)
 
     def display(self, max_len=0):
         if self._push_url is None:
             _display_mirror_entry(max_len, self._name, self.fetch_url)
         else:
-            _display_mirror_entry(
-                max_len, self._name, self.fetch_url, "fetch")
-            _display_mirror_entry(
-                max_len, self._name, self.push_url, "push")
+            _display_mirror_entry(max_len, self._name, self.fetch_url, "fetch")
+            _display_mirror_entry(max_len, self._name, self.push_url, "push")
 
     def __str__(self):
         name = self._name
         if name is None:
-            name = ''
+            name = ""
         else:
             name = ' "%s"' % name
 
         if self._push_url is None:
             return "[Mirror%s (%s)]" % (name, self._fetch_url)
 
-        return "[Mirror%s (fetch: %s, push: %s)]" % (
-            name, self._fetch_url, self._push_url)
+        return "[Mirror%s (fetch: %s, push: %s)]" % (name, self._fetch_url, self._push_url)
 
     def __repr__(self):
-        return ''.join((
-            'Mirror(',
-            ', '.join(
-                '%s=%s' % (k, repr(v))
-                for k, v in (
-                    ('fetch_url', self._fetch_url),
-                    ('push_url', self._push_url),
-                    ('name', self._name))
-                if k == 'fetch_url' or v),
-            ')'
-        ))
+        return "".join(
+            (
+                "Mirror(",
+                ", ".join(
+                    "%s=%s" % (k, repr(v))
+                    for k, v in (
+                        ("fetch_url", self._fetch_url),
+                        ("push_url", self._push_url),
+                        ("name", self._name),
+                    )
+                    if k == "fetch_url" or v
+                ),
+                ")",
+            )
+        )
 
     @property
     def name(self):
@@ -153,8 +152,8 @@ class Mirror(object):
     def get_profile(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get('profile', None)
-            return self._fetch_url.get('profile', None)
+                return self._push_url.get("profile", None)
+            return self._fetch_url.get("profile", None)
         else:
             return None
 
@@ -167,8 +166,8 @@ class Mirror(object):
     def get_access_pair(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get('access_pair', None)
-            return self._fetch_url.get('access_pair', None)
+                return self._push_url.get("access_pair", None)
+            return self._fetch_url.get("access_pair", None)
         else:
             return None
 
@@ -181,8 +180,8 @@ class Mirror(object):
     def get_endpoint_url(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get('endpoint_url', None)
-            return self._fetch_url.get('endpoint_url', None)
+                return self._push_url.get("endpoint_url", None)
+            return self._fetch_url.get("endpoint_url", None)
         else:
             return None
 
@@ -195,8 +194,8 @@ class Mirror(object):
     def get_access_token(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get('access_token', None)
-            return self._fetch_url.get('access_token', None)
+                return self._push_url.get("access_token", None)
+            return self._fetch_url.get("access_token", None)
         else:
             return None
 
@@ -208,8 +207,7 @@ class Mirror(object):
 
     @property
     def fetch_url(self):
-        return self._fetch_url if _is_string(self._fetch_url) \
-            else self._fetch_url["url"]
+        return self._fetch_url if _is_string(self._fetch_url) else self._fetch_url["url"]
 
     @fetch_url.setter
     def fetch_url(self, url):
@@ -219,10 +217,8 @@ class Mirror(object):
     @property
     def push_url(self):
         if self._push_url is None:
-            return self._fetch_url if _is_string(self._fetch_url) \
-                else self._fetch_url["url"]
-        return self._push_url if _is_string(self._push_url) \
-            else self._push_url["url"]
+            return self._fetch_url if _is_string(self._fetch_url) else self._fetch_url["url"]
+        return self._push_url if _is_string(self._push_url) else self._push_url["url"]
 
     @push_url.setter
     def push_url(self, url):
@@ -241,8 +237,11 @@ class MirrorCollection(Mapping):
         self._mirrors = collections.OrderedDict(
             (name, Mirror.from_dict(mirror, name))
             for name, mirror in (
-                mirrors.items() if mirrors is not None else
-                ramble.config.get('mirrors', scope=scope).items()))
+                mirrors.items()
+                if mirrors is not None
+                else ramble.config.get("mirrors", scope=scope).items()
+            )
+        )
 
     def __eq__(self, other):
         return self._mirrors == other._mirrors
@@ -254,12 +253,12 @@ class MirrorCollection(Mapping):
         return spack.util.spack_yaml.dump(self.to_dict(True), stream)
 
     def to_dict(self, recursive=False):
-        return syaml_dict(sorted(
-            (
-                (k, (v.to_dict() if recursive else v))
-                for (k, v) in self._mirrors.items()
-            ), key=operator.itemgetter(0)
-        ))
+        return syaml_dict(
+            sorted(
+                ((k, (v.to_dict() if recursive else v)) for (k, v) in self._mirrors.items()),
+                key=operator.itemgetter(0),
+            )
+        )
 
     @staticmethod
     def from_dict(d):
@@ -303,7 +302,7 @@ def _determine_extension(fetcher):
 
             if ext:
                 # Remove any leading dots
-                ext = ext.lstrip('.')
+                ext = ext.lstrip(".")
             else:
                 # TODO: Clean up this message...
                 # TODO: Add extension to input files...
@@ -327,7 +326,7 @@ Ramble not to expand it with the following syntax:
             ext = None
     else:
         # Otherwise we'll make a .tar.gz ourselves
-        ext = 'tar.gz'
+        ext = "tar.gz"
 
     return ext
 
@@ -345,6 +344,7 @@ class MirrorReference(object):
     this includes names generated by previous naming schemes that are no-longer
     reported by ``storage_path`` or ``cosmetic_path``.
     """
+
     def __init__(self, cosmetic_path, global_path=None):
         self.global_path = global_path
         self.cosmetic_path = cosmetic_path
@@ -372,7 +372,7 @@ def mirror_archive_paths(fetcher, per_input_ref):
 
     global_ref = fetcher.mirror_id()
     if global_ref:
-        global_ref = os.path.join('_input-cache', global_ref)
+        global_ref = os.path.join("_input-cache", global_ref)
     if global_ref and ext:
         global_ref += ".%s" % ext
 
@@ -401,21 +401,20 @@ def create(path, workspace):
     parsed = url_util.parse(path)
     mirror_root = url_util.local_file_path(parsed)
     if not mirror_root:
-        raise ramble.error.RambleError(
-            'MirrorCaches only work with file:// URLs')
+        raise ramble.error.RambleError("MirrorCaches only work with file:// URLs")
 
     # automatically spec-ify anything in the specs array.
     specs = [
         s if isinstance(s, ramble.spec.Spec) else ramble.spec.Spec(s)
-        for s in workspace.all_specs()]
+        for s in workspace.all_specs()
+    ]
 
     # Get the absolute path of the root before we start jumping around.
     if not os.path.isdir(mirror_root):
         try:
             mkdirp(mirror_root)
         except OSError as e:
-            raise MirrorError(
-                "Cannot create directory '%s':" % mirror_root, str(e))
+            raise MirrorError("Cannot create directory '%s':" % mirror_root, str(e))
 
     mirror_cache = ramble.caches.MirrorCache(mirror_root)
     mirror_stats = MirrorStats()
@@ -430,7 +429,7 @@ def create(path, workspace):
 
 def add(name, url, scope, args={}):
     """Add a named mirror in the given scope"""
-    mirrors = ramble.config.get('mirrors', scope=scope)
+    mirrors = ramble.config.get("mirrors", scope=scope)
     if not mirrors:
         mirrors = syaml_dict()
 
@@ -441,12 +440,12 @@ def add(name, url, scope, args={}):
     mirror_data = url
     items.insert(0, (name, mirror_data))
     mirrors = syaml_dict(items)
-    ramble.config.set('mirrors', mirrors, scope=scope)
+    ramble.config.set("mirrors", mirrors, scope=scope)
 
 
 def remove(name, scope):
     """Remove the named mirror in the given scope"""
-    mirrors = ramble.config.get('mirrors', scope=scope)
+    mirrors = ramble.config.get("mirrors", scope=scope)
     if not mirrors:
         mirrors = syaml_dict()
 
@@ -454,15 +453,15 @@ def remove(name, scope):
         logger.die(f"No mirror with name {name}")
 
     old_value = mirrors.pop(name)
-    ramble.config.set('mirrors', mirrors, scope=scope)
+    ramble.config.set("mirrors", mirrors, scope=scope)
 
     debug_msg_url = "url %s"
     debug_msg = ["Removed mirror %s with"]
     values = [name]
 
     try:
-        fetch_value = old_value['fetch']
-        push_value = old_value['push']
+        fetch_value = old_value["fetch"]
+        push_value = old_value["push"]
 
         debug_msg.extend(("fetch", debug_msg_url, "and push", debug_msg_url))
         values.extend((fetch_value, push_value))
@@ -528,12 +527,13 @@ def _add_single_spec(spec, mirror_root, mirror, mirror_stats):
         num_retries -= 1
 
     if exception:
-        if ramble.config.get('config:debug'):
+        if ramble.config.get("config:debug"):
             traceback.print_exception(file=sys.stderr, *exc_tuple)
         else:
             logger.warn(
-                "Error while fetching %s" % spec.cformat('{name}'),
-                getattr(exception, 'message', exception))
+                "Error while fetching %s" % spec.cformat("{name}"),
+                getattr(exception, "message", exception),
+            )
         mirror_stats.error()
 
 
@@ -541,10 +541,10 @@ def push_url_from_directory(output_directory):
     """Given a directory in the local filesystem, return the URL on
     which to push resources.
     """
-    scheme = url_util.parse(output_directory, scheme='<missing>').scheme
-    if scheme != '<missing>':
-        raise ValueError('expected a local path, but got a URL instead')
-    mirror_url = 'file://' + output_directory
+    scheme = url_util.parse(output_directory, scheme="<missing>").scheme
+    if scheme != "<missing>":
+        raise ValueError("expected a local path, but got a URL instead")
+    mirror_url = "file://" + output_directory
     mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
     return url_util.format(mirror.push_url)
 
@@ -559,8 +559,8 @@ def push_url_from_mirror_name(mirror_name):
 
 def push_url_from_mirror_url(mirror_url):
     """Given a mirror URL, return the URL on which to push resources."""
-    scheme = url_util.parse(mirror_url, scheme='<missing>').scheme
-    if scheme == '<missing>':
+    scheme = url_util.parse(mirror_url, scheme="<missing>").scheme
+    if scheme == "<missing>":
         raise ValueError('"{0}" is not a valid URL'.format(mirror_url))
     mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
     return url_util.format(mirror.push_url)
