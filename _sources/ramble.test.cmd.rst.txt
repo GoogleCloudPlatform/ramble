@@ -38,6 +38,14 @@ ramble.test.cmd.debug module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.cmd.flake8 module
+-----------------------------
+
+.. automodule:: ramble.test.cmd.flake8
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.cmd.info module
 ---------------------------
 
