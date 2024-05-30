@@ -21,10 +21,9 @@ from ramble.test.dry_run_helpers import search_files_for_string
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_nested_compilers_are_installed(mutable_config, mutable_mock_workspace_path, capsys):
@@ -71,13 +70,13 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = 'test_nested_compilers_are_installed'
+    workspace_name = "test_nested_compilers_are_installed"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -90,7 +89,7 @@ ramble:
         gcc9_str = "gcc@9.3.0"
         gcc10_str = "gcc@10.1.0"
 
-        out_files = glob.glob(os.path.join(ws.log_dir, '**', '*.out'), recursive=True)
+        out_files = glob.glob(os.path.join(ws.log_dir, "**", "*.out"), recursive=True)
 
         assert search_files_for_string(out_files, gcc8_str) is True
         assert search_files_for_string(out_files, gcc9_str) is True

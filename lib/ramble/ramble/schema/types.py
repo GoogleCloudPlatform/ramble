@@ -16,22 +16,12 @@ class OUTPUT_CAPTURE:
     DEFAULT = STDOUT
 
 
-string_or_num_list = [{'type': 'string'}, {'type': 'number'}]
+string_or_num_list = [{"type": "string"}, {"type": "number"}]
 
-string_or_num = {
-    'anyOf': string_or_num_list
-}
+string_or_num = {"anyOf": string_or_num_list}
 
-array_of_strings_or_nums = {
-    'type': 'array',
-    'default': [],
-    'items': string_or_num
-}
+array_of_strings_or_nums = {"type": "array", "default": [], "items": string_or_num}
 
 array_or_scalar_of_strings_or_nums = {
-    'anyOf':
-        [
-            *string_or_num_list,
-            {'type': 'array', 'default': [], 'items': string_or_num}
-        ]
+    "anyOf": [*string_or_num_list, {"type": "array", "default": [], "items": string_or_num}]
 }

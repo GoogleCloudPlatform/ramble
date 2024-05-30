@@ -17,14 +17,13 @@ level = "short"
 
 
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar='SUBCOMMAND',
-                                  dest='results_command')
+    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="results_command")
 
     # Upload
-    upload_parser = sp.add_parser('upload', help=results_upload.__doc__,
-                                  description=results_upload.__doc__)
-    upload_parser.add_argument(
-        'filename', help='path of file to upload')
+    upload_parser = sp.add_parser(
+        "upload", help=results_upload.__doc__, description=results_upload.__doc__
+    )
+    upload_parser.add_argument("filename", help="path of file to upload")
 
 
 def results_upload(args):
@@ -48,7 +47,7 @@ def import_results_file(filename):
         logger.msg("Import file...")
         parsed_json_file = json.load(imported_file)
         # Check if data contains an experiment
-        if parsed_json_file.get('experiments'):
+        if parsed_json_file.get("experiments"):
             return parsed_json_file
         else:
             logger.die("Error parsing file: Does not contain valid data to upload.")
@@ -57,5 +56,5 @@ def import_results_file(filename):
 
 
 def results(parser, args):
-    action = {'upload': results_upload}
+    action = {"upload": results_upload}
     action[args.results_command](args)

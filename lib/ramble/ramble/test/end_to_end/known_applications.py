@@ -20,15 +20,14 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
 def test_known_applications(application, capsys):
-    info_cmd = RambleCommand('info')
+    info_cmd = RambleCommand("info")
 
     setup_type = ramble.pipeline.pipelines.setup
     analyze_type = ramble.pipeline.pipelines.analyze
@@ -38,8 +37,8 @@ def test_known_applications(application, capsys):
     archive_cls = ramble.pipeline.pipeline_class(archive_type)
     filters = ramble.filters.Filters()
 
-    workload_regex = re.compile(r'Workload: (?P<wl_name>.*)')
-    ws_name = f'test_all_apps_{application}'
+    workload_regex = re.compile(r"Workload: (?P<wl_name>.*)")
+    ws_name = f"test_all_apps_{application}"
 
     base_config = """ramble:
   variables:
@@ -49,30 +48,34 @@ def test_known_applications(application, capsys):
 
     app_info = info_cmd(application)
     workloads = []
-    for line in app_info.split('\n'):
+    for line in app_info.split("\n"):
         match = workload_regex.search(line)
         if match:
-            workloads.append(match.group('wl_name').replace(' ', ''))
+            workloads.append(match.group("wl_name").replace(" ", ""))
 
     with ramble.workspace.create(ws_name) as ws:
         ws.write()
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(base_config)
-            f.write(f'    {application}:\n')
-            f.write('      workloads:\n')
+            f.write(f"    {application}:\n")
+            f.write("      workloads:\n")
             for workload in workloads:
-                f.write(f"""        {workload.strip()}:
+                f.write(
+                    f"""        {workload.strip()}:
           experiments:
             test_experiment:
               variables:
                 n_ranks: '1'
                 n_nodes: '1'
-                processes_per_node: '1'\n""")
-            f.write("""  spack:
+                processes_per_node: '1'\n"""
+                )
+            f.write(
+                """  spack:
     packages: {}
-    environments: {}\n""")
+    environments: {}\n"""
+            )
 
         ws._re_read()
         ws.concretize()

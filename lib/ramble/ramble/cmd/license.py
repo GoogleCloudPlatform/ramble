@@ -15,12 +15,12 @@ import ramble.paths
 from ramble.util.logger import logger
 from spack.util.executable import which
 
-description = 'list and check license headers on files in ramble'
+description = "list and check license headers on files in ramble"
 section = "developer"
 level = "long"
 
 #: need the git command to check new files
-git = which('git')
+git = which("git")
 
 #: SPDX license id must appear in the first <license_lines> lines of a file
 license_lines = 9
@@ -31,43 +31,38 @@ apache2_mit_spdx = "(Apache-2.0 OR MIT)"
 #: regular expressions for licensed files.
 licensed_files = [
     # ramble scripts
-    r'^bin/ramble$',
-    r'^bin/ramble-python$',
-
+    r"^bin/ramble$",
+    r"^bin/ramble-python$",
     # all of ramble core
-    r'^lib/ramble/ramble/.*\.py$',
-    r'^lib/ramble/ramble/.*\.sh$',
-    r'^lib/ramble/llnl/.*\.py$',
-
+    r"^lib/ramble/ramble/.*\.py$",
+    r"^lib/ramble/ramble/.*\.sh$",
+    r"^lib/ramble/llnl/.*\.py$",
     # rst files in documentation
-    r'^lib/ramble/docs/(?!command_index|ramble|llnl).*\.rst$',
-    r'^lib/ramble/docs/.*\.py$',
-
+    r"^lib/ramble/docs/(?!command_index|ramble|llnl).*\.rst$",
+    r"^lib/ramble/docs/.*\.py$",
     # 2 files in external
-    r'^lib/ramble/external/__init__.py$',
-    r'^lib/ramble/external/ordereddict_backport.py$',
-
+    r"^lib/ramble/external/__init__.py$",
+    r"^lib/ramble/external/ordereddict_backport.py$",
     # shell scripts in share
-    r'^share/ramble/.*\.sh$',
-    r'^share/ramble/.*\.bash$',
-    r'^share/ramble/.*\.csh$',
-    r'^share/ramble/qa/run-[^/]*$',
-
+    r"^share/ramble/.*\.sh$",
+    r"^share/ramble/.*\.bash$",
+    r"^share/ramble/.*\.csh$",
+    r"^share/ramble/qa/run-[^/]*$",
     # all applications
-    r'^var/ramble/repos/.*/application.py$'
+    r"^var/ramble/repos/.*/application.py$",
 ]
 
 #: licensed files that can have LGPL language in them
 #: so far, just this command -- so it can find LGPL things elsewhere
 lgpl_exceptions = [
-    r'lib/ramble/ramble/cmd/license.py',
-    r'lib/ramble/ramble/test/cmd/license.py',
+    r"lib/ramble/ramble/cmd/license.py",
+    r"lib/ramble/ramble/test/cmd/license.py",
 ]
 
 
 def _get_modified_files(root):
     """Get a list of modified files in the current repository."""
-    diff_args = ['-C', root, 'diff', 'HEAD', '--name-only']
+    diff_args = ["-C", root, "diff", "HEAD", "--name-only"]
     files = git(*diff_args, output=str).split()
     return files
 
@@ -120,28 +115,29 @@ class LicenseError(object):
         spdx_mismatch = self.error_counts[SPDX_MISMATCH]
         old_license = self.error_counts[OLD_LICENSE]
         return (
-            '%d improperly licensed files' % (total),
-            'files with wrong SPDX-License-Identifier:   %d' % spdx_mismatch,
-            'files with old license header:              %d' % old_license,
-            'files not containing expected license:      %d' % missing)
+            "%d improperly licensed files" % (total),
+            "files with wrong SPDX-License-Identifier:   %d" % spdx_mismatch,
+            "files with old license header:              %d" % old_license,
+            "files not containing expected license:      %d" % missing,
+        )
 
 
 def _check_license(lines, path):
     license_lines = [
-        r'Copyright 2022-2024 The Ramble Authors',  # noqa: E501
-        r'Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or',  # noqa: E501
-        r'https://www.apache.org/licenses/LICENSE-2.0> or the MIT license',  # noqa: E501
-        r'<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your',  # noqa: E501
-        r'option. This file may not be copied, modified, or distributed',  # noqa: E501
-        r'except according to those terms.'  # noqa: E501
+        r"Copyright 2022-2024 The Ramble Authors",  # noqa: E501
+        r"Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",  # noqa: E501
+        r"https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",  # noqa: E501
+        r"<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",  # noqa: E501
+        r"option. This file may not be copied, modified, or distributed",  # noqa: E501
+        r"except according to those terms.",  # noqa: E501
     ]
 
-    strict_date = r'Copyright 2024'
+    strict_date = r"Copyright 2024"
 
     found = []
 
     for line in lines:
-        line = re.sub(r'^[\s#\.]*', '', line)
+        line = re.sub(r"^[\s#\.]*", "", line)
         line = line.rstrip()
         for i, license_line in enumerate(license_lines):
             if re.match(license_line, line):
@@ -150,25 +146,26 @@ def _check_license(lines, path):
                 # out of date.
                 if i == 0:
                     if not re.search(strict_date, line):
-                        logger.debug(f'{path}: copyright date mismatch')
+                        logger.debug(f"{path}: copyright date mismatch")
                 found.append(i)
 
     if len(found) == len(license_lines) and found == list(sorted(found)):
         return
 
     def old_license(line, path):
-        if re.search('This program is free software', line):
-            print('{0}: has old LGPL license header'.format(path))
+        if re.search("This program is free software", line):
+            print("{0}: has old LGPL license header".format(path))
             return OLD_LICENSE
 
     # If the SPDX identifier is present, then there is a mismatch (since it
     # did not match the above regex)
     def wrong_spdx_identifier(line, path):
-        m = re.search(r'SPDX-License-Identifier: ([^\n]*)', line)
+        m = re.search(r"SPDX-License-Identifier: ([^\n]*)", line)
         if m and m.group(1) != apache2_mit_spdx:
-            print('{0}: SPDX license identifier mismatch'
-                  '(expecting {1}, found {2})'
-                  .format(path, apache2_mit_spdx, m.group(1)))
+            print(
+                "{0}: SPDX license identifier mismatch"
+                "(expecting {1}, found {2})".format(path, apache2_mit_spdx, m.group(1))
+            )
             return SPDX_MISMATCH
 
     checks = [old_license, wrong_spdx_identifier]
@@ -179,7 +176,7 @@ def _check_license(lines, path):
             if error:
                 return error
 
-    print('{0}: the license does not match the expected format'.format(path))
+    print("{0}: the license does not match the expected format".format(path))
     return GENERAL_MISMATCH
 
 
@@ -200,36 +197,37 @@ def verify(args):
     if license_errors.has_errors():
         logger.die(*license_errors.error_messages())
     else:
-        logger.msg('No license issues found.')
+        logger.msg("No license issues found.")
 
 
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='license_command')
-    sp.add_parser('list-files', help=list_files.__doc__,
-                  description=list_files.__doc__)
+    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="license_command")
+    sp.add_parser("list-files", help=list_files.__doc__, description=list_files.__doc__)
 
-    verify_parser = sp.add_parser('verify', help=verify.__doc__,
-                                  description=verify.__doc__)
+    verify_parser = sp.add_parser("verify", help=verify.__doc__, description=verify.__doc__)
     verify_parser.add_argument(
-        '--root', action='store', default=ramble.paths.prefix,
-        help='scan a different prefix for license issues')
+        "--root",
+        action="store",
+        default=ramble.paths.prefix,
+        help="scan a different prefix for license issues",
+    )
     verify_parser.add_argument(
-        '--modified',
-        '-m',
-        action='store_true',
+        "--modified",
+        "-m",
+        action="store_true",
         default=False,
-        help='verify only the modified files as outputted by `git ls-files --modified`',
+        help="verify only the modified files as outputted by `git ls-files --modified`",
     )
 
 
 def license(parser, args):
     if not git:
-        logger.die('ramble license requires git in your environment')
+        logger.die("ramble license requires git in your environment")
 
     licensed_files[:] = [re.compile(regex) for regex in licensed_files]
 
     commands = {
-        'list-files': list_files,
-        'verify': verify,
+        "list-files": list_files,
+        "verify": verify,
     }
     return commands[args.license_command](args)

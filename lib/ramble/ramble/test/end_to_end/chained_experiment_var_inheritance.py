@@ -19,15 +19,13 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 @pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
-def test_chained_experiment_variable_inheritance(mutable_config,
-                                                 mutable_mock_workspace_path):
+def test_chained_experiment_variable_inheritance(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:
   formatted_executables:
@@ -122,13 +120,13 @@ ramble:
 
     filters = ramble.filters.Filters()
 
-    workspace_name = 'test_chained_experiment_variable_inheritance'
+    workspace_name = "test_chained_experiment_variable_inheritance"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -137,25 +135,26 @@ ramble:
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
 
-        template_dir = os.path.join(ws.experiment_dir, 'intel-mpi-benchmarks')
+        template_dir = os.path.join(ws.experiment_dir, "intel-mpi-benchmarks")
         assert not os.path.exists(template_dir)
 
-        parent_dir = os.path.join(ws.experiment_dir, 'gromacs', 'water_bare',
-                                  'parent_test')
-        script = os.path.join(parent_dir, 'execute_experiment')
+        parent_dir = os.path.join(ws.experiment_dir, "gromacs", "water_bare", "parent_test")
+        script = os.path.join(parent_dir, "execute_experiment")
         assert os.path.exists(script)
 
         # Check all chained experiments have the correct arguments
-        with open(script, 'r') as f:
+        with open(script, "r") as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
-            chained_script = os.path.join(parent_dir, 'chained_experiments',
-                                          f'{chain_idx}' +
-                                          r'.intel-mpi-benchmarks.collective.collective_chain',
-                                          'execute_experiment')
+            chained_script = os.path.join(
+                parent_dir,
+                "chained_experiments",
+                f"{chain_idx}" + r".intel-mpi-benchmarks.collective.collective_chain",
+                "execute_experiment",
+            )
             assert os.path.exists(chained_script)
             assert chained_script in parent_script_data
 
-            with open(chained_script, 'r') as f:
-                assert 'mpirun -n 20 -ppn 10' in f.read()
+            with open(chained_script, "r") as f:
+                assert "mpirun -n 20 -ppn 10" in f.read()

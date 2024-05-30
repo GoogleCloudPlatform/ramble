@@ -14,37 +14,31 @@
 
 
 success_criteria_def = {
-    'type': 'object',
-    'default': {},
-    'properties': {
-        'name': {'type': 'string'},
-        'mode': {'type': 'string'},
-        'match': {'type': 'string', 'default': None},
-        'file': {'type': 'string', 'default': None},
-        'fom_name': {'type': 'string', 'default': None},
-        'fom_context': {'type': 'string', 'default': None},
-        'formula': {'type': 'string', 'default': None}
+    "type": "object",
+    "default": {},
+    "properties": {
+        "name": {"type": "string"},
+        "mode": {"type": "string"},
+        "match": {"type": "string", "default": None},
+        "file": {"type": "string", "default": None},
+        "fom_name": {"type": "string", "default": None},
+        "fom_context": {"type": "string", "default": None},
+        "formula": {"type": "string", "default": None},
     },
-    'additionalProperties': False,
+    "additionalProperties": False,
 }
 
-success_list_def = {
-    'type': 'array',
-    'default': [],
-    'items': success_criteria_def
-}
+success_list_def = {"type": "array", "default": [], "items": success_criteria_def}
 
 
 #: Properties for inclusion in other schemas
-properties = {
-    'success_criteria': success_list_def
-}
+properties = {"success_criteria": success_list_def}
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble success criteria configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble success criteria configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

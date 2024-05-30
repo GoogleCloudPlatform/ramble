@@ -12,23 +12,23 @@ import pytest
 import ramble.paths
 import ramble.cmd.results
 
-INPUT_DATA = py.path.local(ramble.paths.test_path).join('data', 'results_upload')
+INPUT_DATA = py.path.local(ramble.paths.test_path).join("data", "results_upload")
 
 
 @pytest.mark.parametrize(
-    'filename,expected_output',
+    "filename,expected_output",
     [
         (
-            py.path.local(INPUT_DATA).join('test1_empty_experiments.json'),
-            'Error parsing file: Does not contain valid data to upload.',
+            py.path.local(INPUT_DATA).join("test1_empty_experiments.json"),
+            "Error parsing file: Does not contain valid data to upload.",
         ),
         (
-            py.path.local(INPUT_DATA).join('test2_not_json.txt.json'),
-            'Error parsing file: Invalid JSON formatting.',
+            py.path.local(INPUT_DATA).join("test2_not_json.txt.json"),
+            "Error parsing file: Invalid JSON formatting.",
         ),
         (
-            py.path.local(INPUT_DATA).join('test3_malformed_json.json'),
-            'Error parsing file: Invalid JSON formatting',
+            py.path.local(INPUT_DATA).join("test3_malformed_json.json"),
+            "Error parsing file: Invalid JSON formatting",
         ),
     ],
 )

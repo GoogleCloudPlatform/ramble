@@ -35,8 +35,9 @@ def shell_init_instructions(cmd, equivalent):
         color.colorize("@*c{For csh/tcsh:}"),
         "  source %s/setup-env.csh" % ramble.paths.share_path,
         "",
-        "Or, if you do not want to use shell support, run " + (
-            "one of these" if shell_specific else "this") + " instead:",
+        "Or, if you do not want to use shell support, run "
+        + ("one of these" if shell_specific else "this")
+        + " instead:",
         "",
     ]
 
@@ -48,5 +49,5 @@ def shell_init_instructions(cmd, equivalent):
     else:
         msg += ["  " + equivalent]
 
-    msg += ['']
+    msg += [""]
     logger.error(*msg)

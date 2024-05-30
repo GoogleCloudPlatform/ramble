@@ -19,46 +19,44 @@ import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.licenses
 
-env_properties = spack.schema.env.schema['patternProperties']
-spec_properties = env_properties['^env|spack$']
+env_properties = spack.schema.env.schema["patternProperties"]
+spec_properties = env_properties["^env|spack$"]
 
-applications_properties = ramble.schema.applications.properties['applications']
-app_addProps = applications_properties['additionalProperties']
+applications_properties = ramble.schema.applications.properties["applications"]
+app_addProps = applications_properties["additionalProperties"]
 
-keys = ('ramble', 'workspace')
+keys = ("ramble", "workspace")
 
 #: Properties for inclusion in other schemas
 properties = {
-    'ramble': {
-        'type': 'object',
-        'default': {},
-        'properties': union_dicts(
+    "ramble": {
+        "type": "object",
+        "default": {},
+        "properties": union_dicts(
             ramble.schema.merged.properties,
             {
-                'include': {
-                    'type': 'array',
-                    'default': [],
-                    'items': {'type': 'string'},
+                "include": {
+                    "type": "array",
+                    "default": [],
+                    "items": {"type": "string"},
                 },
-                'application_directories': {
-                    'type': 'array',
-                    'default': [],
-                    'items': {
-                        'type': 'string'
-                    }
-                }
-            }
+                "application_directories": {
+                    "type": "array",
+                    "default": [],
+                    "items": {"type": "string"},
+                },
+            },
         ),
-        'additionalProperties': False,
+        "additionalProperties": False,
     },
 }
 
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble workspace configuration file schema',
-    'type': 'object',
-    'additionalProperties': ramble.schema.spack.properties,
-    'properties': properties,
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble workspace configuration file schema",
+    "type": "object",
+    "additionalProperties": ramble.schema.spack.properties,
+    "properties": properties,
 }

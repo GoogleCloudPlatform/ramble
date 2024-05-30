@@ -42,20 +42,20 @@ supported_math_operators = {
 }
 
 supported_scalar_function_pointers = {
-    'str': str,
-    'int': int,
-    'float': float,
-    'max': max,
-    'min': min,
-    'ceil': math.ceil,
-    'floor': math.floor,
-    'randrange': random.randrange,
-    'randint': random.randint,
-    'simplify_str': spack.util.naming.simplify_name
+    "str": str,
+    "int": int,
+    "float": float,
+    "max": max,
+    "min": min,
+    "ceil": math.ceil,
+    "floor": math.floor,
+    "randrange": random.randrange,
+    "randint": random.randint,
+    "simplify_str": spack.util.naming.simplify_name,
 }
 
 supported_list_function_pointers = {
-    'range': range,
+    "range": range,
 }
 
 
@@ -64,15 +64,17 @@ formatter = string.Formatter()
 
 class ExpansionDelimiter(object):
     """Class representing the delimiters for ramble expansion strings"""
-    left = '{'
-    right = '}'
-    escape = '\\'
+
+    left = "{"
+    right = "}"
+    escape = "\\"
 
 
 class VformatDelimiter(object):
     """Class representing the delimiters for the string.Formatter class"""
-    left = '{'
-    right = '}'
+
+    left = "{"
+    right = "}"
 
 
 class ExpansionNode(object):
@@ -89,13 +91,13 @@ class ExpansionNode(object):
 
     def __str__(self):
         lines = []
-        lines.append('   Node:')
-        lines.append(f'      Indices: ({self.left}, {self.right})')
-        lines.append(f'      Num Children: ({len(self.children)})')
+        lines.append("   Node:")
+        lines.append(f"      Indices: ({self.left}, {self.right})")
+        lines.append(f"      Num Children: ({len(self.children)})")
         lines.append(f'      Contents: "{self.contents}"')
         lines.append(f'      Value: "{self.value}"')
         lines.append(f'      Is root: "{self is self.root}"')
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def relative_indices(self, relative_to):
         """Compute node indices relative to another node
@@ -119,9 +121,15 @@ class ExpansionNode(object):
         else:
             self.children.append(children)
 
-    def define_value(self, expansion_dict, allow_passthrough=True,
-                     expansion_func=str, evaluation_func=eval,
-                     no_expand_vars=set(), used_vars=set()):
+    def define_value(
+        self,
+        expansion_dict,
+        allow_passthrough=True,
+        expansion_func=str,
+        evaluation_func=eval,
+        no_expand_vars=set(),
+        used_vars=set(),
+    ):
         """Define the value for this node.
 
         Construct the value of self. This builds up a string representation of
@@ -146,7 +154,7 @@ class ExpansionNode(object):
             last_idx = 0
             for child in self.children:
                 child_indices = child.relative_indices(self)
-                parts.append(self.contents[last_idx:child_indices[0]])
+                parts.append(self.contents[last_idx : child_indices[0]])
                 parts.append(str(child.value))
                 last_idx = child_indices[1] + 1
 
@@ -154,15 +162,15 @@ class ExpansionNode(object):
                 parts.append(self.contents[last_idx:])
 
             if self != self.root:
-                replaced_contents = ''.join(parts)
+                replaced_contents = "".join(parts)
 
                 # Special case '{}'
                 if len(replaced_contents) == 2:
-                    self.value = '{}'
+                    self.value = "{}"
                     return
 
                 format_kw = replaced_contents[1:-1]
-                kw_parts = format_kw.split(':')
+                kw_parts = format_kw.split(":")
                 required_passthrough = False
 
                 if kw_parts[0] in expansion_dict:
@@ -172,9 +180,11 @@ class ExpansionNode(object):
                         self.value = expansion_dict[kw_parts[0]]
                         return
                     else:
-                        self.value = expansion_func(expansion_dict,
-                                                    expansion_dict[kw_parts[0]],
-                                                    allow_passthrough=allow_passthrough)
+                        self.value = expansion_func(
+                            expansion_dict,
+                            expansion_dict[kw_parts[0]],
+                            allow_passthrough=allow_passthrough,
+                        )
                 else:
                     self.value = kw_parts[0]
                     required_passthrough = True
@@ -190,25 +200,26 @@ class ExpansionNode(object):
 
                 # If we had a format spec, add it
                 if len(kw_parts) > 1:
-                    kw_dict = {'value': self.value}
-                    format_str = f'value:{kw_parts[1]}'
+                    kw_dict = {"value": self.value}
+                    format_str = f"value:{kw_parts[1]}"
                     try:
-                        self.value = formatter.vformat(VformatDelimiter.left +
-                                                       format_str +
-                                                       VformatDelimiter.right,
-                                                       [], kw_dict)
+                        self.value = formatter.vformat(
+                            VformatDelimiter.left + format_str + VformatDelimiter.right,
+                            [],
+                            kw_dict,
+                        )
                         required_passthrough = False
                     except ValueError:
-                        self.value += f':{kw_parts[1]}'
+                        self.value += f":{kw_parts[1]}"
                     except KeyError:
-                        self.value += f':{kw_parts[1]}'
+                        self.value += f":{kw_parts[1]}"
 
                 if required_passthrough:
-                    self.value = f'{{{self.value}}}'
+                    self.value = f"{{{self.value}}}"
                     if not allow_passthrough:
                         raise_passthrough_error(self.contents, self.value)
             else:
-                replaced_contents = ''.join(parts)
+                replaced_contents = "".join(parts)
                 try:
                     self.value = evaluation_func(replaced_contents)
                 except SyntaxError:
@@ -216,7 +227,7 @@ class ExpansionNode(object):
 
                 # Replace escaped curly braces with curly braces
                 if isinstance(self.value, six.string_types):
-                    self.value = self.value.replace('\\{', '{').replace('\\}', '}')
+                    self.value = self.value.replace("\\{", "{").replace("\\}", "}")
 
 
 class ExpansionGraph(object):
@@ -241,14 +252,14 @@ class ExpansionGraph(object):
 
                 cur_match = ExpansionNode(left_idx, right_idx)
                 cur_match.add_children(children.pop())
-                cur_match.contents = self.str[left_idx:right_idx + 1]  # Define contents
+                cur_match.contents = self.str[left_idx : right_idx + 1]  # Define contents
                 cur_match.root = self.root
 
                 if len(opened) > 0:
                     children[-1].append(cur_match)
                 else:
                     self.root.add_children(cur_match)
-            elif c == '\n':  # Don't expand across new lines
+            elif c == "\n":  # Don't expand across new lines
                 opened = []
 
             if c == ExpansionDelimiter.escape:
@@ -279,15 +290,15 @@ class ExpansionGraph(object):
 
     def __str__(self):
         lines = []
-        lines.append(f'Processing string: {self.str}')
+        lines.append(f"Processing string: {self.str}")
         for node in self.walk():
-            lines.append((f'{node}'))
-        return '\n'.join(lines)
+            lines.append((f"{node}"))
+        return "\n".join(lines)
 
 
 class ExpansionDict(dict):
     def __missing__(self, key):
-        return '{' + key + '}'
+        return "{" + key + "}"
 
 
 class Expander(object):
@@ -301,6 +312,7 @@ class Expander(object):
 
     Additionally, math will be evaluated as part of expansion.
     """
+
     def __init__(self, variables, experiment_set, no_expand_vars=set()):
 
         self._keywords = ramble.keywords.keywords
@@ -373,17 +385,18 @@ class Expander(object):
     @property
     def workload_namespace(self):
         if not self._workload_namespace:
-            self._workload_namespace = '%s.%s' % (self.application_name,
-                                                  self.workload_name)
+            self._workload_namespace = "%s.%s" % (self.application_name, self.workload_name)
 
         return self._workload_namespace
 
     @property
     def experiment_namespace(self):
         if not self._experiment_namespace:
-            self._experiment_namespace = '%s.%s.%s' % (self.application_name,
-                                                       self.workload_name,
-                                                       self.experiment_name)
+            self._experiment_namespace = "%s.%s.%s" % (
+                self.application_name,
+                self.workload_name,
+                self.experiment_name,
+            )
 
         return self._experiment_namespace
 
@@ -398,8 +411,9 @@ class Expander(object):
     @property
     def application_input_dir(self):
         if not self._application_input_dir:
-            self._application_input_dir = \
-                self.expand_var_name(self._keywords.application_input_dir)
+            self._application_input_dir = self.expand_var_name(
+                self._keywords.application_input_dir
+            )
 
         return self._application_input_dir
 
@@ -450,7 +464,7 @@ class Expander(object):
         pulling a list from a different experiment.
         """
         try:
-            math_ast = ast.parse(str(var), mode='eval')
+            math_ast = ast.parse(str(var), mode="eval")
             value = self.eval_math(math_ast.body)
             if isinstance(value, list):
                 return value
@@ -464,8 +478,13 @@ class Expander(object):
         except SyntaxError:
             return var
 
-    def expand_var_name(self, var_name: str, extra_vars: Dict = None,
-                        allow_passthrough: bool = True, typed: bool = False):
+    def expand_var_name(
+        self,
+        var_name: str,
+        extra_vars: Dict = None,
+        allow_passthrough: bool = True,
+        typed: bool = False,
+    ):
         """Convert a variable name to an expansion string, and expand it
 
         Take a variable name (var) and convert it to an expansion string by
@@ -479,13 +498,20 @@ class Expander(object):
                                       after expansion
             typed (bool): Whether the return type should be typed or not
         """
-        return self.expand_var(self.expansion_str(var_name),
-                               extra_vars=extra_vars,
-                               allow_passthrough=allow_passthrough,
-                               typed=typed)
+        return self.expand_var(
+            self.expansion_str(var_name),
+            extra_vars=extra_vars,
+            allow_passthrough=allow_passthrough,
+            typed=typed,
+        )
 
-    def expand_var(self, var: str, extra_vars: Dict = None,
-                   allow_passthrough: bool = True, typed: bool = False):
+    def expand_var(
+        self,
+        var: str,
+        extra_vars: Dict = None,
+        allow_passthrough: bool = True,
+        typed: bool = False,
+    ):
         """Perform expansion of a string
 
         Expand a string by building up a dict of all
@@ -502,34 +528,35 @@ class Expander(object):
         passthrough_setting = allow_passthrough
 
         # If disable_passthrough is set, override allow_passthrough from caller
-        if ramble.config.get('config:disable_passthrough'):
+        if ramble.config.get("config:disable_passthrough"):
             passthrough_setting = False
 
-        logger.debug(f'BEGINNING OF EXPAND_VAR STACK ON {var}')
+        logger.debug(f"BEGINNING OF EXPAND_VAR STACK ON {var}")
         expansions = self._variables
         if extra_vars:
             expansions = self._variables.copy()
             expansions.update(extra_vars)
 
         try:
-            value = self._partial_expand(expansions,
-                                         str(var),
-                                         allow_passthrough=passthrough_setting).lstrip()
+            value = self._partial_expand(
+                expansions, str(var), allow_passthrough=passthrough_setting
+            ).lstrip()
         except RamblePassthroughError as e:
             if not passthrough_setting:
-                raise RambleSyntaxError(f'Encountered a passthrough error while expanding {var}\n'
-                                        f'{e}')
+                raise RambleSyntaxError(
+                    f"Encountered a passthrough error while expanding {var}\n" f"{e}"
+                )
 
-        logger.debug(f'END OF EXPAND_VAR STACK {value}')
+        logger.debug(f"END OF EXPAND_VAR STACK {value}")
         if typed:
-            logger.debug(f'BEGINNING OF TYPING ON {value}')
+            logger.debug(f"BEGINNING OF TYPING ON {value}")
             try:
                 value = ast.literal_eval(value)
-                logger.debug(f'END OF TYPING {value}')
+                logger.debug(f"END OF TYPING {value}")
             except ValueError:
-                logger.debug('END OF TYPING Failed with ValueError')
+                logger.debug("END OF TYPING Failed with ValueError")
             except SyntaxError:
-                logger.debug('END OF TYPING Failed with SyntaxError')
+                logger.debug("END OF TYPING Failed with SyntaxError")
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):
@@ -546,19 +573,21 @@ class Expander(object):
         evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
 
         if not isinstance(evaluated, six.string_types):
-            logger.die('Logical compute failed to return a string')
+            logger.die("Logical compute failed to return a string")
 
-        if evaluated == 'True':
+        if evaluated == "True":
             return True
-        elif evaluated == 'False':
+        elif evaluated == "False":
             return False
         else:
-            logger.die(f'When evaluating {in_str}, evaluate_predicate returned '
-                       f'a non-boolean string: "{evaluated}"')
+            logger.die(
+                f"When evaluating {in_str}, evaluate_predicate returned "
+                f'a non-boolean string: "{evaluated}"'
+            )
 
     @staticmethod
     def expansion_str(in_str):
-        return f'{ExpansionDelimiter.left}{in_str}{ExpansionDelimiter.right}'
+        return f"{ExpansionDelimiter.left}{in_str}{ExpansionDelimiter.right}"
 
     def _partial_expand(self, expansion_vars, in_str, allow_passthrough=True):
         """Perform expansion of a string with some variables
@@ -576,12 +605,14 @@ class Expander(object):
         if isinstance(in_str, six.string_types):
             str_graph = ExpansionGraph(in_str)
             for node in str_graph.walk():
-                node.define_value(expansion_vars,
-                                  allow_passthrough=allow_passthrough,
-                                  expansion_func=self._partial_expand,
-                                  evaluation_func=self.perform_math_eval,
-                                  no_expand_vars=self._no_expand_vars,
-                                  used_vars=self._used_variables)
+                node.define_value(
+                    expansion_vars,
+                    allow_passthrough=allow_passthrough,
+                    expansion_func=self._partial_expand,
+                    evaluation_func=self.perform_math_eval,
+                    no_expand_vars=self._no_expand_vars,
+                    used_vars=self._used_variables,
+                )
 
             return str(str_graph.root.value)
 
@@ -599,7 +630,7 @@ class Expander(object):
 
         """
         try:
-            math_ast = ast.parse(in_str, mode='eval')
+            math_ast = ast.parse(in_str, mode="eval")
             out_str = self.eval_math(math_ast.body)
             return out_str
         except MathEvaluationError as e:
@@ -642,14 +673,16 @@ class Expander(object):
             return self._eval_function_call(node)
         else:
             node_type = str(type(node))
-            raise MathEvaluationError(f'Unsupported math AST node {node_type}:\n' +
-                                      f'\t{node.__dict__}')
+            raise MathEvaluationError(
+                f"Unsupported math AST node {node_type}:\n" + f"\t{node.__dict__}"
+            )
 
     # Ast logic helper methods
     def __raise_syntax_error(self, node):
         node_type = str(type(node))
-        raise RambleSyntaxError(f'Syntax error while processing {node_type} node:\n' +
-                                f'{node.__dict__}')
+        raise RambleSyntaxError(
+            f"Syntax error while processing {node_type} node:\n" + f"{node.__dict__}"
+        )
 
     def _ast_num(self, node):
         """Handle a number node in the ast"""
@@ -672,7 +705,7 @@ class Expander(object):
         else:
             self.__raise_syntax_error(node)
 
-        val = f'{base}.{node.attr}'
+        val = f"{base}.{node.attr}"
         return val
 
     def _eval_function_call(self, node):
@@ -691,11 +724,12 @@ class Expander(object):
         elif node.func.id in supported_list_function_pointers.keys():
             func = supported_list_function_pointers[node.func.id]
             return list(func(*args, **kwargs))
-        elif node.func.id == 'replace':
+        elif node.func.id == "replace":
             return str(args[0]).replace(*args[1:], **kwargs)
         else:
-            raise MathEvaluationError(f'Undefined function {node.func.id} used.\n'
-                                      'returning unexapanded string')
+            raise MathEvaluationError(
+                f"Undefined function {node.func.id} used.\n" "returning unexapanded string"
+            )
 
     def _eval_bool_op(self, node):
         """Handle a boolean operator node in the ast"""
@@ -710,9 +744,9 @@ class Expander(object):
             return result
 
         except TypeError:
-            raise SyntaxError('Unsupported operand type in boolean operator')
+            raise SyntaxError("Unsupported operand type in boolean operator")
         except KeyError:
-            raise SyntaxError('Unsupported boolean operator')
+            raise SyntaxError("Unsupported boolean operator")
 
     def _eval_comparisons(self, node):
         """Handle a comparison node in the ast"""
@@ -722,7 +756,7 @@ class Expander(object):
             return self._eval_comp_in(node)
 
         if len(node.ops) == 1 and isinstance(node.ops[0], ast.Is):
-            raise RambleSyntaxError('Encountered unsupported operator `is`')
+            raise RambleSyntaxError("Encountered unsupported operator `is`")
 
         # Try to evaluate the comparison logic, if not return the node as is.
         try:
@@ -744,9 +778,9 @@ class Expander(object):
                     cur_left = cur_right
             return result
         except TypeError:
-            raise SyntaxError('Unsupported operand type in binary comparison operator')
+            raise SyntaxError("Unsupported operand type in binary comparison operator")
         except KeyError:
-            raise SyntaxError('Unsupported binary comparison operator')
+            raise SyntaxError("Unsupported binary comparison operator")
 
     def _eval_comp_in(self, node):
         """Handle in nodes in the ast
@@ -760,17 +794,20 @@ class Expander(object):
             var_name = self._ast_name(node.left)
             if isinstance(node.comparators[0], ast.Attribute):
                 namespace = self.eval_math(node.comparators[0])
-                val = self._experiment_set.get_var_from_experiment(namespace,
-                                                                   self.expansion_str(var_name))
+                val = self._experiment_set.get_var_from_experiment(
+                    namespace, self.expansion_str(var_name)
+                )
                 if not val:
-                    raise RambleSyntaxError(f'{namespace} does not exist in: ' +
-                                            f'"{var_name} in {namespace}"')
+                    raise RambleSyntaxError(
+                        f"{namespace} does not exist in: " + f'"{var_name} in {namespace}"'
+                    )
                     self.__raise_syntax_error(node)
                 return val
         # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
         # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
-        elif isinstance(node.left, ast.Constant) or \
-                (hasattr(ast, 'Str') and isinstance(node.left, ast.Str)):
+        elif isinstance(node.left, ast.Constant) or (
+            hasattr(ast, "Str") and isinstance(node.left, ast.Str)
+        ):
             lhs_value = self.eval_math(node.left)
 
             found = False
@@ -794,12 +831,12 @@ class Expander(object):
             right_eval = self.eval_math(node.right)
             op = supported_math_operators[type(node.op)]
             if isinstance(left_eval, six.string_types) or isinstance(right_eval, six.string_types):
-                raise SyntaxError('Unsupported operand type in binary operator')
+                raise SyntaxError("Unsupported operand type in binary operator")
             return op(left_eval, right_eval)
         except TypeError:
-            raise SyntaxError('Unsupported operand type in binary operator')
+            raise SyntaxError("Unsupported operand type in binary operator")
         except KeyError:
-            raise SyntaxError('Unsupported binary operator')
+            raise SyntaxError("Unsupported binary operator")
 
     def _eval_unary_ops(self, node):
         """Evaluate unary operators in the ast
@@ -809,24 +846,21 @@ class Expander(object):
         try:
             operand = self.eval_math(node.operand)
             if isinstance(operand, six.string_types):
-                raise SyntaxError('Unsupported operand type in unary operator')
+                raise SyntaxError("Unsupported operand type in unary operator")
             op = supported_math_operators[type(node.op)]
             return op(operand)
         except TypeError:
-            raise SyntaxError('Unsupported operand type in unary operator')
+            raise SyntaxError("Unsupported operand type in unary operator")
         except KeyError:
-            raise SyntaxError('Unsupported unary operator')
+            raise SyntaxError("Unsupported unary operator")
 
 
 def raise_passthrough_error(in_str, out_str):
     """Raise an error when passthrough is disabled but variables are not all expanded"""
 
-    logger.debug(f'Expansion stack errors: attempted to expand '
-                 f'"{in_str}"')
-    logger.debug(f'  As: {out_str}')
-    raise RamblePassthroughError('Error Stack:\n'
-                                 f'Input: "{in_str}"\n'
-                                 f'Output: "{out_str}"\n')
+    logger.debug(f"Expansion stack errors: attempted to expand " f'"{in_str}"')
+    logger.debug(f"  As: {out_str}")
+    raise RamblePassthroughError("Error Stack:\n" f'Input: "{in_str}"\n' f'Output: "{out_str}"\n')
 
 
 class ExpanderError(ramble.error.RambleError):

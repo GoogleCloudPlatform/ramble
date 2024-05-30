@@ -16,11 +16,11 @@ def specs_equiv(spec1, spec2):
         if spec2[key] is not None:
             all_keys.add(key)
 
-    if 'application_name' in all_keys:
-        all_keys.remove('application_name')
+    if "application_name" in all_keys:
+        all_keys.remove("application_name")
 
-    if 'spec_type' in all_keys:
-        all_keys.remove('spec_type')
+    if "spec_type" in all_keys:
+        all_keys.remove("spec_type")
 
     for key in all_keys:
         if key not in spec1:

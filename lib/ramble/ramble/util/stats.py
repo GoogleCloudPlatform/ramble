@@ -13,10 +13,10 @@ def decimal_places(value):
     """Returns the number of decimal places of a value"""
 
     val_str = str(value)
-    if '.' not in val_str:
+    if "." not in val_str:
         return 0
     else:
-        return len(val_str.split('.')[1])
+        return len(val_str.split(".")[1])
 
 
 def max_decimal_places(list):
@@ -39,53 +39,53 @@ class StatsBase(object):
         return unit
 
     def report(self, values, unit):
-        label = f'summary::{self.name}'
+        label = f"summary::{self.name}"
         if len(values) < self.min_count:
-            return ('NA', '', label)
+            return ("NA", "", label)
         return (self.compute(values), self.get_unit(unit), label)
 
 
 class StatsMin(StatsBase):
-    name = 'min'
+    name = "min"
 
     def compute(self, values):
         return min(values)
 
 
 class StatsMax(StatsBase):
-    name = 'max'
+    name = "max"
 
     def compute(self, values):
         return max(values)
 
 
 class StatsMean(StatsBase):
-    name = 'mean'
+    name = "mean"
 
     def compute(self, values):
         return round(statistics.mean(values), max_decimal_places(values))
 
 
 class StatsMedian(StatsBase):
-    name = 'median'
+    name = "median"
 
     def compute(self, values):
         return round(statistics.median(values), max_decimal_places(values))
 
 
 class StatsVar(StatsBase):
-    name = 'variance'
+    name = "variance"
     min_count = 2
 
     def get_unit(self, unit):
-        return f'{unit}^2'
+        return f"{unit}^2"
 
     def compute(self, values):
         return round(statistics.variance(values), max_decimal_places(values))
 
 
 class StatsStdev(StatsBase):
-    name = 'stdev'
+    name = "stdev"
     min_count = 2
 
     def compute(self, values):
@@ -93,19 +93,21 @@ class StatsStdev(StatsBase):
 
 
 class StatsCountValues(StatsBase):
-    name = 'n_successful_repeats'
+    name = "n_successful_repeats"
 
     def compute(self, values):
         return len(values)
 
     def get_unit(self, unit):
-        return 'repeats'
+        return "repeats"
 
 
-all_stats = [StatsMin(),
-             StatsMax(),
-             StatsMean(),
-             StatsMedian(),
-             StatsVar(),
-             StatsStdev(),
-             StatsCountValues()]
+all_stats = [
+    StatsMin(),
+    StatsMax(),
+    StatsMean(),
+    StatsMedian(),
+    StatsVar(),
+    StatsStdev(),
+    StatsCountValues(),
+]

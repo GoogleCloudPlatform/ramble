@@ -71,7 +71,7 @@ apidoc_args = [
     "--no-toc",  # Don't create a table of contents file
     "--output-dir=.",  # Directory to place all output
     "--module-first",  # emit module docs before submodule docs
-    "--implicit-namespaces"
+    "--implicit-namespaces",
 ]
 sphinx_apidoc(
     apidoc_args
@@ -400,6 +400,6 @@ intersphinx_mapping = {
 
 # sphinx_copybutton
 # Do not copy the prompt, or any console outputs.
-copybutton_exclude = '.gp, .go'
+copybutton_exclude = ".gp, .go"
 # Escape hatch for turning off the copy button.
 copybutton_selector = "div:not(.hide-copy) > div.highlight > pre"

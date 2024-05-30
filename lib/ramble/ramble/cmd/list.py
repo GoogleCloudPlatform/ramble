@@ -17,8 +17,7 @@ app_type = ramble.repository.ObjectTypes.applications
 
 
 def setup_parser(subparser):
-    ramble.cmd.common.list.setup_list_parser(subparser,
-                                             app_type)
+    ramble.cmd.common.list.setup_list_parser(subparser, app_type)
 
 
 def list(parser, args):

@@ -42,9 +42,11 @@ class Context(object):
     def merge_context(self, in_context):
         """Merges another Context into this Context."""
 
-        internal_sections = [namespace.custom_executables,
-                             namespace.executables,
-                             namespace.executable_injection]
+        internal_sections = [
+            namespace.custom_executables,
+            namespace.executables,
+            namespace.executable_injection,
+        ]
 
         if in_context.variables:
             self.variables.update(in_context.variables)
@@ -63,10 +65,10 @@ class Context(object):
                         if internal_section not in self.internals:
                             self.internals[internal_section] = []
                         self.internals[internal_section].extend(
-                            in_context.internals[internal_section])
-                    else:
-                        self.internals[internal_section] = \
                             in_context.internals[internal_section]
+                        )
+                    else:
+                        self.internals[internal_section] = in_context.internals[internal_section]
         if in_context.chained_experiments:
             for chained_exp in in_context.chained_experiments:
                 self.chained_experiments.append(chained_exp.copy())
@@ -148,9 +150,7 @@ def create_context_from_dict(context_name, in_dict):
         new_context.tags = in_dict[namespace.tags].copy()
 
     new_context.matrices = ramble.util.matrices.extract_matrices(
-        'experiment creation',
-        context_name,
-        in_dict
+        "experiment creation", context_name, in_dict
     )
 
     if namespace.n_repeats in in_dict:

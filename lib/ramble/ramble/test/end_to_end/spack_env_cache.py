@@ -18,11 +18,11 @@ from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    'mutable_config',
-    'mutable_mock_workspace_path',
+    "mutable_config",
+    "mutable_mock_workspace_path",
 )
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_spack_env_cache():
@@ -68,52 +68,50 @@ ramble:
         - gromacs
         - intel-mpi
 """
-    workspace_name = 'test-spack-env-cache'
+    workspace_name = "test-spack-env-cache"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-    with open(config_path, 'w+') as f:
+    with open(config_path, "w+") as f:
         f.write(test_config)
 
     ws._re_read()
 
     workspace(
-        'setup',
-        '--dry-run',
-        global_args=['-w', workspace_name],
+        "setup",
+        "--dry-run",
+        global_args=["-w", workspace_name],
     )
 
     # spack env should be present only at the env_name level.
-    assert os.path.exists(os.path.join(ws.software_dir, 'gromacs'))
-    assert os.path.exists(os.path.join(ws.software_dir, 'g2'))
-    assert not os.path.exists(os.path.join(ws.software_dir, 'g2.water_bare'))
+    assert os.path.exists(os.path.join(ws.software_dir, "gromacs"))
+    assert os.path.exists(os.path.join(ws.software_dir, "g2"))
+    assert not os.path.exists(os.path.join(ws.software_dir, "g2.water_bare"))
 
     # First encounter of an env_name (test1 -> gromacs, test2 -> g2) requires spack usage.
-    test1_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test1.out')
-    with open(test1_log, 'r') as f:
+    test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
+    with open(test1_log, "r") as f:
         content = f.read()
-        assert 'spack install' in content
-        assert 'spack concretize' in content
+        assert "spack install" in content
+        assert "spack concretize" in content
 
-    test2_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test2.out')
-    with open(test2_log, 'r') as f:
+    test2_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test2.out")
+    with open(test2_log, "r") as f:
         content = f.read()
-        assert 'spack install' in content
-        assert 'spack concretize' in content
+        assert "spack install" in content
+        assert "spack concretize" in content
 
     # Envs should already exist and can skip spack calls.
-    test3_log = os.path.join(ws.log_dir, 'setup.latest', 'gromacs.water_bare.test3.out')
-    with open(test3_log, 'r') as f:
+    test3_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test3.out")
+    with open(test3_log, "r") as f:
         content = f.read()
-        assert 'spack install' not in content
-        assert 'spack concretize' not in content
+        assert "spack install" not in content
+        assert "spack concretize" not in content
 
-    test4_log = os.path.join(
-        ws.log_dir, 'setup.latest', 'gromacs.water_gmx50.test4.out'
-    )
-    with open(test4_log, 'r') as f:
+    test4_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_gmx50.test4.out")
+    with open(test4_log, "r") as f:
         content = f.read()
-        assert 'spack install' not in content
-        assert 'spack concretize' not in content
+        assert "spack install" not in content
+        assert "spack concretize" not in content

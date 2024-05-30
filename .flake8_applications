@@ -8,7 +8,7 @@
 # dependents. So we add exceptions for checks related to undefined names.
 #
 # Note that we also add *per-line* exemptions for certain patterns in the
-# `ramble flake8` command.  This is where F403 for `from ramble import *`
+# `ramble style` command.  This is where F403 for `from ramble import *`
 # is added (because we *only* allow that wildcard).
 #
 # See .flake8 for regular exceptions.
@@ -20,5 +20,5 @@
 # - F821: undefined name `name`
 #
 [flake8]
-ignore = E129,E221,E241,E272,E731,E501,W503,W504,W605,F405,F821,F999,N801,N813,N814
+ignore = E129,E203,E221,E241,E272,E731,E501,W503,W504,W605,F405,F821,F999,N801,N813,N814
 max-line-length = 79

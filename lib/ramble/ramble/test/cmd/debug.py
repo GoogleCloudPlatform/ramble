@@ -8,11 +8,11 @@
 
 from ramble.main import RambleCommand
 
-debug = RambleCommand('debug')
+debug = RambleCommand("debug")
 
 
 def test_debug_report():
-    output = debug('report')
+    output = debug("report")
 
     assert "* **Ramble:**" in output
     assert "* **Python:**" in output

@@ -17,10 +17,9 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_gromacs_size_expansion(mutable_config, mutable_mock_workspace_path):
@@ -58,21 +57,22 @@ ramble:
         - intel-mpi
 """
 
-    workspace_name = 'test_gromacs_size_expansion'
+    workspace_name = "test_gromacs_size_expansion"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws1._re_read()
 
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-        exec_script_path = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
-                                        'expansion_test', 'execute_experiment')
+        exec_script_path = os.path.join(
+            ws1.experiment_dir, "gromacs", "water_bare", "expansion_test", "execute_experiment"
+        )
 
-        with open(exec_script_path, 'r') as f:
-            assert '0000.96' in f.read()
+        with open(exec_script_path, "r") as f:
+            assert "0000.96" in f.read()

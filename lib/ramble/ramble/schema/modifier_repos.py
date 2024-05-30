@@ -15,19 +15,19 @@
 
 #: Properties for inclusion in other schemas
 properties = {
-    'modifier_repos': {
-        'type': 'array',
-        'default': [],
-        'items': {'type': 'string'},
+    "modifier_repos": {
+        "type": "array",
+        "default": [],
+        "items": {"type": "string"},
     },
 }
 
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble modifier repository configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties,
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble modifier repository configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

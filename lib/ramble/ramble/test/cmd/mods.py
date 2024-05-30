@@ -10,44 +10,50 @@ import pytest
 
 from ramble.main import RambleCommand
 
-mods = RambleCommand('mods')
+mods = RambleCommand("mods")
 
 
 def check_info(output):
-    expected_sections = ['Tags', 'Mode', 'Builtin Executables',
-                         'Executable Modifiers', 'Default Compilers',
-                         'Software Specs', 'Package Manager Configs']
+    expected_sections = [
+        "Tags",
+        "Mode",
+        "Builtin Executables",
+        "Executable Modifiers",
+        "Default Compilers",
+        "Software Specs",
+        "Package Manager Configs",
+    ]
 
     for section in expected_sections:
         assert section in output
 
 
 def test_mods_list(mutable_mock_mods_repo):
-    out = mods('list')
+    out = mods("list")
 
-    assert 'test-mod' in out
+    assert "test-mod" in out
 
 
 def test_mods_list_tags(mutable_mock_mods_repo):
-    out = mods('list', '-t', 'test')
+    out = mods("list", "-t", "test")
 
-    assert 'test-mod' in out
+    assert "test-mod" in out
 
 
 def test_mods_list_description(mutable_mock_mods_repo):
-    out = mods('list', '-d', 'just a test')
+    out = mods("list", "-d", "just a test")
 
-    assert 'test-mod' in out
+    assert "test-mod" in out
 
 
 def test_mods_info(mutable_mock_mods_repo, mock_modifier):
-    out = mods('info', mock_modifier)
+    out = mods("info", mock_modifier)
 
     check_info(out)
 
 
 @pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
 def test_mods_info_all_real_modifiers(modifier):
-    mod_info = mods('info', modifier)
+    mod_info = mods("info", modifier)
 
     check_info(mod_info)

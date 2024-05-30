@@ -19,14 +19,14 @@ import ramble.test.cmd.workspace
 import ramble.main
 import spack.util.spack_yaml as syaml
 
-config = ramble.main.RambleCommand('config')
-workspace = ramble.main.RambleCommand('workspace')
+config = ramble.main.RambleCommand("config")
+workspace = ramble.main.RambleCommand("workspace")
 
 
-def _create_config(scope=None, data={}, section='repos'):
+def _create_config(scope=None, data={}, section="repos"):
     scope = scope or ramble.config.default_modify_scope()
     cfg_file = ramble.config.config.get_config_filename(scope, section)
-    with open(cfg_file, 'w') as f:
+    with open(cfg_file, "w") as f:
         syaml.dump(data, stream=f)
     return cfg_file
 
@@ -35,157 +35,191 @@ def _create_config(scope=None, data={}, section='repos'):
 def config_yaml_v015(mutable_config):
     """Create a config.yaml in the old format"""
     old_data = {
-        'config': {
-            'install_tree': '/fake/path',
-            'install_path_scheme': '{name}-{version}',
+        "config": {
+            "install_tree": "/fake/path",
+            "install_path_scheme": "{name}-{version}",
         }
     }
-    return functools.partial(_create_config, data=old_data, section='config')
+    return functools.partial(_create_config, data=old_data, section="config")
 
 
 def test_get_config_scope(mock_low_high_config):
-    assert config('get', 'repos').strip() == 'repos: {}'
+    assert config("get", "repos").strip() == "repos: {}"
 
 
 def test_get_config_scope_merged(mock_low_high_config):
-    low_path = mock_low_high_config.scopes['low'].path
-    high_path = mock_low_high_config.scopes['high'].path
+    low_path = mock_low_high_config.scopes["low"].path
+    high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, 'repos.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(low_path, "repos.yaml"), "w") as f:
+        f.write(
+            """\
 repos:
 - repo3
-''')
+"""
+        )
 
-    with open(os.path.join(high_path, 'repos.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(high_path, "repos.yaml"), "w") as f:
+        f.write(
+            """\
 repos:
 - repo1
 - repo2
-''')
+"""
+        )
 
-    assert config('get', 'repos').strip() == '''repos:
+    assert (
+        config("get", "repos").strip()
+        == """repos:
 - repo1
 - repo2
-- repo3'''
+- repo3"""
+    )
 
 
 def test_merged_variables_section(mock_low_high_config):
-    low_path = mock_low_high_config.scopes['low'].path
-    high_path = mock_low_high_config.scopes['high'].path
+    low_path = mock_low_high_config.scopes["low"].path
+    high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, 'variables.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(low_path, "variables.yaml"), "w") as f:
+        f.write(
+            """\
 variables:
   foo: 'bar'
-''')
+"""
+        )
 
-    with open(os.path.join(high_path, 'variables.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(high_path, "variables.yaml"), "w") as f:
+        f.write(
+            """\
 variables:
   bar: 'baz'
-''')
+"""
+        )
 
-    assert config('get', 'variables').strip() == '''variables:
+    assert (
+        config("get", "variables").strip()
+        == """variables:
   bar: baz
-  foo: bar'''
+  foo: bar"""
+    )
 
 
 def test_merged_env_vars_section(mock_low_high_config):
-    low_path = mock_low_high_config.scopes['low'].path
-    high_path = mock_low_high_config.scopes['high'].path
+    low_path = mock_low_high_config.scopes["low"].path
+    high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, 'env_vars.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(low_path, "env_vars.yaml"), "w") as f:
+        f.write(
+            """\
 env_vars:
   set:
     FOO: bar
-''')
+"""
+        )
 
-    with open(os.path.join(high_path, 'env_vars.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(high_path, "env_vars.yaml"), "w") as f:
+        f.write(
+            """\
 env_vars:
   append:
     vars:
       FOO: baz
-''')
+"""
+        )
 
-    assert config('get', 'env_vars').strip() == '''env_vars:
+    assert (
+        config("get", "env_vars").strip()
+        == """env_vars:
   append:
     vars:
       FOO: baz
   set:
-    FOO: bar'''
+    FOO: bar"""
+    )
 
 
 def test_merged_spack_section(mock_low_high_config):
-    low_path = mock_low_high_config.scopes['low'].path
-    high_path = mock_low_high_config.scopes['high'].path
+    low_path = mock_low_high_config.scopes["low"].path
+    high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, 'spack.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(low_path, "spack.yaml"), "w") as f:
+        f.write(
+            """\
 spack:
   packages:
     gcc:
       spack_spec: gcc@4.8.5
-''')
+"""
+        )
 
-    with open(os.path.join(high_path, 'spack.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(high_path, "spack.yaml"), "w") as f:
+        f.write(
+            """\
 spack:
   packages:
     zlib:
       spack_spec: zlib
       compiler: gcc
-''')
+"""
+        )
 
-    assert config('get', 'spack').strip() == '''spack:
+    assert (
+        config("get", "spack").strip()
+        == """spack:
   packages:
     zlib:
       spack_spec: zlib
       compiler: gcc
     gcc:
-      spack_spec: gcc@4.8.5'''
+      spack_spec: gcc@4.8.5"""
+    )
 
 
 def test_merged_success_criteria_section(mock_low_high_config):
-    low_path = mock_low_high_config.scopes['low'].path
-    high_path = mock_low_high_config.scopes['high'].path
+    low_path = mock_low_high_config.scopes["low"].path
+    high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, 'success_criteria.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(low_path, "success_criteria.yaml"), "w") as f:
+        f.write(
+            """\
 success_criteria:
   - name: done
     mode: string
     match: "DONE"
     file: "{log_file}"
-''')
+"""
+        )
 
-    with open(os.path.join(high_path, 'success_criteria.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(high_path, "success_criteria.yaml"), "w") as f:
+        f.write(
+            """\
 success_criteria:
   - name: complete
     mode: string
     match: "COMPLETE"
     file: "{log_file}"
-''')
+"""
+        )
 
-    assert config('get', 'success_criteria').strip() == """success_criteria:
+    assert (
+        config("get", "success_criteria").strip()
+        == """success_criteria:
 - name: complete
   mode: string
   match: COMPLETE
@@ -194,17 +228,19 @@ success_criteria:
   mode: string
   match: DONE
   file: '{log_file}'"""
+    )
 
 
 def test_merged_applications_section(mock_low_high_config):
-    low_path = mock_low_high_config.scopes['low'].path
-    high_path = mock_low_high_config.scopes['high'].path
+    low_path = mock_low_high_config.scopes["low"].path
+    high_path = mock_low_high_config.scopes["high"].path
 
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, 'applications.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(low_path, "applications.yaml"), "w") as f:
+        f.write(
+            """\
 applications:
   foo:
     workloads:
@@ -213,10 +249,12 @@ applications:
           test:
             variables:
               my_var: value
-''')
+"""
+        )
 
-    with open(os.path.join(high_path, 'applications.yaml'), 'w') as f:
-        f.write('''\
+    with open(os.path.join(high_path, "applications.yaml"), "w") as f:
+        f.write(
+            """\
 applications:
   foo:
     workloads:
@@ -237,9 +275,12 @@ applications:
           single:
             variables:
               n_ranks: 1
-''')
+"""
+        )
 
-    assert config('get', 'applications').strip() == """applications:
+    assert (
+        config("get", "applications").strip()
+        == """applications:
   foo:
     workloads:
       bar:
@@ -262,160 +303,188 @@ applications:
           single:
             variables:
               n_ranks: 1"""
+    )
 
 
 def test_config_edit():
     """Ensure `ramble config edit` edits the right paths."""
 
-    dms = ramble.config.default_modify_scope('config')
+    dms = ramble.config.default_modify_scope("config")
     dms_path = ramble.config.config.scopes[dms].path
-    user_path = ramble.config.config.scopes['user'].path
+    user_path = ramble.config.config.scopes["user"].path
 
-    comp_path = os.path.join(dms_path, 'config.yaml')
-    repos_path = os.path.join(user_path, 'repos.yaml')
+    comp_path = os.path.join(dms_path, "config.yaml")
+    repos_path = os.path.join(user_path, "repos.yaml")
 
-    assert config('edit', '--print-file', 'config').strip() == comp_path
-    assert config('edit', '--print-file', 'repos').strip() == repos_path
+    assert config("edit", "--print-file", "config").strip() == comp_path
+    assert config("edit", "--print-file", "repos").strip() == repos_path
 
 
 def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_apps_repo):
-    ws = ramble.workspace.create('test')
+    ws = ramble.workspace.create("test")
 
-    config('get', fail_on_error=False)
+    config("get", fail_on_error=False)
     assert config.returncode == 1
 
     with ws:
-        config('get', fail_on_error=False)
+        config("get", fail_on_error=False)
         assert config.returncode == 1
 
         ws.write()
 
-        config_output = config('get')
+        config_output = config("get")
 
-        expected_keys = ['applications', 'variables', 'env_vars',
-                         'spack', 'mpi_command', 'batch_submit']
+        expected_keys = [
+            "applications",
+            "variables",
+            "env_vars",
+            "spack",
+            "mpi_command",
+            "batch_submit",
+        ]
 
         for key in expected_keys:
             assert key in config_output
 
 
 def test_config_edit_edits_ramble_yaml(mutable_mock_workspace_path):
-    ws = ramble.workspace.create('test')
+    ws = ramble.workspace.create("test")
     ws.write()
     with ws:
-        assert config('edit', '--print-file').strip() == ramble.workspace.config_file(ws.root)
+        assert config("edit", "--print-file").strip() == ramble.workspace.config_file(ws.root)
 
 
 def test_config_edit_fails_correctly_with_no_workspace(mutable_mock_workspace_path):
-    output = config('edit', '--print-file', fail_on_error=False)
+    output = config("edit", "--print-file", fail_on_error=False)
     assert "requires a section argument or an active workspace" in output
 
 
 def test_config_get_fails_correctly_with_no_workspace(mutable_mock_workspace_path):
-    output = config('get', fail_on_error=False)
+    output = config("get", fail_on_error=False)
     assert "requires a section argument or an active workspace" in output
 
 
 def test_config_list():
-    output = config('list')
-    assert 'config' in output
-    assert 'repos' in output
+    output = config("list")
+    assert "config" in output
+    assert "repos" in output
 
 
 def test_config_add(mutable_empty_config):
-    config('add', 'config:dirty:true')
-    output = config('get', 'config')
+    config("add", "config:dirty:true")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   dirty: true
 """
+    )
 
 
 def test_config_add_list(mutable_empty_config):
-    config('add', 'config:template_dirs:test1')
-    config('add', 'config:template_dirs:[test2]')
-    config('add', 'config:template_dirs:test3')
-    output = config('get', 'config')
+    config("add", "config:template_dirs:test1")
+    config("add", "config:template_dirs:[test2]")
+    config("add", "config:template_dirs:test3")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs:
   - test3
   - test2
   - test1
 """
+    )
 
 
 def test_config_add_override(mutable_empty_config):
-    config('--scope', 'site', 'add', 'config:template_dirs:test1')
-    config('add', 'config:template_dirs:[test2]')
-    output = config('get', 'config')
+    config("--scope", "site", "add", "config:template_dirs:test1")
+    config("add", "config:template_dirs:[test2]")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs:
   - test2
   - test1
 """
+    )
 
-    config('add', 'config::template_dirs:[test2]')
-    output = config('get', 'config')
+    config("add", "config::template_dirs:[test2]")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs:
   - test2
 """
+    )
 
 
 def test_config_add_override_leaf(mutable_empty_config):
-    config('--scope', 'site', 'add', 'config:template_dirs:test1')
-    config('add', 'config:template_dirs:[test2]')
-    output = config('get', 'config')
+    config("--scope", "site", "add", "config:template_dirs:test1")
+    config("add", "config:template_dirs:[test2]")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs:
   - test2
   - test1
 """
+    )
 
-    config('add', 'config:template_dirs::[test2]')
-    output = config('get', 'config')
+    config("add", "config:template_dirs::[test2]")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   'template_dirs:':
   - test2
 """
+    )
 
 
 def test_config_add_update_dict(mutable_empty_config):
-    config('add', 'config:test_conf:version:[1.0.0]')
-    output = config('get', 'config')
+    config("add", "config:test_conf:version:[1.0.0]")
+    output = config("get", "config")
 
-    expected = 'config:\n  test_conf:\n    version: [1.0.0]\n'
+    expected = "config:\n  test_conf:\n    version: [1.0.0]\n"
     assert output == expected
 
 
 def test_config_with_c_argument(mutable_empty_config):
 
     # I don't know how to add a ramble argument to a Ramble Command, so we test this way
-    config_file = 'config:install_root:root:/path/to/config.yaml'
+    config_file = "config:install_root:root:/path/to/config.yaml"
     parser = ramble.main.make_argument_parser()
-    args = parser.parse_args(['-c', config_file])
+    args = parser.parse_args(["-c", config_file])
     assert config_file in args.config_vars
 
     # Add the path to the config
-    config("add", args.config_vars[0], scope='command_line')
-    output = config("get", 'config')
+    config("add", args.config_vars[0], scope="command_line")
+    output = config("get", "config")
     assert "config:\n  install_root:\n    root: /path/to/config.yaml" in output
 
 
 def test_config_add_ordered_dict(mutable_empty_config):
-    config('add', 'config:first:/path/to/first')
-    config('add', 'config:second:/path/to/second')
-    output = config('get', 'config')
+    config("add", "config:first:/path/to/first")
+    config("add", "config:second:/path/to/second")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   first: /path/to/first
   second: /path/to/second
 """
+    )
 
 
 def test_config_add_from_file(mutable_empty_config, tmpdir):
@@ -423,15 +492,18 @@ def test_config_add_from_file(mutable_empty_config, tmpdir):
   dirty: true
 """
 
-    file = str(tmpdir.join('my_conf.yaml'))
-    with open(file, 'w') as f:
+    file = str(tmpdir.join("my_conf.yaml"))
+    with open(file, "w") as f:
         f.write(contents)
-    config('add', '-f', file)
-    output = config('get', 'config')
+    config("add", "-f", file)
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   dirty: true
 """
+    )
 
 
 def test_config_add_from_file_multiple(mutable_empty_config, tmpdir):
@@ -440,50 +512,59 @@ def test_config_add_from_file_multiple(mutable_empty_config, tmpdir):
   template_dirs: [test1]
 """
 
-    file = str(tmpdir.join('my_conf.yaml'))
-    with open(file, 'w') as f:
+    file = str(tmpdir.join("my_conf.yaml"))
+    with open(file, "w") as f:
         f.write(contents)
-    config('add', '-f', file)
-    output = config('get', 'config')
+    config("add", "-f", file)
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   dirty: true
   template_dirs: [test1]
 """
+    )
 
 
 def test_config_add_override_from_file(mutable_empty_config, tmpdir):
-    config('--scope', 'site', 'add', 'config:template_dirs:test1')
+    config("--scope", "site", "add", "config:template_dirs:test1")
     contents = """config::
   template_dirs: [test2]
 """
 
-    file = str(tmpdir.join('my_conf.yaml'))
-    with open(file, 'w') as f:
+    file = str(tmpdir.join("my_conf.yaml"))
+    with open(file, "w") as f:
         f.write(contents)
-    config('add', '-f', file)
-    output = config('get', 'config')
+    config("add", "-f", file)
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs: [test2]
 """
+    )
 
 
 def test_config_add_override_leaf_from_file(mutable_empty_config, tmpdir):
-    config('--scope', 'site', 'add', 'config:template_dirs:test1')
+    config("--scope", "site", "add", "config:template_dirs:test1")
     contents = """config:
   template_dirs:: [test2]
 """
 
-    file = str(tmpdir.join('my_conf.yaml'))
-    with open(file, 'w') as f:
+    file = str(tmpdir.join("my_conf.yaml"))
+    with open(file, "w") as f:
         f.write(contents)
-    config('add', '-f', file)
-    output = config('get', 'config')
+    config("add", "-f", file)
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   'template_dirs:': [test2]
 """
+    )
 
 
 def test_config_add_invalid_file_fails(tmpdir):
@@ -494,76 +575,89 @@ def test_config_add_invalid_file_fails(tmpdir):
 """
 
     # create temp file and add it to config
-    file = str(tmpdir.join('my_conf.yaml'))
-    with open(file, 'w') as f:
+    file = str(tmpdir.join("my_conf.yaml"))
+    with open(file, "w") as f:
         f.write(contents)
 
-    with pytest.raises(
-        (ramble.config.ConfigFormatError)
-    ):
-        config('add', '-f', file)
+    with pytest.raises((ramble.config.ConfigFormatError)):
+        config("add", "-f", file)
 
 
 def test_config_remove_value(mutable_empty_config):
-    config('add', 'config:dirty:true')
-    config('remove', 'config:dirty:true')
-    output = config('get', 'config')
+    config("add", "config:dirty:true")
+    config("remove", "config:dirty:true")
+    output = config("get", "config")
 
-    assert output == """config: {}
+    assert (
+        output
+        == """config: {}
 """
+    )
 
 
 def test_config_remove_alias_rm(mutable_empty_config):
-    config('add', 'config:dirty:true')
-    config('rm', 'config:dirty:true')
-    output = config('get', 'config')
+    config("add", "config:dirty:true")
+    config("rm", "config:dirty:true")
+    output = config("get", "config")
 
-    assert output == """config: {}
+    assert (
+        output
+        == """config: {}
 """
+    )
 
 
 def test_config_remove_dict(mutable_empty_config):
-    config('add', 'config:dirty:true')
-    config('rm', 'config:dirty')
-    output = config('get', 'config')
+    config("add", "config:dirty:true")
+    config("rm", "config:dirty")
+    output = config("get", "config")
 
-    assert output == """config: {}
+    assert (
+        output
+        == """config: {}
 """
+    )
 
 
 def test_remove_from_list(mutable_empty_config):
-    config('add', 'config:template_dirs:test1')
-    config('add', 'config:template_dirs:[test2]')
-    config('add', 'config:template_dirs:test3')
-    config('remove', 'config:template_dirs:test2')
-    output = config('get', 'config')
+    config("add", "config:template_dirs:test1")
+    config("add", "config:template_dirs:[test2]")
+    config("add", "config:template_dirs:test3")
+    config("remove", "config:template_dirs:test2")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs:
   - test3
   - test1
 """
+    )
 
 
 def test_remove_list(mutable_empty_config):
-    config('add', 'config:template_dirs:test1')
-    config('add', 'config:template_dirs:[test2]')
-    config('add', 'config:template_dirs:test3')
-    config('remove', 'config:template_dirs:[test2]')
-    output = config('get', 'config')
+    config("add", "config:template_dirs:test1")
+    config("add", "config:template_dirs:[test2]")
+    config("add", "config:template_dirs:test3")
+    config("remove", "config:template_dirs:[test2]")
+    output = config("get", "config")
 
-    assert output == """config:
+    assert (
+        output
+        == """config:
   template_dirs:
   - test3
   - test1
 """
+    )
 
 
 def test_config_add_to_workspace(mutable_empty_config, mutable_mock_workspace_path):
-    workspace('create', 'test')
-    with ramble.workspace.read('test'):
-        config('add', 'config:dirty:true')
-        output = config('get')
+    workspace("create", "test")
+    with ramble.workspace.read("test"):
+        config("add", "config:dirty:true")
+        output = config("get")
 
     expected = """  config:
     dirty: true
@@ -571,9 +665,9 @@ def test_config_add_to_workspace(mutable_empty_config, mutable_mock_workspace_pa
     assert expected in output
 
 
-def test_config_add_to_workspace_preserve_comments(mutable_empty_config,
-                                                   mutable_mock_workspace_path,
-                                                   tmpdir):
+def test_config_add_to_workspace_preserve_comments(
+    mutable_empty_config, mutable_mock_workspace_path, tmpdir
+):
     workspace = ramble.workspace.Workspace(str(tmpdir))
     workspace.write()
     filepath = ramble.workspace.config_file(workspace.root)
@@ -591,12 +685,12 @@ ramble:  # comment
                 n_nodes: '1'
                 processors_per_node: '1'
 """
-    with open(filepath, 'w') as f:
+    with open(filepath, "w") as f:
         f.write(contents)
 
     with workspace:
-        config('add', 'config:dirty:true')
-        output = config('get')
+        config("add", "config:dirty:true")
+        output = config("get")
 
     expected = contents
     expected += """  config:
@@ -609,14 +703,14 @@ ramble:  # comment
 def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspace_path):
     import io
 
-    workspace('create', 'test')
+    workspace("create", "test")
 
-    with ramble.workspace.read('test'):
-        config('add', 'config:dirty:true')
+    with ramble.workspace.read("test"):
+        config("add", "config:dirty:true")
 
-    with ramble.workspace.read('test'):
-        config('rm', 'config:dirty')
-        output = config('get')
+    with ramble.workspace.read("test"):
+        config("rm", "config:dirty")
+        output = config("get")
 
     expected = ramble.workspace.default_config_yaml()
     expected += """  config: {}
@@ -636,9 +730,9 @@ def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspa
 
 
 def test_config_update_not_needed(mutable_config):
-    data_before = ramble.config.get('repos')
-    config('update', '-y', 'repos')
-    data_after = ramble.config.get('repos')
+    data_before = ramble.config.get("repos")
+    config("update", "-y", "repos")
+    data_after = ramble.config.get("repos")
     assert data_before == data_after
 
 
@@ -658,18 +752,18 @@ def test_config_update_not_needed(mutable_config):
 
 def test_config_revert(config_yaml_v015):
     cfg_file = config_yaml_v015()
-    bkp_file = cfg_file + '.bkp'
+    bkp_file = cfg_file + ".bkp"
 
     fs.copy(cfg_file, bkp_file)
 
-    config('add', 'config:dirty:true')
+    config("add", "config:dirty:true")
     md5cfg = fs.md5sum(cfg_file)
 
     # Check that the backup file exists, compute its md5 sum
     assert os.path.exists(bkp_file)
     md5bkp = fs.md5sum(bkp_file)
 
-    config('revert', '-y', 'config')
+    config("revert", "-y", "config")
 
     # Check that the backup file does not exist anymore and
     # that the md5 sum of the configuration file is the same
@@ -718,24 +812,24 @@ def test_config_revert(config_yaml_v015):
 
 
 def check_config_updated(data):
-    assert isinstance(data['install_tree'], dict)
-    assert data['install_tree']['root'] == '/fake/path'
-    assert data['install_tree']['projections'] == {'all': '{name}-{version}'}
+    assert isinstance(data["install_tree"], dict)
+    assert data["install_tree"]["root"] == "/fake/path"
+    assert data["install_tree"]["projections"] == {"all": "{name}-{version}"}
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mock_editor(monkeypatch):
     def _editor(*args, **kwargs):
         return True
 
-    monkeypatch.setattr('ramble.util.editor.editor', _editor)
+    monkeypatch.setattr("ramble.util.editor.editor", _editor)
 
 
 def section_args(section_name):
     class TestArgs(object):
         scope = None
         section = section_name
-        config_command = 'edit'
+        config_command = "edit"
         print_file = False
 
     return TestArgs()

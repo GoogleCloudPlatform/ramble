@@ -37,14 +37,14 @@ properties = union_dicts(
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,
-    ramble.schema.zips.properties
+    ramble.schema.zips.properties,
 )
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/draft-07/schema#',
-    'title': 'Ramble merged configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties,
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Ramble merged configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

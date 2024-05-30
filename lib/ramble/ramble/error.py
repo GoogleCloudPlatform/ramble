@@ -20,7 +20,7 @@ debug = False
 
 class RambleError(Exception):
     """This is the superclass for all Ramble errors.
-       Subclasses can be found in the modules they have to do with.
+    Subclasses can be found in the modules they have to do with.
     """
 
     def __init__(self, message, long_message=None):
@@ -57,7 +57,7 @@ class RambleError(Exception):
         logger.error(self.message)
         if self.long_message:
             sys.stderr.write(self.long_message)
-            sys.stderr.write('\n')
+            sys.stderr.write("\n")
 
         # stack trace, etc. in debug mode.
         if debug:
@@ -84,10 +84,9 @@ class RambleError(Exception):
 
     def __repr__(self):
         args = [repr(self.message), repr(self.long_message)]
-        args = ','.join(args)
-        qualified_name = inspect.getmodule(
-            self).__name__ + '.' + type(self).__name__
-        return qualified_name + '(' + args + ')'
+        args = ",".join(args)
+        qualified_name = inspect.getmodule(self).__name__ + "." + type(self).__name__
+        return qualified_name + "(" + args + ")"
 
     def __reduce__(self):
         return type(self), (self.message, self.long_message)

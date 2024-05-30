@@ -10,7 +10,7 @@ import spack.util.environment
 
 
 class Env:
-    def get_env_set_commands(var_conf, var_set, shell='sh'):
+    def get_env_set_commands(var_conf, var_set, shell="sh"):
         env_mods = spack.util.environment.EnvironmentModifications()
         for var, val in var_conf.items():
             var_set.add(var)
@@ -18,9 +18,9 @@ class Env:
 
         env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
-        return (env_cmds_arr.split('\n'), var_set)
+        return (env_cmds_arr.split("\n"), var_set)
 
-    def get_env_unset_commands(var_conf, var_set, shell='sh'):
+    def get_env_unset_commands(var_conf, var_set, shell="sh"):
         env_mods = spack.util.environment.EnvironmentModifications()
         for var in var_conf:
             if var in var_set:
@@ -29,40 +29,40 @@ class Env:
 
         env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
-        return (env_cmds_arr.split('\n'), var_set)
+        return (env_cmds_arr.split("\n"), var_set)
 
-    def get_env_append_commands(var_conf, var_set, shell='sh'):
+    def get_env_append_commands(var_conf, var_set, shell="sh"):
         env_mods = spack.util.environment.EnvironmentModifications()
 
         append_funcs = {
-            'vars': env_mods.append_flags,
-            'paths': env_mods.append_path,
+            "vars": env_mods.append_flags,
+            "paths": env_mods.append_path,
         }
 
         var_set_orig = var_set.copy()
 
         for append_group in var_conf:
-            sep = ' '
-            if 'var-separator' in append_group:
-                sep = append_group['var-separator']
+            sep = " "
+            if "var-separator" in append_group:
+                sep = append_group["var-separator"]
 
             for group in append_funcs.keys():
                 if group in append_group.keys():
                     for var, val in append_group[group].items():
                         if var not in var_set:
-                            env_mods.set(var, '${%s}' % var)
+                            env_mods.set(var, "${%s}" % var)
                             var_set.add(var)
                         append_funcs[group](var, val, sep=sep)
 
         env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
-        return (env_cmds_arr.split('\n'), var_set_orig)
+        return (env_cmds_arr.split("\n"), var_set_orig)
 
-    def get_env_prepend_commands(var_conf, var_set, shell='sh'):
+    def get_env_prepend_commands(var_conf, var_set, shell="sh"):
         env_mods = spack.util.environment.EnvironmentModifications()
 
         prepend_funcs = {
-            'paths': env_mods.prepend_path,
+            "paths": env_mods.prepend_path,
         }
 
         var_set_orig = var_set.copy()
@@ -71,18 +71,18 @@ class Env:
             for group in prepend_group.keys():
                 for var, val in prepend_group[group].items():
                     if var not in var_set:
-                        env_mods.set(var, '${%s}' % var)
+                        env_mods.set(var, "${%s}" % var)
                         var_set.add(var)
                     prepend_funcs[group](var, val)
 
         env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
-        return (env_cmds_arr.split('\n'), var_set_orig)
+        return (env_cmds_arr.split("\n"), var_set_orig)
 
 
 action_funcs = {
-    'set': Env.get_env_set_commands,
-    'unset': Env.get_env_unset_commands,
-    'append': Env.get_env_append_commands,
-    'prepend': Env.get_env_prepend_commands
+    "set": Env.get_env_set_commands,
+    "unset": Env.get_env_unset_commands,
+    "append": Env.get_env_append_commands,
+    "prepend": Env.get_env_prepend_commands,
 }

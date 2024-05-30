@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+
 def convert_class_attributes(obj):
     """Convert class attributes defined from directives to instance attributes
     Class attributes that are valid for conversion are stored in the _directive_names
@@ -15,7 +16,7 @@ def convert_class_attributes(obj):
         obj (Object): Input object instance to convert attributes in
     """
 
-    if hasattr(obj, '_directive_names'):
+    if hasattr(obj, "_directive_names"):
         dir_set = dir(obj)
         var_set = vars(obj)
         for attr in obj._directive_names:

@@ -14,37 +14,28 @@
 
 #: Properties for inclusion in other schemas
 properties = {
-    'formatted_executables': {
-        'type': 'object',
-        'default': {},
-        'properties': {},
-        'additionalProperties': {
-            'type': 'object',
-            'default': {},
-            'additionalProperties': False,
-            'properties':  {
-                'prefix': {
-                    'type': 'string',
-                    'default': ''
-                },
-                'indentation': {
-                    'type': 'number',
-                    'default': 0
-                },
-                'join_separator': {
-                    'type': 'string',
-                    'default': '\n'
-                }
-            }
-        }
+    "formatted_executables": {
+        "type": "object",
+        "default": {},
+        "properties": {},
+        "additionalProperties": {
+            "type": "object",
+            "default": {},
+            "additionalProperties": False,
+            "properties": {
+                "prefix": {"type": "string", "default": ""},
+                "indentation": {"type": "number", "default": 0},
+                "join_separator": {"type": "string", "default": "\n"},
+            },
+        },
     }
 }
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble formatted executables configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble formatted executables configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

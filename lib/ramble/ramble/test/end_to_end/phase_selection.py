@@ -19,15 +19,15 @@ from ramble.test.dry_run_helpers import search_files_for_string
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def enable_verbose():
     import llnl.util.tty
+
     old_setting = llnl.util.tty._verbose
     llnl.util.tty._verbose = True
     yield
@@ -109,35 +109,36 @@ licenses:
       WRF_LICENSE: port@server
 """
 
-    workspace_name = 'test_end_to_end_wrfv4'
+    workspace_name = "test_end_to_end_wrfv4"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
-        license_path = os.path.join(ws1.config_dir, 'licenses.yaml')
+        license_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
-        aux_software_path = os.path.join(ws1.config_dir,
-                                         ramble.workspace.auxiliary_software_dir_name)
-        aux_software_files = ['packages.yaml', 'my_test.sh']
+        aux_software_path = os.path.join(
+            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+        )
+        aux_software_files = ["packages.yaml", "my_test.sh"]
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
-        with open(license_path, 'w+') as f:
+        with open(license_path, "w+") as f:
             f.write(test_licenses)
 
         for file in aux_software_files:
             file_path = os.path.join(aux_software_path, file)
-            with open(file_path, 'w+') as f:
-                f.write('')
+            with open(file_path, "w+") as f:
+                f.write("")
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, 'full_command.tpl'), 'w+') as f:
-            f.write('{command}')
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+            f.write("{command}")
 
         ws1._re_read()
 
-        output = workspace('info', '-vv', global_args=['-w', workspace_name])
+        output = workspace("info", "-vv", global_args=["-w", workspace_name])
         assert "Phases for setup pipeline:" in output
         assert "get_inputs" in output
         assert "make_experiments" in output
@@ -145,10 +146,16 @@ licenses:
         assert "Phases for archive pipeline:" in output
         assert "Phases for mirror pipeline:" in output
 
-        workspace('setup', '--phases', 'get_*', 'make_*', '--dry-run',
-                           global_args=['-v', '-w', workspace_name])
+        workspace(
+            "setup",
+            "--phases",
+            "get_*",
+            "make_*",
+            "--dry-run",
+            global_args=["-v", "-w", workspace_name],
+        )
 
-        out_files = glob.glob(os.path.join(ws1.log_dir, '**', '*.out'), recursive=True)
+        out_files = glob.glob(os.path.join(ws1.log_dir, "**", "*.out"), recursive=True)
 
-        assert search_files_for_string(out_files, 'Executing phase get_inputs')
-        assert search_files_for_string(out_files, 'Executing phase make_experiments')
+        assert search_files_for_string(out_files, "Executing phase get_inputs")
+        assert search_files_for_string(out_files, "Executing phase make_experiments")

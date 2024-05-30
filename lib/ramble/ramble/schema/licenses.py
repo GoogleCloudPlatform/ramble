@@ -18,51 +18,51 @@ dictionary_of_strings_or_num = spack.schema.environment.dictionary_of_strings_or
 array_of_strings_or_num = spack.schema.environment.array_of_strings_or_num
 
 env_var_actions = {
-    'set': dictionary_of_strings_or_num,
-    'append': {
-        'type': 'array',
-        'items': {
-            'type': 'object',
-            'properties': {
-                'var-separator': {'type': 'string'},
-                'vars': dictionary_of_strings_or_num,
-                'paths': dictionary_of_strings_or_num,
+    "set": dictionary_of_strings_or_num,
+    "append": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "var-separator": {"type": "string"},
+                "vars": dictionary_of_strings_or_num,
+                "paths": dictionary_of_strings_or_num,
             },
-            'additionalProperties': {},
-        }
+            "additionalProperties": {},
+        },
     },
-    'prepend': {
-        'type': 'array',
-        'items': {
-            'type': 'object',
-            'properties': {
-                'paths': dictionary_of_strings_or_num,
+    "prepend": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "paths": dictionary_of_strings_or_num,
             },
-            'additionalProperties': {},
-        }
+            "additionalProperties": {},
+        },
     },
-    'unset': array_of_strings_or_num,
+    "unset": array_of_strings_or_num,
 }
 
 licenses_schema = {
-    'licenses': {
-        'type': 'object',
-        'default': {},
-        'properties': {},
-        'additionalProperties': {
-            'type': 'object',
-            'default': {},
-            'additionalProperties': False,
-            'properties': env_var_actions
-        }
+    "licenses": {
+        "type": "object",
+        "default": {},
+        "properties": {},
+        "additionalProperties": {
+            "type": "object",
+            "default": {},
+            "additionalProperties": False,
+            "properties": env_var_actions,
+        },
     }
 }
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble licenses configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': licenses_schema
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble licenses configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": licenses_schema,
 }

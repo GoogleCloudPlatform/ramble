@@ -17,17 +17,16 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path):
-    test_scopes = ['site', 'system', 'user']
+    test_scopes = ["site", "system", "user"]
 
-    var_name1 = 'test1'
-    var_name2 = 'envtestvar'
+    var_name1 = "test1"
+    var_name2 = "envtestvar"
     var_val = 3
 
     test_config = """
@@ -67,31 +66,33 @@ ramble:
         packages:
         - openfoam
         - intel
-""" .format(*test_scopes, var_name=var_name1)
+""".format(
+        *test_scopes, var_name=var_name1
+    )
 
-    config = ramble.main.RambleCommand('config')
+    config = ramble.main.RambleCommand("config")
 
     expected_experiments = []
     for scope in test_scopes:
-        config('--scope', scope, 'add', f'variables:{var_name1}:{var_val}')
-        expected_experiments.append(f'{scope}_test_{var_val}')
+        config("--scope", scope, "add", f"variables:{var_name1}:{var_val}")
+        expected_experiments.append(f"{scope}_test_{var_val}")
 
     for i, scope in enumerate(test_scopes):
-        config('--scope', scope, 'add', f'env_vars:set:{var_name2}{i}:{var_val}')
+        config("--scope", scope, "add", f"env_vars:set:{var_name2}{i}:{var_val}")
 
-    workspace_name = 'test_sitevar'
+    workspace_name = "test_sitevar"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
 
-        workspace('setup', '--dry-run', global_args=['-w', workspace_name])
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-        software_dir = 'openfoam'
+        software_dir = "openfoam"
         software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
         assert os.path.exists(software_base_dir)
 
@@ -99,11 +100,11 @@ ramble:
         assert os.path.exists(software_path)
 
         for i, exp in enumerate(expected_experiments):
-            exp_dir = os.path.join(ws.root, 'experiments', 'openfoam', 'motorbike', exp)
+            exp_dir = os.path.join(ws.root, "experiments", "openfoam", "motorbike", exp)
             assert os.path.isdir(exp_dir)
-            assert os.path.exists(os.path.join(exp_dir, 'execute_experiment'))
+            assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
 
-            with open(os.path.join(exp_dir, 'execute_experiment'), 'r') as f:
+            with open(os.path.join(exp_dir, "execute_experiment"), "r") as f:
                 data = f.read()
                 # Test the license exists
                 assert f"export {var_name2}{i}={var_val}" in data

@@ -40,12 +40,12 @@ def read_config_file(conf_path: str):
     Returns:
         (dict): Dictionary representation of the data contained in conf_path
     """
-    with open(conf_path, 'r') as base_conf:
-        logger.debug(f'Reading config from {conf_path}')
+    with open(conf_path, "r") as base_conf:
+        logger.debug(f"Reading config from {conf_path}")
         try:
             config_dict = yaml.safe_load(base_conf)
         except yaml.YAMLError:
-            logger.die(f'YAML Error: Failed to load data from {conf_path}')
+            logger.die(f"YAML Error: Failed to load data from {conf_path}")
 
     return config_dict
 
@@ -70,9 +70,9 @@ def all_config_options(config_data: Dict):
 
         if isinstance(cur_part[1], dict):
             for level in cur_part[1]:
-                option_parts.insert(0, (f'{cur_part[0]}.{level}', cur_part[1][level]))
+                option_parts.insert(0, (f"{cur_part[0]}.{level}", cur_part[1][level]))
         else:
-            if len(cur_part[0].split('.')) > 1:
+            if len(cur_part[0].split(".")) > 1:
                 all_configs.add(cur_part[0])
 
     return all_configs
@@ -91,7 +91,7 @@ def get_config_value(config_data: Dict, option_name: str):
     Returns:
         (Any): Value of config option
     """
-    option_parts = option_name.split('.')
+    option_parts = option_name.split(".")
 
     option_scope = config_data
 
@@ -118,7 +118,7 @@ def set_config_value(config_data: Dict, option_name: str, option_value: Any):
         option_name (str): Name of config option to set
         option_value (any): Value to set config option to
     """
-    option_parts = option_name.split('.')
+    option_parts = option_name.split(".")
 
     option_scope = config_data
 
@@ -149,7 +149,7 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
 
     # Set all '{default_config_value}' values to value from the base config
     for var_name, var_def in workload.variables.items():
-        if len(var_name.split('.')) > 1:
+        if len(var_name.split(".")) > 1:
             var_val = app_inst.expander.expand_var(app_inst.expander.expansion_str(var_name))
 
             if var_val == default_config_string:

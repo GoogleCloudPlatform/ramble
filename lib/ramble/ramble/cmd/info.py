@@ -10,9 +10,9 @@ import ramble.cmd.common.info
 import ramble.repository
 
 
-description = 'get detailed information on a particular application'
-section = 'basic'
-level = 'short'
+description = "get detailed information on a particular application"
+section = "basic"
+level = "short"
 
 app_type = ramble.repository.ObjectTypes.applications
 

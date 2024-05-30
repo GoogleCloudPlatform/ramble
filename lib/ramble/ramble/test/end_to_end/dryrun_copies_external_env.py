@@ -19,10 +19,9 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir):
@@ -32,7 +31,7 @@ spack:
 """
 
     env_path = str(tmpdir)
-    with open(os.path.join(env_path, 'spack.yaml'), 'w+') as f:
+    with open(os.path.join(env_path, "spack.yaml"), "w+") as f:
         f.write(test_spack_env)
 
     test_config = f"""
@@ -62,13 +61,13 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = 'test_dryrun_copies_external_env'
+    workspace_name = "test_dryrun_copies_external_env"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -77,9 +76,9 @@ ramble:
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
 
-        env_file = os.path.join(ws.software_dir, 'wrfv4', 'spack.yaml')
+        env_file = os.path.join(ws.software_dir, "wrfv4", "spack.yaml")
 
         assert os.path.exists(env_file)
 
-        with open(env_file, 'r') as f:
-            assert 'wrf' in f.read()
+        with open(env_file, "r") as f:
+            assert "wrf" in f.read()

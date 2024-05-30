@@ -24,7 +24,7 @@ from spack.util.executable import which_string
 
 
 #: editors to try if VISUAL and EDITOR are not set
-_default_editors = ['vim', 'vi', 'emacs', 'nano']
+_default_editors = ["vim", "vi", "emacs", "nano"]
 
 
 def _find_exe_from_env_var(var):
@@ -74,7 +74,7 @@ def editor(*args, **kwargs):
 
     """
     # allow this to be customized for testing
-    _exec_func = kwargs.get('_exec_func', os.execv)
+    _exec_func = kwargs.get("_exec_func", os.execv)
 
     def try_exec(exe, args, var=None):
         """Try to execute an editor with execv, and warn if it fails.
@@ -88,13 +88,13 @@ def editor(*args, **kwargs):
             return True
 
         except OSError as e:
-            if ramble.config.get('config:debug'):
+            if ramble.config.get("config:debug"):
                 raise
 
             # Show variable we were trying to use, if it's from one
             if var:
-                exe = '$%s (%s)' % (var, exe)
-            logger.warn(f'Could not execute {exe} due to error: {e}')
+                exe = "$%s (%s)" % (var, exe)
+            logger.warn(f"Could not execute {exe} due to error: {e}")
             return False
 
     def try_env_var(var):
@@ -108,16 +108,16 @@ def editor(*args, **kwargs):
 
         exe, editor_args = _find_exe_from_env_var(var)
         if not exe:
-            logger.warn(f'${var} is not an executable: {os.environ[var]}')
+            logger.warn(f"${var} is not an executable: {os.environ[var]}")
             return False
 
         full_args = editor_args + list(args)
         return try_exec(exe, full_args, var)
 
     # try standard environment variables
-    if try_env_var('VISUAL'):
+    if try_env_var("VISUAL"):
         return
-    if try_env_var('EDITOR'):
+    if try_env_var("EDITOR"):
         return
 
     # nothing worked -- try the first default we can find don't bother
@@ -129,5 +129,6 @@ def editor(*args, **kwargs):
 
     # Fail if nothing could be found
     raise EnvironmentError(
-        'No text editor found! Please set the VISUAL and/or EDITOR '
-        'environment variable(s) to your preferred text editor.')
+        "No text editor found! Please set the VISUAL and/or EDITOR "
+        "environment variable(s) to your preferred text editor."
+    )

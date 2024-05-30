@@ -17,4 +17,4 @@ class SetCache:
         self.store.add(tupl)
 
     def contains(self, tupl):
-        return (tupl in self.store)
+        return tupl in self.store

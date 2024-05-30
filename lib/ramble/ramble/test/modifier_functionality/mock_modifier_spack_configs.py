@@ -15,26 +15,25 @@ import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.main import RambleCommand
 
-workspace = RambleCommand('workspace')
+workspace = RambleCommand("workspace")
 
 
 @pytest.mark.parametrize(
-    'scope',
+    "scope",
     [
         SCOPES.workspace,
         SCOPES.application,
         SCOPES.workload,
         SCOPES.experiment,
-    ]
+    ],
 )
-def test_gromacs_mock_spack_config_mod(mutable_mock_workspace_path,
-                                       mutable_applications,
-                                       mock_modifiers,
-                                       scope):
-    workspace_name = 'test_gromacs_mock_spack_config_mod'
+def test_gromacs_mock_spack_config_mod(
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope
+):
+    workspace_name = "test_gromacs_mock_spack_config_mod"
 
     test_modifiers = [
-        (scope, modifier_helpers.named_modifier('spack-mod')),
+        (scope, modifier_helpers.named_modifier("spack-mod")),
     ]
 
     with ramble.workspace.create(workspace_name) as ws1:
@@ -42,22 +41,22 @@ def test_gromacs_mock_spack_config_mod(mutable_mock_workspace_path,
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        dry_run_config('modifiers', test_modifiers, config_path, 'gromacs', 'water_bare')
+        dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 
         ws1._re_read()
 
-        workspace('concretize', global_args=['-D', ws1.root])
-        workspace('setup', '--dry-run', global_args=['-D', ws1.root])
-        exp_script = os.path.join(ws1.experiment_dir, 'gromacs', 'water_bare',
-                                  'test_exp', 'execute_experiment')
+        workspace("concretize", global_args=["-D", ws1.root])
+        workspace("setup", "--dry-run", global_args=["-D", ws1.root])
+        exp_script = os.path.join(
+            ws1.experiment_dir, "gromacs", "water_bare", "test_exp", "execute_experiment"
+        )
 
         assert os.path.isfile(exp_script)
 
-        spack_yaml = os.path.join(ws1.software_dir, 'gromacs',
-                                  'spack.yaml')
+        spack_yaml = os.path.join(ws1.software_dir, "gromacs", "spack.yaml")
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml, 'r') as f:
+        with open(spack_yaml, "r") as f:
             data = f.read()
 
-            assert 'debug: true' in data
+            assert "debug: true" in data

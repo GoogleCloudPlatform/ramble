@@ -13,29 +13,20 @@
 """  # noqa E501
 
 
-zip_def = {
-    'type': 'array',
-    'default': [],
-    'items': {'type': 'string'}
-}
+zip_def = {"type": "array", "default": [], "items": {"type": "string"}}
 
-zips_def = {
-    'type': 'object',
-    'default': {},
-    'properties': {},
-    'additionalProperties': zip_def
-}
+zips_def = {"type": "object", "default": {}, "properties": {}, "additionalProperties": zip_def}
 
 #: Properties for inclusion in other schemas
 properties = {
-    'zips': zips_def,
+    "zips": zips_def,
 }
 
 #: Full schema with metadata
 schema = {
-    '$schema': 'http://json-schema.org/schema#',
-    'title': 'Ramble zips configuration file schema',
-    'type': 'object',
-    'additionalProperties': False,
-    'properties': properties
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Ramble zips configuration file schema",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": properties,
 }

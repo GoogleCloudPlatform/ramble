@@ -17,11 +17,10 @@ from ramble.main import RambleCommand
 
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures('mutable_config',
-                                     'mutable_mock_workspace_path')
+pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-workspace = RambleCommand('workspace')
-on = RambleCommand('on')
+workspace = RambleCommand("workspace")
+on = RambleCommand("on")
 
 
 def check_output(output, compared_list, contains=False):
@@ -33,22 +32,23 @@ def check_output(output, compared_list, contains=False):
 
 
 @pytest.mark.parametrize(
-    'tag,expected_experiments,unexpected_experiments',
+    "tag,expected_experiments,unexpected_experiments",
     [
         (
-            'first',
-            [
-                'workload-tags.test_wl.first_experiment'
-            ],
-            [
-                'workload-tags.test_wl2.second_experiment'
-            ]
+            "first",
+            ["workload-tags.test_wl.first_experiment"],
+            ["workload-tags.test_wl2.second_experiment"],
         )
-    ]
+    ],
 )
-def test_workspace_tag_filtering(mutable_config, mutable_mock_workspace_path,
-                                 mock_applications, tag, expected_experiments,
-                                 unexpected_experiments):
+def test_workspace_tag_filtering(
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    tag,
+    expected_experiments,
+    unexpected_experiments,
+):
     test_config = """
 ramble:
   variables:
@@ -78,33 +78,32 @@ ramble:
     environments: {}
 """
 
-    workspace_name = f'test_tag_filtering_{tag}'
+    workspace_name = f"test_tag_filtering_{tag}"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
 
-        with open(config_path, 'w+') as f:
+        with open(config_path, "w+") as f:
             f.write(test_config)
 
         ws1._re_read()
 
-        output = workspace('info', '--filter-tags', tag, global_args=['-w', workspace_name])
+        output = workspace("info", "--filter-tags", tag, global_args=["-w", workspace_name])
 
         check_output(output, expected_experiments, contains=True)
         check_output(output, unexpected_experiments, contains=False)
 
-        output = workspace('setup', '--filter-tags', tag,
-                           global_args=['-v', '-w', workspace_name])
+        output = workspace("setup", "--filter-tags", tag, global_args=["-v", "-w", workspace_name])
 
         check_output(output, expected_experiments, contains=True)
         check_output(output, unexpected_experiments, contains=False)
 
-        output = on('--filter-tags', tag,
-                    global_args=['-v', '-w', workspace_name])
+        output = on("--filter-tags", tag, global_args=["-v", "-w", workspace_name])
 
-        output = workspace('analyze', '--filter-tags', tag,
-                           global_args=['-v', '-w', workspace_name])
+        output = workspace(
+            "analyze", "--filter-tags", tag, global_args=["-v", "-w", workspace_name]
+        )
 
         check_output(output, expected_experiments, contains=True)
         check_output(output, unexpected_experiments, contains=False)

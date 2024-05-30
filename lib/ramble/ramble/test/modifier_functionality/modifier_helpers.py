@@ -25,16 +25,16 @@ def check_software_env(base_dir, tests):
         env_dir = os.path.join(base_dir, test_env)
         assert os.path.exists(env_dir)
 
-        spack_file = os.path.join(env_dir, 'spack.yaml')
+        spack_file = os.path.join(env_dir, "spack.yaml")
         assert os.path.isfile(spack_file)
 
-        with open(spack_file, 'r') as f:
+        with open(spack_file, "r") as f:
             assert test_content in f.read()
 
 
 def check_execute_script(script_path, tests):
     assert os.path.isfile(script_path)
-    with open(script_path, 'r') as f:
+    with open(script_path, "r") as f:
         data = f.read()
         for test in tests:
             assert test in data
@@ -42,77 +42,69 @@ def check_execute_script(script_path, tests):
 
 def named_modifier(name):
     modifier_def = syaml.syaml_dict()
-    modifier_def['name'] = name
+    modifier_def["name"] = name
     return modifier_def
 
 
 def intel_aps_modifier():
-    modifier_def = named_modifier('intel-aps')
-    modifier_def['mode'] = 'mpi'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("intel-aps")
+    modifier_def["mode"] = "mpi"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def intel_aps_answer():
-    expected_software = [
-        ('gromacs', 'intel-oneapi-vtune'),
-        ('gromacs', 'gromacs')
-    ]
-    expected_strs = [
-        'aps -c mpi',
-        'aps-report'
-    ]
+    expected_software = [("gromacs", "intel-oneapi-vtune"), ("gromacs", "gromacs")]
+    expected_strs = ["aps -c mpi", "aps-report"]
     return expected_software, expected_strs
 
 
 def lscpu_modifier():
-    modifier_def = named_modifier('lscpu')
-    modifier_def['mode'] = 'standard'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("lscpu")
+    modifier_def["mode"] = "standard"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def lscpu_answer():
     expected_software = [
-        ('gromacs', 'gromacs'),
+        ("gromacs", "gromacs"),
     ]
     expected_strs = [
-        'lscpu',
+        "lscpu",
     ]
     return expected_software, expected_strs
 
 
 def env_var_append_paths_modifier():
-    modifier_def = named_modifier('append-env-var-mod-paths')
-    modifier_def['mode'] = 'test'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("append-env-var-mod-paths")
+    modifier_def["mode"] = "test"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def env_var_append_paths_modifier_answer():
     expected_software = [
-        ('gromacs', 'gromacs'),
+        ("gromacs", "gromacs"),
     ]
-    expected_strs = [
-        'export test_var="${test_var}:test_val"'
-    ]
+    expected_strs = ['export test_var="${test_var}:test_val"']
     return expected_software, expected_strs
 
 
 def env_var_append_vars_modifier():
-    modifier_def = named_modifier('append-env-var-mod-vars')
-    modifier_def['mode'] = 'test'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("append-env-var-mod-vars")
+    modifier_def["mode"] = "test"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def env_var_append_vars_modifier_answer():
     expected_software = [
-        ('gromacs', 'gromacs'),
+        ("gromacs", "gromacs"),
     ]
     expected_strs = [
         'export test_var="${test_var},test_val"',
@@ -121,16 +113,16 @@ def env_var_append_vars_modifier_answer():
 
 
 def env_var_prepend_paths_modifier():
-    modifier_def = named_modifier('prepend-env-var-mod-paths')
-    modifier_def['mode'] = 'test'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("prepend-env-var-mod-paths")
+    modifier_def["mode"] = "test"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def env_var_prepend_paths_modifier_answer():
     expected_software = [
-        ('gromacs', 'gromacs'),
+        ("gromacs", "gromacs"),
     ]
     expected_strs = [
         'export test_var="test_val:${test_var}"',
@@ -139,37 +131,34 @@ def env_var_prepend_paths_modifier_answer():
 
 
 def env_var_set_modifier():
-    modifier_def = named_modifier('set-env-var-mod')
-    modifier_def['mode'] = 'test'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("set-env-var-mod")
+    modifier_def["mode"] = "test"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def env_var_set_modifier_answer():
     expected_software = [
-        ('gromacs', 'gromacs'),
+        ("gromacs", "gromacs"),
     ]
-    expected_strs = [
-        'export test_var=test_val',
-        'export mask_env_var="0x0"'
-    ]
+    expected_strs = ["export test_var=test_val", 'export mask_env_var="0x0"']
     return expected_software, expected_strs
 
 
 def env_var_unset_modifier():
-    modifier_def = named_modifier('unset-env-var-mod')
-    modifier_def['mode'] = 'test'
-    modifier_def['on_executable'] = syaml.syaml_list()
-    modifier_def['on_executable'].append('*')
+    modifier_def = named_modifier("unset-env-var-mod")
+    modifier_def["mode"] = "test"
+    modifier_def["on_executable"] = syaml.syaml_list()
+    modifier_def["on_executable"].append("*")
     return modifier_def
 
 
 def env_var_unset_modifier_answer():
     expected_software = [
-        ('gromacs', 'gromacs'),
+        ("gromacs", "gromacs"),
     ]
     expected_strs = [
-        'unset test_var',
+        "unset test_var",
     ]
     return expected_software, expected_strs

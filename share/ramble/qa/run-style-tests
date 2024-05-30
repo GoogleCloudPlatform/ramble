@@ -16,7 +16,7 @@
 #     approved exceptions.
 #
 # Usage:
-#     run-flake8-tests
+#     run-style-tests
 #
 ERROR=0
 . "$(dirname $0)/setup.sh"
@@ -27,7 +27,7 @@ fi
 
 
 # verify that the code style is correct
-ramble flake8 -U
+ramble style -U
 if [ $? != 0 ]; then
   ERROR=1
 fi

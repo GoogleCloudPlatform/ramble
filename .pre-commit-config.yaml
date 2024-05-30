@@ -1,9 +1,9 @@
 repos:
 - repo: local
   hooks:
-  - id: flake8
-    name: flake8
-    entry: share/ramble/qa/run-flake8-tests
+  - id: style
+    name: style
+    entry: share/ramble/qa/run-style-tests
     language: system
   - id: short-unit-tests
     name: short-unit-tests

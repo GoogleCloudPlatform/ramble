@@ -17,7 +17,7 @@ class BasicModifier(ModifierBase):
     software to be installed.
     """
 
-    modifier_class = 'BasicModifier'
+    modifier_class = "BasicModifier"
 
     def __init__(self, file_path):
         super().__init__(file_path)

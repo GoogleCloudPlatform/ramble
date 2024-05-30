@@ -30,43 +30,77 @@ level = "long"
 
 def setup_parser(subparser):
     subparser.add_argument(
-        '-H', '--pytest-help', action='store_true', default=False,
-        help="show full pytest help, with advanced options")
+        "-H",
+        "--pytest-help",
+        action="store_true",
+        default=False,
+        help="show full pytest help, with advanced options",
+    )
 
     # extra ramble arguments to list tests
     list_group = subparser.add_argument_group("listing tests")
     list_mutex = list_group.add_mutually_exclusive_group()
     list_mutex.add_argument(
-        '-l', '--list', action='store_const', default=None,
-        dest='list', const='list', help="list test filenames")
+        "-l",
+        "--list",
+        action="store_const",
+        default=None,
+        dest="list",
+        const="list",
+        help="list test filenames",
+    )
     list_mutex.add_argument(
-        '-L', '--list-long', action='store_const', default=None,
-        dest='list', const='long', help="list all test functions")
+        "-L",
+        "--list-long",
+        action="store_const",
+        default=None,
+        dest="list",
+        const="long",
+        help="list all test functions",
+    )
     list_mutex.add_argument(
-        '-N', '--list-names', action='store_const', default=None,
-        dest='list', const='names', help="list full names of all tests")
+        "-N",
+        "--list-names",
+        action="store_const",
+        default=None,
+        dest="list",
+        const="names",
+        help="list full names of all tests",
+    )
 
     # use tests for extension
     subparser.add_argument(
-        '--extension', default=None,
-        help="run test for a given ramble extension")
+        "--extension", default=None, help="run test for a given ramble extension"
+    )
 
     # spell out some common pytest arguments, so they'll show up in help
     pytest_group = subparser.add_argument_group(
-        "common pytest arguments (ramble unit-test --pytest-help for more)")
+        "common pytest arguments (ramble unit-test --pytest-help for more)"
+    )
     pytest_group.add_argument(
-        "-s", action='append_const', dest='parsed_args', const='-s',
-        help="print output while tests run (disable capture)")
+        "-s",
+        action="append_const",
+        dest="parsed_args",
+        const="-s",
+        help="print output while tests run (disable capture)",
+    )
     pytest_group.add_argument(
-        "-k", action='store', metavar="EXPRESSION", dest='expression',
-        help="filter tests by keyword (can also use w/list options)")
+        "-k",
+        action="store",
+        metavar="EXPRESSION",
+        dest="expression",
+        help="filter tests by keyword (can also use w/list options)",
+    )
     pytest_group.add_argument(
-        "--showlocals", action='append_const', dest='parsed_args',
-        const='--showlocals', help="show local variable values in tracebacks")
+        "--showlocals",
+        action="append_const",
+        dest="parsed_args",
+        const="--showlocals",
+        help="show local variable values in tracebacks",
+    )
 
     # remainder is just passed to pytest
-    subparser.add_argument(
-        'pytest_args', nargs=argparse.REMAINDER, help="arguments for pytest")
+    subparser.add_argument("pytest_args", nargs=argparse.REMAINDER, help="arguments for pytest")
 
 
 def do_list(args, extra_args):
@@ -77,15 +111,14 @@ def do_list(args, extra_args):
         sys.stdout = output = StringIO()
         try:
             import pytest
-            pytest.main(['--collect-only'] + extra_args)
+
+            pytest.main(["--collect-only"] + extra_args)
         except ImportError:
-            logger.die(
-                'Pytest python module not found. Ensure requirements.txt are installed.'
-            )
+            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
     finally:
         sys.stdout = old_output
 
-    lines = output.getvalue().split('\n')
+    lines = output.getvalue().split("\n")
     tests = collections.defaultdict(lambda: set())
     prefix = []
 
@@ -101,7 +134,7 @@ def do_list(args, extra_args):
 
         # strip parametrized tests
         if "[" in name:
-            name = name[:name.index("[")]
+            name = name[: name.index("[")]
 
         depth = len(indent) // 2
 
@@ -116,10 +149,7 @@ def do_list(args, extra_args):
 
     def colorize(c, prefix):
         if isinstance(prefix, tuple):
-            return "::".join(
-                color.colorize("@%s{%s}" % (c, p))
-                for p in prefix if p != "()"
-            )
+            return "::".join(color.colorize("@%s{%s}" % (c, p)) for p in prefix if p != "()")
         return color.colorize("@%s{%s}" % (c, prefix))
 
     if args.list == "list":
@@ -161,14 +191,13 @@ def add_back_pytest_args(args, unknown_args):
 def unit_test(parser, args, unknown_args):
     if args.pytest_help:
         # make the pytest.main help output more accurate
-        sys.argv[0] = 'ramble test'
+        sys.argv[0] = "ramble test"
         try:
             import pytest
-            return pytest.main(['-h'])
+
+            return pytest.main(["-h"])
         except ImportError:
-            logger.die(
-                'Pytest python module not found. Ensure requirements.txt are installed.'
-            )
+            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
@@ -178,7 +207,7 @@ def unit_test(parser, args, unknown_args):
     pytest_root = ramble.paths.ramble_root
     if args.extension:
         target = args.extension
-        extensions = ramble.config.get('config:extensions')
+        extensions = ramble.config.get("config:extensions")
         pytest_root = ramble.extensions.path_for_extension(target, *extensions)
 
     # pytest.ini lives in the root of the ramble repository.
@@ -190,8 +219,9 @@ def unit_test(parser, args, unknown_args):
         with ramble.workspace.no_active_workspace():
             try:
                 import pytest
+
                 return pytest.main(pytest_args)
             except ImportError:
                 logger.die(
-                    'Pytest python module not found. Ensure requirements.txt are installed.'
+                    "Pytest python module not found. Ensure requirements.txt are installed."
                 )

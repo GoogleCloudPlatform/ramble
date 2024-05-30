@@ -39,7 +39,7 @@ class SharedMeta(ramble.language.language_base.DirectiveMeta):
 shared_directive = SharedMeta.directive
 
 
-@shared_directive('archive_patterns')
+@shared_directive("archive_patterns")
 def archive_pattern(pattern):
     """Adds a file pattern to be archived in addition to figure of merit logs
 
@@ -57,7 +57,7 @@ def archive_pattern(pattern):
     return _execute_archive_pattern
 
 
-@shared_directive('figure_of_merit_contexts')
+@shared_directive("figure_of_merit_contexts")
 def figure_of_merit_context(name, regex, output_format):
     """Defines a context for figures of merit
 
@@ -72,17 +72,13 @@ def figure_of_merit_context(name, regex, output_format):
     """
 
     def _execute_figure_of_merit_context(obj):
-        obj.figure_of_merit_contexts[name] = {
-            'regex': regex,
-            'output_format': output_format
-        }
+        obj.figure_of_merit_contexts[name] = {"regex": regex, "output_format": output_format}
 
     return _execute_figure_of_merit_context
 
 
-@shared_directive('figures_of_merit')
-def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units='',
-                    contexts=[]):
+@shared_directive("figures_of_merit")
+def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units="", contexts=[]):
     """Adds a figure of merit to track for this object
 
     Defines a new figure of merit.
@@ -97,17 +93,17 @@ def figure_of_merit(name, fom_regex, group_name, log_file='{log_file}', units=''
 
     def _execute_figure_of_merit(obj):
         obj.figures_of_merit[name] = {
-            'log_file': log_file,
-            'regex': fom_regex,
-            'group_name': group_name,
-            'units': units,
-            'contexts': contexts
+            "log_file": log_file,
+            "regex": fom_regex,
+            "group_name": group_name,
+            "units": units,
+            "contexts": contexts,
         }
 
     return _execute_figure_of_merit
 
 
-@shared_directive('compilers')
+@shared_directive("compilers")
 def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
     """Defines the compiler that will be used with this object
 
@@ -116,17 +112,17 @@ def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
     """
 
     def _execute_define_compiler(obj):
-        if hasattr(obj, 'uses_spack') and getattr(obj, 'uses_spack'):
+        if hasattr(obj, "uses_spack") and getattr(obj, "uses_spack"):
             obj.compilers[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
+                "spack_spec": spack_spec,
+                "compiler_spec": compiler_spec,
+                "compiler": compiler,
             }
 
     return _execute_define_compiler
 
 
-@shared_directive('software_specs')
+@shared_directive("software_specs")
 def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
     """Defines a new software spec needed for this object.
 
@@ -141,19 +137,19 @@ def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
     """
 
     def _execute_software_spec(obj):
-        if hasattr(obj, 'uses_spack') and getattr(obj, 'uses_spack'):
+        if hasattr(obj, "uses_spack") and getattr(obj, "uses_spack"):
 
             # Define the spec
             obj.software_specs[name] = {
-                'spack_spec': spack_spec,
-                'compiler_spec': compiler_spec,
-                'compiler': compiler
+                "spack_spec": spack_spec,
+                "compiler_spec": compiler_spec,
+                "compiler": compiler,
             }
 
     return _execute_software_spec
 
 
-@shared_directive('package_manager_configs')
+@shared_directive("package_manager_configs")
 def package_manager_config(name, config, **kwargs):
     """Defines a config option to set within a package manager
 
@@ -168,7 +164,7 @@ def package_manager_config(name, config, **kwargs):
     return _execute_package_manager_config
 
 
-@shared_directive('required_packages')
+@shared_directive("required_packages")
 def required_package(name):
     """Defines a new spack package that is required for this object
     to function properly.
@@ -180,9 +176,10 @@ def required_package(name):
     return _execute_required_package
 
 
-@shared_directive('success_criteria')
-def success_criteria(name, mode, match=None, file='{log_file}',
-                     fom_name=None, fom_context='null', formula=None):
+@shared_directive("success_criteria")
+def success_criteria(
+    name, mode, match=None, file="{log_file}", fom_name=None, fom_context="null", formula=None
+):
     """Defines a success criteria used by experiments of this object
 
     Adds a new success criteria to this object definition.
@@ -207,22 +204,22 @@ def success_criteria(name, mode, match=None, file='{log_file}',
     def _execute_success_criteria(obj):
         valid_modes = ramble.success_criteria.SuccessCriteria._valid_modes
         if mode not in valid_modes:
-            logger.die(f'Mode {mode} is not valid. Valid values are {valid_modes}')
+            logger.die(f"Mode {mode} is not valid. Valid values are {valid_modes}")
 
         obj.success_criteria[name] = {
-            'mode': mode,
-            'match': match,
-            'file': file,
-            'fom_name': fom_name,
-            'fom_context': fom_context,
-            'formula': formula
+            "mode": mode,
+            "match": match,
+            "file": file,
+            "fom_name": fom_name,
+            "fom_context": fom_context,
+            "formula": formula,
         }
 
     return _execute_success_criteria
 
 
-@shared_directive('builtins')
-def register_builtin(name, required=True, injection_method='prepend', depends_on=[]):
+@shared_directive("builtins")
+def register_builtin(name, required=True, injection_method="prepend", depends_on=[]):
     """Register a builtin
 
     Builtins are methods that return lists of strings. These methods represent
@@ -263,26 +260,29 @@ def register_builtin(name, required=True, injection_method='prepend', depends_on
     - 'prepend' -- This builtin will be injected at the beginning of the executable list
     - 'append' -- This builtin will be injected at the end of the executable list
     """
-    supported_injection_methods = ['prepend', 'append']
+    supported_injection_methods = ["prepend", "append"]
 
     def _store_builtin(obj):
         if injection_method not in supported_injection_methods:
             raise ramble.language.language_base.DirectiveError(
-                f'Object {obj.name} defines builtin {name} with an invalid '
-                f'injection method of {injection_method}.\n'
-                f'Valid methods are {str(supported_injection_methods)}'
+                f"Object {obj.name} defines builtin {name} with an invalid "
+                f"injection method of {injection_method}.\n"
+                f"Valid methods are {str(supported_injection_methods)}"
             )
 
         builtin_name = obj._builtin_name.format(obj_name=obj.name, name=name)
 
-        obj.builtins[builtin_name] = {'name': name,
-                                      'required': required,
-                                      'injection_method': injection_method,
-                                      'depends_on': depends_on.copy()}
+        obj.builtins[builtin_name] = {
+            "name": name,
+            "required": required,
+            "injection_method": injection_method,
+            "depends_on": depends_on.copy(),
+        }
+
     return _store_builtin
 
 
-@shared_directive('phase_definitions')
+@shared_directive("phase_definitions")
 def register_phase(name, pipeline=None, run_before=[], run_after=[]):
     """Register a phase
 
@@ -304,35 +304,36 @@ def register_phase(name, pipeline=None, run_before=[], run_after=[]):
 
     def _execute_register_phase(obj):
         import ramble.util.graph
+
         if pipeline not in obj._pipelines:
             raise ramble.language.language_base.DirectiveError(
-                'Directive register_phase was '
+                "Directive register_phase was "
                 f'given an invalid pipeline "{pipeline}"\n'
-                'Available pipelines are: '
-                f' {obj._pipelines}'
+                "Available pipelines are: "
+                f" {obj._pipelines}"
             )
 
         if not isinstance(run_before, list):
             raise ramble.language.language_base.DirectiveError(
-                'Directive register_phase was '
-                'given an invalid type for '
-                'the run_before attribute in object '
-                f'{obj.name}'
+                "Directive register_phase was "
+                "given an invalid type for "
+                "the run_before attribute in object "
+                f"{obj.name}"
             )
 
         if not isinstance(run_after, list):
             raise ramble.language.language_base.DirectiveError(
-                'Directive register_phase was '
-                'given an invalid type for '
-                'the run_after attribute in object '
-                f'{obj.name}'
+                "Directive register_phase was "
+                "given an invalid type for "
+                "the run_after attribute in object "
+                f"{obj.name}"
             )
 
-        if not hasattr(obj, f'_{name}'):
+        if not hasattr(obj, f"_{name}"):
             raise ramble.language.language_base.DirectiveError(
-                'Directive register_phase was '
-                f'given an undefined phase {name} '
-                f'in object {obj.name}'
+                "Directive register_phase was "
+                f"given an undefined phase {name} "
+                f"in object {obj.name}"
             )
 
         if pipeline not in obj.phase_definitions:
